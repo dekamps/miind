@@ -1,0 +1,2 @@
+SUBDIRS = @SUBDIRS_LIBS@
+

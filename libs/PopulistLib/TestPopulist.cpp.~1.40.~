@@ -1,0 +1,2282 @@
+// Copyright (c) 2005 - 2009 Marc de Kamps
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation 
+//      and/or other materials provided with the distribution.
+//    * Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software 
+//      without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY 
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF 
+// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//      If you use this software in work leading to a scientific publication, you should include a reference there to
+//      the 'currently valid reference', which can be found at http://miind.sourceforge.net
+#include <gsl/gsl_math.h>
+#include <boost/tokenizer.hpp>
+#include <fstream>
+#include "TestDefinitions.h"
+#include "TestPopulist.h"
+#include "../NumtoolsLib/NumtoolsLib.h"
+#include "../DynamicLib/DynamicLib.h"
+#include "../DynamicLib/DynamicLibTest.h"
+#include "../SparseImplementationLib/SparseImplementationTest.h"
+#include "AdaptiveHazard.h"
+#include "AEIFParameter.h"
+#include "aeifdydt.h"
+#include "BasicDefinitions.h"
+#include "CreateTwoPopulationNetworkCode.h"
+#include "DelayActivityTest.h"
+#include "DoubleRebinner.h"
+#include "FitRateComputation.h"
+#include "LimitedNonCirculant.h"
+#include "MuSigmaScalarProduct.h"
+#include "OneDMAlgorithmCode.h"
+#include "OneDMParameter.h"
+#include "PolynomialCirculant.h"
+#include "PopulationAlgorithmCode.h"
+#include "ProbabilityQueue.h"
+#include "LocalDefinitions.h"
+#include "MatrixNonCirculant.h"
+#include "PopulationGridController.h"
+#include "InitializeAlgorithmGrid.h"
+#include "InterpolationRebinner.h"
+#include "TransferTestDefinitions.h"
+#include "TestOUDefinitions.h"
+#include "TestZeroLeakDefinitions.h"
+#include "TestZeroFluxLeakDefinitions.h"
+#include "TestZeroLeakGaussDefinitions.h"
+#include "TwoPopulationTest.h"
+#include "VMatrixCode.h"
+#include "VArray.h"
+#include "VChebyshev.h"
+
+using namespace std;
+using namespace UtilLib;
+using namespace PopulistLib;
+using namespace DynamicLib;
+using namespace NumtoolsLib;
+using namespace SparseImplementationLib;
+
+TestPopulist::TestPopulist (shared_ptr<ostream> p):
+LogStream (p)
+{
+}
+
+TestPopulist::~TestPopulist ()
+{
+}
+
+bool TestPopulist::Execute ()
+{
+	ofstream test("test/bla");
+	if (! test)
+	{
+		cout << "Please create a directory called 'test' here" << endl;
+		return true;
+	}
+
+/* 	if (! InnerProductTest() )
+		return false;
+	Record("InnerProductTest succeeded");
+
+	if (! BinCalculationTest() )
+		return false;
+	Record("BinCalculationTest succeeded");
+
+	if (! ZeroLeakTest() )
+		return false;
+	Record("ZeroLeakTest succeeded");
+
+	// Let commented for the time being
+//	if (! ZeroLeakFluxTest() )
+//		return false;
+//	Record("ZeroLeakFluxTest suceeded" );
+
+	if (! InitialDensityTest() )
+		return false;
+	Record("InitialDensityTest succeeded");
+
+	if (! InterpolationRebinnerTest() )
+              return false;
+	Record("InterpolationRebinnerTest succeeded");
+
+	if (! InterpolationResetTest ())
+		return false;
+	Record ("InterpolationResetTest succeeded");
+
+	if ( ! GammaZTest() )
+		return false;
+	Record("GammaZTest succeeded");
+
+	if ( ! Vkj3Test() )
+		return false;
+	Record("VkjTest succeeded");
+
+	if ( ! NonCirculantTransferTest() )
+		return false;
+	Record("NonCirculantTransferTest succeeded");
+
+	if ( ! GenerateVLookUp() )
+		return false;
+	Record("GenerateVLookUp succeeded");
+
+	if (! VArrayTest() )
+		return false;
+	Record("VArrayTest succeeded");
+
+	if ( ! ChebyshevVTest() )
+		return false;
+	Record ("ChebyshevVTest succeeded");
+
+	if (! DoubleRebinnerTest() )
+		return false;
+	Record("DoubleRebinnerTest succeeded");
+
+	if (! PotentialToBinTest() )
+		return false;
+	Record("PotentialToBinTest succeeded");
+
+	if (! GenerateVDataTest() )
+		return false;
+	Record("GenerateVDataTest succeeded");
+
+	if (! OmurtagetAlTest ())
+		return false;
+	Record("OmurtagetAlTest succeeded");
+
+	if (! OmurtagFitTest () )
+		return false;
+	Record ("OmurtagFitTest succeeded");
+	
+	if (! OmurtagDoubleTest () )
+		return false;
+	Record("OmurtagDoubleTest");
+
+	if ( ! OmurtagPolynomialTest() )
+		return false;
+	Record("OmurtagPolynomialTest succeeded");
+
+	if ( ! OmurtagMatrixTest() )
+		return false;
+	Record("OmurtagMatrixTest succeeded");
+
+	if ( ! ResponseCurveTest() )
+		return false;
+	Record("ResponseCurveTest succeeded");
+
+	if (! ResponseCurveExample() )
+		return false;
+	Record("ResponseCurveExample succeeded");
+
+	if (! TestInhibitory() )
+		return false;
+	Record("TestInhibitory succeeded");
+
+	if (! InhibitionTest() )
+		return false;
+	Record("Inhibitiontest succeeded");
+
+	if (! ZeroLeakGaussTest() )
+		return false;
+	Record("ZeroLeakGausstest succeeded");
+
+	if (! OrnsteinUhlenbeckProcessTest() )
+		return false;
+	Record("OrnsteinUhlenbeckProcessTest succeeded");
+
+//	if (! LeakGaussTest() )
+//		return false;
+//	Record("LeakGausstest succeeded");
+
+	if (! this->TwoPopulationTest() )
+		return false;
+	Record("TwoPopulationTest succeeded");
+
+	if ( ! PrintResponseCurve() )
+		return false;
+	Record("PrintResponseCurve succeeded");
+
+	if ( ! ProbabilityQueueTest() )
+		return false;
+	Record("ProbabilityQueueTest succeeded");
+
+	if ( ! ScalarProductTest() )
+		return false;
+	Record("ScalarProductTest succeeded");
+
+	if ( ! AEIFIntegratorTest() )
+		return false;
+	Record("AEIFIntegratorTest succeeded");
+
+	if (!  HazardFunctionTest() )
+		return false;
+	Record("HazardFunctionTest succeeded");
+
+	if ( ! OneDMTest() )
+		return false;
+	Record("OneDMTest succeeded");
+*/
+	if ( ! BalancedExample() )
+		return false;
+	Record("BalancedExample succeeded");
+
+	return true;
+}
+
+bool TestPopulist::InnerProductTest () const 
+{
+	// deprecated, PopulationAlgorithms defer the calculation
+	// of inner products now to ScalarProduct objects, see the relevant
+	// tests: ScalarProductTest
+	/* 
+	Pop_DynamicNode node1;
+	Pop_DynamicNode node2;
+	Pop_DynamicNode node3;
+
+	node1.SetValue (1.0);
+	node2.SetValue (1.0);
+	node3.SetValue (1.0);
+
+	typedef pair < Pop_DynamicNode *, PopulationConnection > connection;
+	typedef Pop_DynamicNode::predecessor_iterator predecessor_iterator;
+
+	vector < connection > vector_of_connections;
+
+	PopulationConnection connection_1 (1, 1);
+	PopulationConnection connection_2 (1, 2);
+	PopulationConnection connection_3 (1, 3);
+		
+	vector_of_connections.push_back
+	(
+		connection
+		(
+			&node1, 
+			connection_1
+		)
+	);
+
+	vector_of_connections.push_back
+	(
+		connection
+		(
+			&node2, 
+			connection_2
+		)
+	);
+
+	vector_of_connections.push_back
+	(
+		connection
+		(
+			&node3, 
+			connection_3
+		)
+	);
+
+	// Need a concrete Algorithm to calculate the inner product
+	PopulationParameter par_pop;
+	PopulistSpecificParameter par_spec;
+
+	PopulationAlgorithm<> algorithm(PopulistParameter(par_pop,par_spec));
+
+	// clumsy notation, because this Algorithm isn't in a Node
+
+	connection* p = &(*vector_of_connections.begin());
+//	double f_inner_product = 
+//		algorithm.InnerProduct
+//		(
+//			predecessor_iterator(&(*vector_of_connections.begin ())),
+//			predecessor_iterator (&(*vector_of_connections.end ()))
+//		);
+
+//	     if (! Numtools::IsApproximatelyEqualTo
+//			(
+//				f_inner_product, 
+//				6.0, 
+//				1e-10
+//			)
+//		)
+//		       return false;
+//
+*/
+	       return true;
+     }
+
+     bool TestPopulist::BinCalculationTest () const 
+     {
+	     return TestPopulist::GenericOnePopulationTest
+			(
+				BINCALCULATION_RATE,
+				BINCALCULATION_EFFICACY,
+				BINCALCULATION_PARAMETER,
+				BINCALCULATION_PARAMETER_RUN,
+				BINCALCULATION_SPECIFIC
+			);
+     }
+
+     bool TestPopulist::ZeroLeakTest () const
+     {
+	     return TestPopulist::GenericOnePopulationTest
+			(
+				ZEROLEAK_RATE,
+				ZEROLEAK_EFFICACY,
+				ZEROLEAK_PARAMETER,
+				ZEROLEAK_PARAMETER_RUN,
+				ZEROLEAK_SPECIFIC
+			);
+	     return true;
+     }
+
+	 bool TestPopulist::ZeroLeakFluxTest() const
+	 {
+		// The naive MatrixNonCirculantSolver and CirculantSolver should give identical results
+
+		valarray<double> val_stand(N_ZEROLEAKFLUX_BINS);
+		valarray<double> val_mat(N_ZEROLEAKFLUX_BINS);
+		val_stand    = 0.0;
+		val_mat      = 0.0;
+		for (Index icomp = 0; icomp < ZEROLEAKFLUX_H; icomp++)
+		{
+			val_stand[icomp] = icomp;
+			val_mat[icomp]   = icomp;
+		}
+		NonCirculantSolver non_standard;
+		MatrixNonCirculant non_matrix;
+
+		// First for positive H
+		InputParameterSet par_input;
+
+		par_input._H_exc		 = ZEROLEAKFLUX_H;
+		par_input._n_noncirc_exc = N_ZEROLEAKFLUX_BINS;
+	
+		non_standard.Configure
+		(
+			val_stand,
+			par_input
+		);
+
+		non_matrix.Configure
+		(
+			val_mat,
+			par_input
+		);
+
+		non_standard.ExecuteExcitatory
+		(
+			N_ZEROLEAKFLUX_BINS,
+			ZEROLEAKFLUX_TAU
+		);
+	
+		non_matrix.ExecuteExcitatory
+		(
+			N_ZEROLEAKFLUX_BINS,
+			ZEROLEAKFLUX_TAU
+		);
+
+		non_matrix.ExecuteInhibitory
+		(
+			N_ZEROLEAKFLUX_BINS,
+			ZEROLEAKFLUX_TAU
+		);
+		for (int i = 0; i < static_cast<int>(N_ZEROLEAKFLUX_BINS); i++)
+			if (val_mat[i] != val_stand[i])
+				return false;
+	
+		Timer t;
+
+		int n_steps = 1000000;
+		for (int t_st = 0; t_st < n_steps; t_st++)
+		{
+			
+			non_standard.ExecuteExcitatory
+			(
+				N_ZEROLEAKFLUX_BINS,
+				ZEROLEAKFLUX_TAU
+			);
+		}
+
+
+		for (int t_ma = 0; t_ma < n_steps; t_ma++)
+		{
+			non_matrix.ExecuteExcitatory
+			(
+				N_ZEROLEAKFLUX_BINS,
+				ZEROLEAKFLUX_TAU
+			);
+
+			non_matrix.ExecuteInhibitory
+			(
+				N_ZEROLEAKFLUX_BINS,
+				ZEROLEAKFLUX_TAU
+			);			
+		}
+	
+
+		return true;
+	 }
+
+     bool TestPopulist::OmurtagetAlTest () const 
+     {
+	     return TestPopulist::GenericOnePopulationTest
+			(
+		     
+				OMURTAG_RATE,
+				OMURTAG_EFFICACY,
+				OMURTAG_PARAMETER,
+				OMURTAG_PARAMETER_RUN,
+				OMURTAG_SPECIFIC,
+				true
+			);
+     }
+
+
+	bool TestPopulist::OmurtagFitTest() const
+	{
+
+	// Standard Omega test, with fit rate calculation
+
+	const SimulationRunParameter 
+		OMURTAG_PARAMETER_FIT
+		(
+			OMURTAG_FIT_HANDLER,
+			OMURTAG_MAXIMUM_NUMBER_OF_ITERATIONS,
+			OMURTAG_T_BEGIN,
+			OMURTAG_T_END,
+			OMURTAG_T_REPORT,
+			OMURTAG_T_REPORT,
+			OMURTAG_T_NETWORK_STEP,
+			"test/omurtagfit.log"
+		);
+
+		GenericOnePopulationTest
+		(
+			OMURTAG_RATE,
+			OMURTAG_EFFICACY,
+			OMURTAG_PARAMETER,
+			OMURTAG_PARAMETER_FIT,
+			OMURTAG_SPECIFIC,
+			false
+		);
+	
+	     return true;
+     }
+
+     bool TestPopulist::GenericOnePopulationTest
+		(
+			PopulistLib::Rate					input_rate,
+			PopulistLib::Efficacy				input_weight,
+			const PopulationParameter&			par_pop,
+			const SimulationRunParameter&		par_run,
+			const PopulistSpecificParameter&	par_spec,
+			bool								b_log
+		) const
+
+{
+	return GenericTwoPopulationTest
+		(	
+			input_rate,
+			input_weight,
+			0,
+			0,
+			par_pop,
+			par_run,
+			par_spec,
+			b_log
+		);
+}
+
+
+bool TestPopulist::GenericTwoPopulationTest
+(
+	PopulistLib::Rate					input_rate_1,
+	PopulistLib::Efficacy				input_weight_1,
+	PopulistLib::Rate					input_rate_2,
+	PopulistLib::Efficacy				input_weight_2,
+	const PopulationParameter&			par_population,
+	const SimulationRunParameter&		par_run,
+	const PopulistSpecificParameter&	par_spec,
+	bool								b_log
+) const
+{
+	// This allows for testing the adapting bin parameters
+	Pop_Network network;
+
+	// Define an rate population
+	RateAlgorithm < PopulationConnection > rate_input_1 (input_rate_1);
+	RateAlgorithm < PopulationConnection > rate_input_2 (input_rate_2);
+
+	NodeId id_rate_node_1, id_rate_node_2;
+	
+	if ( input_weight_1 >= 0 ){
+		id_rate_node_1 = network.AddNode 
+		(
+			rate_input_1,
+			EXCITATORY
+		);
+	}
+	else {
+
+		id_rate_node_1 = network.AddNode 
+		(
+			rate_input_1,
+			INHIBITORY
+		);
+	}
+
+	if ( input_weight_2 >= 0 ){
+		id_rate_node_2 = network.AddNode 
+		(
+			rate_input_2,
+			EXCITATORY
+		);
+	}
+	else {
+
+		id_rate_node_2 = network.AddNode 
+		(
+			rate_input_2,
+			INHIBITORY
+		);
+	}
+
+	// Define the node
+	PopulationAlgorithm_<PopulationConnection> the_algorithm (PopulistParameter(par_population,par_spec));
+
+	NodeId id_the_node = 
+		network.AddNode 
+		(
+			the_algorithm,
+			EXCITATORY
+		);
+
+	PopulationConnection connection_1 (1, input_weight_1);
+	PopulationConnection connection_2 (1, input_weight_2);
+	// add the first rate node, no matter what
+	network.MakeFirstInputOfSecond
+	(
+		id_rate_node_1, 
+		id_the_node, 
+		connection_1
+	);
+
+	// but the 2nd only if it is non-zero
+	if ( input_weight_2 != 0 )
+		network.MakeFirstInputOfSecond
+		(
+			id_rate_node_2,
+			id_the_node,
+			connection_2
+		);
+
+
+	SimulationRunParameter parameter_run_current = par_run;
+
+	parameter_run_current.Handler().AddNodeToCanvas
+	(
+		id_the_node
+	);
+
+	bool b_configure =
+		network.ConfigureSimulation (par_run);
+
+
+
+	if (b_configure)
+	{
+		bool b_return;
+		Timer time;
+		time.SecondsSinceLastCall();
+		b_return =  network.Evolve ();
+	}
+	else
+		return false;
+
+	return true;
+}
+
+
+
+bool TestPopulist::GammaZTest () const 
+{
+	VMatrix <FULL_CALCULATION> solver;
+
+	int maximum_number_gamma_z_values = 120;
+	int n_circulant = 50;
+
+	solver.FillGammaZ
+	(
+		maximum_number_gamma_z_values,
+		n_circulant,
+		5.0
+	);
+
+	int l = 0;
+	complex <double> omega_kt = 
+		       exp (complex <double >
+			(
+				l * 2.0 * M_PI / static_cast<double>(n_circulant),
+				0
+			) *complex < double >
+				(
+					0.0,
+					1.0)
+				)* 5.0;
+
+	       complex < double >test = solver.Gamma (1, 0);
+	     if (
+			!IsApproximatelyEqualTo
+			(
+				test.real (),
+				(complex <double>(1.0, 0.0) - exp (-omega_kt)).real (),
+				1e-10)
+		)
+		       return false;
+
+
+	       test = solver.Gamma (1, 14);
+	       l = 14;
+	       omega_kt =
+		     exp (complex <double >
+				(
+					l * 2.0 * M_PI / static_cast<double>(n_circulant),0)*complex < double >(0.0, 1.0)
+				)*5.0;
+	     if (
+			!IsApproximatelyEqualTo
+			(
+				test.real (),
+				(complex < double >(1.0, 0.0) - exp (-omega_kt)).real (),
+				1e-10
+			)
+		)
+		return false;
+	
+	return true;
+     }
+
+
+     bool TestPopulist::Vkj3Test () const 
+     {
+	     // A simple test that allows quick checking in the debugger
+	     // Compare to the output of MATLAB routines
+
+	     VMatrix <FULL_CALCULATION> solver;
+
+	     Number number_circulant = 3;
+	     Time tau = 0.1;
+
+	     if (
+			!IsApproximatelyEqualTo
+			(
+				solver.V 
+				(
+					number_circulant, 
+					0, 
+					0, 
+					tau
+				), 
+				0.09048751197746,
+				1e-11
+			)
+		 ||	!IsApproximatelyEqualTo 
+			(
+				solver.V
+				(
+					number_circulant, 
+					0, 
+					1, 
+					tau
+				),
+				0.00452426249352,
+				1e-11
+			)
+		 ||	!IsApproximatelyEqualTo
+			(
+				solver.V
+				(
+					number_circulant, 
+					0, 
+					2, 
+					tau
+				),
+				0.00015080749306,
+				1e-11
+			)
+		 ||	!IsApproximatelyEqualTo
+			(
+				solver.V
+				(
+					number_circulant, 
+					1, 
+					0, 
+					tau
+				),
+				0.00452426249352, 
+				1e-11
+			)
+		 ||	!IsApproximatelyEqualTo
+			(
+				solver.V
+				(
+					number_circulant, 
+					1, 
+					1, 
+					tau
+				),
+				0.00015080749306, 
+				1e-11
+			)
+		 ||	!IsApproximatelyEqualTo
+			(
+				solver.V
+				(
+					number_circulant,
+					1, 
+					2, 
+					tau
+				),
+				0.00000377017386, 
+				1e-11
+			)
+		 ||	!IsApproximatelyEqualTo
+			(
+				solver.V
+				(
+					number_circulant, 
+					2, 
+					0, 
+					tau
+				),
+				0.00015080749306,
+				1e-11
+			)
+		 ||	!IsApproximatelyEqualTo
+			(
+				solver.V
+				(
+					number_circulant, 
+					2, 
+					1, 
+					tau
+				),
+				0.00000377017386, 
+				1e-11
+			)
+		 ||	!IsApproximatelyEqualTo
+			(
+				solver.V
+				(
+					number_circulant, 
+					2, 
+					2, 
+					tau
+				),
+				0.00000007540344, 
+				1e-11
+			)
+		)
+		       return false;
+
+	     // also test an even solution, with number of non-circulant > number of circulant
+
+	       number_circulant = 4;
+	       tau = 1;
+
+
+	     if (!IsApproximatelyEqualTo
+		 (solver.V (number_circulant, 0, 0, tau), 0.37094611701740,
+		  1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 0, 1, tau),
+					     0.18445076563595, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 0, 2, tau),
+					     0.06138624136429, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 0, 3, tau),
+					     0.01533743481092, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 1, 0, tau),
+					     0.18445076563595, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 1, 1, tau),
+					     0.06138624136429, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 1, 2, tau),
+					     0.01533743481092, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 1, 3, tau),
+					     0.00306667584596, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 2, 0, tau),
+					     0.06138624136429, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 2, 1, tau),
+					     0.01533743481092, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 2, 2, tau),
+					     0.00306667584596, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 2, 3, tau),
+					     0.00051104505023, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 3, 0, tau),
+					     0.01533743481092, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 3, 1, tau),
+					     0.00306667584596, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 3, 2, tau),
+					     0.00051104505023, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 3, 3, tau),
+					     0.00007300116905, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 0, 4, tau),
+					     0.00306667584596, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 1, 4, tau),
+					     0.00051104505023, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 2, 4, tau),
+					     0.00007300116905, 1e-11)
+		 || !IsApproximatelyEqualTo (solver.
+					     V (number_circulant, 3, 4, tau),
+					     0.00000912476211, 1e-11)
+		     )
+		       return false;
+
+
+	       return true;
+     }
+
+     bool TestPopulist::NonCirculantTransferTest () const 
+     {
+	     return TestPopulist::GenericOnePopulationTest
+			(
+				TRANSFER_RATE,
+				TRANSFER_EFFICACY,
+				TRANSFER_PARAMETER,
+				TRANSFER_PARAMETER_RUN,
+				TRANSFER_SPECIFIC
+			);
+	     return true;
+     }
+
+     bool TestPopulist::InitialDensityTest () const
+     {
+	     PopulationParameter 
+		     parameter_population 
+		     (
+				1,	// theta
+				0,	// V_reset
+				0,	// V_reversal
+				0,	// no refractive period
+				50e-3	// 50 ms or 20 s^-1
+		     );
+
+	     int number_of_bins = 5;
+	     Potential v_min = 0;
+
+	     InitialDensityParameter parameter_density (0, 0);
+
+	     InitializeAlgorithmGrid init;
+	     AlgorithmGrid grid = 
+			init.InitializeGrid 
+			(
+				number_of_bins,
+				v_min,
+				parameter_population,
+				parameter_density
+			);
+
+	       vector<double> vector_density = grid.ToStateVector ();
+
+	     if (	vector_density[0] != number_of_bins	||
+			vector_density[1] != 0			||
+			vector_density[2] != 0			||
+			vector_density[3] != 0			|| 
+			vector_density[4] != 0
+		)
+		       return false;
+
+	       parameter_density._mu = 0.25;
+
+	       InitializeAlgorithmGrid init2;
+	       grid = init2.InitializeGrid
+			(
+				number_of_bins,
+				v_min, 
+				parameter_population, 
+				parameter_density
+			);
+
+	       vector_density = grid.ToStateVector ();
+
+	     if (vector_density[0] != 0 ||
+		 vector_density[1] != number_of_bins ||
+		 vector_density[2] != 0 ||
+		 vector_density[3] != 0 || vector_density[4] != 0)
+		       return false;
+
+	       parameter_density._mu = 0.5;
+
+	       InitializeAlgorithmGrid init3;
+	       grid = init3.InitializeGrid
+			(
+				number_of_bins,
+				v_min, 
+				parameter_population, 
+				parameter_density
+			);
+
+	       vector_density = grid.ToStateVector ();
+
+	     if (vector_density[0] != 0 ||
+		 vector_density[1] != 0 ||
+		 vector_density[2] != number_of_bins ||
+		 vector_density[3] != 0 || vector_density[4] != 0)
+		       return false;
+
+	       parameter_density._mu = 0.75;
+
+	      
+	       grid = init.InitializeGrid
+			(
+				number_of_bins,
+				v_min, 
+				parameter_population, 
+				parameter_density
+			);
+
+	       vector_density = grid.ToStateVector ();
+
+	     if (vector_density[0] != 0 ||
+		 vector_density[1] != 0 ||
+		 vector_density[2] != 0 ||
+		 vector_density[3] != number_of_bins
+		 || vector_density[4] != 0)
+		       return false;
+
+	       parameter_density._mu = 1.0;
+
+	       grid = init.InitializeGrid
+			(
+				number_of_bins,
+				v_min, 
+				parameter_population, 
+				parameter_density
+			);
+
+	       vector_density = grid.ToStateVector ();
+
+	     if (vector_density[0] != 0 ||
+		 vector_density[1] != 0 ||
+		 vector_density[2] != 0 ||
+		 vector_density[3] != 0
+		 || vector_density[4] != number_of_bins)
+		       return false;
+
+
+	       parameter_density._mu = 0.3;
+
+	       grid = init.InitializeGrid
+			(
+				number_of_bins,
+				v_min, 
+				parameter_population, 
+				parameter_density
+			);
+
+	       vector_density = grid.ToStateVector ();
+
+	     if (vector_density[0] != 0 ||
+		 vector_density[1] != number_of_bins ||
+		 vector_density[2] != 0 ||
+		 vector_density[3] != 0 || vector_density[4] != 0)
+		       return false;
+
+
+	       return true;
+     }
+
+     bool TestPopulist::InterpolationRebinnerTest () const 
+     {
+	     InterpolationRebinner rebin;
+
+	     const int number_array = 1000;
+	     const int index_reversal_bin = 499;
+	     const int number_new_bins    = 600;
+
+	     valarray<double> array(number_array);
+
+	     for (int i = 0; i < number_array; i++)
+		     array[i] = (i - index_reversal_bin)/static_cast<double>(number_array - 1 - index_reversal_bin);
+	     cout << array[number_array-1] << endl;
+
+	     bool b_result = 
+			rebin.Configure 
+			(
+				array,
+				index_reversal_bin,
+				0,
+				number_array,
+				number_new_bins
+			);
+
+	     b_result = rebin.Rebin ();
+	     if ( ! IsApproximatelyEqualTo( array[number_new_bins - 1],1.0, 1e-10 ) )
+		     return false;
+
+	     return b_result;
+     }
+
+bool TestPopulist::InterpolationResetTest () const 
+     {
+	       return true;
+     }
+
+     bool TestPopulist::GenerateVLookUp () const
+     {
+	     VMatrix < FULL_CALCULATION > vmatrix_dumb;
+
+//	     cout << vmatrix_dumb.V (5, 2, 2, 0.0425) << endl;
+
+	     return true;
+     }
+
+	bool TestPopulist::VArrayTest () const
+	{
+		VMatrix < FULL_CALCULATION > vmatrix_dumb;
+
+		Time tau = 0.5;
+		Number number_circulant_bins = 30;
+		Number number_non_circulant_bins = 70;
+		for 
+		(
+			int index_circulant = 0;
+			index_circulant < static_cast <int >(number_circulant_bins); 
+			index_circulant++
+		)
+			for
+			(
+				int index_non_circulant = 0;
+				index_non_circulant < static_cast <int >(number_non_circulant_bins);
+				index_non_circulant++
+			)
+			{
+				double v_dumb =
+					vmatrix_dumb.V
+					(
+						number_circulant_bins,
+						index_circulant,
+						index_non_circulant,
+						tau
+					);
+
+				VArray v_array;
+				v_array.FillArray
+				(
+					number_circulant_bins,
+					number_non_circulant_bins,
+					tau
+				);
+
+				double v_smart = 
+				v_array.V 
+				(
+					index_circulant,
+					index_non_circulant
+				);
+
+				if (fabs (v_dumb - v_smart) > 1e-12)
+				       return false;
+			}
+
+	     return true;
+     }
+
+
+
+bool TestPopulist::TestInhibitory() const
+{
+	InputParameterSet input_set;
+
+	for (int nr_bins = 2; nr_bins < 20; nr_bins++)
+		for (int H = 1; H < nr_bins; H++)
+			for (int i_init = 0; i_init < nr_bins; i_init++ )
+				for ( Time tau = 0.0; tau < 10; tau += 0.05 )
+				{
+					int remainder = (nr_bins%H == 0) ? 0 : 1;
+					int nr_n_c = nr_bins/H + remainder;
+
+					valarray<double> test(0.0,nr_bins);
+					test[i_init] = 1.0;
+
+					NonCirculantSolver solver;
+					input_set._n_noncirc_exc = nr_n_c;
+					input_set._H_exc = H;
+
+					solver.Configure(test, input_set);
+					solver.ExecuteExcitatory
+					(
+						nr_bins,
+						tau
+					);
+
+
+					valarray<double> test_reverse(0.0,nr_bins);
+					test_reverse[nr_bins - 1 - i_init] = 1.0;
+
+					input_set._H_inh = H;
+					input_set._n_noncirc_inh = nr_n_c;
+
+					solver.Configure(test_reverse, input_set);
+					solver.ExecuteInhibitory
+					(
+						nr_bins,
+						tau
+					);
+
+
+					for (int i = 0; i < nr_bins; i++ )
+						if ( test[i] != test_reverse[nr_bins - 1 - i] )
+							return false;
+				}
+
+	return true;
+}
+
+bool TestPopulist::InhibitionTest() const
+{
+	return TestPopulist::GenericOnePopulationTest
+		(   
+			INHIBITION_RATE,
+			INHIBITION_EFFICACY,
+			INHIBITION_PARAMETER,
+			INHIBITION_PARAMETER_RUN,
+			INHIBITION_SPECIFIC
+		);
+}
+
+bool TestPopulist::ZeroLeakGaussTest() const
+{
+	return TestPopulist::GenericTwoPopulationTest
+		(   
+			ZEROLEAKGAUSS_RATE,
+			ZEROLEAKGAUSS_EFFICACY,
+			ZEROLEAKGAUSS_RATE,
+			-ZEROLEAKGAUSS_EFFICACY,
+			ZEROLEAKGAUSS_PARAMETER,
+			ZEROLEAKGAUSS_PARAMETER_RUN,
+			ZEROLEAKGAUSS_SPECIFIC,
+			true
+		);
+}
+
+bool TestPopulist::DoubleRebinnerTest() const
+{
+	return true;
+}
+
+bool TestPopulist::OmurtagDoubleTest() const
+{
+	// Classical Omurtag test, but with double rebinner and expansion factor of 2
+
+	InitializeAlgorithmGrid init;
+//TODO: check out why this variable is not used
+//	double expansion_factor = 
+		init.ExpansionFactorDoubleRebinner
+		(
+			OMURTAG_NUMBER_INITIAL_BINS,
+			OMURTAG_V_MIN,
+			OMURTAG_PARAMETER
+		);
+
+	const SimulationRunParameter 
+		run_parameter
+		(
+			OMURTAG_DOUBLE_REBIN_HANDLER,
+			OMURTAG_MAXIMUM_NUMBER_OF_ITERATIONS,
+			OMURTAG_T_BEGIN,
+			OMURTAG_T_END,
+			OMURTAG_T_REPORT,
+			OMURTAG_T_REPORT,
+			OMURTAG_T_NETWORK_STEP,
+			"test/omurtagdouble.log"
+		);
+
+	return TestPopulist::GenericOnePopulationTest
+		(  
+			OMURTAG_RATE,
+			OMURTAG_EFFICACY,
+			OMURTAG_PARAMETER,
+			run_parameter,
+			OMURTAG_SPECIFIC,
+			true
+		);
+}
+
+//bool TestPopulist::LeakGaussTest() const
+//{
+//	ResponseCurveTest
+//	(
+//		LEAKGAUSS_NUMBER_BINS, 
+//		RESPONSE_INTEGRAL, 
+//		SINGLE_POPULATION_MODE,
+//		true
+//	);
+//	return true;
+//}
+//
+bool TestPopulist::PotentialToBinTest() const
+{
+
+	PopulationAlgorithm_<PopulationConnection> pop(PopulistParameter(OMURTAG_PARAMETER,OMURTAG_SPECIFIC));
+
+	pop.Configure(OMURTAG_PARAMETER_RUN);
+
+	for 
+	(
+		Index i = 0;
+		i < OMURTAG_NUMBER_INITIAL_BINS;
+		i++
+	)
+	{
+		Potential v = pop.BinToCurrentPotential(i);
+		Index j = pop.CurrentPotentialToBin(v);
+		if ( i != j )
+			return false;
+	}
+
+	return true;
+}
+
+bool TestPopulist::OrnsteinUhlenbeckProcessTest() const
+{
+		return TestPopulist::GenericTwoPopulationTest
+		(   
+			OUTEST_RATE,
+			OUTEST_EFFICACY,
+			OUTEST_RATE,
+			-OUTEST_EFFICACY,
+			OUTEST_PARAMETER,
+			OUTEST_PARAMETER_RUN,
+			OUTEST_SPECIFIC,
+			true
+		);
+}
+
+bool TestPopulist::TwoPopulationTest() const
+{
+	NodeId id_cortical_background;
+	NodeId id_excitatory_main;
+	NodeId id_inhibitory_main;
+	NodeId id_rate;
+	OU_Network network = 
+		CreateTwoPopulationNetwork<PopulationAlgorithm_<PopulationConnection>, DynamicNetworkImplementation<PopulationAlgorithm_<PopulationConnection>::WeightType> >
+		(
+			&id_cortical_background,
+			&id_excitatory_main,
+			&id_inhibitory_main,
+			&id_rate,
+			TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP,
+			TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP
+		);
+
+
+	TWOPOP_HANDLER.AddNodeToCanvas(id_excitatory_main);
+	TWOPOP_HANDLER.AddNodeToCanvas(id_inhibitory_main);
+
+	bool b_configure = 
+		network.ConfigureSimulation
+			(
+				TWOPOP_PARAMETER
+			);
+
+	if (! b_configure )
+		return false;
+
+	bool b_evolve = network.Evolve();
+
+	return b_evolve;
+}
+
+bool TestPopulist::ChebyshevVTest() const
+{
+	VChebyshev v_cheb;
+
+//	cout << v_cheb.V(0,0,0.3) << endl;
+//	cout << v_cheb.V(0,1,0.3) << endl;
+//	cout << v_cheb.V(1,0,0.3) << endl;
+
+	VArray v_array;
+	v_array.FillArray(N_CIRC_MAX_CHEB,N_NON_CIRC_MAX_CHEB, 0.3);
+
+//	cout << v_array.V(0,0) << endl;
+//	cout << v_array.V(1,0) << endl;
+//	cout << v_array.V(0,1) << endl;
+
+
+	return true;
+}
+
+bool TestPopulist::GenerateVDataTest() const
+{
+	// Purpose: Generate the elements V_kj for various n, k-j, tau
+	// Used for the generation of the the plots of these elements.
+	// Adapt the constants to produce other step sizes or limits. Requires
+	// recompilation!
+
+	// Author: Marc de Kamps
+	ofstream stream((STR_TEST_DIRECTORY + string("VDATA")).c_str());
+
+	stream.precision(10);
+
+	Time log_tmin = log10(VDATA_TMIN);
+	Time log_tmax = log10(VDATA_TMAX);
+
+	for (int n_circ = 2; n_circ < VDATA_NCIRC; n_circ++)
+		for ( int j = 0; j < VDATA_JMAX; j++)
+			for ( int t = 0; t < VDATA_NSTEPS; t++)
+			{
+				Time tau = pow(10.0,((log_tmax - log_tmin)/VDATA_NSTEPS)*t + log_tmin);
+				VArray v_array;
+
+				v_array.FillArray(n_circ ,VDATA_NCIRC + 10,tau);
+		
+				stream << tau << " " << n_circ << " " << j << " " << v_array.V(0,j) << "\n";
+			}
+	return true;
+}
+
+bool TestPopulist::OmurtagPolynomialTest() const
+{
+	GenericOnePopulationTest
+	(
+		OMURTAG_RATE,
+		OMURTAG_EFFICACY,
+		OMURTAG_PARAMETER,
+		OMURTAG_PARAMETER_POLYNOMIAL,
+		OMURTAG_SPECIFIC_POLYNOMIAL,
+		true
+	);
+
+	return true;
+}
+
+
+bool TestPopulist::OmurtagMatrixTest() const
+{
+	GenericOnePopulationTest
+	(
+		OMURTAG_RATE,
+		OMURTAG_EFFICACY,
+		OMURTAG_PARAMETER,
+		OMURTAG_PARAMETER_MATRIX,
+		OMURTAG_SPECIFIC_MATRIX,
+		true
+	);
+	
+	return true;
+}
+
+bool TestPopulist::ResponseCurveTest() const
+{
+	ResponseCurveSingle(true,false);
+
+	// with fit rate, but full solution
+//	ResponseCurveDouble(true,false);
+
+	// with int rate, and polynomial soultion
+
+	// with fit rate, polynomial solution
+//	ResponseCurveDouble(false,false);
+
+	return true;
+}
+
+void TestPopulist::ResponseSpecificParameter
+(
+	bool						b_fit,
+	bool						b_short,
+	bool						b_double,
+	PopulistSpecificParameter*	p_spec
+ ) const
+{
+	Mode mode;
+	Number n_bins;
+
+	if (b_double)
+	{
+		mode   = DOUBLE_POPULATION_MODE;
+		n_bins = RESPONSE_CURVE_DOUBLE_NBINS;
+	}
+	else
+	{
+		mode   = SINGLE_POPULATION_MODE;
+		n_bins = RESPONSE_CURVE_SINGLE_NBINS;
+	}
+
+	const AbstractRateComputation* p_rate;
+	if ( b_fit )
+		p_rate = &FIT_RATE_COMPUTATION;
+	else
+		p_rate = &INTEGRAL_RATE_COMPUTATION;
+
+	const AbstractCirculantSolver*    p_circulant;
+	const AbstractNonCirculantSolver* p_non_circulant; 
+
+	if (b_short)
+	{
+		p_circulant     = &POLYNOMIAL_CIRCULANT;
+		p_non_circulant = &LIMITED_NON_CIRCULANT;
+	}
+	else
+	{
+		p_circulant = 0;
+		p_non_circulant = 0;
+	}
+
+
+
+	PopulistSpecificParameter
+		par_spec
+		(
+			RESPONSE_CURVE_V_MIN,
+			n_bins,
+			RESPONSE_CURVE_NADD,
+			RESPONSE_CURVE_INITIAL_DENSITY,
+			RESPONSE_CURVE_EXPANSION_FACTOR,
+			rebin_interpol,
+			*p_rate,
+			mode,
+			p_circulant,
+			p_non_circulant
+
+		);
+
+	*p_spec = par_spec;
+}
+
+void TestPopulist::ResponseSingleRunParameter
+(
+	bool							b_fit,
+	bool							b_short,
+	bool							b_double,
+	Index							i,
+	string&							str_handler,
+	string&							str_log,
+	PopulistSpecificParameter*		p_par_spec,
+	Number							n_bins
+ ) const
+{
+	string str = RESPONSE_CURVE_ROOT_FILE;
+	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+	boost::char_separator<char> sep(".");
+	tokenizer tokens(str, sep);
+	tokenizer::iterator tok_iter = tokens.begin();
+
+ 
+	string str_fit = b_fit ? "_fitrate" : "_intrate";
+	string str_mod = b_double ? "_double" : "_single";
+	string str_sho = b_short ? "_shorttime_" : "_fulltime_"; 
+	// first generate the appropriate name
+	ostringstream stream;
+	stream << *tok_iter;
+	stream << str_fit;
+	stream << str_sho;
+	stream << str_mod;
+	stream << "_" << n_bins << "_";
+	stream << i;
+	stream << ".root";
+	str_handler = stream.str();
+
+	ostringstream stream_log;
+	stream_log << *tok_iter;
+	stream_log << str_fit;
+	stream_log << str_sho;
+	stream_log << str_mod;
+	stream_log << "_" << n_bins << "_";
+	stream_log << i;
+	stream_log << ".log";
+
+	str_log = stream_log.str();
+ 
+}
+
+void TestPopulist::ResponseCurveSingleNetwork
+(
+	Pop_Network*				p_net,
+	PopulistSpecificParameter*	p_par_spec,
+	bool						b_fit,
+	bool						b_polynomial,
+	PopulistLib::Rate*			p_rate_exc,
+	NodeId*						p_id
+ ) const
+{
+
+		ResponseSpecificParameter
+		(
+			b_fit,
+			b_polynomial,
+			false,
+			p_par_spec
+		);
+	
+		// Define the node
+		PopulationAlgorithm_<PopulationConnection> 
+			the_algorithm
+			(
+				PopulistParameter
+				(
+					PARAMETER_NEURON, 
+					*p_par_spec
+				)
+			);
+
+		*p_id = 
+			p_net->AddNode 
+			(
+				the_algorithm,
+				EXCITATORY
+			);
+
+		// Define an input rate population
+		RateAlgorithm <PopulationConnection> rate_input_excitatory(p_rate_exc);
+	
+		NodeId id_exc = 
+			p_net->AddNode
+			(
+				rate_input_excitatory,
+				EXCITATORY
+			);
+
+		PopulationConnection 
+			connection
+			(
+				0, 
+				0
+			);
+
+		p_net->MakeFirstInputOfSecond
+		(
+			id_exc, 
+			*p_id, 
+			connection
+		);
+}
+
+bool TestPopulist::ResponseCurveSingle
+(
+	bool b_fit,
+	bool b_polynomial
+) const
+{
+	for (Index i = 3;	i < NUMBER_RESPONSE_CURVE_POINTS; i++)
+	{
+		PopulistSpecificParameter par_spec;
+		Pop_Network		network;
+		Rate			rate_exc;
+		NodeId			id;
+
+		ResponseCurveSingleNetwork
+		(
+			&network,
+			&par_spec,
+			b_fit,
+			b_polynomial,
+			&rate_exc,
+			&id
+		);
+
+		string handlername;
+		string logname;				
+
+		ResponseSingleRunParameter
+		(
+			b_fit,
+			b_polynomial,
+			false,
+			i,
+			handlername,
+			logname,
+			&par_spec,
+			RESPONSE_CURVE_SINGLE_NBINS
+		); 
+	
+
+		RootReportHandler 
+			handler
+			(
+				handlername.c_str(),
+				ONSCREEN,
+				INFILE,
+				RESPONSE_CURVE_T_END
+			);
+
+		SimulationRunParameter
+		par_run
+		(
+			handler,
+			RESPONSE_CURVE_MAX_ITER,
+			RESPONSE_CURVE_T_BEGIN,
+			RESPONSE_CURVE_T_END,
+			RESPONSE_CURVE_T_REPORT,
+			RESPONSE_CURVE_T_REPORT,
+			RESPONSE_CURVE_T_NETWORK,
+			logname
+		);
+
+
+		bool b_configure =
+			network.ConfigureSimulation(par_run);
+
+		if (! b_configure)
+			return false;
+
+		// an old fashioned loop over all mu values
+		double h = SIGMA*SIGMA/MU[i];
+		rate_exc = MU[i]*MU[i]/(SIGMA*SIGMA*PARAMETER_NEURON._tau);
+
+		// Seek out the connection from the rate algorithm and set the weight
+		PopulationConnection con(1,h);
+
+		Pop_Network::predecessor_iterator iter = network.begin(id);
+		iter.SetWeight(con);	
+
+		par_run.Handler().AddNodeToCanvas(id);
+
+		bool b_evolve = network.Evolve();
+		if (! b_evolve)
+			return false;
+	
+	}
+
+	return true;
+}
+
+void TestPopulist::ResponseCurveDoubleNetwork
+(
+	Pop_Network*				p_net,
+	PopulistSpecificParameter*	p_par_spec,
+	bool						b_fit,
+	bool						b_polynomial,
+	PopulistLib::Rate*			p_rate_exc,
+	PopulistLib::Rate*			p_rate_inh,
+	NodeId*						p_id
+) const
+{
+	ResponseSpecificParameter
+	(
+		b_fit,
+		b_polynomial,		
+		true,			// is a double network now
+		p_par_spec
+	);
+	
+	// Define an rate population
+	RateAlgorithm < PopulationConnection > 
+		rate_exc(p_rate_exc);
+
+	RateAlgorithm< PopulationConnection >
+		rate_inh(p_rate_inh);
+
+	NodeId id_exc = 
+		p_net->AddNode
+		(
+			rate_exc,
+			EXCITATORY
+		);
+
+	NodeId id_inh =
+		p_net->AddNode
+		(
+			rate_inh,
+			INHIBITORY
+		);
+
+	// Define the node
+	PopulistSpecificParameter par_spec;
+	ResponseSpecificParameter
+	(
+		b_fit,
+		b_polynomial,
+		true,
+		&par_spec
+	);
+ 
+	PopulationAlgorithm_<PopulationConnection> 
+		the_algorithm
+		(
+			PopulistParameter
+			(
+				PARAMETER_NEURON,
+				par_spec
+			)
+		);
+
+	*p_id = 
+		p_net->AddNode 
+		(
+			the_algorithm,
+			EXCITATORY
+		);
+
+	PopulationConnection 
+		connection_1
+		(
+			0, 
+			0
+		);
+
+	PopulationConnection
+		connection_2
+		(	0,
+			0
+		);
+
+	p_net->MakeFirstInputOfSecond
+	(
+		id_exc, 
+		*p_id, 
+		connection_1
+	);
+
+	p_net->MakeFirstInputOfSecond
+	(
+		id_inh,
+		*p_id,
+		connection_2
+	);
+
+}
+
+bool TestPopulist::ResponseCurveDouble
+(
+	bool b_fit, 
+	bool b_polynomial
+) const
+{
+
+
+	for (Index i = 2;	i < NUMBER_RESPONSE_CURVE_POINTS; i++)
+	{
+		Pop_Network					network;
+		PopulistSpecificParameter	par_spec;
+		Rate						input_rate_exc;
+		Rate						input_rate_inh;
+		NodeId						id;
+
+		ResponseCurveDoubleNetwork
+		(
+			&network,
+			&par_spec,
+			b_fit,
+			b_polynomial,
+			&input_rate_exc,
+			&input_rate_inh,
+			&id
+		);
+	
+
+		string handlername;
+		string logname;				
+
+		ResponseSingleRunParameter
+		(
+			b_fit,
+			b_polynomial,
+			true,
+			i,
+			handlername,
+			logname,
+			&par_spec,
+			RESPONSE_CURVE_SINGLE_NBINS
+		); 
+	
+
+		RootReportHandler 
+			handler
+			(
+				handlername.c_str(),
+				ONSCREEN,
+				INFILE,
+				RESPONSE_CURVE_T_END
+			);
+	
+		SimulationRunParameter
+		par_run
+		(
+			handler,
+			RESPONSE_CURVE_MAX_ITER,
+			RESPONSE_CURVE_T_BEGIN,
+			RESPONSE_CURVE_T_END,
+			RESPONSE_CURVE_T_REPORT,
+			RESPONSE_CURVE_T_REPORT,
+			RESPONSE_CURVE_T_NETWORK,
+			logname
+		);
+
+		par_run.Handler().AddNodeToCanvas(id);
+
+		bool b_configure =
+			network.ConfigureSimulation(par_run);
+
+		if (! b_configure)
+			return false;
+
+		if ( network.begin(id) != network.end(id) ){
+			Pop_Network::predecessor_iterator iter = network.begin(id);
+
+			// precise values don't matter, as long as they reproduce correct mu and sigma
+			double h_e = 1;
+			double N_e = (MU[i] + SIGMA*SIGMA)/(2*PARAMETER_NEURON._tau);
+			PopulationConnection con_e(N_e,h_e);
+			iter.SetWeight(con_e);
+			input_rate_exc = 1;
+
+			double h_i = -1;
+			double N_i = (SIGMA*SIGMA -MU[i])/(2*PARAMETER_NEURON._tau);
+			PopulationConnection  con_i(N_i,h_i);
+			iter++;
+			iter.SetWeight(con_i);
+			input_rate_inh = 1;
+		}
+
+		bool b_evolve = network.Evolve();
+
+		if (! b_evolve)
+			return false;
+	}	
+	return true;
+}
+
+
+
+bool TestPopulist::ResponseCurveExample() const
+{
+	// Note we now need an OU_Network instead of a D_Network
+	OU_Network network;
+
+	Potential sigma = 2e-3;
+	Potential mu    = 20e-3;
+
+	Time tau = PARAMETER_NEURON._tau; 
+	Rate nu = mu*mu/(sigma*sigma*tau);
+	Rate J = sigma*sigma/mu;
+
+	OU_Connection 
+		con
+		(
+			1,
+			J
+		);
+
+	// Define a node with a fixed output rate
+	OU_RateAlgorithm rate_alg(nu);
+	NodeId id_rate = network.AddNode(rate_alg,EXCITATORY);
+
+	// Define the receiving node 
+	OU_Algorithm algorithm_exc(PARAMETER_NEURON);
+	NodeId id = network.AddNode(algorithm_exc,EXCITATORY);
+
+	// connect the two nodes
+	network.MakeFirstInputOfSecond(id_rate,id,con);
+
+	// define a handler to store the simulation results
+	RootReportHandler 
+		handler
+		(
+			"test/ouresponse.root",	// file where the simulation results are written
+			true,					// do not display on screen
+			true					// write into file
+		);
+
+	SimulationRunParameter
+		par_run
+		(
+			handler,				// the handler object
+			1000000,				// maximum number of iterations
+			0,						// start time of simulation
+			0.1,					// end time of simulation
+			1e-4,					// report time
+			1e-4,					// update time
+			1e-5,					// network step time
+			"test/ouresponse.log"   // log file name
+		);
+
+	bool b_configure = network.ConfigureSimulation(par_run);
+	if (! b_configure)
+		return false;
+
+	bool b_evolve = network.Evolve();
+	if (! b_evolve)
+		return false;
+	return true;
+}
+
+bool TestPopulist::PrintResponseCurve() const
+{
+	ofstream file("test/responsecurvegraph.txt");
+	double mu_begin = 10e-3;
+	double sigma = 2e-3;
+	double mu_end = 30e-3;
+
+	int n_steps = 10000;
+	for (int i = 0; i < n_steps; i++)
+	{
+		double delta_mu = (mu_end - mu_begin)/(n_steps - 1);
+		double mu = mu_begin + i*delta_mu; 
+		ResponseParameterBrunel par_brun;
+		par_brun.tau			= PARAMETER_NEURON._tau;
+		par_brun.mu				= mu;
+		par_brun.sigma			= sigma;
+		par_brun.tau_refractive = 0;
+		par_brun.theta			= PARAMETER_NEURON._theta;
+		par_brun.V_reset		= PARAMETER_NEURON._V_reset;
+
+		file << mu << " " << ResponseFunction(par_brun) << endl;
+	}
+	return true;
+}
+
+bool TestPopulist::ProbabilityQueueTest() const
+{
+	ProbabilityQueue queue;
+
+	queue.push(StampedProbability(0.5,1e-3));
+	queue.push(StampedProbability(0.3,2e-3));
+	queue.push(StampedProbability(0.7,3e-3));
+	queue.push(StampedProbability(0.9,4e-3));
+	queue.push(StampedProbability(0.2,5e-3));
+
+	Time t_current = 5e-3;
+	Time t_delta   = 2e-3;
+	if ( queue.HasProbability(t_current - t_delta) )
+		Probability prob = queue.CollectAndRemove(t_current - t_delta);
+
+	cout << queue.TotalProbability() << endl;
+
+	return true;
+}
+
+namespace {
+
+	DynamicLib::Rate rate_function_linear(DynamicLib::Time time)
+	{
+		return time;
+	}
+}
+
+bool TestPopulist::ScalarProductTest() const
+{
+	RateFunctor<OU_Connection> ra(rate_function_linear);
+
+	OU_DynamicNode node_e(ra,EXCITATORY);
+	OU_DynamicNode node_i(ra,INHIBITORY);
+
+	//Create a connection list by hand
+
+	vector<OU_DynamicNode::connection> vec_con;
+
+	OU_Connection c_e, c_i;
+	c_e._number_of_connections = 1.0;
+	c_e._efficacy			   = 2.0;
+
+	c_i._number_of_connections = 0.5;
+	c_i._efficacy			   = 3.0;
+
+	OU_DynamicNode::connection con_1;
+	con_1.first  = &node_e;
+	con_1.second = c_e;
+
+	OU_DynamicNode::connection con_2;
+	con_2.first  = &node_i;
+	con_2.second = c_i;
+
+	// this vector is a connection list as they are present in OU_DynamicNode s
+	vec_con.push_back(con_1);
+	vec_con.push_back(con_2);
+
+	node_e.SetValue(10.0);
+	node_i.SetValue(20.0);
+
+	MuSigmaScalarProduct product;
+	// the ugly exposition to the innards of the vector is normally done behind the veils of SparseNode
+	MuSigmaScalarProduct::predecessor_iterator iter_begin(&vec_con[0]);
+	MuSigmaScalarProduct::predecessor_iterator iter_end(&vec_con[vec_con.size()-1] + 1);
+	MuSigma musig =
+		product.Evaluate
+		(
+			iter_begin,
+			iter_end,
+			1.0
+		);
+
+	return true;
+}
+
+bool TestPopulist::AEIFIntegratorTest() const
+{
+	// set adaptation to 0
+	AEIFParameter param;
+	param._a = param._b = 0;
+
+	// add 10% to the interval [V_L, V_th) and initialize a vector
+	Potential V_min = 1.1*param._E_l;
+	Potential V_max = 0.9*param._V_t;
+
+	Number n_steps = 100;
+	
+	Potential Delta = (V_max - V_min)/(n_steps - 1);
+	vector<double> v_init(n_steps);
+
+	for ( Index i = 0; i < n_steps; i++)
+		v_init[i] = V_min + i*Delta; 
+
+	// Now integrate every curve for 2 ms
+
+	for ( Index j = 0; j < n_steps; j++)
+	{
+		vector<double> vec(param.StateDimension());
+		
+		vec[V] = v_init[j];
+		vec[W] = 0.0;
+
+		DVIntegrator<AEIFParameter> 
+			integ
+			(
+				100000,						//<! maximum number of integrations							
+				vec,						//<! initial state
+				0.01,						//<! initial time step
+				0.0,						//<! initial time
+				0.01,						//<! absolute precision
+				0.01,						//<! relative precsion
+				param,						//<! parameter
+				aeifdydt,					//<! dydt
+				0,							//<! Jacobian, if available
+				gsl_odeiv_step_rkf45		//<! gsl integrator object
+			);
+	}
+	return true;
+}
+
+namespace {
+
+	DynamicLib::Rate JumpFunction(DynamicLib::Time t)
+	{
+		return (t < 0.3 || t > 0.6 )? 6.0 : 8.0;
+	}
+}
+bool TestPopulist::OneDMTest() const
+{
+	// set a nominal input in terms of a and b
+	Pop_RateFunctor jump(JumpFunction);
+
+	PopulationConnection con(1.0,1.0);
+
+	Pop_Network net;
+	NodeId id_a = net.AddNode(jump,EXCITATORY);
+
+	Potential g_max = 100;
+	AdaptationParameter 
+		par_adapt
+		(
+			110e-3,	// adaptation time constant
+			14.48,	// adaptation jump value
+			g_max	// maximum g value
+		);
+
+	InterpolationRebinner rebinner;
+	IntegralRateComputation rate;
+
+	PopulistSpecificParameter 
+		par_spec
+		(
+			0.0,								//!< minimum potential of the grid, (typically negative or below the reversal potential
+			100,								//!< initial number of bins
+			1,									//!< number of bins that is after one zero-leak evaluation
+			InitialDensityParameter(0.0,0.0),	//!< gaussian (or delta-peak) initial density profile
+			1.1,								//!< expansion factor
+			rebinner,							//!< rebinning algorithm
+			rate,								//!< rate computation from density profile
+			SINGLE_POPULATION_MODE				//!< SinglePopulationMode or DoublePopulationMode
+		);
+
+	PopulationParameter dummy;
+	OneDMParameter 
+		par_onedm
+		(
+			dummy,
+			par_adapt,
+			par_spec
+		);
+
+	OneDMAlgorithm<PopulationConnection> 
+		alg_onedm
+		(
+			par_onedm
+		);
+
+	NodeId id_one = net.AddNode(alg_onedm,EXCITATORY);
+	net.MakeFirstInputOfSecond(id_a,id_one,con);
+
+	
+	// define a handler to store the simulation results
+	RootReportHandler 
+		handler
+		(
+			"test/onedm_10000.root",		// file where the simulation results are written
+			true,					// do not display on screen
+			true,					// write into file
+			1.0,
+			70.0,
+			70,
+			0.5
+		);
+
+	handler.AddNodeToCanvas(id_one);
+
+	SimulationRunParameter
+		par_run
+		(
+			handler,				// the handler object
+			1000000,				// maximum number of iterations
+			0,						// start time of simulation
+			1.0,					// end time of simulation
+			1e-2,					// report time
+			1e-2,					// update time
+			1e-4,					// network step time
+			"test/onedmresponse.log"// log file name
+		);
+
+	net.ConfigureSimulation(par_run);
+
+	net.Evolve();
+
+	return true;
+}
+
+bool TestPopulist::HazardFunctionTest() const
+{
+	float a = 6.91423056F;	// Hz
+	float b = 0.132995626F; // [nS]^-1
+	float tau = 110.0F;		// ms
+	float q = 14.48F;		// nS
+
+	AdaptiveHazard hazard(a,b);
+
+	int n_steps = 100;
+	float g_max = 10*q;
+
+	float delta = g_max/(n_steps - 1);
+	for (int i = 0; i < n_steps; i++)
+	{	
+		float g = i*delta;
+		cout << i << " " << g << " " << hazard(g) << " " << hazard(g-q) << endl;
+	}
+
+	return true;
+}
+
+bool TestPopulist::BalancedExample() const
+{
+
+OrnsteinUhlenbeckParameter par;
+par._theta      = 20e-3; // (V)
+par._tau        = 10e-3; // (V)
+par._V_reversal = 0.0;
+par._V_reset    = 0.0;
+
+// Set mu and sigma
+double mu    = 20e-3;    // (V)
+double sigma = 2e-3;     // (V)
+
+// In order to approximate a diffusion process set a small value for input
+// weights (small relative to theta).
+//
+double J= 0.01* par._theta;
+//
+// Now convert mu and sigma to input rates of an excitatory and inhibitory
+// population.
+//
+double nu_e = (J*mu + sigma*sigma)/(2*J*J*par._tau);
+double nu_i = (sigma*sigma - J*mu)/(2*J*J*par._tau);
+//
+// some parameters specific to the algorithm
+//
+double V_min  = -10e-3;
+int n_bins    = 500;
+int n_add     = 1;
+double f_exp  = 1.1;
+
+InterpolationRebinner rebinner; 
+IntegralRateComputation ratealg; 
+InitialDensityParameter density(par._V_reversal,0);
+PopulistSpecificParameter 
+	par_spec
+	(
+		V_min,
+		n_bins,
+		n_add,
+		density,
+		f_exp,
+		rebinner,
+		ratealg,
+		SINGLE_POPULATION_MODE
+	);
+
+//
+// Now create the network
+//
+Pop_Network			net;
+PopulistParameter	par_pop(par,par_spec);
+PopulationAlgorithm alg_pop(par_pop);
+NodeId id_pop  =	net.AddNode(alg_pop,EXCITATORY);
+//
+// Create input populations and add them to the network
+//
+Pop_RateAlgorithm alg_rate_exc(nu_e);
+NodeId id_e = net.AddNode(alg_rate_exc,EXCITATORY);
+OrnsteinUhlenbeckConnection con_e(1,J);
+Pop_RateAlgorithm alg_rate_inh(nu_i);
+NodeId id_i = net.AddNode(alg_rate_inh,INHIBITORY);
+OrnsteinUhlenbeckConnection con_i(1,-J);
+//
+net.MakeFirstInputOfSecond(id_e,id_pop,con_e);
+net.MakeFirstInputOfSecond(id_i,id_pop,con_i);
+//
+RootReportHandler handler("data.root",1,1);
+handler.SetFrequencyRange(0,40);
+handler.SetDensityRange(-0.01,200);
+handler.SetTimeRange(0,0.3);
+handler.SetPotentialRange(-0.001,0.020);
+handler.AddNodeToCanvas(id_pop);
+//
+// Configure the simulation
+//
+SimulationRunParameter 
+	par_run
+	(
+		handler,
+		100000,
+		0.,
+		0.3,
+		1e-2,
+		1e-2,
+		1e-2,
+		"simulation.log"
+	);
+
+net.ConfigureSimulation(par_run);
+net.Evolve();
+
+	return true;
+	// end balanced example
+}

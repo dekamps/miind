@@ -1,0 +1,61 @@
+// Copyright (c) 2005 - 2009 Marc de Kamps
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation 
+//      and/or other materials provided with the distribution.
+//    * Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software 
+//      without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY 
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF 
+// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//      If you use this software in work leading to a scientific publication, you should cite
+//      the 'currently valid reference', which can be found at http://miind.sourceforge.net
+#ifndef _CODE_LIBS_CONNECTIONISMLIB_RANDOM_ORDER_INLUDE_GUARD
+#define _CODE_LIBS_CONNECTIONISMLIB_RANDOM_ORDER_INLUDE_GUARD
+
+
+#include "../NetLib/NetLib.h"
+#include "../UtilLib/UtilLib.h"
+#include "../NumtoolsLib/NumtoolsLib.h"
+
+using NetLib::NodeId;
+using UtilLib::Number;
+using NumtoolsLib::RandomGenerator;
+using NumtoolsLib::UniformDistribution;
+
+namespace ConnectionismLib
+{
+
+	//! Orders determine the order in which a network is updated. A RandomOrder updates the network in random order (!).
+	//! A Network class will require some order as a templet argument. RandmOrder can be used in a Hopfield network,
+	//! for example.
+	class RandomOrder {
+	public:
+		
+		//! constructor 
+		RandomOrder
+		(
+			Number,				//!< The number of nodes in the network
+			RandomGenerator&	//!< A random generator, presumably one that generates a UniformDistribution
+		);
+
+		//! NodeId of the next node to be updated
+		NodeId Next();
+
+	private:
+	
+		const Number		_number_of_neurons;
+		UniformDistribution	_dist_uniform;
+	};
+
+} // end of ConnectionismLib
+
+
+#endif // include guard

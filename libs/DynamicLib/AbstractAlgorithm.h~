@@ -1,0 +1,119 @@
+#ifndef _CODE_LIBS_DYNAMICLIB_ABSTRACTEVOLUTIONALGORITHM_INCLUDE_GUARD
+#define _CODE_LIBS_DYNAMICLIB_ABSTRACTEVOLUTIONALGORITHM_INCLUDE_GUARD
+
+#include "../UtilLib/UtilLib.h"
+#include "../SparseImplementationLib/SparseImplementationLib.h"
+#include "NodeState.h"
+#include "SimulationRunParameter.h"
+
+using SparseImplementationLib::ConnectionProduct;
+using SparseImplementationLib::AbstractSparseNode;
+
+using UtilLib::Streamable;
+using std::istream;
+using std::ostream;
+using std::string;
+
+namespace DynamicLib
+{
+	//! AbstractEvolutionAlgorithm
+	//! A single instance exists for every DynamicNode
+
+	template <class WeightValue> class DynamicNode;
+	
+	template <class WeightValue>
+	class AbstractEvolutionAlgorithm : public Streamable
+	{
+	public:
+
+		typedef pair< AbstractSparseNode<double,WeightValue>*, WeightValue > Connection;
+		typedef WeightValue WeightType;
+
+		typedef typename AbstractSparseNode<double,WeightValue>::predecessor_iterator predecessor_iterator;
+		//! standard constructor
+		AbstractEvolutionAlgorithm(Number);
+
+		//! enforce abstract base class
+		virtual ~AbstractEvolutionAlgorithm() = 0;
+		
+
+		virtual bool EvolveNodeState
+				(
+					predecessor_iterator,
+					predecessor_iterator,
+					Time
+				) = 0;
+
+		//! Conceivably every algorithm must be able to deal with an InnerProduct
+	
+		double InnerProduct
+			(
+				predecessor_iterator,
+				predecessor_iterator 
+			) const ;
+
+
+		//! Copy internal grid, pure virtual
+		//! because the representation of a state may determined by the particular algorithm
+		virtual AlgorithmGrid Grid() const = 0;
+
+		//! Copy NodeState, in general a much simpler object than the AlgorithmGrid,
+		//! from which it is calculated. Usually something simple, like a rate
+		virtual NodeState  State() const = 0;
+
+		//! An algorithm saves its log messages, and must be able to produce them for a Report
+		virtual string LogString() const = 0;
+
+		//! Write out object to stream
+		virtual bool ToStream(ostream&) const;
+
+		//! Get object from stream
+		virtual bool FromStream(istream&);
+
+		//! Tag for serialization
+		virtual string Tag() const;
+
+		//! Cloning operation, to provide each DynamicNode with its own 
+		//! Algorithm instance
+
+		virtual AbstractEvolutionAlgorithm* Clone() const = 0;
+
+		//! A complete serialiazation of the staate of an Algorithm, so that
+		//! it can be resumed from its disk representation
+
+		virtual bool Dump(ostream&) const = 0;
+
+		virtual bool Configure
+				(
+					const SimulationRunParameter&
+				) = 0;
+
+		virtual Time CurrentTime() const = 0;
+
+		virtual Rate CurrentRate() const = 0;
+
+		virtual bool IsSynchronous() const { return true; }
+
+	protected:
+
+		Number&           StateSize           (AlgorithmGrid&) const;
+		valarray<double>& ArrayState          (AlgorithmGrid&) const;
+		valarray<double>& ArrayInterpretation (AlgorithmGrid&) const;
+
+	private:
+
+
+	}; // end of AbstractEvolutionAlgorithm
+
+	typedef AbstractEvolutionAlgorithm<double> D_AbstractEvolutionAlgorithm;
+
+	template <class WeightValue>
+	ostream& operator<<(ostream&, const AbstractEvolutionAlgorithm<WeightValue>&);
+
+	template <class WeightValue>
+	istream& operator>>(istream&, AbstractEvolutionAlgorithm<WeightValue>&);
+
+} // end of namespace
+
+#endif // include guard
+
