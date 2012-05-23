@@ -192,7 +192,7 @@ namespace DynamicLib {
 
 		s << this->InsertNameInTag(this->Tag(),this->GetName())	<< "\n";
 		s << CurrentRate()	<< "\n";
-		s << ToEndTag(Tag())<< "\n";
+		s << this->ToEndTag(Tag())<< "\n";
 
 		this->AbstractAlgorithm<Weight>::ApplyBaseClassFooter(s);
 

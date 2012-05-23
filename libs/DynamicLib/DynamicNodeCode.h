@@ -273,7 +273,7 @@ namespace DynamicLib
 		s << this->Tag() << endl;
 		AbstractSparseNode<double,WeightValue>::ToStream(s);
 		_p_algorithm->ToStream(s);
-		s << ToEndTag(this->Tag()) << "\n";
+		s << this->ToEndTag(this->Tag()) << "\n";
 
 		return true;
 	}

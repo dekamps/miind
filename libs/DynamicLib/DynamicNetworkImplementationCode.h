@@ -94,7 +94,7 @@ namespace DynamicLib
       	for (const_node_iterator iter = _vector_of_nodes.begin(); iter != _vector_of_nodes.end();iter++)
          	iter->ToStream(s);
 
-		s << ToEndTag(Tag()) << "\n";
+		s << this->ToEndTag(Tag()) << "\n";
 
 		return true;
 	}
