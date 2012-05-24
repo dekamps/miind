@@ -7,6 +7,13 @@ set( CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix." ) # defaul
 set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 
 
+# Require MPI for this project:
+#find_package(MPI REQUIRED)
+#set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
+#set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
+#include_directories(${MPI_INCLUDE_PATH})
+#does not work with macport need to be teste for linux
+
 if (WIN32)
         ADD_DEFINITIONS( -D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK)
 else (WIN32)
@@ -25,7 +32,7 @@ MARK_AS_ADVANCED( USE_FFTWF )
 OPTION( USE_FFTWF "Use single precision FFTW if found" ON )
 
 find_package( FFTW )
-find_package( Boost COMPONENTS unit_test_framework program_options)
+find_package( Boost COMPONENTS unit_test_framework program_options mpi serialization)
 if( Boost_FOUND )
    message("Boost found setting up directories")
    message("BOOST_ROOT: " ${BOOST_ROOT} )
@@ -67,6 +74,9 @@ endif (SWIG_FOUND)
 
 SET( CMAKE_SWIG_FLAGS "" )
 #---------swig
+
+
+
 
 include_directories( ./libs )
 message("========================================Common settings done going on with libs===================================")
