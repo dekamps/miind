@@ -70,7 +70,7 @@ namespace DynamicLib
 
 		NodeId AddNode(const DynamicNode<WeightValue>&);
 
-		//! make the node, labeled by the first nodeId, input othe second Node
+		//! make the node, labeled by the first nodeId, input other second Node
 		bool MakeFirstInputOfSecond
 			(
 				NodeId,
