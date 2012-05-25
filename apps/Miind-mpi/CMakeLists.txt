@@ -46,6 +46,7 @@ if ( Boost_FOUND )
         ${LIB_PREFIX}Tree
         ${LIB_PREFIX}Gpad
         ${gsl_LINK_FLAGS} 
+        ${MPI_LIBRARIES} 
 	gsl
 	    ${CBLAS_PREFIX}cblas 
         ${Boost_LIBRARIES}

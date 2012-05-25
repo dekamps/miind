@@ -55,7 +55,8 @@ if ( Boost_FOUND )
         ${gsl_LINK_FLAGS}
         ${Boost_LIBRARIES} 
 	    gsl
-	    ${CBLAS_PREFIX}cblas 
+	    ${CBLAS_PREFIX}cblas
+	    ${MPI_LIBRARIES} 
     )
 else( Boost_FOUND)
     message( FATAL_ERROR "Boost.mpi not found -- cannot build without boost mpi" )
