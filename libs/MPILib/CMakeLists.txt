@@ -52,13 +52,13 @@ if ( Boost_FOUND )
         ${LIB_PREFIX}Gpad
 		${LIB_PREFIX}Graf
 		${LIB_PREFIX}Postscript
-        ${gsl_LINK_FLAGS} 
-	gsl
-	${CBLAS_PREFIX}cblas 
-        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+        ${gsl_LINK_FLAGS}
+        ${Boost_LIBRARIES} 
+	    gsl
+	    ${CBLAS_PREFIX}cblas 
     )
 else( Boost_FOUND)
-    message( STATUS "Boost.TEST not found -- skipping the BOOST unit tests" )
+    message( FATAL_ERROR "Boost.mpi not found -- cannot build without boost mpi" )
 endif ( Boost_FOUND )
 
 add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${mpi_SRC} ${mpi_HEADERS} )
