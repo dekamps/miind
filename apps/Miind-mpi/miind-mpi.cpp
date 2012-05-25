@@ -12,7 +12,7 @@
 #include <boost/serialization/base_object.hpp>
 
 #include <MPILib/MPINode.hpp>
-
+#include <MPILib/MPINetwork.hpp>
 
 namespace mpi = boost::mpi;
 
@@ -59,60 +59,25 @@ public:
 //make it mpi datatype the class with std::string this is not possible as it is no MPI Datatype
 BOOST_IS_MPI_DATATYPE(StructPoint)
 
-//// asynchronous send method
-//template<typename T>
-//mpi::request send(T s, int dest, int tag, mpi::communicator w) {
-//	return w.isend(dest, tag, s);
-//}
-//
-//// asynchronous recv method
-//template<typename T>
-//mpi::request recv(T& s, int origin, int tag, mpi::communicator w) {
-//	return w.irecv(origin, tag, s);
-//}
+
 
 int main(int argc, char* argv[]) {
 	// initialize mpi
 
 	mpi::environment env(argc, argv);
 
+	MPINetwork network;
 
-
-	mpi::communicator world;
-
-
-	if (world.rank() == 0) {
-		//store asynchronous requests
-		mpi::request reqs[2];
-
-		StuctPointMessage p;
-		p.x = 1.;
-		p.y = 2;
-		p.z = 3.;
-		p.msg = "blub";
-
-		std::string msg;
-		MPINode blub;
-		// the order of send and recv is unimportant as they are asynchronous
-		// with synchronous this would result in a deadlock
-		reqs[1] = blub.recv(msg, 1, 1, world);
-		reqs[0] = blub.send(p, 1, 2, world);
-		// make sure the sended data has arrived
-		reqs[1].wait();
-		std::cout << msg << "!" << std::endl;
-
-	} else {
-		mpi::request reqs[2];
-		MPINode blub;
-
-		StuctPointMessage p;
-		reqs[0] = blub.recv(p, 0, 2, world);
-		reqs[1] = blub.send(std::string("recieved"), 0, 1, world);
-
-		reqs[0].wait();
-		p.print();
-
-	}
+	network.AddNode(1,1,0);
+	network.AddNode(1,1,1);
+	network.AddNode(1,1,2);
+	network.AddNode(1,1,3);
+	network.AddNode(1,1,4);
+	network.AddNode(1,1,5);
+	network.AddNode(1,1,6);
+	network.AddNode(1,1,7);
+	network.AddNode(1,1,8);
+	network.Evolve();
 
 	return 0;
 }

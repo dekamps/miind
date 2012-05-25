@@ -15,8 +15,8 @@ MPINetwork::MPINetwork() {
 	mpi::communicator world;
 
 	_processorId = world.rank();
+	_totalProcessors = world.size();
 	//set to one as no node should exist at this time point
-	_maxNodeId = 0;
 
 }
 
@@ -24,15 +24,14 @@ MPINetwork::~MPINetwork() {
 
 }
 
-NodeId MPINetwork::AddNode(const Algorithm& alg, NodeType nodetype) {
+void MPINetwork::AddNode(const Algorithm& alg, NodeType nodetype, NodeId id) {
 	//increase the maxNodeId by one to make sure that the node gets a new ID
-	_maxNodeId++;
-	if (isLocalNode(_maxNodeId)) {
+
+	if (isLocalNode(id)) {
 		//TODO make new node
 		//FIXME push back the actual nodes
-		_localNodes.push_back(_maxNodeId);
+		_localNodes.push_back(id);
 	}
-	return _maxNodeId;
 }
 
 bool MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
@@ -59,6 +58,8 @@ bool MPINetwork::Evolve() {
 
 	for (std::vector<Node>::iterator it = _localNodes.begin();
 			it != _localNodes.end(); it++) {
+		std::cout << "processorID:\t" << _processorId << "\tNodeId:\t" << *it
+				<< "\t" << getResponsibleProcessor(*it) << std::endl;
 		//TODO call evolve on the nodes
 	}
 	//FIXME change this
@@ -71,6 +72,6 @@ bool MPINetwork::isLocalNode(NodeId nodeId) {
 }
 
 int MPINetwork::getResponsibleProcessor(NodeId nodeId) {
-	return nodeId % _processorId;
+	return nodeId % _totalProcessors;
 }
 

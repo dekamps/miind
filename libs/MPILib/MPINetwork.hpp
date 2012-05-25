@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-class Algorithm;
+typedef int Algorithm;
 typedef int NodeType;
 typedef int NodeId;
 typedef double WeightType;
@@ -27,7 +27,7 @@ public:
 
 	~MPINetwork();
 
-	NodeId AddNode(const Algorithm&, NodeType);
+	void AddNode(const Algorithm&, NodeType, NodeId);
 
 	bool MakeFirstInputOfSecond(NodeId, NodeId, WeightType&);
 
@@ -60,10 +60,9 @@ private:
 	int _processorId;
 
 	/**
-	 * The highest NodeId assingend so far. We assume that the no nodes get the same id twice and
-	 * the id is always increased by one.
+	 * The total number of processors
 	 */
-	int _maxNodeId;
+	int _totalProcessors;
 
 };
 
