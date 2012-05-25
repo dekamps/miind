@@ -10,12 +10,13 @@
 
 #include <boost/noncopyable.hpp>
 #include <string>
+#include <vector>
 
 class Algorithm;
-class NodeType;
+typedef int NodeType;
 typedef int NodeId;
 typedef double WeightType;
-typedef void SimulationRunParameter;
+typedef int SimulationRunParameter;
 typedef int Node;
 
 
