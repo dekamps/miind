@@ -19,6 +19,7 @@ endif( NOT ROOT_INCLUDE_DIRS AND NOT ROOT_LIBRARY_DIRS )
 include_directories( ${ROOT_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
 
+include_directories( ../../libs/MPILib )
 
 
 if ( Boost_FOUND )
@@ -33,6 +34,7 @@ if ( Boost_FOUND )
         ${MIIND_LIBRARY_PREFIX}numtools
         ${MIIND_LIBRARY_PREFIX}util
         ${MIIND_LIBRARY_PREFIX}net
+        ${MIIND_LIBRARY_PREFIX}mpi
         ${MIIND_LIBRARY_PREFIX}net
 	    ${MIIND_LIBRARY_PREFIX}miind
         ${MIIND_LIBRARY_PREFIX}structnet

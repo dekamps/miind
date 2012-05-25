@@ -1,3 +1,5 @@
+
+
 if( WIN32 )
   find_package( WINGSL REQUIRED )
   if( NOT GSL_FOUND )
@@ -20,6 +22,7 @@ set( mpi_SRC
      )
 
 set( mpi_HEADERS
+    MPINode.hpp
     #add headers
      )
 
