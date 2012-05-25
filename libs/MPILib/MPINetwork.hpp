@@ -27,8 +27,20 @@ public:
 
 	~MPINetwork();
 
+	/**
+	 * Adds a new node to the network
+	 * @param The Algorithm of the actual node
+	 * @param The Type of the Node
+	 * @param The Id of the Node, this need to be slept over //FIXME
+	 */
 	void AddNode(const Algorithm&, NodeType, NodeId);
 
+	/** Connects two node
+	 * @param NodeId of the first node
+	 * @param NodeId of the second node
+	 * @param The WeightType of the connection
+	 * @return A boolean which is true if no error occured
+	 */
 	bool MakeFirstInputOfSecond(NodeId, NodeId, WeightType&);
 
 	//! Configure the next simulation
