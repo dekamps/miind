@@ -18,11 +18,13 @@ include_directories( ${ROOT_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
 
 set( mpi_SRC
+    MPINetwork.cpp
     #add cpp files
      )
 
 set( mpi_HEADERS
     MPINode.hpp
+    MPINetwork.hpp
     #add headers
      )
 
