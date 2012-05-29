@@ -30,7 +30,6 @@ public:
 	 * Adds a new node to the network
 	 * @param The Algorithm of the actual node
 	 * @param The Type of the Node
-	 * @param The Id of the Node, this need to be slept over //FIXME
 	 */
 	void AddNode(const Algorithm&, NodeType);
 
