@@ -8,24 +8,63 @@
 #ifndef MPINODE_H_
 #define MPINODE_H_
 
-#include <boost/mpi.hpp>
-#include <boost/mpi/communicator.hpp>
+#include <boost/noncopyable.hpp>
+#include <vector>
 
-namespace mpi = boost::mpi;
+#include "BasicTypes.hpp"
 
+/**
+ * @class MPINode the class for the actual network nodes. T
+ */
 class MPINode {
 public:
-// asynchronous send method
-	template<typename T>
-	mpi::request send(T s, int dest, int tag, mpi::communicator w) {
-		return w.isend(dest, tag, s);
-	}
+	/**
+	 * Constructor
+	 * @param Algorithm the algorithm the node should contain
+	 * @param NodeType the type of the node
+	 */
+	explicit MPINode(const Algorithm& , NodeType, NodeId );
 
-// asynchronous recv method
-	template<typename T>
-	mpi::request recv(T& s, int origin, int tag, mpi::communicator w) {
-		return w.irecv(origin, tag, s);
-	}
+	/**
+	 * Destructor
+	 */
+	~MPINode();
+
+	/**
+	 * Evolve this algorithm over a time
+	 * @param Time until the algorithm should evolve
+	 * @return Time the algorithm have evolved
+	 */
+	Time Evolve(Time);
+
+	/**
+	 * Configure the Node with the Simulation Parameters
+	 * @param Simulation Parameters
+	 * @return true if it worked correct
+	 */
+	bool ConfigureSimulationRun(const SimulationRunParameter&);
+
+	void addPrecursor(NodeId, WeightType);
+
+	void addSuccessor(NodeId, WeightType);
+
+private:
+
+	std::vector<std::pair<NodeId, WeightType> > _precursors;
+
+	std::vector<std::pair<NodeId, WeightType> > _successors;
+
+	Algorithm _algorithm;
+
+	NodeType _nodeType;
+
+	/**
+	 * the Id of this node
+	 */
+	NodeId _nodeId;
 };
+
+
+
 
 #endif /* MPINODE_H_ */

@@ -10,14 +10,11 @@
 
 #include <boost/noncopyable.hpp>
 #include <string>
-#include <vector>
+#include <map>
 
-typedef int Algorithm;
-typedef int NodeType;
-typedef int NodeId;
-typedef double WeightType;
-typedef int SimulationRunParameter;
-typedef int Node;
+#include "MPINode.hpp"
+#include "BasicTypes.hpp"
+
 
 class MPINetwork: private boost::noncopyable {
 
@@ -30,8 +27,9 @@ public:
 	 * Adds a new node to the network
 	 * @param The Algorithm of the actual node
 	 * @param The Type of the Node
+	 * @return returns the NodeId of the generated node
 	 */
-	void AddNode(const Algorithm&, NodeType);
+	int AddNode(const Algorithm&, NodeType);
 
 	/** Connects two node
 	 * @param NodeId of the first node
@@ -79,7 +77,7 @@ private:
 	/**
 	 * local nodes of the processor
 	 */
-	std::vector<Node> _localNodes;
+	std::map<NodeId, MPINode> _localNodes;
 	/**
 	 * The local processor id
 	 */

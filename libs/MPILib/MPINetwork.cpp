@@ -30,16 +30,17 @@ MPINetwork::~MPINetwork() {
 
 }
 
-void MPINetwork::AddNode(const Algorithm& alg, NodeType nodetype) {
+int MPINetwork::AddNode(const Algorithm& alg, NodeType nodeType) {
 
 	int tempNodeId = getMaxNodeId();
 	if (isLocalNode(tempNodeId)) {
-		//TODO make new node
-		//FIXME push back the actual nodes
-		_localNodes.push_back(tempNodeId);
+		MPINode node = MPINode(alg, nodeType, tempNodeId);
+		_localNodes.insert(std::make_pair(tempNodeId, node));
 	}
 	//increment the max NodeId to make sure that it is not assigned twice.
+	//TODO why here? It does not work correct in the if condition above.
 	incrementMaxNodeId();
+	return tempNodeId;
 }
 
 bool MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
@@ -47,9 +48,21 @@ bool MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
 
 	assert(first!=second);
 
-	//TODO connect the nodes
+	if (isLocalNode(first)) {
+		if (_localNodes.count(first) > 0) {
+			_localNodes.find(first)->second.addSuccessor(second, weight);
+		} else {
+			return false;
+		}
+	}
+	if (isLocalNode(second)) {
+		if (_localNodes.count(second) > 0) {
+			_localNodes.find(second)->second.addPrecursor(first, weight);
+		} else {
+			return false;
+		}
+	}
 
-	//FIXME change to correct return
 	return true;
 
 }
@@ -64,10 +77,12 @@ bool MPINetwork::ConfigureSimulation(const SimulationRunParameter& simParam) {
 //! Envolve the network
 bool MPINetwork::Evolve() {
 
-	for (std::vector<Node>::iterator it = _localNodes.begin();
+	for (std::map<NodeId, MPINode>::iterator it = _localNodes.begin();
 			it != _localNodes.end(); it++) {
-		std::cout << "processorID:\t" << _processorId << "\tNodeId:\t" << *it
-				<< "\t" << std::endl;
+		std::cout << "processorID:\t" << _processorId;
+		//FIXME change to better time
+		it->second.Evolve(1);
+		std::cout << std::endl;
 		//TODO call evolve on the nodes
 	}
 	//FIXME change this

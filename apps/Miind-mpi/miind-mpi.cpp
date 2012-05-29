@@ -66,17 +66,30 @@ int main(int argc, char* argv[]) {
 
 	MPINetwork network;
 
-	network.AddNode(1, 1);
-	network.AddNode(1, 1);
-	network.AddNode(1, 1);
-	network.AddNode(1, 1);
-	network.AddNode(1, 1);
-	network.AddNode(1, 1);
-	network.AddNode(1, 1);
-	network.AddNode(1, 1);
-	network.AddNode(1, 1);
-	network.AddNode(1, 1);
-	network.AddNode(1, 1);
+	int node0 = network.AddNode(1, 1);
+	int node1 = network.AddNode(1, 1);
+	int node2 = network.AddNode(1, 1);
+	int node3 = network.AddNode(1, 1);
+	int node4 = network.AddNode(1, 1);
+	int node5 = network.AddNode(1, 1);
+	int node6 = network.AddNode(1, 1);
+	int node7 = network.AddNode(1, 1);
+	int node8 = network.AddNode(1, 1);
+	int node9 = network.AddNode(1, 1);
+	int node10 = network.AddNode(1, 1);
+	double weight =3.1;
+	network.MakeFirstInputOfSecond(node0, node1, weight);
+	network.MakeFirstInputOfSecond(node1, node2, weight);
+	network.MakeFirstInputOfSecond(node2, node3, weight);
+	network.MakeFirstInputOfSecond(node3, node4, weight);
+	network.MakeFirstInputOfSecond(node4, node5, weight);
+	network.MakeFirstInputOfSecond(node5, node6, weight);
+	network.MakeFirstInputOfSecond(node6, node7, weight);
+	network.MakeFirstInputOfSecond(node7, node8, weight);
+	network.MakeFirstInputOfSecond(node8, node9, weight);
+	network.MakeFirstInputOfSecond(node9, node10, weight);
+	network.MakeFirstInputOfSecond(node10, node0, weight);
+
 
 	network.Evolve();
 

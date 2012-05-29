@@ -19,12 +19,14 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 
 set( mpi_SRC
     MPINetwork.cpp
+    MPINode.cpp
     #add cpp files
      )
 
 set( mpi_HEADERS
     MPINode.hpp
     MPINetwork.hpp
+    BasicTypes.hpp
     #add headers
      )
 
