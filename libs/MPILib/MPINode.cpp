@@ -8,9 +8,17 @@
 #include "MPINode.hpp"
 #include <iostream>
 
+#include <boost/mpi/communicator.hpp>
+
+namespace mpi = boost::mpi;
+
 MPINode::MPINode(const Algorithm& algorithm, NodeType nodeType, NodeId nodeId) :
 		_algorithm(algorithm), _nodeType(nodeType), _nodeId(nodeId) {
 
+	mpi::communicator world;
+
+	_processorId = world.rank();
+	_totalProcessors = world.size();
 }
 ;
 
@@ -19,7 +27,9 @@ MPINode::~MPINode() {
 ;
 
 Time MPINode::Evolve(Time time) {
-	std::cout<<" # \t NodeId: "<<_nodeId<<"\t precursor size: "<<_precursors[0].first<<"\t successors size: "<<_successors[0].first<<" # ";
+	std::cout << " # \t NodeId: " << _nodeId << "\t precursor size: "
+			<< _precursors[0].first << "\t successors size: "
+			<< _successors[0].first << " # ";
 	//FIXME Implement this stub
 	return 0;
 }

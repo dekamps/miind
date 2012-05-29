@@ -23,7 +23,7 @@ public:
 	 * @param Algorithm the algorithm the node should contain
 	 * @param NodeType the type of the node
 	 */
-	explicit MPINode(const Algorithm& , NodeType, NodeId );
+	explicit MPINode(const Algorithm&, NodeType, NodeId);
 
 	/**
 	 * Destructor
@@ -62,9 +62,16 @@ private:
 	 * the Id of this node
 	 */
 	NodeId _nodeId;
+
+	/**
+	 * The local processor id
+	 */
+	int _processorId;
+
+	/**
+	 * The total number of processors
+	 */
+	int _totalProcessors;
 };
-
-
-
 
 #endif /* MPINODE_H_ */
