@@ -54,3 +54,13 @@ NodeState MPINode::getState() const {
 void MPINode::setState(NodeState state) {
 	_state = state;
 }
+
+
+void MPINode::receiveData(){
+
+}
+
+
+void MPINode::sendOwnState(){
+
+}

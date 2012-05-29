@@ -70,6 +70,16 @@ public:
 	 */
 	void setState(NodeState state);
 
+	/**
+	 * Receive the new data from the precursor nodes
+	 */
+	void receiveData();
+
+	/**
+	 * Send the own state to the successors.
+	 */
+	void sendOwnState();
+
 private:
 
 	std::vector<std::pair<NodeId, WeightType> > _precursors;
@@ -99,6 +109,11 @@ private:
 	 * The state of the node it is currently
 	 */
 	NodeState _state;
+
+	/**
+	 * Storage for the state of the precursors, to avoid to much communication.
+	 */
+	std::vector<NodeState> _precursorStates;
 };
 
 #endif /* MPINODE_H_ */
