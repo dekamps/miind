@@ -44,9 +44,9 @@ public:
 	 */
 	bool ConfigureSimulationRun(const SimulationRunParameter&);
 
-	void addPrecursor(NodeId, WeightType);
+	void addPrecursor(NodeId, const WeightType&);
 
-	void addSuccessor(NodeId, WeightType);
+	void addSuccessor(NodeId, const WeightType&);
 
 private:
 

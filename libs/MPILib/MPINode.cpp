@@ -39,10 +39,10 @@ bool MPINode::ConfigureSimulationRun(const SimulationRunParameter& simParam) {
 	return true;
 }
 
-void MPINode::addPrecursor(NodeId nodeId, WeightType weight) {
+void MPINode::addPrecursor(NodeId nodeId, const WeightType& weight) {
 	_precursors.push_back(std::make_pair(nodeId, weight));
 }
 
-void MPINode::addSuccessor(NodeId nodeId, WeightType weight) {
+void MPINode::addSuccessor(NodeId nodeId, const WeightType& weight) {
 	_successors.push_back(std::make_pair(nodeId, weight));
 }

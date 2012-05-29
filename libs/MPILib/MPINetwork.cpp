@@ -44,7 +44,7 @@ int MPINetwork::AddNode(const Algorithm& alg, NodeType nodeType) {
 }
 
 bool MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
-		WeightType& weight) {
+		const WeightType& weight) {
 
 	assert(first!=second);
 
@@ -98,7 +98,7 @@ int MPINetwork::getResponsibleProcessor(NodeId nodeId) {
 	return nodeId % _totalProcessors;
 }
 
-bool MPINetwork::isMaster() {
+bool MPINetwork::isMaster() const{
 	return _processorId == 0;
 }
 

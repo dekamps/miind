@@ -37,7 +37,7 @@ public:
 	 * @param The WeightType of the connection
 	 * @return A boolean which is true if no error occured
 	 */
-	bool MakeFirstInputOfSecond(NodeId, NodeId, WeightType&);
+	bool MakeFirstInputOfSecond(NodeId, NodeId, const WeightType&);
 
 	//! Configure the next simulation
 	bool ConfigureSimulation(const SimulationRunParameter&);
@@ -61,7 +61,7 @@ private:
 	 * If the processor is master (We assume the processor with _processorId=0 is the master)
 	 * @return true if the node is the master.
 	 */
-	bool isMaster();
+	bool isMaster() const;
 
 	/**
 	 * returns the max node id currently used.
