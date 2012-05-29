@@ -14,7 +14,7 @@ typedef int NodeType;
 typedef int NodeId;
 typedef double WeightType;
 typedef int SimulationRunParameter;
-typedef int Node;
 typedef int Time;
+typedef double NodeState;
 
 #endif /* BASICTYPES_HPP_ */

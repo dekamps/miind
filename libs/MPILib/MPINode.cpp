@@ -46,3 +46,11 @@ void MPINode::addPrecursor(NodeId nodeId, const WeightType& weight) {
 void MPINode::addSuccessor(NodeId nodeId, const WeightType& weight) {
 	_successors.push_back(std::make_pair(nodeId, weight));
 }
+
+NodeState MPINode::getState() const {
+	return _state;
+}
+
+void MPINode::setState(NodeState state) {
+	_state = state;
+}

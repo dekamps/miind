@@ -44,9 +44,31 @@ public:
 	 */
 	bool ConfigureSimulationRun(const SimulationRunParameter&);
 
+	/**
+	 * Add a precursor to the current node
+	 * @param NodeId the id of the precursor
+	 * @param WeightType the weight of the connection
+	 */
 	void addPrecursor(NodeId, const WeightType&);
 
+	/**
+	 * Add a successor to the current node
+	 * @param NodeId the id of the successor
+	 * @param WeightType the weight of the connection
+	 */
 	void addSuccessor(NodeId, const WeightType&);
+
+	/**
+	 * Getter for the Nodes state
+	 * @return The current node state
+	 */
+	NodeState getState() const;
+
+	/**
+	 * The Setter for the node state
+	 * @param state The state the node should be in
+	 */
+	void setState(NodeState state);
 
 private:
 
@@ -72,6 +94,11 @@ private:
 	 * The total number of processors
 	 */
 	int _totalProcessors;
+
+	/**
+	 * The state of the node it is currently
+	 */
+	NodeState _state;
 };
 
 #endif /* MPINODE_H_ */
