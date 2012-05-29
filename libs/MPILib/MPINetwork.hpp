@@ -19,7 +19,6 @@ typedef double WeightType;
 typedef int SimulationRunParameter;
 typedef int Node;
 
-
 class MPINetwork: private boost::noncopyable {
 
 public:
@@ -33,7 +32,7 @@ public:
 	 * @param The Type of the Node
 	 * @param The Id of the Node, this need to be slept over //FIXME
 	 */
-	void AddNode(const Algorithm&, NodeType, NodeId);
+	void AddNode(const Algorithm&, NodeType);
 
 	/** Connects two node
 	 * @param NodeId of the first node
@@ -49,7 +48,6 @@ public:
 	//! Envolve the network
 	bool Evolve();
 
-
 private:
 	/** check is a node is local to the processor
 	 * @param The Id of the Node
@@ -63,6 +61,23 @@ private:
 	int getResponsibleProcessor(NodeId);
 
 	/**
+	 * If the processor is master (We assume the processor with _processorId=0 is the master)
+	 * @return true if the node is the master.
+	 */
+	bool isMaster();
+
+	/**
+	 * returns the max node id currently used.
+	 * This is done via a broadcast from the master node.
+	 * @return the max node id assigned so far.
+	 */
+	int getMaxNodeId();
+
+	/**
+	 * Increments the NodeId on the master by 1
+	 */
+	void incrementMaxNodeId();
+	/**
 	 * local nodes of the processor
 	 */
 	std::vector<Node> _localNodes;
@@ -75,6 +90,12 @@ private:
 	 * The total number of processors
 	 */
 	int _totalProcessors;
+
+	/**
+	 * The max Node number assigned so far.
+	 * @attention This number is only handled by the master node. Therefore never access it direct!
+	 */
+	int _maxNodeId;
 
 };
 

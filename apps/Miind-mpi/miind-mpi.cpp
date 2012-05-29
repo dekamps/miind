@@ -59,8 +59,6 @@ public:
 //make it mpi datatype the class with std::string this is not possible as it is no MPI Datatype
 BOOST_IS_MPI_DATATYPE(StructPoint)
 
-
-
 int main(int argc, char* argv[]) {
 	// initialize mpi
 
@@ -68,15 +66,18 @@ int main(int argc, char* argv[]) {
 
 	MPINetwork network;
 
-	network.AddNode(1,1,0);
-	network.AddNode(1,1,1);
-	network.AddNode(1,1,2);
-	network.AddNode(1,1,3);
-	network.AddNode(1,1,4);
-	network.AddNode(1,1,5);
-	network.AddNode(1,1,6);
-	network.AddNode(1,1,7);
-	network.AddNode(1,1,8);
+	network.AddNode(1, 1);
+	network.AddNode(1, 1);
+	network.AddNode(1, 1);
+	network.AddNode(1, 1);
+	network.AddNode(1, 1);
+	network.AddNode(1, 1);
+	network.AddNode(1, 1);
+	network.AddNode(1, 1);
+	network.AddNode(1, 1);
+	network.AddNode(1, 1);
+	network.AddNode(1, 1);
+
 	network.Evolve();
 
 	return 0;
