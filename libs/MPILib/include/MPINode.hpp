@@ -10,10 +10,11 @@
 
 #include <boost/noncopyable.hpp>
 #include <vector>
+#include <boost/mpi/request.hpp>
 
 #include "BasicTypes.hpp"
 
-namespace MPILib{
+namespace MPILib {
 
 /**
  * @class MPINode the class for the actual network nodes. T
@@ -84,9 +85,19 @@ public:
 
 private:
 
-	std::vector<std::pair<NodeId, WeightType> > _precursors;
+	/** get the processor number which is responsible for the node
+	 * @param The Id of the Node
+	 * @return the processor responsible
+	 */
+	int getResponsibleProcessor(NodeId);
 
-	std::vector<std::pair<NodeId, WeightType> > _successors;
+	void waitAll();
+
+	std::vector<NodeId> _precursors;
+
+	std::vector<WeightType> _weights;
+
+	std::vector<NodeId> _successors;
 
 	Algorithm _algorithm;
 
@@ -96,6 +107,8 @@ private:
 	 * the Id of this node
 	 */
 	NodeId _nodeId;
+
+
 
 	/**
 	 * The local processor id
@@ -116,8 +129,10 @@ private:
 	 * Storage for the state of the precursors, to avoid to much communication.
 	 */
 	std::vector<NodeState> _precursorStates;
+
+	std::vector<boost::mpi::request> _mpiStatus;
 };
 
-}//end namespace
+} //end namespace
 
 #endif /* MPILIB_MPINODE_HPP_ */
