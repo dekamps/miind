@@ -20,6 +20,8 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 set( mpi_SRC
     MPINetwork.cpp
     MPINode.cpp
+    Exception.cpp
+    ParallelException.cpp
     #add cpp files
      )
 
@@ -27,6 +29,8 @@ set( mpi_HEADERS
     MPINode.hpp
     MPINetwork.hpp
     BasicTypes.hpp
+    Exception.hpp
+    ParallelException.hpp
     #add headers
      )
 

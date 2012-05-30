@@ -28,7 +28,7 @@ public:
     /** Destructor. Nothrow guarantee.
      * Virtual to allow for subclassing.
      */
-	virtual ~ParallelException();
+	virtual ~ParallelException() throw();
 
     /** Returns a pointer to the constant error message.
      *  @return A pointer to a \c const \c char*. The underlying memory

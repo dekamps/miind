@@ -7,28 +7,31 @@
 
 #include "ParallelException.hpp"
 #include <boost/mpi/communicator.hpp>
+#include <sstream>
 
 namespace mpi = boost::mpi;
 
 ParallelException::ParallelException(const char* message) :
-    msg_(message)
-{
+		Exception(message) {
 	mpi::communicator world;
-	msg_<<"\t processor rank: "<<world.rank()<<"\t from: "<<world.size();
+	std::stringstream sstream;
+	sstream << "Parallel Exception on processor: " << world.rank() << " from: "
+			<< world.size() << " with error message: " << msg_;
+	msg_ = sstream.str();
 }
 
 ParallelException::ParallelException(const std::string& message) :
-    msg_(message)
-{
+		Exception(message) {
 	mpi::communicator world;
-	msg_<<"\t processor rank: "<<world.rank()<<"\t from: "<<world.size();
+	std::stringstream sstream;
+	sstream << "Parallel Exception on processor: " << world.rank() << " from: "
+			<< world.size() << " with error message: " << msg_;
+	msg_ = sstream.str();
 }
 
-ParallelException::~ParallelException() throw ()
-{
+ParallelException::~ParallelException() throw () {
 }
 
-const char* ParallelException::what() const throw ()
-{
-    return msg_.c_str();
+const char* ParallelException::what() const throw () {
+	return msg_.c_str();
 }
