@@ -27,12 +27,13 @@
 
 #include <boost/exception/all.hpp>
 #include <string>
+#include <exception>
 
 
 
 /** libpipe expection base class.
  */
-class Exception : public boost::exception
+class Exception : public std::exception
 {
 public:
     /** Constructor for C-style string error messages.
@@ -68,7 +69,7 @@ protected:
 
 /** Convenience macros.
  */
-#define miind_fail(ERROR_MESSAGE) throw boost::enable_current_exception(Exception(ERROR_MESSAGE))
+#define miind_fail(ERROR_MESSAGE) throw (Exception(ERROR_MESSAGE))
 
 
 #endif //MIIND_EXCEPTION_HPP

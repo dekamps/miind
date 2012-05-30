@@ -40,6 +40,6 @@ public:
 
 /** Convenience macros.
  */
-#define miind_parallel_fail(ERROR_MESSAGE) throw boost::enable_current_exception(ParallelException(ERROR_MESSAGE)
+#define miind_parallel_fail(ERROR_MESSAGE) throw (ParallelException(ERROR_MESSAGE))
 
 #endif /* PARALLELEXCEPTION_HPP_ */

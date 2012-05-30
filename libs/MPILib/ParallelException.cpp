@@ -15,8 +15,8 @@ ParallelException::ParallelException(const char* message) :
 		Exception(message) {
 	mpi::communicator world;
 	std::stringstream sstream;
-	sstream << "Parallel Exception on processor: " << world.rank() << " from: "
-			<< world.size() << " with error message: " << msg_;
+	sstream <<std::endl<< "Parallel Exception on processor: " << world.rank() << " from: "
+			<< world.size() << " with error message: " << msg_<<std::endl;
 	msg_ = sstream.str();
 }
 
@@ -24,8 +24,8 @@ ParallelException::ParallelException(const std::string& message) :
 		Exception(message) {
 	mpi::communicator world;
 	std::stringstream sstream;
-	sstream << "Parallel Exception on processor: " << world.rank() << " from: "
-			<< world.size() << " with error message: " << msg_;
+	sstream <<std::endl<< "Parallel Exception on processor: " << world.rank() << " from: "
+			<< world.size() << " with error message: " << msg_<<std::endl;
 	msg_ = sstream.str();
 }
 
