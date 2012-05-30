@@ -29,7 +29,8 @@
 #include <string>
 #include <exception>
 
-
+namespace MPILib{
+namespace utilities{
 
 /** libpipe expection base class.
  */
@@ -66,6 +67,10 @@ protected:
      */
     std::string msg_;
 };
+
+}//end namespace
+}//end namespace
+
 
 /** Convenience macros.
  */

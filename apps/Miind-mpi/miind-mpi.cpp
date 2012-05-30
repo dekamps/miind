@@ -12,10 +12,11 @@
 #include <boost/serialization/base_object.hpp>
 
 #include <exception>
-#include <MPILib/MPINode.hpp>
-#include <MPILib/MPINetwork.hpp>
+#include <MPILib/include/MPINode.hpp>
+#include <MPILib/include/MPINetwork.hpp>
 
 namespace mpi = boost::mpi;
+using namespace MPILib;
 
 //some user defined data to send around
 class StructPoint {

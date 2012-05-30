@@ -5,11 +5,13 @@
  *      Author: david
  */
 
-#include "ParallelException.hpp"
+#include <MPILib/include/utilities/ParallelException.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <sstream>
 
 namespace mpi = boost::mpi;
+using namespace MPILib::utilities;
+
 
 ParallelException::ParallelException(const char* message) :
 		Exception(message) {

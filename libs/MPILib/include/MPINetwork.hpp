@@ -15,6 +15,7 @@
 #include "MPINode.hpp"
 #include "BasicTypes.hpp"
 
+namespace MPILib{
 
 class MPINetwork: private boost::noncopyable {
 
@@ -95,5 +96,7 @@ private:
 	int _maxNodeId;
 
 };
+
+}//end namespace
 
 #endif /* MPINETWORK_HPP_ */

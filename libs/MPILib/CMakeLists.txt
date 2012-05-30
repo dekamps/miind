@@ -18,19 +18,19 @@ include_directories( ${ROOT_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
 
 set( mpi_SRC
-    MPINetwork.cpp
-    MPINode.cpp
-    Exception.cpp
-    ParallelException.cpp
+    src/MPINetwork.cpp
+    src/MPINode.cpp
+    src/utilities/Exception.cpp
+    src/utilities/ParallelException.cpp
     #add cpp files
      )
 
 set( mpi_HEADERS
-    MPINode.hpp
-    MPINetwork.hpp
-    BasicTypes.hpp
-    Exception.hpp
-    ParallelException.hpp
+    include/MPINode.hpp
+    include/MPINetwork.hpp
+    include/BasicTypes.hpp
+    include/utilities/Exception.hpp
+    include/utilities/ParallelException.hpp
     #add headers
      )
 

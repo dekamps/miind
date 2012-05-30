@@ -13,6 +13,8 @@
 
 #include "BasicTypes.hpp"
 
+namespace MPILib{
+
 /**
  * @class MPINode the class for the actual network nodes. T
  */
@@ -115,5 +117,7 @@ private:
 	 */
 	std::vector<NodeState> _precursorStates;
 };
+
+}//end namespace
 
 #endif /* MPINODE_H_ */

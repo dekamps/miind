@@ -5,11 +5,12 @@
  *      Author: david
  */
 
-#include "MPINetwork.hpp"
+#include <MPILib/include/MPINetwork.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives.hpp>
 
 namespace mpi = boost::mpi;
+using namespace MPILib;
 
 MPINetwork::MPINetwork() {
 

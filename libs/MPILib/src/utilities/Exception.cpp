@@ -23,8 +23,9 @@
  * THE SOFTWARE.
  */
 
-#include "Exception.hpp"
+#include <MPILib/include/utilities/Exception.hpp>
 
+using namespace MPILib::utilities;
 
 Exception::Exception(const char* message) :
     msg_(message)

@@ -5,12 +5,14 @@
  *      Author: david
  */
 
-#include "MPINode.hpp"
+#include <MPILib/include/MPINode.hpp>
 #include <iostream>
 
 #include <boost/mpi/communicator.hpp>
 
 namespace mpi = boost::mpi;
+using namespace MPILib;
+
 
 MPINode::MPINode(const Algorithm& algorithm, NodeType nodeType, NodeId nodeId) :
 		_algorithm(algorithm), _nodeType(nodeType), _nodeId(nodeId) {
