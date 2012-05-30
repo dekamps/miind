@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef MIIND_EXCEPTION_HPP
-#define MIIND_EXCEPTION_HPP
+#ifndef MPILIB_UTILITIES_EXCEPTION_HPP_
+#define MPILIB_UTILITIES_EXCEPTION_HPP_
 
 #include <boost/exception/all.hpp>
 #include <string>
@@ -77,4 +77,4 @@ protected:
 #define miind_fail(ERROR_MESSAGE) throw (Exception(ERROR_MESSAGE))
 
 
-#endif //MIIND_EXCEPTION_HPP
+#endif //MPILIB_UTILITIES_EXCEPTION_HPP_

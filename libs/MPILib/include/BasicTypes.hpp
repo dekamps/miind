@@ -5,8 +5,8 @@
  *      Author: david
  */
 
-#ifndef BASICTYPES_HPP_
-#define BASICTYPES_HPP_
+#ifndef MPILIB_BASICTYPES_HPP_
+#define MPILIB_BASICTYPES_HPP_
 
 namespace MPILib{
 
@@ -20,4 +20,4 @@ typedef double NodeState;
 
 }//end namespace
 
-#endif /* BASICTYPES_HPP_ */
+#endif /* MPILIB_BASICTYPES_HPP_ */

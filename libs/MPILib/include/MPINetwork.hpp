@@ -5,8 +5,8 @@
  *      Author: david
  */
 
-#ifndef MPINETWORK_HPP_
-#define MPINETWORK_HPP_
+#ifndef MPILIB_MPINETWORK_HPP_
+#define MPILIB_MPINETWORK_HPP_
 
 #include <boost/noncopyable.hpp>
 #include <string>
@@ -99,4 +99,4 @@ private:
 
 }//end namespace
 
-#endif /* MPINETWORK_HPP_ */
+#endif /* MPILIB_MPINETWORK_HPP_ */

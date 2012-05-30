@@ -5,8 +5,8 @@
  *      Author: david
  */
 
-#ifndef MPINODE_H_
-#define MPINODE_H_
+#ifndef MPILIB_MPINODE_HPP_
+#define MPILIB_MPINODE_HPP_
 
 #include <boost/noncopyable.hpp>
 #include <vector>
@@ -120,4 +120,4 @@ private:
 
 }//end namespace
 
-#endif /* MPINODE_H_ */
+#endif /* MPILIB_MPINODE_HPP_ */

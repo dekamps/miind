@@ -5,8 +5,8 @@
  *      Author: david
  */
 
-#ifndef PARALLELEXCEPTION_HPP_
-#define PARALLELEXCEPTION_HPP_
+#ifndef MPILIB_UTILITIES_PARALLELEXCEPTION_HPP_
+#define MPILIB_UTILITIES_PARALLELEXCEPTION_HPP_
 
 #include "Exception.hpp"
 
@@ -48,4 +48,4 @@ public:
  */
 #define miind_parallel_fail(ERROR_MESSAGE) throw (ParallelException(ERROR_MESSAGE))
 
-#endif /* PARALLELEXCEPTION_HPP_ */
+#endif /* MPILIB_UTILITIES_PARALLELEXCEPTION_HPP_ */
