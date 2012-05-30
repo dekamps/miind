@@ -37,14 +37,15 @@ public:
 	 * @param NodeId of the second node
 	 * @param The WeightType of the connection
 	 * @return A boolean which is true if no error occured
+	 * @exception Can throw a ParallelException
 	 */
-	bool MakeFirstInputOfSecond(NodeId, NodeId, const WeightType&);
+	void MakeFirstInputOfSecond(NodeId, NodeId, const WeightType&);
 
 	//! Configure the next simulation
 	bool ConfigureSimulation(const SimulationRunParameter&);
 
 	//! Envolve the network
-	bool Evolve();
+	void Evolve();
 
 private:
 	/** check is a node is local to the processor

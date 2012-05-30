@@ -8,6 +8,8 @@
 #include <MPILib/include/MPINetwork.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives.hpp>
+#include <MPILib/include/utilities/ParallelException.hpp>
+#include <sstream>
 
 namespace mpi = boost::mpi;
 using namespace MPILib;
@@ -39,12 +41,11 @@ int MPINetwork::AddNode(const Algorithm& alg, NodeType nodeType) {
 		_localNodes.insert(std::make_pair(tempNodeId, node));
 	}
 	//increment the max NodeId to make sure that it is not assigned twice.
-	//TODO why here? It does not work correct in the if condition above.
 	incrementMaxNodeId();
 	return tempNodeId;
 }
 
-bool MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
+void MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
 		const WeightType& weight) {
 
 	assert(first!=second);
@@ -53,18 +54,21 @@ bool MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
 		if (_localNodes.count(first) > 0) {
 			_localNodes.find(first)->second.addSuccessor(second, weight);
 		} else {
-			return false;
+			std::stringstream tempStream;
+			tempStream << "the node " << first << "does not exist on this node";
+			miind_parallel_fail(tempStream.str());
 		}
 	}
 	if (isLocalNode(second)) {
 		if (_localNodes.count(second) > 0) {
 			_localNodes.find(second)->second.addPrecursor(first, weight);
 		} else {
-			return false;
+			std::stringstream tempStream;
+			tempStream << "the node " << second << "does not exist on this node";
+			miind_parallel_fail(tempStream.str());
 		}
 	}
 
-	return true;
 
 }
 
@@ -76,7 +80,7 @@ bool MPINetwork::ConfigureSimulation(const SimulationRunParameter& simParam) {
 }
 
 //! Envolve the network
-bool MPINetwork::Evolve() {
+void MPINetwork::Evolve() {
 
 	for (std::map<NodeId, MPINode>::iterator it = _localNodes.begin();
 			it != _localNodes.end(); it++) {
@@ -86,8 +90,7 @@ bool MPINetwork::Evolve() {
 		std::cout << std::endl;
 		//TODO call evolve on the nodes
 	}
-	//FIXME change this
-	return true;
+
 
 }
 
@@ -99,7 +102,7 @@ int MPINetwork::getResponsibleProcessor(NodeId nodeId) {
 	return nodeId % _totalProcessors;
 }
 
-bool MPINetwork::isMaster() const{
+bool MPINetwork::isMaster() const {
 	return _processorId == 0;
 }
 
