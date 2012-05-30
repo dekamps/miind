@@ -46,6 +46,6 @@ public:
 
 /** Convenience macros.
  */
-#define miind_parallel_fail(ERROR_MESSAGE) throw (ParallelException(ERROR_MESSAGE))
+#define miind_parallel_fail(ERROR_MESSAGE) throw (MPILib::utilities::ParallelException(ERROR_MESSAGE))
 
 #endif /* MPILIB_UTILITIES_PARALLELEXCEPTION_HPP_ */

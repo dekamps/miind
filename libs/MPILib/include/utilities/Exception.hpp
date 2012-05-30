@@ -74,7 +74,7 @@ protected:
 
 /** Convenience macros.
  */
-#define miind_fail(ERROR_MESSAGE) throw (Exception(ERROR_MESSAGE))
+#define miind_fail(ERROR_MESSAGE) throw (MPILib::utilities::Exception(ERROR_MESSAGE))
 
 
 #endif //MPILIB_UTILITIES_EXCEPTION_HPP_
