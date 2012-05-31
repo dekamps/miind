@@ -19,10 +19,6 @@ namespace mpi = boost::mpi;
 using namespace MPILib;
 
 
-
-//make it mpi datatype the class with std::string this is not possible as it is no MPI Datatype
-BOOST_IS_MPI_DATATYPE(StructPoint)
-
 int main(int argc, char* argv[]) {
 	// initialize mpi
 
