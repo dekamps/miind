@@ -55,6 +55,13 @@ add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${mpi_SRC} ${mpi_HEADERS} )
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} )
 
 
+#############################################################################
+# tests
+#############################################################################
+
+IF (ENABLE_TESTING)
+  ADD_SUBDIRECTORY(test)
+ENDIF (ENABLE_TESTING)
 
 install( FILES ${mpi_HEADERS}
     DESTINATION include/miind/MPILib )
