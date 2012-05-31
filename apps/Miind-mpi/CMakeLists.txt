@@ -29,26 +29,9 @@ if ( Boost_FOUND )
     if (UNIX)
         ADD_DEFINITIONS("-fno-strict-aliasing" )
     endif (UNIX)
-    set ( LIBLIST 
-        ${MIIND_LIBRARY_PREFIX}clam
-        ${MIIND_LIBRARY_PREFIX}numtools
-        ${MIIND_LIBRARY_PREFIX}util
-        ${MIIND_LIBRARY_PREFIX}net
-        ${MIIND_LIBRARY_PREFIX}mpi
-        ${MIIND_LIBRARY_PREFIX}net
-	    ${MIIND_LIBRARY_PREFIX}miind
-        ${MIIND_LIBRARY_PREFIX}structnet
-        ${MIIND_LIBRARY_PREFIX}dynamic
-	    ${MIIND_LIBRARY_PREFIX}populist
-        ${LIB_PREFIX}Core
-        ${LIB_PREFIX}RIO
-        ${LIB_PREFIX}Hist
-        ${LIB_PREFIX}Tree
-        ${LIB_PREFIX}Gpad
-        ${gsl_LINK_FLAGS} 
+    set ( LIBLIST       
+        ${MIIND_LIBRARY_PREFIX}mpi      
         ${MPI_LIBRARIES} 
-	gsl
-	    ${CBLAS_PREFIX}cblas 
         ${Boost_LIBRARIES}
     )
 else( Boost_FOUND)

@@ -7,12 +7,33 @@ set( CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix." ) # defaul
 set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 
 
-# Require MPI for this project:
-find_package(MPI REQUIRED)
-set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
-set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
-include_directories(${MPI_INCLUDE_PATH})
-#does not work with macport need to be teste for linux
+
+
+#
+# Options
+#
+
+OPTION(ENABLE_TESTING "Compile tests" ON)
+OPTION(ENABLE_COVERAGE "Enable GCov coverage analysis (defines a 'coverage' target and enforces static build of libpipe)" OFF)
+OPTION(ENABLE_MPI "Enable threading" FALSE)
+
+IF(ENABLE_MPI)
+    MESSAGE(STATUS "MPI enabled")
+    # Require MPI for this project:
+    find_package(MPI REQUIRED)
+    set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
+    set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
+    include_directories(${MPI_INCLUDE_PATH})
+    #does not work with macport need to be teste for linux
+ELSE()
+    MESSAGE(STATUS "MPI disabled")   
+ENDIF()
+IF(ENABLE_TESTING)
+    MESSAGE(STATUS "Testing enabled")
+ELSE()
+    MESSAGE(STATUS "Testing disabled")
+ENDIF()
+
 
 if (WIN32)
         ADD_DEFINITIONS( -D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK)
@@ -63,16 +84,18 @@ SET (LIB_PREFIX lib)
 else (WIN32)
 SET (CBLAS_PREFIX gsl)
 endif (WIN32)
+
+
 #----------------swig
-#FIND_PACKAGE( SWIG )
-#
-#if (SWIG_FOUND)
-#	INCLUDE( ${SWIG_USE_FILE} )
-#	FIND_PACKAGE( PythonLibs )
-#	INCLUDE_DIRECTORIES( ${PYTHON_INCLUDE_PATH} )
-#endif (SWIG_FOUND)
-#
-#SET( CMAKE_SWIG_FLAGS "" )
+FIND_PACKAGE( SWIG )
+
+if (SWIG_FOUND)
+	INCLUDE( ${SWIG_USE_FILE} )
+	FIND_PACKAGE( PythonLibs )
+	INCLUDE_DIRECTORIES( ${PYTHON_INCLUDE_PATH} )
+endif (SWIG_FOUND)
+
+SET( CMAKE_SWIG_FLAGS "" )
 #---------swig
 
 

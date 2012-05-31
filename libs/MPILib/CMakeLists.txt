@@ -42,26 +42,7 @@ if ( Boost_FOUND )
         ADD_DEFINITIONS("-fno-strict-aliasing" )
     endif (UNIX)
     set ( LIBLIST 
-        ${MIIND_LIBRARY_PREFIX}clam
-        ${MIIND_LIBRARY_PREFIX}numtools
-        ${MIIND_LIBRARY_PREFIX}util
-        ${MIIND_LIBRARY_PREFIX}net
-        ${MIIND_LIBRARY_PREFIX}sparseimplementation
-        ${LIB_PREFIX}Core
-        ${LIB_PREFIX}RIO
-        ${LIB_PREFIX}Hist
-        ${LIB_PREFIX}Tree
-        ${LIB_PREFIX}Table
-		${LIB_PREFIX}Matrix
-		${LIB_PREFIX}MathCore
-		${LIB_PREFIX}MathMore
-        ${LIB_PREFIX}Gpad
-		${LIB_PREFIX}Graf
-		${LIB_PREFIX}Postscript
-        ${gsl_LINK_FLAGS}
         ${Boost_LIBRARIES} 
-	    gsl
-	    ${CBLAS_PREFIX}cblas
 	    ${MPI_LIBRARIES} 
     )
 else( Boost_FOUND)
