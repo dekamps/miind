@@ -1,27 +1,27 @@
+#include <boost/mpi.hpp>
+#include <boost/mpi/communicator.hpp>
 
-
-#define BOOST_ALL_DYN_LINK
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
-
-//____________________________________________________________________________//
-
-// most frequently you implement test cases as a free functions with automatic registration
-BOOST_AUTO_TEST_CASE( test1 )
-{
-    // reports 'error in "test1": test 2 == 1 failed'
-    BOOST_CHECK( 2 == 2 );
-}
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
 
 //____________________________________________________________________________//
 
-// each test file may contain any number of test cases; each test case has to have unique name
-BOOST_AUTO_TEST_CASE( test2 )
+int add( int i, int j ) { return i+j; }
+
+//____________________________________________________________________________//
+
+int test_main(int argc, char* argv[] )             // note the name!
 {
-    int i = 2;
 
-    // reports 'error in "test2": check i == 2 failed [0 != 2]'
-    BOOST_CHECK_EQUAL( i, 2 );
+	boost::mpi::environment env(argc, argv);
+    // six ways to detect and report the same error:
+    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+    BOOST_REQUIRE( add( 2,2 ) == 4 );      // #2 throws on error
+    if( add( 2,2 ) != 4 )
+        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+    if( add( 2,2 ) != 4 )
+        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
 
-
+    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
 }

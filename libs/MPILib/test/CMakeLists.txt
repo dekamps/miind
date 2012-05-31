@@ -35,12 +35,14 @@ MACRO(ADD_LIBPIPE_TEST name exe src)
     )
 
     TARGET_LINK_LIBRARIES(${exe} ${TEST_LIBS})
+    
     # add test to global list of unit test
     ADD_TEST(${name} ${exe})
     MESSAGE(STATUS "Adding test for ${name}: ${exe}.")
     # add target for the test
     STRING(REGEX REPLACE "test_([^ ]+).*" "unit_\\1" unittest_target "${exe}" )
-    ADD_CUSTOM_TARGET(${unittest_target} COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${exe})
+    ADD_CUSTOM_TARGET(${unittest_target} COMMAND mpirun -np 2 ${CMAKE_CURRENT_BINARY_DIR}/${exe})
+    
     IF (HAVE_VALGRIND) 
         #add memory test using valgrind
         STRING(REGEX REPLACE "test_([^ ]+).*" "mem_\\1" memtest_name "${exe}" )
@@ -56,7 +58,8 @@ ENDMACRO(ADD_LIBPIPE_TEST name exe src)
 
 
 INCLUDE_DIRECTORIES( 
-    ../../MPILib 
+    ../../MPILib/include
+    ../../MPILib/include/utilities 
 )
 
 
