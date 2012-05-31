@@ -21,7 +21,7 @@ ENDIF(MPIEXEC STREQUAL "MPIEXEC-NOTFOUND")
 ##############################################################################
 # macro definitions
 ##############################################################################
-MACRO(ADD_LIBPIPE_TEST name exe src)
+MACRO(ADD_MIIND_MPI_TEST name exe src)
     STRING(REGEX REPLACE "test_([^ ]+).*" "\\1" test "${exe}" )
     # build the test
     ADD_EXECUTABLE(${exe} ${src})
@@ -50,7 +50,7 @@ MACRO(ADD_LIBPIPE_TEST name exe src)
         #Add target for the memory test
         ADD_CUSTOM_TARGET(${memtest_name} COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/memcheck.py ${CMAKE_CURRENT_BINARY_DIR}/${exe})
     ENDIF (HAVE_VALGRIND) 
-ENDMACRO(ADD_LIBPIPE_TEST name exe src)
+ENDMACRO(ADD_MIIND_MPI_TEST name exe src)
 
 
 # include directories
@@ -68,8 +68,7 @@ SET(SRCS_UTILITIES_TIME example_test.cpp)
 
 
 #### Tests
-ADD_LIBPIPE_TEST("Example" test_example_test ${SRCS_UTILITIES_TIME})
-
+ADD_MIIND_MPI_TEST("Example" test_example_test ${SRCS_UTILITIES_TIME})
 
 
 
@@ -81,7 +80,7 @@ IF(numtests GREATER 0)
         LIST(GET exe_names ${i} exe)
         MESSAGE(STATUS "Adding memory test for ${memtest_name}: ${exe}.")
         ADD_TEST(${memtest_name}
-            ${CMAKE_CURRENT_SOURCE_DIR}/memtest.py ${CMAKE_CURRENT_BINARY_DIR}/${exe} ${CMAKE_BINARY_DIR})
+            ${MPIEXEC} -np 1 ${CMAKE_CURRENT_SOURCE_DIR}/memtest.py ${CMAKE_CURRENT_BINARY_DIR}/${exe} ${CMAKE_BINARY_DIR})
     ENDFOREACH(i RANGE 0 ${numtests}-1)
 ENDIF(numtests GREATER 0)
 
