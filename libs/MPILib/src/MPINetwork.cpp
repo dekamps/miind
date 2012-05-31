@@ -48,8 +48,6 @@ int MPINetwork::AddNode(const Algorithm& alg, NodeType nodeType) {
 void MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
 		const WeightType& weight) {
 
-	assert(first!=second);
-
 	if (isLocalNode(first)) {
 		if (_localNodes.count(first) > 0) {
 			_localNodes.find(first)->second.addSuccessor(second, weight);
