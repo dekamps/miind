@@ -10,15 +10,13 @@ IF(VALGRIND_EXECUTABLE STREQUAL "VALGRIND_EXECUTABLE-NOTFOUND")
     MESSAGE(STATUS "WARNING: Could not find valgrind. Will NOT build memory tests.")
     SET(HAVE_VALGRIND FALSE)
 ENDIF(VALGRIND_EXECUTABLE STREQUAL "VALGRIND_EXECUTABLE-NOTFOUND")
-##############################################################################
-# check if have mpirun
-##############################################################################
+
+
 SET(HAVE_MPIRUN TRUE)
-FIND_PROGRAM(MPIRUN_EXECUTABLE mpirun)
-IF(MPIRUN_EXECUTABLE STREQUAL "VALGRIND_EXECUTABLE-NOTFOUND")
-    MESSAGE(STATUS "WARNING: Could not find valgrind. Will NOT build memory tests.")
+IF(MPIEXEC STREQUAL "MPIEXEC-NOTFOUND")
+    MESSAGE(FATAL_ERROR "ERROR: Could not find mpirun. Will NOT build tests. Either deactivate test or provide the variable MPIEXEC")
     SET(HAVE_MPIRUN FALSE)
-ENDIF(MPIRUN_EXECUTABLE STREQUAL "VALGRIND_EXECUTABLE-NOTFOUND")
+ENDIF(MPIEXEC STREQUAL "MPIEXEC-NOTFOUND")
 
 ##############################################################################
 # macro definitions
@@ -35,9 +33,10 @@ MACRO(ADD_LIBPIPE_TEST name exe src)
     )
 
     TARGET_LINK_LIBRARIES(${exe} ${TEST_LIBS})
+
     
-    # add test to global list of unit test
-    ADD_TEST(${name} ${exe})
+    
+    ADD_TEST(${name} ${MPIEXEC} -np 2 ${exe})
     MESSAGE(STATUS "Adding test for ${name}: ${exe}.")
     # add target for the test
     STRING(REGEX REPLACE "test_([^ ]+).*" "unit_\\1" unittest_target "${exe}" )

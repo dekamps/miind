@@ -1,42 +1,15 @@
-if( WIN32 )
-  find_package( WINGSL REQUIRED )
-  if( NOT GSL_FOUND )
-    message( FATAL_ERROR "WinGsl not found." )
-  endif( NOT GSL_FOUND )
-  link_directories( ${GSL_LIBRARY_RELEASE_DIRS} )
-else( WIN32 )
-    include( RequireGSL )
-    link_directories( ${GSL_LIBRARY_DIRS} )
-endif( WIN32 )
-
-include_directories( ${GSL_INCLUDE_DIRS} )
-
-find_package( Root )
-if( NOT ROOT_INCLUDE_DIRS AND NOT ROOT_LIBRARY_DIRS )
-    message( FATAL_ERROR "Root Library not found." )
-endif( NOT ROOT_INCLUDE_DIRS AND NOT ROOT_LIBRARY_DIRS )
-
-include_directories( ${ROOT_INCLUDE_DIRS} )
-link_directories( ${ROOT_LIBRARY_DIRS} )
-
 include_directories( ../../libs/MPILib )
 
 
-if ( Boost_FOUND )
-    include_directories( ${Boost_INCLUDE_DIRS} )
-    link_directories( ${Boost_LIBRARY_DIRS} )
-    message( ${Boost_LIBRARY_DIRS} )
-    if (UNIX)
-        ADD_DEFINITIONS("-fno-strict-aliasing" )
-    endif (UNIX)
-    set ( LIBLIST       
-        ${MIIND_LIBRARY_PREFIX}mpi      
-        ${MPI_LIBRARIES} 
-        ${Boost_LIBRARIES}
-    )
-else( Boost_FOUND)
-    message( STATUS "Boost.TEST not found -- skipping the BOOST unit tests" )
-endif ( Boost_FOUND )
+if (UNIX)
+   ADD_DEFINITIONS("-fno-strict-aliasing" )
+endif (UNIX)
+set ( LIBLIST       
+    ${MIIND_LIBRARY_PREFIX}mpi      
+    ${MPI_LIBRARIES} 
+    ${Boost_LIBRARIES}
+)
+
 
 
 add_executable( miind-mpi
