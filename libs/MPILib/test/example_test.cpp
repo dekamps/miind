@@ -14,6 +14,9 @@ int test_main(int argc, char* argv[] )             // note the name!
 {
 
 	boost::mpi::environment env(argc, argv);
+
+
+
     // six ways to detect and report the same error:
     BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
     BOOST_REQUIRE( add( 2,2 ) == 4 );      // #2 throws on error

@@ -11,7 +11,9 @@ IF(VALGRIND_EXECUTABLE STREQUAL "VALGRIND_EXECUTABLE-NOTFOUND")
     SET(HAVE_VALGRIND FALSE)
 ENDIF(VALGRIND_EXECUTABLE STREQUAL "VALGRIND_EXECUTABLE-NOTFOUND")
 
-
+##############################################################################
+# check if MPI Executable is available
+##############################################################################
 SET(HAVE_MPIRUN TRUE)
 IF(MPIEXEC STREQUAL "MPIEXEC-NOTFOUND")
     MESSAGE(FATAL_ERROR "ERROR: Could not find mpirun. Will NOT build tests. Either deactivate test or provide the variable MPIEXEC")
@@ -52,10 +54,9 @@ MACRO(ADD_MIIND_MPI_TEST name exe src)
     ENDIF (HAVE_VALGRIND) 
 ENDMACRO(ADD_MIIND_MPI_TEST name exe src)
 
-
+##############################################################################
 # include directories
-
-
+##############################################################################
 INCLUDE_DIRECTORIES( 
     ../../MPILib/include
     ../../MPILib/include/utilities 
@@ -63,15 +64,17 @@ INCLUDE_DIRECTORIES(
 
 
 
-#### Sources
-SET(SRCS_UTILITIES_TIME example_test.cpp)
+
+##############################################################################
+# Add here the test
+##############################################################################
+ADD_MIIND_MPI_TEST("MPINetwork" test_MPINetwork_test MPINetwork_test.cpp)
+ADD_MIIND_MPI_TEST("Example" test_example_test example_test.cpp)
 
 
-#### Tests
-ADD_MIIND_MPI_TEST("Example" test_example_test ${SRCS_UTILITIES_TIME})
-
-
-
+##############################################################################
+# generation of the memtests
+##############################################################################
 LIST(LENGTH memtest_names numtests)
 IF(numtests GREATER 0)
     MATH(EXPR numtests ${numtests}-1)
