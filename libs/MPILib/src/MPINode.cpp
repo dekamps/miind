@@ -14,13 +14,11 @@
 namespace mpi = boost::mpi;
 using namespace MPILib;
 
-MPINode::MPINode(const Algorithm& algorithm, NodeType nodeType, NodeId nodeId) :
-		_algorithm(algorithm), _nodeType(nodeType), _nodeId(nodeId) {
+MPINode::MPINode(const Algorithm& algorithm, NodeType nodeType, NodeId nodeId,
+		const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution) :
+		_algorithm(algorithm), _nodeType(nodeType), _nodeId(nodeId), _nodeDistribution(
+				nodeDistribution) {
 
-	mpi::communicator world;
-
-	_processorId = world.rank();
-	_totalProcessors = world.size();
 }
 ;
 
@@ -66,11 +64,7 @@ void MPINode::setState(NodeState state) {
 	_state = state;
 }
 
-int MPINode::getResponsibleProcessor(NodeId nodeId) {
-	return nodeId % _totalProcessors;
-}
-
-void::MPINode::waitAll(){
+void ::MPINode::waitAll() {
 	mpi::wait_all(_mpiStatus.begin(), _mpiStatus.end());
 	_mpiStatus.clear();
 }
@@ -78,10 +72,12 @@ void::MPINode::waitAll(){
 void MPINode::receiveData() {
 
 	std::vector<NodeId>::iterator it;
-	int i=0;
+	int i = 0;
 	for (it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		mpi::communicator world;
-		_mpiStatus.push_back(world.irecv(getResponsibleProcessor(*it), *it, _precursorStates[i]));
+		_mpiStatus.push_back(
+				world.irecv(_nodeDistribution->getResponsibleProcessor(*it),
+						*it, _precursorStates[i]));
 	}
 }
 
@@ -90,7 +86,9 @@ void MPINode::sendOwnState() {
 	std::vector<NodeId>::iterator it;
 	for (it = _successors.begin(); it != _successors.end(); it++) {
 		mpi::communicator world;
-		_mpiStatus.push_back(world.isend(getResponsibleProcessor(*it), *it, _state));
+		_mpiStatus.push_back(
+				world.isend(_nodeDistribution->getResponsibleProcessor(*it),
+						*it, _state));
 	}
 
 }

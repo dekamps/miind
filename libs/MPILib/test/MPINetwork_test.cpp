@@ -30,7 +30,7 @@ void test_Constructor() {
 	MPINetwork network;
 
 	if (world.rank() == 0) {
-		BOOST_REQUIRE(network._mpiDistribution->isMaster()==true);
+		BOOST_REQUIRE(network._nodeDistribution->isMaster()==true);
 		BOOST_REQUIRE(network._localNodes.size()==0);
 	} else if (world.rank() == 1) {
 		BOOST_REQUIRE(network._localNodes.size()==0);

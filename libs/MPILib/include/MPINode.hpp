@@ -12,6 +12,8 @@
 #include <vector>
 #include <boost/mpi/request.hpp>
 
+
+#include "utilities/NodeDistributionInterface.hpp"
 #include "BasicTypes.hpp"
 
 namespace MPILib {
@@ -25,8 +27,10 @@ public:
 	 * Constructor
 	 * @param Algorithm the algorithm the node should contain
 	 * @param NodeType the type of the node
+	 * @param NodeId the id of the node
+	 * @param NodeDistributionInterface The Node Distribution.
 	 */
-	explicit MPINode(const Algorithm&, NodeType, NodeId);
+	explicit MPINode(const Algorithm&, NodeType, NodeId, const boost::shared_ptr<utilities::NodeDistributionInterface>&);
 
 	/**
 	 * Destructor
@@ -85,11 +89,6 @@ public:
 
 private:
 
-	/** get the processor number which is responsible for the node
-	 * @param The Id of the Node
-	 * @return the processor responsible
-	 */
-	int getResponsibleProcessor(NodeId);
 
 	void waitAll();
 
@@ -109,16 +108,7 @@ private:
 	NodeId _nodeId;
 
 
-
-	/**
-	 * The local processor id
-	 */
-	int _processorId;
-
-	/**
-	 * The total number of processors
-	 */
-	int _totalProcessors;
+	boost::shared_ptr<utilities::NodeDistributionInterface> _nodeDistribution;
 
 	/**
 	 * The state of the node it is currently

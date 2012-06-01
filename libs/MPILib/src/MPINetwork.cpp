@@ -15,10 +15,10 @@
 namespace mpi = boost::mpi;
 using namespace MPILib;
 
-MPINetwork::MPINetwork():_mpiDistribution(new utilities::CircularDistribution) {
+MPINetwork::MPINetwork():_nodeDistribution(new utilities::CircularDistribution) {
 
 
-	if (_mpiDistribution->isMaster()) {
+	if (_nodeDistribution->isMaster()) {
 		_maxNodeId = 0;
 	}
 
@@ -33,8 +33,8 @@ MPINetwork::~MPINetwork() {
 int MPINetwork::AddNode(const Algorithm& alg, NodeType nodeType) {
 
 	int tempNodeId = getMaxNodeId();
-	if (_mpiDistribution->isLocalNode(tempNodeId)) {
-		MPINode node = MPINode(alg, nodeType, tempNodeId);
+	if (_nodeDistribution->isLocalNode(tempNodeId)) {
+		MPINode node = MPINode(alg, nodeType, tempNodeId, _nodeDistribution);
 		_localNodes.insert(std::make_pair(tempNodeId, node));
 	}
 	//increment the max NodeId to make sure that it is not assigned twice.
@@ -45,7 +45,7 @@ int MPINetwork::AddNode(const Algorithm& alg, NodeType nodeType) {
 void MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
 		const WeightType& weight) {
 
-	if (_mpiDistribution->isLocalNode(first)) {
+	if (_nodeDistribution->isLocalNode(first)) {
 		if (_localNodes.count(first) > 0) {
 			_localNodes.find(first)->second.addSuccessor(second, weight);
 		} else {
@@ -54,7 +54,7 @@ void MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
 			miind_parallel_fail(tempStream.str());
 		}
 	}
-	if (_mpiDistribution->isLocalNode(second)) {
+	if (_nodeDistribution->isLocalNode(second)) {
 		if (_localNodes.count(second) > 0) {
 			_localNodes.find(second)->second.addPrecursor(first, weight);
 		} else {
@@ -79,7 +79,7 @@ void MPINetwork::Evolve() {
 
 	for (std::map<NodeId, MPINode>::iterator it = _localNodes.begin();
 			it != _localNodes.end(); it++) {
-		std::cout << "processorID:\t" << _mpiDistribution->getRank();
+		std::cout << "processorID:\t" << _nodeDistribution->getRank();
 		//FIXME change to better time
 		it->second.Evolve(1);
 		std::cout << std::endl;
@@ -97,7 +97,7 @@ int MPINetwork::getMaxNodeId() {
 }
 
 void MPINetwork::incrementMaxNodeId() {
-	if (_mpiDistribution->isMaster()) {
+	if (_nodeDistribution->isMaster()) {
 		_maxNodeId++;
 	}
 }

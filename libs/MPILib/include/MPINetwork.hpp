@@ -67,7 +67,7 @@ private:
 	/**
 	 * Shared pointer to the actual distribution of the nodes.
 	 */
-	boost::shared_ptr<utilities::NodeDistributionInterface> _mpiDistribution;
+	boost::shared_ptr<utilities::NodeDistributionInterface> _nodeDistribution;
 
 	/**
 	 * local nodes of the processor
