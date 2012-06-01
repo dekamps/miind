@@ -9,11 +9,14 @@
 #define MPILIB_MPINETWORK_HPP_
 
 #include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <map>
 
 #include "MPINode.hpp"
 #include "BasicTypes.hpp"
+#include "utilities/NodeDistributionInterface.hpp"
+
 
 namespace MPILib{
 
@@ -48,22 +51,6 @@ public:
 	void Evolve();
 
 private:
-	/** check is a node is local to the processor
-	 * @param The Id of the Node
-	 * @return true if the Node is local
-	 */
-	bool isLocalNode(NodeId);
-	/** get the processor number which is responsible for the node
-	 * @param The Id of the Node
-	 * @return the processor responsible
-	 */
-	int getResponsibleProcessor(NodeId);
-
-	/**
-	 * If the processor is master (We assume the processor with _processorId=0 is the master)
-	 * @return true if the node is the master.
-	 */
-	bool isMaster() const;
 
 	/**
 	 * returns the max node id currently used.
@@ -76,19 +63,17 @@ private:
 	 * Increments the NodeId on the master by 1
 	 */
 	void incrementMaxNodeId();
+
+	/**
+	 * Shared pointer to the actual distribution of the nodes.
+	 */
+	boost::shared_ptr<utilities::NodeDistributionInterface> _mpiDistribution;
+
 	/**
 	 * local nodes of the processor
 	 */
 	std::map<NodeId, MPINode> _localNodes;
-	/**
-	 * The local processor id
-	 */
-	int _processorId;
 
-	/**
-	 * The total number of processors
-	 */
-	int _totalProcessors;
 
 	/**
 	 * The max Node number assigned so far.

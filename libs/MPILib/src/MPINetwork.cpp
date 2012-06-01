@@ -9,19 +9,16 @@
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <MPILib/include/utilities/ParallelException.hpp>
+#include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <sstream>
 
 namespace mpi = boost::mpi;
 using namespace MPILib;
 
-MPINetwork::MPINetwork() {
+MPINetwork::MPINetwork():_mpiDistribution(new utilities::CircularDistribution) {
 
-	mpi::communicator world;
 
-	_processorId = world.rank();
-	_totalProcessors = world.size();
-
-	if (isMaster()) {
+	if (_mpiDistribution->isMaster()) {
 		_maxNodeId = 0;
 	}
 
@@ -36,7 +33,7 @@ MPINetwork::~MPINetwork() {
 int MPINetwork::AddNode(const Algorithm& alg, NodeType nodeType) {
 
 	int tempNodeId = getMaxNodeId();
-	if (isLocalNode(tempNodeId)) {
+	if (_mpiDistribution->isLocalNode(tempNodeId)) {
 		MPINode node = MPINode(alg, nodeType, tempNodeId);
 		_localNodes.insert(std::make_pair(tempNodeId, node));
 	}
@@ -48,7 +45,7 @@ int MPINetwork::AddNode(const Algorithm& alg, NodeType nodeType) {
 void MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
 		const WeightType& weight) {
 
-	if (isLocalNode(first)) {
+	if (_mpiDistribution->isLocalNode(first)) {
 		if (_localNodes.count(first) > 0) {
 			_localNodes.find(first)->second.addSuccessor(second, weight);
 		} else {
@@ -57,7 +54,7 @@ void MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
 			miind_parallel_fail(tempStream.str());
 		}
 	}
-	if (isLocalNode(second)) {
+	if (_mpiDistribution->isLocalNode(second)) {
 		if (_localNodes.count(second) > 0) {
 			_localNodes.find(second)->second.addPrecursor(first, weight);
 		} else {
@@ -82,7 +79,7 @@ void MPINetwork::Evolve() {
 
 	for (std::map<NodeId, MPINode>::iterator it = _localNodes.begin();
 			it != _localNodes.end(); it++) {
-		std::cout << "processorID:\t" << _processorId;
+		std::cout << "processorID:\t" << _mpiDistribution->getRank();
 		//FIXME change to better time
 		it->second.Evolve(1);
 		std::cout << std::endl;
@@ -90,18 +87,6 @@ void MPINetwork::Evolve() {
 	}
 
 
-}
-
-bool MPINetwork::isLocalNode(NodeId nodeId) {
-	return getResponsibleProcessor(nodeId) == _processorId;
-}
-
-int MPINetwork::getResponsibleProcessor(NodeId nodeId) {
-	return nodeId % _totalProcessors;
-}
-
-bool MPINetwork::isMaster() const {
-	return _processorId == 0;
 }
 
 int MPINetwork::getMaxNodeId() {
@@ -112,7 +97,7 @@ int MPINetwork::getMaxNodeId() {
 }
 
 void MPINetwork::incrementMaxNodeId() {
-	if (isMaster()) {
+	if (_mpiDistribution->isMaster()) {
 		_maxNodeId++;
 	}
 }

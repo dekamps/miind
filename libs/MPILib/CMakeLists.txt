@@ -4,6 +4,7 @@ set( mpi_SRC
     src/MPINode.cpp
     src/utilities/Exception.cpp
     src/utilities/ParallelException.cpp
+    src/utilities/CircularDistribution.cpp
     #add cpp files
      )
 
@@ -13,6 +14,8 @@ set( mpi_HEADERS
     include/BasicTypes.hpp
     include/utilities/Exception.hpp
     include/utilities/ParallelException.hpp
+    include/utilities/CircularDistribution.hpp
+    include/utilities/NodeDistributionInterface.hpp
     #add headers
      )
 

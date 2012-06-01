@@ -30,13 +30,12 @@ void test_Constructor() {
 	MPINetwork network;
 
 	if (world.rank() == 0) {
-		BOOST_REQUIRE(network._maxNodeId==0);
+		BOOST_REQUIRE(network._mpiDistribution->isMaster()==true);
 		BOOST_REQUIRE(network._localNodes.size()==0);
 	} else if (world.rank() == 1) {
 		BOOST_REQUIRE(network._localNodes.size()==0);
 	}
-	BOOST_REQUIRE(world.size()==network._totalProcessors);
-	BOOST_REQUIRE(world.rank()==network._processorId);
+
 
 }
 
@@ -96,35 +95,35 @@ void test_MakeFirstInputOfSecond() {
 	BOOST_REQUIRE(exceptionThrown==true);
 
 }
-
-void test_isLocalNode() {
-	MPINetwork network;
-	if (world.rank() == 0) {
-		BOOST_REQUIRE(network.isLocalNode(0)==true);
-		BOOST_REQUIRE(network.isLocalNode(1)==false);
-
-	} else if (world.rank() == 1) {
-		BOOST_REQUIRE(network.isLocalNode(0)==false);
-		BOOST_REQUIRE(network.isLocalNode(1)==true);
-
-	}
-
-}
-
-void test_getResponsibleProcessor() {
-	MPINetwork network;
-	BOOST_REQUIRE(network.getResponsibleProcessor(1)==1);
-	BOOST_REQUIRE(network.getResponsibleProcessor(0)==0);
-}
-
-void test_isMaster() {
-	MPINetwork network;
-	if (world.rank() == 0) {
-		BOOST_REQUIRE(network.isMaster()==true);
-	} else {
-		BOOST_REQUIRE(network.isMaster()==false);
-	}
-}
+//
+//void test_isLocalNode() {
+//	MPINetwork network;
+//	if (world.rank() == 0) {
+//		BOOST_REQUIRE(network.isLocalNode(0)==true);
+//		BOOST_REQUIRE(network.isLocalNode(1)==false);
+//
+//	} else if (world.rank() == 1) {
+//		BOOST_REQUIRE(network.isLocalNode(0)==false);
+//		BOOST_REQUIRE(network.isLocalNode(1)==true);
+//
+//	}
+//
+//}
+//
+//void test_getResponsibleProcessor() {
+//	MPINetwork network;
+//	BOOST_REQUIRE(network.getResponsibleProcessor(1)==1);
+//	BOOST_REQUIRE(network.getResponsibleProcessor(0)==0);
+//}
+//
+//void test_isMaster() {
+//	MPINetwork network;
+//	if (world.rank() == 0) {
+//		BOOST_REQUIRE(network.isMaster()==true);
+//	} else {
+//		BOOST_REQUIRE(network.isMaster()==false);
+//	}
+//}
 
 void test_getMaxNodeId() {
 	MPINetwork network;
@@ -160,9 +159,9 @@ int test_main(int argc, char* argv[]) // note the name!
 	test_Constructor();
 	test_AddNode();
 	test_MakeFirstInputOfSecond();
-	test_isLocalNode();
-	test_getResponsibleProcessor();
-	test_isMaster();
+//	test_isLocalNode();
+//	test_getResponsibleProcessor();
+//	test_isMaster();
 	test_getMaxNodeId();
 	test_incrementMaxNodeId();
 
