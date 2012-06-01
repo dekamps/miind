@@ -25,18 +25,19 @@ ENDIF(MPIEXEC STREQUAL "MPIEXEC-NOTFOUND")
 ##############################################################################
 MACRO(ADD_MIIND_MPI_TEST src)
 
+    #make sure that the tests all end with _test.cpp
     STRING(REGEX MATCH "_test.cpp$" result ${src})
     IF(NOT(${result} MATCHES "_test.cpp"))
         MESSAGE(FATAL_ERROR "test need to end with _test.cpp")
     ENDIF()
     
-    #set the test name
+    #set the test name by removing the _test.cpp from the source file
     STRING(REGEX REPLACE "_test.cpp" "" name ${src})
     
-    #set the name of executable
+    #set the name of executable by prepending test_ to the beginning
     SET(exe "test_" ${name})
+    #and replace all / with _
     STRING(REGEX REPLACE "/" "_" exe ${exe})
-    
     
     # build the test
     ADD_EXECUTABLE(${exe} ${src})
@@ -49,8 +50,7 @@ MACRO(ADD_MIIND_MPI_TEST src)
 
     TARGET_LINK_LIBRARIES(${exe} ${TEST_LIBS})
 
-    
-    
+        
     ADD_TEST(${name} ${MPIEXEC} -np 2 ${exe})
     MESSAGE(STATUS "Adding test for ${name}: ${exe}.")
     # add target for the test
