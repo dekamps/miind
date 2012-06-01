@@ -23,8 +23,21 @@ ENDIF(MPIEXEC STREQUAL "MPIEXEC-NOTFOUND")
 ##############################################################################
 # macro definitions
 ##############################################################################
-MACRO(ADD_MIIND_MPI_TEST name exe src)
-    STRING(REGEX REPLACE "test_([^ ]+).*" "\\1" test "${exe}" )
+MACRO(ADD_MIIND_MPI_TEST src)
+
+    STRING(REGEX MATCH "_test.cpp$" result ${src})
+    IF(NOT(${result} MATCHES "_test.cpp"))
+        MESSAGE(FATAL_ERROR "test need to end with _test.cpp")
+    ENDIF()
+    
+    #set the test name
+    STRING(REGEX REPLACE "_test.cpp" "" name ${src})
+    
+    #set the name of executable
+    SET(exe "test_" ${name})
+    STRING(REGEX REPLACE "/" "_" exe ${exe})
+    
+    
     # build the test
     ADD_EXECUTABLE(${exe} ${src})
     
@@ -46,7 +59,7 @@ MACRO(ADD_MIIND_MPI_TEST name exe src)
     
     IF (HAVE_VALGRIND) 
         #add memory test using valgrind
-        STRING(REGEX REPLACE "test_([^ ]+).*" "mem_\\1" memtest_name "${exe}" )
+        STRING(REGEX REPLACE "test_([^ ]+).*" "memtest_\\1" memtest_name "${exe}" )
         LIST(APPEND memtest_names ${memtest_name})
         LIST(APPEND exe_names ${exe})
         #Add target for the memory test
@@ -66,28 +79,35 @@ INCLUDE_DIRECTORIES(
 
 
 ##############################################################################
-# Add here the test
+# Add here the test the test source files need to end with _test.cpp
 ##############################################################################
-ADD_MIIND_MPI_TEST("MPINetwork" test_MPINetwork_test MPINetwork_test.cpp)
-ADD_MIIND_MPI_TEST("utilities/CircularDistrbution" test_CircularDistribution_test utilities/CircularDistribution_test.cpp)
-ADD_MIIND_MPI_TEST("utilities/Exception" test_Exception_test utilities/Exception_test.cpp)
-ADD_MIIND_MPI_TEST("utilities/ParallelException" test_ParallelException_test utilities/ParallelException_test.cpp)
 
-#ADD_MIIND_MPI_TEST("Example" test_example_test example_test.cpp)
+message("######################## Adding unit tests ########################")
+
+
+ADD_MIIND_MPI_TEST( MPINetwork_test.cpp)
+ADD_MIIND_MPI_TEST( utilities/CircularDistribution_test.cpp)
+ADD_MIIND_MPI_TEST( utilities/Exception_test.cpp)
+ADD_MIIND_MPI_TEST( utilities/ParallelException_test.cpp)
+
 
 
 ##############################################################################
 # generation of the memtests
 ##############################################################################
+
+message("######################## Adding memory tests ########################")
+
 LIST(LENGTH memtest_names numtests)
 IF(numtests GREATER 0)
     MATH(EXPR numtests ${numtests}-1)
     FOREACH(i RANGE 0 ${numtests})
         LIST(GET memtest_names ${i} memtest_name)
         LIST(GET exe_names ${i} exe)
-        MESSAGE(STATUS "Adding memory test for ${memtest_name}: ${exe}.")
+        MESSAGE(STATUS "Adding memory test for ${name}: ${exe}.")
         ADD_TEST(${memtest_name}
             ${MPIEXEC} -np 1 ${CMAKE_CURRENT_SOURCE_DIR}/memtest.py ${CMAKE_CURRENT_BINARY_DIR}/${exe} ${CMAKE_BINARY_DIR})
     ENDFOREACH(i RANGE 0 ${numtests}-1)
 ENDIF(numtests GREATER 0)
+message("######################## Adding of test finished ########################")
 
