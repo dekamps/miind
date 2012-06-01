@@ -52,7 +52,7 @@ MACRO(ADD_MIIND_MPI_TEST src)
 
         
     ADD_TEST(${name} ${MPIEXEC} -np 2 ${exe})
-    MESSAGE(STATUS "Adding test for ${name}: ${exe}.")
+    MESSAGE(STATUS "   ${name}: ${exe}.")
     # add target for the test
     STRING(REGEX REPLACE "test_([^ ]+).*" "unit_\\1" unittest_target "${exe}" )
     ADD_CUSTOM_TARGET(${unittest_target} COMMAND mpirun -np 2 ${CMAKE_CURRENT_BINARY_DIR}/${exe})
@@ -82,9 +82,9 @@ INCLUDE_DIRECTORIES(
 # Add here the test the test source files need to end with _test.cpp
 ##############################################################################
 
-message("######################## Adding unit tests ########################")
+message("######################## Unit tests ########################")
 
-
+MESSAGE(STATUS "Adding test for:")
 ADD_MIIND_MPI_TEST( MPINetwork_test.cpp)
 ADD_MIIND_MPI_TEST( utilities/CircularDistribution_test.cpp)
 ADD_MIIND_MPI_TEST( utilities/Exception_test.cpp)
@@ -96,7 +96,8 @@ ADD_MIIND_MPI_TEST( utilities/ParallelException_test.cpp)
 # generation of the memtests
 ##############################################################################
 
-message("######################## Adding memory tests ########################")
+message("######################## Memory tests ########################")
+MESSAGE(STATUS "Adding memory test for:")
 
 LIST(LENGTH memtest_names numtests)
 IF(numtests GREATER 0)
@@ -104,10 +105,10 @@ IF(numtests GREATER 0)
     FOREACH(i RANGE 0 ${numtests})
         LIST(GET memtest_names ${i} memtest_name)
         LIST(GET exe_names ${i} exe)
-        MESSAGE(STATUS "Adding memory test for ${name}: ${exe}.")
+        MESSAGE(STATUS "   ${name}: ${exe}.")
         ADD_TEST(${memtest_name}
             ${MPIEXEC} -np 1 ${CMAKE_CURRENT_SOURCE_DIR}/memtest.py ${CMAKE_CURRENT_BINARY_DIR}/${exe} ${CMAKE_BINARY_DIR})
     ENDFOREACH(i RANGE 0 ${numtests}-1)
 ENDIF(numtests GREATER 0)
-message("######################## Adding of test finished ########################")
+message("######################## Tests finished ########################")
 

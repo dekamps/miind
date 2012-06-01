@@ -1,7 +1,7 @@
 if(ENABLE_MPI)
     ADD_SUBDIRECTORY( MPILib)
 
-else()
+else(ENABLE_MPI)
     if (AGENT)
     ADD_SUBDIRECTORY( AgentLib )
     endif  (AGENT)
@@ -19,6 +19,6 @@ else()
       ADD_SUBDIRECTORY( DynamicLib )
       ADD_SUBDIRECTORY( PopulistLib )
     endif ( ROOT_FOUND )
-endif()
+endif(ENABLE_MPI)
 
 
