@@ -70,6 +70,8 @@ INCLUDE_DIRECTORIES(
 ##############################################################################
 ADD_MIIND_MPI_TEST("MPINetwork" test_MPINetwork_test MPINetwork_test.cpp)
 ADD_MIIND_MPI_TEST("utilities/CircularDistrbution" test_CircularDistribution_test utilities/CircularDistribution_test.cpp)
+ADD_MIIND_MPI_TEST("utilities/Exception" test_Exception_test utilities/Exception_test.cpp)
+
 #ADD_MIIND_MPI_TEST("Example" test_example_test example_test.cpp)
 
 

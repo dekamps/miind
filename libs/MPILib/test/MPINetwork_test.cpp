@@ -156,6 +156,12 @@ int test_main(int argc, char* argv[]) // note the name!
 
 	boost::mpi::environment env(argc, argv);
 	// we use only two processors for this testing
+
+	if (world.size() != 2) {
+		BOOST_FAIL( "Run the test with two processes!");
+	}
+
+
 	test_Constructor();
 	test_AddNode();
 	test_MakeFirstInputOfSecond();
