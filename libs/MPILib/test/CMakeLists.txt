@@ -11,6 +11,9 @@ IF(VALGRIND_EXECUTABLE STREQUAL "VALGRIND_EXECUTABLE-NOTFOUND")
     SET(HAVE_VALGRIND FALSE)
 ENDIF(VALGRIND_EXECUTABLE STREQUAL "VALGRIND_EXECUTABLE-NOTFOUND")
 
+MESSAGE(STATUS "WARNING: Memtest with openmpi does not work at the moment. Therefore memory test are NOT build!")
+    SET(HAVE_VALGRIND FALSE)
+
 ##############################################################################
 # check if MPI Executable is available
 ##############################################################################
@@ -107,7 +110,7 @@ IF(numtests GREATER 0)
         LIST(GET exe_names ${i} exe)
         MESSAGE(STATUS "   ${name}: ${exe}.")
         ADD_TEST(${memtest_name}
-            ${MPIEXEC} -np 1 ${CMAKE_CURRENT_SOURCE_DIR}/memtest.py ${CMAKE_CURRENT_BINARY_DIR}/${exe} ${CMAKE_BINARY_DIR})
+           ${MPIEXEC} -np 2 ${CMAKE_CURRENT_SOURCE_DIR}/memtest.py ${CMAKE_CURRENT_BINARY_DIR}/${exe} ${CMAKE_BINARY_DIR})
     ENDFOREACH(i RANGE 0 ${numtests}-1)
 ENDIF(numtests GREATER 0)
 message("######################## Tests finished ########################")
