@@ -5,6 +5,7 @@ set( mpi_SRC
     src/utilities/Exception.cpp
     src/utilities/ParallelException.cpp
     src/utilities/CircularDistribution.cpp
+    src/EmptyAlgorithm.cpp
     #add cpp files
      )
 
@@ -16,6 +17,8 @@ set( mpi_HEADERS
     include/utilities/ParallelException.hpp
     include/utilities/CircularDistribution.hpp
     include/utilities/NodeDistributionInterface.hpp
+    include/AlgorithmInterface.hpp
+    include/EmptyAlgorithm.hpp
     #add headers
      )
 

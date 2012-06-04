@@ -30,7 +30,7 @@ MPINetwork::~MPINetwork() {
 
 }
 
-int MPINetwork::AddNode(const Algorithm& alg, NodeType nodeType) {
+int MPINetwork::AddNode(const AlgorithmInterface& alg, NodeType nodeType) {
 
 	int tempNodeId = getMaxNodeId();
 	if (_nodeDistribution->isLocalNode(tempNodeId)) {

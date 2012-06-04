@@ -12,8 +12,10 @@
 #include <vector>
 #include <boost/mpi/request.hpp>
 
-#include "utilities/NodeDistributionInterface.hpp"
-#include "BasicTypes.hpp"
+#include <MPILib/include/AlgorithmInterface.hpp>
+
+#include <MPILib/include/utilities/NodeDistributionInterface.hpp>
+#include <MPILib/include/BasicTypes.hpp>
 
 namespace MPILib {
 
@@ -30,7 +32,7 @@ public:
 	 * @param nodeDistribution The Node Distribution.
 	 * @param localNode The local nodes of this processor
 	 */
-	explicit MPINode(const Algorithm& algorithm, NodeType nodeType,
+	explicit MPINode(const AlgorithmInterface& algorithm, NodeType nodeType,
 			NodeId nodeId,
 			const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution,
 			const std::map<NodeId, MPINode>& localNode);
@@ -98,7 +100,7 @@ private:
 
 	std::vector<NodeId> _successors;
 
-	Algorithm _algorithm;
+	AlgorithmInterface* _algorithm;
 
 	NodeType _nodeType;
 

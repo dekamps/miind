@@ -14,10 +14,10 @@
 namespace mpi = boost::mpi;
 using namespace MPILib;
 
-MPINode::MPINode(const Algorithm& algorithm, NodeType nodeType, NodeId nodeId,
+MPINode::MPINode(const AlgorithmInterface& algorithm, NodeType nodeType, NodeId nodeId,
 		const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution,
 		const std::map<NodeId, MPINode>& localNode) :
-		_algorithm(algorithm), _nodeType(nodeType), _nodeId(nodeId), _nodeDistribution(
+		_algorithm(algorithm.Clone()), _nodeType(nodeType), _nodeId(nodeId), _nodeDistribution(
 				nodeDistribution), _refLocalNodes(localNode) {
 
 }

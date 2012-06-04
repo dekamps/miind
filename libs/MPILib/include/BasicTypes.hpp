@@ -10,7 +10,6 @@
 
 namespace MPILib{
 
-typedef int Algorithm;
 typedef int NodeType;
 typedef int NodeId;
 typedef double WeightType;

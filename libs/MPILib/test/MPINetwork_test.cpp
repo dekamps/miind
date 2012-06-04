@@ -16,6 +16,7 @@
 #undef private
 
 #include <MPILib/include/utilities/ParallelException.hpp>
+#include <MPILib/include/EmptyAlgorithm.hpp>
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
@@ -24,6 +25,7 @@ using namespace MPILib;
 namespace mpi = boost::mpi;
 
 mpi::communicator world;
+
 
 void test_Constructor() {
 
@@ -49,7 +51,8 @@ void test_AddNode() {
 		BOOST_REQUIRE(network._localNodes.size()==0);
 	}
 
-	network.AddNode(1, 1);
+	EmptyAlgorithm alg;
+	network.AddNode(alg, 1);
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==1);
@@ -58,7 +61,7 @@ void test_AddNode() {
 		BOOST_REQUIRE(network._localNodes.size()==0);
 	}
 
-	network.AddNode(1, 1);
+	network.AddNode(alg, 1);
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==2);
@@ -71,9 +74,10 @@ void test_AddNode() {
 void test_MakeFirstInputOfSecond() {
 
 	MPINetwork network;
+	EmptyAlgorithm alg;
 
-	int node0 = network.AddNode(1, 1);
-	int node1 = network.AddNode(1, 1);
+	int node0 = network.AddNode(alg, 1);
+	int node1 = network.AddNode(alg, 1);
 	double weight = 2.0;
 
 	bool exceptionThrown = false;
@@ -113,13 +117,13 @@ void test_MakeFirstInputOfSecond() {
 
 void test_getMaxNodeId() {
 	MPINetwork network;
-
+	EmptyAlgorithm alg;
 	BOOST_REQUIRE(network.getMaxNodeId()==0);
-	network.AddNode(1, 1);
+	network.AddNode(alg, 1);
 	BOOST_REQUIRE(network.getMaxNodeId()==1);
-	network.AddNode(1, 1);
-	network.AddNode(1, 1);
-	network.AddNode(1, 1);
+	network.AddNode(alg, 1);
+	network.AddNode(alg, 1);
+	network.AddNode(alg, 1);
 	BOOST_REQUIRE(network.getMaxNodeId()==4);
 
 }

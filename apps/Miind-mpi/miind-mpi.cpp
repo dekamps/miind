@@ -14,6 +14,7 @@
 #include <exception>
 #include <MPILib/include/MPINode.hpp>
 #include <MPILib/include/MPINetwork.hpp>
+#include <MPILib/include/EmptyAlgorithm.hpp>
 
 namespace mpi = boost::mpi;
 using namespace MPILib;
@@ -25,10 +26,12 @@ int main(int argc, char* argv[]) {
 	mpi::environment env(argc, argv);
 	try {
 		MPINetwork network;
+		EmptyAlgorithm alg;
 
-		int node0 = network.AddNode(1, 1);
-		int node1 = network.AddNode(1, 1);
-		int node2 = network.AddNode(1, 1);
+
+		int node0 = network.AddNode(alg, 1);
+		int node1 = network.AddNode(alg, 1);
+		int node2 = network.AddNode(alg, 1);
 
 		double weight = 3.1;
 		network.MakeFirstInputOfSecond(node0, node1, weight);

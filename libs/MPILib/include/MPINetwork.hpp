@@ -13,9 +13,9 @@
 #include <string>
 #include <map>
 
-#include "MPINode.hpp"
-#include "BasicTypes.hpp"
-#include "utilities/NodeDistributionInterface.hpp"
+#include <MPILib/include/MPINode.hpp>
+#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/utilities/NodeDistributionInterface.hpp>
 
 
 namespace MPILib{
@@ -33,7 +33,7 @@ public:
 	 * @param nodeType The Type of the Node
 	 * @return returns the NodeId of the generated node
 	 */
-	int AddNode(const Algorithm& alg, NodeType nodeType);
+	int AddNode(const AlgorithmInterface& alg, NodeType nodeType);
 
 	/**
 	 * Connects two node
