@@ -19,7 +19,7 @@ namespace utilities{
 /**
  * @class NodeDistributionInterface abstract interface for implementing concrete distributions
  */
-class NodeDistributionInterface: public boost::noncopyable{
+class NodeDistributionInterface: private boost::noncopyable{
 public:
 	NodeDistributionInterface(){};
 
