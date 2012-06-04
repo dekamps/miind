@@ -47,7 +47,7 @@ void MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
 
 	if (_nodeDistribution->isLocalNode(first)) {
 		if (_localNodes.count(first) > 0) {
-			_localNodes.find(first)->second.addSuccessor(second, weight);
+			_localNodes.find(first)->second.addSuccessor(second);
 		} else {
 			std::stringstream tempStream;
 			tempStream << "the node " << first << "does not exist on this node";
