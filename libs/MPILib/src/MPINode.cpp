@@ -27,15 +27,19 @@ MPINode::~MPINode() {
 ;
 
 Time MPINode::Evolve(Time time) {
-	waitAll();
-
-	std::cout << " # \t NodeId: " << _nodeId << "\t precursor size: "
-			<< _precursors[0] << "\t successors size: " << _successors[0]
-			<< " # ";
-
+	_state = _nodeDistribution->getRank()+1;
 	receiveData();
 	sendOwnState();
+	waitAll();
 
+//	std::cout << " # \t NodeId: " << _nodeId << "\t precursor size: "
+//			<< _precursors[0] << "\t successors size: " << _successors[0]
+//			<< "\t state of precursor: " << _precursorStates[0] << " # ";
+
+	if (_precursorStates.size() > 0) {
+		std::cout << " # \t NodeId: " << _nodeId << "\t state of precursor: "
+				<< _precursorStates[0] << " # ";
+	}
 	//FIXME Implement this stub
 	return 0;
 }
@@ -67,6 +71,7 @@ void MPINode::setState(NodeState state) {
 void ::MPINode::waitAll() {
 	mpi::wait_all(_mpiStatus.begin(), _mpiStatus.end());
 	_mpiStatus.clear();
+
 }
 
 void MPINode::receiveData() {
@@ -75,9 +80,11 @@ void MPINode::receiveData() {
 	int i = 0;
 	for (it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		mpi::communicator world;
+		std::cout << "get data from: " << *it << "from "
+				<< _nodeDistribution->getRank() << std::endl;
 		_mpiStatus.push_back(
 				world.irecv(_nodeDistribution->getResponsibleProcessor(*it),
-						*it, _precursorStates[i]));
+						22, _precursorStates[i]));
 	}
 }
 
@@ -86,9 +93,12 @@ void MPINode::sendOwnState() {
 	std::vector<NodeId>::iterator it;
 	for (it = _successors.begin(); it != _successors.end(); it++) {
 		mpi::communicator world;
+		std::cout << "send data to: " << *it << "from "
+				<< _nodeDistribution->getRank() << std::endl;
+
 		_mpiStatus.push_back(
 				world.isend(_nodeDistribution->getResponsibleProcessor(*it),
-						*it, _state));
+						22, _state));
 	}
 
 }
