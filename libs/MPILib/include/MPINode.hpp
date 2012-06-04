@@ -31,7 +31,7 @@ public:
 	 */
 	explicit MPINode(const Algorithm&, NodeType, NodeId,
 			const boost::shared_ptr<utilities::NodeDistributionInterface>&,
-			std::map<NodeId, MPINode>&);
+			const std::map<NodeId, MPINode>&);
 
 	/**
 	 * Destructor
@@ -110,7 +110,7 @@ private:
 	/**
 	 * Reference to the local nodes of the processor. They are stored by the network.
 	 */
-	std::map<NodeId, MPINode>& _refLocalNodes;
+	const std::map<NodeId, MPINode>& _refLocalNodes;
 
 	boost::shared_ptr<utilities::NodeDistributionInterface> _nodeDistribution;
 
