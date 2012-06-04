@@ -23,31 +23,36 @@ namespace MPILib{
 class MPINetwork: private boost::noncopyable {
 
 public:
-	MPINetwork();
+	explicit MPINetwork();
 
 	~MPINetwork();
 
 	/**
 	 * Adds a new node to the network
-	 * @param The Algorithm of the actual node
-	 * @param The Type of the Node
+	 * @param alg The Algorithm of the actual node
+	 * @param nodeType The Type of the Node
 	 * @return returns the NodeId of the generated node
 	 */
-	int AddNode(const Algorithm&, NodeType);
+	int AddNode(const Algorithm& alg, NodeType nodeType);
 
-	/** Connects two node
-	 * @param NodeId of the first node
-	 * @param NodeId of the second node
-	 * @param The WeightType of the connection
-	 * @return A boolean which is true if no error occured
+	/**
+	 * Connects two node
+	 * @param first NodeId of the first node
+	 * @param second NodeId of the second node
+	 * @param weight The WeightType of the connection
 	 * @exception Can throw a ParallelException
 	 */
-	void MakeFirstInputOfSecond(NodeId, NodeId, const WeightType&);
+	void MakeFirstInputOfSecond(NodeId first, NodeId second, const WeightType& weight);
 
-	//! Configure the next simulation
-	bool ConfigureSimulation(const SimulationRunParameter&);
+	/**
+	 * Configure the next simulation
+	 * @param simParam The Simulation Parameter
+	 */
+	void ConfigureSimulation(const SimulationRunParameter& simParam);
 
-	//! Envolve the network
+	/**
+	 * Envolve the network
+	 */
 	void Evolve();
 
 private:

@@ -47,9 +47,8 @@ Time MPINode::Evolve(Time time) {
 	return 0;
 }
 
-bool MPINode::ConfigureSimulationRun(const SimulationRunParameter& simParam) {
+void MPINode::ConfigureSimulationRun(const SimulationRunParameter& simParam) {
 	//FIXME Implement this stub
-	return true;
 }
 
 void MPINode::addPrecursor(NodeId nodeId, const WeightType& weight) {
@@ -59,7 +58,7 @@ void MPINode::addPrecursor(NodeId nodeId, const WeightType& weight) {
 	_precursorStates.resize(_precursors.size());
 }
 
-void MPINode::addSuccessor(NodeId nodeId, const WeightType& weight) {
+void MPINode::addSuccessor(NodeId nodeId) {
 	_successors.push_back(nodeId);
 }
 

@@ -24,14 +24,16 @@ class MPINode {
 public:
 	/**
 	 * Constructor
-	 * @param Algorithm the algorithm the node should contain
-	 * @param NodeType the type of the node
-	 * @param NodeId the id of the node
-	 * @param NodeDistributionInterface The Node Distribution.
+	 * @param algorithm Algorithm the algorithm the node should contain
+	 * @param nodeType NodeType the type of the node
+	 * @param nodeId NodeId the id of the node
+	 * @param nodeDistribution The Node Distribution.
+	 * @param localNode The local nodes of this processor
 	 */
-	explicit MPINode(const Algorithm&, NodeType, NodeId,
-			const boost::shared_ptr<utilities::NodeDistributionInterface>&,
-			const std::map<NodeId, MPINode>&);
+	explicit MPINode(const Algorithm& algorithm, NodeType nodeType,
+			NodeId nodeId,
+			const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution,
+			const std::map<NodeId, MPINode>& localNode);
 
 	/**
 	 * Destructor
@@ -40,31 +42,29 @@ public:
 
 	/**
 	 * Evolve this algorithm over a time
-	 * @param Time until the algorithm should evolve
+	 * @param time Time until the algorithm should evolve
 	 * @return Time the algorithm have evolved
 	 */
-	Time Evolve(Time);
+	Time Evolve(Time time);
 
 	/**
 	 * Configure the Node with the Simulation Parameters
-	 * @param Simulation Parameters
-	 * @return true if it worked correct
+	 * @param simParam Simulation Parameters
 	 */
-	bool ConfigureSimulationRun(const SimulationRunParameter&);
+	void ConfigureSimulationRun(const SimulationRunParameter& simParam);
 
 	/**
 	 * Add a precursor to the current node
-	 * @param NodeId the id of the precursor
-	 * @param WeightType the weight of the connection
+	 * @param nodeId NodeId the id of the precursor
+	 * @param weight the weight of the connection
 	 */
-	void addPrecursor(NodeId, const WeightType&);
+	void addPrecursor(NodeId nodeId, const WeightType& weight);
 
 	/**
 	 * Add a successor to the current node
-	 * @param NodeId the id of the successor
-	 * @param WeightType the weight of the connection
+	 * @param nodeId NodeId the id of the successor
 	 */
-	void addSuccessor(NodeId, const WeightType&);
+	void addSuccessor(NodeId nodeId);
 
 	/**
 	 * Getter for the Nodes state

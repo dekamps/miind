@@ -67,11 +67,10 @@ void MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
 
 }
 
-bool MPINetwork::ConfigureSimulation(const SimulationRunParameter& simParam) {
+void MPINetwork::ConfigureSimulation(const SimulationRunParameter& simParam) {
 	//TODO implement this
 
-	//FIXME change to correct return
-	return true;
+
 }
 
 //! Envolve the network
