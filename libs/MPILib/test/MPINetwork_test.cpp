@@ -36,7 +36,6 @@ void test_Constructor() {
 		BOOST_REQUIRE(network._localNodes.size()==0);
 	}
 
-
 }
 
 void test_AddNode() {
@@ -84,6 +83,22 @@ void test_MakeFirstInputOfSecond() {
 		exceptionThrown = true;
 	}
 	BOOST_REQUIRE(exceptionThrown==false);
+	if (world.rank() == 1) {
+
+		BOOST_REQUIRE(
+				network._localNodes.find(node1)->second._precursors.size()==1);
+		BOOST_REQUIRE(
+				network._localNodes.find(node1)->second._weights.size()==1);
+		BOOST_REQUIRE(
+				network._localNodes.find(node1)->second._precursorStates.size()==1);
+	} else {
+		BOOST_REQUIRE(
+				network._localNodes.find(node0)->second._successors.size()==1);
+		BOOST_REQUIRE(
+				network._localNodes.find(node0)->second._weights.size()==0);
+		BOOST_REQUIRE(
+				network._localNodes.find(node0)->second._precursorStates.size()==0);
+	}
 
 	exceptionThrown = false;
 	try {
@@ -96,13 +111,16 @@ void test_MakeFirstInputOfSecond() {
 
 }
 
-
 void test_getMaxNodeId() {
 	MPINetwork network;
 
 	BOOST_REQUIRE(network.getMaxNodeId()==0);
 	network.AddNode(1, 1);
 	BOOST_REQUIRE(network.getMaxNodeId()==1);
+	network.AddNode(1, 1);
+	network.AddNode(1, 1);
+	network.AddNode(1, 1);
+	BOOST_REQUIRE(network.getMaxNodeId()==4);
 
 }
 
@@ -132,7 +150,6 @@ int test_main(int argc, char* argv[]) // note the name!
 	if (world.size() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
-
 
 	test_Constructor();
 	test_AddNode();
