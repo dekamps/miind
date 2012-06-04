@@ -16,7 +16,7 @@ using namespace MPILib;
 
 MPINode::MPINode(const Algorithm& algorithm, NodeType nodeType, NodeId nodeId,
 		const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution,
-		 std::map<NodeId, MPINode>& localNode) :
+		std::map<NodeId, MPINode>& localNode) :
 		_algorithm(algorithm), _nodeType(nodeType), _nodeId(nodeId), _nodeDistribution(
 				nodeDistribution), _refLocalNodes(localNode) {
 
@@ -28,7 +28,7 @@ MPINode::~MPINode() {
 ;
 
 Time MPINode::Evolve(Time time) {
-	_state = (_nodeDistribution->getRank() + 1) * _nodeId;
+	_state = (_nodeDistribution->getRank() + 1) * (_nodeId+1);
 
 	std::cout << "#\t NodeId: " << _nodeId << "\t#precursors: "
 			<< _precursors.size() << "\t#successors: " << _successors.size()
@@ -40,7 +40,7 @@ Time MPINode::Evolve(Time time) {
 
 	for (int i = 0; i < _precursorStates.size(); i++) {
 		std::cout << " # \t NodeId: " << _nodeId << "\t state of precursor: "
-				<< _precursorStates[i] << " # ";
+				<< _precursorStates[i] << " # "<<std::endl;
 
 	}
 	//FIXME Implement this stub
@@ -83,11 +83,15 @@ void MPINode::receiveData() {
 	int i = 0;
 	for (it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		mpi::communicator world;
-		std::cout << "get data from: " << *it << "to "
-				<< _nodeDistribution->getRank() << std::endl;
-		_mpiStatus.push_back(
-				world.irecv(_nodeDistribution->getResponsibleProcessor(*it),
-						_nodeDistribution->getRank(), _precursorStates[i]));
+		//do not send the data if the node is local!
+		if (_nodeDistribution->isLocalNode(*it)) {
+			_precursorStates[i] = _refLocalNodes.find(*it)->second.getState();
+
+		} else {
+			_mpiStatus.push_back(
+					world.irecv(_nodeDistribution->getResponsibleProcessor(*it),
+							_nodeDistribution->getRank(), _precursorStates[i]));
+		}
 	}
 }
 
@@ -96,12 +100,12 @@ void MPINode::sendOwnState() {
 	std::vector<NodeId>::iterator it;
 	for (it = _successors.begin(); it != _successors.end(); it++) {
 		mpi::communicator world;
-		std::cout << "send data to: " << *it << "from "
-				<< _nodeDistribution->getRank() << std::endl;
-
-		_mpiStatus.push_back(
-				world.isend(_nodeDistribution->getResponsibleProcessor(*it),
-						*it, _state));
+		//do not send the data if the node is local!
+		if (!_nodeDistribution->isLocalNode(*it)) {
+			_mpiStatus.push_back(
+					world.isend(_nodeDistribution->getResponsibleProcessor(*it),
+							*it, _state));
+		}
 	}
 
 }

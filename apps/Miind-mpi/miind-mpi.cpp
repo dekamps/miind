@@ -38,6 +38,8 @@ int main(int argc, char* argv[]) {
 		weight = 6.4;
 
 		network.MakeFirstInputOfSecond(node1, node0, weight);
+		weight = 6.1;
+		network.MakeFirstInputOfSecond(node2, node1, weight);
 		network.Evolve();
 	} catch (std::exception & e) {
 		std::cout << e.what();
