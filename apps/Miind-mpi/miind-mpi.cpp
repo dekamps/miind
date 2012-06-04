@@ -28,9 +28,13 @@ int main(int argc, char* argv[]) {
 
 		int node0 = network.AddNode(1, 1);
 		int node1 = network.AddNode(1, 1);
+		int node2 = network.AddNode(1, 1);
 
 		double weight = 3.1;
 		network.MakeFirstInputOfSecond(node0, node1, weight);
+		weight = 1.2;
+		network.MakeFirstInputOfSecond(node0, node2, weight);
+
 		weight = 6.4;
 
 		network.MakeFirstInputOfSecond(node1, node0, weight);

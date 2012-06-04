@@ -15,9 +15,10 @@ namespace mpi = boost::mpi;
 using namespace MPILib;
 
 MPINode::MPINode(const Algorithm& algorithm, NodeType nodeType, NodeId nodeId,
-		const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution) :
+		const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution,
+		 std::map<NodeId, MPINode>& localNode) :
 		_algorithm(algorithm), _nodeType(nodeType), _nodeId(nodeId), _nodeDistribution(
-				nodeDistribution) {
+				nodeDistribution), _refLocalNodes(localNode) {
 
 }
 ;
@@ -27,18 +28,20 @@ MPINode::~MPINode() {
 ;
 
 Time MPINode::Evolve(Time time) {
-	_state = _nodeDistribution->getRank()+1;
+	_state = (_nodeDistribution->getRank() + 1) * _nodeId;
+
+	std::cout << "#\t NodeId: " << _nodeId << "\t#precursors: "
+			<< _precursors.size() << "\t#successors: " << _successors.size()
+			<< "\t state: " << _state << std::endl;
+
 	receiveData();
 	sendOwnState();
 	waitAll();
 
-//	std::cout << " # \t NodeId: " << _nodeId << "\t precursor size: "
-//			<< _precursors[0] << "\t successors size: " << _successors[0]
-//			<< "\t state of precursor: " << _precursorStates[0] << " # ";
-
-	if (_precursorStates.size() > 0) {
+	for (int i = 0; i < _precursorStates.size(); i++) {
 		std::cout << " # \t NodeId: " << _nodeId << "\t state of precursor: "
-				<< _precursorStates[0] << " # ";
+				<< _precursorStates[i] << " # ";
+
 	}
 	//FIXME Implement this stub
 	return 0;
@@ -80,11 +83,11 @@ void MPINode::receiveData() {
 	int i = 0;
 	for (it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		mpi::communicator world;
-		std::cout << "get data from: " << *it << "from "
+		std::cout << "get data from: " << *it << "to "
 				<< _nodeDistribution->getRank() << std::endl;
 		_mpiStatus.push_back(
 				world.irecv(_nodeDistribution->getResponsibleProcessor(*it),
-						22, _precursorStates[i]));
+						_nodeDistribution->getRank(), _precursorStates[i]));
 	}
 }
 
@@ -98,7 +101,7 @@ void MPINode::sendOwnState() {
 
 		_mpiStatus.push_back(
 				world.isend(_nodeDistribution->getResponsibleProcessor(*it),
-						22, _state));
+						*it, _state));
 	}
 
 }

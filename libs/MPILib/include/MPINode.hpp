@@ -12,7 +12,6 @@
 #include <vector>
 #include <boost/mpi/request.hpp>
 
-
 #include "utilities/NodeDistributionInterface.hpp"
 #include "BasicTypes.hpp"
 
@@ -30,7 +29,9 @@ public:
 	 * @param NodeId the id of the node
 	 * @param NodeDistributionInterface The Node Distribution.
 	 */
-	explicit MPINode(const Algorithm&, NodeType, NodeId, const boost::shared_ptr<utilities::NodeDistributionInterface>&);
+	explicit MPINode(const Algorithm&, NodeType, NodeId,
+			const boost::shared_ptr<utilities::NodeDistributionInterface>&,
+			std::map<NodeId, MPINode>&);
 
 	/**
 	 * Destructor
@@ -89,7 +90,6 @@ public:
 
 private:
 
-
 	void waitAll();
 
 	std::vector<NodeId> _precursors;
@@ -107,6 +107,10 @@ private:
 	 */
 	NodeId _nodeId;
 
+	/**
+	 * Reference to the local nodes of the processor. They are stored by the network.
+	 */
+	std::map<NodeId, MPINode>& _refLocalNodes;
 
 	boost::shared_ptr<utilities::NodeDistributionInterface> _nodeDistribution;
 
