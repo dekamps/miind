@@ -30,7 +30,7 @@ IF(ENABLE_MPI)
     ##############################################################################
     # find boost with mpi
     ##############################################################################
-    find_package( Boost COMPONENTS unit_test_framework program_options mpi serialization)
+    find_package( Boost COMPONENTS unit_test_framework program_options mpi thread serialization)
     if( Boost_FOUND )
        message(STATUS "Boost found setting up directories")
        message(STATUS "BOOST_ROOT: " ${BOOST_ROOT} )

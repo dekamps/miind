@@ -5,7 +5,7 @@ set( mpi_SRC
     src/utilities/Exception.cpp
     src/utilities/ParallelException.cpp
     src/utilities/CircularDistribution.cpp
-    src/EmptyAlgorithm.cpp
+    src/Sleep10secAlgorithm.cpp
     src/utilities/Time.cpp
     #add cpp files
      )
@@ -19,7 +19,7 @@ set( mpi_HEADERS
     include/utilities/CircularDistribution.hpp
     include/utilities/NodeDistributionInterface.hpp
     include/AlgorithmInterface.hpp
-    include/EmptyAlgorithm.hpp
+    include/Sleep10secAlgorithm.hpp
     include/utilities/Time.hpp
     include/utilities/walltime.hpp
     #add headers

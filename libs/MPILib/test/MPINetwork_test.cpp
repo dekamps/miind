@@ -16,7 +16,7 @@
 #undef private
 
 #include <MPILib/include/utilities/ParallelException.hpp>
-#include <MPILib/include/EmptyAlgorithm.hpp>
+#include <MPILib/include/Sleep10secAlgorithm.hpp>
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
@@ -51,7 +51,7 @@ void test_AddNode() {
 		BOOST_REQUIRE(network._localNodes.size()==0);
 	}
 
-	EmptyAlgorithm alg;
+	Sleep10secAlgorithm alg;
 	network.AddNode(alg, 1);
 
 	if (world.rank() == 0) {
@@ -74,7 +74,7 @@ void test_AddNode() {
 void test_MakeFirstInputOfSecond() {
 
 	MPINetwork network;
-	EmptyAlgorithm alg;
+	Sleep10secAlgorithm alg;
 
 	int node0 = network.AddNode(alg, 1);
 	int node1 = network.AddNode(alg, 1);
@@ -117,7 +117,7 @@ void test_MakeFirstInputOfSecond() {
 
 void test_getMaxNodeId() {
 	MPINetwork network;
-	EmptyAlgorithm alg;
+	Sleep10secAlgorithm alg;
 	BOOST_REQUIRE(network.getMaxNodeId()==0);
 	network.AddNode(alg, 1);
 	BOOST_REQUIRE(network.getMaxNodeId()==1);

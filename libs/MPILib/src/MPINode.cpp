@@ -28,6 +28,9 @@ MPINode::~MPINode() {
 ;
 
 Time MPINode::Evolve(Time time) {
+
+	_algorithm->EvolveNodeState(_precursorStates, _weights, time);
+
 	_state = (_nodeDistribution->getRank() + 1) * (_nodeId+1);
 
 	std::cout << "#\t NodeId: " << _nodeId << "\t#precursors: "

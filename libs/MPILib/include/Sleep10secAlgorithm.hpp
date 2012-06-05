@@ -1,12 +1,12 @@
 /*
- * EmptyAlgorithm.h
+ * Sleep10secAlgorithm.hpp
  *
  *  Created on: 04.06.2012
  *      Author: david
  */
 
-#ifndef MPILIB_EMPTYALGORITHM_H_
-#define MPILIB_EMPTYALGORITHM_H_
+#ifndef MPILIB_SLEEP10SECALGORITHM_HPP_
+#define MPILIB_SLEEP10SECALGORITHM_HPP_
 
 #include <MPILib/include/AlgorithmInterface.hpp>
 #include <vector>
@@ -14,16 +14,16 @@
 
 namespace MPILib {
 
-class EmptyAlgorithm: public MPILib::AlgorithmInterface {
+class Sleep10secAlgorithm: public MPILib::AlgorithmInterface {
 public:
-	explicit EmptyAlgorithm();
+	explicit Sleep10secAlgorithm();
 
-	virtual ~EmptyAlgorithm();
+	virtual ~Sleep10secAlgorithm();
 	/**
 	 * Cloning operation, to provide each DynamicNode with its own
 	 * Algorithm instance. Clients use the naked pointer at their own risk.
 	 */
-	virtual EmptyAlgorithm* Clone() const;
+	virtual Sleep10secAlgorithm* Clone() const;
 
 	/**
 	 * Configure the Algorithm
@@ -42,4 +42,4 @@ public:
 };
 
 } /* namespace MPILib */
-#endif /* MPILIB_EMPTYALGORITHM_H_ */
+#endif /* MPILIB_SLEEP10SECALGORITHM_HPP_ */
