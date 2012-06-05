@@ -24,7 +24,6 @@ template <class WeightValue>
 class MPINetwork: private boost::noncopyable {
 
 public:
-	typedef MPINode<WeightValue> D_Node;
 
 	explicit MPINetwork();
 
@@ -36,7 +35,7 @@ public:
 	 * @param nodeType The Type of the Node
 	 * @return returns the NodeId of the generated node
 	 */
-	int AddNode(const AlgorithmInterface& alg, NodeType nodeType);
+	int AddNode(const AlgorithmInterface<WeightValue>& alg, NodeType nodeType);
 
 	/**
 	 * Connects two node
@@ -80,7 +79,7 @@ private:
 	/**
 	 * local nodes of the processor
 	 */
-	std::map<NodeId, D_Node > _localNodes;
+	std::map<NodeId, MPINode<WeightValue> > _localNodes;
 
 
 	/**

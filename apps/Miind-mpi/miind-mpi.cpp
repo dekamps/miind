@@ -14,7 +14,7 @@
 #include <exception>
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
-#include <MPILib/include/Sleep10secAlgorithm.hpp>
+#include <MPILib/include/Sleep10secAlgorithmCode.hpp>
 #include <MPILib/include/utilities/walltime.hpp>
 
 namespace mpi = boost::mpi;
@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 	mpi::communicator world;
 	try {
 		MPINetwork<double> network;
-		Sleep10secAlgorithm alg;
+		Sleep10secAlgorithm<double> alg;
 
 		int node0 = network.AddNode(alg, 1);
 		int node1 = network.AddNode(alg, 1);

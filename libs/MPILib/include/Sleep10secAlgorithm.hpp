@@ -14,7 +14,8 @@
 
 namespace MPILib {
 
-class Sleep10secAlgorithm: public MPILib::AlgorithmInterface {
+template <class WeightValue>
+class Sleep10secAlgorithm: public MPILib::AlgorithmInterface<WeightValue> {
 public:
 	explicit Sleep10secAlgorithm();
 
@@ -38,7 +39,7 @@ public:
 	 * @param time Time point of the algorithm
 	 */
 	virtual void EvolveNodeState(const std::vector<NodeState>& nodeVector,
-			const std::vector<WeightType>& weightVector, Time time);
+			const std::vector<WeightValue>& weightVector, Time time);
 
 	/**
 	 * The current timepoint

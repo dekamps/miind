@@ -15,7 +15,7 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #undef protected
 #undef private
-#include <MPILib/include/Sleep10secAlgorithm.hpp>
+#include <MPILib/include/Sleep10secAlgorithmCode.hpp>
 
 
 #include <MPILib/include/utilities/ParallelException.hpp>
@@ -32,7 +32,7 @@ void test_Constructor() {
 
 	// make node global
 	MPINetwork<double> network;
-	Sleep10secAlgorithm alg;
+	Sleep10secAlgorithm<double> alg;
 	NodeType nodeType = 1;
 	NodeId nodeId = 1;
 	MPINode<double> node(alg, nodeType, nodeId, network._nodeDistribution,
@@ -51,12 +51,13 @@ void test_Constructor() {
 void test_addPrecursor() {
 	// make node global
 	MPINetwork<double> network;
-	Sleep10secAlgorithm alg;
+
+	Sleep10secAlgorithm<double> alg;
 
 	MPINode<double> node(alg, 1, 1, network._nodeDistribution, network._localNodes);
 
 	NodeId nodeId = 4;
-	WeightType weight = 2.1;
+	double weight = 2.1;
 
 	node.addPrecursor(nodeId, weight);
 	BOOST_REQUIRE(node._precursors.size()==1);
@@ -69,7 +70,7 @@ void test_addPrecursor() {
 
 void test_addSuccessor() {
 	MPINetwork<double> network;
-	Sleep10secAlgorithm alg;
+	Sleep10secAlgorithm<double> alg;
 
 	MPINode<double> node(alg, 1, 1, network._nodeDistribution, network._localNodes);
 
@@ -86,7 +87,7 @@ void test_addSuccessor() {
 
 void test_setGetState() {
 	MPINetwork<double> network;
-	Sleep10secAlgorithm alg;
+	Sleep10secAlgorithm<double> alg;
 
 	MPINode<double> node(alg, 1, 1, network._nodeDistribution, network._localNodes);
 	node.setState(3);
@@ -98,7 +99,7 @@ void test_setGetState() {
 void test_sendRecvWait() {
 	MPINode<double>* node;
 	MPINetwork<double> network;
-	Sleep10secAlgorithm alg;
+	Sleep10secAlgorithm<double> alg;
 	if (world.rank() == 0) {
 		node = new MPINode<double>(alg, 1, 0, network._nodeDistribution,
 				network._localNodes);

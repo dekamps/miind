@@ -33,11 +33,11 @@ MPINetwork<WeightValue>::~MPINetwork() {
 }
 
 template <class WeightValue>
-int MPINetwork<WeightValue>::AddNode(const AlgorithmInterface& alg, NodeType nodeType) {
+int MPINetwork<WeightValue>::AddNode(const AlgorithmInterface<WeightValue>& alg, NodeType nodeType) {
 
 	int tempNodeId = getMaxNodeId();
 	if (_nodeDistribution->isLocalNode(tempNodeId)) {
-		D_Node node = D_Node(alg, nodeType, tempNodeId, _nodeDistribution, _localNodes);
+		MPINode<WeightValue> node = MPINode<WeightValue>(alg, nodeType, tempNodeId, _nodeDistribution, _localNodes);
 		_localNodes.insert(std::make_pair(tempNodeId, node));
 	}
 	//increment the max NodeId to make sure that it is not assigned twice.

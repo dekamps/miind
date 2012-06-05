@@ -14,6 +14,7 @@
 
 namespace MPILib {
 
+template <class WeightValue>
 class AlgorithmInterface {
 public:
 	AlgorithmInterface(){};
@@ -38,7 +39,7 @@ public:
 	 * @param time Time point of the algorithm
 	 */
 	virtual void EvolveNodeState(const std::vector<NodeState>& nodeVector,
-			const std::vector<WeightType>& weightVector, Time time) = 0;
+			const std::vector<WeightValue>& weightVector, Time time) = 0;
 
 	/**
 	 * The current timepoint

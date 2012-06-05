@@ -18,7 +18,7 @@ namespace mpi = boost::mpi;
 namespace MPILib{
 
 template<class Weight>
-MPINode<Weight>::MPINode(const AlgorithmInterface& algorithm, NodeType nodeType,
+MPINode<Weight>::MPINode(const AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
 		NodeId nodeId,
 		const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution,
 		const std::map<NodeId, MPINode>& localNode) :
@@ -60,7 +60,7 @@ void MPINode<Weight>::ConfigureSimulationRun(
 	//FIXME Implement this stub
 }
 template<class Weight>
-void MPINode<Weight>::addPrecursor(NodeId nodeId, const WeightType& weight) {
+void MPINode<Weight>::addPrecursor(NodeId nodeId, const Weight& weight) {
 	_precursors.push_back(nodeId);
 	_weights.push_back(weight);
 	//make sure that _precursorStates is big enough to store the data

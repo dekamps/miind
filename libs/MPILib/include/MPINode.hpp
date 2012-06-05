@@ -8,9 +8,10 @@
 #ifndef MPILIB_MPINODE_HPP_
 #define MPILIB_MPINODE_HPP_
 
-#include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
 #include <vector>
 #include <boost/mpi/request.hpp>
+#include <memory>
 
 #include <MPILib/include/AlgorithmInterface.hpp>
 
@@ -33,7 +34,7 @@ public:
 	 * @param nodeDistribution The Node Distribution.
 	 * @param localNode The local nodes of this processor
 	 */
-	explicit MPINode(const AlgorithmInterface& algorithm, NodeType nodeType,
+	explicit MPINode(const AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
 			NodeId nodeId,
 			const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution,
 			const std::map<NodeId, MPINode<Weight> >& localNode);
@@ -61,7 +62,7 @@ public:
 	 * @param nodeId NodeId the id of the precursor
 	 * @param weight the weight of the connection
 	 */
-	void addPrecursor(NodeId nodeId, const WeightType& weight);
+	void addPrecursor(NodeId nodeId, const Weight& weight);
 
 	/**
 	 * Add a successor to the current node
@@ -101,7 +102,7 @@ private:
 
 	std::vector<NodeId> _successors;
 
-	AlgorithmInterface* _algorithm;
+	boost::shared_ptr<AlgorithmInterface<Weight> > _algorithm;
 
 	NodeType _nodeType;
 

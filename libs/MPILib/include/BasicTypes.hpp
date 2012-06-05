@@ -12,7 +12,6 @@ namespace MPILib{
 
 typedef int NodeType;
 typedef int NodeId;
-typedef double WeightType;
 typedef int SimulationRunParameter;
 typedef int Time;
 typedef double NodeState;
