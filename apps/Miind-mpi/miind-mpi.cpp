@@ -15,6 +15,7 @@
 #include <MPILib/include/MPINode.hpp>
 #include <MPILib/include/MPINetwork.hpp>
 #include <MPILib/include/EmptyAlgorithm.hpp>
+#include <MPILib/include/utilities/walltime.hpp>
 
 namespace mpi = boost::mpi;
 using namespace MPILib;
@@ -43,7 +44,16 @@ int main(int argc, char* argv[]) {
 		network.MakeFirstInputOfSecond(node1, node0, weight);
 		weight = 6.1;
 		network.MakeFirstInputOfSecond(node2, node1, weight);
+
+	    double time, time_start = 0.0;
+
+	    time = walltime(&time_start);
+
 		network.Evolve();
+
+	    time = walltime(&time);
+
+	    std::cout << time << " sec" << std::endl;
 	} catch (std::exception & e) {
 		std::cout << e.what();
 	};

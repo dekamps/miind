@@ -1,5 +1,5 @@
-#ifndef WALLTIME_H
-#define WALLTIME_H
+#ifndef MPILIB_UTILITIES_WALLTIME_HPP
+#define MPILIB_UTILITIES_WALLTIME_HPP
 
 #include <MPILib/include/utilities/Time.hpp>
 
@@ -24,4 +24,4 @@ double walltime(double *t0){
     return(time);
 }
 
-#endif // WALLTIME_H
+#endif // MPILIB_UTILITIES_WALLTIME_HPP

@@ -93,6 +93,7 @@ ADD_MIIND_MPI_TEST( MPINode_test.cpp)
 ADD_MIIND_MPI_TEST( utilities/CircularDistribution_test.cpp)
 ADD_MIIND_MPI_TEST( utilities/Exception_test.cpp)
 ADD_MIIND_MPI_TEST( utilities/ParallelException_test.cpp)
+ADD_MIIND_MPI_TEST( utilities/Time_test.cpp)
 
 
 
