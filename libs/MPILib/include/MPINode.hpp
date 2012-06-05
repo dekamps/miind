@@ -117,7 +117,7 @@ private:
 	const std::map<NodeId, MPINode>& _refLocalNodes;
 
 	//this need to be a shared_ptr see here why auto_ptr does not work:
-	//http://stackoverflow.com/questions/10894058/template-class-wrong-copy-constructor-called
+	//http://stackoverflow.com/a/10894173/992460
 	boost::shared_ptr<utilities::NodeDistributionInterface> _nodeDistribution;
 
 	/**
