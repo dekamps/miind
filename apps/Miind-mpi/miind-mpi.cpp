@@ -20,15 +20,14 @@
 namespace mpi = boost::mpi;
 using namespace MPILib;
 
-
 int main(int argc, char* argv[]) {
 	// initialize mpi
 
 	mpi::environment env(argc, argv);
+	mpi::communicator world;
 	try {
 		MPINetwork network;
 		EmptyAlgorithm alg;
-
 
 		int node0 = network.AddNode(alg, 1);
 		int node1 = network.AddNode(alg, 1);
@@ -45,15 +44,24 @@ int main(int argc, char* argv[]) {
 		weight = 6.1;
 		network.MakeFirstInputOfSecond(node2, node1, weight);
 
-	    double time, time_start = 0.0;
+		double time, time_start = 0.0;
 
-	    time = walltime(&time_start);
+		time = walltime(&time_start);
 
 		network.Evolve();
 
-	    time = walltime(&time);
+		time = walltime(&time);
 
-	    std::cout << time << " sec" << std::endl;
+
+		if (world.rank() == 0) {
+			double maxtime;
+			mpi::reduce(world, time, maxtime, mpi::maximum<double>(), 0);
+			std::cout << "The max time is " << maxtime << " sec"
+					<< std::endl;
+		} else {
+			reduce(world, time, mpi::maximum<double>(), 0);
+		}
+
 	} catch (std::exception & e) {
 		std::cout << e.what();
 	};
