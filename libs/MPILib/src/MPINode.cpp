@@ -31,7 +31,8 @@ Time MPINode::Evolve(Time time) {
 
 	_algorithm->EvolveNodeState(_precursorStates, _weights, time);
 
-	_state = (_nodeDistribution->getRank() + 1) * (_nodeId+1);
+
+	_state = _algorithm->getCurrentRate();
 
 	std::cout << "#\t NodeId: " << _nodeId << "\t#precursors: "
 			<< _precursors.size() << "\t#successors: " << _successors.size()

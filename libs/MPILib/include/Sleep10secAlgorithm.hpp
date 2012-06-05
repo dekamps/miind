@@ -39,6 +39,18 @@ public:
 	 */
 	virtual void EvolveNodeState(const std::vector<NodeState>& nodeVector,
 			const std::vector<WeightType>& weightVector, Time time);
+
+	/**
+	 * The current timepoint
+	 * @return The current time point
+	 */
+	virtual Time getCurrentTime() const;
+
+	/**
+	 * The calculated rate of the node
+	 * @return The rate of the node
+	 */
+	virtual Rate getCurrentRate() const;
 };
 
 } /* namespace MPILib */
