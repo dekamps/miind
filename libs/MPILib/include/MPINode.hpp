@@ -22,6 +22,7 @@ namespace MPILib {
 /**
  * @class MPINode the class for the actual network nodes. T
  */
+template <class Weight>
 class MPINode {
 public:
 	/**
@@ -35,12 +36,12 @@ public:
 	explicit MPINode(const AlgorithmInterface& algorithm, NodeType nodeType,
 			NodeId nodeId,
 			const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution,
-			const std::map<NodeId, MPINode>& localNode);
+			const std::map<NodeId, MPINode<Weight> >& localNode);
 
 	/**
 	 * Destructor
 	 */
-	~MPINode();
+	virtual ~MPINode();
 
 	/**
 	 * Evolve this algorithm over a time
@@ -96,7 +97,7 @@ private:
 
 	std::vector<NodeId> _precursors;
 
-	std::vector<WeightType> _weights;
+	std::vector<Weight> _weights;
 
 	std::vector<NodeId> _successors;
 
@@ -128,6 +129,9 @@ private:
 
 	std::vector<boost::mpi::request> _mpiStatus;
 };
+
+typedef MPINode<double> D_MPINode;
+
 
 } //end namespace
 

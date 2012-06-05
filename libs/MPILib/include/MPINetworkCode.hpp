@@ -15,7 +15,8 @@
 namespace mpi = boost::mpi;
 using namespace MPILib;
 
-MPINetwork::MPINetwork():_nodeDistribution(new utilities::CircularDistribution) {
+template <class WeightValue>
+MPINetwork<WeightValue>::MPINetwork():_nodeDistribution(new utilities::CircularDistribution) {
 
 
 	if (_nodeDistribution->isMaster()) {
@@ -26,15 +27,17 @@ MPINetwork::MPINetwork():_nodeDistribution(new utilities::CircularDistribution) 
 
 }
 
-MPINetwork::~MPINetwork() {
+template <class WeightValue>
+MPINetwork<WeightValue>::~MPINetwork() {
 
 }
 
-int MPINetwork::AddNode(const AlgorithmInterface& alg, NodeType nodeType) {
+template <class WeightValue>
+int MPINetwork<WeightValue>::AddNode(const AlgorithmInterface& alg, NodeType nodeType) {
 
 	int tempNodeId = getMaxNodeId();
 	if (_nodeDistribution->isLocalNode(tempNodeId)) {
-		MPINode node = MPINode(alg, nodeType, tempNodeId, _nodeDistribution, _localNodes);
+		D_Node node = D_Node(alg, nodeType, tempNodeId, _nodeDistribution, _localNodes);
 		_localNodes.insert(std::make_pair(tempNodeId, node));
 	}
 	//increment the max NodeId to make sure that it is not assigned twice.
@@ -42,8 +45,9 @@ int MPINetwork::AddNode(const AlgorithmInterface& alg, NodeType nodeType) {
 	return tempNodeId;
 }
 
-void MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
-		const WeightType& weight) {
+template <class WeightValue>
+void MPINetwork<WeightValue>::MakeFirstInputOfSecond(NodeId first, NodeId second,
+		const WeightValue& weight) {
 
 	if (_nodeDistribution->isLocalNode(first)) {
 		if (_localNodes.count(first) > 0) {
@@ -67,16 +71,18 @@ void MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
 
 }
 
-void MPINetwork::ConfigureSimulation(const SimulationRunParameter& simParam) {
+template <class WeightValue>
+void MPINetwork<WeightValue>::ConfigureSimulation(const SimulationRunParameter& simParam) {
 	//TODO implement this
 
 
 }
 
 //! Envolve the network
-void MPINetwork::Evolve() {
+template <class WeightValue>
+void MPINetwork<WeightValue>::Evolve() {
 
-	for (std::map<NodeId, MPINode>::iterator it = _localNodes.begin();
+	for (std::map<NodeId, D_MPINode>::iterator it = _localNodes.begin();
 			it != _localNodes.end(); it++) {
 		std::cout << "processorID:\t" << _nodeDistribution->getRank();
 		//FIXME change to better time
@@ -88,14 +94,16 @@ void MPINetwork::Evolve() {
 
 }
 
-int MPINetwork::getMaxNodeId() {
+template <class WeightValue>
+int MPINetwork<WeightValue>::getMaxNodeId() {
 
 	mpi::communicator world;
 	mpi::broadcast(world, _maxNodeId, 0);
 	return _maxNodeId;
 }
 
-void MPINetwork::incrementMaxNodeId() {
+template <class WeightValue>
+void MPINetwork<WeightValue>::incrementMaxNodeId() {
 	if (_nodeDistribution->isMaster()) {
 		_maxNodeId++;
 	}

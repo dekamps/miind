@@ -11,7 +11,7 @@
 //Hack to test privat members
 #define private public
 #define protected public
-#include <MPILib/include/MPINetwork.hpp>
+#include <MPILib/include/MPINetworkCode.hpp>
 #undef protected
 #undef private
 
@@ -29,7 +29,7 @@ mpi::communicator world;
 
 void test_Constructor() {
 
-	MPINetwork network;
+	MPINetwork<double> network;
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._nodeDistribution->isMaster()==true);
@@ -42,7 +42,7 @@ void test_Constructor() {
 
 void test_AddNode() {
 
-	MPINetwork network;
+	MPINetwork<double> network;
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==0);
@@ -73,7 +73,7 @@ void test_AddNode() {
 
 void test_MakeFirstInputOfSecond() {
 
-	MPINetwork network;
+	MPINetwork<double> network;
 	Sleep10secAlgorithm alg;
 
 	int node0 = network.AddNode(alg, 1);
@@ -116,7 +116,7 @@ void test_MakeFirstInputOfSecond() {
 }
 
 void test_getMaxNodeId() {
-	MPINetwork network;
+	MPINetwork<double> network;
 	Sleep10secAlgorithm alg;
 	BOOST_REQUIRE(network.getMaxNodeId()==0);
 	network.AddNode(alg, 1);
@@ -129,7 +129,7 @@ void test_getMaxNodeId() {
 }
 
 void test_incrementMaxNodeId() {
-	MPINetwork network;
+	MPINetwork<double> network;
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==0);

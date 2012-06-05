@@ -13,16 +13,19 @@
 #include <string>
 #include <map>
 
-#include <MPILib/include/MPINode.hpp>
+#include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/utilities/NodeDistributionInterface.hpp>
 
 
 namespace MPILib{
 
+template <class WeightValue>
 class MPINetwork: private boost::noncopyable {
 
 public:
+	typedef MPINode<WeightValue> D_Node;
+
 	explicit MPINetwork();
 
 	~MPINetwork();
@@ -42,7 +45,7 @@ public:
 	 * @param weight The WeightType of the connection
 	 * @exception Can throw a ParallelException
 	 */
-	void MakeFirstInputOfSecond(NodeId first, NodeId second, const WeightType& weight);
+	void MakeFirstInputOfSecond(NodeId first, NodeId second, const WeightValue& weight);
 
 	/**
 	 * Configure the next simulation
@@ -77,7 +80,7 @@ private:
 	/**
 	 * local nodes of the processor
 	 */
-	std::map<NodeId, MPINode> _localNodes;
+	std::map<NodeId, D_Node > _localNodes;
 
 
 	/**

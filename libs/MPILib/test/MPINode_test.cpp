@@ -11,8 +11,8 @@
 //Hack to test privat members
 #define private public
 #define protected public
-#include <MPILib/include/MPINode.hpp>
-#include <MPILib/include/MPINetwork.hpp>
+#include <MPILib/include/MPINodeCode.hpp>
+#include <MPILib/include/MPINetworkCode.hpp>
 #undef protected
 #undef private
 #include <MPILib/include/Sleep10secAlgorithm.hpp>
@@ -31,11 +31,11 @@ mpi::communicator world;
 void test_Constructor() {
 
 	// make node global
-	MPINetwork network;
+	MPINetwork<double> network;
 	Sleep10secAlgorithm alg;
 	NodeType nodeType = 1;
 	NodeId nodeId = 1;
-	MPINode node(alg, nodeType, nodeId, network._nodeDistribution,
+	MPINode<double> node(alg, nodeType, nodeId, network._nodeDistribution,
 			network._localNodes);
 // TODO test if the algorithm is the same
 //	BOOST_REQUIRE(alg==node._algorithm);
@@ -50,10 +50,10 @@ void test_Constructor() {
 
 void test_addPrecursor() {
 	// make node global
-	MPINetwork network;
+	MPINetwork<double> network;
 	Sleep10secAlgorithm alg;
 
-	MPINode node(alg, 1, 1, network._nodeDistribution, network._localNodes);
+	MPINode<double> node(alg, 1, 1, network._nodeDistribution, network._localNodes);
 
 	NodeId nodeId = 4;
 	WeightType weight = 2.1;
@@ -68,10 +68,10 @@ void test_addPrecursor() {
 }
 
 void test_addSuccessor() {
-	MPINetwork network;
+	MPINetwork<double> network;
 	Sleep10secAlgorithm alg;
 
-	MPINode node(alg, 1, 1, network._nodeDistribution, network._localNodes);
+	MPINode<double> node(alg, 1, 1, network._nodeDistribution, network._localNodes);
 
 	NodeId nodeId = 4;
 
@@ -85,10 +85,10 @@ void test_addSuccessor() {
 }
 
 void test_setGetState() {
-	MPINetwork network;
+	MPINetwork<double> network;
 	Sleep10secAlgorithm alg;
 
-	MPINode node(alg, 1, 1, network._nodeDistribution, network._localNodes);
+	MPINode<double> node(alg, 1, 1, network._nodeDistribution, network._localNodes);
 	node.setState(3);
 	BOOST_REQUIRE(node.getState()==3);
 	node.setState(4);
@@ -96,16 +96,16 @@ void test_setGetState() {
 }
 
 void test_sendRecvWait() {
-	MPINode* node;
-	MPINetwork network;
+	MPINode<double>* node;
+	MPINetwork<double> network;
 	Sleep10secAlgorithm alg;
 	if (world.rank() == 0) {
-		node = new MPINode(alg, 1, 0, network._nodeDistribution,
+		node = new MPINode<double>(alg, 1, 0, network._nodeDistribution,
 				network._localNodes);
 		node->addSuccessor(1);
 		node->addPrecursor(1, 2.1);
 	} else {
-		node = new MPINode(alg, 1, 1, network._nodeDistribution,
+		node = new MPINode<double>(alg, 1, 1, network._nodeDistribution,
 				network._localNodes);
 		node->addSuccessor(0);
 		node->addPrecursor(0, 1.2);
@@ -120,6 +120,8 @@ void test_sendRecvWait() {
 	} else {
 		BOOST_REQUIRE(node->_precursorStates[0]==0);
 	}
+
+	delete node;
 
 }
 

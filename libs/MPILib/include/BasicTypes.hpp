@@ -18,6 +18,7 @@ typedef int Time;
 typedef double NodeState;
 typedef NodeState Rate;
 
+
 }//end namespace
 
 #endif /* MPILIB_BASICTYPES_HPP_ */

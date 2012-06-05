@@ -12,8 +12,8 @@
 #include <boost/serialization/base_object.hpp>
 
 #include <exception>
-#include <MPILib/include/MPINode.hpp>
-#include <MPILib/include/MPINetwork.hpp>
+#include <MPILib/include/MPINodeCode.hpp>
+#include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/Sleep10secAlgorithm.hpp>
 #include <MPILib/include/utilities/walltime.hpp>
 
@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 	mpi::environment env(argc, argv);
 	mpi::communicator world;
 	try {
-		MPINetwork network;
+		MPINetwork<double> network;
 		Sleep10secAlgorithm alg;
 
 		int node0 = network.AddNode(alg, 1);

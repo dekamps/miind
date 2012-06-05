@@ -1,7 +1,5 @@
 
 set( mpi_SRC
-    src/MPINetwork.cpp
-    src/MPINode.cpp
     src/utilities/Exception.cpp
     src/utilities/ParallelException.cpp
     src/utilities/CircularDistribution.cpp
@@ -12,7 +10,9 @@ set( mpi_SRC
 
 set( mpi_HEADERS
     include/MPINode.hpp
+    include/MPINodeCode.hpp
     include/MPINetwork.hpp
+    include/MPINetworkCode.hpp
     include/BasicTypes.hpp
     include/utilities/Exception.hpp
     include/utilities/ParallelException.hpp
