@@ -22,15 +22,14 @@ MPINode<Weight, NodeDistribution>::MPINode(const AlgorithmInterface<Weight>& alg
 		NodeId nodeId,
 		const boost::shared_ptr<NodeDistribution>& nodeDistribution,
 		const boost::shared_ptr<std::map<NodeId, MPINode> >& localNode) :
-		_algorithm(algorithm.Clone()), _nodeType(nodeType), _nodeId(nodeId), _pNodeDistribution(
-				nodeDistribution), _pLocalNodes(localNode) {
+		_algorithm(algorithm.Clone()), _nodeType(nodeType), _nodeId(nodeId), _pLocalNodes(localNode), _pNodeDistribution(
+				nodeDistribution) {
 
 }
-;
+
 template<class Weight, class NodeDistribution>
 MPINode<Weight, NodeDistribution>::~MPINode() {
 }
-;
 
 template<class Weight, class NodeDistribution>
 Time MPINode<Weight, NodeDistribution>::Evolve(Time time) {
@@ -47,7 +46,7 @@ Time MPINode<Weight, NodeDistribution>::Evolve(Time time) {
 	sendOwnState();
 	waitAll();
 
-	for (int i = 0; i < _precursorStates.size(); i++) {
+	for (unsigned int i = 0; i < _precursorStates.size(); i++) {
 		std::cout << " # \t NodeId: " << _nodeId << "\t state of precursor: "
 				<< _precursorStates[i] << " # " << std::endl;
 
