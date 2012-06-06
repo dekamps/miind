@@ -17,22 +17,23 @@
 namespace mpi = boost::mpi;
 namespace MPILib{
 
-template<class Weight>
-MPINode<Weight>::MPINode(const AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
+template<class Weight, class NodeDistribution>
+MPINode<Weight, NodeDistribution>::MPINode(const AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
 		NodeId nodeId,
-		const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution,
+		const boost::shared_ptr<NodeDistribution>& nodeDistribution,
 		const std::map<NodeId, MPINode>& localNode) :
 		_algorithm(algorithm.Clone()), _nodeType(nodeType), _nodeId(nodeId), _nodeDistribution(
 				nodeDistribution), _refLocalNodes(localNode) {
 
 }
 ;
-template<class Weight>
-MPINode<Weight>::~MPINode() {
+template<class Weight, class NodeDistribution>
+MPINode<Weight, NodeDistribution>::~MPINode() {
 }
 ;
-template<class Weight>
-Time MPINode<Weight>::Evolve(Time time) {
+
+template<class Weight, class NodeDistribution>
+Time MPINode<Weight, NodeDistribution>::Evolve(Time time) {
 
 	_algorithm->EvolveNodeState(_precursorStates, _weights, time);
 
@@ -54,38 +55,44 @@ Time MPINode<Weight>::Evolve(Time time) {
 	//FIXME Implement this stub
 	return 0;
 }
-template<class Weight>
-void MPINode<Weight>::ConfigureSimulationRun(
+
+template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::ConfigureSimulationRun(
 		const SimulationRunParameter& simParam) {
 	//FIXME Implement this stub
 }
-template<class Weight>
-void MPINode<Weight>::addPrecursor(NodeId nodeId, const Weight& weight) {
+
+template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::addPrecursor(NodeId nodeId, const Weight& weight) {
 	_precursors.push_back(nodeId);
 	_weights.push_back(weight);
 	//make sure that _precursorStates is big enough to store the data
 	_precursorStates.resize(_precursors.size());
 }
-template<class Weight>
-void MPINode<Weight>::addSuccessor(NodeId nodeId) {
+
+template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::addSuccessor(NodeId nodeId) {
 	_successors.push_back(nodeId);
 }
-template<class Weight>
-NodeState MPINode<Weight>::getState() const {
+
+template<class Weight, class NodeDistribution>
+NodeState MPINode<Weight, NodeDistribution>::getState() const {
 	return _state;
 }
-template<class Weight>
-void MPINode<Weight>::setState(NodeState state) {
+
+template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::setState(NodeState state) {
 	_state = state;
 }
-template<class Weight>
-void MPINode<Weight>::waitAll() {
+
+template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::waitAll() {
 	mpi::wait_all(_mpiStatus.begin(), _mpiStatus.end());
 	_mpiStatus.clear();
 
 }
-template<class Weight>
-void MPINode<Weight>::receiveData() {
+template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::receiveData() {
 
 	std::vector<NodeId>::iterator it;
 	int i = 0;
@@ -102,8 +109,8 @@ void MPINode<Weight>::receiveData() {
 		}
 	}
 }
-template<class Weight>
-void MPINode<Weight>::sendOwnState() {
+template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::sendOwnState() {
 
 	std::vector<NodeId>::iterator it;
 	for (it = _successors.begin(); it != _successors.end(); it++) {

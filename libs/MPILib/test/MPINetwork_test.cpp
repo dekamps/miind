@@ -16,7 +16,10 @@
 #undef private
 
 #include <MPILib/include/utilities/ParallelException.hpp>
+#include <MPILib/include/utilities/CircularDistribution.hpp>
+
 #include <MPILib/include/Sleep10secAlgorithmCode.hpp>
+
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
@@ -29,7 +32,7 @@ mpi::communicator world;
 
 void test_Constructor() {
 
-	MPINetwork<double> network;
+	MPINetwork<double, utilities::CircularDistribution> network;
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._nodeDistribution->isMaster()==true);
@@ -42,7 +45,7 @@ void test_Constructor() {
 
 void test_AddNode() {
 
-	MPINetwork<double> network;
+	MPINetwork<double, utilities::CircularDistribution> network;
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==0);
@@ -74,7 +77,7 @@ void test_AddNode() {
 
 void test_MakeFirstInputOfSecond() {
 
-	MPINetwork<double> network;
+	MPINetwork<double, utilities::CircularDistribution> network;
 	Sleep10secAlgorithm<double> alg;
 
 	int node0 = network.AddNode(alg, 1);
@@ -117,7 +120,7 @@ void test_MakeFirstInputOfSecond() {
 }
 
 void test_getMaxNodeId() {
-	MPINetwork<double> network;
+	MPINetwork<double, utilities::CircularDistribution> network;
 	Sleep10secAlgorithm<double> alg;
 	BOOST_REQUIRE(network.getMaxNodeId()==0);
 	network.AddNode(alg, 1);
@@ -130,7 +133,7 @@ void test_getMaxNodeId() {
 }
 
 void test_incrementMaxNodeId() {
-	MPINetwork<double> network;
+	MPINetwork<double, utilities::CircularDistribution> network;
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==0);

@@ -20,7 +20,7 @@
 
 namespace MPILib{
 
-template <class WeightValue>
+template <class WeightValue, class NodeDistribution>
 class MPINetwork: private boost::noncopyable {
 
 public:
@@ -74,12 +74,12 @@ private:
 	/**
 	 * Shared pointer to the actual distribution of the nodes.
 	 */
-	boost::shared_ptr<utilities::NodeDistributionInterface> _nodeDistribution;
+	boost::shared_ptr<NodeDistribution> _nodeDistribution;
 
 	/**
 	 * local nodes of the processor
 	 */
-	std::map<NodeId, MPINode<WeightValue> > _localNodes;
+	std::map<NodeId, MPINode<WeightValue, NodeDistribution> > _localNodes;
 
 
 	/**

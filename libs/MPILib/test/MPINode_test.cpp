@@ -31,11 +31,11 @@ mpi::communicator world;
 void test_Constructor() {
 
 	// make node global
-	MPINetwork<double> network;
+	MPINetwork<double, utilities::CircularDistribution> network;
 	Sleep10secAlgorithm<double> alg;
 	NodeType nodeType = 1;
 	NodeId nodeId = 1;
-	MPINode<double> node(alg, nodeType, nodeId, network._nodeDistribution,
+	MPINode<double, utilities::CircularDistribution> node(alg, nodeType, nodeId, network._nodeDistribution,
 			network._localNodes);
 // TODO test if the algorithm is the same
 //	BOOST_REQUIRE(alg==node._algorithm);
@@ -50,11 +50,11 @@ void test_Constructor() {
 
 void test_addPrecursor() {
 	// make node global
-	MPINetwork<double> network;
+	MPINetwork<double, utilities::CircularDistribution> network;
 
 	Sleep10secAlgorithm<double> alg;
 
-	MPINode<double> node(alg, 1, 1, network._nodeDistribution, network._localNodes);
+	MPINode<double, utilities::CircularDistribution> node(alg, 1, 1, network._nodeDistribution, network._localNodes);
 
 	NodeId nodeId = 4;
 	double weight = 2.1;
@@ -69,10 +69,10 @@ void test_addPrecursor() {
 }
 
 void test_addSuccessor() {
-	MPINetwork<double> network;
+	MPINetwork<double, utilities::CircularDistribution> network;
 	Sleep10secAlgorithm<double> alg;
 
-	MPINode<double> node(alg, 1, 1, network._nodeDistribution, network._localNodes);
+	MPINode<double, utilities::CircularDistribution> node(alg, 1, 1, network._nodeDistribution, network._localNodes);
 
 	NodeId nodeId = 4;
 
@@ -86,10 +86,10 @@ void test_addSuccessor() {
 }
 
 void test_setGetState() {
-	MPINetwork<double> network;
+	MPINetwork<double, utilities::CircularDistribution> network;
 	Sleep10secAlgorithm<double> alg;
 
-	MPINode<double> node(alg, 1, 1, network._nodeDistribution, network._localNodes);
+	MPINode<double, utilities::CircularDistribution> node(alg, 1, 1, network._nodeDistribution, network._localNodes);
 	node.setState(3);
 	BOOST_REQUIRE(node.getState()==3);
 	node.setState(4);
@@ -97,16 +97,16 @@ void test_setGetState() {
 }
 
 void test_sendRecvWait() {
-	MPINode<double>* node;
-	MPINetwork<double> network;
+	MPINode<double, utilities::CircularDistribution>* node;
+	MPINetwork<double, utilities::CircularDistribution> network;
 	Sleep10secAlgorithm<double> alg;
 	if (world.rank() == 0) {
-		node = new MPINode<double>(alg, 1, 0, network._nodeDistribution,
+		node = new MPINode<double, utilities::CircularDistribution>(alg, 1, 0, network._nodeDistribution,
 				network._localNodes);
 		node->addSuccessor(1);
 		node->addPrecursor(1, 2.1);
 	} else {
-		node = new MPINode<double>(alg, 1, 1, network._nodeDistribution,
+		node = new MPINode<double, utilities::CircularDistribution>(alg, 1, 1, network._nodeDistribution,
 				network._localNodes);
 		node->addSuccessor(0);
 		node->addPrecursor(0, 1.2);

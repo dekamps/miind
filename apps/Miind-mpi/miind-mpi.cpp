@@ -16,6 +16,8 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/Sleep10secAlgorithmCode.hpp>
 #include <MPILib/include/utilities/walltime.hpp>
+#include <MPILib/include/utilities/CircularDistribution.hpp>
+
 
 namespace mpi = boost::mpi;
 using namespace MPILib;
@@ -26,7 +28,7 @@ int main(int argc, char* argv[]) {
 	mpi::environment env(argc, argv);
 	mpi::communicator world;
 	try {
-		MPINetwork<double> network;
+		MPINetwork<double, utilities::CircularDistribution> network;
 		Sleep10secAlgorithm<double> alg;
 
 		int node0 = network.AddNode(alg, 1);

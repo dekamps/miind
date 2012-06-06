@@ -10,12 +10,13 @@
 
 #include <boost/shared_ptr.hpp>
 #include <vector>
+#include <map>
 #include <boost/mpi/request.hpp>
 #include <memory>
 
 #include <MPILib/include/AlgorithmInterface.hpp>
+#include <MPILib/include/utilities/CircularDistribution.hpp>
 
-#include <MPILib/include/utilities/NodeDistributionInterface.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
 namespace MPILib {
@@ -23,7 +24,7 @@ namespace MPILib {
 /**
  * @class MPINode the class for the actual network nodes. T
  */
-template <class Weight>
+template <class Weight, class NodeDistribution>
 class MPINode {
 public:
 	/**
@@ -36,8 +37,8 @@ public:
 	 */
 	explicit MPINode(const AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
 			NodeId nodeId,
-			const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution,
-			const std::map<NodeId, MPINode<Weight> >& localNode);
+			const boost::shared_ptr<NodeDistribution>& nodeDistribution,
+			const std::map<NodeId, MPINode<Weight, NodeDistribution> >& localNode);
 
 	/**
 	 * Destructor
@@ -118,7 +119,7 @@ private:
 
 	//this need to be a shared_ptr see here why auto_ptr does not work:
 	//http://stackoverflow.com/a/10894173/992460
-	boost::shared_ptr<utilities::NodeDistributionInterface> _nodeDistribution;
+	boost::shared_ptr<NodeDistribution> _nodeDistribution;
 
 	/**
 	 * The state of the node it is currently
@@ -133,7 +134,7 @@ private:
 	std::vector<boost::mpi::request> _mpiStatus;
 };
 
-typedef MPINode<double> D_MPINode;
+typedef MPINode<double, utilities::CircularDistribution> D_MPINode;
 
 
 } //end namespace
