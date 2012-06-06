@@ -17,10 +17,9 @@
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/utilities/NodeDistributionInterface.hpp>
 
+namespace MPILib {
 
-namespace MPILib{
-
-template <class WeightValue, class NodeDistribution>
+template<class WeightValue, class NodeDistribution>
 class MPINetwork: private boost::noncopyable {
 
 public:
@@ -44,7 +43,8 @@ public:
 	 * @param weight The WeightType of the connection
 	 * @exception Can throw a ParallelException
 	 */
-	void MakeFirstInputOfSecond(NodeId first, NodeId second, const WeightValue& weight);
+	void MakeFirstInputOfSecond(NodeId first, NodeId second,
+			const WeightValue& weight);
 
 	/**
 	 * Configure the next simulation
@@ -74,13 +74,12 @@ private:
 	/**
 	 * Shared pointer to the actual distribution of the nodes.
 	 */
-	boost::shared_ptr<NodeDistribution> _nodeDistribution;
+	boost::shared_ptr<NodeDistribution> _pNodeDistribution;
 
 	/**
 	 * local nodes of the processor
 	 */
-	std::map<NodeId, MPINode<WeightValue, NodeDistribution> > _localNodes;
-
+	boost::shared_ptr<std::map<NodeId, MPINode<WeightValue, NodeDistribution> > > _pLocalNodes;
 
 	/**
 	 * The max Node number assigned so far.
@@ -90,6 +89,6 @@ private:
 
 };
 
-}//end namespace
+} //end namespace
 
 #endif /* MPILIB_MPINETWORK_HPP_ */

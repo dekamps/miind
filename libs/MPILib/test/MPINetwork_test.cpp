@@ -35,10 +35,10 @@ void test_Constructor() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 
 	if (world.rank() == 0) {
-		BOOST_REQUIRE(network._nodeDistribution->isMaster()==true);
-		BOOST_REQUIRE(network._localNodes.size()==0);
+		BOOST_REQUIRE(network._pNodeDistribution->isMaster()==true);
+		BOOST_REQUIRE(network._pLocalNodes->size()==0);
 	} else if (world.rank() == 1) {
-		BOOST_REQUIRE(network._localNodes.size()==0);
+		BOOST_REQUIRE(network._pLocalNodes->size()==0);
 	}
 
 }
@@ -49,9 +49,9 @@ void test_AddNode() {
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==0);
-		BOOST_REQUIRE(network._localNodes.size()==0);
+		BOOST_REQUIRE(network._pLocalNodes->size()==0);
 	} else if (world.rank() == 1) {
-		BOOST_REQUIRE(network._localNodes.size()==0);
+		BOOST_REQUIRE(network._pLocalNodes->size()==0);
 	}
 
 	Sleep10secAlgorithm<double> alg;
@@ -60,18 +60,18 @@ void test_AddNode() {
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==1);
-		BOOST_REQUIRE(network._localNodes.size()==1);
+		BOOST_REQUIRE(network._pLocalNodes->size()==1);
 	} else if (world.rank() == 1) {
-		BOOST_REQUIRE(network._localNodes.size()==0);
+		BOOST_REQUIRE(network._pLocalNodes->size()==0);
 	}
 
 	network.AddNode(alg, 1);
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==2);
-		BOOST_REQUIRE(network._localNodes.size()==1);
+		BOOST_REQUIRE(network._pLocalNodes->size()==1);
 	} else if (world.rank() == 1) {
-		BOOST_REQUIRE(network._localNodes.size()==1);
+		BOOST_REQUIRE(network._pLocalNodes->size()==1);
 	}
 }
 
@@ -94,18 +94,18 @@ void test_MakeFirstInputOfSecond() {
 	if (world.rank() == 1) {
 
 		BOOST_REQUIRE(
-				network._localNodes.find(node1)->second._precursors.size()==1);
+				network._pLocalNodes->find(node1)->second._precursors.size()==1);
 		BOOST_REQUIRE(
-				network._localNodes.find(node1)->second._weights.size()==1);
+				network._pLocalNodes->find(node1)->second._weights.size()==1);
 		BOOST_REQUIRE(
-				network._localNodes.find(node1)->second._precursorStates.size()==1);
+				network._pLocalNodes->find(node1)->second._precursorStates.size()==1);
 	} else {
 		BOOST_REQUIRE(
-				network._localNodes.find(node0)->second._successors.size()==1);
+				network._pLocalNodes->find(node0)->second._successors.size()==1);
 		BOOST_REQUIRE(
-				network._localNodes.find(node0)->second._weights.size()==0);
+				network._pLocalNodes->find(node0)->second._weights.size()==0);
 		BOOST_REQUIRE(
-				network._localNodes.find(node0)->second._precursorStates.size()==0);
+				network._pLocalNodes->find(node0)->second._precursorStates.size()==0);
 	}
 
 	exceptionThrown = false;

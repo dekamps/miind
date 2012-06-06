@@ -38,7 +38,8 @@ public:
 	explicit MPINode(const AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
 			NodeId nodeId,
 			const boost::shared_ptr<NodeDistribution>& nodeDistribution,
-			const std::map<NodeId, MPINode<Weight, NodeDistribution> >& localNode);
+			const boost::shared_ptr<std::map<NodeId, MPINode<Weight, NodeDistribution> > >& localNode);
+
 
 	/**
 	 * Destructor
@@ -113,13 +114,14 @@ private:
 	NodeId _nodeId;
 
 	/**
-	 * Reference to the local nodes of the processor. They are stored by the network.
+	 * Pointer to the local nodes of the processor. They are stored by the network.
 	 */
-	const std::map<NodeId, MPINode>& _refLocalNodes;
+	boost::shared_ptr<std::map<NodeId, MPINode> > _pLocalNodes;
 
 	//this need to be a shared_ptr see here why auto_ptr does not work:
 	//http://stackoverflow.com/a/10894173/992460
-	boost::shared_ptr<NodeDistribution> _nodeDistribution;
+	boost::shared_ptr<NodeDistribution> _pNodeDistribution;
+
 
 	/**
 	 * The state of the node it is currently
