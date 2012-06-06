@@ -5,10 +5,12 @@
  *      Author: david
  */
 
-#include <MPILib/include/Sleep10secAlgorithm.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/mpi.hpp>
 #include <boost/mpi/communicator.hpp>
+
+#include <MPILib/include/Sleep10secAlgorithm.hpp>
+
 namespace mpi = boost::mpi;
 
 

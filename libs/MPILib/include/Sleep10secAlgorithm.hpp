@@ -8,9 +8,10 @@
 #ifndef MPILIB_SLEEP10SECALGORITHM_HPP_
 #define MPILIB_SLEEP10SECALGORITHM_HPP_
 
-#include <MPILib/include/AlgorithmInterface.hpp>
 #include <vector>
 #include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/AlgorithmInterface.hpp>
+
 
 namespace MPILib {
 

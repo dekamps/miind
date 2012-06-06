@@ -25,7 +25,6 @@
 #ifndef MPILIB_UTILITIES_EXCEPTION_HPP_
 #define MPILIB_UTILITIES_EXCEPTION_HPP_
 
-#include <boost/exception/all.hpp>
 #include <string>
 #include <exception>
 

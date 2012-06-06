@@ -9,7 +9,7 @@
 #define MPILIB_UTILITIES_NODEDISTRIBUTIONINTERFACE_HPP_
 
 #include <boost/noncopyable.hpp>
-#include "../BasicTypes.hpp"
+#include <MPILib/include/BasicTypes.hpp>
 
 
 namespace MPILib{

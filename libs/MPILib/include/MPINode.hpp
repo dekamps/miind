@@ -8,11 +8,10 @@
 #ifndef MPILIB_MPINODE_HPP_
 #define MPILIB_MPINODE_HPP_
 
-#include <boost/shared_ptr.hpp>
 #include <vector>
 #include <map>
 #include <boost/mpi/request.hpp>
-#include <memory>
+#include <boost/shared_ptr.hpp>
 
 #include <MPILib/include/AlgorithmInterface.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>

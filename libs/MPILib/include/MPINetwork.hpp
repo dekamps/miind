@@ -13,10 +13,9 @@
 #include <string>
 #include <map>
 
-#include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/utilities/NodeDistributionInterface.hpp>
-
+#include <MPILib/include/AlgorithmInterface.hpp>
+#include <MPILib/include/MPINode.hpp>
 namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
