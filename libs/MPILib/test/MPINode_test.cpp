@@ -35,17 +35,17 @@ void test_Constructor() {
 	Sleep10secAlgorithm alg;
 	NodeType nodeType = 1;
 	NodeId nodeId = 1;
-	MPINode node(alg, nodeType, nodeId, network._nodeDistribution,
-			network._localNodes);
+	MPINode node(alg, nodeType, nodeId, network._pNodeDistribution,
+			network._pLocalNodes);
 // TODO test if the algorithm is the same
 //	BOOST_REQUIRE(alg==node._algorithm);
 	BOOST_REQUIRE(nodeType==node._nodeType);
 	BOOST_REQUIRE(nodeId==node._nodeId);
-	BOOST_REQUIRE(network._nodeDistribution==node._nodeDistribution);
+	BOOST_REQUIRE(network._pNodeDistribution==node._pNodeDistribution);
 	//indirect comparision
-	BOOST_REQUIRE(network._localNodes.size()==node._refLocalNodes.size());
+	BOOST_REQUIRE(network._pLocalNodes->size()==node._pLocalNodes->size());
 	//make sure the shared_ptr works :)
-	BOOST_REQUIRE(network._nodeDistribution.use_count()==2);
+	BOOST_REQUIRE(network._pNodeDistribution.use_count()==2);
 }
 
 void test_addPrecursor() {
@@ -53,7 +53,7 @@ void test_addPrecursor() {
 	MPINetwork network;
 	Sleep10secAlgorithm alg;
 
-	MPINode node(alg, 1, 1, network._nodeDistribution, network._localNodes);
+	MPINode node(alg, 1, 1, network._pNodeDistribution, network._pLocalNodes);
 
 	NodeId nodeId = 4;
 	WeightType weight = 2.1;
@@ -71,7 +71,7 @@ void test_addSuccessor() {
 	MPINetwork network;
 	Sleep10secAlgorithm alg;
 
-	MPINode node(alg, 1, 1, network._nodeDistribution, network._localNodes);
+	MPINode node(alg, 1, 1, network._pNodeDistribution, network._pLocalNodes);
 
 	NodeId nodeId = 4;
 
@@ -88,7 +88,7 @@ void test_setGetState() {
 	MPINetwork network;
 	Sleep10secAlgorithm alg;
 
-	MPINode node(alg, 1, 1, network._nodeDistribution, network._localNodes);
+	MPINode node(alg, 1, 1, network._pNodeDistribution, network._pLocalNodes);
 	node.setState(3);
 	BOOST_REQUIRE(node.getState()==3);
 	node.setState(4);
@@ -100,13 +100,13 @@ void test_sendRecvWait() {
 	MPINetwork network;
 	Sleep10secAlgorithm alg;
 	if (world.rank() == 0) {
-		node = new MPINode(alg, 1, 0, network._nodeDistribution,
-				network._localNodes);
+		node = new MPINode(alg, 1, 0, network._pNodeDistribution,
+				network._pLocalNodes);
 		node->addSuccessor(1);
 		node->addPrecursor(1, 2.1);
 	} else {
-		node = new MPINode(alg, 1, 1, network._nodeDistribution,
-				network._localNodes);
+		node = new MPINode(alg, 1, 1, network._pNodeDistribution,
+				network._pLocalNodes);
 		node->addSuccessor(0);
 		node->addPrecursor(0, 1.2);
 	}

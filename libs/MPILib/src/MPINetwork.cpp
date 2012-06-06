@@ -15,10 +15,10 @@
 namespace mpi = boost::mpi;
 using namespace MPILib;
 
-MPINetwork::MPINetwork():_nodeDistribution(new utilities::CircularDistribution) {
+MPINetwork::MPINetwork():_pNodeDistribution(new utilities::CircularDistribution), _pLocalNodes(new std::map<NodeId, MPINode>) {
 
 
-	if (_nodeDistribution->isMaster()) {
+	if (_pNodeDistribution->isMaster()) {
 		_maxNodeId = 0;
 	}
 
@@ -33,9 +33,9 @@ MPINetwork::~MPINetwork() {
 int MPINetwork::AddNode(const AlgorithmInterface& alg, NodeType nodeType) {
 
 	int tempNodeId = getMaxNodeId();
-	if (_nodeDistribution->isLocalNode(tempNodeId)) {
-		MPINode node = MPINode(alg, nodeType, tempNodeId, _nodeDistribution, _localNodes);
-		_localNodes.insert(std::make_pair(tempNodeId, node));
+	if (_pNodeDistribution->isLocalNode(tempNodeId)) {
+		MPINode node = MPINode(alg, nodeType, tempNodeId, _pNodeDistribution, _pLocalNodes);
+		_pLocalNodes->insert(std::make_pair(tempNodeId, node));
 	}
 	//increment the max NodeId to make sure that it is not assigned twice.
 	incrementMaxNodeId();
@@ -45,18 +45,18 @@ int MPINetwork::AddNode(const AlgorithmInterface& alg, NodeType nodeType) {
 void MPINetwork::MakeFirstInputOfSecond(NodeId first, NodeId second,
 		const WeightType& weight) {
 
-	if (_nodeDistribution->isLocalNode(first)) {
-		if (_localNodes.count(first) > 0) {
-			_localNodes.find(first)->second.addSuccessor(second);
+	if (_pNodeDistribution->isLocalNode(first)) {
+		if (_pLocalNodes->count(first) > 0) {
+			_pLocalNodes->find(first)->second.addSuccessor(second);
 		} else {
 			std::stringstream tempStream;
 			tempStream << "the node " << first << "does not exist on this node";
 			miind_parallel_fail(tempStream.str());
 		}
 	}
-	if (_nodeDistribution->isLocalNode(second)) {
-		if (_localNodes.count(second) > 0) {
-			_localNodes.find(second)->second.addPrecursor(first, weight);
+	if (_pNodeDistribution->isLocalNode(second)) {
+		if (_pLocalNodes->count(second) > 0) {
+			_pLocalNodes->find(second)->second.addPrecursor(first, weight);
 		} else {
 			std::stringstream tempStream;
 			tempStream << "the node " << second << "does not exist on this node";
@@ -76,9 +76,9 @@ void MPINetwork::ConfigureSimulation(const SimulationRunParameter& simParam) {
 //! Envolve the network
 void MPINetwork::Evolve() {
 
-	for (std::map<NodeId, MPINode>::iterator it = _localNodes.begin();
-			it != _localNodes.end(); it++) {
-		std::cout << "processorID:\t" << _nodeDistribution->getRank();
+	for (std::map<NodeId, MPINode>::iterator it = _pLocalNodes->begin();
+			it != _pLocalNodes->end(); it++) {
+		std::cout << "processorID:\t" << _pNodeDistribution->getRank();
 		//FIXME change to better time
 		it->second.Evolve(1);
 		std::cout << std::endl;
@@ -96,7 +96,7 @@ int MPINetwork::getMaxNodeId() {
 }
 
 void MPINetwork::incrementMaxNodeId() {
-	if (_nodeDistribution->isMaster()) {
+	if (_pNodeDistribution->isMaster()) {
 		_maxNodeId++;
 	}
 }

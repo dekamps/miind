@@ -16,9 +16,9 @@ using namespace MPILib;
 
 MPINode::MPINode(const AlgorithmInterface& algorithm, NodeType nodeType, NodeId nodeId,
 		const boost::shared_ptr<utilities::NodeDistributionInterface>& nodeDistribution,
-		const std::map<NodeId, MPINode>& localNode) :
-		_algorithm(algorithm.Clone()), _nodeType(nodeType), _nodeId(nodeId), _nodeDistribution(
-				nodeDistribution), _refLocalNodes(localNode) {
+		const boost::shared_ptr<std::map<NodeId, MPINode> > localNode) :
+		_algorithm(algorithm.Clone()), _nodeType(nodeType), _nodeId(nodeId), _pNodeDistribution(
+				nodeDistribution), _pLocalNodes(localNode) {
 
 }
 ;
@@ -87,13 +87,13 @@ void MPINode::receiveData() {
 	for (it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		mpi::communicator world;
 		//do not send the data if the node is local!
-		if (_nodeDistribution->isLocalNode(*it)) {
-			_precursorStates[i] = _refLocalNodes.find(*it)->second.getState();
+		if (_pNodeDistribution->isLocalNode(*it)) {
+			_precursorStates[i] = _pLocalNodes->find(*it)->second.getState();
 
 		} else {
 			_mpiStatus.push_back(
-					world.irecv(_nodeDistribution->getResponsibleProcessor(*it),
-							_nodeDistribution->getRank(), _precursorStates[i]));
+					world.irecv(_pNodeDistribution->getResponsibleProcessor(*it),
+							_pNodeDistribution->getRank(), _precursorStates[i]));
 		}
 	}
 }
@@ -104,9 +104,9 @@ void MPINode::sendOwnState() {
 	for (it = _successors.begin(); it != _successors.end(); it++) {
 		mpi::communicator world;
 		//do not send the data if the node is local!
-		if (!_nodeDistribution->isLocalNode(*it)) {
+		if (!_pNodeDistribution->isLocalNode(*it)) {
 			_mpiStatus.push_back(
-					world.isend(_nodeDistribution->getResponsibleProcessor(*it),
+					world.isend(_pNodeDistribution->getResponsibleProcessor(*it),
 							*it, _state));
 		}
 	}

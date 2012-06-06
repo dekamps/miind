@@ -72,12 +72,12 @@ private:
 	/**
 	 * Shared pointer to the actual distribution of the nodes.
 	 */
-	boost::shared_ptr<utilities::NodeDistributionInterface> _nodeDistribution;
+	boost::shared_ptr<utilities::NodeDistributionInterface> _pNodeDistribution;
 
 	/**
 	 * local nodes of the processor
 	 */
-	std::map<NodeId, MPINode> _localNodes;
+	boost::shared_ptr<std::map<NodeId, MPINode> > _pLocalNodes;
 
 
 	/**
