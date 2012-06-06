@@ -33,13 +33,21 @@ Sleep10secAlgorithm<WeightValue>* Sleep10secAlgorithm<WeightValue>::Clone() cons
 
 template <class WeightValue>
 void Sleep10secAlgorithm<WeightValue>::Configure(const SimulationRunParameter& simParam) {
+	double t = simParam;
+	t=2*simParam;
+//FIXME
 
 }
 
 template <class WeightValue>
 void Sleep10secAlgorithm<WeightValue>::EvolveNodeState(const std::vector<NodeState>& nodeVector,
 		const std::vector<WeightValue>& weightVector, Time time) {
+	time =2;
+	unsigned int size = nodeVector.size();
+	size = weightVector.size();
+//FIXME
 	boost::this_thread::sleep( boost::posix_time::seconds(10) );
+
 }
 
 template <class WeightValue>
