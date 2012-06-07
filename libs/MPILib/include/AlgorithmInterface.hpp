@@ -51,7 +51,7 @@ public:
 	 * The calculated rate of the node
 	 * @return The rate of the node
 	 */
-	virtual NodeState getCurrentRate() const = 0;
+	virtual Rate getCurrentRate() const = 0;
 };
 
 } /* namespace MPILib */

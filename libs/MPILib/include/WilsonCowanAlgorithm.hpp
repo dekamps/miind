@@ -12,12 +12,14 @@
 #include "WilsonCowanParameter.hpp"
 #include <MPILib/include/AlgorithmInterface.hpp>
 
-
 namespace MPILib {
 
 class WilsonCowanAlgorithm: public AlgorithmInterface<double> {
 public:
 	WilsonCowanAlgorithm();
+
+	WilsonCowanAlgorithm(const WilsonCowanParameter&);
+
 	virtual ~WilsonCowanAlgorithm();
 
 	/**
@@ -51,7 +53,7 @@ public:
 	 * The calculated rate of the node
 	 * @return The rate of the node
 	 */
-	virtual NodeState getCurrentRate() const;
+	virtual Rate getCurrentRate() const;
 
 private:
 
@@ -60,8 +62,9 @@ private:
 
 	vector<double> InitialState() const;
 
+	WilsonCowanParameter _parameter;
 
-	NumtoolsLib::DVIntegrator<WilsonCowanParameter>	_integrator;
+	NumtoolsLib::DVIntegrator<WilsonCowanParameter> _integrator;
 
 };
 
