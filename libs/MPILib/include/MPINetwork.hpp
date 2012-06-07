@@ -49,7 +49,7 @@ public:
 	 * Configure the next simulation
 	 * @param simParam The Simulation Parameter
 	 */
-	void ConfigureSimulation(const SimulationRunParameter& simParam);
+	void ConfigureSimulation(const DynamicLib::SimulationRunParameter& simParam);
 
 	/**
 	 * Envolve the network

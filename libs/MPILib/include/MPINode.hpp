@@ -56,7 +56,7 @@ public:
 	 * Configure the Node with the Simulation Parameters
 	 * @param simParam Simulation Parameters
 	 */
-	void ConfigureSimulationRun(const SimulationRunParameter& simParam);
+	void ConfigureSimulationRun(const DynamicLib::SimulationRunParameter& simParam);
 
 	/**
 	 * Add a precursor to the current node

@@ -57,7 +57,7 @@ Time MPINode<Weight, NodeDistribution>::Evolve(Time time) {
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::ConfigureSimulationRun(
-		const SimulationRunParameter& simParam) {
+		const DynamicLib::SimulationRunParameter& simParam) {
 	//FIXME Implement this stub
 }
 

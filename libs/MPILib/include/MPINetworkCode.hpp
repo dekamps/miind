@@ -78,7 +78,7 @@ void MPINetwork<WeightValue, NodeDistribution>::MakeFirstInputOfSecond(
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::ConfigureSimulation(
-		const SimulationRunParameter& simParam) {
+		const DynamicLib::SimulationRunParameter& simParam) {
 	//TODO implement this
 
 }

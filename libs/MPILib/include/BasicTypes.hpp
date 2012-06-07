@@ -8,8 +8,7 @@
 #ifndef MPILIB_BASICTYPES_HPP_
 #define MPILIB_BASICTYPES_HPP_
 
-#include <MPILib/include/NodeState.hpp>
-
+#include <string>
 
 namespace MPILib {
 
@@ -51,9 +50,8 @@ const int KEY_PRECISION = 8;
 //my own
 typedef int NodeType;
 typedef int NodeId;
-typedef int SimulationRunParameter;
 
-const string STR_NUMBER_ITERATIONS_EXCEEDED
+const std::string STR_NUMBER_ITERATIONS_EXCEEDED
 				(
 					"The predetermined number of iterations is exceeded in Evolve()"
 				);
