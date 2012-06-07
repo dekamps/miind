@@ -5,9 +5,9 @@
  *      Author: david
  */
 
-#include <MPILib/include/WilsonCowanAlgorithm.hpp>
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/WilsonCowanAlgorithm.hpp>
 
 #include "../../NumtoolsLib/NumtoolsLib.h"
 #include <gsl/gsl_matrix.h>
@@ -19,8 +19,8 @@
 namespace {
 
 int sigmoid(double t, const double y[], double f[], void *params) {
-	MPILib::WilsonCowanParameter* p_parameter =
-			(MPILib::WilsonCowanParameter *) params;
+	DynamicLib::WilsonCowanParameter* p_parameter =
+			(DynamicLib::WilsonCowanParameter *) params;
 
 	f[0] = (-y[0]
 			+ p_parameter->_rate_maximum
@@ -32,8 +32,8 @@ int sigmoid(double t, const double y[], double f[], void *params) {
 
 int sigmoidprime(double t, const double y[], double *dfdy, double dfdt[],
 		void *params) {
-	MPILib::WilsonCowanParameter* p_parameter =
-			(MPILib::WilsonCowanParameter *) params;
+	DynamicLib::WilsonCowanParameter* p_parameter =
+			(DynamicLib::WilsonCowanParameter *) params;
 	gsl_matrix_view dfdy_mat = gsl_matrix_view_array(dfdy, 1, 1);
 
 	gsl_matrix * m = &dfdy_mat.matrix;
@@ -58,7 +58,7 @@ WilsonCowanAlgorithm::WilsonCowanAlgorithm() :
 
 }
 
-WilsonCowanAlgorithm::WilsonCowanAlgorithm(const WilsonCowanParameter&parameter) :
+WilsonCowanAlgorithm::WilsonCowanAlgorithm(const DynamicLib::WilsonCowanParameter&parameter) :
 		AlgorithmInterface<double>(), _parameter(parameter), _integrator(0,
 				InitialState(), 0, 0,
 				NumtoolsLib::Precision(WC_ABSOLUTE_PRECISION,
@@ -74,7 +74,7 @@ WilsonCowanAlgorithm* WilsonCowanAlgorithm::Clone() const {
 	return new WilsonCowanAlgorithm(*this);
 }
 
-void WilsonCowanAlgorithm::Configure(const SimulationRunParameter& simParam) {
+void WilsonCowanAlgorithm::Configure(const DynamicLib::SimulationRunParameter& simParam) {
 
 //	NumtoolsLib::DVIntegratorStateParameter<WilsonCowanParameter> parameter_dv;
 //
@@ -106,9 +106,9 @@ void WilsonCowanAlgorithm::EvolveNodeState(const std::vector<Rate>& nodeVector,
 	} catch (NumtoolsLib::DVIntegratorException& except) {
 		//FIXME
 //		if (except.Code() == NumtoolsLib::NUMBER_ITERATIONS_EXCEEDED)
-//			throw miind_parallel_fail("number of iterations exceeded");
+//			throw miind_parallel_fail(STR_NUMBER_ITERATIONS_EXCEEDED);
 //		else
-//			throw except;
+			throw except;
 	}
 }
 

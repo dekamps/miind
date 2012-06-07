@@ -44,7 +44,13 @@ IF(ENABLE_MPI)
        message(FATAL_ERROR "Boost is mandatory to build the libraries")
     endif( Boost_FOUND )
     
-        
+    find_package( Root )
+    if( ROOT_FOUND )
+      message(STATUS "Building Root dependent parts")
+    else( ROOT_FOUND )
+      message(STATUS "Building parts not depending on Root")
+    endif( ROOT_FOUND )
+    
     # TODO:  This is ugly and must be fixed in the windows install procedure
     if (WIN32)
     SET (LIB_PREFIX lib)

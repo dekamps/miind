@@ -53,7 +53,10 @@ typedef int NodeType;
 typedef int NodeId;
 typedef int SimulationRunParameter;
 
-
+const string STR_NUMBER_ITERATIONS_EXCEEDED
+				(
+					"The predetermined number of iterations is exceeded in Evolve()"
+				);
 
 }//end namespace
 

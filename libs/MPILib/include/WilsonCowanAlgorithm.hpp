@@ -8,8 +8,9 @@
 #ifndef MPILIB_WILSONCOWANALGORITHM_HPP_
 #define MPILIB_WILSONCOWANALGORITHM_HPP_
 
-#include "../../NumtoolsLib/NumtoolsLib.h"
-#include "WilsonCowanParameter.hpp"
+#include <NumtoolsLib/NumtoolsLib.h>
+#include <DynamicLib/WilsonCowanParameter.h>
+
 #include <MPILib/include/AlgorithmInterface.hpp>
 
 namespace MPILib {
@@ -18,7 +19,7 @@ class WilsonCowanAlgorithm: public AlgorithmInterface<double> {
 public:
 	WilsonCowanAlgorithm();
 
-	WilsonCowanAlgorithm(const WilsonCowanParameter&);
+	WilsonCowanAlgorithm(const DynamicLib::WilsonCowanParameter&);
 
 	virtual ~WilsonCowanAlgorithm();
 
@@ -32,7 +33,7 @@ public:
 	 * Configure the Algorithm
 	 * @param simParam
 	 */
-	virtual void Configure(const SimulationRunParameter& simParam);
+	virtual void Configure(const DynamicLib::SimulationRunParameter& simParam);
 
 	/**
 	 * Evolve the node state
@@ -62,9 +63,9 @@ private:
 
 	vector<double> InitialState() const;
 
-	WilsonCowanParameter _parameter;
+	DynamicLib::WilsonCowanParameter _parameter;
 
-	NumtoolsLib::DVIntegrator<WilsonCowanParameter> _integrator;
+	NumtoolsLib::DVIntegrator<DynamicLib::WilsonCowanParameter> _integrator;
 
 };
 

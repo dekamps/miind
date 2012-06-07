@@ -26,6 +26,7 @@
 #include "../UtilLib/UtilLib.h"
 #include "BasicDefinitions.h"
 #include "LocalDefinitions.h"
+#include "DynamicLibException.h"
 
 using std::istream;
 using std::ostream;

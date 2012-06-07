@@ -9,6 +9,7 @@
 #define MPILIB_ALGORITHMINTERFACE_HPP_
 
 #include <MPILib/include/BasicTypes.hpp>
+#include <DynamicLib/SimulationRunParameter.h>
 #include <vector>
 
 
@@ -30,7 +31,7 @@ public:
 	 * Configure the Algorithm
 	 * @param simParam
 	 */
-	virtual void Configure(const SimulationRunParameter& simParam) = 0;
+	virtual void Configure(const DynamicLib::SimulationRunParameter& simParam) = 0;
 
 	/**
 	 * Evolve the node state
