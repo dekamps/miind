@@ -76,20 +76,20 @@ WilsonCowanAlgorithm* WilsonCowanAlgorithm::Clone() const {
 
 void WilsonCowanAlgorithm::Configure(const DynamicLib::SimulationRunParameter& simParam) {
 
-//	NumtoolsLib::DVIntegratorStateParameter<WilsonCowanParameter> parameter_dv;
-//
-//	parameter_dv._vector_state = vector<double>(1, 0);
-//	parameter_dv._time_begin = simParam.TBegin();
-//	parameter_dv._time_end = simParam.TEnd();
-//	parameter_dv._time_step = simParam.TStep();
-//	parameter_dv._time_current = simParam.TBegin();
-//
-//	parameter_dv._parameter_space = _parameter;
-//
-//	parameter_dv._number_maximum_iterations =
-//			simParam.MaximumNumberIterations();
-//
-//	_integrator.Reconfigure(parameter_dv);
+	NumtoolsLib::DVIntegratorStateParameter<DynamicLib::WilsonCowanParameter> parameter_dv;
+
+	parameter_dv._vector_state = vector<double>(1, 0);
+	parameter_dv._time_begin = simParam.TBegin();
+	parameter_dv._time_end = simParam.TEnd();
+	parameter_dv._time_step = simParam.TStep();
+	parameter_dv._time_current = simParam.TBegin();
+
+	parameter_dv._parameter_space = _parameter;
+
+	parameter_dv._number_maximum_iterations =
+			simParam.MaximumNumberIterations();
+
+	_integrator.Reconfigure(parameter_dv);
 //FIXME
 }
 

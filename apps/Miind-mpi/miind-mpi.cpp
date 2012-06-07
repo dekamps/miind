@@ -18,7 +18,6 @@
 #include <DynamicLib/WilsonCowanParameter.h>
 #include <DynamicLib/RootReportHandler.h>
 
-
 #include <MPILib/include/RateAlgorithm.hpp>
 #include <MPILib/include/utilities/walltime.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
@@ -41,6 +40,21 @@ const DynamicLib::SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, //
 		"test/wilsonresponse.log" // log file name
 		);
 
+const DynamicLib::RootReportHandler WILSONCOWAN_HANDLER1(
+		"test/wilsonresponse1.root", // file where the simulation results are written
+		false, // do not display on screen
+		false // only rate diagrams
+		);
+
+const DynamicLib::SimulationRunParameter PAR_WILSONCOWAN1(WILSONCOWAN_HANDLER1, // the handler object
+		1000000, // maximum number of iterations
+		0, // start time of simulation
+		0.5, // end time of simulation
+		1e-4, // report time
+		1e-4, // update time
+		1e-5, // network step time
+		"test/wilsonresponse1.log" // log file name
+		);
 
 using namespace MPILib;
 
@@ -75,7 +89,12 @@ int main(int argc, char* argv[]) {
 		// connect the two nodes
 		network.MakeFirstInputOfSecond(id_rate, id, epsilon);
 
-		network.ConfigureSimulation(PAR_WILSONCOWAN);
+		if (world.rank() == 0) {
+			network.ConfigureSimulation(PAR_WILSONCOWAN);
+
+		} else {
+			network.ConfigureSimulation(PAR_WILSONCOWAN1);
+		}
 
 		double time, time_start = 0.0;
 
@@ -95,6 +114,13 @@ int main(int argc, char* argv[]) {
 
 	} catch (std::exception & e) {
 		std::cout << e.what();
+		env.abort(1);
+		return 1;
+	} catch (UtilLib::GeneralException &e) {
+		std::cout << e.Description();
+		env.abort(2);
+
+		return 2;
 	};
 
 	return 0;

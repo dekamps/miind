@@ -1,5 +1,7 @@
 if(ENABLE_MPI)
     ADD_SUBDIRECTORY( Miind-mpi )
+        ADD_SUBDIRECTORY( DynamicLib )
+    
 else()
 
     if( ROOT_FOUND )

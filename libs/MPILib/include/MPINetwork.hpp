@@ -18,6 +18,7 @@
 #include <MPILib/include/MPINode.hpp>
 
 #include <DynamicLib/InactiveReportHandler.h>
+#include <DynamicLib/NetworkState.h>
 
 namespace MPILib {
 
@@ -74,6 +75,17 @@ private:
 	 */
 	void incrementMaxNodeId();
 
+	void UpdateReportTime				();
+	void UpdateSimulationTime			();
+	void UpdateUpdateTime				();
+	void UpdateStateTime				();
+
+	Time EndTime						() const;
+	Time CurrentReportTime				() const;
+	Time CurrentSimulationTime			() const;
+	Time CurrentUpdateTime				() const;
+	Time CurrentStateTime				() const;
+
 	/**
 	 * Shared pointer to the actual distribution of the nodes.
 	 */
@@ -94,6 +106,7 @@ private:
 	Time _current_update_time;
 	Time _current_state_time;
 	Time _current_simulation_time;
+	DynamicLib::NetworkState _state_network;
 
 	DynamicLib::SimulationRunParameter _parameter_simulation_run;
 	LogStream _stream_log;
