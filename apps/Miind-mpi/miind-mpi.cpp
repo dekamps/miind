@@ -14,12 +14,34 @@
 #include <exception>
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
-#include <MPILib/include/Sleep10secAlgorithmCode.hpp>
+#include <MPILib/include/WilsonCowanAlgorithm.hpp>
+#include <DynamicLib/WilsonCowanParameter.h>
+#include <DynamicLib/RootReportHandler.h>
+
+
+#include <MPILib/include/RateAlgorithm.hpp>
 #include <MPILib/include/utilities/walltime.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
-
 namespace mpi = boost::mpi;
+
+const DynamicLib::RootReportHandler WILSONCOWAN_HANDLER(
+		"test/wilsonresponse.root", // file where the simulation results are written
+		false, // do not display on screen
+		false // only rate diagrams
+		);
+
+const DynamicLib::SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, // the handler object
+		1000000, // maximum number of iterations
+		0, // start time of simulation
+		0.5, // end time of simulation
+		1e-4, // report time
+		1e-4, // update time
+		1e-5, // network step time
+		"test/wilsonresponse.log" // log file name
+		);
+
+
 using namespace MPILib;
 
 int main(int argc, char* argv[]) {
@@ -29,22 +51,31 @@ int main(int argc, char* argv[]) {
 	mpi::communicator world;
 	try {
 		MPINetwork<double, utilities::CircularDistribution> network;
-		Sleep10secAlgorithm<double> alg;
 
-		int node0 = network.AddNode(alg, 1);
-		int node1 = network.AddNode(alg, 1);
-		int node2 = network.AddNode(alg, 1);
+		Time tau = 10e-3; //10 ms
+		Rate rate_max = 100.0;
+		double noise = 1.0;
 
-		double weight = 3.1;
-		network.MakeFirstInputOfSecond(node0, node1, weight);
-		weight = 1.2;
-		network.MakeFirstInputOfSecond(node0, node2, weight);
+		// define some efficacy
+		Efficacy epsilon = 1.0;
 
-		weight = 6.4;
+		// define some input rate
+		Rate nu = 0;
 
-		network.MakeFirstInputOfSecond(node1, node0, weight);
-		weight = 6.1;
-		network.MakeFirstInputOfSecond(node2, node1, weight);
+		// Define a node with a fixed output rate
+		RateAlgorithm rate_alg(nu);
+		int id_rate = network.AddNode(rate_alg, 1);
+
+		// Define the receiving node
+		DynamicLib::WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
+
+		WilsonCowanAlgorithm algorithm_exc(par_sigmoid);
+		int id = network.AddNode(algorithm_exc, 1);
+
+		// connect the two nodes
+		network.MakeFirstInputOfSecond(id_rate, id, epsilon);
+
+		network.ConfigureSimulation(PAR_WILSONCOWAN);
 
 		double time, time_start = 0.0;
 
@@ -54,12 +85,10 @@ int main(int argc, char* argv[]) {
 
 		time = walltime(&time);
 
-
 		if (world.rank() == 0) {
 			double maxtime;
 			mpi::reduce(world, time, maxtime, mpi::maximum<double>(), 0);
-			std::cout << "The max time is " << maxtime << " sec"
-					<< std::endl;
+			std::cout << "The max time is " << maxtime << " sec" << std::endl;
 		} else {
 			reduce(world, time, mpi::maximum<double>(), 0);
 		}

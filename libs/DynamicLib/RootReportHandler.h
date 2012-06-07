@@ -90,7 +90,7 @@ namespace DynamicLib
 				const NodeInfo&
 			);
 
-		virtual void AddNodeToCanvas(NodeId) const;
+		virtual void AddNodeToCanvas(NetLib::NodeId) const;
 
 		//! Set the minimum and maximum density to be shown in the canvas.
 		void SetDensityRange
@@ -125,7 +125,7 @@ namespace DynamicLib
 		void SetMaximumDensity() const;
 
 		void WriteInfoTuple(const NodeInfo&);
-		void RemoveFromNodeList(NodeId);
+		void RemoveFromNodeList(NetLib::NodeId);
 		void GlobalCleanUp();
 
 		TGraph* ConvertAlgorithmGridToGraph(const Report&) const;
@@ -146,8 +146,8 @@ namespace DynamicLib
 		static ValueHandlerHandler	_value_handler;
 
 	
-		static vector<NodeId>	_list_nodes;
-		static vector<NodeId>	_vector_id;
+		static vector<NetLib::NodeId>	_list_nodes;
+		static vector<NetLib::NodeId>	_vector_id;
 
 		TGraph*					_p_current_rate_graph;
 		TGraph*					_p_current_state_graph;

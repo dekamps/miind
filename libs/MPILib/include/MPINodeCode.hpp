@@ -57,20 +57,19 @@ template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::ConfigureSimulationRun(
 		const DynamicLib::SimulationRunParameter& simParam) {
 	_maximum_iterations = simParam.MaximumNumberIterations();
-	bool b_return = _algorithm->Configure(simParam);
+	_algorithm->Configure(simParam);
 
 	// Add this line or other nodes will not get a proper input at the first simulation step!
-	this->setActivity(_algorithm->CurrentRate());
+	this->setActivity(_algorithm->getCurrentRate());
 
 	_p_handler = auto_ptr<DynamicLib::AbstractReportHandler>(
 			simParam.Handler().Clone());
 
 	// by this time, the Id of a Node should be known
 	// this can't be handled by the constructor because it is an implementation (i.e. a network)  property
-	_info._id = _nodeId;
+	_info._id = NetLib::ConvertToNodeId(_nodeId);
 	_p_handler->InitializeHandler(_info);
 
-	return b_return;
 }
 
 template<class Weight, class NodeDistribution>

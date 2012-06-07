@@ -89,7 +89,7 @@ void MPINetwork<WeightValue, NodeDistribution>::ConfigureSimulation(
 	_parameter_simulation_run = simParam;
 
 	//loop over all local nodes!
-	typename std::map<NodeId, MPINode<WeightValue, NodeDistribution> >::const_iterator it;
+	typename std::map<NodeId, MPINode<WeightValue, NodeDistribution> >::iterator it;
 	for (it = _pLocalNodes->begin(); it != _pLocalNodes->end(); it++) {
 		it->second.ConfigureSimulationRun(simParam);
 	}
