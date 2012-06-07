@@ -38,7 +38,7 @@ Time MPINode<Weight, NodeDistribution>::Evolve(Time time) {
 	receiveData();
 
 	waitAll();
-	while (_algorithm->CurrentTime() < time) {
+	while (_algorithm->getCurrentTime() < time) {
 		++_number_iterations;
 
 		_algorithm->EvolveNodeState(_precursorActivity, _weights, time);
@@ -46,11 +46,11 @@ Time MPINode<Weight, NodeDistribution>::Evolve(Time time) {
 	}
 
 	// update state
-	this->setActivity(_algorithm->CurrentRate());
+	this->setActivity(_algorithm->getCurrentRate());
 
 	sendOwnActivity();
 
-	return _algorithm->CurrentTime();
+	return _algorithm->getCurrentTime();
 }
 
 template<class Weight, class NodeDistribution>

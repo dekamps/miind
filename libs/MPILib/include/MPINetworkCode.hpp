@@ -12,13 +12,16 @@
 #include <MPILib/include/MPINetwork.hpp>
 #include <MPILib/include/MPINodeCode.hpp>
 
-
 namespace mpi = boost::mpi;
 using namespace MPILib;
 
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::MPINetwork() :
-		_pNodeDistribution(new NodeDistribution), _pLocalNodes(
+
+		_current_report_time(0), _current_update_time(0), _current_state_time(
+				0), _current_simulation_time(0), _parameter_simulation_run(
+				DynamicLib::InactiveReportHandler(), 0, 0.0, 0.0, 0.0, 0.0, 0.0,
+				""), _stream_log(), _pNodeDistribution(new NodeDistribution), _pLocalNodes(
 				new std::map<NodeId, MPINode<WeightValue, NodeDistribution> >) {
 
 	if (_pNodeDistribution->isMaster()) {
@@ -79,7 +82,17 @@ void MPINetwork<WeightValue, NodeDistribution>::MakeFirstInputOfSecond(
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::ConfigureSimulation(
 		const DynamicLib::SimulationRunParameter& simParam) {
-	//TODO implement this
+	_current_report_time = simParam.TReport();
+	_current_update_time = simParam.TUpdate();
+	_current_simulation_time = simParam.TBegin();
+
+	_parameter_simulation_run = simParam;
+
+	//loop over all local nodes!
+	typename std::map<NodeId, MPINode<WeightValue, NodeDistribution> >::const_iterator it;
+	for (it = _pLocalNodes->begin(); it != _pLocalNodes->end(); it++) {
+		it->second.ConfigureSimulationRun(simParam);
+	}
 
 }
 

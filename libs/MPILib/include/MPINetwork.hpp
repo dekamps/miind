@@ -16,6 +16,9 @@
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/AlgorithmInterface.hpp>
 #include <MPILib/include/MPINode.hpp>
+
+#include <DynamicLib/InactiveReportHandler.h>
+
 namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
@@ -49,7 +52,8 @@ public:
 	 * Configure the next simulation
 	 * @param simParam The Simulation Parameter
 	 */
-	void ConfigureSimulation(const DynamicLib::SimulationRunParameter& simParam);
+	void ConfigureSimulation(
+			const DynamicLib::SimulationRunParameter& simParam);
 
 	/**
 	 * Envolve the network
@@ -85,6 +89,14 @@ private:
 	 * @attention This number is only handled by the master node. Therefore never access it direct!
 	 */
 	int _maxNodeId;
+
+	Time _current_report_time;
+	Time _current_update_time;
+	Time _current_state_time;
+	Time _current_simulation_time;
+
+	DynamicLib::SimulationRunParameter _parameter_simulation_run;
+	LogStream _stream_log;
 
 };
 
