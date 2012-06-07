@@ -11,6 +11,7 @@
 
 #include <MPILib/include/Sleep10secAlgorithm.hpp>
 
+
 namespace mpi = boost::mpi;
 
 
@@ -32,15 +33,14 @@ Sleep10secAlgorithm<WeightValue>* Sleep10secAlgorithm<WeightValue>::Clone() cons
 }
 
 template <class WeightValue>
-void Sleep10secAlgorithm<WeightValue>::Configure(const SimulationRunParameter& simParam) {
-	double t = simParam;
-	t=2*simParam;
+void Sleep10secAlgorithm<WeightValue>::Configure(const DynamicLib::SimulationRunParameter& simParam) {
+
 //FIXME
 
 }
 
 template <class WeightValue>
-void Sleep10secAlgorithm<WeightValue>::EvolveNodeState(const std::vector<NodeState>& nodeVector,
+void Sleep10secAlgorithm<WeightValue>::EvolveNodeState(const std::vector<ActivityType>& nodeVector,
 		const std::vector<WeightValue>& weightVector, Time time) {
 	time =2;
 	unsigned int size = nodeVector.size();

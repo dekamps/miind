@@ -18,6 +18,8 @@
 
 #include <MPILib/include/BasicTypes.hpp>
 
+#include <DynamicLib/NodeState.h>
+
 namespace MPILib {
 
 /**
@@ -71,17 +73,29 @@ public:
 	 */
 	void addSuccessor(NodeId nodeId);
 
+//	/**
+//	 * Getter for the Nodes state
+//	 * @return The current node state
+//	 */
+//	DynamicLib::NodeState getState() const;
+//
+//	/**
+//	 * The Setter for the node state
+//	 * @param state The state the node should be in
+//	 */
+//	void setState(DynamicLib::NodeState state);
 	/**
-	 * Getter for the Nodes state
-	 * @return The current node state
+	 * Getter for the Nodes activity
+	 * @return The current node activity
 	 */
-	NodeState getState() const;
+	ActivityType getActivity() const;
 
 	/**
-	 * The Setter for the node state
-	 * @param state The state the node should be in
+	 * The Setter for the node activity
+	 * @param activity The activity the node should be in
 	 */
-	void setState(NodeState state);
+	void setActivity(ActivityType activity);
+
 
 	/**
 	 * Receive the new data from the precursor nodes
@@ -91,7 +105,7 @@ public:
 	/**
 	 * Send the own state to the successors.
 	 */
-	void sendOwnState();
+	void sendOwnActivity();
 
 private:
 
@@ -103,7 +117,6 @@ private:
 
 	std::vector<NodeId> _successors;
 
-	boost::shared_ptr<AlgorithmInterface<Weight> > _algorithm;
 
 	NodeType _nodeType;
 
@@ -122,17 +135,26 @@ private:
 	boost::shared_ptr<NodeDistribution> _pNodeDistribution;
 
 
+
 	/**
-	 * The state of the node it is currently
+	 * Activity of this node
 	 */
-	NodeState _state;
+	ActivityType _activity;
 
 	/**
 	 * Storage for the state of the precursors, to avoid to much communication.
 	 */
-	std::vector<NodeState> _precursorStates;
+	std::vector<ActivityType> _precursorActivity;
 
 	std::vector<boost::mpi::request> _mpiStatus;
+
+	UtilLib::Number						_number_iterations;
+	UtilLib::Number						_maximum_iterations;
+	NodeType							_type;
+	DynamicLib::NodeInfo				_info;
+
+	boost::shared_ptr<AlgorithmInterface<Weight> > _algorithm;
+	mutable boost::shared_ptr<DynamicLib::AbstractReportHandler>	_p_handler;
 };
 
 typedef MPINode<double, utilities::CircularDistribution> D_MPINode;

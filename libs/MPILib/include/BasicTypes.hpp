@@ -16,6 +16,7 @@ namespace MPILib {
 const int HAVE_ROOT = 1;
 
 typedef double Rate;
+typedef double ActivityType;
 typedef double Time;
 typedef Time TimeStep;
 typedef double Density;

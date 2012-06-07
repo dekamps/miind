@@ -33,7 +33,7 @@ void test_Constructor() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	Sleep10secAlgorithm<double> alg;
 	NodeType nodeType = 1;
-	NodeId nodeId = 1;
+	MPILib::NodeId nodeId = 1;
 	MPINode<double, utilities::CircularDistribution> node(alg, nodeType, nodeId,
 			network._pNodeDistribution, network._pLocalNodes);
 
@@ -57,7 +57,7 @@ void test_addPrecursor() {
 	MPINode<double, utilities::CircularDistribution> node(alg, 1, 1,
 			network._pNodeDistribution, network._pLocalNodes);
 
-	NodeId nodeId = 4;
+	MPILib::NodeId nodeId = 4;
 	double weight = 2.1;
 
 	node.addPrecursor(nodeId, weight);
@@ -65,7 +65,7 @@ void test_addPrecursor() {
 	BOOST_REQUIRE(node._precursors[0]==4);
 	BOOST_REQUIRE(node._weights.size()==1);
 	BOOST_REQUIRE(node._weights[0]==2.1);
-	BOOST_REQUIRE(node._precursorStates.size()==1);
+	BOOST_REQUIRE(node._precursorActivity.size()==1);
 
 }
 
@@ -76,12 +76,12 @@ void test_addSuccessor() {
 	MPINode<double, utilities::CircularDistribution> node(alg, 1, 1,
 			network._pNodeDistribution, network._pLocalNodes);
 
-	NodeId nodeId = 4;
+	MPILib::NodeId nodeId = 4;
 
 	node.addSuccessor(nodeId);
 	BOOST_REQUIRE(node._precursors.size()==0);
 	BOOST_REQUIRE(node._weights.size()==0);
-	BOOST_REQUIRE(node._precursorStates.size()==0);
+	BOOST_REQUIRE(node._precursorActivity.size()==0);
 	BOOST_REQUIRE(node._successors.size()==1);
 	BOOST_REQUIRE(node._successors[0]==4);
 
@@ -94,10 +94,10 @@ void test_setGetState() {
 	MPINode<double, utilities::CircularDistribution> node(alg, 1, 1,
 			network._pNodeDistribution, network._pLocalNodes);
 
-	node.setState(3);
-	BOOST_REQUIRE(node.getState()==3);
-	node.setState(4);
-	BOOST_REQUIRE(node.getState()==4);
+	node.setActivity(3);
+	BOOST_REQUIRE(node.getActivity()==3);
+	node.setActivity(4);
+	BOOST_REQUIRE(node.getActivity()==4);
 }
 
 void test_sendRecvWait() {
@@ -120,14 +120,14 @@ void test_sendRecvWait() {
 		node->addPrecursor(0, 1.2);
 	}
 
-	node->setState(world.rank());
-	node->sendOwnState();
+	node->setActivity(world.rank());
+	node->sendOwnActivity();
 	node->receiveData();
 	node->waitAll();
 	if (world.rank() == 0) {
-		BOOST_REQUIRE(node->_precursorStates[0]==1);
+		BOOST_REQUIRE(node->_precursorActivity[0]==1);
 	} else {
-		BOOST_REQUIRE(node->_precursorStates[0]==0);
+		BOOST_REQUIRE(node->_precursorActivity[0]==0);
 	}
 
 	delete node;

@@ -11,6 +11,7 @@
 #include <vector>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/AlgorithmInterface.hpp>
+#include <DynamicLib/NodeState.h>
 
 
 namespace MPILib {
@@ -31,7 +32,7 @@ public:
 	 * Configure the Algorithm
 	 * @param simParam
 	 */
-	virtual void Configure(const SimulationRunParameter& simParam);
+	virtual void Configure(const DynamicLib::SimulationRunParameter& simParam);
 
 	/**
 	 * Evolve the node state
@@ -39,7 +40,7 @@ public:
 	 * @param weightVector Vector of the weights of the nodes
 	 * @param time Time point of the algorithm
 	 */
-	virtual void EvolveNodeState(const std::vector<NodeState>& nodeVector,
+	virtual void EvolveNodeState(const std::vector<ActivityType>& nodeVector,
 			const std::vector<WeightValue>& weightVector, Time time);
 
 	/**

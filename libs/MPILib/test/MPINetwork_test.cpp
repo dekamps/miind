@@ -98,14 +98,14 @@ void test_MakeFirstInputOfSecond() {
 		BOOST_REQUIRE(
 				network._pLocalNodes->find(node1)->second._weights.size()==1);
 		BOOST_REQUIRE(
-				network._pLocalNodes->find(node1)->second._precursorStates.size()==1);
+				network._pLocalNodes->find(node1)->second._precursorActivity.size()==1);
 	} else {
 		BOOST_REQUIRE(
 				network._pLocalNodes->find(node0)->second._successors.size()==1);
 		BOOST_REQUIRE(
 				network._pLocalNodes->find(node0)->second._weights.size()==0);
 		BOOST_REQUIRE(
-				network._pLocalNodes->find(node0)->second._precursorStates.size()==0);
+				network._pLocalNodes->find(node0)->second._precursorActivity.size()==0);
 	}
 
 	exceptionThrown = false;
