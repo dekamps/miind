@@ -4,6 +4,8 @@ set( mpi_SRC
     src/utilities/ParallelException.cpp
     src/utilities/CircularDistribution.cpp
     src/utilities/Time.cpp
+    src/WilsonCowanAlgorithm.cpp
+    src/NodeState.cpp
     #add cpp files
      )
 
@@ -22,8 +24,14 @@ set( mpi_HEADERS
     include/Sleep10secAlgorithmCode.hpp
     include/utilities/Time.hpp
     include/utilities/walltime.hpp
+    include/WilsonCowanAlgorithm.hpp
+    include/WilsonCowanParameter.hpp
+    include/NodeState.hpp
     #add headers
      )
+     
+include_directories( ${GSL_INCLUDE_DIRS} )
+link_directories( ${GSL_LIBRARY_DIRS} )
 
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
@@ -31,9 +39,13 @@ endif (UNIX)
 set ( LIBLIST 
     ${Boost_LIBRARIES} 
     ${MPI_LIBRARIES} 
+    ${MIIND_LIBRARY_PREFIX}numtools
+    ${gsl_LINK_FLAGS} 
+	gsl
+    
 )
 
-add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${mpi_SRC} ${mpi_HEADERS} )
+add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${mpi_SRC} ${mpi_HEADERS})
 
 
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} )

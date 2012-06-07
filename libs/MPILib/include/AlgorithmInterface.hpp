@@ -38,7 +38,7 @@ public:
 	 * @param weightVector Vector of the weights of the nodes
 	 * @param time Time point of the algorithm
 	 */
-	virtual void EvolveNodeState(const std::vector<NodeState>& nodeVector,
+	virtual void EvolveNodeState(const std::vector<Rate>& nodeVector,
 			const std::vector<WeightValue>& weightVector, Time time) = 0;
 
 	/**
@@ -51,7 +51,7 @@ public:
 	 * The calculated rate of the node
 	 * @return The rate of the node
 	 */
-	virtual Rate getCurrentRate() const = 0;
+	virtual NodeState getCurrentRate() const = 0;
 };
 
 } /* namespace MPILib */

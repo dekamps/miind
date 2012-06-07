@@ -1,5 +1,8 @@
 if(ENABLE_MPI)
     ADD_SUBDIRECTORY( MPILib)
+    ADD_SUBDIRECTORY( NumtoolsLib )
+    ADD_SUBDIRECTORY( UtilLib )
+    
 
 else(ENABLE_MPI)
     if (AGENT)

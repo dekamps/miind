@@ -7,9 +7,9 @@ set( CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix." ) # defaul
 set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 
 #activate all warnings
-IF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wno-long-long -pedantic")
-ENDIF()
+#IF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+#    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wno-long-long -pedantic")
+#ENDIF()
 
 ##############################################################################
 # cmake options
@@ -43,6 +43,14 @@ IF(ENABLE_MPI)
     else ( Boost_FOUND )
        message(FATAL_ERROR "Boost is mandatory to build the libraries")
     endif( Boost_FOUND )
+    
+        
+    # TODO:  This is ugly and must be fixed in the windows install procedure
+    if (WIN32)
+    SET (LIB_PREFIX lib)
+    else (WIN32)
+    SET (CBLAS_PREFIX gsl)
+    endif (WIN32)
 ELSE(ENABLE_MPI)
     MESSAGE(STATUS "MPI disabled")
     ##############################################################################
