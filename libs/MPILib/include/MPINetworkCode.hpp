@@ -42,7 +42,7 @@ MPINetwork<WeightValue, NodeDistribution>::~MPINetwork() {
 }
 
 template<class WeightValue, class NodeDistribution>
-int MPINetwork<WeightValue, NodeDistribution>::AddNode(
+int MPINetwork<WeightValue, NodeDistribution>::addNode(
 		const AlgorithmInterface<WeightValue>& alg, NodeType nodeType) {
 
 	int tempNodeId = getMaxNodeId();
@@ -58,7 +58,7 @@ int MPINetwork<WeightValue, NodeDistribution>::AddNode(
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::MakeFirstInputOfSecond(
+void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 		NodeId first, NodeId second, const WeightValue& weight) {
 
 	if (_pNodeDistribution->isLocalNode(first)) {
@@ -84,7 +84,7 @@ void MPINetwork<WeightValue, NodeDistribution>::MakeFirstInputOfSecond(
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::ConfigureSimulation(
+void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 		const DynamicLib::SimulationRunParameter& simParam) {
 	_current_report_time = simParam.TReport();
 	_current_update_time = simParam.TUpdate();
@@ -92,7 +92,7 @@ void MPINetwork<WeightValue, NodeDistribution>::ConfigureSimulation(
 
 	_parameter_simulation_run = simParam;
 
-	InitializeLogStream(simParam.LogName());
+	initializeLogStream(simParam.LogName());
 
 	try {
 		//loop over all local nodes!
@@ -113,7 +113,7 @@ void MPINetwork<WeightValue, NodeDistribution>::ConfigureSimulation(
 
 //! Envolve the network
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::Evolve() {
+void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 	std::string report;
 	if (_state_network.IsConfigured()) {
@@ -126,41 +126,41 @@ void MPINetwork<WeightValue, NodeDistribution>::Evolve() {
 				do {
 					// business as usual: keep evolving, as long as there is nothing to report
 					// or to update
-					UpdateSimulationTime();
+					updateSimulationTime();
 
 					//envolve all local nodes
 					for (std::map<NodeId, D_MPINode>::iterator it =
 							_pLocalNodes->begin(); it != _pLocalNodes->end();
 							it++) {
 
-						it->second.Evolve(CurrentSimulationTime());
+						it->second.Evolve(getCurrentSimulationTime());
 						//TODO call evolve on the nodes
 					}
 
-				} while (CurrentSimulationTime() < CurrentReportTime()
-						&& CurrentSimulationTime() < CurrentUpdateTime()
-						&& CurrentSimulationTime() < CurrentStateTime());
+				} while (getCurrentSimulationTime() < getCurrentReportTime()
+						&& getCurrentSimulationTime() < getCurrentUpdateTime()
+						&& getCurrentSimulationTime() < getCurrentStateTime());
 
 				// now there is something to report or to update
-				if (CurrentSimulationTime() >= CurrentReportTime()) {
+				if (getCurrentSimulationTime() >= getCurrentReportTime()) {
 					// there is something to report
 					//CheckPercentageAndLog(CurrentSimulationTime());
-					UpdateReportTime();
+					updateReportTime();
 					report = collectReport(DynamicLib::RATE);
 					_stream_log << report;
 				}
 				// just a rate or also a state?
-				if (CurrentSimulationTime() >= CurrentStateTime()) {
+				if (getCurrentSimulationTime() >= getCurrentStateTime()) {
 					// a rate as well as a state
 					collectReport(DynamicLib::STATE);
-					UpdateStateTime();
+					updateStateTime();
 				}
 				// update?
-				if (CurrentReportTime() >= CurrentUpdateTime()) {
+				if (getCurrentReportTime() >= getCurrentUpdateTime()) {
 					collectReport(DynamicLib::UPDATE);
-					UpdateUpdateTime();
+					updateUpdateTime();
 				}
-			} while (CurrentReportTime() < EndTime());
+			} while (getCurrentReportTime() < getEndTime());
 			// write out the final state
 			collectReport(DynamicLib::STATE);
 		}
@@ -174,7 +174,7 @@ void MPINetwork<WeightValue, NodeDistribution>::Evolve() {
 
 		//_implementation.ClearSimulation();
 		_stream_log << "Simulation ended, no problems noticed\n";
-		_stream_log << "End time: " << CurrentSimulationTime() << "\n";
+		_stream_log << "End time: " << getCurrentSimulationTime() << "\n";
 		_stream_log.close();
 	}
 
@@ -211,10 +211,10 @@ std::string MPINetwork<WeightValue, NodeDistribution>::collectReport(
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::InitializeLogStream(
-		const std::string & name) {
+void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
+		const std::string & filename) {
 	// resource will be passed on to _stream_log
-	boost::shared_ptr<std::ostream> p_stream(new std::ofstream(name.c_str()));
+	boost::shared_ptr<std::ostream> p_stream(new std::ofstream(filename.c_str()));
 	if (!p_stream)
 		throw DynamicLib::DynamicLibException(
 				"DynamicNetwork cannot open log file.");
@@ -231,47 +231,47 @@ void MPINetwork<WeightValue, NodeDistribution>::clearSimulation() {
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::UpdateReportTime() {
+void MPINetwork<WeightValue, NodeDistribution>::updateReportTime() {
 	_current_report_time += _parameter_simulation_run.TReport();
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::UpdateSimulationTime() {
+void MPINetwork<WeightValue, NodeDistribution>::updateSimulationTime() {
 	_current_simulation_time += _parameter_simulation_run.TStep();
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::UpdateUpdateTime() {
+void MPINetwork<WeightValue, NodeDistribution>::updateUpdateTime() {
 	_current_update_time += _parameter_simulation_run.TUpdate();
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::UpdateStateTime() {
+void MPINetwork<WeightValue, NodeDistribution>::updateStateTime() {
 	_current_state_time += _parameter_simulation_run.TState();
 }
 
 template<class WeightValue, class NodeDistribution>
-Time MPINetwork<WeightValue, NodeDistribution>::EndTime() const {
+Time MPINetwork<WeightValue, NodeDistribution>::getEndTime() const {
 	return _parameter_simulation_run.TEnd();
 }
 
 template<class WeightValue, class NodeDistribution>
-Time MPINetwork<WeightValue, NodeDistribution>::CurrentReportTime() const {
+Time MPINetwork<WeightValue, NodeDistribution>::getCurrentReportTime() const {
 	return _current_report_time;
 }
 
 template<class WeightValue, class NodeDistribution>
-Time MPINetwork<WeightValue, NodeDistribution>::CurrentSimulationTime() const {
+Time MPINetwork<WeightValue, NodeDistribution>::getCurrentSimulationTime() const {
 	return _current_simulation_time;
 }
 
 template<class WeightValue, class NodeDistribution>
-Time MPINetwork<WeightValue, NodeDistribution>::CurrentUpdateTime() const {
+Time MPINetwork<WeightValue, NodeDistribution>::getCurrentUpdateTime() const {
 	return _current_update_time;
 }
 
 template<class WeightValue, class NodeDistribution>
-Time MPINetwork<WeightValue, NodeDistribution>::CurrentStateTime() const {
+Time MPINetwork<WeightValue, NodeDistribution>::getCurrentStateTime() const {
 	return _current_state_time;
 
 }

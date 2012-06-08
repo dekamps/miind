@@ -78,29 +78,29 @@ int main(int argc, char* argv[]) {
 
 		// Define a node with a fixed output rate
 		RateAlgorithm rate_alg(nu);
-		int id_rate = network.AddNode(rate_alg, 1);
+		int id_rate = network.addNode(rate_alg, 1);
 
 		// Define the receiving node
 		DynamicLib::WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
 
 		WilsonCowanAlgorithm algorithm_exc(par_sigmoid);
-		int id = network.AddNode(algorithm_exc, 1);
+		int id = network.addNode(algorithm_exc, 1);
 
 		// connect the two nodes
-		network.MakeFirstInputOfSecond(id_rate, id, epsilon);
+		network.makeFirstInputOfSecond(id_rate, id, epsilon);
 
 		if (world.rank() == 0) {
-			network.ConfigureSimulation(PAR_WILSONCOWAN);
+			network.configureSimulation(PAR_WILSONCOWAN);
 
 		} else {
-			network.ConfigureSimulation(PAR_WILSONCOWAN1);
+			network.configureSimulation(PAR_WILSONCOWAN1);
 		}
 
 		double time, time_start = 0.0;
 
 		time = walltime(&time_start);
 
-		network.Evolve();
+		network.evolve();
 
 		time = walltime(&time);
 

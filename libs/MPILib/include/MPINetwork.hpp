@@ -37,7 +37,7 @@ public:
 	 * @param nodeType The Type of the Node
 	 * @return returns the NodeId of the generated node
 	 */
-	int AddNode(const AlgorithmInterface<WeightValue>& alg, NodeType nodeType);
+	int addNode(const AlgorithmInterface<WeightValue>& alg, NodeType nodeType);
 
 	/**
 	 * Connects two node
@@ -46,20 +46,20 @@ public:
 	 * @param weight The WeightType of the connection
 	 * @exception Can throw a ParallelException
 	 */
-	void MakeFirstInputOfSecond(NodeId first, NodeId second,
+	void makeFirstInputOfSecond(NodeId first, NodeId second,
 			const WeightValue& weight);
 
 	/**
 	 * Configure the next simulation
 	 * @param simParam The Simulation Parameter
 	 */
-	void ConfigureSimulation(
+	void configureSimulation(
 			const DynamicLib::SimulationRunParameter& simParam);
 
 	/**
 	 * Envolve the network
 	 */
-	void Evolve();
+	void evolve();
 
 private:
 
@@ -77,21 +77,28 @@ private:
 
 	std::string collectReport(DynamicLib::ReportType type);
 
-	void InitializeLogStream(const std::string & name);
+	/**
+	 * initialize the log stream
+	 * @param filename filename of the log stream
+	 */
+	void initializeLogStream(const std::string & filename);
 
+	/**
+	 * called when the simulation is finished
+	 */
 	void clearSimulation();
 
 
-	void UpdateReportTime				();
-	void UpdateSimulationTime			();
-	void UpdateUpdateTime				();
-	void UpdateStateTime				();
+	void updateReportTime				();
+	void updateSimulationTime			();
+	void updateUpdateTime				();
+	void updateStateTime				();
 
-	Time EndTime						() const;
-	Time CurrentReportTime				() const;
-	Time CurrentSimulationTime			() const;
-	Time CurrentUpdateTime				() const;
-	Time CurrentStateTime				() const;
+	Time getEndTime						() const;
+	Time getCurrentReportTime			() const;
+	Time getCurrentSimulationTime		() const;
+	Time getCurrentUpdateTime			() const;
+	Time getCurrentStateTime			() const;
 
 	/**
 	 * Shared pointer to the actual distribution of the nodes.

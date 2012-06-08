@@ -56,7 +56,7 @@ void test_AddNode() {
 
 	Sleep10secAlgorithm<double> alg;
 
-	network.AddNode(alg, 1);
+	network.addNode(alg, 1);
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==1);
@@ -65,7 +65,7 @@ void test_AddNode() {
 		BOOST_REQUIRE(network._pLocalNodes->size()==0);
 	}
 
-	network.AddNode(alg, 1);
+	network.addNode(alg, 1);
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==2);
@@ -80,13 +80,13 @@ void test_MakeFirstInputOfSecond() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	Sleep10secAlgorithm<double> alg;
 
-	int node0 = network.AddNode(alg, 1);
-	int node1 = network.AddNode(alg, 1);
+	int node0 = network.addNode(alg, 1);
+	int node1 = network.addNode(alg, 1);
 	double weight = 2.0;
 
 	bool exceptionThrown = false;
 	try {
-		network.MakeFirstInputOfSecond(node0, node1, weight);
+		network.makeFirstInputOfSecond(node0, node1, weight);
 	} catch (...) {
 		exceptionThrown = true;
 	}
@@ -111,7 +111,7 @@ void test_MakeFirstInputOfSecond() {
 	exceptionThrown = false;
 	try {
 		//use bad input to test exception
-		network.MakeFirstInputOfSecond(100, 101, weight);
+		network.makeFirstInputOfSecond(100, 101, weight);
 	} catch (utilities::ParallelException &e) {
 		exceptionThrown = true;
 	}
@@ -123,11 +123,11 @@ void test_getMaxNodeId() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	Sleep10secAlgorithm<double> alg;
 	BOOST_REQUIRE(network.getMaxNodeId()==0);
-	network.AddNode(alg, 1);
+	network.addNode(alg, 1);
 	BOOST_REQUIRE(network.getMaxNodeId()==1);
-	network.AddNode(alg, 1);
-	network.AddNode(alg, 1);
-	network.AddNode(alg, 1);
+	network.addNode(alg, 1);
+	network.addNode(alg, 1);
+	network.addNode(alg, 1);
 	BOOST_REQUIRE(network.getMaxNodeId()==4);
 
 }
