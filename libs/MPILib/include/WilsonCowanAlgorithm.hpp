@@ -56,6 +56,8 @@ public:
 	 */
 	virtual Rate getCurrentRate() const;
 
+	virtual DynamicLib::AlgorithmGrid Grid() const;
+
 private:
 
 	double innerProduct(const std::vector<Rate>& nodeVector,

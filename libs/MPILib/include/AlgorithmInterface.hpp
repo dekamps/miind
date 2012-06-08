@@ -10,6 +10,7 @@
 
 #include <MPILib/include/BasicTypes.hpp>
 #include <DynamicLib/SimulationRunParameter.h>
+#include <DynamicLib/AlgorithmGrid.h>
 #include <vector>
 
 
@@ -53,6 +54,8 @@ public:
 	 * @return The rate of the node
 	 */
 	virtual Rate getCurrentRate() const = 0;
+
+	virtual DynamicLib::AlgorithmGrid Grid() const = 0;
 };
 
 } /* namespace MPILib */

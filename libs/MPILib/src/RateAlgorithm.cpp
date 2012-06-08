@@ -51,4 +51,10 @@ Rate RateAlgorithm::getCurrentRate() const {
 	return (_p_rate) ? *_p_rate : _rate;
 }
 
+DynamicLib::AlgorithmGrid RateAlgorithm::Grid() const {
+	std::vector<double> vector_grid(DynamicLib::RATE_STATE_DIMENSION, _rate);
+	std::vector<double> vector_interpretation(DynamicLib::RATE_STATE_DIMENSION, 0);
+	return DynamicLib::AlgorithmGrid(vector_grid, vector_interpretation);
+}
+
 } /* namespace MPILib */

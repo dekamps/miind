@@ -107,6 +107,9 @@ public:
 	 */
 	void sendOwnActivity();
 
+	std::string reportAll	(DynamicLib::ReportType) const;
+
+
 private:
 
 	void waitAll();

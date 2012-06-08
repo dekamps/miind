@@ -24,7 +24,7 @@ MPINode<Weight, NodeDistribution>::MPINode(
 		const boost::shared_ptr<NodeDistribution>& nodeDistribution,
 		const boost::shared_ptr<std::map<NodeId, MPINode> >& localNode) :
 		_algorithm(algorithm.Clone()), _nodeType(nodeType), _nodeId(nodeId), _pLocalNodes(
-				localNode), _pNodeDistribution(nodeDistribution){
+				localNode), _pNodeDistribution(nodeDistribution) {
 
 }
 
@@ -149,6 +149,31 @@ void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 	}
 
 }
+
+template<class Weight, class NodeDistribution>
+std::string MPINode<Weight, NodeDistribution>::reportAll(
+		DynamicLib::ReportType type) const {
+
+	string string_return("");
+
+	std::vector<DynamicLib::ReportValue> vec_values;
+
+	if (type == DynamicLib::RATE || type == DynamicLib::STATE) {
+		DynamicLib::Report report(_algorithm->getCurrentTime(),
+				DynamicLib::Rate(this->getActivity()),
+				NetLib::NodeId(this->_nodeId),
+				DynamicLib::NodeState(std::vector<double>(_activity)),
+				_algorithm->Grid(), string_return, type, vec_values);
+
+		_p_handler->WriteReport(report);
+	}
+
+	if (type == DynamicLib::UPDATE)
+		_p_handler->Update();
+
+	return string_return;
+}
+
 } //end namespace MPILib
 
 #endif /* CODE_MPILIB_MPINODE_HPP_ */

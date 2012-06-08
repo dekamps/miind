@@ -57,6 +57,8 @@ public:
 	 */
 	virtual Rate getCurrentRate() const;
 
+	virtual DynamicLib::AlgorithmGrid Grid() const;
+
 private:
 
 	Time _time_current;

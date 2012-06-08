@@ -102,6 +102,7 @@ void MPINetwork<WeightValue, NodeDistribution>::ConfigureSimulation(
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::Evolve() {
 
+	std::string report;
 	if (_state_network.IsConfigured()) {
 		_state_network.ToggleConfigured();
 		_stream_log << "Starting simulation\n";
@@ -118,11 +119,8 @@ void MPINetwork<WeightValue, NodeDistribution>::Evolve() {
 					for (std::map<NodeId, D_MPINode>::iterator it =
 							_pLocalNodes->begin(); it != _pLocalNodes->end();
 							it++) {
-						std::cout << "processorID:\t"
-								<< _pNodeDistribution->getRank();
-						//FIXME change to better time
-						it->second.Evolve(1);
-						std::cout << std::endl;
+
+						it->second.Evolve(CurrentSimulationTime());
 						//TODO call evolve on the nodes
 					}
 
@@ -135,23 +133,23 @@ void MPINetwork<WeightValue, NodeDistribution>::Evolve() {
 					// there is something to report
 					//CheckPercentageAndLog(CurrentSimulationTime());
 					UpdateReportTime();
-					//report = _implementation.CollectReport(RATE);
-					_stream_log << "blub";
+					report = collectReport(DynamicLib::RATE);
+					_stream_log << report;
 				}
 				// just a rate or also a state?
 				if (CurrentSimulationTime() >= CurrentStateTime()) {
 					// a rate as well as a state
-					//_implementation.CollectReport(STATE);
+					collectReport(DynamicLib::STATE);
 					UpdateStateTime();
 				}
 				// update?
 				if (CurrentReportTime() >= CurrentUpdateTime()) {
-					//_implementation.CollectReport(UPDATE);
+					collectReport(DynamicLib::UPDATE);
 					UpdateUpdateTime();
 				}
 			} while (CurrentReportTime() < EndTime());
 			// write out the final state
-			//_implementation.CollectReport(STATE);
+			collectReport(DynamicLib::STATE);
 		}
 
 		catch (DynamicLib::IterationNumberException &e) {
@@ -182,6 +180,25 @@ void MPINetwork<WeightValue, NodeDistribution>::incrementMaxNodeId() {
 	if (_pNodeDistribution->isMaster()) {
 		_maxNodeId++;
 	}
+}
+
+template<class WeightValue, class NodeDistribution>
+std::string MPINetwork<WeightValue, NodeDistribution>::collectReport(
+		DynamicLib::ReportType type) {
+
+
+	string string_return;
+
+	for (std::map<NodeId, D_MPINode>::iterator it =
+								_pLocalNodes->begin(); it != _pLocalNodes->end();
+								it++) {
+		string_return = it->second.reportAll(type);
+
+
+
+	}
+
+	return string_return;
 }
 
 template<class WeightValue, class NodeDistribution>

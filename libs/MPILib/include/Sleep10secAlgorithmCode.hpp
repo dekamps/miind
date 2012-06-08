@@ -64,4 +64,11 @@ Rate Sleep10secAlgorithm<WeightValue>::getCurrentRate() const{
 
 }
 
+template <class WeightValue>
+DynamicLib::AlgorithmGrid  Sleep10secAlgorithm<WeightValue>::Grid() const {
+	std::vector<double> vector_grid(DynamicLib::RATE_STATE_DIMENSION, 1);
+	std::vector<double> vector_interpretation(DynamicLib::RATE_STATE_DIMENSION, 0);
+	return DynamicLib::AlgorithmGrid(vector_grid, vector_interpretation);
+}
+
 } /* namespace MPILib */

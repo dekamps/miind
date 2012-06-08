@@ -54,6 +54,9 @@ public:
 	 * @return The rate of the node
 	 */
 	virtual Rate getCurrentRate() const;
+
+	virtual DynamicLib::AlgorithmGrid Grid() const;
+
 };
 
 } /* namespace MPILib */

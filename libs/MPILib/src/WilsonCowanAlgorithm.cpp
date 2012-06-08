@@ -143,4 +143,9 @@ vector<double> WilsonCowanAlgorithm::InitialState() const {
 	return array_return;
 }
 
+DynamicLib::AlgorithmGrid WilsonCowanAlgorithm::Grid() const
+{
+	return _integrator.State();
+}
+
 } /* namespace MPILib */

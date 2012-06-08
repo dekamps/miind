@@ -75,6 +75,8 @@ private:
 	 */
 	void incrementMaxNodeId();
 
+	std::string collectReport(DynamicLib::ReportType type);
+
 	void UpdateReportTime				();
 	void UpdateSimulationTime			();
 	void UpdateUpdateTime				();
