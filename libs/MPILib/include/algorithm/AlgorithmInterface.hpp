@@ -15,6 +15,7 @@
 
 
 namespace MPILib {
+namespace algorithm{
 
 template <class WeightValue>
 class AlgorithmInterface {
@@ -62,5 +63,6 @@ public:
 	virtual DynamicLib::AlgorithmGrid getGrid() const = 0;
 };
 
+} /* namespace algorithm */
 } /* namespace MPILib */
 #endif /* MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_ */

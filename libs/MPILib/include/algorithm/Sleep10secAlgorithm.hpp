@@ -1,34 +1,34 @@
 /*
- * WilsonCowanAlgorithm.hpp
+ * Sleep10secAlgorithm.hpp
  *
- *  Created on: 07.06.2012
+ *  Created on: 04.06.2012
  *      Author: david
  */
 
-#ifndef MPILIB_ALGORITHMS_RATEALGORITHM_HPP_
-#define MPILIB_ALGORITHMS_RATEALGORITHM_HPP_
+#ifndef MPILIB_ALGORITHMS_SLEEP10SECALGORITHM_HPP_
+#define MPILIB_ALGORITHMS_SLEEP10SECALGORITHM_HPP_
 
-#include <NumtoolsLib/NumtoolsLib.h>
-#include <DynamicLib/WilsonCowanParameter.h>
+#include <vector>
+#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <DynamicLib/NodeState.h>
 
-#include <MPILib/include/Algorithms/AlgorithmInterface.hpp>
 
 namespace MPILib {
+namespace algorithm{
 
-class RateAlgorithm: public AlgorithmInterface<double> {
+
+template <class WeightValue>
+class Sleep10secAlgorithm: public AlgorithmInterface<WeightValue> {
 public:
+	explicit Sleep10secAlgorithm();
 
-	RateAlgorithm(Rate* rate);
-
-	RateAlgorithm(Rate rate);
-
-	virtual ~RateAlgorithm();
-
+	virtual ~Sleep10secAlgorithm();
 	/**
 	 * Cloning operation, to provide each DynamicNode with its own
 	 * Algorithm instance. Clients use the naked pointer at their own risk.
 	 */
-	virtual RateAlgorithm* clone() const;
+	virtual Sleep10secAlgorithm* clone() const;
 
 	/**
 	 * Configure the Algorithm
@@ -42,8 +42,8 @@ public:
 	 * @param weightVector Vector of the weights of the nodes
 	 * @param time Time point of the algorithm
 	 */
-	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
-			const std::vector<double>& weightVector, Time time);
+	virtual void evolveNodeState(const std::vector<ActivityType>& nodeVector,
+			const std::vector<WeightValue>& weightVector, Time time);
 
 	/**
 	 * The current timepoint
@@ -59,13 +59,8 @@ public:
 
 	virtual DynamicLib::AlgorithmGrid getGrid() const;
 
-private:
-
-	Time _time_current;
-	Rate _rate;
-	Rate* _p_rate;
-
 };
 
+} /* namespace algorithm */
 } /* namespace MPILib */
-#endif /* MPILIB_ALGORITHMS_RATEALGORITHM_HPP_ */
+#endif /* MPILIB_ALGORITHMS_SLEEP10SECALGORITHM_HPP_ */

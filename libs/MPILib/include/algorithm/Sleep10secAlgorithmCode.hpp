@@ -13,13 +13,16 @@
 #include <boost/mpi.hpp>
 #include <boost/mpi/communicator.hpp>
 
-#include <MPILib/include/Algorithms/Sleep10secAlgorithm.hpp>
+#include <MPILib/include/algorithm/Sleep10secAlgorithm.hpp>
 
 
 namespace mpi = boost::mpi;
 
 
 namespace MPILib {
+namespace algorithm{
+
+
 template <class WeightValue>
 Sleep10secAlgorithm<WeightValue>::Sleep10secAlgorithm(){
 	// TODO Auto-generated constructor stub
@@ -75,6 +78,7 @@ DynamicLib::AlgorithmGrid  Sleep10secAlgorithm<WeightValue>::getGrid() const {
 	return DynamicLib::AlgorithmGrid(vector_grid, vector_interpretation);
 }
 
+} /* namespace algorithm */
 } /* namespace MPILib */
 
 #endif// MPILIB_ALGORITHMS_SLEEP10SECALGORITHM_CODE_HPP_

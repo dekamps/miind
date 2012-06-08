@@ -13,7 +13,7 @@
 #include <boost/mpi/request.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <MPILib/include/Algorithms/AlgorithmInterface.hpp>
+#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
 #include <MPILib/include/BasicTypes.hpp>
@@ -36,7 +36,7 @@ public:
 	 * @param nodeDistribution The Node Distribution.
 	 * @param localNode The local nodes of this processor
 	 */
-	explicit MPINode(const AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
+	explicit MPINode(const algorithm::AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
 			NodeId nodeId,
 			const boost::shared_ptr<NodeDistribution>& nodeDistribution,
 			const boost::shared_ptr<std::map<NodeId, MPINode<Weight, NodeDistribution> > >& localNode);
@@ -166,7 +166,7 @@ private:
 	NodeType							_type;
 	DynamicLib::NodeInfo				_info;
 
-	boost::shared_ptr<AlgorithmInterface<Weight> > _pAlgorithm;
+	boost::shared_ptr<algorithm::AlgorithmInterface<Weight> > _pAlgorithm;
 	mutable boost::shared_ptr<DynamicLib::AbstractReportHandler>	_pHandler;
 };
 

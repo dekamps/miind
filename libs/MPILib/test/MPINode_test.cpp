@@ -15,9 +15,10 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #undef protected
 #undef private
-#include <MPILib/include/Algorithms/Sleep10secAlgorithmCode.hpp>
+#include <MPILib/include/algorithm/Sleep10secAlgorithmCode.hpp>
 
 #include <MPILib/include/utilities/ParallelException.hpp>
+#include <MPILib/include/utilities/CircularDistribution.hpp>
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
@@ -31,7 +32,7 @@ void test_Constructor() {
 
 	// make node global
 	MPINetwork<double, utilities::CircularDistribution> network;
-	Sleep10secAlgorithm<double> alg;
+	algorithm::Sleep10secAlgorithm<double> alg;
 	NodeType nodeType = 1;
 	MPILib::NodeId nodeId = 1;
 	MPINode<double, utilities::CircularDistribution> node(alg, nodeType, nodeId,
@@ -52,7 +53,7 @@ void test_addPrecursor() {
 	// make node global
 	MPINetwork<double, utilities::CircularDistribution> network;
 
-	Sleep10secAlgorithm<double> alg;
+	algorithm::Sleep10secAlgorithm<double> alg;
 
 	MPINode<double, utilities::CircularDistribution> node(alg, 1, 1,
 			network._pNodeDistribution, network._pLocalNodes);
@@ -71,7 +72,7 @@ void test_addPrecursor() {
 
 void test_addSuccessor() {
 	MPINetwork<double, utilities::CircularDistribution> network;
-	Sleep10secAlgorithm<double> alg;
+	algorithm::Sleep10secAlgorithm<double> alg;
 
 	MPINode<double, utilities::CircularDistribution> node(alg, 1, 1,
 			network._pNodeDistribution, network._pLocalNodes);
@@ -89,7 +90,7 @@ void test_addSuccessor() {
 
 void test_setGetState() {
 	MPINetwork<double, utilities::CircularDistribution> network;
-	Sleep10secAlgorithm<double> alg;
+	algorithm::Sleep10secAlgorithm<double> alg;
 
 	MPINode<double, utilities::CircularDistribution> node(alg, 1, 1,
 			network._pNodeDistribution, network._pLocalNodes);
@@ -103,7 +104,7 @@ void test_setGetState() {
 void test_sendRecvWait() {
 	MPINode<double, utilities::CircularDistribution>* node;
 	MPINetwork<double, utilities::CircularDistribution> network;
-	Sleep10secAlgorithm<double> alg;
+	algorithm::Sleep10secAlgorithm<double> alg;
 	if (world.rank() == 0) {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg, 1, 0,

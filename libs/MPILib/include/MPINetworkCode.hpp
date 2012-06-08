@@ -43,7 +43,7 @@ MPINetwork<WeightValue, NodeDistribution>::~MPINetwork() {
 
 template<class WeightValue, class NodeDistribution>
 int MPINetwork<WeightValue, NodeDistribution>::addNode(
-		const AlgorithmInterface<WeightValue>& alg, NodeType nodeType) {
+		const algorithm::AlgorithmInterface<WeightValue>& alg, NodeType nodeType) {
 
 	int tempNodeId = getMaxNodeId();
 	if (_pNodeDistribution->isLocalNode(tempNodeId)) {

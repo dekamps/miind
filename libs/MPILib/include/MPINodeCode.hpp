@@ -19,7 +19,7 @@ namespace MPILib {
 
 template<class Weight, class NodeDistribution>
 MPINode<Weight, NodeDistribution>::MPINode(
-		const AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
+		const algorithm::AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
 		NodeId nodeId,
 		const boost::shared_ptr<NodeDistribution>& nodeDistribution,
 		const boost::shared_ptr<std::map<NodeId, MPINode> >& localNode) :

@@ -5,29 +5,32 @@
  *      Author: david
  */
 
-#ifndef MPILIB_ALGORITHMS_WILSONCOWANALGORITHM_HPP_
-#define MPILIB_ALGORITHMS_WILSONCOWANALGORITHM_HPP_
+#ifndef MPILIB_ALGORITHMS_RATEALGORITHM_HPP_
+#define MPILIB_ALGORITHMS_RATEALGORITHM_HPP_
 
 #include <NumtoolsLib/NumtoolsLib.h>
 #include <DynamicLib/WilsonCowanParameter.h>
 
-#include <MPILib/include/Algorithms/AlgorithmInterface.hpp>
+#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 
 namespace MPILib {
+namespace algorithm{
 
-class WilsonCowanAlgorithm: public AlgorithmInterface<double> {
+
+class RateAlgorithm: public AlgorithmInterface<double> {
 public:
-	WilsonCowanAlgorithm();
 
-	WilsonCowanAlgorithm(const DynamicLib::WilsonCowanParameter&);
+	RateAlgorithm(Rate* rate);
 
-	virtual ~WilsonCowanAlgorithm();
+	RateAlgorithm(Rate rate);
+
+	virtual ~RateAlgorithm();
 
 	/**
 	 * Cloning operation, to provide each DynamicNode with its own
 	 * Algorithm instance. Clients use the naked pointer at their own risk.
 	 */
-	virtual WilsonCowanAlgorithm* clone() const;
+	virtual RateAlgorithm* clone() const;
 
 	/**
 	 * Configure the Algorithm
@@ -60,16 +63,12 @@ public:
 
 private:
 
-	double innerProduct(const std::vector<Rate>& nodeVector,
-			const std::vector<double>& weightVector);
-
-	vector<double> getInitialState() const;
-
-	DynamicLib::WilsonCowanParameter _parameter;
-
-	NumtoolsLib::DVIntegrator<DynamicLib::WilsonCowanParameter> _integrator;
+	Time _time_current;
+	Rate _rate;
+	Rate* _p_rate;
 
 };
 
+} /* namespace algorithm */
 } /* namespace MPILib */
-#endif /* MPILIB_ALGORITHMS_WILSONCOWANALGORITHM_HPP_ */
+#endif /* MPILIB_ALGORITHMS_RATEALGORITHM_HPP_ */

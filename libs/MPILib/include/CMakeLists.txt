@@ -1,4 +1,4 @@
-add_subdirectory(Algorithms)
+add_subdirectory(algorithm)
 add_subdirectory(utilities)
 
 add_header(

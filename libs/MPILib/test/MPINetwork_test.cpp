@@ -18,7 +18,7 @@
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
-#include <MPILib/include/Algorithms/Sleep10secAlgorithmCode.hpp>
+#include <MPILib/include/algorithm/Sleep10secAlgorithmCode.hpp>
 
 
 #include <boost/test/minimal.hpp>
@@ -54,7 +54,7 @@ void test_AddNode() {
 		BOOST_REQUIRE(network._pLocalNodes->size()==0);
 	}
 
-	Sleep10secAlgorithm<double> alg;
+	algorithm::Sleep10secAlgorithm<double> alg;
 
 	network.addNode(alg, 1);
 
@@ -78,7 +78,7 @@ void test_AddNode() {
 void test_MakeFirstInputOfSecond() {
 
 	MPINetwork<double, utilities::CircularDistribution> network;
-	Sleep10secAlgorithm<double> alg;
+	algorithm::Sleep10secAlgorithm<double> alg;
 
 	int node0 = network.addNode(alg, 1);
 	int node1 = network.addNode(alg, 1);
@@ -121,7 +121,7 @@ void test_MakeFirstInputOfSecond() {
 
 void test_getMaxNodeId() {
 	MPINetwork<double, utilities::CircularDistribution> network;
-	Sleep10secAlgorithm<double> alg;
+	algorithm::Sleep10secAlgorithm<double> alg;
 	BOOST_REQUIRE(network.getMaxNodeId()==0);
 	network.addNode(alg, 1);
 	BOOST_REQUIRE(network.getMaxNodeId()==1);

@@ -7,7 +7,7 @@
 
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/Algorithms/WilsonCowanAlgorithm.hpp>
+#include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
 
 #include <NumtoolsLib/NumtoolsLib.h>
 #include <gsl/gsl_matrix.h>
@@ -49,6 +49,7 @@ int sigmoidprime(double t, const double y[], double *dfdy, double dfdt[],
 ;
 
 namespace MPILib {
+namespace algorithm{
 
 WilsonCowanAlgorithm::WilsonCowanAlgorithm() :
 		AlgorithmInterface<double>(), _integrator(0, getInitialState(), 0, 0,
@@ -148,4 +149,5 @@ DynamicLib::AlgorithmGrid WilsonCowanAlgorithm::getGrid() const
 	return _integrator.State();
 }
 
+} /* namespace algorithm */
 } /* namespace MPILib */

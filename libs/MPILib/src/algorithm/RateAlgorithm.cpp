@@ -7,9 +7,11 @@
 
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/Algorithms/RateAlgorithm.hpp>
+#include <MPILib/include/algorithm/RateAlgorithm.hpp>
 
 namespace MPILib {
+namespace algorithm{
+
 
 RateAlgorithm::RateAlgorithm(Rate* rate) :
 		AlgorithmInterface<double>(), _time_current(
@@ -57,4 +59,5 @@ DynamicLib::AlgorithmGrid RateAlgorithm::getGrid() const {
 	return DynamicLib::AlgorithmGrid(vector_grid, vector_interpretation);
 }
 
+} /* namespace algorithm */
 } /* namespace MPILib */

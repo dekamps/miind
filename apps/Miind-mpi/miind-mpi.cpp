@@ -14,11 +14,11 @@
 #include <exception>
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
-#include <MPILib/include/Algorithms/WilsonCowanAlgorithm.hpp>
+#include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
 #include <DynamicLib/WilsonCowanParameter.h>
 #include <DynamicLib/RootReportHandler.h>
 
-#include <MPILib/include/Algorithms/RateAlgorithm.hpp>
+#include <MPILib/include/algorithm/RateAlgorithm.hpp>
 #include <MPILib/include/utilities/walltime.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
@@ -77,13 +77,13 @@ int main(int argc, char* argv[]) {
 		Rate nu = 0;
 
 		// Define a node with a fixed output rate
-		RateAlgorithm rate_alg(nu);
+		algorithm::RateAlgorithm rate_alg(nu);
 		int id_rate = network.addNode(rate_alg, 1);
 
 		// Define the receiving node
 		DynamicLib::WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
 
-		WilsonCowanAlgorithm algorithm_exc(par_sigmoid);
+		algorithm::WilsonCowanAlgorithm algorithm_exc(par_sigmoid);
 		int id = network.addNode(algorithm_exc, 1);
 
 		// connect the two nodes

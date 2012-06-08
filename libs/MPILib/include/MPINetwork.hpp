@@ -14,7 +14,7 @@
 #include <map>
 
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/Algorithms/AlgorithmInterface.hpp>
+#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/MPINode.hpp>
 
 #include <DynamicLib/InactiveReportHandler.h>
@@ -37,7 +37,7 @@ public:
 	 * @param nodeType The Type of the Node
 	 * @return returns the NodeId of the generated node
 	 */
-	int addNode(const AlgorithmInterface<WeightValue>& alg, NodeType nodeType);
+	int addNode(const algorithm::AlgorithmInterface<WeightValue>& alg, NodeType nodeType);
 
 	/**
 	 * Connects two node
