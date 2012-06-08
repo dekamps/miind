@@ -52,13 +52,13 @@ public:
 	 * @param time Time until the algorithm should evolve
 	 * @return Time the algorithm have evolved
 	 */
-	Time Evolve(Time time);
+	Time evolve(Time time);
 
 	/**
 	 * Configure the Node with the Simulation Parameters
 	 * @param simParam Simulation Parameters
 	 */
-	void ConfigureSimulationRun(const DynamicLib::SimulationRunParameter& simParam);
+	void configureSimulationRun(const DynamicLib::SimulationRunParameter& simParam);
 
 	/**
 	 * Add a precursor to the current node
@@ -158,8 +158,8 @@ private:
 	NodeType							_type;
 	DynamicLib::NodeInfo				_info;
 
-	boost::shared_ptr<AlgorithmInterface<Weight> > _algorithm;
-	mutable boost::shared_ptr<DynamicLib::AbstractReportHandler>	_p_handler;
+	boost::shared_ptr<AlgorithmInterface<Weight> > _pAlgorithm;
+	mutable boost::shared_ptr<DynamicLib::AbstractReportHandler>	_pHandler;
 };
 
 typedef MPINode<double, utilities::CircularDistribution> D_MPINode;

@@ -98,7 +98,7 @@ void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 		//loop over all local nodes!
 		typename std::map<NodeId, MPINode<WeightValue, NodeDistribution> >::iterator it;
 		for (it = _pLocalNodes->begin(); it != _pLocalNodes->end(); it++) {
-			it->second.ConfigureSimulationRun(simParam);
+			it->second.configureSimulationRun(simParam);
 		}
 	} catch (...) {
 		_stream_log << "error during configuration/n";
@@ -133,7 +133,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 							_pLocalNodes->begin(); it != _pLocalNodes->end();
 							it++) {
 
-						it->second.Evolve(getCurrentSimulationTime());
+						it->second.evolve(getCurrentSimulationTime());
 						//TODO call evolve on the nodes
 					}
 

@@ -23,7 +23,7 @@ MPINode<Weight, NodeDistribution>::MPINode(
 		NodeId nodeId,
 		const boost::shared_ptr<NodeDistribution>& nodeDistribution,
 		const boost::shared_ptr<std::map<NodeId, MPINode> >& localNode) :
-		_algorithm(algorithm.Clone()), _nodeType(nodeType), _nodeId(nodeId), _pLocalNodes(
+		_pAlgorithm(algorithm.Clone()), _nodeType(nodeType), _nodeId(nodeId), _pLocalNodes(
 				localNode), _pNodeDistribution(nodeDistribution) {
 
 }
@@ -33,42 +33,42 @@ MPINode<Weight, NodeDistribution>::~MPINode() {
 }
 
 template<class Weight, class NodeDistribution>
-Time MPINode<Weight, NodeDistribution>::Evolve(Time time) {
+Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 
 	receiveData();
 
 	waitAll();
-	while (_algorithm->getCurrentTime() < time) {
+	while (_pAlgorithm->getCurrentTime() < time) {
 		++_number_iterations;
 
-		_algorithm->EvolveNodeState(_precursorActivity, _weights, time);
+		_pAlgorithm->EvolveNodeState(_precursorActivity, _weights, time);
 
 	}
 
 	// update state
-	this->setActivity(_algorithm->getCurrentRate());
+	this->setActivity(_pAlgorithm->getCurrentRate());
 
 	sendOwnActivity();
 
-	return _algorithm->getCurrentTime();
+	return _pAlgorithm->getCurrentTime();
 }
 
 template<class Weight, class NodeDistribution>
-void MPINode<Weight, NodeDistribution>::ConfigureSimulationRun(
+void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 		const DynamicLib::SimulationRunParameter& simParam) {
 	_maximum_iterations = simParam.MaximumNumberIterations();
-	_algorithm->Configure(simParam);
+	_pAlgorithm->Configure(simParam);
 
 	// Add this line or other nodes will not get a proper input at the first simulation step!
-	this->setActivity(_algorithm->getCurrentRate());
+	this->setActivity(_pAlgorithm->getCurrentRate());
 
-	_p_handler = boost::shared_ptr<DynamicLib::AbstractReportHandler>(
+	_pHandler = boost::shared_ptr<DynamicLib::AbstractReportHandler>(
 			simParam.Handler().Clone());
 
 	// by this time, the Id of a Node should be known
 	// this can't be handled by the constructor because it is an implementation (i.e. a network)  property
 	_info._id = NetLib::ConvertToNodeId(_nodeId);
-	_p_handler->InitializeHandler(_info);
+	_pHandler->InitializeHandler(_info);
 
 }
 
@@ -160,27 +160,27 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 
 	if (type == DynamicLib::RATE || type == DynamicLib::STATE) {
 		DynamicLib::Report report(
-				_algorithm->getCurrentTime(),
+				_pAlgorithm->getCurrentTime(),
 				DynamicLib::Rate(this->getActivity()),
 				NetLib::NodeId(this->_nodeId),
 				DynamicLib::NodeState(std::vector<double>(_activity)),
-				_algorithm->Grid(),
+				_pAlgorithm->Grid(),
 				string_return,
 				type,
 				vec_values);
 
-		_p_handler->WriteReport(report);
+		_pHandler->WriteReport(report);
 	}
 
 	if (type == DynamicLib::UPDATE)
-		_p_handler->Update();
+		_pHandler->Update();
 
 	return string_return;
 }
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::clearSimulation() {
-	_p_handler->DetachHandler(_info);
+	_pHandler->DetachHandler(_info);
 	return true;
 }
 
