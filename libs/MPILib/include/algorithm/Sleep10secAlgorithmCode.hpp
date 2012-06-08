@@ -53,7 +53,7 @@ void Sleep10secAlgorithm<WeightValue>::evolveNodeState(const std::vector<Activit
 	unsigned int size = nodeVector.size();
 	size = weightVector.size();
 //FIXME
-	boost::this_thread::sleep( boost::posix_time::seconds(10) );
+	boost::this_thread::sleep( boost::posix_time::seconds(1) );
 
 }
 
