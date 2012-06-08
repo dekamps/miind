@@ -62,7 +62,7 @@ void MPINode<Weight, NodeDistribution>::ConfigureSimulationRun(
 	// Add this line or other nodes will not get a proper input at the first simulation step!
 	this->setActivity(_algorithm->getCurrentRate());
 
-	_p_handler = auto_ptr<DynamicLib::AbstractReportHandler>(
+	_p_handler = boost::shared_ptr<DynamicLib::AbstractReportHandler>(
 			simParam.Handler().Clone());
 
 	// by this time, the Id of a Node should be known
@@ -159,11 +159,15 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 	std::vector<DynamicLib::ReportValue> vec_values;
 
 	if (type == DynamicLib::RATE || type == DynamicLib::STATE) {
-		DynamicLib::Report report(_algorithm->getCurrentTime(),
+		DynamicLib::Report report(
+				_algorithm->getCurrentTime(),
 				DynamicLib::Rate(this->getActivity()),
 				NetLib::NodeId(this->_nodeId),
 				DynamicLib::NodeState(std::vector<double>(_activity)),
-				_algorithm->Grid(), string_return, type, vec_values);
+				_algorithm->Grid(),
+				string_return,
+				type,
+				vec_values);
 
 		_p_handler->WriteReport(report);
 	}
@@ -172,6 +176,12 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 		_p_handler->Update();
 
 	return string_return;
+}
+
+template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::clearSimulation() {
+	_p_handler->DetachHandler(_info);
+	return true;
 }
 
 } //end namespace MPILib

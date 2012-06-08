@@ -109,6 +109,8 @@ public:
 
 	std::string reportAll	(DynamicLib::ReportType) const;
 
+	void clearSimulation();
+
 
 private:
 

@@ -5,6 +5,8 @@
  *      Author: david
  */
 #include <sstream>
+#include <iostream>
+#include <fstream>
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <MPILib/include/utilities/ParallelException.hpp>
@@ -90,11 +92,22 @@ void MPINetwork<WeightValue, NodeDistribution>::ConfigureSimulation(
 
 	_parameter_simulation_run = simParam;
 
-	//loop over all local nodes!
-	typename std::map<NodeId, MPINode<WeightValue, NodeDistribution> >::iterator it;
-	for (it = _pLocalNodes->begin(); it != _pLocalNodes->end(); it++) {
-		it->second.ConfigureSimulationRun(simParam);
+	InitializeLogStream(simParam.LogName());
+
+	try {
+		//loop over all local nodes!
+		typename std::map<NodeId, MPINode<WeightValue, NodeDistribution> >::iterator it;
+		for (it = _pLocalNodes->begin(); it != _pLocalNodes->end(); it++) {
+			it->second.ConfigureSimulationRun(simParam);
+		}
+	} catch (...) {
+		_stream_log << "error during configuration/n";
+		_stream_log.flush();
 	}
+
+	_state_network.ToggleConfigured();
+
+	_stream_log.flush();
 
 }
 
@@ -186,19 +199,35 @@ template<class WeightValue, class NodeDistribution>
 std::string MPINetwork<WeightValue, NodeDistribution>::collectReport(
 		DynamicLib::ReportType type) {
 
-
 	string string_return;
 
-	for (std::map<NodeId, D_MPINode>::iterator it =
-								_pLocalNodes->begin(); it != _pLocalNodes->end();
-								it++) {
+	for (std::map<NodeId, D_MPINode>::iterator it = _pLocalNodes->begin();
+			it != _pLocalNodes->end(); it++) {
 		string_return = it->second.reportAll(type);
-
-
 
 	}
 
 	return string_return;
+}
+
+template<class WeightValue, class NodeDistribution>
+void MPINetwork<WeightValue, NodeDistribution>::InitializeLogStream(
+		const std::string & name) {
+	// resource will be passed on to _stream_log
+	boost::shared_ptr<std::ostream> p_stream(new std::ofstream(name.c_str()));
+	if (!p_stream)
+		throw DynamicLib::DynamicLibException(
+				"DynamicNetwork cannot open log file.");
+	if (!_stream_log.OpenStream(p_stream))
+		_stream_log << "WARNING YOU ARE TRYING TO REOPEN THIS LOG FILE\n";
+}
+
+template<class WeightValue, class NodeDistribution>
+void MPINetwork<WeightValue, NodeDistribution>::clearSimulation() {
+	typename std::map<NodeId, MPINode<WeightValue, NodeDistribution> >::iterator it;
+	for (it = _pLocalNodes->begin(); it != _pLocalNodes->end(); it++) {
+		it->second.clearSimulation();
+	}
 }
 
 template<class WeightValue, class NodeDistribution>

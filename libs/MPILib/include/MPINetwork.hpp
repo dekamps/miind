@@ -77,6 +77,11 @@ private:
 
 	std::string collectReport(DynamicLib::ReportType type);
 
+	void InitializeLogStream(const std::string & name);
+
+	void clearSimulation();
+
+
 	void UpdateReportTime				();
 	void UpdateSimulationTime			();
 	void UpdateUpdateTime				();
@@ -111,7 +116,7 @@ private:
 	DynamicLib::NetworkState _state_network;
 
 	DynamicLib::SimulationRunParameter _parameter_simulation_run;
-	LogStream _stream_log;
+	UtilLib::LogStream _stream_log;
 
 };
 
