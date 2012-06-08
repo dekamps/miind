@@ -88,12 +88,12 @@ INCLUDE_DIRECTORIES(
 message("######################## Unit tests ########################")
 
 MESSAGE(STATUS "Adding test for:")
+
+add_subdirectory(utilities)
+
 ADD_MIIND_MPI_TEST( MPINetwork_test.cpp)
 ADD_MIIND_MPI_TEST( MPINode_test.cpp)
-ADD_MIIND_MPI_TEST( utilities/CircularDistribution_test.cpp)
-ADD_MIIND_MPI_TEST( utilities/Exception_test.cpp)
-ADD_MIIND_MPI_TEST( utilities/ParallelException_test.cpp)
-ADD_MIIND_MPI_TEST( utilities/Time_test.cpp)
+
 
 
 
