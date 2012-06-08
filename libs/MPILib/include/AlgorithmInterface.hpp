@@ -26,13 +26,13 @@ public:
 	 * Cloning operation, to provide each DynamicNode with its own
 	 * Algorithm instance. Clients use the naked pointer at their own risk.
 	 */
-	virtual AlgorithmInterface* Clone() const = 0;
+	virtual AlgorithmInterface* clone() const = 0;
 
 	/**
 	 * Configure the Algorithm
 	 * @param simParam
 	 */
-	virtual void Configure(const DynamicLib::SimulationRunParameter& simParam) = 0;
+	virtual void configure(const DynamicLib::SimulationRunParameter& simParam) = 0;
 
 	/**
 	 * Evolve the node state
@@ -40,7 +40,7 @@ public:
 	 * @param weightVector Vector of the weights of the nodes
 	 * @param time Time point of the algorithm
 	 */
-	virtual void EvolveNodeState(const std::vector<Rate>& nodeVector,
+	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
 			const std::vector<WeightValue>& weightVector, Time time) = 0;
 
 	/**
@@ -55,7 +55,11 @@ public:
 	 */
 	virtual Rate getCurrentRate() const = 0;
 
-	virtual DynamicLib::AlgorithmGrid Grid() const = 0;
+	/**
+	 * #FIXME no idear why this is needed.
+	 * @return
+	 */
+	virtual DynamicLib::AlgorithmGrid getGrid() const = 0;
 };
 
 } /* namespace MPILib */

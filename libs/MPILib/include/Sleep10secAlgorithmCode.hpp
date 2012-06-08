@@ -28,19 +28,19 @@ Sleep10secAlgorithm<WeightValue>::~Sleep10secAlgorithm() {
 }
 
 template <class WeightValue>
-Sleep10secAlgorithm<WeightValue>* Sleep10secAlgorithm<WeightValue>::Clone() const {
+Sleep10secAlgorithm<WeightValue>* Sleep10secAlgorithm<WeightValue>::clone() const {
 	return new Sleep10secAlgorithm(*this);
 }
 
 template <class WeightValue>
-void Sleep10secAlgorithm<WeightValue>::Configure(const DynamicLib::SimulationRunParameter& simParam) {
+void Sleep10secAlgorithm<WeightValue>::configure(const DynamicLib::SimulationRunParameter& simParam) {
 
 //FIXME
 
 }
 
 template <class WeightValue>
-void Sleep10secAlgorithm<WeightValue>::EvolveNodeState(const std::vector<ActivityType>& nodeVector,
+void Sleep10secAlgorithm<WeightValue>::evolveNodeState(const std::vector<ActivityType>& nodeVector,
 		const std::vector<WeightValue>& weightVector, Time time) {
 	time =2;
 	unsigned int size = nodeVector.size();
@@ -65,7 +65,7 @@ Rate Sleep10secAlgorithm<WeightValue>::getCurrentRate() const{
 }
 
 template <class WeightValue>
-DynamicLib::AlgorithmGrid  Sleep10secAlgorithm<WeightValue>::Grid() const {
+DynamicLib::AlgorithmGrid  Sleep10secAlgorithm<WeightValue>::getGrid() const {
 	std::vector<double> vector_grid(DynamicLib::RATE_STATE_DIMENSION, 1);
 	std::vector<double> vector_interpretation(DynamicLib::RATE_STATE_DIMENSION, 0);
 	return DynamicLib::AlgorithmGrid(vector_grid, vector_interpretation);

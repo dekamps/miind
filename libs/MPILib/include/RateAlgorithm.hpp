@@ -28,13 +28,13 @@ public:
 	 * Cloning operation, to provide each DynamicNode with its own
 	 * Algorithm instance. Clients use the naked pointer at their own risk.
 	 */
-	virtual RateAlgorithm* Clone() const;
+	virtual RateAlgorithm* clone() const;
 
 	/**
 	 * Configure the Algorithm
 	 * @param simParam
 	 */
-	virtual void Configure(const DynamicLib::SimulationRunParameter& simParam);
+	virtual void configure(const DynamicLib::SimulationRunParameter& simParam);
 
 	/**
 	 * Evolve the node state
@@ -42,7 +42,7 @@ public:
 	 * @param weightVector Vector of the weights of the nodes
 	 * @param time Time point of the algorithm
 	 */
-	virtual void EvolveNodeState(const std::vector<Rate>& nodeVector,
+	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
 			const std::vector<double>& weightVector, Time time);
 
 	/**
@@ -57,7 +57,7 @@ public:
 	 */
 	virtual Rate getCurrentRate() const;
 
-	virtual DynamicLib::AlgorithmGrid Grid() const;
+	virtual DynamicLib::AlgorithmGrid getGrid() const;
 
 private:
 

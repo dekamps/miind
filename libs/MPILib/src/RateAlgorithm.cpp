@@ -25,18 +25,18 @@ RateAlgorithm::~RateAlgorithm() {
 	// TODO Auto-generated destructor stub
 }
 
-RateAlgorithm* RateAlgorithm::Clone() const {
+RateAlgorithm* RateAlgorithm::clone() const {
 	return new RateAlgorithm(*this);
 }
 
-void RateAlgorithm::Configure(
+void RateAlgorithm::configure(
 		const DynamicLib::SimulationRunParameter& simParam) {
 
 	_time_current = simParam.TBegin();
 
 }
 
-void RateAlgorithm::EvolveNodeState(const std::vector<Rate>& nodeVector,
+void RateAlgorithm::evolveNodeState(const std::vector<Rate>& nodeVector,
 		const std::vector<double>& weightVector, Time time) {
 
 	_time_current = time;
@@ -51,7 +51,7 @@ Rate RateAlgorithm::getCurrentRate() const {
 	return (_p_rate) ? *_p_rate : _rate;
 }
 
-DynamicLib::AlgorithmGrid RateAlgorithm::Grid() const {
+DynamicLib::AlgorithmGrid RateAlgorithm::getGrid() const {
 	std::vector<double> vector_grid(DynamicLib::RATE_STATE_DIMENSION, _rate);
 	std::vector<double> vector_interpretation(DynamicLib::RATE_STATE_DIMENSION, 0);
 	return DynamicLib::AlgorithmGrid(vector_grid, vector_interpretation);

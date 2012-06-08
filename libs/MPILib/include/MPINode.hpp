@@ -107,8 +107,16 @@ public:
 	 */
 	void sendOwnActivity();
 
+	/**
+	 * Report the node state
+	 * @param The type of Report
+	 * @return The report
+	 */
 	std::string reportAll	(DynamicLib::ReportType) const;
 
+	/**
+	 * finishes the simulation.
+	 */
 	void clearSimulation();
 
 

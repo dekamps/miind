@@ -51,7 +51,7 @@ int sigmoidprime(double t, const double y[], double *dfdy, double dfdt[],
 namespace MPILib {
 
 WilsonCowanAlgorithm::WilsonCowanAlgorithm() :
-		AlgorithmInterface<double>(), _integrator(0, InitialState(), 0, 0,
+		AlgorithmInterface<double>(), _integrator(0, getInitialState(), 0, 0,
 				NumtoolsLib::Precision(WC_ABSOLUTE_PRECISION,
 						WC_RELATIVE_PRECISION), sigmoid, sigmoidprime) {
 	// TODO Auto-generated constructor stub
@@ -60,7 +60,7 @@ WilsonCowanAlgorithm::WilsonCowanAlgorithm() :
 
 WilsonCowanAlgorithm::WilsonCowanAlgorithm(const DynamicLib::WilsonCowanParameter&parameter) :
 		AlgorithmInterface<double>(), _parameter(parameter), _integrator(0,
-				InitialState(), 0, 0,
+				getInitialState(), 0, 0,
 				NumtoolsLib::Precision(WC_ABSOLUTE_PRECISION,
 						WC_RELATIVE_PRECISION), sigmoid, sigmoidprime) {
 	_integrator.Parameter() = _parameter;
@@ -70,11 +70,11 @@ WilsonCowanAlgorithm::~WilsonCowanAlgorithm() {
 	// TODO Auto-generated destructor stub
 }
 
-WilsonCowanAlgorithm* WilsonCowanAlgorithm::Clone() const {
+WilsonCowanAlgorithm* WilsonCowanAlgorithm::clone() const {
 	return new WilsonCowanAlgorithm(*this);
 }
 
-void WilsonCowanAlgorithm::Configure(const DynamicLib::SimulationRunParameter& simParam) {
+void WilsonCowanAlgorithm::configure(const DynamicLib::SimulationRunParameter& simParam) {
 
 	NumtoolsLib::DVIntegratorStateParameter<DynamicLib::WilsonCowanParameter> parameter_dv;
 
@@ -93,7 +93,7 @@ void WilsonCowanAlgorithm::Configure(const DynamicLib::SimulationRunParameter& s
 //FIXME
 }
 
-void WilsonCowanAlgorithm::EvolveNodeState(const std::vector<Rate>& nodeVector,
+void WilsonCowanAlgorithm::evolveNodeState(const std::vector<Rate>& nodeVector,
 		const std::vector<double>& weightVector, Time time) {
 
 	double f_inner_product = innerProduct(nodeVector, weightVector);
@@ -137,13 +137,13 @@ double WilsonCowanAlgorithm::innerProduct(const std::vector<Rate>& nodeVector,
 
 }
 
-vector<double> WilsonCowanAlgorithm::InitialState() const {
+vector<double> WilsonCowanAlgorithm::getInitialState() const {
 	vector<double> array_return(WILSON_COWAN_STATE_DIMENSION);
 	array_return[0] = 0;
 	return array_return;
 }
 
-DynamicLib::AlgorithmGrid WilsonCowanAlgorithm::Grid() const
+DynamicLib::AlgorithmGrid WilsonCowanAlgorithm::getGrid() const
 {
 	return _integrator.State();
 }

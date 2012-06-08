@@ -23,7 +23,7 @@ MPINode<Weight, NodeDistribution>::MPINode(
 		NodeId nodeId,
 		const boost::shared_ptr<NodeDistribution>& nodeDistribution,
 		const boost::shared_ptr<std::map<NodeId, MPINode> >& localNode) :
-		_pAlgorithm(algorithm.Clone()), _nodeType(nodeType), _nodeId(nodeId), _pLocalNodes(
+		_pAlgorithm(algorithm.clone()), _nodeType(nodeType), _nodeId(nodeId), _pLocalNodes(
 				localNode), _pNodeDistribution(nodeDistribution) {
 
 }
@@ -41,7 +41,7 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 	while (_pAlgorithm->getCurrentTime() < time) {
 		++_number_iterations;
 
-		_pAlgorithm->EvolveNodeState(_precursorActivity, _weights, time);
+		_pAlgorithm->evolveNodeState(_precursorActivity, _weights, time);
 
 	}
 
@@ -57,7 +57,7 @@ template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 		const DynamicLib::SimulationRunParameter& simParam) {
 	_maximum_iterations = simParam.MaximumNumberIterations();
-	_pAlgorithm->Configure(simParam);
+	_pAlgorithm->configure(simParam);
 
 	// Add this line or other nodes will not get a proper input at the first simulation step!
 	this->setActivity(_pAlgorithm->getCurrentRate());
@@ -164,7 +164,7 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 				DynamicLib::Rate(this->getActivity()),
 				NetLib::NodeId(this->_nodeId),
 				DynamicLib::NodeState(std::vector<double>(_activity)),
-				_pAlgorithm->Grid(),
+				_pAlgorithm->getGrid(),
 				string_return,
 				type,
 				vec_values);
