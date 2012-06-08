@@ -13,12 +13,10 @@
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <DynamicLib/NodeState.h>
 
-
 namespace MPILib {
-namespace algorithm{
+namespace algorithm {
 
-
-template <class WeightValue>
+template<class WeightValue>
 class SleepAlgorithm: public AlgorithmInterface<WeightValue> {
 public:
 	explicit SleepAlgorithm();
@@ -58,6 +56,10 @@ public:
 	virtual Rate getCurrentRate() const;
 
 	virtual DynamicLib::AlgorithmGrid getGrid() const;
+
+private:
+
+	static double const kSleepTime = 1;
 
 };
 

@@ -53,7 +53,7 @@ void SleepAlgorithm<WeightValue>::evolveNodeState(const std::vector<ActivityType
 	unsigned int size = nodeVector.size();
 	size = weightVector.size();
 //FIXME
-	boost::this_thread::sleep( boost::posix_time::seconds(1) );
+	boost::this_thread::sleep( boost::posix_time::seconds(kSleepTime) );
 
 }
 
@@ -77,6 +77,8 @@ DynamicLib::AlgorithmGrid  SleepAlgorithm<WeightValue>::getGrid() const {
 	std::vector<double> vector_interpretation(DynamicLib::RATE_STATE_DIMENSION, 0);
 	return DynamicLib::AlgorithmGrid(vector_grid, vector_interpretation);
 }
+
+
 
 } /* namespace algorithm */
 } /* namespace MPILib */
