@@ -5,8 +5,8 @@
  *      Author: david
  */
 
-#ifndef MPILIB_ALGORITHMS_SLEEP10SECALGORITHM_HPP_
-#define MPILIB_ALGORITHMS_SLEEP10SECALGORITHM_HPP_
+#ifndef MPILIB_ALGORITHMS_SLEEPALGORITHM_HPP_
+#define MPILIB_ALGORITHMS_SLEEPALGORITHM_HPP_
 
 #include <vector>
 #include <MPILib/include/BasicTypes.hpp>
@@ -19,16 +19,16 @@ namespace algorithm{
 
 
 template <class WeightValue>
-class Sleep10secAlgorithm: public AlgorithmInterface<WeightValue> {
+class SleepAlgorithm: public AlgorithmInterface<WeightValue> {
 public:
-	explicit Sleep10secAlgorithm();
+	explicit SleepAlgorithm();
 
-	virtual ~Sleep10secAlgorithm();
+	virtual ~SleepAlgorithm();
 	/**
 	 * Cloning operation, to provide each DynamicNode with its own
 	 * Algorithm instance. Clients use the naked pointer at their own risk.
 	 */
-	virtual Sleep10secAlgorithm* clone() const;
+	virtual SleepAlgorithm* clone() const;
 
 	/**
 	 * Configure the Algorithm
@@ -63,4 +63,4 @@ public:
 
 } /* namespace algorithm */
 } /* namespace MPILib */
-#endif /* MPILIB_ALGORITHMS_SLEEP10SECALGORITHM_HPP_ */
+#endif /* MPILIB_ALGORITHMS_SLEEPALGORITHM_HPP_ */

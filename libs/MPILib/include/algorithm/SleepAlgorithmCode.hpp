@@ -6,14 +6,14 @@
  */
 
 
-#ifndef MPILIB_ALGORITHMS_SLEEP10SECALGORITHM_CODE_HPP_
-#define MPILIB_ALGORITHMS_SLEEP10SECALGORITHM_CODE_HPP_
+#ifndef MPILIB_ALGORITHMS_SLEEPALGORITHM_CODE_HPP_
+#define MPILIB_ALGORITHMS_SLEEPALGORITHM_CODE_HPP_
 
 #include <boost/thread/thread.hpp>
 #include <boost/mpi.hpp>
 #include <boost/mpi/communicator.hpp>
 
-#include <MPILib/include/algorithm/Sleep10secAlgorithm.hpp>
+#include <MPILib/include/algorithm/SleepAlgorithm.hpp>
 
 
 namespace mpi = boost::mpi;
@@ -24,30 +24,30 @@ namespace algorithm{
 
 
 template <class WeightValue>
-Sleep10secAlgorithm<WeightValue>::Sleep10secAlgorithm(){
+SleepAlgorithm<WeightValue>::SleepAlgorithm(){
 	// TODO Auto-generated constructor stub
 
 }
 
 template <class WeightValue>
-Sleep10secAlgorithm<WeightValue>::~Sleep10secAlgorithm() {
+SleepAlgorithm<WeightValue>::~SleepAlgorithm() {
 	// TODO Auto-generated destructor stub
 }
 
 template <class WeightValue>
-Sleep10secAlgorithm<WeightValue>* Sleep10secAlgorithm<WeightValue>::clone() const {
-	return new Sleep10secAlgorithm(*this);
+SleepAlgorithm<WeightValue>* SleepAlgorithm<WeightValue>::clone() const {
+	return new SleepAlgorithm(*this);
 }
 
 template <class WeightValue>
-void Sleep10secAlgorithm<WeightValue>::configure(const DynamicLib::SimulationRunParameter& simParam) {
+void SleepAlgorithm<WeightValue>::configure(const DynamicLib::SimulationRunParameter& simParam) {
 
 //FIXME
 
 }
 
 template <class WeightValue>
-void Sleep10secAlgorithm<WeightValue>::evolveNodeState(const std::vector<ActivityType>& nodeVector,
+void SleepAlgorithm<WeightValue>::evolveNodeState(const std::vector<ActivityType>& nodeVector,
 		const std::vector<WeightValue>& weightVector, Time time) {
 	time =2;
 	unsigned int size = nodeVector.size();
@@ -58,13 +58,13 @@ void Sleep10secAlgorithm<WeightValue>::evolveNodeState(const std::vector<Activit
 }
 
 template <class WeightValue>
-Time Sleep10secAlgorithm<WeightValue>::getCurrentTime() const{
+Time SleepAlgorithm<WeightValue>::getCurrentTime() const{
 	//TODO
 	return 1.0;
 }
 
 template <class WeightValue>
-Rate Sleep10secAlgorithm<WeightValue>::getCurrentRate() const{
+Rate SleepAlgorithm<WeightValue>::getCurrentRate() const{
 	//TODO
 	mpi::communicator world;
 	return world.rank()+world.size();
@@ -72,7 +72,7 @@ Rate Sleep10secAlgorithm<WeightValue>::getCurrentRate() const{
 }
 
 template <class WeightValue>
-DynamicLib::AlgorithmGrid  Sleep10secAlgorithm<WeightValue>::getGrid() const {
+DynamicLib::AlgorithmGrid  SleepAlgorithm<WeightValue>::getGrid() const {
 	std::vector<double> vector_grid(DynamicLib::RATE_STATE_DIMENSION, 1);
 	std::vector<double> vector_interpretation(DynamicLib::RATE_STATE_DIMENSION, 0);
 	return DynamicLib::AlgorithmGrid(vector_grid, vector_interpretation);
