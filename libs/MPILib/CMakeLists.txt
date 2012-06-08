@@ -1,33 +1,83 @@
 
-set( mpi_SRC
-    src/utilities/Exception.cpp
-    src/utilities/ParallelException.cpp
-    src/utilities/CircularDistribution.cpp
-    src/utilities/Time.cpp
-    src/Algorithms/WilsonCowanAlgorithm.cpp
-    src/Algorithms/RateAlgorithm.cpp
-    #add cpp files
-     )
 
-set( mpi_HEADERS
-    include/MPINode.hpp
-    include/MPINodeCode.hpp
-    include/MPINetwork.hpp
-    include/MPINetworkCode.hpp
-    include/BasicTypes.hpp
-    include/utilities/Exception.hpp
-    include/utilities/ParallelException.hpp
-    include/utilities/CircularDistribution.hpp
-    include/utilities/NodeDistributionInterface.hpp
-    include/Algorithms/AlgorithmInterface.hpp
-    include/Algorithms/Sleep10secAlgorithm.hpp
-    include/Algorithms/Sleep10secAlgorithmCode.hpp
-    include/utilities/Time.hpp
-    include/utilities/walltime.hpp
-    include/Algorithms/WilsonCowanAlgorithm.hpp
-    include/Algorithms/RateAlgorithm.hpp
-    #add headers
-     )
+##############################################################################
+# add the source files
+##############################################################################
+function(add_sources)
+  get_property(is_defined GLOBAL PROPERTY SRCS_LIST DEFINED)
+  if(NOT is_defined)
+    define_property(GLOBAL PROPERTY SRCS_LIST
+      BRIEF_DOCS "List of source files"
+      FULL_DOCS "List of source files to be compiled in one library")
+  endif()
+  # make absolute paths
+  set(SRCS)
+  foreach(s IN LISTS ARGN)
+    if(NOT IS_ABSOLUTE "${s}")
+      get_filename_component(s "${s}" ABSOLUTE)
+    endif()
+    list(APPEND SRCS "${s}")
+  endforeach()
+  # append to global list
+  set_property(GLOBAL APPEND PROPERTY SRCS_LIST "${SRCS}")
+endfunction(add_sources)
+
+add_subdirectory(src)
+
+set(MPI_SRCS)
+get_property(SRCS GLOBAL PROPERTY SRCS_LIST)
+foreach(s IN LISTS SRCS)
+  file(RELATIVE_PATH rs "${CMAKE_CURRENT_SOURCE_DIR}" "${s}")
+  string(REGEX REPLACE "r$" "" o "${CMAKE_CURRENT_BINARY_DIR}/${rs}")
+  add_custom_command(
+    OUTPUT "${o}"
+    COMMAND ${CMAKE_COMMAND} -E copy "${s}" "${o}"
+    DEPENDS "${s}"
+    COMMENT "Creating ${o}"
+    VERBATIM
+    )
+  list(APPEND MPI_SRCS "${o}")
+endforeach()
+
+
+##############################################################################
+# add the header files
+##############################################################################
+function(add_header)
+  get_property(is_defined GLOBAL PROPERTY HEADER_LIST DEFINED)
+  if(NOT is_defined)
+    define_property(GLOBAL PROPERTY HEADER_LIST
+      BRIEF_DOCS "List of header files"
+      FULL_DOCS "List of header files to be compiled in one library")
+  endif()
+  # make absolute paths
+  set(HEADER)
+  foreach(s IN LISTS ARGN)
+    if(NOT IS_ABSOLUTE "${s}")
+      get_filename_component(s "${s}" ABSOLUTE)
+    endif()
+    list(APPEND HEADER "${s}")
+  endforeach()
+  # append to global list
+  set_property(GLOBAL APPEND PROPERTY HEADER_LIST "${HEADER}")
+endfunction(add_header)
+
+add_subdirectory(include)
+
+set(MPI_HEADER)
+get_property(HEADER GLOBAL PROPERTY HEADER_LIST)
+foreach(s IN LISTS HEADER)
+  file(RELATIVE_PATH rs "${CMAKE_CURRENT_SOURCE_DIR}" "${s}")
+  string(REGEX REPLACE "r$" "" o "${CMAKE_CURRENT_BINARY_DIR}/${rs}")
+  add_custom_command(
+    OUTPUT "${o}"
+    COMMAND ${CMAKE_COMMAND} -E copy "${s}" "${o}"
+    DEPENDS "${s}"
+#    COMMENT "Creating ${o}"
+    VERBATIM
+    )
+  list(APPEND MPI_HEADER "${o}")
+endforeach()
      
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
@@ -47,7 +97,7 @@ set ( LIBLIST
     
 )
 
-add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${mpi_SRC} ${mpi_HEADERS})
+add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${MPI_SRCS} ${MPI_HEADER})
 
 
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} )
