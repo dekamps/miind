@@ -7,9 +7,9 @@
 
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/WilsonCowanAlgorithm.hpp>
+#include <MPILib/include/Algorithms/WilsonCowanAlgorithm.hpp>
 
-#include "../../NumtoolsLib/NumtoolsLib.h"
+#include <NumtoolsLib/NumtoolsLib.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_errno.h>
 

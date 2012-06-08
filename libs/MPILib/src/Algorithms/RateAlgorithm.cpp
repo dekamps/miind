@@ -7,7 +7,7 @@
 
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/RateAlgorithm.hpp>
+#include <MPILib/include/Algorithms/RateAlgorithm.hpp>
 
 namespace MPILib {
 

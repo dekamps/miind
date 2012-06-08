@@ -13,7 +13,7 @@
 #include <boost/mpi/request.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <MPILib/include/AlgorithmInterface.hpp>
+#include <MPILib/include/Algorithms/AlgorithmInterface.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
 #include <MPILib/include/BasicTypes.hpp>

@@ -5,8 +5,8 @@
  *      Author: david
  */
 
-#ifndef MPILIB_ALGORITHMINTERFACE_HPP_
-#define MPILIB_ALGORITHMINTERFACE_HPP_
+#ifndef MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
+#define MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
 
 #include <MPILib/include/BasicTypes.hpp>
 #include <DynamicLib/SimulationRunParameter.h>
@@ -63,4 +63,4 @@ public:
 };
 
 } /* namespace MPILib */
-#endif /* MPILIB_ALGORITHMINTERFACE_HPP_ */
+#endif /* MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_ */

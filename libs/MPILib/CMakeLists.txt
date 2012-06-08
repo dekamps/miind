@@ -4,8 +4,8 @@ set( mpi_SRC
     src/utilities/ParallelException.cpp
     src/utilities/CircularDistribution.cpp
     src/utilities/Time.cpp
-    src/WilsonCowanAlgorithm.cpp
-    src/RateAlgorithm.cpp
+    src/Algorithms/WilsonCowanAlgorithm.cpp
+    src/Algorithms/RateAlgorithm.cpp
     #add cpp files
      )
 
@@ -19,13 +19,13 @@ set( mpi_HEADERS
     include/utilities/ParallelException.hpp
     include/utilities/CircularDistribution.hpp
     include/utilities/NodeDistributionInterface.hpp
-    include/AlgorithmInterface.hpp
-    include/Sleep10secAlgorithm.hpp
-    include/Sleep10secAlgorithmCode.hpp
+    include/Algorithms/AlgorithmInterface.hpp
+    include/Algorithms/Sleep10secAlgorithm.hpp
+    include/Algorithms/Sleep10secAlgorithmCode.hpp
     include/utilities/Time.hpp
     include/utilities/walltime.hpp
-    include/WilsonCowanAlgorithm.hpp
-    include/RateAlgorithm.hpp
+    include/Algorithms/WilsonCowanAlgorithm.hpp
+    include/Algorithms/RateAlgorithm.hpp
     #add headers
      )
      

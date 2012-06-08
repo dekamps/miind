@@ -14,7 +14,7 @@
 #include <map>
 
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/AlgorithmInterface.hpp>
+#include <MPILib/include/Algorithms/AlgorithmInterface.hpp>
 #include <MPILib/include/MPINode.hpp>
 
 #include <DynamicLib/InactiveReportHandler.h>

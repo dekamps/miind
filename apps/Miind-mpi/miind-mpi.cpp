@@ -14,11 +14,11 @@
 #include <exception>
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
-#include <MPILib/include/WilsonCowanAlgorithm.hpp>
+#include <MPILib/include/Algorithms/WilsonCowanAlgorithm.hpp>
 #include <DynamicLib/WilsonCowanParameter.h>
 #include <DynamicLib/RootReportHandler.h>
 
-#include <MPILib/include/RateAlgorithm.hpp>
+#include <MPILib/include/Algorithms/RateAlgorithm.hpp>
 #include <MPILib/include/utilities/walltime.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 

@@ -5,11 +5,15 @@
  *      Author: david
  */
 
+
+#ifndef MPILIB_ALGORITHMS_SLEEP10SECALGORITHM_CODE_HPP_
+#define MPILIB_ALGORITHMS_SLEEP10SECALGORITHM_CODE_HPP_
+
 #include <boost/thread/thread.hpp>
 #include <boost/mpi.hpp>
 #include <boost/mpi/communicator.hpp>
 
-#include <MPILib/include/Sleep10secAlgorithm.hpp>
+#include <MPILib/include/Algorithms/Sleep10secAlgorithm.hpp>
 
 
 namespace mpi = boost::mpi;
@@ -72,3 +76,5 @@ DynamicLib::AlgorithmGrid  Sleep10secAlgorithm<WeightValue>::getGrid() const {
 }
 
 } /* namespace MPILib */
+
+#endif// MPILIB_ALGORITHMS_SLEEP10SECALGORITHM_CODE_HPP_

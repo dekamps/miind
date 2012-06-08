@@ -15,7 +15,7 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #undef protected
 #undef private
-#include <MPILib/include/Sleep10secAlgorithmCode.hpp>
+#include <MPILib/include/Algorithms/Sleep10secAlgorithmCode.hpp>
 
 #include <MPILib/include/utilities/ParallelException.hpp>
 

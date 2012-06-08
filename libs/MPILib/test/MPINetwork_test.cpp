@@ -18,7 +18,7 @@
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
-#include <MPILib/include/Sleep10secAlgorithmCode.hpp>
+#include <MPILib/include/Algorithms/Sleep10secAlgorithmCode.hpp>
 
 
 #include <boost/test/minimal.hpp>

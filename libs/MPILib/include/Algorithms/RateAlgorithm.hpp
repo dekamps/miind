@@ -1,32 +1,34 @@
 /*
- * Sleep10secAlgorithm.hpp
+ * WilsonCowanAlgorithm.hpp
  *
- *  Created on: 04.06.2012
+ *  Created on: 07.06.2012
  *      Author: david
  */
 
-#ifndef MPILIB_SLEEP10SECALGORITHM_HPP_
-#define MPILIB_SLEEP10SECALGORITHM_HPP_
+#ifndef MPILIB_ALGORITHMS_RATEALGORITHM_HPP_
+#define MPILIB_ALGORITHMS_RATEALGORITHM_HPP_
 
-#include <vector>
-#include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/AlgorithmInterface.hpp>
-#include <DynamicLib/NodeState.h>
+#include <NumtoolsLib/NumtoolsLib.h>
+#include <DynamicLib/WilsonCowanParameter.h>
 
+#include <MPILib/include/Algorithms/AlgorithmInterface.hpp>
 
 namespace MPILib {
 
-template <class WeightValue>
-class Sleep10secAlgorithm: public MPILib::AlgorithmInterface<WeightValue> {
+class RateAlgorithm: public AlgorithmInterface<double> {
 public:
-	explicit Sleep10secAlgorithm();
 
-	virtual ~Sleep10secAlgorithm();
+	RateAlgorithm(Rate* rate);
+
+	RateAlgorithm(Rate rate);
+
+	virtual ~RateAlgorithm();
+
 	/**
 	 * Cloning operation, to provide each DynamicNode with its own
 	 * Algorithm instance. Clients use the naked pointer at their own risk.
 	 */
-	virtual Sleep10secAlgorithm* clone() const;
+	virtual RateAlgorithm* clone() const;
 
 	/**
 	 * Configure the Algorithm
@@ -40,8 +42,8 @@ public:
 	 * @param weightVector Vector of the weights of the nodes
 	 * @param time Time point of the algorithm
 	 */
-	virtual void evolveNodeState(const std::vector<ActivityType>& nodeVector,
-			const std::vector<WeightValue>& weightVector, Time time);
+	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
+			const std::vector<double>& weightVector, Time time);
 
 	/**
 	 * The current timepoint
@@ -57,7 +59,13 @@ public:
 
 	virtual DynamicLib::AlgorithmGrid getGrid() const;
 
+private:
+
+	Time _time_current;
+	Rate _rate;
+	Rate* _p_rate;
+
 };
 
 } /* namespace MPILib */
-#endif /* MPILIB_SLEEP10SECALGORITHM_HPP_ */
+#endif /* MPILIB_ALGORITHMS_RATEALGORITHM_HPP_ */
