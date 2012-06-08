@@ -127,3 +127,13 @@ LogStream& UtilLib::operator<<(LogStream& stream, double f)
 	return stream;
 }
 
+LogStream& UtilLib::operator<<(LogStream& stream, int i)
+{
+	if ( stream._p_stream_log )
+		*stream._p_stream_log << i;
+	// else
+		// no op (/dev/null)
+
+	return stream;
+}
+
