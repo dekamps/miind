@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
 // define some input rate
 	Rate nu = 0;
 
+
 // Define a node with a fixed output rate
 	D_RateAlgorithm rate_alg(nu);
 	NodeId id_rate = network_wctest.AddNode(rate_alg, EXCITATORY);
