@@ -181,7 +181,6 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::clearSimulation() {
 	_pHandler->DetachHandler(_info);
-	return true;
 }
 
 } //end namespace MPILib

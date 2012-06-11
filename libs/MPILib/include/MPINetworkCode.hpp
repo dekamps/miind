@@ -172,7 +172,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 			_stream_log.close();
 		}
 
-		//_implementation.ClearSimulation();
+		clearSimulation();
 		_stream_log << "Simulation ended, no problems noticed\n";
 		_stream_log << "End time: " << getCurrentSimulationTime() << "\n";
 		_stream_log.close();
