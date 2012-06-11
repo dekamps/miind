@@ -29,7 +29,7 @@ inline bool IsFinite( double f ){ return !!_finite(f); }
 
 #else //GCC
 
-inline bool IsFinite( double f ){ return !!finite(f); }
+inline bool IsFinite( double f ){ return !!std::isfinite(f); }
 
 #endif 
 
