@@ -36,14 +36,14 @@ void test_Constructor() {
 	// define some input rate
 	MPILib::Rate nu = 0;
 
-
 	// Define the receiving node
 	DynamicLib::WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
 
 	WilsonCowanAlgorithm algorithm_exc(par_sigmoid);
 
 	BOOST_REQUIRE(algorithm_exc._parameter._f_noise == par_sigmoid._f_noise);
-	BOOST_REQUIRE(algorithm_exc._integrator.Parameter()._f_noise  == par_sigmoid._f_noise);
+	BOOST_REQUIRE(
+			algorithm_exc._integrator.Parameter()._f_noise == par_sigmoid._f_noise);
 
 }
 
@@ -68,7 +68,7 @@ void test_getCurrentRate() {
 	//TODO
 }
 
-void test_innerProduct(){
+void test_innerProduct() {
 	MPILib::Time tau = 10e-3; //10 ms
 	MPILib::Rate rate_max = 100.0;
 	double noise = 1.0;
@@ -79,29 +79,22 @@ void test_innerProduct(){
 	// define some input rate
 	MPILib::Rate nu = 0;
 
-
 	// Define the receiving node
 	DynamicLib::WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
 
 	WilsonCowanAlgorithm algorithm_exc(par_sigmoid);
 
+	std::vector<double> weightVector = { 4.2, 5.2, 7.2 };
 
-	std::vector<double> weightVector = {4.2,5.2,7.2};
-//	weightVector.push_back(4.2);
-//	weightVector.push_back(5.2);
-//	weightVector.push_back(7.2);
-
-	std::vector<double> nodeVector;
-	nodeVector.push_back(2.3);
-	nodeVector.push_back(5.3);
-	nodeVector.push_back(9.3);
+	std::vector<double> nodeVector = { 2.3, 5.3, 9.3 };
 
 	//need to calculate this
 	double res = algorithm_exc.innerProduct(weightVector, nodeVector);
+	BOOST_REQUIRE(res == 104.18);
 
 }
 
-void test_getInitialState(){
+void test_getInitialState() {
 	//TODO
 }
 
