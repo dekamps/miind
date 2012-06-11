@@ -90,6 +90,7 @@ message("######################## Unit tests ########################")
 MESSAGE(STATUS "Adding test for:")
 
 add_subdirectory(utilities)
+add_subdirectory(algorithm)
 
 ADD_MIIND_MPI_TEST( MPINetwork_test.cpp)
 ADD_MIIND_MPI_TEST( MPINode_test.cpp)

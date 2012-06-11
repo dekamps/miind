@@ -60,10 +60,15 @@ WilsonCowanAlgorithm::WilsonCowanAlgorithm() :
 }
 
 WilsonCowanAlgorithm::WilsonCowanAlgorithm(const DynamicLib::WilsonCowanParameter&parameter) :
-		AlgorithmInterface<double>(), _parameter(parameter), _integrator(0,
-				getInitialState(), 0, 0,
-				NumtoolsLib::Precision(WC_ABSOLUTE_PRECISION,
-						WC_RELATIVE_PRECISION), sigmoid, sigmoidprime) {
+		AlgorithmInterface<double>(),
+		_parameter(parameter),
+		_integrator(0,
+				getInitialState(),
+				0,
+				0,
+				NumtoolsLib::Precision(WC_ABSOLUTE_PRECISION, WC_RELATIVE_PRECISION),
+				sigmoid,
+				sigmoidprime) {
 	_integrator.Parameter() = _parameter;
 }
 
