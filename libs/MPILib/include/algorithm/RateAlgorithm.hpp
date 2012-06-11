@@ -20,8 +20,6 @@ namespace algorithm{
 class RateAlgorithm: public AlgorithmInterface<double> {
 public:
 
-	RateAlgorithm(Rate* rate);
-
 	RateAlgorithm(Rate rate);
 
 	virtual ~RateAlgorithm();
@@ -65,7 +63,6 @@ private:
 
 	Time _time_current;
 	Rate _rate;
-	Rate* _p_rate;
 
 };
 

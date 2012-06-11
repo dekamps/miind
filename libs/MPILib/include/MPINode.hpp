@@ -39,7 +39,7 @@ public:
 	explicit MPINode(const algorithm::AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
 			NodeId nodeId,
 			const boost::shared_ptr<NodeDistribution>& nodeDistribution,
-			const boost::shared_ptr<std::map<NodeId, MPINode<Weight, NodeDistribution> > >& localNode);
+			const boost::shared_ptr<std::map<NodeId, MPINode<Weight, NodeDistribution>>>& localNode);
 
 
 	/**
@@ -166,7 +166,7 @@ private:
 	NodeType							_type;
 	DynamicLib::NodeInfo				_info;
 
-	boost::shared_ptr<algorithm::AlgorithmInterface<Weight> > _pAlgorithm;
+	boost::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
 	mutable boost::shared_ptr<DynamicLib::AbstractReportHandler>	_pHandler;
 };
 

@@ -108,7 +108,7 @@ private:
 	/**
 	 * local nodes of the processor
 	 */
-	boost::shared_ptr<std::map<NodeId, MPINode<WeightValue, NodeDistribution> > > _pLocalNodes;
+	boost::shared_ptr<std::map<NodeId, MPINode<WeightValue, NodeDistribution>>> _pLocalNodes;
 
 	/**
 	 * The max Node number assigned so far.

@@ -13,14 +13,9 @@ namespace MPILib {
 namespace algorithm{
 
 
-RateAlgorithm::RateAlgorithm(Rate* rate) :
-		AlgorithmInterface<double>(), _time_current(
-				numeric_limits<double>::max()), _rate(0), _p_rate(rate) {
-}
-
 RateAlgorithm::RateAlgorithm(Rate rate) :
 		AlgorithmInterface<double>(), _time_current(
-				numeric_limits<double>::max()), _rate(rate), _p_rate(0) {
+				numeric_limits<double>::max()), _rate(rate) {
 }
 
 RateAlgorithm::~RateAlgorithm() {
@@ -50,7 +45,7 @@ Time RateAlgorithm::getCurrentTime() const {
 }
 
 Rate RateAlgorithm::getCurrentRate() const {
-	return (_p_rate) ? *_p_rate : _rate;
+	return _rate;
 }
 
 DynamicLib::AlgorithmGrid RateAlgorithm::getGrid() const {
