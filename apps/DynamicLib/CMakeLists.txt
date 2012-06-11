@@ -58,7 +58,12 @@ add_executable( ExampleWilsonCowan
 
 add_executable( TestDynamicLib
     TestDynamicLib.cpp )
-
+    
+add_executable( WilsonCowanVerification
+    WilsonCowanVerification.cpp )
+ 
+    
+target_link_libraries( WilsonCowanVerification ${LIBLIST} )
 target_link_libraries( TestDynamicLib ${LIBLIST} )
 target_link_libraries( ExampleWilsonCowan ${LIBLIST})
 
