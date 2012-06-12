@@ -1,9 +1,6 @@
 add_sources(
     SimulationRunParameter.cpp
     NetworkState.cpp
-    ValueHandlerHandler.cpp
-    GraphKey.cpp
-    CanvasParameter.cpp
     #add source files
 )
 

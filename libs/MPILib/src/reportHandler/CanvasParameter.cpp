@@ -19,7 +19,7 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
 #include <boost/lexical_cast.hpp>
-#include <MPILib/include/CanvasParameter.hpp>
+#include <MPILib/include/reportHandler/CanvasParameter.hpp>
 
 namespace MPILib{
 

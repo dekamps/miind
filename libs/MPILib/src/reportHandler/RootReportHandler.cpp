@@ -30,7 +30,7 @@
 #include <MPILib/include/utilities/Exception.hpp>
 
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/GraphKey.hpp>
+#include <MPILib/include/reportHandler/GraphKey.hpp>
 
 #ifdef HAVE_LIBCORE
 #include <TApplication.h>

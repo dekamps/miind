@@ -20,7 +20,7 @@
 #include <sstream>
 #include <boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
-#include <MPILib/include/GraphKey.hpp>
+#include <MPILib/include/reportHandler/GraphKey.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
 namespace MPILib{

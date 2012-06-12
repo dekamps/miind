@@ -25,8 +25,8 @@
 #include <vector>
 #include <MPILib/include/reportHandler/AbstractReportHandler.hpp>
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/CanvasParameter.hpp>
-#include <MPILib/include/ValueHandlerHandler.hpp>
+#include <MPILib/include/reportHandler/CanvasParameter.hpp>
+#include <MPILib/include/reportHandler/ValueHandlerHandler.hpp>
 
 using std::vector;
 using std::string;
