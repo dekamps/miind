@@ -23,7 +23,7 @@
 
 #include <string>
 #include <MPILib/include/BasicTypes.hpp>
-#include <DynamicLib/Report.h>
+#include <MPILib/include/Report.hpp>
 
 namespace MPILib {
 
@@ -44,7 +44,7 @@ public:
 	//! Manadatory virtual destructor
 	virtual ~AbstractReportHandler(){};
 
-	virtual bool WriteReport(const DynamicLib::Report&) = 0;
+	virtual bool WriteReport(const Report&) = 0;
 
 	//! Mandatory cloning operation.
 	virtual AbstractReportHandler* Clone() const = 0;

@@ -74,7 +74,7 @@ namespace MPILib
 			AlgorithmGrid			grid,
 			std::string				log_message,
 			ReportType				type,
-			vector<ReportValue>		vec_values
+			std::vector<ReportValue>		vec_values
 		):
 		_time(time),
 		_rate(rate),

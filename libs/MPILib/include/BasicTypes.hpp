@@ -9,25 +9,24 @@
 #define MPILIB_BASICTYPES_HPP_
 
 #include <string>
-#include <DynamicLib/BasicDefinitions.h>
 namespace MPILib {
 
 //from basicdefinitions
 const int HAVE_ROOT = 1;
 
-typedef DynamicLib::Rate Rate;
-typedef DynamicLib::Rate ActivityType;
+typedef double Rate;
+typedef Rate ActivityType;
 typedef double Time;
 typedef Time TimeStep;
 typedef double Density;
 typedef double Potential;
 typedef double Efficacy;
 
+typedef unsigned int Number;
+
 // RootRortHandler will start with initial display of the first TIME_ROOT_INITIAL_DISPLAY_SECONDS , by default
 const Time TIME_ROOT_INITIAL_DISPLAY = 0.05;
-//from localdefinitions
-typedef DynamicLib::Time Time;
-typedef Time TimeStep;
+
 
 //! Rate Algorithm nodes have a single state
 const int RATE_STATE_DIMENSION = 1;

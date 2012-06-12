@@ -64,7 +64,7 @@ namespace MPILib
 			Time,							/*!< Report time															*/ 
 			Time,							/*!< Update Time															*/
 			Time,							/*!< Network step time														*/
-			const string&,					/*!< Log file path name														*/
+			const std::string&,					/*!< Log file path name														*/
 			Time report_state_time = 0		/*!< Report State time														*/
 		); 
 
@@ -95,7 +95,7 @@ namespace MPILib
 		Time TState () const { return _t_state_report; }
 
 		//! Give name of the log file, associated with this run
-		string LogName() const { return _name_log; }
+		std::string LogName() const { return _name_log; }
 
 		const MPILib::AbstractReportHandler& Handler () const { return *_p_handler; }
 

@@ -18,7 +18,6 @@
 
 #include <MPILib/include/BasicTypes.hpp>
 
-#include <DynamicLib/NodeState.h>
 
 namespace MPILib {
 

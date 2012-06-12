@@ -10,10 +10,10 @@
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <MPILib/include/utilities/ParallelException.hpp>
+#include <MPILib/include/utilities/IterationNumberException.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/MPINetwork.hpp>
 #include <MPILib/include/MPINodeCode.hpp>
-#include <DynamicLib/IterationNumberException.h>
 
 namespace mpi = boost::mpi;
 using namespace MPILib;
@@ -158,7 +158,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 			collectReport(DynamicLib::STATE);
 		}
 
-		catch (DynamicLib::IterationNumberException &e) {
+		catch (utilities::IterationNumberException &e) {
 			_stream_log << "NUMBER OF ITERATIONS EXCEEDED\n";
 			_state_network.SetResult(DynamicLib::NUMBER_ITERATIONS_ERROR);
 			_stream_log.flush();
@@ -208,8 +208,7 @@ void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
 	boost::shared_ptr<std::ostream> p_stream(
 			new std::ofstream(filename.c_str()));
 	if (!p_stream)
-		throw DynamicLib::DynamicLibException(
-				"DynamicNetwork cannot open log file.");
+		throw utilities::Exception("MPINetwork cannot open log file.");
 	if (!_stream_log.OpenStream(p_stream))
 		_stream_log << "WARNING YOU ARE TRYING TO REOPEN THIS LOG FILE\n";
 }

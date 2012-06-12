@@ -22,13 +22,13 @@
 
 #include <vector>
 #include <valarray>
+#include <MPILib/include/BasicTypes.hpp>
 
 namespace MPILib {
 
 //! AlgorithmGrid
 class AlgorithmGrid {
 public:
-	typedef unsigned int Number;
 
 	//! Create the state for a AlgorithmGrid with a maximum number of elements
 	AlgorithmGrid(Number);

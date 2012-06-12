@@ -25,7 +25,7 @@ namespace MPILib {
 SimulationRunParameter::SimulationRunParameter(
 		const MPILib::AbstractReportHandler& handler, Number max_iter,
 		Time t_begin, Time t_end, Time t_report, Time t_update, Time t_step,
-		const string& name_log, Time t_state_report) :
+		const std::string& name_log, Time t_state_report) :
 
 		_p_handler(&handler), //
 		_max_iter(max_iter), //

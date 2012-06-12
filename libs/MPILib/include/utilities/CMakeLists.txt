@@ -1,5 +1,6 @@
 add_header(
     Exception.hpp
+    IterationNumberException.hpp
     ParallelException.hpp
     CircularDistribution.hpp
     NodeDistributionInterface.hpp

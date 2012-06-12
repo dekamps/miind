@@ -116,11 +116,11 @@ std::valarray<double>& AlgorithmGrid::ArrayInterpretation() {
 	return _array_interpretation;
 }
 
-MPILib::AlgorithmGrid::Number& AlgorithmGrid::StateSize() {
+Number& AlgorithmGrid::StateSize() {
 	return _number_state;
 }
 
-MPILib::AlgorithmGrid::Number AlgorithmGrid::StateSize() const {
+Number AlgorithmGrid::StateSize() const {
 	return _number_state;
 }
 
