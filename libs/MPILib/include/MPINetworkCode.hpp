@@ -20,10 +20,6 @@ using namespace MPILib;
 
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::MPINetwork() :
-		_current_report_time(0), //
-		_current_update_time(0), //
-		_current_state_time(0), //
-		_current_simulation_time(0), //
 		_parameter_simulation_run(DynamicLib::InactiveReportHandler(), 0, 0.0,
 				0.0, 0.0, 0.0, 0.0, ""), //
 		_stream_log(), //
@@ -97,10 +93,10 @@ void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 
 	try {
 		//loop over all local nodes!
-		typename std::map<NodeId, MPINode<WeightValue, NodeDistribution>>::iterator it;
-		for (it = _pLocalNodes->begin(); it != _pLocalNodes->end(); it++) {
-			it->second.configureSimulationRun(simParam);
+		for (auto& it : (*_pLocalNodes)) {
+			it.second.configureSimulationRun(simParam);
 		}
+
 	} catch (...) {
 		_stream_log << "error during configuration/n";
 		_stream_log.flush();
@@ -130,16 +126,8 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					updateSimulationTime();
 
 					//envolve all local nodes
-//					for (auto it : (*_pLocalNodes)) {
-//						it.second.evolve(getCurrentSimulationTime());
-//					}
-
-//
-					for (auto it = _pLocalNodes->begin();
-							it != _pLocalNodes->end(); it++) {
-
-						it->second.evolve(getCurrentSimulationTime());
-						//TODO call evolve on the nodes
+					for (auto& it : (*_pLocalNodes)) {
+						it.second.evolve(getCurrentSimulationTime());
 					}
 
 				} while (getCurrentSimulationTime() < getCurrentReportTime()
@@ -206,10 +194,8 @@ std::string MPINetwork<WeightValue, NodeDistribution>::collectReport(
 
 	string string_return;
 
-	for (std::map<NodeId, D_MPINode>::iterator it = _pLocalNodes->begin();
-			it != _pLocalNodes->end(); it++) {
-		string_return = it->second.reportAll(type);
-
+	for(auto& it: (*_pLocalNodes)) {
+		string_return += it.second.reportAll(type);
 	}
 
 	return string_return;
@@ -230,10 +216,11 @@ void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::clearSimulation() {
-	typename std::map<NodeId, MPINode<WeightValue, NodeDistribution> >::iterator it;
-	for (it = _pLocalNodes->begin(); it != _pLocalNodes->end(); it++) {
-		it->second.clearSimulation();
+
+	for(auto& it: (*_pLocalNodes)) {
+		it.second.clearSimulation();
 	}
+
 }
 
 template<class WeightValue, class NodeDistribution>

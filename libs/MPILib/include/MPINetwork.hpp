@@ -116,10 +116,10 @@ private:
 	 */
 	int _maxNodeId;
 
-	Time _current_report_time;
-	Time _current_update_time;
-	Time _current_state_time;
-	Time _current_simulation_time;
+	Time _current_report_time = 0;
+	Time _current_update_time = 0;
+	Time _current_state_time = 0;
+	Time _current_simulation_time = 0;
 	DynamicLib::NetworkState _state_network;
 
 	DynamicLib::SimulationRunParameter _parameter_simulation_run;
