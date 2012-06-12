@@ -9,4 +9,7 @@ add_header(
     BasicTypes.hpp
     SimulationRunParameter.hpp
     AbstractReportHandler.hpp
+    Report.hpp
+    ReportType.hpp
+    ReportValue.hpp
 )
