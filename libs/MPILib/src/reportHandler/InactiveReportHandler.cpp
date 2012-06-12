@@ -18,7 +18,7 @@
 //      If you use this software in work leading to a scientific publication, you should cite
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
-#include <MPILib/include/InactiveReportHandler.hpp>
+#include <MPILib/include/reportHandler/InactiveReportHandler.hpp>
 #include <sstream>
 
 namespace MPILib{

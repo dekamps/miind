@@ -22,7 +22,7 @@
 #define MPILIB_SIMULATIONRUNPARAMETER_HPP_
 
 #include <string>
-#include <MPILib/include/AbstractReportHandler.hpp>
+#include <MPILib/include/reportHandler/AbstractReportHandler.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
 

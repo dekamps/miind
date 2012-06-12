@@ -16,7 +16,7 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
 #include <MPILib/include/algorithm/WilsonCowanParameter.hpp>
-#include <MPILib/include/RootReportHandler.hpp>
+#include <MPILib/include/reportHandler/RootReportHandler.hpp>
 
 #include <MPILib/include/algorithm/RateAlgorithm.hpp>
 #include <MPILib/include/utilities/walltime.hpp>

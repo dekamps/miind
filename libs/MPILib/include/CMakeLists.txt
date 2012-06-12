@@ -1,8 +1,8 @@
 add_subdirectory(algorithm)
+add_subdirectory(reportHandler)
 add_subdirectory(utilities)
 
 add_header(
-    InactiveReportHandler.hpp
     ValueHandlerHandler.hpp
     CanvasParameter.hpp
     MPINetwork.hpp
@@ -11,11 +11,9 @@ add_header(
     MPINetworkCode.hpp
     BasicTypes.hpp
     SimulationRunParameter.hpp
-    AbstractReportHandler.hpp
     Report.hpp
     ReportType.hpp
     ReportValue.hpp
     NetworkState.hpp
-    RootReportHandler.hpp
     GraphKey.hpp
 )

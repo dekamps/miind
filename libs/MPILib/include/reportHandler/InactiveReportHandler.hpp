@@ -1,4 +1,4 @@
-// Copyright (c) 2005 - 2011 Marc de Kamps
+// Copyright (c) 2005 - 2010 Marc de Kamps
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,59 +18,48 @@
 //      If you use this software in work leading to a scientific publication, you should cite
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
-#ifndef MPILIB_ABSTRACTREPORTHANDLER_HPP_
-#define MPILIB_ABSTRACTREPORTHANDLER_HPP_
+#ifndef MPILIB_INACTIVEREPORTHANDLER_HPP_
+#define MPILIB_INACTIVEREPORTHANDLER_HPP_
 
-#include <string>
-#include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/Report.hpp>
+#include <MPILib/include/reportHandler/AbstractReportHandler.hpp>
 
-namespace MPILib {
+namespace MPILib
+{
+	//! This ReportHandler does nothing, which is sometimes useful in debugging.
+	class InactiveReportHandler : public AbstractReportHandler
+	{
+	public:
 
-//! Base class for all ReportHandlers
-//!
-//! ReportHandlers are responsible for dispatching the Reports from each node and collating them
-//! in a simulation results file. There are not many prescriptions for how this should be done and
-//! it's very simple to derive one's own. AsciiReportHandler records the simulation results in an XML format.
-//! RootReportHandler directly stores graphs of simulations. AsciiReportHandler and RootReportHandler come with MIIND.
-class AbstractReportHandler {
-public:
+		//! Default constructor
+		InactiveReportHandler();
 
-	//! Takes the file name as argument
-	AbstractReportHandler(const std::string& stream_name) :
-			_stream_name(stream_name) {
-	}
+		virtual ~InactiveReportHandler();
 
-	//! Manadatory virtual destructor
-	virtual ~AbstractReportHandler(){};
 
-	virtual bool WriteReport(const Report&) = 0;
+		virtual bool WriteReport
+				(
+					const Report&
+				);
 
-	//! Mandatory cloning operation.
-	virtual AbstractReportHandler* Clone() const = 0;
 
-	//! During Configuration a DynamicNode will associate itself with the handler.
-	virtual void InitializeHandler(const NodeId&) = 0;
+		virtual InactiveReportHandler* Clone() const;
 
-	//! A DynamicNode will request to be dissociated from the handler at the end of simulation.
-	virtual void DetachHandler(const NodeId&) = 0;
+		virtual bool Close();
 
-	std::string MediumName() const {
-		return _stream_name;
-	}
+		virtual void InitializeHandler
+				(
+					const NodeId&
+				);
+		virtual void DetachHandler
+				(
+					const NodeId&
+				);
+	private:
 
-	//! Default is a NOOP. In a RootReportHandler this function is used.
-	virtual void AddNodeToCanvas(NodeId) const {
-	}
 
-protected:
 
-private:
+	}; // end of InactiveReportHandler
 
-	const std::string _stream_name;
+} // end of MPILib
 
-};
-
-}// end of MPILib
-
-#endif // MPILIB_ABSTRACTREPORTHANDLER_HPP_ include guard
+#endif // MPILIB_INACTIVEREPORTHANDLER_HPP_ include guard

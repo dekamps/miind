@@ -12,7 +12,7 @@
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/utilities/IterationNumberException.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
-#include <MPILib/include/InactiveReportHandler.hpp>
+#include <MPILib/include/reportHandler/InactiveReportHandler.hpp>
 #include <MPILib/include/MPINetwork.hpp>
 #include <MPILib/include/MPINodeCode.hpp>
 

@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <sstream>
 #include <assert.h>
-#include <MPILib/include/RootReportHandler.hpp>
+#include <MPILib/include/reportHandler/RootReportHandler.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 
 #include <MPILib/include/BasicTypes.hpp>

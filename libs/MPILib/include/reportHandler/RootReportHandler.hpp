@@ -23,7 +23,7 @@
 
 #include <string>
 #include <vector>
-#include <MPILib/include/AbstractReportHandler.hpp>
+#include <MPILib/include/reportHandler/AbstractReportHandler.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/CanvasParameter.hpp>
 #include <MPILib/include/ValueHandlerHandler.hpp>
