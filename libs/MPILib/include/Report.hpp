@@ -24,13 +24,13 @@
 #include <MPILib/include/ReportType.hpp>
 #include <MPILib/include/ReportValue.hpp>
 #include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 
 
 
 #include <sstream>
 #include <string>
 
-#include <DynamicLib/AlgorithmGrid.h>
 
 namespace MPILib
 {
@@ -44,7 +44,7 @@ namespace MPILib
 		Time				_time;			//!< Current time at this node.
 		Rate				_rate;			//!< Current firing rate of this node.
 		NodeId				_id;			//!< NodeId of this node.
-		DynamicLib::AlgorithmGrid		_grid;			//!< The state space of the Algorithm
+		AlgorithmGrid		_grid;			//!< The state space of the Algorithm
 		std::string				_log_message;	//!< Whatever message should appear in the log file
 		ReportType			_type;			//!< Information for the handler on how to treat the Report
 		std::vector<ReportValue>	_values;		//!< Ad hoc values that need to be logged in the simulation file
@@ -54,7 +54,7 @@ namespace MPILib
 			Time		time,
 			Rate		rate,
 			NodeId		id,
-			string		log_message
+			std::string		log_message
 		):
 		_time(time),
 		_rate(rate),
@@ -71,8 +71,8 @@ namespace MPILib
 			Time					time,
 			Rate					rate,
 			NodeId					id,
-			DynamicLib::AlgorithmGrid			grid,
-			string					log_message,
+			AlgorithmGrid			grid,
+			std::string				log_message,
 			ReportType				type,
 			vector<ReportValue>		vec_values
 		):
@@ -86,7 +86,7 @@ namespace MPILib
 		{
 		}
 
-		bool AddValue(const DynamicLib::ReportValue& value)
+		bool AddValue(const ReportValue& value)
 		{
 			_values.push_back(value);
 			return true;
