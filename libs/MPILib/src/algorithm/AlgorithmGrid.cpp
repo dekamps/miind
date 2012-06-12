@@ -65,7 +65,7 @@ AlgorithmGrid& AlgorithmGrid::operator=(const AlgorithmGrid& rhs) {
 	}
 }
 
-std::vector<double> AlgorithmGrid::ToStateVector() {
+std::vector<double> AlgorithmGrid::ToStateVector() const{
 	return ToVector(_array_state, _number_state);
 }
 
@@ -74,7 +74,7 @@ void AlgorithmGrid::Resize(Number number_of_new_bins) {
 	_array_interpretation.resize(number_of_new_bins);
 }
 
-std::vector<double> AlgorithmGrid::ToInterpretationVector() {
+std::vector<double> AlgorithmGrid::ToInterpretationVector() const{
 	return ToVector(_array_interpretation, _number_state);
 }
 
@@ -126,13 +126,13 @@ Number AlgorithmGrid::StateSize() const {
 
 template<class Value>
 std::valarray<Value> AlgorithmGrid::ToValarray(
-		const std::vector<double>& vector) {
+		const std::vector<double>& vector) const {
 	return std::valarray<Value>(&vector[0], vector.size());
 }
 
 template<class Value>
 std::vector<Value> AlgorithmGrid::ToVector(const std::valarray<Value>& array,
-		Number number_to_be_copied) {
+		Number number_to_be_copied) const {
 	std::valarray<Value>& array_test = const_cast<std::valarray<Value>&>(array);
 	Value* p_begin = &array_test[0];
 	Value* p_end = p_begin + number_to_be_copied;

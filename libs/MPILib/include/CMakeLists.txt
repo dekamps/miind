@@ -3,6 +3,8 @@ add_subdirectory(utilities)
 
 add_header(
     InactiveReportHandler.hpp
+    ValueHandlerHandler.hpp
+    CanvasParameter.hpp
     MPINetwork.hpp
     MPINode.hpp
     MPINodeCode.hpp
@@ -14,4 +16,6 @@ add_header(
     ReportType.hpp
     ReportValue.hpp
     NetworkState.hpp
+    RootReportHandler.hpp
+    GraphKey.hpp
 )

@@ -1,4 +1,4 @@
-// Copyright (c) 2005 - 2010 Marc de Kamps
+// Copyright (c) 2005 - 2011 Marc de Kamps
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,66 +17,52 @@
 //
 //      If you use this software in work leading to a scientific publication, you should cite
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_ALGORITHMS_ALGORITHMGRID_HPP_
-#define MPILIB_ALGORITHMS_ALGORITHMGRID_HPP_
+#ifndef MPILIB_VALUEVALUEHANDLER_HPP_
+#define MPILIB_VALUEVALUEHANDLER_HPP_
+
+#include <MPILib/include/Report.hpp>
 
 #include <vector>
-#include <valarray>
-#include <MPILib/include/BasicTypes.hpp>
+class TGraph;
 
-namespace MPILib {
 
-//! AlgorithmGrid
-class AlgorithmGrid {
-public:
+namespace MPILib
+{
 
-	//! Create the state for a AlgorithmGrid with a maximum number of elements
-	AlgorithmGrid(Number);
+	//! ValueHandlerHandler is an auxilliary class for the RootReportHandler which keeps track
+	//! of quantities that need to be logged in the simulation file and which are registered as such
+	//! during simulation
 
-	//! copy constructor
-	AlgorithmGrid(const AlgorithmGrid&);
 
-	//! Create an Algorithmrid with just a state (usually a single number)
-	AlgorithmGrid(const std::vector<double>&);
+	class ValueHandlerHandler {
+	public:
+	
+		ValueHandlerHandler();
 
-	//! construct an AlgorithmGrid from two a state and an interpretation
-	AlgorithmGrid(const std::vector<double>&, const std::vector<double>&);
+		bool AddReport(const Report&);
 
-	AlgorithmGrid& operator=(const AlgorithmGrid&);
+		void Write();
 
-	std::vector<double> ToStateVector() const;
-	std::vector<double> ToInterpretationVector() const;
+		struct Event {
+			std::string _str;
+			float  _time;
+			float  _value;
+		};
 
-private:
+		bool IsWritten() const {return _is_written;}
 
-	template<class WeightValue> friend class AbstractAlgorithm;
+		void Reset();
 
-	template<class Value>
-	std::valarray<Value> ToValarray(const std::vector<double>& vector) const;
+	private:
 
-	template<class Value>
-	std::vector<Value> ToVector(const std::valarray<Value>& array,
-			Number number_to_be_copied) const;
+		void DistributeEvent(const Event&);
 
-	std::valarray<double>& ArrayState();
-	std::valarray<double>& ArrayInterpretation();
-	Number& StateSize();
-	Number StateSize() const;
-
-	void Resize(Number);
-
-	//! allow iteration over internal values of the state
-	const double* begin_state() const;
-	const double* end_state() const;
-
-	const double* begin_interpretation() const;
-	const double* end_interpretation() const;
-
-	Number _number_state; // the array_state is sometimes larger than the actual state
-	std::valarray<double> _array_state;
-	std::valarray<double> _array_interpretation;
-};
+		bool					_is_written;
+		std::vector<std::string>			_vec_names;
+		std::vector<std::vector<float> >	_vec_time;
+		std::vector<std::vector<float> >	_vec_quantity;
+	};
 
 } // end of namespace
 
-#endif //MPILIB_ALGORITHMS_ALGORITHMGRID_HPP_ include guard
+#endif // include guard
