@@ -1,5 +1,6 @@
 add_sources(
-SimulationRunParameter.cpp
+    SimulationRunParameter.cpp
+    AbstractReportHandler.cpp
     #add source files
 )
 

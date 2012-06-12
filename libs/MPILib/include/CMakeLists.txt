@@ -8,4 +8,5 @@ add_header(
     MPINetworkCode.hpp
     BasicTypes.hpp
     SimulationRunParameter.hpp
+    AbstractReportHandler.hpp
 )

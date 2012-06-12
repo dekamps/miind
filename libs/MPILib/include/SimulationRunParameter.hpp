@@ -23,16 +23,12 @@
 
 #include <vector>
 #include <string>
-#include <UtilLib/UtilLib.h>
-#include "AbstractSpecificAlgorithmParameter.h"
-#include "AlgorithmGrid.h"
-#include "AbstractReportHandler.h"
-#include "LocalDefinitions.h"
+#include <MPILib/include/AbstractReportHandler.hpp>
+#include <MPILib/include/BasicTypes.hpp>
 
-using std::string;
-using std::vector;
-using UtilLib::Number;
-using UtilLib::Streamable;
+#include <UtilLib/UtilLib.h>
+
+
 
 namespace MPILib
 {
@@ -64,7 +60,7 @@ namespace MPILib
 		//! standard constructor
 		SimulationRunParameter
 		( 
-			const DynamicLib::AbstractReportHandler&, 	/*!< ReportHandler (where and how is the NodeState information recorded ?)	*/
+			const MPILib::AbstractReportHandler&, 	/*!< ReportHandler (where and how is the NodeState information recorded ?)	*/
 			Number,							/*!< maximum number of iterations											*/
 			Time,   						/*!< Start time of simulation												*/
 			Time,							/*!< End time of Simulation													*/
@@ -104,14 +100,14 @@ namespace MPILib
 		//! Give name of the log file, associated with this run
 		string LogName() const { return _name_log; }
 
-		const DynamicLib::AbstractReportHandler& Handler () const { return *_p_handler; }
+		const MPILib::AbstractReportHandler& Handler () const { return *_p_handler; }
 
 		Number MaximumNumberIterations       () const { return _max_iter; }
 
 
 	private:
 
-		const DynamicLib::AbstractReportHandler*
+		const MPILib::AbstractReportHandler*
 				_p_handler;
 
 		Number	_max_iter;
