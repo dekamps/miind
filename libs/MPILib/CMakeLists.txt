@@ -91,7 +91,6 @@ set ( LIBLIST
     ${Boost_LIBRARIES} 
     ${MPI_LIBRARIES} 
     ${MIIND_LIBRARY_PREFIX}numtools
-#    ${MIIND_LIBRARY_PREFIX}dynamic
     ${gsl_LINK_FLAGS} 
 	gsl
     

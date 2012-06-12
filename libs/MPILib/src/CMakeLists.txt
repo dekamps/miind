@@ -4,6 +4,8 @@ add_sources(
     NetworkState.cpp
     ValueHandlerHandler.cpp
     RootReportHandler.cpp
+    GraphKey.cpp
+    CanvasParameter.cpp
     #add source files
 )
 

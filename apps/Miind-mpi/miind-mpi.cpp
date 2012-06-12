@@ -15,8 +15,8 @@
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
-#include <DynamicLib/WilsonCowanParameter.h>
-#include <DynamicLib/RootReportHandler.h>
+#include <MPILib/include/algorithm/WilsonCowanParameter.hpp>
+#include <MPILib/include/RootReportHandler.hpp>
 
 #include <MPILib/include/algorithm/RateAlgorithm.hpp>
 #include <MPILib/include/utilities/walltime.hpp>
@@ -24,13 +24,13 @@
 
 namespace mpi = boost::mpi;
 
-const DynamicLib::RootReportHandler WILSONCOWAN_HANDLER(
+const RootReportHandler WILSONCOWAN_HANDLER(
 		"test/wilsonresponse.root", // file where the simulation results are written
 		false, // do not display on screen
 		false // only rate diagrams
 		);
 
-const DynamicLib::SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, // the handler object
+const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, // the handler object
 		1000000, // maximum number of iterations
 		0, // start time of simulation
 		0.5, // end time of simulation
@@ -40,13 +40,13 @@ const DynamicLib::SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, //
 		"test/wilsonresponse.log" // log file name
 		);
 
-const DynamicLib::RootReportHandler WILSONCOWAN_HANDLER1(
+const RootReportHandler WILSONCOWAN_HANDLER1(
 		"test/wilsonresponse1.root", // file where the simulation results are written
 		false, // do not display on screen
 		false // only rate diagrams
 		);
 
-const DynamicLib::SimulationRunParameter PAR_WILSONCOWAN1(WILSONCOWAN_HANDLER1, // the handler object
+const SimulationRunParameter PAR_WILSONCOWAN1(WILSONCOWAN_HANDLER1, // the handler object
 		1000000, // maximum number of iterations
 		0, // start time of simulation
 		0.5, // end time of simulation
@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
 		int id_rate = network.addNode(rate_alg, 1);
 
 		// Define the receiving node
-		DynamicLib::WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
+		algorithm::WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
 
 		algorithm::WilsonCowanAlgorithm algorithm_exc(par_sigmoid);
 		int id = network.addNode(algorithm_exc, 1);
@@ -116,12 +116,7 @@ int main(int argc, char* argv[]) {
 		std::cout << e.what();
 		env.abort(1);
 		return 1;
-	} catch (UtilLib::GeneralException &e) {
-		std::cout << e.Description();
-		env.abort(2);
-
-		return 2;
-	};
+	}
 
 	return 0;
 }

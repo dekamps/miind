@@ -1,6 +1,5 @@
 if(ENABLE_MPI)
-    ADD_SUBDIRECTORY( Miind-mpi )
-    
+    ADD_SUBDIRECTORY( Miind-mpi )  
 else()
 
     if( ROOT_FOUND )
