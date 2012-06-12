@@ -226,7 +226,7 @@ namespace StructnetLib
 			NodeId IdReverse = net_reverse.Id(current_struc);
 
 			// set its activity in this network
-			SetActivity(id,net_reverse.GetActivity(IdReverse) );
+			this->SetActivity(id,net_reverse.GetActivity(IdReverse) );
 		}			
 	}
 

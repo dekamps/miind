@@ -59,7 +59,7 @@ public:
 
 private:
 
-	static double const kSleepTime = 1;
+	static double constexpr kSleepTime = 1;
 
 };
 

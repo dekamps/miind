@@ -172,7 +172,7 @@ namespace StructnetLib
 
 		s >> str;
 
-		if ( str != ToEndTag(OrientedPattern<PatternValue>::Tag()) )
+		if ( str != this->ToEndTag(OrientedPattern<PatternValue>::Tag()) )
 			throw PatternParsingException("Oriented Pattern error");
 
 		return true;
@@ -193,7 +193,7 @@ namespace StructnetLib
 		s << _nr_y          << "\n";
 		s << _nr_o          << "\n";
 
-		s << ToEndTag(OrientedPattern<PatternValue>::Tag()) << "\n";
+		s << this->ToEndTag(OrientedPattern<PatternValue>::Tag()) << "\n";
 
 		return true;
 	}
@@ -208,13 +208,13 @@ ostream& operator<<(ostream& s, const OrientedPattern<PatternValue>& pattern)
 template <class PatternValue>
 PatternValue& OrientedPattern<PatternValue>::operator ()(Index n_x, Index n_y, Index n_or )
 {
-	return operator[]( IndexFunction(n_x,n_y,n_or) );
+	return this->operator[]( IndexFunction(n_x,n_y,n_or) );
 }											
 
 template <class PatternValue>
 const PatternValue& OrientedPattern<PatternValue>::operator ()(Index n_x, Index n_y, Index n_or ) const 
 {
-	return operator[]( IndexFunction(n_x,n_y,n_or) );
+	return this->operator[]( IndexFunction(n_x,n_y,n_or) );
 }											
 
 
