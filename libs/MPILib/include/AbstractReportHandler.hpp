@@ -21,81 +21,56 @@
 #ifndef MPILIB_ABSTRACTREPORTHANDLER_HPP_
 #define MPILIB_ABSTRACTREPORTHANDLER_HPP_
 
-#include <iostream>
-#include <DynamicLib/NodeInfo.h>
+#include <string>
+#include <MPILib/include/BasicTypes.hpp>
 #include <DynamicLib/Report.h>
 
-using std::ostream;
+namespace MPILib {
 
+//! Base class for all ReportHandlers
+//!
+//! ReportHandlers are responsible for dispatching the Reports from each node and collating them
+//! in a simulation results file. There are not many prescriptions for how this should be done and
+//! it's very simple to derive one's own. AsciiReportHandler records the simulation results in an XML format.
+//! RootReportHandler directly stores graphs of simulations. AsciiReportHandler and RootReportHandler come with MIIND.
+class AbstractReportHandler {
+public:
 
-namespace MPILib
-{
+	//! Takes the file name as argument
+	AbstractReportHandler(const std::string& stream_name) :
+			_stream_name(stream_name) {
+	}
 
-	//! Base class for all ReportHandlers
-	//!
-	//! ReportHandlers are responsible for dispatching the Reports from each node and collating them
-	//! in a simulation results file. There are not many prescriptions for how this should be done and
-	//! it's very simple to derive one's own. AsciiReportHandler records the simulation results in an XML format.
-	//! RootReportHandler directly stores graphs of simulations. AsciiReportHandler and RootReportHandler come with MIIND.
-	class AbstractReportHandler
-	{
-	public:
+	//! Manadatory virtual destructor
+	virtual ~AbstractReportHandler(){};
 
-		//! Takes the file name as argument
-		AbstractReportHandler
-		(
-			const string&
-		);
+	virtual bool WriteReport(const DynamicLib::Report&) = 0;
 
-		//! Manadatory virtual destructor
-		virtual ~AbstractReportHandler() = 0;
+	//! Mandatory cloning operation.
+	virtual AbstractReportHandler* Clone() const = 0;
 
-		bool Configure
-		(
-			ostream&
-		);
+	//! During Configuration a DynamicNode will associate itself with the handler.
+	virtual void InitializeHandler(const NodeId&) = 0;
 
-		virtual bool WriteReport
-		(
-			const DynamicLib::Report&
-		) = 0;
+	//! A DynamicNode will request to be dissociated from the handler at the end of simulation.
+	virtual void DetachHandler(const NodeId&) = 0;
 
+	std::string MediumName() const {
+		return _stream_name;
+	}
 
-		//! Mandatory cloning operation.
-		virtual AbstractReportHandler* Clone
-		(
-		) const = 0;
+	//! Default is a NOOP. In a RootReportHandler this function is used.
+	virtual void AddNodeToCanvas(NodeId) const {
+	}
 
-		//! During Configuration a DynamicNode will associate itself with the handler.
-		virtual void InitializeHandler
-		(
-			const DynamicLib::NodeInfo&
-		) = 0;
+protected:
 
-		//! A DynamicNode will request to be dissociated from the handler at the end of simulation.
-		virtual void DetachHandler
-		(
-			const DynamicLib::NodeInfo&
-		) = 0;
+private:
 
-		string MediumName() const { return _stream_name; }
+	const std::string _stream_name;
 
-		//! Default is a NOOP. In a RootReportHandler this function is used.
-		virtual void  AddNodeToCanvas
-		(
-			NodeId
-		) const {}
+};
 
-
-	protected:
-
-	private:
-
-		const string _stream_name;
-
-	}; // end of AbstractReportmanager
-
-} // end of DynamicLib
-
+}// end of MPILib
 
 #endif // MPILIB_ABSTRACTREPORTHANDLER_HPP_ include guard

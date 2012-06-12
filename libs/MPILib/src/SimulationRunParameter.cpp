@@ -21,7 +21,6 @@
 #include <MPILib/include/SimulationRunParameter.hpp>
 
 namespace MPILib {
-using namespace std;
 
 SimulationRunParameter::SimulationRunParameter(
 		const MPILib::AbstractReportHandler& handler, Number max_iter,

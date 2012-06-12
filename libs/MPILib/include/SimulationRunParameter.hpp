@@ -21,12 +21,9 @@
 #ifndef MPILIB_SIMULATIONRUNPARAMETER_HPP_
 #define MPILIB_SIMULATIONRUNPARAMETER_HPP_
 
-#include <vector>
 #include <string>
 #include <MPILib/include/AbstractReportHandler.hpp>
 #include <MPILib/include/BasicTypes.hpp>
-
-#include <UtilLib/UtilLib.h>
 
 
 
@@ -118,7 +115,7 @@ namespace MPILib
 		Time	_t_update;
 		Time	_t_step;
 
-		string	_name_log;
+		std::string	_name_log;
 
 		Time	_t_state_report;
 
