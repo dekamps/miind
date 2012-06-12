@@ -80,7 +80,7 @@ WilsonCowanAlgorithm* WilsonCowanAlgorithm::clone() const {
 	return new WilsonCowanAlgorithm(*this);
 }
 
-void WilsonCowanAlgorithm::configure(const DynamicLib::SimulationRunParameter& simParam) {
+void WilsonCowanAlgorithm::configure(const SimulationRunParameter& simParam) {
 
 	NumtoolsLib::DVIntegratorStateParameter<DynamicLib::WilsonCowanParameter> parameter_dv;
 
@@ -149,7 +149,7 @@ vector<double> WilsonCowanAlgorithm::getInitialState() const {
 	return array_return;
 }
 
-DynamicLib::AlgorithmGrid WilsonCowanAlgorithm::getGrid() const
+AlgorithmGrid WilsonCowanAlgorithm::getGrid() const
 {
 	return _integrator.State();
 }

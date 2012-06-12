@@ -8,8 +8,6 @@
 #ifndef MPILIB_ALGORITHMS_RATEALGORITHM_HPP_
 #define MPILIB_ALGORITHMS_RATEALGORITHM_HPP_
 
-#include <NumtoolsLib/NumtoolsLib.h>
-#include <DynamicLib/WilsonCowanParameter.h>
 
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 
@@ -34,7 +32,7 @@ public:
 	 * Configure the Algorithm
 	 * @param simParam
 	 */
-	virtual void configure(const DynamicLib::SimulationRunParameter& simParam);
+	virtual void configure(const SimulationRunParameter& simParam);
 
 	/**
 	 * Evolve the node state
@@ -57,7 +55,7 @@ public:
 	 */
 	virtual Rate getCurrentRate() const;
 
-	virtual DynamicLib::AlgorithmGrid getGrid() const;
+	virtual AlgorithmGrid getGrid() const;
 
 private:
 

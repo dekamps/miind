@@ -11,7 +11,6 @@
 #include <vector>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
-#include <DynamicLib/NodeState.h>
 
 namespace MPILib {
 namespace algorithm {
@@ -32,7 +31,7 @@ public:
 	 * Configure the Algorithm
 	 * @param simParam
 	 */
-	virtual void configure(const DynamicLib::SimulationRunParameter& simParam);
+	virtual void configure(const SimulationRunParameter& simParam);
 
 	/**
 	 * Evolve the node state
@@ -55,7 +54,7 @@ public:
 	 */
 	virtual Rate getCurrentRate() const;
 
-	virtual DynamicLib::AlgorithmGrid getGrid() const;
+	virtual AlgorithmGrid getGrid() const;
 
 private:
 

@@ -12,6 +12,7 @@
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/utilities/IterationNumberException.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
+#include <MPILib/include/InactiveReportHandler.hpp>
 #include <MPILib/include/MPINetwork.hpp>
 #include <MPILib/include/MPINodeCode.hpp>
 
@@ -20,7 +21,7 @@ using namespace MPILib;
 
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::MPINetwork() :
-		_parameter_simulation_run(DynamicLib::InactiveReportHandler(), 0, 0.0,
+		_parameter_simulation_run(InactiveReportHandler(), 0, 0.0,
 				0.0, 0.0, 0.0, 0.0, ""), //
 		_stream_log(), //
 		_pNodeDistribution(new NodeDistribution), //
@@ -83,7 +84,7 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
-		const DynamicLib::SimulationRunParameter& simParam) {
+		const SimulationRunParameter& simParam) {
 	_current_report_time = simParam.TReport();
 	_current_update_time = simParam.TUpdate();
 	_current_simulation_time = simParam.TBegin();
@@ -139,23 +140,23 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					// there is something to report
 					//CheckPercentageAndLog(CurrentSimulationTime());
 					updateReportTime();
-					report = collectReport(DynamicLib::RATE);
+					report = collectReport(RATE);
 					_stream_log << report;
 				}
 				// just a rate or also a state?
 				if (getCurrentSimulationTime() >= getCurrentStateTime()) {
 					// a rate as well as a state
-					collectReport(DynamicLib::STATE);
+					collectReport(STATE);
 					updateStateTime();
 				}
-				// update?
-				if (getCurrentReportTime() >= getCurrentUpdateTime()) {
-					collectReport(DynamicLib::UPDATE);
-					updateUpdateTime();
-				}
+//				// update?
+//				if (getCurrentReportTime() >= getCurrentUpdateTime()) {
+//					collectReport(DynamicLib::UPDATE);
+//					updateUpdateTime();
+//				}
 			} while (getCurrentReportTime() < getEndTime());
 			// write out the final state
-			collectReport(DynamicLib::STATE);
+			collectReport(STATE);
 		}
 
 		catch (utilities::IterationNumberException &e) {
@@ -190,7 +191,7 @@ void MPINetwork<WeightValue, NodeDistribution>::incrementMaxNodeId() {
 
 template<class WeightValue, class NodeDistribution>
 std::string MPINetwork<WeightValue, NodeDistribution>::collectReport(
-		DynamicLib::ReportType type) {
+		ReportType type) {
 
 	string string_return;
 

@@ -1,5 +1,6 @@
 add_sources(
     SimulationRunParameter.cpp
+    InactiveReportHandler.cpp
     #add source files
 )
 

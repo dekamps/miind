@@ -28,7 +28,7 @@ void test_Constructor() {
 	double rate = 2.1;
 
 	RateAlgorithm rAlg(rate);
-	BOOST_REQUIRE(rAlg._time_current == numeric_limits<double>::max());
+	BOOST_REQUIRE(rAlg._time_current == std::numeric_limits<double>::max());
 	BOOST_REQUIRE(rAlg._rate == 2.1);
 
 }
@@ -59,7 +59,7 @@ void test_getCurrentTime() {
 	tempVec.push_back(1.0);
 
 	RateAlgorithm rAlg(rate);
-	BOOST_REQUIRE(rAlg.getCurrentTime()==numeric_limits<double>::max());
+	BOOST_REQUIRE(rAlg.getCurrentTime()==std::numeric_limits<double>::max());
 
 	rAlg.evolveNodeState(tempVec, tempVec, 2.1);
 

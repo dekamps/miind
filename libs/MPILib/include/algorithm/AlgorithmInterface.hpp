@@ -9,8 +9,8 @@
 #define MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
 
 #include <MPILib/include/BasicTypes.hpp>
-#include <DynamicLib/SimulationRunParameter.h>
-#include <DynamicLib/AlgorithmGrid.h>
+#include <MPILib/include/SimulationRunParameter.hpp>
+#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 #include <vector>
 
 
@@ -33,7 +33,7 @@ public:
 	 * Configure the Algorithm
 	 * @param simParam
 	 */
-	virtual void configure(const DynamicLib::SimulationRunParameter& simParam) = 0;
+	virtual void configure(const SimulationRunParameter& simParam) = 0;
 
 	/**
 	 * Evolve the node state
@@ -60,7 +60,7 @@ public:
 	 * #FIXME no idear why this is needed.
 	 * @return
 	 */
-	virtual DynamicLib::AlgorithmGrid getGrid() const = 0;
+	virtual AlgorithmGrid getGrid() const = 0;
 };
 
 } /* namespace algorithm */

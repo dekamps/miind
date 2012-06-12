@@ -40,7 +40,7 @@ SleepAlgorithm<WeightValue>* SleepAlgorithm<WeightValue>::clone() const {
 }
 
 template <class WeightValue>
-void SleepAlgorithm<WeightValue>::configure(const DynamicLib::SimulationRunParameter& simParam) {
+void SleepAlgorithm<WeightValue>::configure(const SimulationRunParameter& simParam) {
 
 //FIXME
 
@@ -72,10 +72,10 @@ Rate SleepAlgorithm<WeightValue>::getCurrentRate() const{
 }
 
 template <class WeightValue>
-DynamicLib::AlgorithmGrid  SleepAlgorithm<WeightValue>::getGrid() const {
-	std::vector<double> vector_grid(DynamicLib::RATE_STATE_DIMENSION, 1);
-	std::vector<double> vector_interpretation(DynamicLib::RATE_STATE_DIMENSION, 0);
-	return DynamicLib::AlgorithmGrid(vector_grid, vector_interpretation);
+AlgorithmGrid  SleepAlgorithm<WeightValue>::getGrid() const {
+	std::vector<double> vector_grid(RATE_STATE_DIMENSION, 1);
+	std::vector<double> vector_interpretation(RATE_STATE_DIMENSION, 0);
+	return AlgorithmGrid(vector_grid, vector_interpretation);
 }
 
 

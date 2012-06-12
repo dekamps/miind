@@ -57,7 +57,7 @@ public:
 	 * Configure the Node with the Simulation Parameters
 	 * @param simParam Simulation Parameters
 	 */
-	void configureSimulationRun(const DynamicLib::SimulationRunParameter& simParam);
+	void configureSimulationRun(const SimulationRunParameter& simParam);
 
 	/**
 	 * Add a precursor to the current node
@@ -111,7 +111,7 @@ public:
 	 * @param The type of Report
 	 * @return The report
 	 */
-	std::string reportAll	(DynamicLib::ReportType) const;
+	std::string reportAll	(ReportType) const;
 
 	/**
 	 * finishes the simulation.
@@ -160,13 +160,12 @@ private:
 
 	std::vector<boost::mpi::request> _mpiStatus;
 
-	UtilLib::Number						_number_iterations;
-	UtilLib::Number						_maximum_iterations;
+	Number						_number_iterations;
+	Number						_maximum_iterations;
 	NodeType							_type;
-	DynamicLib::NodeInfo				_info;
 
 	boost::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
-	mutable boost::shared_ptr<DynamicLib::AbstractReportHandler>	_pHandler;
+	mutable boost::shared_ptr<AbstractReportHandler>	_pHandler;
 };
 
 typedef MPINode<double, utilities::CircularDistribution> D_MPINode;

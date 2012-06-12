@@ -60,20 +60,17 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::configureSimulationRun(
-		const DynamicLib::SimulationRunParameter& simParam) {
+		const SimulationRunParameter& simParam) {
 	_maximum_iterations = simParam.MaximumNumberIterations();
 	_pAlgorithm->configure(simParam);
 
 	// Add this line or other nodes will not get a proper input at the first simulation step!
 	this->setActivity(_pAlgorithm->getCurrentRate());
 
-	_pHandler = boost::shared_ptr<DynamicLib::AbstractReportHandler>(
+	_pHandler = boost::shared_ptr<AbstractReportHandler>(
 			simParam.Handler().Clone());
 
-	// by this time, the Id of a Node should be known
-	// this can't be handled by the constructor because it is an implementation (i.e. a network)  property
-	_info._id = NetLib::ConvertToNodeId(_nodeId);
-	_pHandler->InitializeHandler(_info);
+	_pHandler->InitializeHandler(_nodeId);
 
 }
 
@@ -154,31 +151,30 @@ void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 
 template<class Weight, class NodeDistribution>
 std::string MPINode<Weight, NodeDistribution>::reportAll(
-		DynamicLib::ReportType type) const {
+		ReportType type) const {
 
-	string string_return("");
+	std::string string_return("");
 
-	std::vector<DynamicLib::ReportValue> vec_values;
+	std::vector<ReportValue> vec_values;
 
-	if (type == DynamicLib::RATE || type == DynamicLib::STATE) {
-		DynamicLib::Report report(_pAlgorithm->getCurrentTime(),
-				DynamicLib::Rate(this->getActivity()),
-				NetLib::NodeId(this->_nodeId),
-				DynamicLib::NodeState(std::vector<double>(_activity)),
+	if (type == RATE || type == STATE) {
+		Report report(_pAlgorithm->getCurrentTime(),
+				Rate(this->getActivity()),
+				this->_nodeId,
 				_pAlgorithm->getGrid(), string_return, type, vec_values);
 
 		_pHandler->WriteReport(report);
 	}
 
-	if (type == DynamicLib::UPDATE)
-		_pHandler->Update();
+//	if (type == DynamicLib::UPDATE)
+//		_pHandler->Update();
 
 	return string_return;
 }
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::clearSimulation() {
-	_pHandler->DetachHandler(_info);
+	_pHandler->DetachHandler(_nodeId);
 }
 
 } //end namespace MPILib

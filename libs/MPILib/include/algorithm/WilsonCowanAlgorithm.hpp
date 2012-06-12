@@ -35,7 +35,7 @@ public:
 	 * Configure the Algorithm
 	 * @param simParam
 	 */
-	virtual void configure(const DynamicLib::SimulationRunParameter& simParam);
+	virtual void configure(const SimulationRunParameter& simParam);
 
 	/**
 	 * Evolve the node state
@@ -58,7 +58,7 @@ public:
 	 */
 	virtual Rate getCurrentRate() const;
 
-	virtual DynamicLib::AlgorithmGrid getGrid() const;
+	virtual AlgorithmGrid getGrid() const;
 
 private:
 

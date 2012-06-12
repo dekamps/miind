@@ -54,7 +54,7 @@ public:
 	 * @param simParam The Simulation Parameter
 	 */
 	void configureSimulation(
-			const DynamicLib::SimulationRunParameter& simParam);
+			const SimulationRunParameter& simParam);
 
 	/**
 	 * Envolve the network
@@ -75,7 +75,7 @@ private:
 	 */
 	void incrementMaxNodeId();
 
-	std::string collectReport(DynamicLib::ReportType type);
+	std::string collectReport(ReportType type);
 
 	/**
 	 * initialize the log stream
@@ -122,7 +122,7 @@ private:
 	Time _current_simulation_time = 0;
 	DynamicLib::NetworkState _state_network;
 
-	DynamicLib::SimulationRunParameter _parameter_simulation_run;
+	SimulationRunParameter _parameter_simulation_run;
 	UtilLib::LogStream _stream_log;
 
 };

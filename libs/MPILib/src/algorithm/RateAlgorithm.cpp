@@ -15,7 +15,7 @@ namespace algorithm{
 
 RateAlgorithm::RateAlgorithm(Rate rate) :
 		AlgorithmInterface<double>(), _time_current(
-				numeric_limits<double>::max()), _rate(rate) {
+				std::numeric_limits<double>::max()), _rate(rate) {
 }
 
 RateAlgorithm::~RateAlgorithm() {
@@ -27,7 +27,7 @@ RateAlgorithm* RateAlgorithm::clone() const {
 }
 
 void RateAlgorithm::configure(
-		const DynamicLib::SimulationRunParameter& simParam) {
+		const SimulationRunParameter& simParam) {
 
 	_time_current = simParam.TBegin();
 
@@ -48,10 +48,10 @@ Rate RateAlgorithm::getCurrentRate() const {
 	return _rate;
 }
 
-DynamicLib::AlgorithmGrid RateAlgorithm::getGrid() const {
-	std::vector<double> vector_grid(DynamicLib::RATE_STATE_DIMENSION, _rate);
-	std::vector<double> vector_interpretation(DynamicLib::RATE_STATE_DIMENSION, 0);
-	return DynamicLib::AlgorithmGrid(vector_grid, vector_interpretation);
+AlgorithmGrid RateAlgorithm::getGrid() const {
+	std::vector<double> vector_grid(RATE_STATE_DIMENSION, _rate);
+	std::vector<double> vector_interpretation(RATE_STATE_DIMENSION, 0);
+	return AlgorithmGrid(vector_grid, vector_interpretation);
 }
 
 } /* namespace algorithm */
