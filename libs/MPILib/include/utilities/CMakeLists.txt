@@ -6,4 +6,7 @@ add_header(
     NodeDistributionInterface.hpp
     Time.hpp
     walltime.hpp
+    Timer.hpp
+    TimeException.hpp
+    LogStream.hpp
 )

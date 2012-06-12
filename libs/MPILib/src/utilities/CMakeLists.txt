@@ -4,4 +4,7 @@ add_sources(
     ParallelException.cpp
     CircularDistribution.cpp
     Time.cpp
+    Timer.cpp
+    TimeException.cpp
+    LogStream.cpp
 )

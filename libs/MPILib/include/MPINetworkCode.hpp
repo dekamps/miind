@@ -161,7 +161,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 		catch (utilities::IterationNumberException &e) {
 			_stream_log << "NUMBER OF ITERATIONS EXCEEDED\n";
-			_state_network.SetResult(DynamicLib::NUMBER_ITERATIONS_ERROR);
+			_state_network.SetResult(NUMBER_ITERATIONS_ERROR);
 			_stream_log.flush();
 			_stream_log.close();
 		}
@@ -193,7 +193,7 @@ template<class WeightValue, class NodeDistribution>
 std::string MPINetwork<WeightValue, NodeDistribution>::collectReport(
 		ReportType type) {
 
-	string string_return;
+	std::string string_return;
 
 	for(auto& it: (*_pLocalNodes)) {
 		string_return += it.second.reportAll(type);

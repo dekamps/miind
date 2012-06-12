@@ -16,9 +16,9 @@
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/MPINode.hpp>
+#include <MPILib/include/NetworkState.hpp>
+#include <MPILib/include/utilities/LogStream.hpp>
 
-#include <DynamicLib/InactiveReportHandler.h>
-#include <DynamicLib/NetworkState.h>
 
 namespace MPILib {
 
@@ -120,10 +120,10 @@ private:
 	Time _current_update_time = 0;
 	Time _current_state_time = 0;
 	Time _current_simulation_time = 0;
-	DynamicLib::NetworkState _state_network;
+	NetworkState _state_network;
 
 	SimulationRunParameter _parameter_simulation_run;
-	UtilLib::LogStream _stream_log;
+	utilities::LogStream _stream_log;
 
 };
 
