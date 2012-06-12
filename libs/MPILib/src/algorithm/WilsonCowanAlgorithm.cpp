@@ -19,8 +19,8 @@
 namespace {
 
 int sigmoid(double t, const double y[], double f[], void *params) {
-	DynamicLib::WilsonCowanParameter* p_parameter =
-			(DynamicLib::WilsonCowanParameter *) params;
+	MPILib::algorithm::WilsonCowanParameter* p_parameter =
+			(MPILib::algorithm::WilsonCowanParameter *) params;
 
 	f[0] = (-y[0]
 			+ p_parameter->_rate_maximum
@@ -32,8 +32,8 @@ int sigmoid(double t, const double y[], double f[], void *params) {
 
 int sigmoidprime(double t, const double y[], double *dfdy, double dfdt[],
 		void *params) {
-	DynamicLib::WilsonCowanParameter* p_parameter =
-			(DynamicLib::WilsonCowanParameter *) params;
+	MPILib::algorithm::WilsonCowanParameter* p_parameter =
+			(MPILib::algorithm::WilsonCowanParameter *) params;
 	gsl_matrix_view dfdy_mat = gsl_matrix_view_array(dfdy, 1, 1);
 
 	gsl_matrix * m = &dfdy_mat.matrix;
@@ -59,7 +59,7 @@ WilsonCowanAlgorithm::WilsonCowanAlgorithm() :
 
 }
 
-WilsonCowanAlgorithm::WilsonCowanAlgorithm(const DynamicLib::WilsonCowanParameter&parameter) :
+WilsonCowanAlgorithm::WilsonCowanAlgorithm(const WilsonCowanParameter&parameter) :
 		AlgorithmInterface<double>(),
 		_parameter(parameter),
 		_integrator(0,
@@ -82,7 +82,7 @@ WilsonCowanAlgorithm* WilsonCowanAlgorithm::clone() const {
 
 void WilsonCowanAlgorithm::configure(const SimulationRunParameter& simParam) {
 
-	NumtoolsLib::DVIntegratorStateParameter<DynamicLib::WilsonCowanParameter> parameter_dv;
+	NumtoolsLib::DVIntegratorStateParameter<WilsonCowanParameter> parameter_dv;
 
 	parameter_dv._vector_state = vector<double>(1, 0);
 	parameter_dv._time_begin = simParam.TBegin();

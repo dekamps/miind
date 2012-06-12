@@ -37,7 +37,7 @@ void test_Constructor() {
 	MPILib::Rate nu = 0;
 
 	// Define the receiving node
-	DynamicLib::WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
+	WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
 
 	WilsonCowanAlgorithm algorithm_exc(par_sigmoid);
 
@@ -80,7 +80,7 @@ void test_innerProduct() {
 	MPILib::Rate nu = 0;
 
 	// Define the receiving node
-	DynamicLib::WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
+	WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
 
 	WilsonCowanAlgorithm algorithm_exc(par_sigmoid);
 

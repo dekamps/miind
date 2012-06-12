@@ -4,5 +4,6 @@ add_header(
     SleepAlgorithm.hpp
     SleepAlgorithmCode.hpp
     WilsonCowanAlgorithm.hpp
+    WilsonCowanParameter.hpp
     RateAlgorithm.hpp
 )
