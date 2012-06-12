@@ -1,4 +1,5 @@
 add_sources(
+SimulationRunParameter.cpp
     #add source files
 )
 

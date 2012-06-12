@@ -7,4 +7,5 @@ add_header(
     MPINodeCode.hpp
     MPINetworkCode.hpp
     BasicTypes.hpp
+    SimulationRunParameter.hpp
 )
