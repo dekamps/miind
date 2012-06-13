@@ -34,7 +34,6 @@ const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, // the handler
 		0, // start time of simulation
 		0.5, // end time of simulation
 		1e-4, // report time
-		1e-4, // update time
 		1e-5, // network step time
 		"test/wilsonresponse.log" // log file name
 		);
@@ -49,7 +48,6 @@ const SimulationRunParameter PAR_WILSONCOWAN1(WILSONCOWAN_HANDLER1, // the handl
 		0, // start time of simulation
 		0.5, // end time of simulation
 		1e-4, // report time
-		1e-4, // update time
 		1e-5, // network step time
 		"test/wilsonresponse1.log" // log file name
 		);

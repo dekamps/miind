@@ -62,7 +62,6 @@ namespace MPILib
 			Time,   						/*!< Start time of simulation												*/
 			Time,							/*!< End time of Simulation													*/
 			Time,							/*!< Report time															*/ 
-			Time,							/*!< Update Time															*/
 			Time,							/*!< Network step time														*/
 			const std::string&,					/*!< Log file path name														*/
 			Time report_state_time = 0		/*!< Report State time														*/
@@ -89,8 +88,6 @@ namespace MPILib
 
 		Time TStep  () const { return _t_step;   }
 
-		Time TUpdate() const { return _t_update; }
-
 		//! Give the time when a full state must be written out
 		Time TState () const { return _t_state_report; }
 
@@ -112,7 +109,6 @@ namespace MPILib
 		Time	_t_begin;
 		Time	_t_end;
 		Time	_t_report;
-		Time	_t_update;
 		Time	_t_step;
 
 		std::string	_name_log;
