@@ -3,3 +3,4 @@ build/
 .project
 .DS_*
 .pydevproject
+.settings
