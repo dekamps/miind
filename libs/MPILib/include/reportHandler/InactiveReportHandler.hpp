@@ -23,43 +23,32 @@
 
 #include <MPILib/include/reportHandler/AbstractReportHandler.hpp>
 
-namespace MPILib
-{
-	//! This ReportHandler does nothing, which is sometimes useful in debugging.
-	class InactiveReportHandler : public AbstractReportHandler
-	{
-	public:
+namespace MPILib {
+//! This ReportHandler does nothing, which is sometimes useful in debugging.
+class InactiveReportHandler: public AbstractReportHandler {
+public:
 
-		//! Default constructor
-		InactiveReportHandler();
+	//! Default constructor
+	InactiveReportHandler();
 
-		virtual ~InactiveReportHandler();
+	virtual ~InactiveReportHandler();
 
+	virtual void writeReport(const Report&) override;
 
-		virtual bool WriteReport
-				(
-					const Report&
-				);
+	virtual InactiveReportHandler* clone() const;
 
+	virtual void initializeHandler
+	(
+			const NodeId&
+	) override;
+	virtual void detachHandler
+	(
+			const NodeId&
+	) override;
+private:
 
-		virtual InactiveReportHandler* Clone() const;
+}; // end of InactiveReportHandler
 
-		virtual bool Close();
-
-		virtual void InitializeHandler
-				(
-					const NodeId&
-				);
-		virtual void DetachHandler
-				(
-					const NodeId&
-				);
-	private:
-
-
-
-	}; // end of InactiveReportHandler
-
-} // end of MPILib
+}// end of MPILib
 
 #endif // MPILIB_INACTIVEREPORTHANDLER_HPP_ include guard

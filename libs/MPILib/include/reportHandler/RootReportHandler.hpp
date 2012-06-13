@@ -48,52 +48,115 @@ namespace MPILib {
 class RootReportHandler: public AbstractReportHandler {
 public:
 
-	RootReportHandler(const std::string&,
-			bool b_force_state_write = false);
+	RootReportHandler(const std::string&, bool b_force_state_write = false);
 
 	RootReportHandler(const RootReportHandler&);
 
 	//! virtual destructor
 	virtual ~RootReportHandler();
 
-	//! Collects the Report of a DynamicNode for storage in the simulation file.
-	virtual bool WriteReport(const Report&);
+	/**
+	 * Writes the Report to the file.
+	 * @param report The report written into the file
+	 */
+	virtual void writeReport(const Report&)
+override	;
 
-	virtual RootReportHandler* Clone() const;
+	/**
+	 * Cloning operation
+	 * @return A clone of the algorithm
+	 */
+	virtual RootReportHandler* clone() const;
 
-	virtual void InitializeHandler(const NodeId&);
+	/**
+	 * During Configuration a MPINode will associate itself with the handler.
+	 * @param The NodeId of the Node
+	 */
+	virtual void initializeHandler(const NodeId&) override;
 
-	virtual void DetachHandler(const NodeId&);
+	/**
+	 * A MPINode will request to be dissociated from the handler at the end of simulation.
+	 * @param The NodeId of the Node
+	 */
+	virtual void detachHandler(const NodeId&) override;
 
 private:
 
+	/**
+	 * Writes the info tuple to the file
+	 * @param The NodeId
+	 */
+	void writeInfoTuple(const NodeId&);
 
-	void WriteInfoTuple(const NodeId&);
-	void RemoveFromNodeList(NodeId);
-	void GlobalCleanUp();
+	/**
+	 * removes the node from the handler
+	 * @param The NodeId of the node removed
+	 */
+	void removeFromNodeList(NodeId);
 
-	std::unique_ptr<TGraph> ConvertAlgorithmGridToGraph(const Report&) const;
-	bool BelongsToAnAlgorithm() const;
-	bool IsStateWriteMandatory() const;
-	bool HasANoneTrivialState(const Report&) const;
+	/**
+	 * Finalize the report Handler
+	 */
+	void finalize();
 
-	bool HandleReportValue(const Report&);
+	/**
+	 * TODO what does this
+	 * @param
+	 * @return
+	 */
+	std::unique_ptr<TGraph> convertAlgorithmGridToGraph(const Report&) const;
 
-	static TFile* _p_file;
-	static TNtuple* _p_tuple;
+	/**
+	 * Check if the Handler is connected to an algorithm
+	 * @return True if the Handler is connected to an algorithm
+	 */
+	bool isConnectedToAlgorithm() const;
 
-	static ValueHandlerHandler _value_handler;
+	/**
+	 * Does the current State need to be written to the file
+	 * @return True if the State need to be written to the file
+	 */
+	bool isStateWriteMandatory() const;
 
-	static std::vector<NodeId> _list_nodes;
-	static std::vector<NodeId> _vector_id;
+	/**
+	 * Pointer to the file. @todo change this to smart pointer
+	 */
+	static TFile* _pFile;
 
-	std::unique_ptr<TGraph> _p_current_rate_graph;
-	std::unique_ptr<TGraph> _p_current_state_graph;
+	/**
+	 * Pointer to the tuple. @todo change this to smart pointer
+	 */
+	static TNtuple* _pTuple;
 
-	bool _b_file { false };
+	/**
+	 * The Value Handler
+	 */
+	static ValueHandlerHandler _valueHandler;
 
-	int _nr_reports { 0 };
+	/**
+	 * Vector of the connected Nodes
+	 */
+	static std::vector<NodeId> _nodes;
 
+
+	/**
+	 * Pointer to the current rate graph
+	 */
+	std::unique_ptr<TGraph> _spCurrentRateGraph;
+	/**
+	 * Pointer to the current state graph
+	 */
+	std::unique_ptr<TGraph> _spCurrentStateGraph;
+
+	/**
+	 * True if the state should be written to the file
+	 */
+	bool _isStateWriteMandatory {false};
+
+	/**
+	 * Number of reports generated so far
+	 */
+	int _nrReports {0};
 
 };
 

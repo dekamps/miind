@@ -45,74 +45,69 @@ namespace MPILib {
 TApplication APPLICATION("application", 0, 0);
 
 
-TFile* RootReportHandler::_p_file = nullptr;
-TNtuple* RootReportHandler::_p_tuple = nullptr;
+TFile* RootReportHandler::_pFile = nullptr;
+TNtuple* RootReportHandler::_pTuple = nullptr;
 
-std::vector<NodeId> RootReportHandler::_list_nodes(0);
-std::vector<NodeId> RootReportHandler::_vector_id(0);
+std::vector<NodeId> RootReportHandler::_nodes(0);
 
-ValueHandlerHandler RootReportHandler::_value_handler;
+ValueHandlerHandler RootReportHandler::_valueHandler;
 
-RootReportHandler::RootReportHandler(const std::string& file_name, bool b_file) :
+RootReportHandler::RootReportHandler(const std::string& file_name, bool writeState) :
 		AbstractReportHandler(file_name), //
-		_b_file(b_file) {
+		_isStateWriteMandatory(writeState) {
 }
 
 RootReportHandler::RootReportHandler(const RootReportHandler& rhs) :
-		AbstractReportHandler(rhs.MediumName()), //
-		_b_file(rhs._b_file) {
-	if (rhs._p_current_rate_graph)
+		AbstractReportHandler(rhs.getStreamFileName()), //
+		_isStateWriteMandatory(rhs._isStateWriteMandatory) {
+	if (rhs._spCurrentRateGraph)
 		throw utilities::Exception(STR_HANDLER_STALE);
 }
 
 RootReportHandler::~RootReportHandler()
 // 11-07-2007: test on p_tuple by Volker Baier
 {
-	if (_p_file) {
-		if (_p_tuple)
-			_p_tuple->Write();
-		_p_file->Close();
-		delete _p_file;
-		_p_file = nullptr;
+	if (_pFile) {
+		if (_pTuple)
+			_pTuple->Write();
+		_pFile->Close();
+		delete _pFile;
+		_pFile = nullptr;
 	}
 
 }
 
-bool RootReportHandler::WriteReport(const Report& report) {
+void RootReportHandler::writeReport(const Report& report) {
 
-	if (_nr_reports == 0) {
+	if (_nrReports == 0) {
 
-		_p_current_rate_graph = std::unique_ptr < TGraph > (new TGraph);
+		_spCurrentRateGraph = std::unique_ptr < TGraph > (new TGraph);
 
 		std::ostringstream stream;
 		stream << "rate_" << report._id;
-		_p_current_rate_graph->SetName(stream.str().c_str());
-
-		std::vector<NodeId>::iterator iter = std::find(_vector_id.begin(),
-				_vector_id.end(), report._id);
+		_spCurrentRateGraph->SetName(stream.str().c_str());
 
 	}
 
-	_p_current_rate_graph->SetPoint(_nr_reports++, report._time, report._rate);
+	_spCurrentRateGraph->SetPoint(_nrReports++, report._time, report._rate);
 
-	_p_current_state_graph.reset();
-	_p_current_state_graph = ConvertAlgorithmGridToGraph(report);
+	_spCurrentStateGraph.reset();
+	_spCurrentStateGraph = convertAlgorithmGridToGraph(report);
 
-	if (report._type == STATE && BelongsToAnAlgorithm()
-			&& (IsStateWriteMandatory()))
-		_p_current_state_graph->Write();
+	if (report._type == STATE && isConnectedToAlgorithm()
+			&& (isStateWriteMandatory()))
+		_spCurrentStateGraph->Write();
 
 	// always log ReportValue elements
-	_value_handler.AddReport(report);
-	return true;
+	_valueHandler.AddReport(report);
 }
 
-RootReportHandler* RootReportHandler::Clone() const {
+RootReportHandler* RootReportHandler::clone() const {
 
 	return new RootReportHandler(*this);
 }
 
-std::unique_ptr<TGraph> RootReportHandler::ConvertAlgorithmGridToGraph(
+std::unique_ptr<TGraph> RootReportHandler::convertAlgorithmGridToGraph(
 		const Report& report) const {
 
 	std::vector<double> vector_of_grid_values = report._grid.ToStateVector();
@@ -145,84 +140,80 @@ std::unique_ptr<TGraph> RootReportHandler::ConvertAlgorithmGridToGraph(
 	return p_state_graph;
 }
 
-bool RootReportHandler::BelongsToAnAlgorithm() const {
-	return (_p_current_rate_graph != 0);
+bool RootReportHandler::isConnectedToAlgorithm() const {
+	return (_spCurrentRateGraph != 0);
 }
 
-bool RootReportHandler::IsStateWriteMandatory() const {
-	return _b_file;
+bool RootReportHandler::isStateWriteMandatory() const {
+	return _isStateWriteMandatory;
 }
 
-bool RootReportHandler::HasANoneTrivialState(const Report& report) const {
-	return true;
-}
 
-void RootReportHandler::InitializeHandler(const NodeId& info) {
+void RootReportHandler::initializeHandler(const NodeId& info) {
 	// Purpose: this function will be called by MPINode upon configuration.
 	// no canvas are generated as it would cause lot of problems with mpi
-	if (!_p_file) {
-		_p_file = new TFile(this->MediumName().c_str(), "RECREATE");
+	if (!_pFile) {
+		_pFile = new TFile(this->getStreamFileName().c_str(), "RECREATE");
 
-		if (_p_file->IsZombie())
+		if (_pFile->IsZombie())
 			throw utilities::Exception(STR_ROOT_FILE_OPENED_FAILED);
 
-		_p_tuple = new TNtuple("infotuple", "node info", "id:x:y:z:f");
-		_value_handler.Reset();
+		_pTuple = new TNtuple("infotuple", "node info", "id:x:y:z:f");
+		_valueHandler.Reset();
 
 	}
 
-	WriteInfoTuple(info);
+	writeInfoTuple(info);
 
 }
 
-void RootReportHandler::WriteInfoTuple(const NodeId& nodeId) {
-	_p_tuple->Fill(static_cast<Float_t>(nodeId));
-	_list_nodes.push_back(nodeId);
+void RootReportHandler::writeInfoTuple(const NodeId& nodeId) {
+	_pTuple->Fill(static_cast<Float_t>(nodeId));
+	_nodes.push_back(nodeId);
 }
 
-void RootReportHandler::DetachHandler(const NodeId& nodeId) {
+void RootReportHandler::detachHandler(const NodeId& nodeId) {
 	// Purpose: this function will be called upon DynamicNode destruction. 
 	// This works under the assumption that no isolated DynamicNodes
 	// exist which are associated with an open RootReporthandler. 
 	// Author: Marc de Kamps
 	// Date: 26-08-2005
 
-	RemoveFromNodeList(nodeId);
+	removeFromNodeList(nodeId);
 
-	if (_p_current_rate_graph) {
-		_p_current_rate_graph->Write();
-		_p_current_rate_graph.reset();
-		if (!_value_handler.IsWritten())
-			_value_handler.Write();
+	if (_spCurrentRateGraph) {
+		_spCurrentRateGraph->Write();
+		_spCurrentRateGraph.reset();
+		if (!_valueHandler.IsWritten())
+			_valueHandler.Write();
 
 	}
 
-	if (_list_nodes.empty())
-		GlobalCleanUp();
+	if (_nodes.empty())
+		finalize();
 }
 
-void RootReportHandler::RemoveFromNodeList(NodeId id) {
-	auto iter = std::find(_list_nodes.begin(), _list_nodes.end(), id);
+void RootReportHandler::removeFromNodeList(NodeId id) {
+	auto iter = std::find(_nodes.begin(), _nodes.end(), id);
 
-	if (iter == _list_nodes.end())
+	if (iter == _nodes.end())
 		throw utilities::Exception(
 				"Can't locate NodeId during detaching handler");
 
-	_list_nodes.erase(iter);
+	_nodes.erase(iter);
 }
 
-void RootReportHandler::GlobalCleanUp() {
-	_p_tuple->Write();
-	_p_file->Close();
+void RootReportHandler::finalize() {
+	_pTuple->Write();
+	_pFile->Close();
 
-	if (_p_file) {
-		delete _p_file;
-		_p_file = nullptr;
+	if (_pFile) {
+		delete _pFile;
+		_pFile = nullptr;
 	}
 
-	_p_tuple = nullptr;
-	_list_nodes.clear();
-	_vector_id.clear();
+	_pTuple = nullptr;
+	_nodes.clear();
 }
 
 } //end namespace

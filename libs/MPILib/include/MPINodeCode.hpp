@@ -68,9 +68,9 @@ void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 	this->setActivity(_pAlgorithm->getCurrentRate());
 
 	_pHandler = boost::shared_ptr<AbstractReportHandler>(
-			simParam.Handler().Clone());
+			simParam.Handler().clone());
 
-	_pHandler->InitializeHandler(_nodeId);
+	_pHandler->initializeHandler(_nodeId);
 
 }
 
@@ -163,7 +163,7 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 				this->_nodeId,
 				_pAlgorithm->getGrid(), string_return, type, vec_values);
 
-		_pHandler->WriteReport(report);
+		_pHandler->writeReport(report);
 	}
 
 //	if (type == DynamicLib::UPDATE)
@@ -174,7 +174,7 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::clearSimulation() {
-	_pHandler->DetachHandler(_nodeId);
+	_pHandler->detachHandler(_nodeId);
 }
 
 } //end namespace MPILib

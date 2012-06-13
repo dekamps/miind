@@ -33,38 +33,68 @@ namespace MPILib {
 //! in a simulation results file. There are not many prescriptions for how this should be done and
 //! it's very simple to derive one's own. AsciiReportHandler records the simulation results in an XML format.
 //! RootReportHandler directly stores graphs of simulations. AsciiReportHandler and RootReportHandler come with MIIND.
+
+/**
+ * Base class for all ReportHandlers
+ *
+ * ReportHandlers are responsible for dispatching the Reports from each node and collating them
+ * in a simulation results file. There are not many prescriptions for how this should be done and
+ * it's very simple to derive one's own. RootReportHandler directly stores graphs of simulations.
+ *
+ */
+
 class AbstractReportHandler {
 public:
 
-	//! Takes the file name as argument
-	AbstractReportHandler(const std::string& stream_name) :
-			_stream_name(stream_name) {
+	/**
+	 * Constructor
+	 * @param fileName The filename of the output file
+	 */
+	AbstractReportHandler(const std::string& fileName) :
+			_streamFileName(fileName) {
 	}
 
 	//! Manadatory virtual destructor
 	virtual ~AbstractReportHandler(){};
 
-	virtual bool WriteReport(const Report&) = 0;
+	/**
+	 * Writes the Report to the file.
+	 * @param report The report written into the file
+	 */
+	virtual void writeReport(const Report& report) = 0;
 
-	//! Mandatory cloning operation.
-	virtual AbstractReportHandler* Clone() const = 0;
+	/**
+	 * Cloning operation
+	 * @return A clone of the algorithm
+	 */
+	virtual AbstractReportHandler* clone() const = 0;
 
-	//! During Configuration a DynamicNode will associate itself with the handler.
-	virtual void InitializeHandler(const NodeId&) = 0;
+	/**
+	 * During Configuration a MPINode will associate itself with the handler.
+	 * @param The NodeId of the Node
+	 */
+	virtual void initializeHandler(const NodeId&) = 0;
 
-	//! A DynamicNode will request to be dissociated from the handler at the end of simulation.
-	virtual void DetachHandler(const NodeId&) = 0;
+	/**
+	 * A MPINode will request to be dissociated from the handler at the end of simulation.
+	 * @param The NodeId of the Node
+	 */
+	virtual void detachHandler(const NodeId&) = 0;
 
-	std::string MediumName() const {
-		return _stream_name;
+	/**
+	 * Getter for the streamFileName
+	 * @return The name of the streamFile
+	 */
+	std::string getStreamFileName() const {
+		return _streamFileName;
 	}
-
-
-protected:
 
 private:
 
-	const std::string _stream_name;
+	/**
+	 * The streamFileName
+	 */
+	const std::string _streamFileName;
 
 };
 

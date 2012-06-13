@@ -35,31 +35,25 @@ InactiveReportHandler::~InactiveReportHandler()
 {
 }
 
-bool InactiveReportHandler::WriteReport(const Report& report)
+void InactiveReportHandler::writeReport(const Report& report)
 {
-	return true;
+
 }
 
-InactiveReportHandler* InactiveReportHandler::Clone() const
+InactiveReportHandler* InactiveReportHandler::clone() const
 {
 	return new InactiveReportHandler;
 }
 
 
-bool InactiveReportHandler::Close()
-{
-	return true;
-}
-
-
-void InactiveReportHandler::InitializeHandler
+void InactiveReportHandler::initializeHandler
 (
 	const NodeId& info
 )
 {
 }
 
-void InactiveReportHandler::DetachHandler(const NodeId &)
+void InactiveReportHandler::detachHandler(const NodeId &)
 {
 }
 
