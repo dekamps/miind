@@ -119,7 +119,7 @@ std::unique_ptr<TGraph> RootReportHandler::convertAlgorithmGridToGraph(
 	std::vector<double> vector_of_state_interpretation =
 			report._grid.ToInterpretationVector();
 
-	std::unique_ptr < TGraph > p_state_graph { new TGraph };
+	std::unique_ptr<TGraph> p_state_graph { new TGraph };
 
 	GraphKey key(report._id, report._time);
 	p_state_graph->SetName(key.Name().c_str());
@@ -127,15 +127,12 @@ std::unique_ptr<TGraph> RootReportHandler::convertAlgorithmGridToGraph(
 	assert(
 			vector_of_grid_values.size() == vector_of_state_interpretation.size());
 
-	for (std::vector<double>::iterator iter = vector_of_grid_values.begin();
-			iter != vector_of_grid_values.end(); iter++) {
-		int n_index = static_cast<int>(iter - vector_of_grid_values.begin());
-
-		p_state_graph->SetPoint(n_index,
-				vector_of_state_interpretation[n_index],
-				vector_of_grid_values[n_index]);
-
+	for (unsigned int i = 0; i<vector_of_grid_values.size(); i++){
+			p_state_graph->SetPoint(i,
+					vector_of_state_interpretation[i],
+					vector_of_grid_values[i]);
 	}
+
 
 	return p_state_graph;
 }

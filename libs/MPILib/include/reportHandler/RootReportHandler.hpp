@@ -59,8 +59,7 @@ public:
 	 * Writes the Report to the file.
 	 * @param report The report written into the file
 	 */
-	virtual void writeReport(const Report&)
-override	;
+	virtual void writeReport(const Report&);
 
 	/**
 	 * Cloning operation
@@ -72,13 +71,13 @@ override	;
 	 * During Configuration a MPINode will associate itself with the handler.
 	 * @param The NodeId of the Node
 	 */
-	virtual void initializeHandler(const NodeId&) override;
+	virtual void initializeHandler(const NodeId&);
 
 	/**
 	 * A MPINode will request to be dissociated from the handler at the end of simulation.
 	 * @param The NodeId of the Node
 	 */
-	virtual void detachHandler(const NodeId&) override;
+	virtual void detachHandler(const NodeId&);
 
 private:
 

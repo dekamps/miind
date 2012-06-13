@@ -6,6 +6,7 @@
  */
 
 #include <boost/mpi.hpp>
+#include <boost/timer/timer.hpp>
 #include <iostream>
 #include <string>
 #include <boost/serialization/string.hpp>
@@ -56,7 +57,7 @@ using namespace MPILib;
 
 int main(int argc, char* argv[]) {
 	// initialize mpi
-
+	boost::timer::auto_cpu_timer t;
 	mpi::environment env(argc, argv);
 	mpi::communicator world;
 	try {
@@ -96,7 +97,14 @@ int main(int argc, char* argv[]) {
 
 		time = walltime(&time_start);
 
+
+		boost::timer::auto_cpu_timer te;
+		te.start();
+
 		network.evolve();
+
+		te.stop();
+		te.report();
 
 		time = walltime(&time);
 
