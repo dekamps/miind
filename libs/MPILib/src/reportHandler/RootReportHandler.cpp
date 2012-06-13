@@ -32,7 +32,6 @@
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/reportHandler/GraphKey.hpp>
 
-#ifdef HAVE_LIBCORE
 #include <TApplication.h>
 #include <TFile.h>
 #include <TGraph.h>
@@ -42,11 +41,6 @@
 #include <TNtuple.h>
 #include <TStyle.h>
 
-using namespace ROOT;
-
-#endif // end of ROOT includes
-#ifndef HAVE_LIBCORE // Without ROOT, a NO-OP
-#else  //ROOT defined !!
 
 namespace MPILib {
 
@@ -72,38 +66,30 @@ TH2F HISTO_STATE("state_histo", "", NUMBER_HISTO_CHANNELS, POTENTIAL_MIN,
 		POTENTIAL_MAX, NUMBER_HISTO_CHANNELS, DENSITY_MIN, DENSITY_MAX);
 }
 
-TFile* RootReportHandler::_p_file = 0;
-TCanvas* RootReportHandler::_p_canvas = 0;
-TNtuple* RootReportHandler::_p_tuple = 0;
-TPad* RootReportHandler::_p_pad_rate = 0;
-TPad* RootReportHandler::_p_pad_state = 0;
+TFile* RootReportHandler::_p_file = nullptr;
+TCanvas* RootReportHandler::_p_canvas = nullptr;
+TNtuple* RootReportHandler::_p_tuple = nullptr;
+TPad* RootReportHandler::_p_pad_rate = nullptr;
+TPad* RootReportHandler::_p_pad_state = nullptr;
 
 std::vector<NodeId> RootReportHandler::_list_nodes(0);
 std::vector<NodeId> RootReportHandler::_vector_id(0);
 
 ValueHandlerHandler RootReportHandler::_value_handler;
 
-RootReportHandler::RootReportHandler(const string& file_name, bool b_canvas,
+RootReportHandler::RootReportHandler(const std::string& file_name, bool b_canvas,
 		bool b_file, const CanvasParameter& par) :
 		AbstractReportHandler(file_name), //
-		_p_style(new TStyle), //
-		_p_current_rate_graph(0), //
-		_p_current_state_graph(0), //
 		_b_canvas(b_canvas), //
 		_b_file(b_file), //
-		_nr_reports(0), //
-		_index_pad(-1), //
 		_par_canvas(par) {
 	_p_style->SetOptStat(0);
 }
 
 RootReportHandler::RootReportHandler(const RootReportHandler& rhs) :
-		AbstractReportHandler(rhs.MediumName()), _p_current_rate_graph(0), //
-		_p_current_state_graph(0), //
+		AbstractReportHandler(rhs.MediumName()), //
 		_b_canvas(rhs._b_canvas), //
 		_b_file(rhs._b_file), //
-		_nr_reports(0), //
-		_index_pad(-1), //
 		_par_canvas(rhs._par_canvas) {
 	if (rhs._p_current_rate_graph)
 		throw utilities::Exception(STR_HANDLER_STALE);
@@ -132,13 +118,13 @@ bool RootReportHandler::WriteReport(const Report& report) {
 		if (_par_canvas._t_max != 0)
 			this->SetTimeRange(0, _par_canvas._t_max);
 
-		_p_current_rate_graph = new TGraph;
+		_p_current_rate_graph = std::unique_ptr<TGraph>(new TGraph);
 
 		std::ostringstream stream;
 		stream << "rate_" << report._id;
 		_p_current_rate_graph->SetName(stream.str().c_str());
 
-		vector<NodeId>::iterator iter = find(_vector_id.begin(),
+		std::vector<NodeId>::iterator iter = find(_vector_id.begin(),
 				_vector_id.end(), report._id);
 
 		if (iter != _vector_id.end())
@@ -149,7 +135,7 @@ bool RootReportHandler::WriteReport(const Report& report) {
 
 	_p_current_rate_graph->SetPoint(_nr_reports++, report._time, report._rate);
 
-	delete _p_current_state_graph;
+	_p_current_state_graph.reset();
 	_p_current_state_graph = ConvertAlgorithmGridToGraph(report);
 
 	if (report._type == STATE && BelongsToAnAlgorithm()
@@ -171,19 +157,19 @@ RootReportHandler* RootReportHandler::Clone() const {
 	return new RootReportHandler(*this);
 }
 
-TGraph* RootReportHandler::ConvertAlgorithmGridToGraph(
+std::unique_ptr<TGraph> RootReportHandler::ConvertAlgorithmGridToGraph(
 		const Report& report) const {
 
-	vector<double> vector_of_grid_values = report._grid.ToStateVector();
+	std::vector<double> vector_of_grid_values = report._grid.ToStateVector();
 
 	// if the Report does not contain a filled AlgorithmGrid, no Graph can be made
 	if (vector_of_grid_values.size() == 0)
 		return 0;
 
-	vector<double> vector_of_state_interpretation =
+	std::vector<double> vector_of_state_interpretation =
 			report._grid.ToInterpretationVector();
 
-	TGraph* p_state_graph = new TGraph;
+	std::unique_ptr<TGraph> p_state_graph {new TGraph};
 
 	GraphKey key(report._id, report._time);
 	p_state_graph->SetName(key.Name().c_str());
@@ -291,8 +277,7 @@ void RootReportHandler::DetachHandler(const NodeId& nodeId) {
 
 	if (_p_current_rate_graph) {
 		_p_current_rate_graph->Write();
-		delete _p_current_rate_graph;
-		_p_current_rate_graph = 0;
+		_p_current_rate_graph.reset();
 		if (!_value_handler.IsWritten())
 			_value_handler.Write();
 
@@ -326,7 +311,7 @@ void RootReportHandler::SetMaximumRate() const {
 }
 
 void RootReportHandler::RemoveFromNodeList(NodeId id) {
-	vector<NodeId>::iterator iter = find(_list_nodes.begin(), _list_nodes.end(),
+	std::vector<NodeId>::iterator iter = find(_list_nodes.begin(), _list_nodes.end(),
 			id);
 
 	if (iter == _list_nodes.end())
@@ -406,5 +391,4 @@ void RootReportHandler::SetPotentialRange(Potential v_min, Potential v_max) {
 
 } //end namespace
 
-#endif
 

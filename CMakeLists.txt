@@ -44,7 +44,7 @@ IF(ENABLE_MPI)
     
     
           
-    set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS} "-std=c++0x")
+    set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
     set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
     include_directories(${MPI_INCLUDE_PATH})
     
@@ -67,7 +67,7 @@ IF(ENABLE_MPI)
     if( ROOT_FOUND )
       message(STATUS "Building Root dependent parts")
     else( ROOT_FOUND )
-      message(STATUS "Building parts not depending on Root")
+      message(FATAL_ERROR "Root is required for MPILib")
     endif( ROOT_FOUND )
     
     # TODO:  This is ugly and must be fixed in the windows install procedure

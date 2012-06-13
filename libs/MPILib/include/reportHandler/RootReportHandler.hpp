@@ -23,13 +23,11 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include <MPILib/include/reportHandler/AbstractReportHandler.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/reportHandler/CanvasParameter.hpp>
 #include <MPILib/include/reportHandler/ValueHandlerHandler.hpp>
-
-using std::vector;
-using std::string;
 
 // forward declarations 
 
@@ -40,125 +38,92 @@ class TCanvas;
 class TFile;
 class TH2F;
 class TNtuple;
-class TStyle;
+#include <TStyle.h>
 
+namespace MPILib {
+//! This handler writes states and firing rates as TGraph objects in a root file.
+//! (see http://root.cern.ch). It is also able to show run time graphs of selected nodes.
+//!
+//! ROOT is a visualisation and data management tool with a good interface to numerical
+//! methods. The RootReportHandler is reliable when no run time graphs are shown and is a very
+//! efficient way to store the simulation data, as they are compressed when written to file.
+//! The behaviour and resource consumption of the run time graphs need closer investigation
+//! but for debugging purposes they are tremendously useful. A disadvantage for high throughput is that
+//! memory use increases over time. Where this is an issue, use RootHighThroughputHandler.
+class RootReportHandler: public AbstractReportHandler {
+public:
 
-namespace MPILib
-{
-	//! This handler writes states and firing rates as TGraph objects in a root file.
-	//! (see http://root.cern.ch). It is also able to show run time graphs of selected nodes.
-	//!
-	//! ROOT is a visualisation and data management tool with a good interface to numerical
-	//! methods. The RootReportHandler is reliable when no run time graphs are shown and is a very
-	//! efficient way to store the simulation data, as they are compressed when written to file.
-	//! The behaviour and resource consumption of the run time graphs need closer investigation
-	//! but for debugging purposes they are tremendously useful. A disadvantage for high throughput is that
-	//! memory use increases over time. Where this is an issue, use RootHighThroughputHandler.
-	class RootReportHandler : public AbstractReportHandler
-	{
-	public:
+	RootReportHandler(const std::string&, bool b_canvas = false,
+			bool b_force_state_write = false, const CanvasParameter& =
+					DEFAULT_CANVAS);
 
-		RootReportHandler
-			(
-				const  string&,
-				bool   b_canvas             = false,
-				bool   b_force_state_write  = false,
-				const CanvasParameter&	    = DEFAULT_CANVAS
-			);
+	RootReportHandler(const RootReportHandler&);
 
-		RootReportHandler(const RootReportHandler&);
+	//! virtual destructor
+	virtual ~RootReportHandler();
 
-		//! virtual destructor
-		virtual ~RootReportHandler();
+	//! Collects the Report of a DynamicNode for storage in the simulation file.
+	virtual bool WriteReport(const Report&);
 
-		//! Collects the Report of a DynamicNode for storage in the simulation file.
-		virtual bool WriteReport(const Report&);
+	virtual RootReportHandler* Clone() const;
 
+	virtual void InitializeHandler(const NodeId&);
 
-		virtual RootReportHandler* Clone() const;
+	virtual void DetachHandler(const NodeId&);
 
-		virtual void InitializeHandler
-		(
-				const NodeId&
-		);
+	virtual void AddNodeToCanvas(NodeId) const;
 
+	//! Set the minimum and maximum density to be shown in the canvas.
+	void SetDensityRange(Density, Density);
 
-		virtual void DetachHandler
-			(
-				const NodeId&
-			);
+	void SetFrequencyRange(Rate, Rate);
 
-		virtual void AddNodeToCanvas(NodeId) const;
+	void SetTimeRange(Time, Time);
 
-		//! Set the minimum and maximum density to be shown in the canvas.
-		void SetDensityRange
-		(
-			Density,
-			Density
-		);
+	void SetPotentialRange(Potential, Potential);
 
-		void SetFrequencyRange
-		(
-			Rate,
-			Rate
-		);
+private:
 
-		void SetTimeRange
-		(
-			Time,
-			Time
-		);
+	void InitializeCanvas() const;
+	void ToRateCanvas(int);
+	void SetMaximumRate() const;
+	void SetMaximumDensity() const;
 
-		void SetPotentialRange
-		(
-			Potential,
-			Potential
-		);
+	void WriteInfoTuple(const NodeId&);
+	void RemoveFromNodeList(NodeId);
+	void GlobalCleanUp();
 
-	private:
+	std::unique_ptr<TGraph> ConvertAlgorithmGridToGraph(const Report&) const;
+	bool BelongsToAnAlgorithm() const;
+	bool IsStateWriteMandatory() const;
+	bool HasANoneTrivialState(const Report&) const;
 
-		void InitializeCanvas() const;
-		void ToRateCanvas(int);
-		void SetMaximumRate() const;
-		void SetMaximumDensity() const;
+	bool HandleReportValue(const Report&);
 
-		void WriteInfoTuple(const NodeId&);
-		void RemoveFromNodeList(NodeId);
-		void GlobalCleanUp();
+	static TCanvas* _p_canvas;
+	static TFile* _p_file;
+	static TNtuple* _p_tuple;
+	static TPad* _p_pad_rate;
+	static TPad* _p_pad_state;
+	std::unique_ptr<TStyle> _p_style { new TStyle };
 
-		TGraph* ConvertAlgorithmGridToGraph(const Report&) const;
-		bool BelongsToAnAlgorithm  () const;
-		bool IsStateWriteMandatory () const;
-		bool HasANoneTrivialState  (const Report&) const;
+	static ValueHandlerHandler _value_handler;
 
-		bool HandleReportValue(const Report&);
+	static std::vector<NodeId> _list_nodes;
+	static std::vector<NodeId> _vector_id;
 
+	std::unique_ptr<TGraph> _p_current_rate_graph;
+	std::unique_ptr<TGraph> _p_current_state_graph;
 
-		static TCanvas*			_p_canvas;
-		static TFile*			_p_file;
-		static TNtuple*			_p_tuple;
-		static TPad*			_p_pad_rate;
-		static TPad*			_p_pad_state;
-		TStyle*					_p_style;
+	bool _b_canvas { false };
+	bool _b_file { false };
 
-		static ValueHandlerHandler	_value_handler;
+	int _nr_reports { 0 };
+	int _index_pad { -1 };
 
-	
-		static vector<NodeId>	_list_nodes;
-		static vector<NodeId>	_vector_id;
+	CanvasParameter _par_canvas = DEFAULT_CANVAS;
 
-		TGraph*					_p_current_rate_graph;
-		TGraph*					_p_current_state_graph;
-
-		bool					_b_canvas;
-		bool					_b_file;
-
-		int						_nr_reports;
-		int						_index_pad;
-
-		CanvasParameter		_par_canvas;
-
-	};
+};
 
 } // end of MPILib
 
