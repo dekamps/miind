@@ -26,7 +26,6 @@ namespace mpi = boost::mpi;
 
 const RootReportHandler WILSONCOWAN_HANDLER(
 		"test/wilsonresponse.root", // file where the simulation results are written
-		false, // do not display on screen
 		false // only rate diagrams
 		);
 
@@ -42,7 +41,6 @@ const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, // the handler
 
 const RootReportHandler WILSONCOWAN_HANDLER1(
 		"test/wilsonresponse1.root", // file where the simulation results are written
-		false, // do not display on screen
 		false // only rate diagrams
 		);
 

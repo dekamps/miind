@@ -4,5 +4,4 @@ add_header(
     RootReportHandler.hpp
     ValueHandlerHandler.hpp
     GraphKey.hpp
-    CanvasParameter.hpp
 )

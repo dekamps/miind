@@ -3,6 +3,5 @@ add_sources(
     RootReportHandler.cpp
     ValueHandlerHandler.cpp
     GraphKey.cpp
-    CanvasParameter.cpp
     #add source files
 )

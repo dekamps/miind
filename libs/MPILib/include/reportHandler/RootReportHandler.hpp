@@ -26,7 +26,6 @@
 #include <memory>
 #include <MPILib/include/reportHandler/AbstractReportHandler.hpp>
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/reportHandler/CanvasParameter.hpp>
 #include <MPILib/include/reportHandler/ValueHandlerHandler.hpp>
 
 // forward declarations 
@@ -53,9 +52,8 @@ namespace MPILib {
 class RootReportHandler: public AbstractReportHandler {
 public:
 
-	RootReportHandler(const std::string&, bool b_canvas = false,
-			bool b_force_state_write = false, const CanvasParameter& =
-					DEFAULT_CANVAS);
+	RootReportHandler(const std::string&,
+			bool b_force_state_write = false);
 
 	RootReportHandler(const RootReportHandler&);
 
@@ -71,23 +69,8 @@ public:
 
 	virtual void DetachHandler(const NodeId&);
 
-	virtual void AddNodeToCanvas(NodeId) const;
-
-	//! Set the minimum and maximum density to be shown in the canvas.
-	void SetDensityRange(Density, Density);
-
-	void SetFrequencyRange(Rate, Rate);
-
-	void SetTimeRange(Time, Time);
-
-	void SetPotentialRange(Potential, Potential);
-
 private:
 
-	void InitializeCanvas() const;
-	void ToRateCanvas(int);
-	void SetMaximumRate() const;
-	void SetMaximumDensity() const;
 
 	void WriteInfoTuple(const NodeId&);
 	void RemoveFromNodeList(NodeId);
@@ -100,11 +83,8 @@ private:
 
 	bool HandleReportValue(const Report&);
 
-	static TCanvas* _p_canvas;
 	static TFile* _p_file;
 	static TNtuple* _p_tuple;
-	static TPad* _p_pad_rate;
-	static TPad* _p_pad_state;
 	std::unique_ptr<TStyle> _p_style { new TStyle };
 
 	static ValueHandlerHandler _value_handler;
@@ -115,13 +95,11 @@ private:
 	std::unique_ptr<TGraph> _p_current_rate_graph;
 	std::unique_ptr<TGraph> _p_current_state_graph;
 
-	bool _b_canvas { false };
 	bool _b_file { false };
 
 	int _nr_reports { 0 };
 	int _index_pad { -1 };
 
-	CanvasParameter _par_canvas = DEFAULT_CANVAS;
 
 };
 

@@ -59,9 +59,6 @@ public:
 		return _stream_name;
 	}
 
-	//! Default is a NOOP. In a RootReportHandler this function is used.
-	virtual void AddNodeToCanvas(NodeId) const {
-	}
 
 protected:
 
