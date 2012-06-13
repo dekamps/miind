@@ -27,7 +27,7 @@ namespace utilities {
 LogStream::LogStream() {
 }
 
-LogStream::LogStream(boost::shared_ptr<std::ostream> p_stream_log) :
+LogStream::LogStream(std::shared_ptr<std::ostream> p_stream_log) :
 		_p_stream_log(p_stream_log), _b_time_available(true) {
 
 	try {
@@ -58,7 +58,7 @@ void LogStream::Record(const std::string& string_message) {
 	}
 }
 
-boost::shared_ptr<std::ostream> LogStream::Stream() const {
+std::shared_ptr<std::ostream> LogStream::Stream() const {
 	return _p_stream_log;
 }
 
@@ -73,7 +73,7 @@ void LogStream::close() {
 		_p_stream_log->flush();
 }
 
-bool LogStream::OpenStream(boost::shared_ptr<std::ostream> p_stream) {
+bool LogStream::OpenStream(std::shared_ptr<std::ostream> p_stream) {
 	if (_p_stream_log)
 		return false;
 	else {

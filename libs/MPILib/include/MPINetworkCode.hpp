@@ -200,7 +200,7 @@ template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
 		const std::string & filename) {
 	// resource will be passed on to _stream_log
-	boost::shared_ptr<std::ostream> p_stream(
+	std::shared_ptr<std::ostream> p_stream(
 			new std::ofstream(filename.c_str()));
 	if (!p_stream)
 		throw utilities::Exception("MPINetwork cannot open log file.");

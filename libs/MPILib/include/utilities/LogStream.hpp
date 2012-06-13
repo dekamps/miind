@@ -20,7 +20,7 @@
 #ifndef MPILIB_UTILITIES_LOGSTREAM_HPP_
 #define MPILIB_UTILITIES_LOGSTREAM_HPP_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <iostream>
 #include <string>
 #include <MPILib/include/utilities/Timer.hpp>
@@ -39,7 +39,7 @@ namespace utilities{
 		LogStream();            
 
 		//! Associate a LogStream with an ostream; the ostream resource should be created on the heap
-		LogStream(boost::shared_ptr<std::ostream>);
+		LogStream(std::shared_ptr<std::ostream>);
 
 		//! Provide sensible behaviour for copying an object containing a LogStream: 
 		//! dissociate from the stream of the originator object
@@ -48,13 +48,13 @@ namespace utilities{
 		//! virtual destructor
 		virtual ~LogStream();
 
-		boost::shared_ptr<std::ostream> Stream() const;
+		std::shared_ptr<std::ostream> Stream() const;
 
 		virtual void Record(const std::string&);
 
 		//! Open a stream that was previously closed
 		//! if a stream was already open, OpenStream will return false and nothing will be done
-		bool OpenStream(boost::shared_ptr<std::ostream>);
+		bool OpenStream(std::shared_ptr<std::ostream>);
 
 		//! Is an open stream associated with this LogStream
 		bool IsOpen() const;
@@ -74,7 +74,7 @@ namespace utilities{
 		
 
 
-		boost::shared_ptr<std::ostream>		_p_stream_log;     // pointer to the log stream
+		std::shared_ptr<std::ostream>		_p_stream_log;     // pointer to the log stream
 
 		bool							_b_time_available; // system time available ?
 
