@@ -35,36 +35,15 @@
 #include <TApplication.h>
 #include <TFile.h>
 #include <TGraph.h>
-#include <TH2F.h>
-#include <TCanvas.h>
-#include <TPad.h>
 #include <TNtuple.h>
-#include <TStyle.h>
 
 namespace MPILib {
 
-const int NUMBER_HISTO_CHANNELS = 500;
 
-const Time T_MIN = 0;
-const Time T_MAX = .04;
-const Density DENSITY_MIN = -0.1;
-const Density DENSITY_MAX = 50;
-const Rate F_MIN = -1;
-const Rate F_MAX = 20;
-const Potential POTENTIAL_MIN = -0.01;
-const Potential POTENTIAL_MAX = 0.020;
-
-namespace {
 
 // need one global application object
 TApplication APPLICATION("application", 0, 0);
 
-TH2F HISTO_RATE("rate_histo", "", NUMBER_HISTO_CHANNELS, T_MIN, T_MAX,
-		NUMBER_HISTO_CHANNELS, F_MIN, F_MAX);
-
-TH2F HISTO_STATE("state_histo", "", NUMBER_HISTO_CHANNELS, POTENTIAL_MIN,
-		POTENTIAL_MAX, NUMBER_HISTO_CHANNELS, DENSITY_MIN, DENSITY_MAX);
-}
 
 TFile* RootReportHandler::_p_file = nullptr;
 TNtuple* RootReportHandler::_p_tuple = nullptr;
@@ -74,11 +53,9 @@ std::vector<NodeId> RootReportHandler::_vector_id(0);
 
 ValueHandlerHandler RootReportHandler::_value_handler;
 
-RootReportHandler::RootReportHandler(const std::string& file_name,
-		 bool b_file) :
+RootReportHandler::RootReportHandler(const std::string& file_name, bool b_file) :
 		AbstractReportHandler(file_name), //
 		_b_file(b_file) {
-	_p_style->SetOptStat(0);
 }
 
 RootReportHandler::RootReportHandler(const RootReportHandler& rhs) :
@@ -96,7 +73,7 @@ RootReportHandler::~RootReportHandler()
 			_p_tuple->Write();
 		_p_file->Close();
 		delete _p_file;
-		_p_file = 0;
+		_p_file = nullptr;
 	}
 
 }
@@ -114,13 +91,10 @@ bool RootReportHandler::WriteReport(const Report& report) {
 		std::vector<NodeId>::iterator iter = std::find(_vector_id.begin(),
 				_vector_id.end(), report._id);
 
-		if (iter != _vector_id.end())
-			_index_pad = static_cast<int>(iter - _vector_id.begin()) + 1;
-		// else
-		// ignore
 	}
 
 	_p_current_rate_graph->SetPoint(_nr_reports++, report._time, report._rate);
+
 	_p_current_state_graph.reset();
 	_p_current_state_graph = ConvertAlgorithmGridToGraph(report);
 
@@ -157,6 +131,7 @@ std::unique_ptr<TGraph> RootReportHandler::ConvertAlgorithmGridToGraph(
 
 	assert(
 			vector_of_grid_values.size() == vector_of_state_interpretation.size());
+
 	for (std::vector<double>::iterator iter = vector_of_grid_values.begin();
 			iter != vector_of_grid_values.end(); iter++) {
 		int n_index = static_cast<int>(iter - vector_of_grid_values.begin());
@@ -182,16 +157,9 @@ bool RootReportHandler::HasANoneTrivialState(const Report& report) const {
 	return true;
 }
 
-
-
 void RootReportHandler::InitializeHandler(const NodeId& info) {
-	// Purpose: this function will be called by MPINode upon configuration. This means that if there is no canvas yet, and it is desired,
-	// that now is the time to create it. This works under the assumption that no two MPINetwork simulations are running at the same time.
-	// Idea is that several handlers can be created, but that no competition between the ROOT resources, which contain globals and statics, takes place
-	// Assumptions: No two MPINetwork simulations are running at the same time
-	// Author: Marc de Kamps
-	// Date: 26-08-2005
-
+	// Purpose: this function will be called by MPINode upon configuration.
+	// no canvas are generated as it would cause lot of problems with mpi
 	if (!_p_file) {
 		_p_file = new TFile(this->MediumName().c_str(), "RECREATE");
 
@@ -204,7 +172,6 @@ void RootReportHandler::InitializeHandler(const NodeId& info) {
 	}
 
 	WriteInfoTuple(info);
-
 
 }
 
@@ -234,10 +201,8 @@ void RootReportHandler::DetachHandler(const NodeId& nodeId) {
 		GlobalCleanUp();
 }
 
-
 void RootReportHandler::RemoveFromNodeList(NodeId id) {
-	std::vector<NodeId>::iterator iter = std::find(_list_nodes.begin(),
-			_list_nodes.end(), id);
+	auto iter = std::find(_list_nodes.begin(), _list_nodes.end(), id);
 
 	if (iter == _list_nodes.end())
 		throw utilities::Exception(
@@ -250,14 +215,15 @@ void RootReportHandler::GlobalCleanUp() {
 	_p_tuple->Write();
 	_p_file->Close();
 
-	delete _p_file;
-	_p_file = 0;
+	if (_p_file) {
+		delete _p_file;
+		_p_file = nullptr;
+	}
 
-	_p_tuple = 0;
+	_p_tuple = nullptr;
 	_list_nodes.clear();
 	_vector_id.clear();
 }
-
 
 } //end namespace
 

@@ -31,13 +31,9 @@
 // forward declarations 
 
 class TApplication;
-class TPad;
 class TGraph;
-class TCanvas;
-class TFile;
-class TH2F;
 class TNtuple;
-#include <TStyle.h>
+class TFile;
 
 namespace MPILib {
 //! This handler writes states and firing rates as TGraph objects in a root file.
@@ -85,7 +81,6 @@ private:
 
 	static TFile* _p_file;
 	static TNtuple* _p_tuple;
-	std::unique_ptr<TStyle> _p_style { new TStyle };
 
 	static ValueHandlerHandler _value_handler;
 
@@ -98,7 +93,6 @@ private:
 	bool _b_file { false };
 
 	int _nr_reports { 0 };
-	int _index_pad { -1 };
 
 
 };
