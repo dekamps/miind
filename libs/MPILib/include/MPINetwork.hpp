@@ -19,7 +19,6 @@
 #include <MPILib/include/NetworkState.hpp>
 #include <MPILib/include/utilities/LogStream.hpp>
 
-
 namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
@@ -37,7 +36,8 @@ public:
 	 * @param nodeType The Type of the Node
 	 * @return returns the NodeId of the generated node
 	 */
-	int addNode(const algorithm::AlgorithmInterface<WeightValue>& alg, NodeType nodeType);
+	int addNode(const algorithm::AlgorithmInterface<WeightValue>& alg,
+			NodeType nodeType);
 
 	/**
 	 * Connects two node
@@ -53,8 +53,7 @@ public:
 	 * Configure the next simulation
 	 * @param simParam The Simulation Parameter
 	 */
-	void configureSimulation(
-			const SimulationRunParameter& simParam);
+	void configureSimulation(const SimulationRunParameter& simParam);
 
 	/**
 	 * Envolve the network
@@ -88,39 +87,39 @@ private:
 	 */
 	void clearSimulation();
 
+	void updateReportTime();
+	void updateSimulationTime();
+	void updateStateTime();
 
-	void updateReportTime				();
-	void updateSimulationTime			();
-	void updateStateTime				();
-
-	Time getEndTime						() const;
-	Time getCurrentReportTime			() const;
-	Time getCurrentSimulationTime		() const;
-	Time getCurrentStateTime			() const;
+	Time getEndTime() const;
+	Time getCurrentReportTime() const;
+	Time getCurrentSimulationTime() const;
+	Time getCurrentStateTime() const;
 
 	/**
 	 * Shared pointer to the actual distribution of the nodes.
 	 */
-	std::shared_ptr<NodeDistribution> _pNodeDistribution;
+	std::shared_ptr<NodeDistribution> _pNodeDistribution { new NodeDistribution };
 
 	/**
 	 * local nodes of the processor
 	 */
-	std::shared_ptr<std::map<NodeId, MPINode<WeightValue, NodeDistribution>>> _pLocalNodes;
+	std::shared_ptr<std::map<NodeId, MPINode<WeightValue, NodeDistribution>>>_pLocalNodes {new std::map<NodeId, MPINode<WeightValue, NodeDistribution>>};
 
 	/**
 	 * The max Node number assigned so far.
 	 * @attention This number is only handled by the master node. Therefore never access it direct!
 	 */
-	int _maxNodeId;
+	int _maxNodeId {0};
 
-	Time _current_report_time = 0;
-	Time _current_state_time = 0;
-	Time _current_simulation_time = 0;
-	NetworkState _state_network;
+	Time _current_report_time {0};
+	Time _current_state_time {0};
+	Time _current_simulation_time {0};
+	NetworkState _state_network {0.0};
 
-	SimulationRunParameter _parameter_simulation_run;
-	utilities::LogStream _stream_log;
+	SimulationRunParameter _parameter_simulation_run {InactiveReportHandler(), 0, 0.0,
+		0.0, 0.0, 0.0, ""};
+	utilities::LogStream _stream_log {};
 
 };
 

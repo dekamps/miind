@@ -129,7 +129,7 @@ private:
 	/**
 	 * Pointer to the local nodes of the processor. They are stored by the network.
 	 */
-	std::shared_ptr<std::map<NodeId, MPINode> > _pLocalNodes;
+	std::shared_ptr<std::map<NodeId, MPINode>> _pLocalNodes;
 
 	//this need to be a shared_ptr see here why auto_ptr does not work:
 	//http://stackoverflow.com/a/10894173/992460

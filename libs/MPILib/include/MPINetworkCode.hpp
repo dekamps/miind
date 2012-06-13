@@ -20,18 +20,7 @@ namespace mpi = boost::mpi;
 using namespace MPILib;
 
 template<class WeightValue, class NodeDistribution>
-MPINetwork<WeightValue, NodeDistribution>::MPINetwork() :
-		_parameter_simulation_run(InactiveReportHandler(), 0, 0.0,
-				0.0, 0.0, 0.0, ""), //
-		_stream_log(), //
-		_pNodeDistribution(new NodeDistribution), //
-		_state_network(0.0), //
-		_pLocalNodes(
-				new std::map<NodeId, MPINode<WeightValue, NodeDistribution>>) {
-
-	if (_pNodeDistribution->isMaster()) {
-		_maxNodeId = 0;
-	}
+MPINetwork<WeightValue, NodeDistribution>::MPINetwork() {
 }
 
 template<class WeightValue, class NodeDistribution>
