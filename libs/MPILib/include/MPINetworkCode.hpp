@@ -86,7 +86,6 @@ template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 		const SimulationRunParameter& simParam) {
 	_current_report_time = simParam.TReport();
-	_current_update_time = simParam.TUpdate();
 	_current_simulation_time = simParam.TBegin();
 	_parameter_simulation_run = simParam;
 
@@ -132,7 +131,6 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					}
 
 				} while (getCurrentSimulationTime() < getCurrentReportTime()
-						&& getCurrentSimulationTime() < getCurrentUpdateTime()
 						&& getCurrentSimulationTime() < getCurrentStateTime());
 
 				// now there is something to report or to update
@@ -149,11 +147,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					collectReport(STATE);
 					updateStateTime();
 				}
-//				// update?
-//				if (getCurrentReportTime() >= getCurrentUpdateTime()) {
-//					collectReport(DynamicLib::UPDATE);
-//					updateUpdateTime();
-//				}
+
 			} while (getCurrentReportTime() < getEndTime());
 			// write out the final state
 			collectReport(STATE);
@@ -234,11 +228,6 @@ void MPINetwork<WeightValue, NodeDistribution>::updateSimulationTime() {
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::updateUpdateTime() {
-	_current_update_time += _parameter_simulation_run.TUpdate();
-}
-
-template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::updateStateTime() {
 	_current_state_time += _parameter_simulation_run.TState();
 }
@@ -256,11 +245,6 @@ Time MPINetwork<WeightValue, NodeDistribution>::getCurrentReportTime() const {
 template<class WeightValue, class NodeDistribution>
 Time MPINetwork<WeightValue, NodeDistribution>::getCurrentSimulationTime() const {
 	return _current_simulation_time;
-}
-
-template<class WeightValue, class NodeDistribution>
-Time MPINetwork<WeightValue, NodeDistribution>::getCurrentUpdateTime() const {
-	return _current_update_time;
 }
 
 template<class WeightValue, class NodeDistribution>

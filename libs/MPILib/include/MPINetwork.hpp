@@ -9,9 +9,9 @@
 #define MPILIB_MPINETWORK_HPP_
 
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
 #include <string>
 #include <map>
+#include <memory>
 
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
@@ -91,24 +91,22 @@ private:
 
 	void updateReportTime				();
 	void updateSimulationTime			();
-	void updateUpdateTime				();
 	void updateStateTime				();
 
 	Time getEndTime						() const;
 	Time getCurrentReportTime			() const;
 	Time getCurrentSimulationTime		() const;
-	Time getCurrentUpdateTime			() const;
 	Time getCurrentStateTime			() const;
 
 	/**
 	 * Shared pointer to the actual distribution of the nodes.
 	 */
-	boost::shared_ptr<NodeDistribution> _pNodeDistribution;
+	std::shared_ptr<NodeDistribution> _pNodeDistribution;
 
 	/**
 	 * local nodes of the processor
 	 */
-	boost::shared_ptr<std::map<NodeId, MPINode<WeightValue, NodeDistribution>>> _pLocalNodes;
+	std::shared_ptr<std::map<NodeId, MPINode<WeightValue, NodeDistribution>>> _pLocalNodes;
 
 	/**
 	 * The max Node number assigned so far.
@@ -117,7 +115,6 @@ private:
 	int _maxNodeId;
 
 	Time _current_report_time = 0;
-	Time _current_update_time = 0;
 	Time _current_state_time = 0;
 	Time _current_simulation_time = 0;
 	NetworkState _state_network;

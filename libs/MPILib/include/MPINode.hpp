@@ -10,8 +10,8 @@
 
 #include <vector>
 #include <map>
+#include <memory>
 #include <boost/mpi/request.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
@@ -37,8 +37,8 @@ public:
 	 */
 	explicit MPINode(const algorithm::AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
 			NodeId nodeId,
-			const boost::shared_ptr<NodeDistribution>& nodeDistribution,
-			const boost::shared_ptr<std::map<NodeId, MPINode<Weight, NodeDistribution>>>& localNode);
+			const std::shared_ptr<NodeDistribution>& nodeDistribution,
+			const std::shared_ptr<std::map<NodeId, MPINode<Weight, NodeDistribution>>>& localNode);
 
 
 	/**
@@ -72,17 +72,6 @@ public:
 	 */
 	void addSuccessor(NodeId nodeId);
 
-//	/**
-//	 * Getter for the Nodes state
-//	 * @return The current node state
-//	 */
-//	DynamicLib::NodeState getState() const;
-//
-//	/**
-//	 * The Setter for the node state
-//	 * @param state The state the node should be in
-//	 */
-//	void setState(DynamicLib::NodeState state);
 	/**
 	 * Getter for the Nodes activity
 	 * @return The current node activity
@@ -140,11 +129,11 @@ private:
 	/**
 	 * Pointer to the local nodes of the processor. They are stored by the network.
 	 */
-	boost::shared_ptr<std::map<NodeId, MPINode> > _pLocalNodes;
+	std::shared_ptr<std::map<NodeId, MPINode> > _pLocalNodes;
 
 	//this need to be a shared_ptr see here why auto_ptr does not work:
 	//http://stackoverflow.com/a/10894173/992460
-	boost::shared_ptr<NodeDistribution> _pNodeDistribution;
+	std::shared_ptr<NodeDistribution> _pNodeDistribution;
 
 
 

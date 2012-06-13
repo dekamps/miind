@@ -21,8 +21,8 @@ template<class Weight, class NodeDistribution>
 MPINode<Weight, NodeDistribution>::MPINode(
 		const algorithm::AlgorithmInterface<Weight>& algorithm,
 		NodeType nodeType, NodeId nodeId,
-		const boost::shared_ptr<NodeDistribution>& nodeDistribution,
-		const boost::shared_ptr<
+		const std::shared_ptr<NodeDistribution>& nodeDistribution,
+		const std::shared_ptr<
 				std::map<NodeId, MPINode<Weight, NodeDistribution>>>& localNode) :
 		_pAlgorithm(algorithm.clone()), //
 		_nodeType(nodeType),//
@@ -88,15 +88,7 @@ void MPINode<Weight, NodeDistribution>::addSuccessor(NodeId nodeId) {
 	_successors.push_back(nodeId);
 }
 
-//template<class Weight, class NodeDistribution>
-//DynamicLib::NodeState MPINode<Weight, NodeDistribution>::getState() const {
-//	return _state;
-//}
-//
-//template<class Weight, class NodeDistribution>
-//void MPINode<Weight, NodeDistribution>::setState(DynamicLib::NodeState state) {
-//	_state = state;
-//}
+
 
 template<class Weight, class NodeDistribution>
 ActivityType MPINode<Weight, NodeDistribution>::getActivity() const {
@@ -166,8 +158,6 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 		_pHandler->writeReport(report);
 	}
 
-//	if (type == DynamicLib::UPDATE)
-//		_pHandler->Update();
 
 	return string_return;
 }
