@@ -30,6 +30,11 @@ MPINode<Weight, NodeDistribution>::MPINode(
 		_pLocalNodes(localNode),//
 		_pNodeDistribution(nodeDistribution)
 		{
+			//hope this sets the timer to zero.
+			_mpiTimer.start();
+			_mpiTimer.stop();
+			_algorithmTimer.start();
+			_algorithmTimer.stop();
 
 		}
 
@@ -43,6 +48,9 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 	receiveData();
 
 	waitAll();
+
+	_algorithmTimer.resume();
+
 	while (_pAlgorithm->getCurrentTime() < time) {
 		++_number_iterations;
 
@@ -52,6 +60,9 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 
 	// update state
 	this->setActivity(_pAlgorithm->getCurrentRate());
+
+	_algorithmTimer.stop();
+
 
 	sendOwnActivity();
 
@@ -88,8 +99,6 @@ void MPINode<Weight, NodeDistribution>::addSuccessor(NodeId nodeId) {
 	_successors.push_back(nodeId);
 }
 
-
-
 template<class Weight, class NodeDistribution>
 ActivityType MPINode<Weight, NodeDistribution>::getActivity() const {
 	return _activity;
@@ -102,12 +111,18 @@ void MPINode<Weight, NodeDistribution>::setActivity(ActivityType activity) {
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::waitAll() {
+
+	_mpiTimer.resume();
+
 	mpi::wait_all(_mpiStatus.begin(), _mpiStatus.end());
 	_mpiStatus.clear();
+
+	_mpiTimer.stop();
 
 }
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::receiveData() {
+	_mpiTimer.resume();
 
 	int i = 0;
 	for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
@@ -125,9 +140,13 @@ void MPINode<Weight, NodeDistribution>::receiveData() {
 							_precursorActivity[i]));
 		}
 	}
+
+	_mpiTimer.stop();
 }
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
+	_mpiTimer.resume();
+
 	mpi::communicator world;
 
 	for (auto& it : _successors) {
@@ -139,6 +158,7 @@ void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 		}
 	}
 
+	_mpiTimer.stop();
 }
 
 template<class Weight, class NodeDistribution>
@@ -150,14 +170,12 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 	std::vector<ReportValue> vec_values;
 
 	if (type == RATE || type == STATE) {
-		Report report(_pAlgorithm->getCurrentTime(),
-				Rate(this->getActivity()),
-				this->_nodeId,
-				_pAlgorithm->getGrid(), string_return, type, vec_values);
+		Report report(_pAlgorithm->getCurrentTime(), Rate(this->getActivity()),
+				this->_nodeId, _pAlgorithm->getGrid(), string_return, type,
+				vec_values);
 
 		_pHandler->writeReport(report);
 	}
-
 
 	return string_return;
 }
@@ -165,7 +183,23 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::clearSimulation() {
 	_pHandler->detachHandler(_nodeId);
+
+	if(_pNodeDistribution->isMaster() && !_isLogPrinted){
+		std::cout<<"MPI Timer: "<<_mpiTimer.format()<<std::endl;
+		std::cout<<"Algorithm Timer: "<<_algorithmTimer.format()<<std::endl;
+		_isLogPrinted=true;
+
+	}
 }
+
+template<class Weight, class NodeDistribution>
+boost::timer::cpu_timer MPINode<Weight, NodeDistribution>::_mpiTimer = boost::timer::cpu_timer();
+
+template<class Weight, class NodeDistribution>
+boost::timer::cpu_timer MPINode<Weight, NodeDistribution>::_algorithmTimer = boost::timer::cpu_timer();
+
+template<class Weight, class NodeDistribution>
+bool MPINode<Weight, NodeDistribution>::_isLogPrinted = false;
 
 } //end namespace MPILib
 

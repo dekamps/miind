@@ -11,6 +11,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <boost/timer/timer.hpp>
 #include <boost/mpi/request.hpp>
 
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
@@ -117,6 +118,12 @@ private:
 	std::vector<Weight> _weights;
 
 	std::vector<NodeId> _successors;
+
+	// Timers for mpi and algorithm time
+	static boost::timer::cpu_timer _mpiTimer, _algorithmTimer;
+
+	// make sure that the log is only printed ones.
+	static bool _isLogPrinted;
 
 
 	NodeType _nodeType;
