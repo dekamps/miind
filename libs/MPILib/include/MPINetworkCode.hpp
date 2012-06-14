@@ -7,14 +7,13 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/collectives.hpp>
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/utilities/IterationNumberException.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/reportHandler/InactiveReportHandler.hpp>
 #include <MPILib/include/MPINetwork.hpp>
 #include <MPILib/include/MPINodeCode.hpp>
+#include <MPILib/include/utilities/ProgressBar.hpp>
 
 namespace mpi = boost::mpi;
 using namespace MPILib;
@@ -108,6 +107,11 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 		_stream_log.flush();
 
 		try {
+			utilities::ProgressBar pb(
+					getEndTime() /  _parameter_simulation_run.TReport()
+							+ getEndTime()
+									/ _parameter_simulation_run.TState());
+
 			do {
 				do {
 					// business as usual: keep evolving, as long as there is nothing to report
@@ -136,6 +140,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					collectReport(STATE);
 					updateStateTime();
 				}
+				pb++;
 
 			} while (getCurrentReportTime() < getEndTime());
 			// write out the final state
@@ -178,7 +183,7 @@ std::string MPINetwork<WeightValue, NodeDistribution>::collectReport(
 
 	std::string string_return;
 
-	for(auto& it: (*_pLocalNodes)) {
+	for (auto& it : (*_pLocalNodes)) {
 		string_return += it.second.reportAll(type);
 	}
 
@@ -189,8 +194,7 @@ template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
 		const std::string & filename) {
 	// resource will be passed on to _stream_log
-	std::shared_ptr<std::ostream> p_stream(
-			new std::ofstream(filename.c_str()));
+	std::shared_ptr<std::ostream> p_stream(new std::ofstream(filename.c_str()));
 	if (!p_stream)
 		throw utilities::Exception("MPINetwork cannot open log file.");
 	if (!_stream_log.OpenStream(p_stream))
@@ -200,7 +204,7 @@ void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::clearSimulation() {
 
-	for(auto& it: (*_pLocalNodes)) {
+	for (auto& it : (*_pLocalNodes)) {
 		it.second.clearSimulation();
 	}
 
