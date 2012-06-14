@@ -20,13 +20,11 @@
 #include <MPILib/include/reportHandler/RootReportHandler.hpp>
 
 #include <MPILib/include/algorithm/RateAlgorithm.hpp>
-#include <MPILib/include/utilities/walltime.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
 namespace mpi = boost::mpi;
 
-const RootReportHandler WILSONCOWAN_HANDLER(
-		"test/wilsonresponse.root", // file where the simulation results are written
+const RootReportHandler WILSONCOWAN_HANDLER("test/wilsonresponse.root", // file where the simulation results are written
 		false // only rate diagrams
 		);
 
@@ -39,8 +37,7 @@ const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, // the handler
 		"test/wilsonresponse.log" // log file name
 		);
 
-const RootReportHandler WILSONCOWAN_HANDLER1(
-		"test/wilsonresponse1.root", // file where the simulation results are written
+const RootReportHandler WILSONCOWAN_HANDLER1("test/wilsonresponse1.root", // file where the simulation results are written
 		false // only rate diagrams
 		);
 
@@ -57,7 +54,7 @@ using namespace MPILib;
 
 int main(int argc, char* argv[]) {
 	// initialize mpi
-	boost::timer::auto_cpu_timer t;
+	//boost::timer::auto_cpu_timer t;
 	mpi::environment env(argc, argv);
 	mpi::communicator world;
 	try {
@@ -93,27 +90,17 @@ int main(int argc, char* argv[]) {
 			network.configureSimulation(PAR_WILSONCOWAN1);
 		}
 
-		double time, time_start = 0.0;
-
-		time = walltime(&time_start);
-
-
 		boost::timer::auto_cpu_timer te;
 		te.start();
 
 		network.evolve();
-
+		world.barrier();
 		te.stop();
-		te.report();
-
-		time = walltime(&time);
 
 		if (world.rank() == 0) {
-			double maxtime;
-			mpi::reduce(world, time, maxtime, mpi::maximum<double>(), 0);
-			std::cout << "The max time is " << maxtime << " sec" << std::endl;
-		} else {
-			reduce(world, time, mpi::maximum<double>(), 0);
+
+			std::cout << "Time of Envolve methode of processor 0: \n";
+			te.report();
 		}
 
 	} catch (std::exception & e) {

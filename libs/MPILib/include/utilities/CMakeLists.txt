@@ -4,8 +4,7 @@ add_header(
     ParallelException.hpp
     CircularDistribution.hpp
     NodeDistributionInterface.hpp
-    Time.hpp
-    walltime.hpp
+    ProgressBar.hpp
     Timer.hpp
     TimeException.hpp
     LogStream.hpp

@@ -3,7 +3,7 @@ add_sources(
     IterationNumberException.cpp
     ParallelException.cpp
     CircularDistribution.cpp
-    Time.cpp
+    ProgressBar.cpp
     Timer.cpp
     TimeException.cpp
     LogStream.cpp
