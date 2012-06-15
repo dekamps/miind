@@ -1,4 +1,3 @@
 ADD_MIIND_MPI_TEST( CircularDistribution_test.cpp)
 ADD_MIIND_MPI_TEST( Exception_test.cpp)
 ADD_MIIND_MPI_TEST( ParallelException_test.cpp)
-ADD_MIIND_MPI_TEST( Time_test.cpp)
