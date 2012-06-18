@@ -1,4 +1,4 @@
-// Copyright (c) 2005 - 2011 Marc de Kamps
+// Copyright (c) 2005 - 2010 Marc de Kamps
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,52 +17,43 @@
 //
 //      If you use this software in work leading to a scientific publication, you should cite
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_VALUEVALUEHANDLER_HPP_
-#define MPILIB_VALUEVALUEHANDLER_HPP_
 
-#include <MPILib/include/Report.hpp>
+#ifndef MPILIB_INACTIVEREPORTHANDLER_HPP_
+#define MPILIB_INACTIVEREPORTHANDLER_HPP_
 
-#include <vector>
-class TGraph;
+#include <MPILib/include/report/handler/AbstractReportHandler.hpp>
 
 
-namespace MPILib
-{
+namespace MPILib {
+namespace report {
+namespace handler {
+//! This ReportHandler does nothing, which is sometimes useful in debugging.
+class InactiveReportHandler: public AbstractReportHandler {
+public:
 
-	//! ValueHandlerHandler is an auxilliary class for the RootReportHandler which keeps track
-	//! of quantities that need to be logged in the simulation file and which are registered as such
-	//! during simulation
+	//! Default constructor
+	InactiveReportHandler();
 
+	virtual ~InactiveReportHandler();
 
-	class ValueHandlerHandler {
-	public:
-	
-		ValueHandlerHandler();
+	virtual void writeReport(const Report&) override;
 
-		bool AddReport(const Report&);
+	virtual InactiveReportHandler* clone() const;
 
-		void Write();
+	virtual void initializeHandler
+	(
+			const NodeId&
+	) override;
+	virtual void detachHandler
+	(
+			const NodeId&
+	) override;
+private:
 
-		struct Event {
-			std::string _str;
-			float  _time;
-			float  _value;
-		};
+}; // end of InactiveReportHandler
 
-		bool IsWritten() const {return _is_written;}
+}// end namespace of handler
+}// end namespace of report
+}// end namespace of MPILib
 
-		void Reset();
-
-	private:
-
-		void DistributeEvent(const Event&);
-
-		bool					_is_written;
-		std::vector<std::string>			_vec_names;
-		std::vector<std::vector<float> >	_vec_time;
-		std::vector<std::vector<float> >	_vec_quantity;
-	};
-
-} // end of namespace
-
-#endif // include guard
+#endif // MPILIB_INACTIVEREPORTHANDLER_HPP_ include guard

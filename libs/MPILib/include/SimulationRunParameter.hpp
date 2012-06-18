@@ -22,7 +22,7 @@
 #define MPILIB_SIMULATIONRUNPARAMETER_HPP_
 
 #include <string>
-#include <MPILib/include/reportHandler/AbstractReportHandler.hpp>
+#include <MPILib/include/report/handler/AbstractReportHandler.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
 
@@ -57,7 +57,7 @@ namespace MPILib
 		//! standard constructor
 		SimulationRunParameter
 		( 
-			const MPILib::AbstractReportHandler&, 	/*!< ReportHandler (where and how is the NodeState information recorded ?)	*/
+			const report::handler::AbstractReportHandler&, 	/*!< ReportHandler (where and how is the NodeState information recorded ?)	*/
 			Number,							/*!< maximum number of iterations											*/
 			Time,   						/*!< Start time of simulation												*/
 			Time,							/*!< End time of Simulation													*/
@@ -94,14 +94,14 @@ namespace MPILib
 		//! Give name of the log file, associated with this run
 		std::string LogName() const { return _name_log; }
 
-		const MPILib::AbstractReportHandler& Handler () const { return *_p_handler; }
+		const report::handler::AbstractReportHandler& Handler () const { return *_p_handler; }
 
 		Number MaximumNumberIterations       () const { return _max_iter; }
 
 
 	private:
 
-		const MPILib::AbstractReportHandler*
+		const report::handler::AbstractReportHandler*
 				_p_handler;
 
 		Number	_max_iter;
@@ -118,6 +118,6 @@ namespace MPILib
 	}; // end of PopulationSimulationRunParameter
 
 
-} // end of DynamicLib
+} // end of namespace MPILib
 
 #endif // MPILIB_SIMULATIONRUNPARAMETER_HPP_ include guard

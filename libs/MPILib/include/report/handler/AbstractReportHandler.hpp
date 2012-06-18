@@ -23,9 +23,13 @@
 
 #include <string>
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/Report.hpp>
+#include <MPILib/include/report/Report.hpp>
 
 namespace MPILib {
+namespace report {
+namespace handler {
+
+
 
 //! Base class for all ReportHandlers
 //!
@@ -98,6 +102,8 @@ private:
 
 };
 
-}// end of MPILib
+}// end namespace of handler
+}// end namespace of report
+}// end namespace of MPILib
 
 #endif // MPILIB_ABSTRACTREPORTHANDLER_HPP_ include guard

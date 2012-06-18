@@ -78,7 +78,7 @@ void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 	// Add this line or other nodes will not get a proper input at the first simulation step!
 	this->setActivity(_pAlgorithm->getCurrentRate());
 
-	_pHandler = boost::shared_ptr<AbstractReportHandler>(
+	_pHandler = boost::shared_ptr<report::handler::AbstractReportHandler>(
 			simParam.Handler().clone());
 
 	_pHandler->initializeHandler(_nodeId);
@@ -163,14 +163,14 @@ void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 
 template<class Weight, class NodeDistribution>
 std::string MPINode<Weight, NodeDistribution>::reportAll(
-		ReportType type) const {
+		report::ReportType type) const {
 
 	std::string string_return("");
 
-	std::vector<ReportValue> vec_values;
+	std::vector<report::ReportValue> vec_values;
 
-	if (type == RATE || type == STATE) {
-		Report report(_pAlgorithm->getCurrentTime(), Rate(this->getActivity()),
+	if (type == report::RATE || type == report::STATE) {
+		report::Report report(_pAlgorithm->getCurrentTime(), Rate(this->getActivity()),
 				this->_nodeId, _pAlgorithm->getGrid(), string_return, type,
 				vec_values);
 

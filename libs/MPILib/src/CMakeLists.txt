@@ -5,5 +5,5 @@ add_sources(
 )
 
 add_subdirectory(algorithm)
-add_subdirectory(reportHandler)
+add_subdirectory(report)
 add_subdirectory(utilities)

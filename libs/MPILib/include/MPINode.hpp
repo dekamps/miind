@@ -101,7 +101,7 @@ public:
 	 * @param The type of Report
 	 * @return The report
 	 */
-	std::string reportAll	(ReportType) const;
+	std::string reportAll	(report::ReportType) const;
 
 	/**
 	 * finishes the simulation.
@@ -161,7 +161,7 @@ private:
 	NodeType							_type;
 
 	boost::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
-	mutable boost::shared_ptr<AbstractReportHandler>	_pHandler;
+	mutable boost::shared_ptr<report::handler::AbstractReportHandler>	_pHandler;
 };
 
 typedef MPINode<double, utilities::CircularDistribution> D_MPINode;

@@ -25,11 +25,12 @@
 #include <boost/bind.hpp>
 #include <TGraph.h>
 #include <TDirectory.h>
-#include <MPILib/include/reportHandler/ValueHandlerHandler.hpp>
+#include <MPILib/include/report/handler/ValueHandlerHandler.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
-namespace MPILib{
-
+namespace MPILib {
+namespace report {
+namespace handler {
 
 ValueHandlerHandler::ValueHandlerHandler():
 _is_written(false),
@@ -119,4 +120,6 @@ void ValueHandlerHandler::Reset()
 	_vec_quantity.clear();
 }
 
-}//end namespace
+}// end namespace of handler
+}// end namespace of report
+}// end namespace of MPILib

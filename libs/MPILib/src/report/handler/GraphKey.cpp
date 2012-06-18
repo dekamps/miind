@@ -20,10 +20,12 @@
 #include <sstream>
 #include <boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
-#include <MPILib/include/reportHandler/GraphKey.hpp>
+#include <MPILib/include/report/handler/GraphKey.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
-namespace MPILib{
+namespace MPILib {
+namespace report {
+namespace handler {
 
 GraphKey::GraphKey
 (
@@ -82,4 +84,6 @@ std::string GraphKey::Name() const
 	return str.str();
 }
 
-}//end namespace
+}// end namespace of handler
+}// end namespace of report
+}// end namespace of MPILib

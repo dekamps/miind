@@ -21,8 +21,8 @@
 #ifndef MPILIB_REPORT_HPP_
 #define MPILIB_REPORT_HPP_
 
-#include <MPILib/include/ReportType.hpp>
-#include <MPILib/include/ReportValue.hpp>
+#include <MPILib/include/report/ReportType.hpp>
+#include <MPILib/include/report/ReportValue.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 
@@ -32,8 +32,8 @@
 #include <string>
 
 
-namespace MPILib
-{
+namespace MPILib{
+namespace report{
 	//! A Report is sent by a MPINode when it is queried.
 	//!
 	//! The information compiled by individual nodes is sent at a request of the agent that drives the
@@ -45,7 +45,7 @@ namespace MPILib
 		Rate				_rate;			//!< Current firing rate of this node.
 		NodeId				_id;			//!< NodeId of this node.
 		AlgorithmGrid		_grid {0};			//!< The state space of the Algorithm
-		std::string				_log_message;	//!< Whatever message should appear in the log file
+		std::string			_log_message;	//!< Whatever message should appear in the log file
 		ReportType			_type;			//!< Information for the handler on how to treat the Report
 		std::vector<ReportValue>	_values {};		//!< Ad hoc values that need to be logged in the simulation file
 
@@ -59,8 +59,7 @@ namespace MPILib
 		_time(time),
 		_rate(rate),
 		_id(id),
-		_log_message(log_message),
-		_values(0)
+		_log_message(log_message)
 		{
 		}
 
@@ -102,7 +101,7 @@ namespace MPILib
 
 	}; // end of Report
 
-
-} // end of MPILib
+} //end of namespace report
+} // end of namespace MPILib
 
 #endif // MPILIB_REPORT_HPP_ include guard

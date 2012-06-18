@@ -18,6 +18,8 @@
 #include <MPILib/include/MPINode.hpp>
 #include <MPILib/include/NetworkState.hpp>
 #include <MPILib/include/utilities/LogStream.hpp>
+#include <MPILib/include/report/handler/InactiveReportHandler.hpp>
+
 
 namespace MPILib {
 
@@ -74,7 +76,7 @@ private:
 	 */
 	void incrementMaxNodeId();
 
-	std::string collectReport(ReportType type);
+	std::string collectReport(report::ReportType type);
 
 	/**
 	 * initialize the log stream
@@ -117,7 +119,7 @@ private:
 	Time _current_simulation_time {0};
 	NetworkState _state_network {0.0};
 
-	SimulationRunParameter _parameter_simulation_run {InactiveReportHandler(), 0, 0.0,
+	SimulationRunParameter _parameter_simulation_run {report::handler::InactiveReportHandler(), 0, 0.0,
 		0.0, 0.0, 0.0, ""};
 	utilities::LogStream _stream_log {};
 

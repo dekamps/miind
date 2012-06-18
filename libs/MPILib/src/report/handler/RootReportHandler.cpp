@@ -26,18 +26,19 @@
 #include <algorithm>
 #include <sstream>
 #include <assert.h>
-#include <MPILib/include/reportHandler/RootReportHandler.hpp>
+#include <MPILib/include/report/handler/RootReportHandler.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/reportHandler/GraphKey.hpp>
+#include <MPILib/include/report/handler/GraphKey.hpp>
 
 #include <TApplication.h>
 #include <TFile.h>
 #include <TGraph.h>
 
 namespace MPILib {
-
+namespace report {
+namespace handler {
 
 
 // need one global application object
@@ -203,5 +204,6 @@ void RootReportHandler::finalize() {
 	_nodes.clear();
 }
 
-} //end namespace
-
+}// end namespace of handler
+}// end namespace of report
+}// end namespace of MPILib

@@ -17,14 +17,14 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
 #include <MPILib/include/algorithm/WilsonCowanParameter.hpp>
-#include <MPILib/include/reportHandler/RootReportHandler.hpp>
+#include <MPILib/include/report/handler/RootReportHandler.hpp>
 
 #include <MPILib/include/algorithm/RateAlgorithm.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
 namespace mpi = boost::mpi;
 
-const RootReportHandler WILSONCOWAN_HANDLER("test/wilsonresponse.root", // file where the simulation results are written
+const report::handler::RootReportHandler WILSONCOWAN_HANDLER("test/wilsonresponse.root", // file where the simulation results are written
 		false // only rate diagrams
 		);
 
@@ -37,7 +37,7 @@ const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, // the handler
 		"test/wilsonresponse.log" // log file name
 		);
 
-const RootReportHandler WILSONCOWAN_HANDLER1("test/wilsonresponse1.root", // file where the simulation results are written
+const report::handler::RootReportHandler WILSONCOWAN_HANDLER1("test/wilsonresponse1.root", // file where the simulation results are written
 		false // only rate diagrams
 		);
 

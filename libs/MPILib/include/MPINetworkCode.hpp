@@ -10,7 +10,6 @@
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/utilities/IterationNumberException.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
-#include <MPILib/include/reportHandler/InactiveReportHandler.hpp>
 #include <MPILib/include/MPINetwork.hpp>
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/utilities/ProgressBar.hpp>
@@ -131,20 +130,20 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					// there is something to report
 					//CheckPercentageAndLog(CurrentSimulationTime());
 					updateReportTime();
-					report = collectReport(RATE);
+					report = collectReport(report::RATE);
 					_stream_log << report;
 				}
 				// just a rate or also a state?
 				if (getCurrentSimulationTime() >= getCurrentStateTime()) {
 					// a rate as well as a state
-					collectReport(STATE);
+					collectReport(report::STATE);
 					updateStateTime();
 				}
 				pb++;
 
 			} while (getCurrentReportTime() < getEndTime());
 			// write out the final state
-			collectReport(STATE);
+			collectReport(report::STATE);
 		}
 
 		catch (utilities::IterationNumberException &e) {
@@ -179,7 +178,7 @@ void MPINetwork<WeightValue, NodeDistribution>::incrementMaxNodeId() {
 
 template<class WeightValue, class NodeDistribution>
 std::string MPINetwork<WeightValue, NodeDistribution>::collectReport(
-		ReportType type) {
+		report::ReportType type) {
 
 	std::string string_return;
 

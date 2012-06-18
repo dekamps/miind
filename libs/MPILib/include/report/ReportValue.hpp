@@ -17,38 +17,30 @@
 //
 //      If you use this software in work leading to a scientific publication, you should cite
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
+#ifndef MPILIB_REPORTVALUE_HPP_
+#define MPILIB_REPORTVALUE_HPP_
 
-#ifndef MPILIB_INACTIVEREPORTHANDLER_HPP_
-#define MPILIB_INACTIVEREPORTHANDLER_HPP_
+#include <string>
 
-#include <MPILib/include/reportHandler/AbstractReportHandler.hpp>
 
-namespace MPILib {
-//! This ReportHandler does nothing, which is sometimes useful in debugging.
-class InactiveReportHandler: public AbstractReportHandler {
-public:
+namespace MPILib{
+namespace report{
 
-	//! Default constructor
-	InactiveReportHandler();
+	//! ReportValue objects cab be added to a Report when a particular quantity, as yet unknown at this stage,
+	//! needs to be stored into  the simulation data file.
 
-	virtual ~InactiveReportHandler();
+	//! Each handler has its own way of dealing with these objects.
+	//! For the RootReport handler the behavious is as follows: if a TGraph corresponding to the name
+	//! member does not yet exist, one will be created for the DynamicNode where it is added to the
+	//! Report. From that moment onwards, every ReportValue added in this node will be added to the TGraph,
+	//! together with the simulation time of the Report. Hence a plot over time of the quantity in question
+	//! will be created and stored in the simulation file.
+	struct ReportValue {
+		std::string  _name_quantity;
+		double  _value;
+		double	_time;
+	};
+} //end of namespace report
+} // end of namespace MPILib
 
-	virtual void writeReport(const Report&) override;
-
-	virtual InactiveReportHandler* clone() const;
-
-	virtual void initializeHandler
-	(
-			const NodeId&
-	) override;
-	virtual void detachHandler
-	(
-			const NodeId&
-	) override;
-private:
-
-}; // end of InactiveReportHandler
-
-}// end of MPILib
-
-#endif // MPILIB_INACTIVEREPORTHANDLER_HPP_ include guard
+#endif // MPILIB_REPORTVALUE_HPP_ include guard

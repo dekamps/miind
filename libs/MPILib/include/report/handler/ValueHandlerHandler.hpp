@@ -15,48 +15,56 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-//      If you use this software in work leading to a scientific publication, you should include a reference there to
+//      If you use this software in work leading to a scientific publication, you should cite
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_GRAPHKEY_HPP_
-#define MPILIB_GRAPHKEY_HPP_
+#ifndef MPILIB_VALUEVALUEHANDLER_HPP_
+#define MPILIB_VALUEVALUEHANDLER_HPP_
 
-#include <string>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/report/Report.hpp>
 
+#include <vector>
+class TGraph;
 
 namespace MPILib {
+namespace report {
+namespace handler {
 
-	enum GraphType { STATEGRAPH, RATEGRAPH };
+	//! ValueHandlerHandler is an auxilliary class for the RootReportHandler which keeps track
+	//! of quantities that need to be logged in the simulation file and which are registered as such
+	//! during simulation
 
-	//! Serves to interpret the name of a graph assigned by any AbstractReportHandler, and serves as a
-	//! key for searches on graphs in simulation files.
-	//!
-	//! Given the size of root files nowadays, the Node and time stamp of state graphs in any handler must not
-	//! only be stored, but also be retrieved in subsequent analysis. The GraphKey object is the central object
-	//! to code and decode the names of state graphs.
-	struct GraphKey {
-		
-		std::string		_name;
-		NodeId		_id;		
-		Time		_time;
-		GraphType	_type;
 
-		//! Default constructor for use in containers
-		GraphKey();
+	class ValueHandlerHandler {
+	public:
+	
+		ValueHandlerHandler();
 
-		//! construct a graph key from the key in the root file. If the string does not represent a valid key, no object will
-		//! be constructed, but otherwise nothig will happen. This allows parsing of heterogeneous object files.
-		GraphKey(const std::string&);
+		bool AddReport(const Report&);
 
-		//! construct a graph key from a Report information
-		GraphKey
-		(
-			NodeId,
-			Time
-		);
+		void Write();
 
-		std::string Name() const;
+		struct Event {
+			std::string _str;
+			float  _time;
+			float  _value;
+		};
+
+		bool IsWritten() const {return _is_written;}
+
+		void Reset();
+
+	private:
+
+		void DistributeEvent(const Event&);
+
+		bool					_is_written;
+		std::vector<std::string>			_vec_names;
+		std::vector<std::vector<float> >	_vec_time;
+		std::vector<std::vector<float> >	_vec_quantity;
 	};
 
-}
+}// end namespace of handler
+}// end namespace of report
+}// end namespace of MPILib
+
 #endif // include guard

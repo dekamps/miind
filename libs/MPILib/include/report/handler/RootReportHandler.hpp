@@ -24,9 +24,9 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <MPILib/include/reportHandler/AbstractReportHandler.hpp>
+#include <MPILib/include/report/handler/AbstractReportHandler.hpp>
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/reportHandler/ValueHandlerHandler.hpp>
+#include <MPILib/include/report/handler/ValueHandlerHandler.hpp>
 
 // forward declarations 
 
@@ -34,7 +34,10 @@ class TApplication;
 class TGraph;
 class TFile;
 
+
 namespace MPILib {
+namespace report {
+namespace handler {
 //! This handler writes states and firing rates as TGraph objects in a root file.
 //! (see http://root.cern.ch). It is also able to show run time graphs of selected nodes.
 //!
@@ -148,6 +151,8 @@ private:
 
 };
 
-} // end of MPILib
+}// end namespace of handler
+}// end namespace of report
+}// end namespace of MPILib
 
 #endif // MPILIB_ROOTHANDLER_HPP_ include guard

@@ -1,4 +1,4 @@
-// Copyright (c) 2005 - 2010 Marc de Kamps
+// Copyright (c) 2005 - 2008 Marc de Kamps
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,14 +17,45 @@
 //
 //      If you use this software in work leading to a scientific publication, you should cite
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_REPORTTYPE_HPP_
-#define MPILIB_REPORTTYPE_HPP_
+
+#include <MPILib/include/report/handler/InactiveReportHandler.hpp>
+#include <sstream>
 
 namespace MPILib {
+namespace report {
+namespace handler {
 
-	//! A ReportType specifies whether just a DynamicNode's activation is reported or its full NodeState
-	enum ReportType {RATE, STATE};
+InactiveReportHandler::InactiveReportHandler():
+AbstractReportHandler("")
+{
 }
 
-#endif // include guard
+InactiveReportHandler::~InactiveReportHandler()
+{
+}
 
+void InactiveReportHandler::writeReport(const Report& report)
+{
+
+}
+
+InactiveReportHandler* InactiveReportHandler::clone() const
+{
+	return new InactiveReportHandler;
+}
+
+
+void InactiveReportHandler::initializeHandler
+(
+	const NodeId& info
+)
+{
+}
+
+void InactiveReportHandler::detachHandler(const NodeId &)
+{
+}
+
+}// end namespace of handler
+}// end namespace of report
+}// end namespace of MPILib

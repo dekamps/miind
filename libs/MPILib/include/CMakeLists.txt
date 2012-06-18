@@ -1,5 +1,5 @@
 add_subdirectory(algorithm)
-add_subdirectory(reportHandler)
+add_subdirectory(report)
 add_subdirectory(utilities)
 
 add_header(
@@ -9,8 +9,5 @@ add_header(
     MPINetworkCode.hpp
     BasicTypes.hpp
     SimulationRunParameter.hpp
-    Report.hpp
-    ReportType.hpp
-    ReportValue.hpp
     NetworkState.hpp
 )
