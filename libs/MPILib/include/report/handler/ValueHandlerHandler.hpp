@@ -17,8 +17,8 @@
 //
 //      If you use this software in work leading to a scientific publication, you should cite
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_VALUEVALUEHANDLER_HPP_
-#define MPILIB_VALUEVALUEHANDLER_HPP_
+#ifndef MPILIB_REPORT_HANDLER_VALUEVALUEHANDLER_HPP_
+#define MPILIB_REPORT_HANDLER_VALUEVALUEHANDLER_HPP_
 
 #include <MPILib/include/report/Report.hpp>
 

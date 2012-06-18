@@ -17,8 +17,8 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_GRAPHKEY_HPP_
-#define MPILIB_GRAPHKEY_HPP_
+#ifndef MPILIB_REPORT_HANDLER_GRAPHKEY_HPP_
+#define MPILIB_REPORT_HANDLER_GRAPHKEY_HPP_
 
 #include <string>
 #include <MPILib/include/BasicTypes.hpp>

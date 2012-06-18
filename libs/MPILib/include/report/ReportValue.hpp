@@ -17,8 +17,8 @@
 //
 //      If you use this software in work leading to a scientific publication, you should cite
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_REPORTVALUE_HPP_
-#define MPILIB_REPORTVALUE_HPP_
+#ifndef MPILIB_REPORT_REPORTVALUE_HPP_
+#define MPILIB_REPORT_REPORTVALUE_HPP_
 
 #include <string>
 
@@ -43,4 +43,4 @@ namespace report{
 } //end of namespace report
 } // end of namespace MPILib
 
-#endif // MPILIB_REPORTVALUE_HPP_ include guard
+#endif // MPILIB_REPORT_REPORTVALUE_HPP_ include guard

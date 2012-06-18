@@ -18,8 +18,8 @@
 //      If you use this software in work leading to a scientific publication, you should cite
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
-#ifndef MPILIB_INACTIVEREPORTHANDLER_HPP_
-#define MPILIB_INACTIVEREPORTHANDLER_HPP_
+#ifndef MPILIB_REPORT_HANDLER_INACTIVEREPORTHANDLER_HPP_
+#define MPILIB_REPORT_HANDLER_INACTIVEREPORTHANDLER_HPP_
 
 #include <MPILib/include/report/handler/AbstractReportHandler.hpp>
 
@@ -56,4 +56,4 @@ private:
 }// end namespace of report
 }// end namespace of MPILib
 
-#endif // MPILIB_INACTIVEREPORTHANDLER_HPP_ include guard
+#endif // MPILIB_REPORT_HANDLER_INACTIVEREPORTHANDLER_HPP_ include guard
