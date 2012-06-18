@@ -35,7 +35,6 @@
 #include <TApplication.h>
 #include <TFile.h>
 #include <TGraph.h>
-#include <TNtuple.h>
 
 namespace MPILib {
 
@@ -46,7 +45,6 @@ TApplication APPLICATION("application", 0, 0);
 
 
 TFile* RootReportHandler::_pFile = nullptr;
-TNtuple* RootReportHandler::_pTuple = nullptr;
 
 std::vector<NodeId> RootReportHandler::_nodes(0);
 
@@ -68,8 +66,6 @@ RootReportHandler::~RootReportHandler()
 // 11-07-2007: test on p_tuple by Volker Baier
 {
 	if (_pFile) {
-		if (_pTuple)
-			_pTuple->Write();
 		_pFile->Close();
 		delete _pFile;
 		_pFile = nullptr;
@@ -146,7 +142,7 @@ bool RootReportHandler::isStateWriteMandatory() const {
 }
 
 
-void RootReportHandler::initializeHandler(const NodeId& info) {
+void RootReportHandler::initializeHandler(const NodeId& nodeId) {
 	// Purpose: this function will be called by MPINode upon configuration.
 	// no canvas are generated as it would cause lot of problems with mpi
 	if (!_pFile) {
@@ -155,18 +151,13 @@ void RootReportHandler::initializeHandler(const NodeId& info) {
 		if (_pFile->IsZombie())
 			throw utilities::Exception(STR_ROOT_FILE_OPENED_FAILED);
 
-		_pTuple = new TNtuple("infotuple", "node info", "id:x:y:z:f");
 		_valueHandler.Reset();
 
 	}
-
-	writeInfoTuple(info);
-
-}
-
-void RootReportHandler::writeInfoTuple(const NodeId& nodeId) {
-	_pTuple->Fill(static_cast<Float_t>(nodeId));
+	// store the node
 	_nodes.push_back(nodeId);
+
+
 }
 
 void RootReportHandler::detachHandler(const NodeId& nodeId) {
@@ -190,8 +181,8 @@ void RootReportHandler::detachHandler(const NodeId& nodeId) {
 		finalize();
 }
 
-void RootReportHandler::removeFromNodeList(NodeId id) {
-	auto iter = std::find(_nodes.begin(), _nodes.end(), id);
+void RootReportHandler::removeFromNodeList(NodeId nodeId) {
+	auto iter = std::find(_nodes.begin(), _nodes.end(), nodeId);
 
 	if (iter == _nodes.end())
 		throw utilities::Exception(
@@ -201,15 +192,12 @@ void RootReportHandler::removeFromNodeList(NodeId id) {
 }
 
 void RootReportHandler::finalize() {
-	_pTuple->Write();
 	_pFile->Close();
 
 	if (_pFile) {
 		delete _pFile;
 		_pFile = nullptr;
 	}
-
-	_pTuple = nullptr;
 	_nodes.clear();
 }
 

@@ -32,7 +32,6 @@
 
 class TApplication;
 class TGraph;
-class TNtuple;
 class TFile;
 
 namespace MPILib {
@@ -81,11 +80,6 @@ public:
 
 private:
 
-	/**
-	 * Writes the info tuple to the file
-	 * @param The NodeId
-	 */
-	void writeInfoTuple(const NodeId&);
 
 	/**
 	 * removes the node from the handler
@@ -121,11 +115,6 @@ private:
 	 * Pointer to the file. @todo change this to smart pointer
 	 */
 	static TFile* _pFile;
-
-	/**
-	 * Pointer to the tuple. @todo change this to smart pointer
-	 */
-	static TNtuple* _pTuple;
 
 	/**
 	 * The Value Handler
