@@ -115,22 +115,24 @@ std::unique_ptr<TGraph> RootReportHandler::convertAlgorithmGridToGraph(
 	std::vector<double> vector_of_state_interpretation =
 			report._grid.ToInterpretationVector();
 
-	std::unique_ptr<TGraph> p_state_graph { new TGraph };
+	std::unique_ptr<TGraph> tempPtrStateGraph {new TGraph};
 
 	GraphKey key(report._id, report._time);
-	p_state_graph->SetName(key.Name().c_str());
+	tempPtrStateGraph->SetName(key.Name().c_str());
 
 	assert(
 			vector_of_grid_values.size() == vector_of_state_interpretation.size());
 
-	for (unsigned int i = 0; i<vector_of_grid_values.size(); i++){
-			p_state_graph->SetPoint(i,
-					vector_of_state_interpretation[i],
-					vector_of_grid_values[i]);
+	unsigned int i = 0;
+	for(auto& it : vector_of_grid_values){
+		tempPtrStateGraph->SetPoint(i,
+				vector_of_state_interpretation[i],
+				vector_of_grid_values[i]);
+		i++;
 	}
 
 
-	return p_state_graph;
+	return tempPtrStateGraph;
 }
 
 bool RootReportHandler::isConnectedToAlgorithm() const {
