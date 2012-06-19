@@ -65,7 +65,7 @@ void ValueHandlerHandler::distributeEvent(const Event& ev) {
 	}
 }
 
-bool ValueHandlerHandler::addReport(const Report& report) {
+void ValueHandlerHandler::addReport(const Report& report) {
 	// strip all ReportValues and store them in Events
 	std::vector<Event> vec_event(report._values.size());
 	std::transform(report._values.begin(), report._values.end(),
@@ -74,7 +74,6 @@ bool ValueHandlerHandler::addReport(const Report& report) {
 	for_each(vec_event.begin(), vec_event.end(),
 			boost::bind(&ValueHandlerHandler::distributeEvent, this, _1));
 
-	return true;
 }
 
 void ValueHandlerHandler::write() {
@@ -92,6 +91,9 @@ void ValueHandlerHandler::write() {
 
 	p_dir->cd();
 }
+
+bool ValueHandlerHandler::isWritten() const {return _is_written;}
+
 
 void ValueHandlerHandler::reset() {
 	_is_written = false;

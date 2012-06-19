@@ -39,7 +39,7 @@ namespace handler {
 	
 		ValueHandlerHandler();
 
-		bool addReport(const Report&);
+		void addReport(const Report&);
 
 		void write();
 
@@ -49,7 +49,7 @@ namespace handler {
 			float  _value;
 		};
 
-		bool isWritten() const {return _is_written;}
+		bool isWritten() const;
 
 		void reset();
 
