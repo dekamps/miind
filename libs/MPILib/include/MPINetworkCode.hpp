@@ -15,7 +15,7 @@
 #include <MPILib/include/utilities/ProgressBar.hpp>
 
 namespace mpi = boost::mpi;
-using namespace MPILib;
+namespace MPILib{
 
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::MPINetwork() {
@@ -276,3 +276,5 @@ Time MPINetwork<WeightValue, NodeDistribution>::getCurrentStateTime() const {
 	return _current_state_time;
 
 }
+
+}//end namespace MPILib

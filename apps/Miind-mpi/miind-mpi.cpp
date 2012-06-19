@@ -23,6 +23,7 @@
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
 namespace mpi = boost::mpi;
+using namespace MPILib;
 
 const report::handler::RootReportHandler WILSONCOWAN_HANDLER("test/wilsonresponse.root", // file where the simulation results are written
 		false // only rate diagrams
@@ -50,7 +51,6 @@ const SimulationRunParameter PAR_WILSONCOWAN1(WILSONCOWAN_HANDLER1, // the handl
 		"test/wilsonresponse1.log" // log file name
 		);
 
-using namespace MPILib;
 
 int main(int argc, char* argv[]) {
 	// initialize mpi

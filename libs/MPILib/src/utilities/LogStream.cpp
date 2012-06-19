@@ -28,7 +28,7 @@ LogStream::LogStream() {
 }
 
 LogStream::LogStream(std::shared_ptr<std::ostream> p_stream_log) :
-		_p_stream_log(p_stream_log), _b_time_available(true) {
+		_p_stream_log(p_stream_log) {
 
 	try {
 		// just check if there is timing
