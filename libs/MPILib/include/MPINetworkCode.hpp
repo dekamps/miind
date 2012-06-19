@@ -50,7 +50,7 @@ template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 		NodeId first, NodeId second, const WeightValue& weight) {
 
-	//Make sure that the node exists
+	//Make sure that the node exists and then add the successor
 	if (_pNodeDistribution->isLocalNode(first)) {
 		if (_pLocalNodes->count(first) > 0) {
 			_pLocalNodes->find(first)->second.addSuccessor(second);
@@ -65,11 +65,9 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 	if (_pNodeDistribution->isLocalNode(first)) {
 		if (isDalesLawSet()) {
 
-			MPINode<WeightValue, NodeDistribution> tempNode =
-					_pLocalNodes->find(first)->second;
+			auto tempNode = _pLocalNodes->find(first)->second;
 
-			if ((tempNode.getNodeType() == EXCITATORY
-					&& toEfficacy(weight) < 0)
+			if ((tempNode.getNodeType() == EXCITATORY && toEfficacy(weight) < 0)
 					|| (tempNode.getNodeType() == INHIBITORY
 							&& toEfficacy(weight) > 0)) {
 				throw utilities::Exception("Dale's law violated");
@@ -79,6 +77,7 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 
 	}
 
+	// Make sure that the second node exist and then set the precursor
 	if (_pNodeDistribution->isLocalNode(second)) {
 		if (_pLocalNodes->count(second) > 0) {
 			_pLocalNodes->find(second)->second.addPrecursor(first, weight);

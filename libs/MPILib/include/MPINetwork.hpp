@@ -90,8 +90,16 @@ private:
 	 */
 	void clearSimulation();
 
+	/**
+	 * checks if dales Law is active
+	 * @return true if Dales law is set
+	 */
 	bool isDalesLawSet() const;
 
+	/**
+	 * setter for Dales law
+	 * @param b_law true if Dales law should be active
+	 */
 	void setDalesLaw(bool b_law);
 
 	void updateReportTime();
@@ -123,12 +131,13 @@ private:
 	Time _current_state_time {0};
 	Time _current_simulation_time {0};
 	NetworkState _state_network {0.0};
+	bool _isDalesLaw {true};
 
 	SimulationRunParameter _parameter_simulation_run {report::handler::InactiveReportHandler(), 0, 0.0,
 		0.0, 0.0, 0.0, ""};
 	utilities::LogStream _stream_log {};
 
-	bool _isDalesLaw {true};
+
 
 };
 
