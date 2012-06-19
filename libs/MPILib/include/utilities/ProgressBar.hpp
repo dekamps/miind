@@ -51,7 +51,7 @@ public:
 	unsigned long operator++(int);
 
 private:
-	unsigned long _count, _expected_count, _next_tic_count;
+	unsigned long _count, _expectedCount, _nextTicCount;
 	unsigned int _tic;
 
 	/**

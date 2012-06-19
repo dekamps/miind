@@ -11,19 +11,19 @@
 namespace MPILib {
 namespace utilities {
 
-ProgressBar::ProgressBar(unsigned long expected_count,
+ProgressBar::ProgressBar(unsigned long expectedCount,
 		const std::string & description, std::ostream& os) :
 		_description(description), _outputStream(os) {
 	boost::mpi::communicator world;
 
 	if (world.rank() == 0) {
-		restart(expected_count);
+		restart(expectedCount);
 	}
 }
 
 void ProgressBar::restart(unsigned long expected_count) {
-	_count = _next_tic_count = _tic = 0;
-	_expected_count = expected_count;
+	_count = _nextTicCount = _tic = 0;
+	_expectedCount = expected_count;
 	_outputStream << _description << "\n"
 			<< "0%   10   20   30   40   50   60   70   80   90   100%\n"
 			<< "|----|----|----|----|----|----|----|----|----|----|"
@@ -35,7 +35,7 @@ unsigned long ProgressBar::operator+=(unsigned long increment) {
 	boost::mpi::communicator world;
 
 	if (world.rank() == 0) {
-		if ((_count += increment) >= _next_tic_count) {
+		if ((_count += increment) >= _nextTicCount) {
 			display_tic();
 		}
 	}
@@ -53,13 +53,13 @@ unsigned long ProgressBar::operator++(int) {
 void ProgressBar::display_tic() {
 	unsigned int tics_needed =
 			static_cast<unsigned int>((static_cast<double>(_count)
-					/ _expected_count) * 50.0);
+					/ _expectedCount) * 50.0);
 	do {
 		_outputStream << '*' << std::flush;
 	} while (++_tic < tics_needed);
-	_next_tic_count =
-			static_cast<unsigned long>((_tic / 50.0) * _expected_count);
-	if (_count == _expected_count) {
+	_nextTicCount =
+			static_cast<unsigned long>((_tic / 50.0) * _expectedCount);
+	if (_count == _expectedCount) {
 		if (_tic < 51)
 			_outputStream << '*';
 		_outputStream << std::endl;
