@@ -33,6 +33,56 @@ void test_Constructor() {
 			strncmp(sstream.str().c_str(), e2.what(), sstream.str().size())== 0);
 }
 
+void test_catch() {
+
+	try {
+		throw IterationNumberException("message");
+	} catch (IterationNumberException& e) {
+		std::stringstream sstream;
+		sstream << "message";
+		BOOST_REQUIRE(
+				strncmp(sstream.str().c_str(), e.what(), sstream.str().size())== 0);
+
+	}
+
+	try {
+		throw IterationNumberException("message");
+	} catch (Exception& e) {
+		std::stringstream sstream;
+		sstream << "message";
+		BOOST_REQUIRE(
+				strncmp(sstream.str().c_str(), e.what(), sstream.str().size())== 0);
+
+	}
+
+	try {
+		throw IterationNumberException("message");
+	} catch (std::exception& e) {
+		std::stringstream sstream;
+		sstream << "message";
+		BOOST_REQUIRE(
+				strncmp(sstream.str().c_str(), e.what(), sstream.str().size())== 0);
+
+	}
+
+	try {
+		throw IterationNumberException("message");
+	} catch (IterationNumberException& e) {
+
+	} catch (std::exception& e) {
+		BOOST_FAIL("should be catched already");
+	}
+
+	try {
+		throw Exception("message");
+	} catch (IterationNumberException& e) {
+		BOOST_FAIL("should not be catched as it is a Exception");
+
+	} catch (Exception& e) {
+	}
+
+}
+
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
@@ -44,6 +94,7 @@ int test_main(int argc, char* argv[]) // note the name!
 
 	// we use only two processors for this testing
 	test_Constructor();
+	test_catch();
 
 	return 0;
 

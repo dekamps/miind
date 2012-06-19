@@ -65,6 +65,53 @@ void test_Macros() {
 	BOOST_REQUIRE(thrown== true);
 }
 
+void test_catch() {
+
+	try {
+		throw ParallelException("message");
+	} catch (ParallelException& e) {
+
+	} catch (...) {
+		BOOST_FAIL("should be catched already");
+
+	}
+
+	try {
+		throw ParallelException("message");
+	} catch (Exception& e) {
+
+	} catch (...) {
+		BOOST_FAIL("should be catched already");
+
+	}
+
+	try {
+		throw ParallelException("message");
+	} catch (std::exception& e) {
+
+	} catch (...) {
+		BOOST_FAIL("should be catched already");
+
+	}
+
+	try {
+		throw ParallelException("message");
+	} catch (ParallelException& e) {
+
+	} catch (std::exception& e) {
+		BOOST_FAIL("should be catched already");
+	}
+
+	try {
+		throw Exception("message");
+	} catch (ParallelException& e) {
+		BOOST_FAIL("should not be catched as it is a Exception");
+
+	} catch (Exception& e) {
+	}
+
+}
+
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
@@ -77,6 +124,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	// we use only two processors for this testing
 	test_Constructor();
 	test_Macros();
+	test_catch();
 
 	return 0;
 //    // six ways to detect and report the same error:

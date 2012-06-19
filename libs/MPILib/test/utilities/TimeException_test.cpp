@@ -33,6 +33,53 @@ void test_Constructor() {
 			strncmp(sstream.str().c_str(), e2.what(), sstream.str().size())== 0);
 }
 
+
+void test_catch() {
+
+	try {
+		throw TimeException("message");
+	} catch (TimeException& e) {
+
+	} catch (...) {
+		BOOST_FAIL("should be catched already");
+
+	}
+
+	try {
+		throw TimeException("message");
+	} catch (Exception& e) {
+
+	} catch (...) {
+		BOOST_FAIL("should be catched already");
+
+	}
+
+	try {
+		throw TimeException("message");
+	} catch (std::exception& e) {
+
+	} catch (...) {
+		BOOST_FAIL("should be catched already");
+
+	}
+
+	try {
+		throw TimeException("message");
+	} catch (TimeException& e) {
+
+	} catch (std::exception& e) {
+		BOOST_FAIL("should be catched already");
+	}
+
+	try {
+		throw Exception("message");
+	} catch (TimeException& e) {
+		BOOST_FAIL("should not be catched as it is a Exception");
+
+	} catch (Exception& e) {
+	}
+
+}
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
@@ -44,6 +91,7 @@ int test_main(int argc, char* argv[]) // note the name!
 
 	// we use only two processors for this testing
 	test_Constructor();
+	test_catch();
 
 	return 0;
 

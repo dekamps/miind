@@ -78,6 +78,46 @@ void test_Macros() {
 	BOOST_REQUIRE(thrown== true);
 }
 
+void test_catch() {
+
+	try {
+		throw Exception("message");
+	} catch (Exception& e) {
+
+	} catch (...) {
+		BOOST_FAIL("should be catched already");
+
+	}
+
+	try {
+		throw Exception("message");
+	} catch (std::exception& e) {
+
+	} catch (...) {
+		BOOST_FAIL("should be catched already");
+
+	}
+
+
+
+	try {
+		throw Exception("message");
+	} catch (Exception& e) {
+
+	} catch (std::exception& e) {
+		BOOST_FAIL("should be catched already");
+	}
+
+	try {
+		throw std::exception();
+	} catch (Exception& e) {
+		BOOST_FAIL("should not be catched as it is a Exception");
+
+	} catch (...) {
+	}
+
+}
+
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
@@ -91,6 +131,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	test_Constructor();
 	test_DerivedClass();
 	test_Macros();
+	test_catch();
 
 	return 0;
 //    // six ways to detect and report the same error:
