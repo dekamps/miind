@@ -23,38 +23,53 @@
 #include <iostream>
 #include <MPILib/include/BasicTypes.hpp>
 
-namespace MPILib
-{
-	enum EvolveResult 
-		{ 
-			NOT_RUN, 
-			SUCCESS, 
-			CONFIGURATION_ERROR, 
-			EVOLUTION_ERROR, 
-			NUMBER_ITERATIONS_ERROR,
-			REPORT_ERROR
-		};
+namespace MPILib {
+enum EvolveResult {
+	NOT_RUN,
+	SUCCESS,
+	CONFIGURATION_ERROR,
+	EVOLUTION_ERROR,
+	NUMBER_ITERATIONS_ERROR,
+	REPORT_ERROR
+};
 
-	//! NetworkState
-	struct NetworkState 
-	{
-		Time			_time_current;
-		bool			_b_configured;
-		EvolveResult	_result;
+//! NetworkState
+struct NetworkState {
+	Time _currentTime;
+	bool _isConfigured { false };
+	EvolveResult _result { NOT_RUN };
 
-		NetworkState(Time);
+	/**
+	 * Constructor
+	 */
+	NetworkState(Time);
 
-		//!
-		bool IsConfigured() const { return _b_configured; }
+	/**
+	 * Check is Network is configured
+	 * @return true if the network is configured
+	 */
+	bool isConfigured() const;
 
-		//!
-		void ToggleConfigured();
+	/**
+	 * switch _isConfigured
+	 */
+	void toggleConfigured();
 
-		void			SetResult	(EvolveResult);
-		EvolveResult	GetResult	();
+	/**
+	 * Set the Result
+	 * @param The Result the Network State should be set
+	 */
+	void setResult(EvolveResult);
 
-	}; // end of NetworkState
+	/**
+	 * Getter for the Network State result
+	 * @return The current State of the Network
+	 */
+	EvolveResult getResult();
 
-} // end of MPILib
+};
+// end of NetworkState
+
+}// end of MPILib
 
 #endif // MPILIB_NETWORKSTATE_HPP_ include guard

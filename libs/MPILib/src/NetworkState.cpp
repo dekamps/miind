@@ -23,22 +23,24 @@
 namespace MPILib {
 
 NetworkState::NetworkState(Time time_current) :
-		_time_current(time_current), _b_configured(false), _result(NOT_RUN) {
+		_currentTime(time_current) {
 }
 
-void NetworkState::ToggleConfigured() {
-	_b_configured = _b_configured ? false : true;
+bool NetworkState::isConfigured() const {
+	return _isConfigured;
 }
 
-void NetworkState::SetResult(EvolveResult result) {
+void NetworkState::toggleConfigured() {
+	_isConfigured = _isConfigured ? false : true;
+}
+
+void NetworkState::setResult(EvolveResult result) {
 	_result = result;
 }
 
-EvolveResult NetworkState::GetResult() {
+EvolveResult NetworkState::getResult() {
 	return _result;
 }
 
-
 }
-
 

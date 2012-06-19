@@ -111,7 +111,7 @@ void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 		_stream_log.flush();
 	}
 
-	_state_network.ToggleConfigured();
+	_state_network.toggleConfigured();
 
 	_stream_log.flush();
 
@@ -122,8 +122,8 @@ template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 	std::string report;
-	if (_state_network.IsConfigured()) {
-		_state_network.ToggleConfigured();
+	if (_state_network.isConfigured()) {
+		_state_network.toggleConfigured();
 		_stream_log << "Starting simulation\n";
 		_stream_log.flush();
 
@@ -170,7 +170,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 		catch (utilities::IterationNumberException &e) {
 			_stream_log << "NUMBER OF ITERATIONS EXCEEDED\n";
-			_state_network.SetResult(NUMBER_ITERATIONS_ERROR);
+			_state_network.setResult(NUMBER_ITERATIONS_ERROR);
 			_stream_log.flush();
 			_stream_log.close();
 		}
