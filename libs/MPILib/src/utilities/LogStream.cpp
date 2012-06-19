@@ -28,69 +28,69 @@ LogStream::LogStream() {
 }
 
 LogStream::LogStream(std::shared_ptr<std::ostream> p_stream_log) :
-		_p_stream_log(p_stream_log) {
+		_pStreamLog(p_stream_log) {
 
 	try {
 		// just check if there is timing
 		float time_first = _timer.secondsSinceLastCall();
 
 	} catch (TimeException &e) {
-		_b_time_available = false;
-		*_p_stream_log << "No time available error: "<<e.what() << std::endl;
+		_isTimeAvailable = false;
+		*_pStreamLog << "No time available error: "<<e.what() << std::endl;
 
 	}
 }
 
 LogStream::~LogStream() {
-	if (_p_stream_log)
-		*_p_stream_log << "Total time: " << _timer.secondsSinceFirstCall()
+	if (_pStreamLog)
+		*_pStreamLog << "Total time: " << _timer.secondsSinceFirstCall()
 				<< std::endl;
 }
 
-void LogStream::Record(const std::string& string_message) {
+void LogStream::record(const std::string& string_message) {
 
-	if (_p_stream_log) {
-		if (_b_time_available)
-			*_p_stream_log << _timer.secondsSinceLastCall() << "\t"
+	if (_pStreamLog) {
+		if (_isTimeAvailable)
+			*_pStreamLog << _timer.secondsSinceLastCall() << "\t"
 					<< string_message << std::endl;
 		else
-			*_p_stream_log << string_message << std::endl;
+			*_pStreamLog << string_message << std::endl;
 	}
 }
 
-std::shared_ptr<std::ostream> LogStream::Stream() const {
-	return _p_stream_log;
+std::shared_ptr<std::ostream> LogStream::getStream() const {
+	return _pStreamLog;
 }
 
 void LogStream::flush() {
-	if (_p_stream_log)
-		_p_stream_log->flush();
+	if (_pStreamLog)
+		_pStreamLog->flush();
 }
 
 void LogStream::close() {
 	// flush the stream's buffer 
-	if (_p_stream_log)
-		_p_stream_log->flush();
+	if (_pStreamLog)
+		_pStreamLog->flush();
 }
 
-bool LogStream::OpenStream(std::shared_ptr<std::ostream> p_stream) {
-	if (_p_stream_log)
+bool LogStream::openStream(std::shared_ptr<std::ostream> p_stream) {
+	if (_pStreamLog)
 		return false;
 	else {
-		_p_stream_log = p_stream;
+		_pStreamLog = p_stream;
 		return true;
 	}
 }
 
 LogStream& operator<<(LogStream& stream, const char* p) {
-	if (stream._p_stream_log)
-		*stream._p_stream_log << p;
+	if (stream._pStreamLog)
+		*stream._pStreamLog << p;
 	return stream;
 }
 
 LogStream& operator<<(LogStream& stream, const std::string& message) {
-	if (stream._p_stream_log)
-		*stream._p_stream_log << message;
+	if (stream._pStreamLog)
+		*stream._pStreamLog << message;
 
 	// else
 	// no op (/dev/null)
@@ -98,8 +98,8 @@ LogStream& operator<<(LogStream& stream, const std::string& message) {
 }
 
 LogStream& operator<<(LogStream& stream, double f) {
-	if (stream._p_stream_log)
-		*stream._p_stream_log << f;
+	if (stream._pStreamLog)
+		*stream._pStreamLog << f;
 	// else
 	// no op (/dev/null)
 
@@ -107,8 +107,8 @@ LogStream& operator<<(LogStream& stream, double f) {
 }
 
 LogStream& operator<<(LogStream& stream, int i) {
-	if (stream._p_stream_log)
-		*stream._p_stream_log << i;
+	if (stream._pStreamLog)
+		*stream._pStreamLog << i;
 	// else
 	// no op (/dev/null)
 

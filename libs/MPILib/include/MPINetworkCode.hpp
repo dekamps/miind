@@ -218,7 +218,7 @@ void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
 	std::shared_ptr<std::ostream> p_stream(new std::ofstream(filename.c_str()));
 	if (!p_stream)
 		throw utilities::Exception("MPINetwork cannot open log file.");
-	if (!_stream_log.OpenStream(p_stream))
+	if (!_stream_log.openStream(p_stream))
 		_stream_log << "WARNING YOU ARE TRYING TO REOPEN THIS LOG FILE\n";
 }
 

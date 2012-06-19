@@ -48,16 +48,13 @@ namespace utilities{
 		//! virtual destructor
 		virtual ~LogStream();
 
-		std::shared_ptr<std::ostream> Stream() const;
+		std::shared_ptr<std::ostream> getStream() const;
 
-		virtual void Record(const std::string&);
+		virtual void record(const std::string&);
 
 		//! Open a stream that was previously closed
 		//! if a stream was already open, OpenStream will return false and nothing will be done
-		bool OpenStream(std::shared_ptr<std::ostream>);
-
-		//! Is an open stream associated with this LogStream
-		bool IsOpen() const;
+		bool openStream(std::shared_ptr<std::ostream>);
 
 		void flush();
 
@@ -74,9 +71,9 @@ namespace utilities{
 		
 
 
-		std::shared_ptr<std::ostream>	_p_stream_log;     // pointer to the log stream
+		std::shared_ptr<std::ostream>	_pStreamLog;     // pointer to the log stream
 
-		bool							_b_time_available {true}; // system time available ?
+		bool							_isTimeAvailable {true}; // system time available ?
 
 		Timer							_timer;            // timer, records time between calls of Record
 
