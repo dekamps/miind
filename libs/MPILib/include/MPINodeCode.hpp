@@ -71,14 +71,14 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 		const SimulationRunParameter& simParam) {
-	_maximum_iterations = simParam.MaximumNumberIterations();
+	_maximum_iterations = simParam.getMaximumNumberIterations();
 	_pAlgorithm->configure(simParam);
 
 	// Add this line or other nodes will not get a proper input at the first simulation step!
 	this->setActivity(_pAlgorithm->getCurrentRate());
 
 	_pHandler = boost::shared_ptr<report::handler::AbstractReportHandler>(
-			simParam.Handler().clone());
+			simParam.getHandler().clone());
 
 	_pHandler->initializeHandler(_nodeId);
 

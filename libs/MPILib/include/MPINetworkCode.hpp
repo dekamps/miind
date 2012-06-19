@@ -94,11 +94,11 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 		const SimulationRunParameter& simParam) {
-	_current_report_time = simParam.TReport();
-	_current_simulation_time = simParam.TBegin();
+	_current_report_time = simParam.getTReport();
+	_current_simulation_time = simParam.getTBegin();
 	_parameter_simulation_run = simParam;
 
-	initializeLogStream(simParam.LogName());
+	initializeLogStream(simParam.getLogName());
 
 	try {
 		//loop over all local nodes!
@@ -129,9 +129,9 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 		try {
 			utilities::ProgressBar pb(
-					getEndTime() / _parameter_simulation_run.TReport()
+					getEndTime() / _parameter_simulation_run.getTReport()
 							+ getEndTime()
-									/ _parameter_simulation_run.TState());
+									/ _parameter_simulation_run.getTState());
 
 			do {
 				do {
@@ -243,22 +243,22 @@ void MPINetwork<WeightValue, NodeDistribution>::setDalesLaw(bool b_law) {
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::updateReportTime() {
-	_current_report_time += _parameter_simulation_run.TReport();
+	_current_report_time += _parameter_simulation_run.getTReport();
 }
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::updateSimulationTime() {
-	_current_simulation_time += _parameter_simulation_run.TStep();
+	_current_simulation_time += _parameter_simulation_run.getTStep();
 }
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::updateStateTime() {
-	_current_state_time += _parameter_simulation_run.TState();
+	_current_state_time += _parameter_simulation_run.getTState();
 }
 
 template<class WeightValue, class NodeDistribution>
 Time MPINetwork<WeightValue, NodeDistribution>::getEndTime() const {
-	return _parameter_simulation_run.TEnd();
+	return _parameter_simulation_run.getTEnd();
 }
 
 template<class WeightValue, class NodeDistribution>

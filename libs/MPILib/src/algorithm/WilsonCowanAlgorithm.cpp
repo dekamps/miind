@@ -85,15 +85,15 @@ void WilsonCowanAlgorithm::configure(const SimulationRunParameter& simParam) {
 	NumtoolsLib::DVIntegratorStateParameter<WilsonCowanParameter> parameter_dv;
 
 	parameter_dv._vector_state = vector<double>(1, 0);
-	parameter_dv._time_begin = simParam.TBegin();
-	parameter_dv._time_end = simParam.TEnd();
-	parameter_dv._time_step = simParam.TStep();
-	parameter_dv._time_current = simParam.TBegin();
+	parameter_dv._time_begin = simParam.getTBegin();
+	parameter_dv._time_end = simParam.getTEnd();
+	parameter_dv._time_step = simParam.getTStep();
+	parameter_dv._time_current = simParam.getTBegin();
 
 	parameter_dv._parameter_space = _parameter;
 
 	parameter_dv._number_maximum_iterations =
-			simParam.MaximumNumberIterations();
+			simParam.getMaximumNumberIterations();
 
 	_integrator.Reconfigure(parameter_dv);
 //FIXME

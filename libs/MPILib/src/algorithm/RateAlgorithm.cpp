@@ -29,7 +29,7 @@ RateAlgorithm* RateAlgorithm::clone() const {
 void RateAlgorithm::configure(
 		const SimulationRunParameter& simParam) {
 
-	_time_current = simParam.TBegin();
+	_time_current = simParam.getTBegin();
 
 }
 

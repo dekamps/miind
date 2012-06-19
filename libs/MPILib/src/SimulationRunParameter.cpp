@@ -49,7 +49,6 @@ SimulationRunParameter::SimulationRunParameter(
 		_t_state_report(parameter._t_state_report) {
 }
 
-
 SimulationRunParameter& SimulationRunParameter::operator=(
 		const SimulationRunParameter& parameter) {
 	if (&parameter == this)
@@ -66,6 +65,38 @@ SimulationRunParameter& SimulationRunParameter::operator=(
 	_t_state_report = parameter._t_state_report;
 
 	return *this;
+}
+
+Time SimulationRunParameter::getTBegin() const {
+	return _t_begin;
+}
+
+Time SimulationRunParameter::getTEnd() const {
+	return _t_end;
+}
+
+Time SimulationRunParameter::getTReport() const {
+	return _t_report;
+}
+
+Time SimulationRunParameter::getTStep() const {
+	return _t_step;
+}
+
+Time SimulationRunParameter::getTState() const {
+	return _t_state_report;
+}
+
+std::string SimulationRunParameter::getLogName() const {
+	return _name_log;
+}
+
+const report::handler::AbstractReportHandler& SimulationRunParameter::getHandler() const {
+	return *_p_handler;
+}
+
+Number SimulationRunParameter::getMaximumNumberIterations() const {
+	return _max_iter;
 }
 
 } // end namespace MPILib

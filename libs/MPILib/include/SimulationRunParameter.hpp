@@ -25,99 +25,124 @@
 #include <MPILib/include/report/handler/AbstractReportHandler.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
+namespace MPILib {
+//! Parameter determining how a simulation is run. Specifiying begin and end time, log file names, etc.
 
+//! This Parameter requires a handler, which determines how the simulation results are stored to disk. Common
+//! choices are AsciiReportHandler or RootReportHandler (see their respective documentation). Begin and end times
+//! of the simulation must be specified. Report time indicates at which time the simulation results should be written
+//! by the Handler. Clearly one wants to set a report time that on the one hand represents the simulation accurately,
+//! but on the other hand does not burden the simulation by writing out massive amounts of data, thereby impeding
+//! simulation effciency. An update time allows to set a report time for an online visualisation module. The objective
+//! of online visualization is typically to monitor whether the simulation behaves as expected, whilst running.
+//! Since visualization can make a heavy demand on processing time on a single core machine (e.g. during development),
+//! it makes sense to update much less than to report.
+//! The maximum number of iterations is there to prevent endless loops or to specify a maximum number of
+//! iterations that is reasonable. It allows for automatically breaking off simulations that have gone on expectedly
+//! long. The string specfies the path of the log file, where the status of the simulation is reported during running.
+//! In some simulations, typically involving population density techniques, the nodes have an activity as well as a
+//! state. By default only activities are written into the simulation results by the handler, but optionally an
+//! Algorithms state can be stored as well. This is specfied by the State Report time, which must be set in order
+//! for more than just the beginning and the end state to be written out.
+//! See the example programs in PopulistLib for applications.
 
-namespace MPILib
-{
-	//! Parameter determining how a simulation is run. Specifiying begin and end time, log file names, etc.
+class SimulationRunParameter {
+public:
 
-	//! This Parameter requires a handler, which determines how the simulation results are stored to disk. Common
-	//! choices are AsciiReportHandler or RootReportHandler (see their respective documentation). Begin and end times
-	//! of the simulation must be specified. Report time indicates at which time the simulation results should be written
-	//! by the Handler. Clearly one wants to set a report time that on the one hand represents the simulation accurately,
-	//! but on the other hand does not burden the simulation by writing out massive amounts of data, thereby impeding 
-	//! simulation effciency. An update time allows to set a report time for an online visualisation module. The objective
-	//! of online visualization is typically to monitor whether the simulation behaves as expected, whilst running. 
-	//! Since visualization can make a heavy demand on processing time on a single core machine (e.g. during development),
-	//! it makes sense to update much less than to report. 
-	//! The maximum number of iterations is there to prevent endless loops or to specify a maximum number of 
-	//! iterations that is reasonable. It allows for automatically breaking off simulations that have gone on expectedly
-	//! long. The string specfies the path of the log file, where the status of the simulation is reported during running.
-	//! In some simulations, typically involving population density techniques, the nodes have an activity as well as a 
-	//! state. By default only activities are written into the simulation results by the handler, but optionally an 
-	//! Algorithms state can be stored as well. This is specfied by the State Report time, which must be set in order
-	//! for more than just the beginning and the end state to be written out. 
-	//! See the example programs in PopulistLib for applications.
+	/**
+	 * The standard constructor
+	 * @param handler ReportHandler (where and how is the NodeState information recorded ?)
+	 * @param max_iter maximum number of iterations
+	 * @param t_begin Start time of simulation
+	 * @param t_end End time of Simulation
+	 * @param t_report Report time
+	 * @param t_step Network step time
+	 * @param name_log Log file path name
+	 * @param t_state_report Report State time
+	 */
+	SimulationRunParameter(
+			const report::handler::AbstractReportHandler& handler,
+			Number max_iter, Time t_begin, Time t_end, Time t_report,
+			Time t_step, const std::string& name_log, Time t_state_report = 0);
 
+	/**
+	 * copy constructor
+	 * @param Another SimulationRunParameter
+	 */
+	SimulationRunParameter(const SimulationRunParameter&);
 
-	class SimulationRunParameter
-	{
-	public:
+	/**
+	 * copy operator
+	 * @param Another SimulationRunParameter
+	 */
+	SimulationRunParameter&
+	operator=(const SimulationRunParameter&);
 
-		//! standard constructor
-		SimulationRunParameter
-		( 
-			const report::handler::AbstractReportHandler&, 	/*!< ReportHandler (where and how is the NodeState information recorded ?)	*/
-			Number,							/*!< maximum number of iterations											*/
-			Time,   						/*!< Start time of simulation												*/
-			Time,							/*!< End time of Simulation													*/
-			Time,							/*!< Report time															*/ 
-			Time,							/*!< Network step time														*/
-			const std::string&,					/*!< Log file path name														*/
-			Time report_state_time = 0		/*!< Report State time														*/
-		); 
+	/**
+	 * Getter for the start time
+	 * @return the start time
+	 */
+	Time getTBegin() const;
 
-		//! copy constructor
-		SimulationRunParameter
-		(
-			const SimulationRunParameter&
-		);
+	/**
+	 * Getter for the end time
+	 * @return the end time
+	 */
+	Time getTEnd() const;
 
-		//! copy operator
-		SimulationRunParameter&
-				operator=(const SimulationRunParameter&);
+	/**
+	 * Getter for the report time
+	 * @return the report time
+	 */
+	Time getTReport() const;
 
-		/// Give start time of simulation
-		Time TBegin () const { return _t_begin;  }
+	/**
+	 * Getter for the step time
+	 * @return the step time
+	 */
+	Time getTStep() const;
 
-		/// Give end time of simulation
-		Time TEnd   () const { return _t_end;    }	
+	/**
+	 * Getter for the state report
+	 * @return the state report time
+	 */
+	Time getTState() const;
 
-		/// Give report time of simulation
-		Time TReport() const { return _t_report; }	
+	/**
+	 * Getter for the log name
+	 * @return the log file name
+	 */
+	std::string getLogName() const;
 
-		Time TStep  () const { return _t_step;   }
+	/**
+	 * Getter for the Handler
+	 * @return the handler
+	 */
+	const report::handler::AbstractReportHandler& getHandler() const;
 
-		//! Give the time when a full state must be written out
-		Time TState () const { return _t_state_report; }
+	/**
+	 * Getter for the maximum number of iterations
+	 * @return the maximum number of iterations
+	 */
+	Number getMaximumNumberIterations() const;
 
-		//! Give name of the log file, associated with this run
-		std::string LogName() const { return _name_log; }
+private:
 
-		const report::handler::AbstractReportHandler& Handler () const { return *_p_handler; }
+	const report::handler::AbstractReportHandler* _p_handler;
 
-		Number MaximumNumberIterations       () const { return _max_iter; }
+	Number _max_iter;
 
+	Time _t_begin;
+	Time _t_end;
+	Time _t_report;
+	Time _t_step;
 
-	private:
+	std::string _name_log;
 
-		const report::handler::AbstractReportHandler*
-				_p_handler;
+	Time _t_state_report;
 
-		Number	_max_iter;
+};
 
-		Time	_t_begin;
-		Time	_t_end;
-		Time	_t_report;
-		Time	_t_step;
-
-		std::string	_name_log;
-
-		Time	_t_state_report;
-
-	}; // end of PopulationSimulationRunParameter
-
-
-} // end of namespace MPILib
+}// end of namespace MPILib
 
 #endif // MPILIB_SIMULATIONRUNPARAMETER_HPP_ include guard
