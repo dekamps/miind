@@ -94,7 +94,7 @@ add_subdirectory(algorithm)
 
 ADD_MIIND_MPI_TEST( MPINetwork_test.cpp)
 ADD_MIIND_MPI_TEST( MPINode_test.cpp)
-
+ADD_MIIND_MPI_TEST( SimulationRunParameter_test.cpp)
 
 
 
