@@ -72,13 +72,13 @@ int main(int argc, char* argv[]) {
 
 		// Define a node with a fixed output rate
 		algorithm::RateAlgorithm rate_alg(nu);
-		int id_rate = network.addNode(rate_alg, 1);
+		int id_rate = network.addNode(rate_alg, EXCITATORY);
 
 		// Define the receiving node
 		algorithm::WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
 
 		algorithm::WilsonCowanAlgorithm algorithm_exc(par_sigmoid);
-		int id = network.addNode(algorithm_exc, 1);
+		int id = network.addNode(algorithm_exc, EXCITATORY);
 
 		// connect the two nodes
 		network.makeFirstInputOfSecond(id_rate, id, epsilon);

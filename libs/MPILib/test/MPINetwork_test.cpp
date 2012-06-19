@@ -15,6 +15,8 @@
 #undef protected
 #undef private
 
+#include <MPILib/include/NodeType.hpp>
+
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
@@ -56,7 +58,7 @@ void test_AddNode() {
 
 	algorithm::SleepAlgorithm<double> alg;
 
-	network.addNode(alg, 1);
+	network.addNode(alg, EXCITATORY);
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==1);
@@ -65,7 +67,7 @@ void test_AddNode() {
 		BOOST_REQUIRE(network._pLocalNodes->size()==0);
 	}
 
-	network.addNode(alg, 1);
+	network.addNode(alg, EXCITATORY);
 
 	if (world.rank() == 0) {
 		BOOST_REQUIRE(network._maxNodeId==2);
@@ -80,8 +82,8 @@ void test_MakeFirstInputOfSecond() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	algorithm::SleepAlgorithm<double> alg;
 
-	int node0 = network.addNode(alg, 1);
-	int node1 = network.addNode(alg, 1);
+	int node0 = network.addNode(alg, EXCITATORY);
+	int node1 = network.addNode(alg, EXCITATORY);
 	double weight = 2.0;
 
 	bool exceptionThrown = false;
@@ -123,11 +125,11 @@ void test_getMaxNodeId() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	algorithm::SleepAlgorithm<double> alg;
 	BOOST_REQUIRE(network.getMaxNodeId()==0);
-	network.addNode(alg, 1);
+	network.addNode(alg, EXCITATORY);
 	BOOST_REQUIRE(network.getMaxNodeId()==1);
-	network.addNode(alg, 1);
-	network.addNode(alg, 1);
-	network.addNode(alg, 1);
+	network.addNode(alg, EXCITATORY);
+	network.addNode(alg, EXCITATORY);
+	network.addNode(alg, EXCITATORY);
 	BOOST_REQUIRE(network.getMaxNodeId()==4);
 
 }

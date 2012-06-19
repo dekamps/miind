@@ -13,12 +13,13 @@
 #include <map>
 #include <memory>
 
+#include <MPILib/include/MPINode.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
-#include <MPILib/include/MPINode.hpp>
 #include <MPILib/include/NetworkState.hpp>
 #include <MPILib/include/utilities/LogStream.hpp>
 #include <MPILib/include/report/handler/InactiveReportHandler.hpp>
+#include <MPILib/include/NodeType.hpp>
 
 
 namespace MPILib {
@@ -89,6 +90,10 @@ private:
 	 */
 	void clearSimulation();
 
+	bool isDalesLawSet() const;
+
+	void setDalesLaw(bool b_law);
+
 	void updateReportTime();
 	void updateSimulationTime();
 	void updateStateTime();
@@ -123,7 +128,12 @@ private:
 		0.0, 0.0, 0.0, ""};
 	utilities::LogStream _stream_log {};
 
+	bool _isDalesLaw {true};
+
 };
+
+//! Standard conversion for operations that depend on efficacy online
+inline double toEfficacy( double efficacy ) { return efficacy; }
 
 } //end namespace
 

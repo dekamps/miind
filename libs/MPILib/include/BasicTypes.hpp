@@ -36,7 +36,6 @@ const int RATE_STATE_DIMENSION = 1;
 const int WILSON_COWAN_STATE_DIMENSION = 1;
 
 //my own
-typedef int NodeType;
 typedef int NodeId;
 
 

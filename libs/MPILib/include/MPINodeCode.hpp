@@ -63,7 +63,6 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 
 	_algorithmTimer.stop();
 
-
 	sendOwnActivity();
 
 	return _pAlgorithm->getCurrentTime();
@@ -170,9 +169,9 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 	std::vector<report::ReportValue> vec_values;
 
 	if (type == report::RATE || type == report::STATE) {
-		report::Report report(_pAlgorithm->getCurrentTime(), Rate(this->getActivity()),
-				this->_nodeId, _pAlgorithm->getGrid(), string_return, type,
-				vec_values);
+		report::Report report(_pAlgorithm->getCurrentTime(),
+				Rate(this->getActivity()), this->_nodeId,
+				_pAlgorithm->getGrid(), string_return, type, vec_values);
 
 		_pHandler->writeReport(report);
 	}
@@ -184,19 +183,27 @@ template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::clearSimulation() {
 	_pHandler->detachHandler(_nodeId);
 
-	if(_pNodeDistribution->isMaster() && !_isLogPrinted){
-		std::cout<<"MPI Timer: "<<_mpiTimer.format()<<std::endl;
-		std::cout<<"Algorithm Timer: "<<_algorithmTimer.format()<<std::endl;
-		_isLogPrinted=true;
+	if (_pNodeDistribution->isMaster() && !_isLogPrinted) {
+		std::cout << "MPI Timer: " << _mpiTimer.format() << std::endl;
+		std::cout << "Algorithm Timer: " << _algorithmTimer.format()
+				<< std::endl;
+		_isLogPrinted = true;
 
 	}
 }
 
 template<class Weight, class NodeDistribution>
-boost::timer::cpu_timer MPINode<Weight, NodeDistribution>::_mpiTimer = boost::timer::cpu_timer();
+NodeType MPINode<Weight, NodeDistribution>::getNodeType() const {
+	return _nodeType;
+}
 
 template<class Weight, class NodeDistribution>
-boost::timer::cpu_timer MPINode<Weight, NodeDistribution>::_algorithmTimer = boost::timer::cpu_timer();
+boost::timer::cpu_timer MPINode<Weight, NodeDistribution>::_mpiTimer =
+		boost::timer::cpu_timer();
+
+template<class Weight, class NodeDistribution>
+boost::timer::cpu_timer MPINode<Weight, NodeDistribution>::_algorithmTimer =
+		boost::timer::cpu_timer();
 
 template<class Weight, class NodeDistribution>
 bool MPINode<Weight, NodeDistribution>::_isLogPrinted = false;

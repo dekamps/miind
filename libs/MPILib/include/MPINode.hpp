@@ -16,6 +16,7 @@
 
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
+#include <MPILib/include/NodeType.hpp>
 
 #include <MPILib/include/BasicTypes.hpp>
 
@@ -28,6 +29,8 @@ namespace MPILib {
 template <class Weight, class NodeDistribution>
 class MPINode {
 public:
+
+
 	/**
 	 * Constructor
 	 * @param algorithm Algorithm the algorithm the node should contain
@@ -108,6 +111,11 @@ public:
 	 */
 	void clearSimulation();
 
+	/**
+	 * returns the type of the node
+	 */
+	NodeType getNodeType() const;
+
 
 private:
 
@@ -158,7 +166,7 @@ private:
 
 	Number						_number_iterations;
 	Number						_maximum_iterations;
-	NodeType							_type;
+	NodeType					_type;
 
 	boost::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
 	mutable boost::shared_ptr<report::handler::AbstractReportHandler>	_pHandler;

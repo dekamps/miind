@@ -10,4 +10,5 @@ add_header(
     BasicTypes.hpp
     SimulationRunParameter.hpp
     NetworkState.hpp
+    NodeType.hpp
 )

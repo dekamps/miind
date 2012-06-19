@@ -31,6 +31,9 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 		const algorithm::AlgorithmInterface<WeightValue>& alg,
 		NodeType nodeType) {
 
+	assert(
+			nodeType == EXCITATORY || nodeType == INHIBITORY || nodeType == NEUTRAL || nodeType == EXCITATORY_BURST || nodeType == INHIBITORY_BURST);
+
 	int tempNodeId = getMaxNodeId();
 	if (_pNodeDistribution->isLocalNode(tempNodeId)) {
 		MPINode<WeightValue, NodeDistribution> node = MPINode<WeightValue,
@@ -47,6 +50,7 @@ template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 		NodeId first, NodeId second, const WeightValue& weight) {
 
+	//Make sure that the node exists
 	if (_pNodeDistribution->isLocalNode(first)) {
 		if (_pLocalNodes->count(first) > 0) {
 			_pLocalNodes->find(first)->second.addSuccessor(second);
@@ -56,6 +60,25 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 			miind_parallel_fail(tempStream.str());
 		}
 	}
+
+	// Make sure the Dales Law holds
+	if (_pNodeDistribution->isLocalNode(first)) {
+		if (isDalesLawSet()) {
+
+			MPINode<WeightValue, NodeDistribution> tempNode =
+					_pLocalNodes->find(first)->second;
+
+			if ((tempNode.getNodeType() == EXCITATORY
+					&& toEfficacy(weight) < 0)
+					|| (tempNode.getNodeType() == INHIBITORY
+							&& toEfficacy(weight) > 0)) {
+				throw utilities::Exception("Dale's law violated");
+
+			}
+		}
+
+	}
+
 	if (_pNodeDistribution->isLocalNode(second)) {
 		if (_pLocalNodes->count(second) > 0) {
 			_pLocalNodes->find(second)->second.addPrecursor(first, weight);
@@ -107,7 +130,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 		try {
 			utilities::ProgressBar pb(
-					getEndTime() /  _parameter_simulation_run.TReport()
+					getEndTime() / _parameter_simulation_run.TReport()
 							+ getEndTime()
 									/ _parameter_simulation_run.TState());
 
@@ -207,6 +230,16 @@ void MPINetwork<WeightValue, NodeDistribution>::clearSimulation() {
 		it.second.clearSimulation();
 	}
 
+}
+
+template<class WeightValue, class NodeDistribution>
+bool MPINetwork<WeightValue, NodeDistribution>::isDalesLawSet() const {
+	return _isDalesLaw;
+}
+
+template<class WeightValue, class NodeDistribution>
+void MPINetwork<WeightValue, NodeDistribution>::setDalesLaw(bool b_law) {
+	_isDalesLaw = b_law;
 }
 
 template<class WeightValue, class NodeDistribution>

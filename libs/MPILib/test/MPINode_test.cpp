@@ -33,7 +33,7 @@ void test_Constructor() {
 	// make node global
 	MPINetwork<double, utilities::CircularDistribution> network;
 	algorithm::SleepAlgorithm<double> alg;
-	NodeType nodeType = 1;
+	NodeType nodeType = EXCITATORY;
 	MPILib::NodeId nodeId = 1;
 	MPINode<double, utilities::CircularDistribution> node(alg, nodeType, nodeId,
 			network._pNodeDistribution, network._pLocalNodes);
@@ -55,7 +55,7 @@ void test_addPrecursor() {
 
 	algorithm::SleepAlgorithm<double> alg;
 
-	MPINode<double, utilities::CircularDistribution> node(alg, 1, 1,
+	MPINode<double, utilities::CircularDistribution> node(alg, EXCITATORY,1,
 			network._pNodeDistribution, network._pLocalNodes);
 
 	MPILib::NodeId nodeId = 4;
@@ -74,7 +74,7 @@ void test_addSuccessor() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	algorithm::SleepAlgorithm<double> alg;
 
-	MPINode<double, utilities::CircularDistribution> node(alg, 1, 1,
+	MPINode<double, utilities::CircularDistribution> node(alg, EXCITATORY,1,
 			network._pNodeDistribution, network._pLocalNodes);
 
 	MPILib::NodeId nodeId = 4;
@@ -92,7 +92,7 @@ void test_setGetState() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	algorithm::SleepAlgorithm<double> alg;
 
-	MPINode<double, utilities::CircularDistribution> node(alg, 1, 1,
+	MPINode<double, utilities::CircularDistribution> node(alg, EXCITATORY, 1,
 			network._pNodeDistribution, network._pLocalNodes);
 
 	node.setActivity(3);
@@ -107,14 +107,14 @@ void test_sendRecvWait() {
 	algorithm::SleepAlgorithm<double> alg;
 	if (world.rank() == 0) {
 
-		node = new MPINode<double, utilities::CircularDistribution>(alg, 1, 0,
+		node = new MPINode<double, utilities::CircularDistribution>(alg, EXCITATORY, 0,
 				network._pNodeDistribution, network._pLocalNodes);
 
 		node->addSuccessor(1);
 		node->addPrecursor(1, 2.1);
 	} else {
 
-		node = new MPINode<double, utilities::CircularDistribution>(alg, 1, 1,
+		node = new MPINode<double, utilities::CircularDistribution>(alg, EXCITATORY, 1,
 				network._pNodeDistribution, network._pLocalNodes);
 
 		node->addSuccessor(0);
