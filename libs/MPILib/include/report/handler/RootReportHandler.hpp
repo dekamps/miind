@@ -50,11 +50,22 @@ namespace handler {
 class RootReportHandler: public AbstractReportHandler {
 public:
 
+	/**
+	 * Constructor
+	 * @param The name of the root file
+	 * @param b_force_state_write True if the state should be written to the root file
+	 */
 	RootReportHandler(const std::string&, bool b_force_state_write = false);
 
+	/**
+	 * Copy constructor
+	 * @param another RootReportHandler
+	 */
 	RootReportHandler(const RootReportHandler&);
 
-	//! virtual destructor
+	/**
+	 * virtual destructor
+	 */
 	virtual ~RootReportHandler();
 
 	/**
@@ -96,9 +107,9 @@ private:
 	void finalize();
 
 	/**
-	 * TODO what does this
-	 * @param
-	 * @return
+	 * convert the state of the algorithm to a graph
+	 * @param The report
+	 * @return A graph
 	 */
 	std::unique_ptr<TGraph> convertAlgorithmGridToGraph(const Report&) const;
 

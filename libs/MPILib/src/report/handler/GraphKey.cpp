@@ -37,11 +37,7 @@ _time(time)
 {
 }
 
-GraphKey::GraphKey():
-_name(""),
-_id(NodeId(0)),
-_time(0),
-_type(RATEGRAPH)
+GraphKey::GraphKey()
 {
 }
 
@@ -50,11 +46,7 @@ GraphKey::GraphKey
 	const std::string& key_string
 )
 {
-	_id = NodeId(0);
-	_name = "";
-	_time = 0.0;
-
-	typedef boost::tokenizer<boost::char_separator<char> > 
+	typedef boost::tokenizer<boost::char_separator<char> >
 		tokenizer;
 	boost::char_separator<char> sep("_");
 	tokenizer tokens(key_string, sep);
@@ -64,7 +56,7 @@ GraphKey::GraphKey
 		_id = NodeId(ind);
 		_time = boost::lexical_cast<Time>(*(++tok_iter));
 		_type = STATEGRAPH;
-	} 
+	}
 	if (*tok_iter != std::string("rate") )
 		return;
 	Index ind = boost::lexical_cast<Index>(*(++tok_iter));
@@ -73,7 +65,7 @@ GraphKey::GraphKey
 	_type = RATEGRAPH;
 }
 
-std::string GraphKey::Name() const
+std::string GraphKey::generateName() const
 {
 	std::ostringstream str;
 	str.precision(KEY_PRECISION);

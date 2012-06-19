@@ -23,45 +23,56 @@
 #include <string>
 #include <MPILib/include/BasicTypes.hpp>
 
-
-
 namespace MPILib {
 namespace report {
 namespace handler {
 
-	enum GraphType { STATEGRAPH, RATEGRAPH };
+enum GraphType {
+	STATEGRAPH, RATEGRAPH
+};
 
-	//! Serves to interpret the name of a graph assigned by any AbstractReportHandler, and serves as a
-	//! key for searches on graphs in simulation files.
-	//!
-	//! Given the size of root files nowadays, the Node and time stamp of state graphs in any handler must not
-	//! only be stored, but also be retrieved in subsequent analysis. The GraphKey object is the central object
-	//! to code and decode the names of state graphs.
-	struct GraphKey {
-		
-		std::string		_name;
-		NodeId		_id;		
-		Time		_time;
-		GraphType	_type;
+//! Serves to interpret the name of a graph assigned by any AbstractReportHandler, and serves as a
+//! key for searches on graphs in simulation files.
+//!
+//! Given the size of root files nowadays, the Node and time stamp of state graphs in any handler must not
+//! only be stored, but also be retrieved in subsequent analysis. The GraphKey object is the central object
+//! to code and decode the names of state graphs.
+struct GraphKey {
 
-		//! Default constructor for use in containers
-		GraphKey();
+	std::string _name { "" };
+	NodeId _id { NodeId(0) };
+	Time _time { 0 };
+	GraphType _type { RATEGRAPH };
 
-		//! construct a graph key from the key in the root file. If the string does not represent a valid key, no object will
-		//! be constructed, but otherwise nothig will happen. This allows parsing of heterogeneous object files.
-		GraphKey(const std::string&);
+	/**
+	 * Default constructor for use in containers
+	 */
+	GraphKey();
 
-		//! construct a graph key from a Report information
-		GraphKey
-		(
-			NodeId,
-			Time
-		);
+	/**
+	 * construct a graph key from the key in the root file.
+	 * If the string does not represent a valid key, no object will
+	 * be constructed, but otherwise nothing will happen.
+	 * This allows parsing of heterogeneous object files.
+	 * @param The graph key
+	 */
+	GraphKey(const std::string&);
 
-		std::string Name() const;
-	};
+	/**
+	 * construct a graph key from a Report information
+	 * @param The NodeId of the Node
+	 * @param The Timepoint
+	 */
+	GraphKey(NodeId, Time);
 
-}// end namespace of handler
-}// end namespace of report
-}// end namespace of MPILib
+	/**
+	 * generates a name of the graph
+	 * @return A name for the graph
+	 */
+	std::string generateName() const;
+};
+
+} // end namespace of handler
+} // end namespace of report
+} // end namespace of MPILib
 #endif // include guard

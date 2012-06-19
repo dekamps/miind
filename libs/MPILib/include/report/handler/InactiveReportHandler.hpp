@@ -27,11 +27,15 @@
 namespace MPILib {
 namespace report {
 namespace handler {
-//! This ReportHandler does nothing, which is sometimes useful in debugging.
+/**
+ * This ReportHandler does nothing, which is sometimes useful in debugging.
+ */
 class InactiveReportHandler: public AbstractReportHandler {
 public:
 
-	//! Default constructor
+	/**
+	 * Constructor
+	 */
 	InactiveReportHandler();
 
 	virtual ~InactiveReportHandler();

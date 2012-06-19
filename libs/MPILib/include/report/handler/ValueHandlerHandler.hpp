@@ -39,9 +39,9 @@ namespace handler {
 	
 		ValueHandlerHandler();
 
-		bool AddReport(const Report&);
+		bool addReport(const Report&);
 
-		void Write();
+		void write();
 
 		struct Event {
 			std::string _str;
@@ -49,18 +49,18 @@ namespace handler {
 			float  _value;
 		};
 
-		bool IsWritten() const {return _is_written;}
+		bool isWritten() const {return _is_written;}
 
-		void Reset();
+		void reset();
 
 	private:
 
-		void DistributeEvent(const Event&);
+		void distributeEvent(const Event&);
 
-		bool					_is_written;
-		std::vector<std::string>			_vec_names;
-		std::vector<std::vector<float> >	_vec_time;
-		std::vector<std::vector<float> >	_vec_quantity;
+		bool					_is_written {false};
+		std::vector<std::string>			_vec_names {};
+		std::vector<std::vector<float> >	_vec_time {};
+		std::vector<std::vector<float> >	_vec_quantity {};
 	};
 
 }// end namespace of handler

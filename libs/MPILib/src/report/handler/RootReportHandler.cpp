@@ -96,7 +96,7 @@ void RootReportHandler::writeReport(const Report& report) {
 		_spCurrentStateGraph->Write();
 
 	// always log ReportValue elements
-	_valueHandler.AddReport(report);
+	_valueHandler.addReport(report);
 }
 
 RootReportHandler* RootReportHandler::clone() const {
@@ -119,7 +119,7 @@ std::unique_ptr<TGraph> RootReportHandler::convertAlgorithmGridToGraph(
 	std::unique_ptr<TGraph> tempPtrStateGraph {new TGraph};
 
 	GraphKey key(report._id, report._time);
-	tempPtrStateGraph->SetName(key.Name().c_str());
+	tempPtrStateGraph->SetName(key.generateName().c_str());
 
 	assert(
 			vector_of_grid_values.size() == vector_of_state_interpretation.size());
@@ -154,7 +154,7 @@ void RootReportHandler::initializeHandler(const NodeId& nodeId) {
 		if (_pFile->IsZombie())
 			throw utilities::Exception(STR_ROOT_FILE_OPENED_FAILED);
 
-		_valueHandler.Reset();
+		_valueHandler.reset();
 
 	}
 	// store the node
@@ -175,8 +175,8 @@ void RootReportHandler::detachHandler(const NodeId& nodeId) {
 	if (_spCurrentRateGraph) {
 		_spCurrentRateGraph->Write();
 		_spCurrentRateGraph.reset();
-		if (!_valueHandler.IsWritten())
-			_valueHandler.Write();
+		if (!_valueHandler.isWritten())
+			_valueHandler.write();
 
 	}
 

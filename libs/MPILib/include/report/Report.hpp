@@ -37,14 +37,14 @@ namespace report{
 	//! A Report is sent by a MPINode when it is queried.
 	//!
 	//! The information compiled by individual nodes is sent at a request of the agent that drives the
-	//! simulation, typically a DynamicNetwork. Such Reports are collected by an instance of an 
+	//! simulation, typically a MPINetwork. Such Reports are collected by an instance of an
 	//! AbstractReportHandler, which is responsible for entering this information into a simulation file.
 	struct Report
 	{
 		Time				_time;			//!< Current time at this node.
 		Rate				_rate;			//!< Current firing rate of this node.
 		NodeId				_id;			//!< NodeId of this node.
-		AlgorithmGrid		_grid {0};			//!< The state space of the Algorithm
+		AlgorithmGrid		_grid {0};		//!< The state space of the Algorithm
 		std::string			_log_message;	//!< Whatever message should appear in the log file
 		ReportType			_type;			//!< Information for the handler on how to treat the Report
 		std::vector<ReportValue>	_values {};		//!< Ad hoc values that need to be logged in the simulation file
@@ -55,13 +55,7 @@ namespace report{
 			Rate		rate,
 			NodeId		id,
 			std::string		log_message
-		):
-		_time(time),
-		_rate(rate),
-		_id(id),
-		_log_message(log_message)
-		{
-		}
+		);
 
 
 		Report
@@ -73,31 +67,14 @@ namespace report{
 			std::string				log_message,
 			ReportType				type,
 			std::vector<ReportValue>		vec_values
-		):
-		_time(time),
-		_rate(rate),
-		_id(id),
-		_grid(grid),
-		_log_message(log_message),
-		_type(type),
-		_values(vec_values)
-		{
-		}
+		);
 
-		bool AddValue(const ReportValue& value)
-		{
-			_values.push_back(value);
-			return true;
-		}
+		/**
+		 * Add a ReportValue to the report
+		 * @param value The ReportValue added to the Report
+		 */
+		void addValue(const ReportValue& value);
 
-		//! Title us a combination of id value of the node and time.
-		//! This function used to be used to create the name of TGraphs in the root files, but GraphKey objects are now used for that.
-		std::string Title() const
-		{
-			std::ostringstream stream;
-			stream << _id << "_" <<  _time << '\0';
-			return stream.str();
-		}
 
 	}; // end of Report
 

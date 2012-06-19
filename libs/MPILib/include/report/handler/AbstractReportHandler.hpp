@@ -30,14 +30,6 @@ namespace report {
 namespace handler {
 
 
-
-//! Base class for all ReportHandlers
-//!
-//! ReportHandlers are responsible for dispatching the Reports from each node and collating them
-//! in a simulation results file. There are not many prescriptions for how this should be done and
-//! it's very simple to derive one's own. AsciiReportHandler records the simulation results in an XML format.
-//! RootReportHandler directly stores graphs of simulations. AsciiReportHandler and RootReportHandler come with MIIND.
-
 /**
  * Base class for all ReportHandlers
  *
@@ -46,7 +38,6 @@ namespace handler {
  * it's very simple to derive one's own. RootReportHandler directly stores graphs of simulations.
  *
  */
-
 class AbstractReportHandler {
 public:
 
@@ -58,7 +49,9 @@ public:
 			_streamFileName(fileName) {
 	}
 
-	//! Manadatory virtual destructor
+	/**
+	 * Manadatory virtual destructor
+	 */
 	virtual ~AbstractReportHandler(){};
 
 	/**
