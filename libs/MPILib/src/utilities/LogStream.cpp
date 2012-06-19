@@ -32,7 +32,7 @@ LogStream::LogStream(std::shared_ptr<std::ostream> p_stream_log) :
 
 	try {
 		// just check if there is timing
-		float time_first = _timer.SecondsSinceLastCall();
+		float time_first = _timer.secondsSinceLastCall();
 
 	} catch (TimeException &e) {
 		_b_time_available = false;
@@ -43,7 +43,7 @@ LogStream::LogStream(std::shared_ptr<std::ostream> p_stream_log) :
 
 LogStream::~LogStream() {
 	if (_p_stream_log)
-		*_p_stream_log << "Total time: " << _timer.SecondsSinceFirstCall()
+		*_p_stream_log << "Total time: " << _timer.secondsSinceFirstCall()
 				<< std::endl;
 }
 
@@ -51,7 +51,7 @@ void LogStream::Record(const std::string& string_message) {
 
 	if (_p_stream_log) {
 		if (_b_time_available)
-			*_p_stream_log << _timer.SecondsSinceLastCall() << "\t"
+			*_p_stream_log << _timer.secondsSinceLastCall() << "\t"
 					<< string_message << std::endl;
 		else
 			*_p_stream_log << string_message << std::endl;

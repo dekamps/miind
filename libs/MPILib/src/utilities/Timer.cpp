@@ -38,7 +38,7 @@ _time_at_first_call( time(&_time_since_last_call) )
 
 
 
-float Timer::SecondsSinceLastCall()
+float Timer::secondsSinceLastCall()
 {
 	time_t time_dummy, time_now = time(&time_dummy);
 	
@@ -49,14 +49,14 @@ float Timer::SecondsSinceLastCall()
 }
 
 
-float Timer::HoursSinceLastCall()
+float Timer::hoursSinceLastCall()
 {
-	float f_ret = SecondsSinceLastCall();
+	float f_ret = secondsSinceLastCall();
 
 	return f_ret/SECONDS_PER_HOUR;
 }
 
-float Timer::SecondsSinceFirstCall()
+float Timer::secondsSinceFirstCall()
 {
 	time_t time_dummy, time_now = time(&time_dummy);
 	return static_cast<float>(difftime(time_now, _time_at_first_call));

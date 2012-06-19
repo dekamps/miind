@@ -35,9 +35,9 @@ public:
 
 	Timer();
 
-	float HoursSinceLastCall();
-	float SecondsSinceLastCall();
-	float SecondsSinceFirstCall();
+	float hoursSinceLastCall();
+	float secondsSinceLastCall();
+	float secondsSinceFirstCall();
 
 private:
 
