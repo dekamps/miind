@@ -19,18 +19,22 @@
 
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
-
-#include <MPILib/include/algorithm/SleepAlgorithmCode.hpp>
-
+#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
 using namespace MPILib;
 
+#include <boost/thread/thread.hpp>
+#include <boost/mpi.hpp>
+#include <boost/mpi/communicator.hpp>
+
+#include "helperClasses/SleepAlgorithm.hpp"
+
+
 namespace mpi = boost::mpi;
 
 mpi::communicator world;
-
 
 void test_Constructor() {
 
@@ -65,7 +69,7 @@ void test_AddNode() {
 		BOOST_CHECK(network._pLocalNodes->size()==0);
 	}
 
-	algorithm::SleepAlgorithm<double> alg;
+	SleepAlgorithm<double> alg;
 
 	network.addNode(alg, EXCITATORY);
 
@@ -89,7 +93,7 @@ void test_AddNode() {
 void test_MakeFirstInputOfSecond() {
 
 	MPINetwork<double, utilities::CircularDistribution> network;
-	algorithm::SleepAlgorithm<double> alg;
+	SleepAlgorithm<double> alg;
 
 	int node0 = network.addNode(alg, EXCITATORY);
 	int node1 = network.addNode(alg, EXCITATORY);
@@ -132,7 +136,7 @@ void test_MakeFirstInputOfSecond() {
 
 void test_getMaxNodeId() {
 	MPINetwork<double, utilities::CircularDistribution> network;
-	algorithm::SleepAlgorithm<double> alg;
+	SleepAlgorithm<double> alg;
 	BOOST_CHECK(network.getMaxNodeId()==0);
 	network.addNode(alg, EXCITATORY);
 	BOOST_CHECK(network.getMaxNodeId()==1);
