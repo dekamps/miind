@@ -19,8 +19,7 @@
 namespace {
 
 int sigmoid(double t, const double y[], double f[], void *params) {
-	MPILib::algorithm::WilsonCowanParameter* p_parameter =
-			(MPILib::algorithm::WilsonCowanParameter *) params;
+	auto p_parameter = (MPILib::algorithm::WilsonCowanParameter *) params;
 
 	f[0] = (-y[0]
 			+ p_parameter->_rate_maximum
@@ -32,8 +31,7 @@ int sigmoid(double t, const double y[], double f[], void *params) {
 
 int sigmoidprime(double t, const double y[], double *dfdy, double dfdt[],
 		void *params) {
-	MPILib::algorithm::WilsonCowanParameter* p_parameter =
-			(MPILib::algorithm::WilsonCowanParameter *) params;
+	auto p_parameter = (MPILib::algorithm::WilsonCowanParameter *) params;
 	gsl_matrix_view dfdy_mat = gsl_matrix_view_array(dfdy, 1, 1);
 
 	gsl_matrix * m = &dfdy_mat.matrix;
@@ -49,31 +47,24 @@ int sigmoidprime(double t, const double y[], double *dfdy, double dfdt[],
 ;
 
 namespace MPILib {
-namespace algorithm{
+namespace algorithm {
 
 WilsonCowanAlgorithm::WilsonCowanAlgorithm() :
 		AlgorithmInterface<double>(), _integrator(0, getInitialState(), 0, 0,
 				NumtoolsLib::Precision(WC_ABSOLUTE_PRECISION,
 						WC_RELATIVE_PRECISION), sigmoid, sigmoidprime) {
-	// TODO Auto-generated constructor stub
 
 }
 
 WilsonCowanAlgorithm::WilsonCowanAlgorithm(const WilsonCowanParameter&parameter) :
-		AlgorithmInterface<double>(),
-		_parameter(parameter),
-		_integrator(0,
-				getInitialState(),
-				0,
-				0,
-				NumtoolsLib::Precision(WC_ABSOLUTE_PRECISION, WC_RELATIVE_PRECISION),
-				sigmoid,
-				sigmoidprime) {
+		AlgorithmInterface<double>(), _parameter(parameter), _integrator(0,
+				getInitialState(), 0, 0,
+				NumtoolsLib::Precision(WC_ABSOLUTE_PRECISION,
+						WC_RELATIVE_PRECISION), sigmoid, sigmoidprime) {
 	_integrator.Parameter() = _parameter;
 }
 
 WilsonCowanAlgorithm::~WilsonCowanAlgorithm() {
-	// TODO Auto-generated destructor stub
 }
 
 WilsonCowanAlgorithm* WilsonCowanAlgorithm::clone() const {
@@ -96,7 +87,6 @@ void WilsonCowanAlgorithm::configure(const SimulationRunParameter& simParam) {
 			simParam.getMaximumNumberIterations();
 
 	_integrator.Reconfigure(parameter_dv);
-//FIXME
 }
 
 void WilsonCowanAlgorithm::evolveNodeState(const std::vector<Rate>& nodeVector,
@@ -110,15 +100,12 @@ void WilsonCowanAlgorithm::evolveNodeState(const std::vector<Rate>& nodeVector,
 		while (_integrator.Evolve(time) < time)
 			;
 	} catch (NumtoolsLib::DVIntegratorException& except) {
-		//FIXME
-//		if (except.Code() == NumtoolsLib::NUMBER_ITERATIONS_EXCEEDED)
-//			throw miind_parallel_fail(STR_NUMBER_ITERATIONS_EXCEEDED);
-//		else
+		if (except.Code() == NumtoolsLib::NUMBER_ITERATIONS_EXCEEDED)
+			throw utilities::ParallelException(STR_NUMBER_ITERATIONS_EXCEEDED);
+		else
 			throw except;
 	}
 }
-
-
 
 Time WilsonCowanAlgorithm::getCurrentTime() const {
 	return _integrator.CurrentTime();
@@ -149,8 +136,7 @@ vector<double> WilsonCowanAlgorithm::getInitialState() const {
 	return array_return;
 }
 
-AlgorithmGrid WilsonCowanAlgorithm::getGrid() const
-{
+AlgorithmGrid WilsonCowanAlgorithm::getGrid() const {
 	return _integrator.State();
 }
 
