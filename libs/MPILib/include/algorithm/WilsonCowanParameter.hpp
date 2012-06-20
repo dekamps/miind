@@ -21,56 +21,53 @@
 #ifndef MPILIB_ALGORITHMS_WILSONCOWANPARAMETER_HPP_
 #define MPILIB_ALGORITHMS_WILSONCOWANPARAMETER_HPP_
 
-#include <iostream>
-#include <boost/lexical_cast.hpp>
 #include <MPILib/include/BasicTypes.hpp>
-
-using std::istream;
-using std::ostream;
 
 namespace MPILib {
 namespace algorithm {
-//! WilsonCowanParameter
 struct WilsonCowanParameter {
 
-	WilsonCowanParameter() :
-			_time_membrane(0), _rate_maximum(0), _f_noise(0), _f_input(0) {
+	WilsonCowanParameter() {
 	}
 
-	//! constructor for convenience
-	WilsonCowanParameter(
-	//! membrane time constant in ms
-			Time time_membrane,
-
-			//! maximum firing rate in Hz
-			Rate rate_maximum,
-
-			//! noise parameter for sigmoid
-			double f_noise,
-
-			//! input
-			double f_input = 0
-
-			) :
+	/**
+	 * constructor for convenience
+	 * @param time_membrane membrane time constant in ms
+	 * @param rate_maximum maximum firing rate in Hz
+	 * @param f_noise noise parameter for sigmoid
+	 * @param f_input input
+	 */
+	WilsonCowanParameter(Time time_membrane, Rate rate_maximum, double f_noise,
+			double f_input = 0) :
 			_time_membrane(time_membrane), _rate_maximum(rate_maximum), _f_noise(
 					f_noise), _f_input(f_input) {
 	}
 
-	//! virtual destructor necessary: derives from Streamable
+	/**
+	 * virtual destructor
+	 */
 	virtual ~WilsonCowanParameter() {
 	}
 
-	//! membrane time constant
-	Time _time_membrane;
+	/**
+	 * membrane time constant
+	 */
+	Time _time_membrane { 0 };
 
-	//! maximum firing rate
-	Rate _rate_maximum;
+	/**
+	 * maximum firing rate
+	 */
+	Rate _rate_maximum { 0 };
 
-	//! noise parameter
-	double _f_noise;
+	/**
+	 * noise parameter
+	 */
+	double _f_noise { 0 };
 
-	//! input
-	double _f_input;
+	/**
+	 * input
+	 */
+	double _f_input { 0 };
 };
 
 }
