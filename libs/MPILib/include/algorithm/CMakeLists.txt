@@ -1,8 +1,6 @@
 add_header(
     AlgorithmGrid.hpp
     AlgorithmInterface.hpp
-    SleepAlgorithm.hpp
-    SleepAlgorithmCode.hpp
     WilsonCowanAlgorithm.hpp
     WilsonCowanParameter.hpp
     RateAlgorithm.hpp
