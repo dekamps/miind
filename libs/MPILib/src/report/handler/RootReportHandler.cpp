@@ -107,14 +107,14 @@ RootReportHandler* RootReportHandler::clone() const {
 std::unique_ptr<TGraph> RootReportHandler::convertAlgorithmGridToGraph(
 		const Report& report) const {
 
-	std::vector<double> vector_of_grid_values = report._grid.ToStateVector();
+	std::vector<double> vector_of_grid_values = report._grid.toStateVector();
 
 	// if the Report does not contain a filled AlgorithmGrid, no Graph can be made
 	if (vector_of_grid_values.size() == 0)
 		return 0;
 
 	std::vector<double> vector_of_state_interpretation =
-			report._grid.ToInterpretationVector();
+			report._grid.toInterpretationVector();
 
 	std::unique_ptr<TGraph> tempPtrStateGraph {new TGraph};
 

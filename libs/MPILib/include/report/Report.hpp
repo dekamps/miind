@@ -44,7 +44,7 @@ namespace report{
 		Time				_time;			//!< Current time at this node.
 		Rate				_rate;			//!< Current firing rate of this node.
 		NodeId				_id;			//!< NodeId of this node.
-		AlgorithmGrid		_grid {0};		//!< The state space of the Algorithm
+		algorithm::AlgorithmGrid		_grid {0};		//!< The state space of the Algorithm
 		std::string			_log_message;	//!< Whatever message should appear in the log file
 		ReportType			_type;			//!< Information for the handler on how to treat the Report
 		std::vector<ReportValue>	_values {};		//!< Ad hoc values that need to be logged in the simulation file
@@ -63,7 +63,7 @@ namespace report{
 			Time					time,
 			Rate					rate,
 			NodeId					id,
-			AlgorithmGrid			grid,
+			algorithm::AlgorithmGrid			grid,
 			std::string				log_message,
 			ReportType				type,
 			std::vector<ReportValue>		vec_values

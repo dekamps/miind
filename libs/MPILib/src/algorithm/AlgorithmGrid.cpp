@@ -23,31 +23,26 @@
 #include <functional>
 
 namespace MPILib {
+namespace algorithm {
 
 AlgorithmGrid::AlgorithmGrid(Number number_of_elements) :
-		_number_state(number_of_elements), _array_state(0.0,
-				number_of_elements), _array_interpretation(0.0,
+		_numberState(number_of_elements), _arrayState(0.0,
+				number_of_elements), _arrayInterpretation(0.0,
 				number_of_elements) {
 }
 
-AlgorithmGrid::AlgorithmGrid(const AlgorithmGrid& rhs) :
-		_number_state(rhs._number_state), _array_state(rhs._array_state), _array_interpretation(
-				rhs._array_interpretation) {
-	assert( _array_state.size() == _array_interpretation.size());
-}
-
 AlgorithmGrid::AlgorithmGrid(const std::vector<double>& array_state) :
-		_number_state(static_cast<Number>(array_state.size())), _array_state(
-				ToValarray<double>(array_state)), _array_interpretation(
+		_numberState(static_cast<Number>(array_state.size())), _arrayState(
+				toValarray<double>(array_state)), _arrayInterpretation(
 				std::valarray<double>(0.0, array_state.size())) {
 }
 
 AlgorithmGrid::AlgorithmGrid(const std::vector<double>& array_state,
 		const std::vector<double>& array_interpretation) :
-		_number_state(static_cast<Number>(array_state.size())), _array_state(
-				ToValarray<double>(array_state)), _array_interpretation(
-				ToValarray<double>(array_interpretation)) {
-	assert( _array_state.size() == _array_interpretation.size());
+		_numberState(static_cast<Number>(array_state.size())), _arrayState(
+				toValarray<double>(array_state)), _arrayInterpretation(
+				toValarray<double>(array_interpretation)) {
+	assert( _arrayState.size() == _arrayInterpretation.size());
 }
 
 AlgorithmGrid& AlgorithmGrid::operator=(const AlgorithmGrid& rhs) {
@@ -55,87 +50,37 @@ AlgorithmGrid& AlgorithmGrid::operator=(const AlgorithmGrid& rhs) {
 		return *this;
 	else {
 		// resize, because copying valarrays of different length is undefined
-		_array_state.resize(rhs._array_state.size());
-		_array_interpretation.resize(rhs._array_interpretation.size());
+		_arrayState.resize(rhs._arrayState.size());
+		_arrayInterpretation.resize(rhs._arrayInterpretation.size());
 
-		_array_state = rhs._array_state;
-		_array_interpretation = rhs._array_interpretation;
-		_number_state = rhs._number_state;
+		_arrayState = rhs._arrayState;
+		_arrayInterpretation = rhs._arrayInterpretation;
+		_numberState = rhs._numberState;
 		return *this;
 	}
 }
 
-std::vector<double> AlgorithmGrid::ToStateVector() const{
-	return ToVector(_array_state, _number_state);
+std::vector<double> AlgorithmGrid::toStateVector() const {
+	return toVector(_arrayState, _numberState);
 }
 
-void AlgorithmGrid::Resize(Number number_of_new_bins) {
-	_array_state.resize(number_of_new_bins);
-	_array_interpretation.resize(number_of_new_bins);
-}
 
-std::vector<double> AlgorithmGrid::ToInterpretationVector() const{
-	return ToVector(_array_interpretation, _number_state);
-}
-
-const double* AlgorithmGrid::begin_state() const {
-
-	std::valarray<double>& ref_state =
-			const_cast<std::valarray<double>&>(_array_state);
-	const double* p_begin = &ref_state[0];
-	return p_begin;
-}
-
-const double* AlgorithmGrid::end_state() const {
-	std::valarray<double>& ref_state =
-			const_cast<std::valarray<double>&>(_array_state);
-	const double* p_end = &ref_state[_number_state];
-	return p_end;
-}
-
-const double* AlgorithmGrid::begin_interpretation() const {
-
-	std::valarray<double>& ref_state =
-			const_cast<std::valarray<double>&>(_array_interpretation);
-	const double* p_begin = &ref_state[0];
-	return p_begin;
-}
-
-const double* AlgorithmGrid::end_interpretation() const {
-	std::valarray<double>& ref_state =
-			const_cast<std::valarray<double>&>(_array_interpretation);
-	const double* p_end = &ref_state[_number_state];
-	return p_end;
-}
-
-std::valarray<double>& AlgorithmGrid::ArrayState() {
-	return _array_state;
-}
-
-std::valarray<double>& AlgorithmGrid::ArrayInterpretation() {
-	return _array_interpretation;
-}
-
-Number& AlgorithmGrid::StateSize() {
-	return _number_state;
-}
-
-Number AlgorithmGrid::StateSize() const {
-	return _number_state;
+std::vector<double> AlgorithmGrid::toInterpretationVector() const {
+	return toVector(_arrayInterpretation, _numberState);
 }
 
 template<class Value>
-std::valarray<Value> AlgorithmGrid::ToValarray(
+std::valarray<Value> AlgorithmGrid::toValarray(
 		const std::vector<double>& vector) const {
 	return std::valarray<Value>(&vector[0], vector.size());
 }
 
 template<class Value>
-std::vector<Value> AlgorithmGrid::ToVector(const std::valarray<Value>& array,
+std::vector<Value> AlgorithmGrid::toVector(const std::valarray<Value>& array,
 		Number number_to_be_copied) const {
-	std::valarray<Value>& array_test = const_cast<std::valarray<Value>&>(array);
-	Value* p_begin = &array_test[0];
-	Value* p_end = p_begin + number_to_be_copied;
+	auto& array_test = const_cast<std::valarray<Value>&>(array);
+	auto p_begin = &array_test[0];
+	auto p_end = p_begin + number_to_be_copied;
 
 	std::vector<Value> vector_return(0);
 	std::copy(p_begin, p_end, back_inserter(vector_return));
@@ -143,4 +88,58 @@ std::vector<Value> AlgorithmGrid::ToVector(const std::valarray<Value>& array,
 	return vector_return;
 }
 
+std::valarray<double>& AlgorithmGrid::getArrayState() {
+	return _arrayState;
+}
+
+std::valarray<double>& AlgorithmGrid::getArrayInterpretation() {
+	return _arrayInterpretation;
+}
+
+Number& AlgorithmGrid::getStateSize() {
+	return _numberState;
+}
+
+Number AlgorithmGrid::getStateSize() const {
+	return _numberState;
+}
+
+
+void AlgorithmGrid::resize(Number number_of_new_bins) {
+	_arrayState.resize(number_of_new_bins);
+	_arrayInterpretation.resize(number_of_new_bins);
+}
+
+
+const double* AlgorithmGrid::begin_state() const {
+
+	auto& ref_state = const_cast<std::valarray<double>&>(_arrayState);
+	const double* p_begin = &ref_state[0];
+	return p_begin;
+}
+
+const double* AlgorithmGrid::end_state() const {
+	auto& ref_state = const_cast<std::valarray<double>&>(_arrayState);
+	const double* p_end = &ref_state[_numberState];
+	return p_end;
+}
+
+const double* AlgorithmGrid::begin_interpretation() const {
+
+	auto& ref_state = const_cast<std::valarray<double>&>(_arrayInterpretation);
+	const double* p_begin = &ref_state[0];
+	return p_begin;
+}
+
+const double* AlgorithmGrid::end_interpretation() const {
+	auto& ref_state = const_cast<std::valarray<double>&>(_arrayInterpretation);
+	const double* p_end = &ref_state[_numberState];
+	return p_end;
+}
+
+
+
+
+
+}
 } //end namespace MPILib

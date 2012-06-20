@@ -14,7 +14,7 @@ Report::Report(Time time, Rate rate, NodeId id, std::string log_message) :
 		_time(time), _rate(rate), _id(id), _log_message(log_message) {
 }
 
-Report::Report(Time time, Rate rate, NodeId id, AlgorithmGrid grid,
+Report::Report(Time time, Rate rate, NodeId id, algorithm::AlgorithmGrid grid,
 		std::string log_message, ReportType type,
 		std::vector<ReportValue> vec_values) :
 		_time(time), _rate(rate), _id(id), _grid(grid), _log_message(

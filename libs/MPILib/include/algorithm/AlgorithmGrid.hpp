@@ -25,45 +25,99 @@
 #include <MPILib/include/BasicTypes.hpp>
 
 namespace MPILib {
+namespace algorithm {
 
 //! AlgorithmGrid
 class AlgorithmGrid {
 public:
 
-	//! Create the state for a AlgorithmGrid with a maximum number of elements
+	/**
+	 * Create the state for a AlgorithmGrid with a maximum number of elements
+	 */
 	AlgorithmGrid(Number);
 
-	//! copy constructor
-	AlgorithmGrid(const AlgorithmGrid&);
-
-	//! Create an Algorithmrid with just a state (usually a single number)
+	/**
+	 * Create an AlgorithmGrid with just a state (usually a single number)
+	 * @param The State of the algorithm
+	 */
 	AlgorithmGrid(const std::vector<double>&);
 
-	//! construct an AlgorithmGrid from two a state and an interpretation
+	/**
+	 * Construct an AlgorithmGrid from
+	 * @param a state
+	 * @param an interpretation
+	 * @post the size of the state and interpretation array needs to be the same
+	 */
 	AlgorithmGrid(const std::vector<double>&, const std::vector<double>&);
 
+	/**
+	 * Assignment operator
+	 * @param The assigned AlgorithmGrid
+	 * @return this
+	 */
 	AlgorithmGrid& operator=(const AlgorithmGrid&);
 
-	std::vector<double> ToStateVector() const;
-	std::vector<double> ToInterpretationVector() const;
+	/**
+	 * Getter for the state vector
+	 * @return the state vector
+	 */
+	std::vector<double> toStateVector() const;
+
+	/**
+	 * Getter for the interpretation vector
+	 * @return the interpretation vector
+	 */
+	std::vector<double> toInterpretationVector() const;
 
 private:
 
-	template<class WeightValue> friend class AbstractAlgorithm;
+	template<class WeightValue> friend class AlgorithmInterface;
 
+	/**
+	 * Helper function to convert vector to valarray
+	 * @param vector to be converted
+	 * @return a valarray
+	 */
 	template<class Value>
-	std::valarray<Value> ToValarray(const std::vector<double>& vector) const;
+	std::valarray<Value> toValarray(const std::vector<double>& vector) const;
 
+	/**
+	 * Helper function to convert valarray to vector
+	 * @param array the valarray to be converted
+	 * @param number_to_be_copied The number of elements copied
+	 * @return a vector
+	 */
 	template<class Value>
-	std::vector<Value> ToVector(const std::valarray<Value>& array,
+	std::vector<Value> toVector(const std::valarray<Value>& array,
 			Number number_to_be_copied) const;
 
-	std::valarray<double>& ArrayState();
-	std::valarray<double>& ArrayInterpretation();
-	Number& StateSize();
-	Number StateSize() const;
+	/**
+	 * Getter for the state array
+	 * @return the state array
+	 */
+	std::valarray<double>& getArrayState();
+	/**
+	 * Getter for the array interpretation
+	 * @return the interpretation array
+	 */
+	std::valarray<double>& getArrayInterpretation();
 
-	void Resize(Number);
+	/**
+	 * Getter for the number of states stored
+	 * @return number of elements stored
+	 */
+	Number& getStateSize();
+	/**
+	 * const getter for the number of states stored
+	 * @return number of elements stored
+	 */
+	Number getStateSize() const;
+
+	/**
+	 * Resize the arrays of elements
+	 * @param The new size of the arrays
+	 */
+	void resize(Number);
 
 	//! allow iteration over internal values of the state
 	const double* begin_state() const;
@@ -72,11 +126,12 @@ private:
 	const double* begin_interpretation() const;
 	const double* end_interpretation() const;
 
-	Number _number_state; // the array_state is sometimes larger than the actual state
-	std::valarray<double> _array_state;
-	std::valarray<double> _array_interpretation;
+	Number _numberState; // the array_state is sometimes larger than the actual state
+	std::valarray<double> _arrayState;
+	std::valarray<double> _arrayInterpretation;
 };
 
+}
 } // end of namespace
 
 #endif //MPILIB_ALGORITHMS_ALGORITHMGRID_HPP_ include guard
