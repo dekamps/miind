@@ -39,14 +39,14 @@ void test_Constructor() {
 			network._pNodeDistribution, network._pLocalNodes);
 
 // TODO test if the algorithm is the same
-//	BOOST_REQUIRE(alg==node._algorithm);
-	BOOST_REQUIRE(nodeType==node._nodeType);
-	BOOST_REQUIRE(nodeId==node._nodeId);
-	BOOST_REQUIRE(network._pNodeDistribution==node._pNodeDistribution);
+//	BOOST_CHECK(alg==node._algorithm);
+	BOOST_CHECK(nodeType==node._nodeType);
+	BOOST_CHECK(nodeId==node._nodeId);
+	BOOST_CHECK(network._pNodeDistribution==node._pNodeDistribution);
 	//indirect comparision
-	BOOST_REQUIRE(network._pLocalNodes->size()==node._pLocalNodes->size());
+	BOOST_CHECK(network._pLocalNodes->size()==node._pLocalNodes->size());
 	//make sure the shared_ptr works :)
-	BOOST_REQUIRE(network._pNodeDistribution.use_count()==2);
+	BOOST_CHECK(network._pNodeDistribution.use_count()==2);
 }
 
 void test_addPrecursor() {
@@ -62,11 +62,11 @@ void test_addPrecursor() {
 	double weight = 2.1;
 
 	node.addPrecursor(nodeId, weight);
-	BOOST_REQUIRE(node._precursors.size()==1);
-	BOOST_REQUIRE(node._precursors[0]==4);
-	BOOST_REQUIRE(node._weights.size()==1);
-	BOOST_REQUIRE(node._weights[0]==2.1);
-	BOOST_REQUIRE(node._precursorActivity.size()==1);
+	BOOST_CHECK(node._precursors.size()==1);
+	BOOST_CHECK(node._precursors[0]==4);
+	BOOST_CHECK(node._weights.size()==1);
+	BOOST_CHECK(node._weights[0]==2.1);
+	BOOST_CHECK(node._precursorActivity.size()==1);
 
 }
 
@@ -80,11 +80,11 @@ void test_addSuccessor() {
 	MPILib::NodeId nodeId = 4;
 
 	node.addSuccessor(nodeId);
-	BOOST_REQUIRE(node._precursors.size()==0);
-	BOOST_REQUIRE(node._weights.size()==0);
-	BOOST_REQUIRE(node._precursorActivity.size()==0);
-	BOOST_REQUIRE(node._successors.size()==1);
-	BOOST_REQUIRE(node._successors[0]==4);
+	BOOST_CHECK(node._precursors.size()==0);
+	BOOST_CHECK(node._weights.size()==0);
+	BOOST_CHECK(node._precursorActivity.size()==0);
+	BOOST_CHECK(node._successors.size()==1);
+	BOOST_CHECK(node._successors[0]==4);
 
 }
 
@@ -96,9 +96,9 @@ void test_setGetState() {
 			network._pNodeDistribution, network._pLocalNodes);
 
 	node.setActivity(3);
-	BOOST_REQUIRE(node.getActivity()==3);
+	BOOST_CHECK(node.getActivity()==3);
 	node.setActivity(4);
-	BOOST_REQUIRE(node.getActivity()==4);
+	BOOST_CHECK(node.getActivity()==4);
 }
 
 void test_sendRecvWait() {
@@ -126,9 +126,9 @@ void test_sendRecvWait() {
 	node->receiveData();
 	node->waitAll();
 	if (world.rank() == 0) {
-		BOOST_REQUIRE(node->_precursorActivity[0]==1);
+		BOOST_CHECK(node->_precursorActivity[0]==1);
 	} else {
-		BOOST_REQUIRE(node->_precursorActivity[0]==0);
+		BOOST_CHECK(node->_precursorActivity[0]==0);
 	}
 
 	delete node;
@@ -154,7 +154,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	return 0;
 //    // six ways to detect and report the same error:
 //    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
-//    BOOST_REQUIRE( add( 2,2 ) == 4 );      // #2 throws on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
 //    if( add( 2,2 ) != 4 )
 //        BOOST_ERROR( "Ouch..." );          // #3 continues on error
 //    if( add( 2,2 ) != 4 )

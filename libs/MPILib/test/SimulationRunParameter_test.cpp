@@ -29,48 +29,48 @@ void test_Constructor_and_Copy() {
 
 	SimulationRunParameter simParam { handler, 0, 0.0, 0.0, 0.0, 0.0, "" };
 
-	BOOST_REQUIRE(simParam._p_handler == &handler);
-	BOOST_REQUIRE(simParam._max_iter == 0);
-	BOOST_REQUIRE(simParam._t_begin ==0.0);
-	BOOST_REQUIRE(simParam._t_end==0.0);
-	BOOST_REQUIRE(simParam._t_report==0.0);
-	BOOST_REQUIRE(simParam._t_step==0.0);
-	BOOST_REQUIRE(simParam._name_log=="");
-	BOOST_REQUIRE(simParam._t_state_report == 0.0);
+	BOOST_CHECK(simParam._p_handler == &handler);
+	BOOST_CHECK(simParam._max_iter == 0);
+	BOOST_CHECK(simParam._t_begin ==0.0);
+	BOOST_CHECK(simParam._t_end==0.0);
+	BOOST_CHECK(simParam._t_report==0.0);
+	BOOST_CHECK(simParam._t_step==0.0);
+	BOOST_CHECK(simParam._name_log=="");
+	BOOST_CHECK(simParam._t_state_report == 0.0);
 
 	SimulationRunParameter simParam2 { report::handler::InactiveReportHandler(),
 			1, 1.0, 1.0, 1.0, 1.0, "a", 2.0 };
 
-	BOOST_REQUIRE(simParam2._p_handler != &handler);
-	BOOST_REQUIRE(simParam2._max_iter == 1);
-	BOOST_REQUIRE(simParam2._t_begin ==1.0);
-	BOOST_REQUIRE(simParam2._t_end==1.0);
-	BOOST_REQUIRE(simParam2._t_report==1.0);
-	BOOST_REQUIRE(simParam2._t_step==1.0);
-	BOOST_REQUIRE(simParam2._name_log=="a");
-	BOOST_REQUIRE(simParam2._t_state_report == 2.0);
+	BOOST_CHECK(simParam2._p_handler != &handler);
+	BOOST_CHECK(simParam2._max_iter == 1);
+	BOOST_CHECK(simParam2._t_begin ==1.0);
+	BOOST_CHECK(simParam2._t_end==1.0);
+	BOOST_CHECK(simParam2._t_report==1.0);
+	BOOST_CHECK(simParam2._t_step==1.0);
+	BOOST_CHECK(simParam2._name_log=="a");
+	BOOST_CHECK(simParam2._t_state_report == 2.0);
 
 	SimulationRunParameter simParam3 { simParam2 };
 
-	BOOST_REQUIRE(simParam3._p_handler != &handler);
-	BOOST_REQUIRE(simParam3._max_iter == 1);
-	BOOST_REQUIRE(simParam3._t_begin ==1.0);
-	BOOST_REQUIRE(simParam3._t_end==1.0);
-	BOOST_REQUIRE(simParam3._t_report==1.0);
-	BOOST_REQUIRE(simParam3._t_step==1.0);
-	BOOST_REQUIRE(simParam3._name_log=="a");
-	BOOST_REQUIRE(simParam3._t_state_report == 2.0);
+	BOOST_CHECK(simParam3._p_handler != &handler);
+	BOOST_CHECK(simParam3._max_iter == 1);
+	BOOST_CHECK(simParam3._t_begin ==1.0);
+	BOOST_CHECK(simParam3._t_end==1.0);
+	BOOST_CHECK(simParam3._t_report==1.0);
+	BOOST_CHECK(simParam3._t_step==1.0);
+	BOOST_CHECK(simParam3._name_log=="a");
+	BOOST_CHECK(simParam3._t_state_report == 2.0);
 
 	SimulationRunParameter simParam4 = simParam2;
 
-	BOOST_REQUIRE(simParam4._p_handler != &handler);
-	BOOST_REQUIRE(simParam4._max_iter == 1);
-	BOOST_REQUIRE(simParam4._t_begin ==1.0);
-	BOOST_REQUIRE(simParam4._t_end==1.0);
-	BOOST_REQUIRE(simParam4._t_report==1.0);
-	BOOST_REQUIRE(simParam4._t_step==1.0);
-	BOOST_REQUIRE(simParam4._name_log=="a");
-	BOOST_REQUIRE(simParam4._t_state_report == 2.0);
+	BOOST_CHECK(simParam4._p_handler != &handler);
+	BOOST_CHECK(simParam4._max_iter == 1);
+	BOOST_CHECK(simParam4._t_begin ==1.0);
+	BOOST_CHECK(simParam4._t_end==1.0);
+	BOOST_CHECK(simParam4._t_report==1.0);
+	BOOST_CHECK(simParam4._t_step==1.0);
+	BOOST_CHECK(simParam4._name_log=="a");
+	BOOST_CHECK(simParam4._t_state_report == 2.0);
 }
 
 void test_Getters() {
@@ -79,14 +79,14 @@ void test_Getters() {
 	SimulationRunParameter simParam2 { handler,
 			1, 1.0, 1.0, 1.0, 1.0, "a", 2.0 };
 
-	BOOST_REQUIRE(&simParam2.getHandler() == &handler);
-	BOOST_REQUIRE(simParam2.getMaximumNumberIterations() == 1);
-	BOOST_REQUIRE(simParam2.getTBegin() ==1.0);
-	BOOST_REQUIRE(simParam2.getTEnd()==1.0);
-	BOOST_REQUIRE(simParam2.getTReport()==1.0);
-	BOOST_REQUIRE(simParam2.getTStep()==1.0);
-	BOOST_REQUIRE(simParam2.getLogName()=="a");
-	BOOST_REQUIRE(simParam2.getTState() == 2.0);
+	BOOST_CHECK(&simParam2.getHandler() == &handler);
+	BOOST_CHECK(simParam2.getMaximumNumberIterations() == 1);
+	BOOST_CHECK(simParam2.getTBegin() ==1.0);
+	BOOST_CHECK(simParam2.getTEnd()==1.0);
+	BOOST_CHECK(simParam2.getTReport()==1.0);
+	BOOST_CHECK(simParam2.getTStep()==1.0);
+	BOOST_CHECK(simParam2.getLogName()=="a");
+	BOOST_CHECK(simParam2.getTState() == 2.0);
 }
 
 int test_main(int argc, char* argv[]) // note the name!

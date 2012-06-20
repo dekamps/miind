@@ -28,10 +28,10 @@ void test_Constructor() {
 			<< " from: " << world.size() << " with error message: message"
 			<< std::endl;
 
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			strncmp(sstream.str().c_str(), e.what(), sstream.str().size())== 0);
 	ParallelException e2(std::string("message"));
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			strncmp(sstream.str().c_str(), e2.what(), sstream.str().size())== 0);
 }
 
@@ -48,21 +48,21 @@ void test_Macros() {
 	try {
 		miind_parallel_fail("abc");
 	} catch (Exception& e) {
-		BOOST_REQUIRE(
+		BOOST_CHECK(
 				strncmp(sstream.str().c_str(), e.what(), sstream.str().size())== 0);
 		thrown = true;
 	}
-	BOOST_REQUIRE(thrown== true);
+	BOOST_CHECK(thrown== true);
 	thrown = false;
 	std::string abc("abc");
 	try {
 		miind_parallel_fail(abc);
 	} catch (Exception& e) {
-		BOOST_REQUIRE(
+		BOOST_CHECK(
 				strncmp(sstream.str().c_str(), e.what(), sstream.str().size())== 0);
 		thrown = true;
 	}
-	BOOST_REQUIRE(thrown== true);
+	BOOST_CHECK(thrown== true);
 }
 
 void test_catch() {
@@ -129,7 +129,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	return 0;
 //    // six ways to detect and report the same error:
 //    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
-//    BOOST_REQUIRE( add( 2,2 ) == 4 );      // #2 throws on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
 //    if( add( 2,2 ) != 4 )
 //        BOOST_ERROR( "Ouch..." );          // #3 continues on error
 //    if( add( 2,2 ) != 4 )

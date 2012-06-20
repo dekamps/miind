@@ -41,18 +41,18 @@ public:
 
 void test_Constructor() {
 	Exception e("message");
-	BOOST_REQUIRE(strncmp("message", e.what(), 7)== 0);
+	BOOST_CHECK(strncmp("message", e.what(), 7)== 0);
 	Exception e2(std::string("message"));
-	BOOST_REQUIRE(strncmp("message", e2.what(), 7)== 0);
+	BOOST_CHECK(strncmp("message", e2.what(), 7)== 0);
 }
 
 /** Try to instantiate a derived class.
  */
 void test_DerivedClass() {
 	TestException t;
-	BOOST_REQUIRE(strncmp(t.what(), "qwerty", 6)== 0);
+	BOOST_CHECK(strncmp(t.what(), "qwerty", 6)== 0);
 	TestExceptionWithOverload to;
-	BOOST_REQUIRE(strncmp(to.what(), "qwerty", 6)== 0);
+	BOOST_CHECK(strncmp(to.what(), "qwerty", 6)== 0);
 }
 
 /** Test the macros that come with the class.
@@ -63,19 +63,19 @@ void test_Macros() {
 	try {
 		miind_fail("abc");
 	} catch (Exception& e) {
-		BOOST_REQUIRE(strncmp("abc", e.what(), 3)== 0);
+		BOOST_CHECK(strncmp("abc", e.what(), 3)== 0);
 		thrown = true;
 	}
-	BOOST_REQUIRE(thrown== true);
+	BOOST_CHECK(thrown== true);
 	thrown = false;
 	std::string abc("abc");
 	try {
 		miind_fail(abc);
 	} catch (Exception& e) {
-		BOOST_REQUIRE(strncmp("abc", e.what(), 3)== 0);
+		BOOST_CHECK(strncmp("abc", e.what(), 3)== 0);
 		thrown = true;
 	}
-	BOOST_REQUIRE(thrown== true);
+	BOOST_CHECK(thrown== true);
 }
 
 void test_catch() {
@@ -136,7 +136,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	return 0;
 //    // six ways to detect and report the same error:
 //    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
-//    BOOST_REQUIRE( add( 2,2 ) == 4 );      // #2 throws on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
 //    if( add( 2,2 ) != 4 )
 //        BOOST_ERROR( "Ouch..." );          // #3 continues on error
 //    if( add( 2,2 ) != 4 )

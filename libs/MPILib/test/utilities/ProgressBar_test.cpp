@@ -32,9 +32,9 @@ void test_Constructor() {
 	ProgressBar pb(100, "blub", os);
 
 	if (world.rank() == 0) {
-		BOOST_REQUIRE(pb._expectedCount==100);
+		BOOST_CHECK(pb._expectedCount==100);
 	}
-	BOOST_REQUIRE(pb._description=="blub");
+	BOOST_CHECK(pb._description=="blub");
 
 	if (world.rank() == 0) {
 
@@ -43,21 +43,21 @@ void test_Constructor() {
 				<< "0%   10   20   30   40   50   60   70   80   90   100%\n"
 				<< "|----|----|----|----|----|----|----|----|----|----|"
 				<< std::endl;
-		BOOST_REQUIRE(os.str()==tempStream.str());
+		BOOST_CHECK(os.str()==tempStream.str());
 		pb++;
 		pb++;
 		pb++;
 		pb++;
 		tempStream << "***";
-		BOOST_REQUIRE(os.str()==tempStream.str());
+		BOOST_CHECK(os.str()==tempStream.str());
 		++pb;
 		++pb;
 		++pb;
 		tempStream << "*";
-		BOOST_REQUIRE(os.str()==tempStream.str());
+		BOOST_CHECK(os.str()==tempStream.str());
 		pb+=50;
 		tempStream <<"************************";
-		BOOST_REQUIRE(os.str()==tempStream.str());
+		BOOST_CHECK(os.str()==tempStream.str());
 
 	}
 }

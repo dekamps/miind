@@ -26,10 +26,10 @@ void test_Constructor() {
 	std::stringstream sstream;
 	sstream << "message";
 
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			strncmp(sstream.str().c_str(), e.what(), sstream.str().size())== 0);
 	IterationNumberException e2(std::string("message"));
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			strncmp(sstream.str().c_str(), e2.what(), sstream.str().size())== 0);
 }
 
@@ -40,7 +40,7 @@ void test_catch() {
 	} catch (IterationNumberException& e) {
 		std::stringstream sstream;
 		sstream << "message";
-		BOOST_REQUIRE(
+		BOOST_CHECK(
 				strncmp(sstream.str().c_str(), e.what(), sstream.str().size())== 0);
 
 	}
@@ -50,7 +50,7 @@ void test_catch() {
 	} catch (Exception& e) {
 		std::stringstream sstream;
 		sstream << "message";
-		BOOST_REQUIRE(
+		BOOST_CHECK(
 				strncmp(sstream.str().c_str(), e.what(), sstream.str().size())== 0);
 
 	}
@@ -60,7 +60,7 @@ void test_catch() {
 	} catch (std::exception& e) {
 		std::stringstream sstream;
 		sstream << "message";
-		BOOST_REQUIRE(
+		BOOST_CHECK(
 				strncmp(sstream.str().c_str(), e.what(), sstream.str().size())== 0);
 
 	}

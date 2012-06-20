@@ -41,8 +41,8 @@ void test_Constructor() {
 
 	WilsonCowanAlgorithm algorithm_exc(par_sigmoid);
 
-	BOOST_REQUIRE(algorithm_exc._parameter._f_noise == par_sigmoid._f_noise);
-	BOOST_REQUIRE(
+	BOOST_CHECK(algorithm_exc._parameter._f_noise == par_sigmoid._f_noise);
+	BOOST_CHECK(
 			algorithm_exc._integrator.Parameter()._f_noise == par_sigmoid._f_noise);
 
 }
@@ -90,7 +90,7 @@ void test_innerProduct() {
 
 	//need to calculate this
 	double res = algorithm_exc.innerProduct(weightVector, nodeVector);
-	BOOST_REQUIRE(res == 104.18);
+	BOOST_CHECK(res == 104.18);
 
 }
 
@@ -125,7 +125,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	return 0;
 //    // six ways to detect and report the same error:
 //    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
-//    BOOST_REQUIRE( add( 2,2 ) == 4 );      // #2 throws on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
 //    if( add( 2,2 ) != 4 )
 //        BOOST_ERROR( "Ouch..." );          // #3 continues on error
 //    if( add( 2,2 ) != 4 )

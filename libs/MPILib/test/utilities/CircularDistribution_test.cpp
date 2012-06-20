@@ -28,11 +28,11 @@ void test_Constructor() {
 	CircularDistribution circularD;
 
 	if (world.rank() == 0) {
-		BOOST_REQUIRE(circularD._processorId==0);
-		BOOST_REQUIRE(circularD._totalProcessors==world.size());
+		BOOST_CHECK(circularD._processorId==0);
+		BOOST_CHECK(circularD._totalProcessors==world.size());
 	} else if (world.rank() == 1) {
-		BOOST_REQUIRE(circularD._processorId==1);
-		BOOST_REQUIRE(circularD._totalProcessors==world.size());
+		BOOST_CHECK(circularD._processorId==1);
+		BOOST_CHECK(circularD._totalProcessors==world.size());
 	}
 
 }
@@ -40,38 +40,38 @@ void test_Constructor() {
 void test_isLocalNode() {
 	CircularDistribution circularD;
 	if (world.rank() == 0) {
-		BOOST_REQUIRE(circularD.isLocalNode(0)==true);
-		BOOST_REQUIRE(circularD.isLocalNode(1)==false);
+		BOOST_CHECK(circularD.isLocalNode(0)==true);
+		BOOST_CHECK(circularD.isLocalNode(1)==false);
 
 	} else if (world.rank() == 1) {
-		BOOST_REQUIRE(circularD.isLocalNode(0)==false);
-		BOOST_REQUIRE(circularD.isLocalNode(1)==true);
+		BOOST_CHECK(circularD.isLocalNode(0)==false);
+		BOOST_CHECK(circularD.isLocalNode(1)==true);
 	}
 }
 
 void test_getResponsibleProcessor() {
 	CircularDistribution circularD;
-	BOOST_REQUIRE(circularD.getResponsibleProcessor(1)==1);
-	BOOST_REQUIRE(circularD.getResponsibleProcessor(0)==0);
+	BOOST_CHECK(circularD.getResponsibleProcessor(1)==1);
+	BOOST_CHECK(circularD.getResponsibleProcessor(0)==0);
 }
 
 void test_isMaster() {
 	CircularDistribution circularD;
 	if (world.rank() == 0) {
-		BOOST_REQUIRE(circularD.isMaster()==true);
+		BOOST_CHECK(circularD.isMaster()==true);
 	} else {
-		BOOST_REQUIRE(circularD.isMaster()==false);
+		BOOST_CHECK(circularD.isMaster()==false);
 	}
 }
 
 void test_getRank() {
 	CircularDistribution circularD;
-	BOOST_REQUIRE(circularD.getRank() == world.rank());
+	BOOST_CHECK(circularD.getRank() == world.rank());
 }
 
 void test_getSize() {
 	CircularDistribution circularD;
-	BOOST_REQUIRE(circularD.getSize() == world.size());
+	BOOST_CHECK(circularD.getSize() == world.size());
 }
 int test_main(int argc, char* argv[]) // note the name!
 		{
@@ -92,7 +92,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	return 0;
 //    // six ways to detect and report the same error:
 //    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
-//    BOOST_REQUIRE( add( 2,2 ) == 4 );      // #2 throws on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
 //    if( add( 2,2 ) != 4 )
 //        BOOST_ERROR( "Ouch..." );          // #3 continues on error
 //    if( add( 2,2 ) != 4 )

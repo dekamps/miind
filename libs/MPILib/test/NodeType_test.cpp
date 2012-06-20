@@ -24,11 +24,11 @@ namespace mpi = boost::mpi;
 mpi::communicator world;
 
 void test_enum(){
-	BOOST_REQUIRE(static_cast<int>(NodeType::NEUTRAL) == 0);
-	BOOST_REQUIRE(static_cast<int>(NodeType::EXCITATORY) == 1);
-	BOOST_REQUIRE(static_cast<int>(NodeType::INHIBITORY) == 2);
-	BOOST_REQUIRE(static_cast<int>(NodeType::EXCITATORY_BURST) == 3);
-	BOOST_REQUIRE(static_cast<int>(NodeType::INHIBITORY_BURST) == 4);
+	BOOST_CHECK(static_cast<int>(NodeType::NEUTRAL) == 0);
+	BOOST_CHECK(static_cast<int>(NodeType::EXCITATORY) == 1);
+	BOOST_CHECK(static_cast<int>(NodeType::INHIBITORY) == 2);
+	BOOST_CHECK(static_cast<int>(NodeType::EXCITATORY_BURST) == 3);
+	BOOST_CHECK(static_cast<int>(NodeType::INHIBITORY_BURST) == 4);
 
 }
 

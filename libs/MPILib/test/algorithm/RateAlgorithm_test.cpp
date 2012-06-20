@@ -28,8 +28,8 @@ void test_Constructor() {
 	double rate = 2.1;
 
 	RateAlgorithm rAlg(rate);
-	BOOST_REQUIRE(rAlg._time_current == std::numeric_limits<double>::max());
-	BOOST_REQUIRE(rAlg._rate == 2.1);
+	BOOST_CHECK(rAlg._time_current == std::numeric_limits<double>::max());
+	BOOST_CHECK(rAlg._rate == 2.1);
 
 }
 
@@ -49,7 +49,7 @@ void test_evolveNodeState() {
 
 	rAlg.evolveNodeState(tempVec, tempVec, 2.1);
 
-	BOOST_REQUIRE(rAlg._time_current==2.1);
+	BOOST_CHECK(rAlg._time_current==2.1);
 }
 
 void test_getCurrentTime() {
@@ -59,18 +59,18 @@ void test_getCurrentTime() {
 	tempVec.push_back(1.0);
 
 	RateAlgorithm rAlg(rate);
-	BOOST_REQUIRE(rAlg.getCurrentTime()==std::numeric_limits<double>::max());
+	BOOST_CHECK(rAlg.getCurrentTime()==std::numeric_limits<double>::max());
 
 	rAlg.evolveNodeState(tempVec, tempVec, 2.1);
 
-	BOOST_REQUIRE(rAlg.getCurrentTime()==2.1);
+	BOOST_CHECK(rAlg.getCurrentTime()==2.1);
 }
 
 void test_getCurrentRate() {
 
 	double rate = 2.1;
 	RateAlgorithm rAlg(rate);
-	BOOST_REQUIRE(rAlg.getCurrentRate() == 2.1);
+	BOOST_CHECK(rAlg.getCurrentRate() == 2.1);
 }
 
 void test_getGrid() {
@@ -98,7 +98,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	return 0;
 //    // six ways to detect and report the same error:
 //    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
-//    BOOST_REQUIRE( add( 2,2 ) == 4 );      // #2 throws on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
 //    if( add( 2,2 ) != 4 )
 //        BOOST_ERROR( "Ouch..." );          // #3 continues on error
 //    if( add( 2,2 ) != 4 )

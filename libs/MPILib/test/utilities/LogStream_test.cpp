@@ -29,12 +29,12 @@ void test_Constructor() {
 
 	LogStream ls;
 
-	BOOST_REQUIRE(ls._isTimeAvailable == true);
+	BOOST_CHECK(ls._isTimeAvailable == true);
 
 	std::shared_ptr<std::ostream> os(new std::ostringstream);
 	LogStream ls2(os);
-	BOOST_REQUIRE(ls2._isTimeAvailable == true);
-	BOOST_REQUIRE(ls2._pStreamLog == os);
+	BOOST_CHECK(ls2._isTimeAvailable == true);
+	BOOST_CHECK(ls2._pStreamLog == os);
 
 }
 
@@ -46,7 +46,7 @@ void test_Destructor() {
 	std::stringstream temp;
 	temp << "Total time: ";
 	//cast needed as otherwise str() is not available
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			std::dynamic_pointer_cast<std::ostringstream>(os1)->str().compare(0, temp.str().length(), temp.str())==0);
 }
 
@@ -56,7 +56,7 @@ void test_Record() {
 	ls.record("blub");
 	std::string s = "blub";
 	//cast needed as otherwise str() is not available
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			std::dynamic_pointer_cast<std::ostringstream>(os)->str().find(s)!= std::string::npos);
 }
 
@@ -64,17 +64,17 @@ void test_GetStream() {
 	std::shared_ptr<std::ostream> os(new std::ostringstream);
 	LogStream ls(os);
 	//cast needed as otherwise str() is not available
-	BOOST_REQUIRE(ls.getStream()==os);
+	BOOST_CHECK(ls.getStream()==os);
 }
 
 void test_OpenStream() {
 	std::shared_ptr<std::ostream> os(new std::ostringstream);
 	LogStream ls(os);
 	//cast needed as otherwise str() is not available
-	BOOST_REQUIRE(ls.openStream(os)==false);
+	BOOST_CHECK(ls.openStream(os)==false);
 
 	LogStream ls1;
-	BOOST_REQUIRE(ls1.openStream(os)==true);
+	BOOST_CHECK(ls1.openStream(os)==true);
 }
 
 void test_Operators() {
@@ -84,25 +84,25 @@ void test_Operators() {
 	s << std::string("blub");
 	ls << std::string("blub");
 	//cast needed as otherwise str() is not available
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			std::dynamic_pointer_cast<std::ostringstream>(os)->str().find(s.str())!= std::string::npos);
 	s.clear();
 	s << "blub2";
 	ls << "blub2";
 	//cast needed as otherwise str() is not available
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			std::dynamic_pointer_cast<std::ostringstream>(os)->str().find(s.str())!= std::string::npos);
 	s.clear();
 	s << int(1);
 	ls << int(1);
 	//cast needed as otherwise str() is not available
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			std::dynamic_pointer_cast<std::ostringstream>(os)->str().find(s.str())!= std::string::npos);
 	s.clear();
 	s << double(1.4);
 	ls << double(1.4);
 	//cast needed as otherwise str() is not available
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			std::dynamic_pointer_cast<std::ostringstream>(os)->str().find(s.str())!= std::string::npos);
 
 }

@@ -31,7 +31,7 @@ void test_Timer() {
 		time(&cur_time);
 	} while ((cur_time - start_time) < 0.1);
 
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			t.secondsSinceLastCall()>0.09 && t.secondsSinceLastCall()<0.11);
 
 	time(&start_time);
@@ -39,9 +39,9 @@ void test_Timer() {
 		time(&cur_time);
 	} while ((cur_time - start_time) < 0.1);
 
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			t.secondsSinceLastCall()>0.09 && t.secondsSinceLastCall()<0.11);
-	BOOST_REQUIRE( t.secondsSinceFirstCall()>0.19);
+	BOOST_CHECK( t.secondsSinceFirstCall()>0.19);
 
 }
 

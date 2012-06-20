@@ -26,10 +26,10 @@ void test_Constructor() {
 	std::stringstream sstream;
 	sstream << "message";
 
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			strncmp(sstream.str().c_str(), e.what(), sstream.str().size())== 0);
 	TimeException e2(std::string("message"));
-	BOOST_REQUIRE(
+	BOOST_CHECK(
 			strncmp(sstream.str().c_str(), e2.what(), sstream.str().size())== 0);
 }
 
