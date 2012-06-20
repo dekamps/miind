@@ -15,6 +15,9 @@
 #undef protected
 #undef private
 
+#include <MPILib/include/report/handler/RootReportHandler.hpp>
+#include <MPILib/include/SimulationRunParameter.hpp>
+
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
 using namespace MPILib::algorithm;
@@ -34,16 +37,50 @@ void test_Constructor() {
 }
 
 void test_clone() {
-	//TODO
+
+	double rate = 2.1;
+
+	RateAlgorithm rAlg(rate);
+
+	RateAlgorithm* alg = rAlg.clone();
+	BOOST_CHECK(alg->_rate == 2.1);
+	delete alg;
+
+	AlgorithmInterface<double>* algI;
+	algI = rAlg.clone();
+
+	if (dynamic_cast<RateAlgorithm *>(algI)) {
+	} else {
+		BOOST_ERROR("should be of dynamic type RateAlgorithm");
+	}
+	delete algI;
 }
 
 void test_configure() {
-	//TODO
+	const MPILib::report::handler::RootReportHandler WILSONCOWAN_HANDLER(
+			"test/wilsonresponse.root", // file where the simulation results are written
+			false // only rate diagrams
+			);
+
+	const MPILib::SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, // the handler object
+			1000000, // maximum number of iterations
+			0, // start time of simulation
+			0.5, // end time of simulation
+			1e-4, // report time
+			1e-5, // network step time
+			"test/wilsonresponse.log" // log file name
+			);
+
+	double rate = 2.1;
+
+	RateAlgorithm rAlg(rate);
+	rAlg.configure(PAR_WILSONCOWAN);
+	BOOST_CHECK(rAlg._time_current==0);
 }
 
 void test_evolveNodeState() {
 	double rate = 2.1;
-	std::vector<double> tempVec = {1.0};
+	std::vector<double> tempVec = { 1.0 };
 
 	RateAlgorithm rAlg(rate);
 
@@ -74,7 +111,13 @@ void test_getCurrentRate() {
 }
 
 void test_getGrid() {
-	//TODO
+	double rate = 2.1;
+	RateAlgorithm rAlg(rate);
+	AlgorithmGrid grid = rAlg.getGrid();
+
+	BOOST_CHECK(grid._arrayState[0]==2.1);
+	BOOST_CHECK(grid._arrayInterpretation[0]==0.0);
+
 }
 
 int test_main(int argc, char* argv[]) // note the name!

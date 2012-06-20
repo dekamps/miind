@@ -18,6 +18,10 @@ namespace algorithm{
 class RateAlgorithm: public AlgorithmInterface<double> {
 public:
 
+	/**
+	 * Constructor
+	 * @param rate the rate of the algorithm
+	 */
 	RateAlgorithm(Rate rate);
 
 	virtual ~RateAlgorithm();
