@@ -27,37 +27,25 @@ namespace MPILib {
 namespace report {
 namespace handler {
 
-GraphKey::GraphKey
-(
-	NodeId id,
-	Time time
-):
-_id(id),
-_time(time)
-{
+GraphKey::GraphKey(NodeId id, Time time) :
+		_id(id), _time(time) {
 }
 
-GraphKey::GraphKey()
-{
+GraphKey::GraphKey() {
 }
 
-GraphKey::GraphKey
-(
-	const std::string& key_string
-)
-{
-	typedef boost::tokenizer<boost::char_separator<char> >
-		tokenizer;
+GraphKey::GraphKey(const std::string& key_string) {
+	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 	boost::char_separator<char> sep("_");
 	tokenizer tokens(key_string, sep);
 	tokenizer::iterator tok_iter = tokens.begin();
-	if (*tok_iter == std::string("grid") ){
+	if (*tok_iter == std::string("grid")) {
 		Index ind = boost::lexical_cast<Index>(*(++tok_iter));
 		_id = NodeId(ind);
 		_time = boost::lexical_cast<Time>(*(++tok_iter));
 		_type = STATEGRAPH;
 	}
-	if (*tok_iter != std::string("rate") )
+	if (*tok_iter != std::string("rate"))
 		return;
 	Index ind = boost::lexical_cast<Index>(*(++tok_iter));
 	_id = NodeId(ind);
@@ -65,8 +53,7 @@ GraphKey::GraphKey
 	_type = RATEGRAPH;
 }
 
-std::string GraphKey::generateName() const
-{
+std::string GraphKey::generateName() const {
 	std::ostringstream str;
 	str.precision(KEY_PRECISION);
 	if (_type == RATEGRAPH)
@@ -76,6 +63,6 @@ std::string GraphKey::generateName() const
 	return str.str();
 }
 
-}// end namespace of handler
-}// end namespace of report
-}// end namespace of MPILib
+} // end namespace of handler
+} // end namespace of report
+} // end namespace of MPILib

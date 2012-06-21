@@ -31,17 +31,27 @@ enum GraphType {
 	STATEGRAPH, RATEGRAPH
 };
 
-//! Serves to interpret the name of a graph assigned by any AbstractReportHandler, and serves as a
-//! key for searches on graphs in simulation files.
-//!
-//! Given the size of root files nowadays, the Node and time stamp of state graphs in any handler must not
-//! only be stored, but also be retrieved in subsequent analysis. The GraphKey object is the central object
-//! to code and decode the names of state graphs.
+/**
+ * @brief Serves to interpret the name of a graph assigned by any AbstractReportHandler, and serves as a
+ * key for searches on graphs in simulation files.
+ *
+ * Given the size of root files nowadays, the Node and time stamp of state graphs in any handler must not
+ * only be stored, but also be retrieved in subsequent analysis. The GraphKey object is the central object
+ * to code and decode the names of state graphs.
+ */
 struct GraphKey {
 
-	std::string _name { "" };
+	/**
+	 * The nodeId of the node
+	 */
 	NodeId _id { NodeId(0) };
-	Time _time { 0 };
+	/**
+	 * The time point of the node
+	 */
+	Time _time { 0.0 };
+	/**
+	 * The GraphType
+	 */
 	GraphType _type { RATEGRAPH };
 
 	/**
