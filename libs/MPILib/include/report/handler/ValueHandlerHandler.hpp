@@ -29,42 +29,62 @@ namespace MPILib {
 namespace report {
 namespace handler {
 
-	//! ValueHandlerHandler is an auxilliary class for the RootReportHandler which keeps track
-	//! of quantities that need to be logged in the simulation file and which are registered as such
-	//! during simulation
+/**
+ * ValueHandlerHandler is an auxilliary class for the RootReportHandler which keeps track
+ * of quantities that need to be logged in the simulation file and which are registered as such
+ * during simulation
+ */
+class ValueHandlerHandler {
+public:
 
+	ValueHandlerHandler();
 
-	class ValueHandlerHandler {
-	public:
-	
-		ValueHandlerHandler();
+	/**
+	 * Adds a report to the ValueHandlerHandler
+	 * @param A Report
+	 */
+	void addReport(const Report&);
+	/**
+	 * Write the Events to a file
+	 */
+	void write();
 
-		void addReport(const Report&);
-
-		void write();
-
-		struct Event {
-			std::string _str;
-			float  _time;
-			float  _value;
-		};
-
-		bool isWritten() const;
-
-		void reset();
-
-	private:
-
-		void distributeEvent(const Event&);
-
-		bool					_is_written {false};
-		std::vector<std::string>			_vec_names {};
-		std::vector<std::vector<float> >	_vec_time {};
-		std::vector<std::vector<float> >	_vec_quantity {};
+	/**
+	 * every thing is stored as an event
+	 */
+	struct Event {
+		std::string _str;
+		float _time;
+		float _value;
 	};
 
-}// end namespace of handler
-}// end namespace of report
-}// end namespace of MPILib
+	/**
+	 * Are the events written to a file
+	 * @return true if they were written to file
+	 */
+	bool isWritten() const;
+
+	/**
+	 * resets all Events
+	 */
+	void reset();
+
+private:
+
+	/**
+	 * Stores a event
+	 * @param a event
+	 */
+	void distributeEvent(const Event&);
+
+	bool _is_written { false };
+	std::vector<std::string> _vec_names { };
+	std::vector<std::vector<float> > _vec_time { };
+	std::vector<std::vector<float> > _vec_quantity { };
+};
+
+} // end namespace of handler
+} // end namespace of report
+} // end namespace of MPILib
 
 #endif // include guard

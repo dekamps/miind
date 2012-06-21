@@ -32,9 +32,6 @@ namespace MPILib {
 namespace report {
 namespace handler {
 
-ValueHandlerHandler::ValueHandlerHandler() {
-}
-
 ValueHandlerHandler::Event processValues(const ReportValue& value, NodeId id) {
 	ValueHandlerHandler::Event ret_event;
 	std::ostringstream ost;
@@ -46,23 +43,8 @@ ValueHandlerHandler::Event processValues(const ReportValue& value, NodeId id) {
 	return ret_event;
 }
 
-void ValueHandlerHandler::distributeEvent(const Event& ev) {
-	auto iter = std::find(_vec_names.begin(), _vec_names.end(), ev._str);
 
-	if (iter != _vec_names.end()) {
-		auto dif = iter - _vec_names.begin();
-		auto it_time = _vec_time.begin() + dif;
-		it_time->push_back(ev._time);
-		auto it_q = _vec_quantity.begin() + dif;
-		it_q->push_back(ev._value);
-	} else {
-		_vec_names.push_back(ev._str);
-		_vec_time.push_back(std::vector<float>(0));
-		_vec_quantity.push_back(std::vector<float>(0));
-
-		_vec_time.back().push_back(ev._time);
-		_vec_quantity.back().push_back(ev._value);
-	}
+ValueHandlerHandler::ValueHandlerHandler() {
 }
 
 void ValueHandlerHandler::addReport(const Report& report) {
@@ -92,8 +74,9 @@ void ValueHandlerHandler::write() {
 	p_dir->cd();
 }
 
-bool ValueHandlerHandler::isWritten() const {return _is_written;}
-
+bool ValueHandlerHandler::isWritten() const {
+	return _is_written;
+}
 
 void ValueHandlerHandler::reset() {
 	_is_written = false;
@@ -101,6 +84,29 @@ void ValueHandlerHandler::reset() {
 	_vec_time.clear();
 	_vec_quantity.clear();
 }
+
+void ValueHandlerHandler::distributeEvent(const Event& ev) {
+	auto iter = std::find(_vec_names.begin(), _vec_names.end(), ev._str);
+
+	if (iter != _vec_names.end()) {
+		auto dif = iter - _vec_names.begin();
+		//get the actual positions
+		auto it_time = _vec_time.begin() + dif;
+		auto it_q = _vec_quantity.begin() + dif;
+
+		it_time->push_back(ev._time);
+		it_q->push_back(ev._value);
+	} else {
+		_vec_names.push_back(ev._str);
+		_vec_time.push_back(std::vector<float>(0));
+		_vec_quantity.push_back(std::vector<float>(0));
+
+		_vec_time.back().push_back(ev._time);
+		_vec_quantity.back().push_back(ev._value);
+	}
+}
+
+
 
 } // end namespace of handler
 } // end namespace of report
