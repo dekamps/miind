@@ -40,10 +40,8 @@ namespace MPILib {
 namespace report {
 namespace handler {
 
-
 // need one global application object
 TApplication APPLICATION("application", 0, 0);
-
 
 TFile* RootReportHandler::_pFile = nullptr;
 
@@ -51,7 +49,8 @@ std::vector<NodeId> RootReportHandler::_nodes(0);
 
 ValueHandlerHandler RootReportHandler::_valueHandler;
 
-RootReportHandler::RootReportHandler(const std::string& file_name, bool writeState) :
+RootReportHandler::RootReportHandler(const std::string& file_name,
+		bool writeState) :
 		AbstractReportHandler(file_name), //
 		_isStateWriteMandatory(writeState) {
 }
@@ -104,47 +103,6 @@ RootReportHandler* RootReportHandler::clone() const {
 	return new RootReportHandler(*this);
 }
 
-std::unique_ptr<TGraph> RootReportHandler::convertAlgorithmGridToGraph(
-		const Report& report) const {
-
-	std::vector<double> vector_of_grid_values = report._grid.toStateVector();
-
-	// if the Report does not contain a filled AlgorithmGrid, no Graph can be made
-	if (vector_of_grid_values.size() == 0)
-		return 0;
-
-	std::vector<double> vector_of_state_interpretation =
-			report._grid.toInterpretationVector();
-
-	std::unique_ptr<TGraph> tempPtrStateGraph {new TGraph};
-
-	GraphKey key(report._id, report._time);
-	tempPtrStateGraph->SetName(key.generateName().c_str());
-
-	assert(
-			vector_of_grid_values.size() == vector_of_state_interpretation.size());
-
-	unsigned int i = 0;
-	for(auto& it : vector_of_grid_values){
-		tempPtrStateGraph->SetPoint(i,
-				vector_of_state_interpretation[i],
-				vector_of_grid_values[i]);
-		i++;
-	}
-
-
-	return tempPtrStateGraph;
-}
-
-bool RootReportHandler::isConnectedToAlgorithm() const {
-	return (_spCurrentRateGraph != 0);
-}
-
-bool RootReportHandler::isStateWriteMandatory() const {
-	return _isStateWriteMandatory;
-}
-
-
 void RootReportHandler::initializeHandler(const NodeId& nodeId) {
 	// Purpose: this function will be called by MPINode upon configuration.
 	// no canvas are generated as it would cause lot of problems with mpi
@@ -159,14 +117,12 @@ void RootReportHandler::initializeHandler(const NodeId& nodeId) {
 	}
 	// store the node
 	_nodes.push_back(nodeId);
-
-
 }
 
 void RootReportHandler::detachHandler(const NodeId& nodeId) {
-	// Purpose: this function will be called upon DynamicNode destruction. 
+	// Purpose: this function will be called upon MPINode destruction.
 	// This works under the assumption that no isolated DynamicNodes
-	// exist which are associated with an open RootReporthandler. 
+	// exist which are associated with an open RootReporthandler.
 	// Author: Marc de Kamps
 	// Date: 26-08-2005
 
@@ -204,6 +160,42 @@ void RootReportHandler::finalize() {
 	_nodes.clear();
 }
 
-}// end namespace of handler
-}// end namespace of report
-}// end namespace of MPILib
+std::unique_ptr<TGraph> RootReportHandler::convertAlgorithmGridToGraph(
+		const Report& report) const {
+
+	auto vectorOfGridValues = report._grid.toStateVector();
+
+	// if the Report does not contain a filled AlgorithmGrid, no Graph can be made
+	if (vectorOfGridValues.size() == 0)
+		return 0;
+
+	auto vectorOfStateInterpretation = report._grid.toInterpretationVector();
+
+	std::unique_ptr < TGraph > tempPtrStateGraph { new TGraph };
+
+	GraphKey key(report._id, report._time);
+	tempPtrStateGraph->SetName(key.generateName().c_str());
+
+	assert( vectorOfGridValues.size() == vectorOfStateInterpretation.size());
+
+	unsigned int i = 0;
+	for (auto& it : vectorOfGridValues) {
+		tempPtrStateGraph->SetPoint(i, vectorOfStateInterpretation[i],
+				vectorOfGridValues[i]);
+		i++;
+	}
+
+	return tempPtrStateGraph;
+}
+
+bool RootReportHandler::isConnectedToAlgorithm() const {
+	return (_spCurrentRateGraph != 0);
+}
+
+bool RootReportHandler::isStateWriteMandatory() const {
+	return _isStateWriteMandatory;
+}
+
+} // end namespace of handler
+} // end namespace of report
+} // end namespace of MPILib

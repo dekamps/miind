@@ -38,15 +38,18 @@ class TFile;
 namespace MPILib {
 namespace report {
 namespace handler {
-//! This handler writes states and firing rates as TGraph objects in a root file.
-//! (see http://root.cern.ch). It is also able to show run time graphs of selected nodes.
-//!
-//! ROOT is a visualisation and data management tool with a good interface to numerical
-//! methods. The RootReportHandler is reliable when no run time graphs are shown and is a very
-//! efficient way to store the simulation data, as they are compressed when written to file.
-//! The behaviour and resource consumption of the run time graphs need closer investigation
-//! but for debugging purposes they are tremendously useful. A disadvantage for high throughput is that
-//! memory use increases over time. Where this is an issue, use RootHighThroughputHandler.
+
+/**
+ * @brief This handler writes states and firing rates as TGraph objects in a root file.
+ * (see http://root.cern.ch). It is also able to show run time graphs of selected nodes.
+ *
+ * ROOT is a visualisation and data management tool with a good interface to numerical
+ * methods. The RootReportHandler is reliable when no run time graphs are shown and is a very
+ * efficient way to store the simulation data, as they are compressed when written to file.
+ * The behaviour and resource consumption of the run time graphs need closer investigation
+ * but for debugging purposes they are tremendously useful. A disadvantage for high throughput is that
+ * memory use increases over time. Where this is an issue, use RootHighThroughputHandler.
+ */
 class RootReportHandler: public AbstractReportHandler {
 public:
 

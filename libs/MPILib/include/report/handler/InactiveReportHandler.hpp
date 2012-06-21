@@ -23,7 +23,6 @@
 
 #include <MPILib/include/report/handler/AbstractReportHandler.hpp>
 
-
 namespace MPILib {
 namespace report {
 namespace handler {
@@ -40,24 +39,19 @@ public:
 
 	virtual ~InactiveReportHandler();
 
-	virtual void writeReport(const Report&) override;
+	virtual void writeReport(const Report&);
 
 	virtual InactiveReportHandler* clone() const;
 
-	virtual void initializeHandler
-	(
-			const NodeId&
-	) override;
-	virtual void detachHandler
-	(
-			const NodeId&
-	) override;
+	virtual void initializeHandler(const NodeId&);
+	virtual void detachHandler(const NodeId&);
 private:
 
-}; // end of InactiveReportHandler
+};
+// end of InactiveReportHandler
 
 }// end namespace of handler
-}// end namespace of report
-}// end namespace of MPILib
+} // end namespace of report
+} // end namespace of MPILib
 
 #endif // MPILIB_REPORT_HANDLER_INACTIVEREPORTHANDLER_HPP_ include guard
