@@ -26,59 +26,82 @@
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 
-
-
 #include <sstream>
 #include <string>
 
+namespace MPILib {
+namespace report {
 
-namespace MPILib{
-namespace report{
-	//! A Report is sent by a MPINode when it is queried.
-	//!
-	//! The information compiled by individual nodes is sent at a request of the agent that drives the
-	//! simulation, typically a MPINetwork. Such Reports are collected by an instance of an
-	//! AbstractReportHandler, which is responsible for entering this information into a simulation file.
-	struct Report
-	{
-		Time				_time;			//!< Current time at this node.
-		Rate				_rate;			//!< Current firing rate of this node.
-		NodeId				_id;			//!< NodeId of this node.
-		algorithm::AlgorithmGrid		_grid {0};		//!< The state space of the Algorithm
-		std::string			_log_message;	//!< Whatever message should appear in the log file
-		ReportType			_type;			//!< Information for the handler on how to treat the Report
-		std::vector<ReportValue>	_values {};		//!< Ad hoc values that need to be logged in the simulation file
+/**
+ * @brief A Report is sent by a MPINode when it is queried.
+ *
+ * The information compiled by individual nodes is sent at a request of the agent that drives the
+ * simulation, typically a MPINetwork. Such Reports are collected by an instance of an
+ * AbstractReportHandler, which is responsible for entering this information into a simulation file.
+ */
+struct Report {
+	/**
+	 * Current time at this node.
+	 */
+	Time _time;
+	/**
+	 * Current firing rate of this node.
+	 */
+	Rate _rate;
+	/**
+	 * NodeId of this node.
+	 */
+	NodeId _id;
+	/**
+	 * The state space of the Algorithm
+	 */
+	algorithm::AlgorithmGrid _grid { 0 };
+	/**
+	 * Whatever message should appear in the log file
+	 */
+	std::string _log_message;
+	/**
+	 * Information for the handler on how to treat the Report
+	 */
+	ReportType _type;
+	/**
+	 * Ad hoc values that need to be logged in the simulation file
+	 */
+	std::vector<ReportValue> _values { };
 
-		Report
-		(
-			Time		time,
-			Rate		rate,
-			NodeId		id,
-			std::string		log_message
-		);
+	/**
+	 * Constructor
+	 * @param time Current time at this node.
+	 * @param rate Current firing rate of this node.
+	 * @param id NodeId of this node.
+	 * @param log_message Whatever message should appear in the log file
+	 */
+	Report(Time time, Rate rate, NodeId id, std::string log_message);
 
+	/**
+	 *
+	 * @param time Current time at this node.
+	 * @param rate Current firing rate of this node.
+	 * @param id NodeId of this node.
+	 * @param grid The state space of the Algorithm
+	 * @param log_message Whatever message should appear in the log file
+	 * @param type Information for the handler on how to treat the Report
+	 * @param vec_values Ad hoc values that need to be logged in the simulation file
+	 */
+	Report(Time time, Rate rate, NodeId id, algorithm::AlgorithmGrid grid,
+			std::string log_message, ReportType type,
+			std::vector<ReportValue> vec_values);
 
-		Report
-		(
-			Time					time,
-			Rate					rate,
-			NodeId					id,
-			algorithm::AlgorithmGrid			grid,
-			std::string				log_message,
-			ReportType				type,
-			std::vector<ReportValue>		vec_values
-		);
+	/**
+	 * Add a ReportValue to the report
+	 * @param value The ReportValue added to the Report
+	 */
+	void addValue(const ReportValue& value);
 
-		/**
-		 * Add a ReportValue to the report
-		 * @param value The ReportValue added to the Report
-		 */
-		void addValue(const ReportValue& value);
+};
+// end of Report
 
-
-	}; // end of Report
-
-} //end of namespace report
+}//end of namespace report
 } // end of namespace MPILib
 
 #endif // MPILIB_REPORT_REPORT_HPP_ include guard
