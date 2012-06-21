@@ -1,7 +1,8 @@
 add_header(
-    InactiveReportHandler.hpp
     AbstractReportHandler.hpp
+    GraphKey.hpp
+    InactiveReportHandler.hpp
+    RootHighThroughputHandler.hpp
     RootReportHandler.hpp
     ValueHandlerHandler.hpp
-    GraphKey.hpp
 )
