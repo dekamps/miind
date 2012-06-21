@@ -18,6 +18,8 @@
 #include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
 #include <MPILib/include/algorithm/WilsonCowanParameter.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
+#include <MPILib/include/report/handler/RootHighThroughputHandler.hpp>
+
 
 #include <MPILib/include/algorithm/RateAlgorithm.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
@@ -25,11 +27,15 @@
 namespace mpi = boost::mpi;
 using namespace MPILib;
 
+const report::handler::RootHighThroughputHandler WILSONCOWAN_HIGH_HANDLER("test/wilsonresponseHigh.root", // file where the simulation results are written
+		false // only rate diagrams
+		);
+
 const report::handler::RootReportHandler WILSONCOWAN_HANDLER("test/wilsonresponse.root", // file where the simulation results are written
 		false // only rate diagrams
 		);
 
-const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, // the handler object
+const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HIGH_HANDLER, // the handler object
 		1000000, // maximum number of iterations
 		0, // start time of simulation
 		0.5, // end time of simulation
@@ -38,11 +44,16 @@ const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, // the handler
 		"test/wilsonresponse.log" // log file name
 		);
 
+
+const report::handler::RootHighThroughputHandler WILSONCOWAN_HIGH_HANDLER1("test/wilsonresponseHigh1.root", // file where the simulation results are written
+		false // only rate diagrams
+		);
+
 const report::handler::RootReportHandler WILSONCOWAN_HANDLER1("test/wilsonresponse1.root", // file where the simulation results are written
 		false // only rate diagrams
 		);
 
-const SimulationRunParameter PAR_WILSONCOWAN1(WILSONCOWAN_HANDLER1, // the handler object
+const SimulationRunParameter PAR_WILSONCOWAN1(WILSONCOWAN_HIGH_HANDLER1, // the handler object
 		1000000, // maximum number of iterations
 		0, // start time of simulation
 		0.5, // end time of simulation

@@ -24,6 +24,7 @@
 #include "LocalDefinitions.h"
 #include "SimulationRunParameter.h"
 #include "RootReportHandler.h"
+#include "RootHighThroughputHandler.h"
 
 namespace DynamicLib
 {
@@ -96,7 +97,7 @@ namespace DynamicLib
 		);
 
 	// define a handler to store the simulation results
-	const RootReportHandler 
+	const RootHighThroughputHandler
 		WILSONCOWAN_HANDLER
 		(
 			"test/wilsonresponse.root",	// file where the simulation results are written
