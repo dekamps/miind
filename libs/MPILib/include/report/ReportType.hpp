@@ -20,14 +20,16 @@
 #ifndef MPILIB_REPORT_REPORTTYPE_HPP_
 #define MPILIB_REPORT_REPORTTYPE_HPP_
 
-namespace MPILib{
-namespace report{
+namespace MPILib {
+namespace report {
 
-	//! A ReportType specifies whether just a DynamicNode's activation is reported or its full NodeState
-	enum ReportType {RATE, STATE};
+/**
+ * A ReportType specifies whether just a MPINode's activation is reported or its full NodeState
+ */
+enum ReportType {
+	RATE, STATE
+};
 } //end of namespace report
 } // end of namespace MPILib
 
-
 #endif // include guard MPILIB_REPORT_REPORTTYPE_HPP_
-

@@ -22,24 +22,34 @@
 
 #include <string>
 
+namespace MPILib {
+namespace report {
 
-namespace MPILib{
-namespace report{
-
-	//! ReportValue objects cab be added to a Report when a particular quantity, as yet unknown at this stage,
-	//! needs to be stored into  the simulation data file.
-
-	//! Each handler has its own way of dealing with these objects.
-	//! For the RootReport handler the behavious is as follows: if a TGraph corresponding to the name
-	//! member does not yet exist, one will be created for the DynamicNode where it is added to the
-	//! Report. From that moment onwards, every ReportValue added in this node will be added to the TGraph,
-	//! together with the simulation time of the Report. Hence a plot over time of the quantity in question
-	//! will be created and stored in the simulation file.
-	struct ReportValue {
-		std::string  _name_quantity;
-		double  _value;
-		double	_time;
-	};
+/**
+ * @brief ReportValue objects cab be added to a Report when a particular quantity, as yet unknown at this stage,
+ * needs to be stored into  the simulation data file.
+ *
+ * Each handler has its own way of dealing with these objects.
+ * For the RootReport handler the behavious is as follows: if a TGraph corresponding to the name
+ * member does not yet exist, one will be created for the DynamicNode where it is added to the
+ * Report. From that moment onwards, every ReportValue added in this node will be added to the TGraph,
+ * together with the simulation time of the Report. Hence a plot over time of the quantity in question
+ * will be created and stored in the simulation file.
+ */
+struct ReportValue {
+	/**
+	 * The name of the stored quantity
+	 */
+	std::string _name_quantity;
+	/**
+	 * The value stored
+	 */
+	double _value;
+	/**
+	 * The corresponding time point
+	 */
+	double _time;
+};
 } //end of namespace report
 } // end of namespace MPILib
 
