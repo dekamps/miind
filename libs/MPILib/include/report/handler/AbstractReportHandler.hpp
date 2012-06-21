@@ -62,7 +62,7 @@ public:
 
 	/**
 	 * Cloning operation
-	 * @return A clone of the algorithm
+	 * @return A clone of the ReportHandler
 	 */
 	virtual AbstractReportHandler* clone() const = 0;
 

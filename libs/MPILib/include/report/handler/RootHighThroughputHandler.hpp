@@ -29,67 +29,79 @@
 class TTree;
 class TFile;
 class TBranch;
-template <class Type> class TVectorT;
+template<class Type> class TVectorT;
 
 namespace MPILib {
 namespace report {
 namespace handler {
-	//! This is a handler which organises data in time slices. Its memory use is constant over a simulation, unlike that
-	//! of RootReportHandler, but is doesn't offer online visualisation.
-	//!
-	class RootHighThroughputHandler : public AbstractReportHandler
-	{
-	public:
+/**
+ * This is a handler which organizes data in time slices.
+ * Its memory use is constant over a simulation, unlike that
+ * of RootReportHandler.
+ */
+class RootHighThroughputHandler: public AbstractReportHandler {
+public:
 
-		//! Standard constructor for client code
-		RootHighThroughputHandler
-		(
-			const std::string&,	//! root file name
-			bool,			//! write out state file 
-			bool	reinstate_rate_graph = false //! backward compatibility option for an older ROOT layout
-		);
+	/**
+	 * Standard constructor for client code
+	 * @param root file name
+	 * @param write out state file
+	 * @param reinstate_rate_graph backward compatibility option for an older ROOT layout
+	 */
+	RootHighThroughputHandler(const std::string&, bool,
+			bool reinstate_rate_graph = false);
 
-		RootHighThroughputHandler(const RootHighThroughputHandler&);
+	/**
+	 * Copy constructor
+	 * @param another RootHighThroughputHandler
+	 */
+	RootHighThroughputHandler(const RootHighThroughputHandler&);
 
-		virtual ~RootHighThroughputHandler();
+	virtual ~RootHighThroughputHandler();
 
+	/**
+	 * Writes the Report to the file.
+	 * @param report The report written into the file
+	 */
+	virtual void writeReport(const Report&);
 
-		//! Collects the Report of a DynamicNode for storage in the simulation file.
-		virtual void writeReport(const Report&);
+	/**
+	 * Cloning operation
+	 * @return A clone of the ReportHandler
+	 */
+	virtual RootHighThroughputHandler* clone() const;
 
+	/**
+	 * During Configuration a MPINode will associate itself with the handler.
+	 * @param The NodeId of the Node
+	 */
+	virtual void initializeHandler(const NodeId&);
 
-		virtual RootHighThroughputHandler* clone() const;
+	/**
+	 * A MPINode will request to be dissociated from the handler at the end of simulation.
+	 * @param The NodeId of the Node
+	 */
+	virtual void detachHandler(const NodeId&);
 
-		virtual void initializeHandler
-		(
-				const NodeId&
-		);
+private:
 
+	bool reinstateNodeGraphs(const char*);
+	void collectGraphInformation(std::vector<double>*, Number*, Number*);
+	void storeRateGraphs(const std::vector<double>&, Number, Number);
 
-		virtual void detachHandler
-		(
-			const NodeId&
-		);
+	static Time _startTime;
+	static TTree* _pTree;
+	static TFile* _pFile;
+	static TVectorT<double>* _pArray;
+	static bool _reinstateNodeGraphs;
+	static bool _isRecording;
+	static bool _isFirstTimeSliceProcessed;
+	static int _nrSlice;
+	static std::vector<double> _vData;
 
-	private:
+};
 
-		bool reinstateNodeGraphs(const char*);
-	    void collectGraphInformation(std::vector<double>*,Number*,Number*);
-		void storeRateGraphs(const std::vector<double>&, Number, Number);
-
-		static Time					_t_start;
-		static TTree*				_p_tree;
-		static TFile*				_p_file;
-		static TVectorT<double>*	_p_array;
-		static bool					_reinstate_node_graphs;
-		static bool					_is_recording;
-		static bool					_is_first_time_slice_processed;
-		static int					_nr_slice;
-		static std::vector<double>		_vec_data;
-
-	};
-
-}// end namespace of handler
-}// end namespace of report
-}// end namespace of MPILib
+} // end namespace of handler
+} // end namespace of report
+} // end namespace of MPILib
 #endif // include guard MPILIB_REPORT_HANDLER_ROOTHIGHTHROUGHPUTHANDLER_HPP_

@@ -30,14 +30,14 @@ namespace MPILib {
 namespace report {
 namespace handler {
 
-Time RootHighThroughputHandler::_t_start = 0;
-TTree* RootHighThroughputHandler::_p_tree = 0;
-bool RootHighThroughputHandler::_is_recording = false;
-bool RootHighThroughputHandler::_is_first_time_slice_processed = false;
-bool RootHighThroughputHandler::_reinstate_node_graphs = false;
-std::vector<double> RootHighThroughputHandler::_vec_data = std::vector<double>(0);
-TFile* RootHighThroughputHandler::_p_file = 0;
-TVectorD* RootHighThroughputHandler::_p_array = 0;
+Time RootHighThroughputHandler::_startTime = 0;
+TTree* RootHighThroughputHandler::_pTree = 0;
+bool RootHighThroughputHandler::_isRecording = false;
+bool RootHighThroughputHandler::_isFirstTimeSliceProcessed = false;
+bool RootHighThroughputHandler::_reinstateNodeGraphs = false;
+std::vector<double> RootHighThroughputHandler::_vData = std::vector<double>(0);
+TFile* RootHighThroughputHandler::_pFile = 0;
+TVectorD* RootHighThroughputHandler::_pArray = 0;
 
 
 RootHighThroughputHandler::RootHighThroughputHandler
@@ -51,7 +51,7 @@ AbstractReportHandler
 	file_name
 )
 {
-	this->_reinstate_node_graphs = reinstate_node_graphs;
+	this->_reinstateNodeGraphs = reinstate_node_graphs;
 }
 
 RootHighThroughputHandler::RootHighThroughputHandler
@@ -65,32 +65,32 @@ AbstractReportHandler(rhs)
 void RootHighThroughputHandler::detachHandler(const NodeId&)
 {
 	// write after the last array
-	if (_p_array){
-		_p_tree->Write();
+	if (_pArray){
+		_pTree->Write();
 
 		// if so desired, create node rate graphs
 		// note that the file is closed by the first node so that the test for its existence is necessary
-		if (_reinstate_node_graphs && _p_file)
-			reinstateNodeGraphs(_p_file->GetName());
+		if (_reinstateNodeGraphs && _pFile)
+			reinstateNodeGraphs(_pFile->GetName());
 
 	}
 
 	// restore all static definitions
-	delete _p_array;
-	_p_array						= 0;
-	_t_start						= 0;
-	_is_recording					= false;
-	_is_first_time_slice_processed	= false;
-	_reinstate_node_graphs			= false;
-	_vec_data						= std::vector<double>(0);
-	_p_tree							= 0;
+	delete _pArray;
+	_pArray						= 0;
+	_startTime						= 0;
+	_isRecording					= false;
+	_isFirstTimeSliceProcessed	= false;
+	_reinstateNodeGraphs			= false;
+	_vData						= std::vector<double>(0);
+	_pTree							= 0;
 
-	if ( _p_file ) {
+	if ( _pFile ) {
 		// clean up
-		_p_file->Close();
-		delete _p_array;
-		_p_array = 0;
-		_p_file = 0;
+		_pFile->Close();
+		delete _pArray;
+		_pArray = 0;
+		_pFile = 0;
 	}
 }
 
@@ -102,9 +102,9 @@ RootHighThroughputHandler* RootHighThroughputHandler::clone() const
 
 void RootHighThroughputHandler::initializeHandler(const NodeId&)
 {
-	if (!_p_file)
-		_p_file = new TFile(this->getStreamFileName().c_str(),"RECREATE");
-	if (_p_file->IsZombie() )
+	if (!_pFile)
+		_pFile = new TFile(this->getStreamFileName().c_str(),"RECREATE");
+	if (_pFile->IsZombie() )
 		throw utilities::Exception("Couldn't open root file");
 
 }
@@ -113,54 +113,54 @@ void RootHighThroughputHandler::initializeHandler(const NodeId&)
 void RootHighThroughputHandler::writeReport(const Report& report)
 {
 
-	if (report._id == NodeId(0) && _is_recording && !_is_first_time_slice_processed)
+	if (report._id == NodeId(0) && _isRecording && !_isFirstTimeSliceProcessed)
 	{
 		 // This is the first time that a complete time slice has been recorded, presumably the simulation time start
-		_is_first_time_slice_processed = true;
+		_isFirstTimeSliceProcessed = true;
 		// so we should have a full fledged version of the data vector. We create a TArrayD which from now on will hold on data. From the vector we know the right size
-		_p_array= new TVectorD(_vec_data.size() + 1);
-		(*_p_array)[0] = _t_start;
+		_pArray= new TVectorD(_vData.size() + 1);
+		(*_pArray)[0] = _startTime;
 
-		for (Index i = 0; i < _vec_data.size(); i++)
-			(*_p_array)[i+1] = _vec_data[i];
+		for (Index i = 0; i < _vData.size(); i++)
+			(*_pArray)[i+1] = _vData[i];
 	}
 
-	if (report._id == NodeId(1) && !_is_recording)
+	if (report._id == NodeId(1) && !_isRecording)
 	{
-		_is_recording = true;
-		_p_tree = new TTree("Activations","Times slices");
-		_p_tree->Branch("slices","TVectorT<double>",&_p_array,32000,0);
+		_isRecording = true;
+		_pTree = new TTree("Activations","Times slices");
+		_pTree->Branch("slices","TVectorT<double>",&_pArray,32000,0);
 	}
 
 
 
-	if (! _is_first_time_slice_processed && _is_recording)
+	if (! _isFirstTimeSliceProcessed && _isRecording)
 	{
 
 		// Here we are adding events to the first time slice. We don't know how many there are, because here we don't know the size of the network
 		// So we keep adding them to the event vector
 		if (report._id != NodeId(0) )
-			_vec_data.push_back(report._rate);
+			_vData.push_back(report._rate);
 
 		// we also need to record the start time, since the slice can only be written once this step is complete, i.e. at the next report time.
 		// But the time use when writing that slice must be the simulation start time
-		_t_start = report._time;
+		_startTime = report._time;
 	}
 
-	if ( _is_first_time_slice_processed && _is_recording )
+	if ( _isFirstTimeSliceProcessed && _isRecording )
 	{
 		if (report._id == NodeId(1) ){
 			// here we can write the TArrayD of the last time slice, as well as the time and start filling it up again
-			_p_tree->Fill();
+			_pTree->Fill();
 			// normal operation, just fill the TVectorD
-			(*_p_array)[0] = report._time;
-			(*_p_array)[report._id]=report._rate;
+			(*_pArray)[0] = report._time;
+			(*_pArray)[report._id]=report._rate;
 		}
 		else
 		{
 			if (report._id != NodeId(0) ){
 				// normal operation, just fill the TVectorD
-				(*_p_array)[report._id]=report._rate;
+				(*_pArray)[report._id]=report._rate;
 			}
 		}
 	}
@@ -173,16 +173,16 @@ bool RootHighThroughputHandler::reinstateNodeGraphs(const char* p)
 {
 	const std::string file_name(p);
 	//close to flush buffers and reopen to append
-	_p_file->Close();
-	delete _p_file;
+	_pFile->Close();
+	delete _pFile;
 	//closing the file has invalidated (destroyed) the tree
-	_p_tree = 0;
-	delete _p_array;
-	_p_array = 0;
+	_pTree = 0;
+	delete _pArray;
+	_pArray = 0;
 
-	_p_file = new TFile(file_name.c_str(),"UPDATE");
+	_pFile = new TFile(file_name.c_str(),"UPDATE");
 
-	TGraph* p_graph = (TGraph*)_p_file->Get("rate_1");
+	TGraph* p_graph = (TGraph*)_pFile->Get("rate_1");
 	if (p_graph){
 		std::cout << "They are already in" << std::endl;
 		return false;
@@ -196,18 +196,18 @@ bool RootHighThroughputHandler::reinstateNodeGraphs(const char* p)
 
 	storeRateGraphs(vec_times,number_of_nodes,number_of_slices);
 
-	_p_file->Close();	// the file object does not exist anymore, don't delete the pointer
-	_p_file = 0;		// just set it to 0
-	delete _p_array;
-	_p_array = 0;
+	_pFile->Close();	// the file object does not exist anymore, don't delete the pointer
+	_pFile = 0;		// just set it to 0
+	delete _pArray;
+	_pArray = 0;
 
 	return true;
 }
 
 void RootHighThroughputHandler::storeRateGraphs(const std::vector<double>& vec_time, Number n_nodes, Number n_slices)
 {
-	TBranch* p_branch = _p_tree->GetBranch("slices");
-	p_branch->SetAddress(&_p_array); //address of pointer!
+	TBranch* p_branch = _pTree->GetBranch("slices");
+	p_branch->SetAddress(&_pArray); //address of pointer!
 
 	for (Index node = 0; node < n_nodes; node++ )
 	{	
@@ -217,7 +217,7 @@ void RootHighThroughputHandler::storeRateGraphs(const std::vector<double>& vec_t
 		for (Index slice = 0; slice < n_slices; slice++ )
 		{
 			p_branch->GetEvent(slice);
-			vec_rate.push_back((*_p_array)[id_node]);
+			vec_rate.push_back((*_pArray)[id_node]);
 		}
 		if (vec_rate.size() != vec_time.size() )
 			throw utilities::Exception("Inconsistency between times and rate");
@@ -233,24 +233,24 @@ void RootHighThroughputHandler::storeRateGraphs(const std::vector<double>& vec_t
 }
 
 void RootHighThroughputHandler::collectGraphInformation(std::vector<double>* p_vec_time, Number* p_num_nodes, Number* p_num_slices){
-	if (_p_tree)
+	if (_pTree)
 		throw utilities::Exception("There is a TTree that shouldn't be there");
 
-	_p_tree= (TTree*)_p_file->Get("Activations");
-	if (!_p_tree)
+	_pTree= (TTree*)_pFile->Get("Activations");
+	if (!_pTree)
 		throw utilities::Exception("No valid TTree");
 
-	*p_num_slices = static_cast<Number>(_p_tree->GetEntries());
+	*p_num_slices = static_cast<Number>(_pTree->GetEntries());
 
-	TBranch* p_branch = _p_tree->GetBranch("slices");
-	p_branch->SetAddress(&_p_array); //address of pointer!
+	TBranch* p_branch = _pTree->GetBranch("slices");
+	p_branch->SetAddress(&_pArray); //address of pointer!
 
 	for (Index i = 0; i < *p_num_slices; i++){
 		p_branch->GetEvent(i);
-		p_vec_time->push_back((*_p_array)[0]);
+		p_vec_time->push_back((*_pArray)[0]);
 	}
 	//exclude NodeId(0)
-	*p_num_nodes = _p_array->GetNoElements() -1;
+	*p_num_nodes = _pArray->GetNoElements() -1;
 }
 
 } // end namespace of handler
