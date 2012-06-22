@@ -27,7 +27,7 @@ public:
 	 * @param fileName The Filename, do not append an ending
 	 * @param fileType The Type of a file, the file extension depends on this param
 	 */
-	explicit FileNameGenerator(std::string& fileName, FileType fileType =
+	explicit FileNameGenerator(const std::string& fileName, FileType fileType =
 			LOGFILE);
 	virtual ~FileNameGenerator();
 

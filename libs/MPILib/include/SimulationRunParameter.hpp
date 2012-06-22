@@ -57,7 +57,7 @@ public:
 	 * @param t_end End time of Simulation
 	 * @param t_report Report time
 	 * @param t_step Network step time
-	 * @param name_log Log file path name
+	 * @param name_log Log file path name @attention without extension
 	 * @param t_state_report Report State time
 	 */
 	SimulationRunParameter(
@@ -128,18 +128,19 @@ public:
 
 private:
 
-	const report::handler::AbstractReportHandler* _p_handler;
+	const report::handler::AbstractReportHandler* _pHandler;
 
-	Number _max_iter;
+	Number _maxIter;
 
-	Time _t_begin;
-	Time _t_end;
-	Time _t_report;
-	Time _t_step;
+	Time _tBegin;
+	Time _tEnd;
+	Time _tReport;
+	Time _tStep;
+	Time _tStateReport;
 
-	std::string _name_log;
 
-	Time _t_state_report;
+	std::string _logFileName;
+
 
 };
 

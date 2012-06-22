@@ -19,7 +19,7 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
 #include <MPILib/include/SimulationRunParameter.hpp>
-
+#include <MPILib/include/utilities/FileNameGenerator.hpp>
 namespace MPILib {
 
 SimulationRunParameter::SimulationRunParameter(
@@ -27,26 +27,26 @@ SimulationRunParameter::SimulationRunParameter(
 		Time t_begin, Time t_end, Time t_report, Time t_step,
 		const std::string& name_log, Time t_state_report) :
 
-		_p_handler(&handler), //
-		_max_iter(max_iter), //
-		_t_begin(t_begin), //
-		_t_end(t_end), //
-		_t_report(t_report), //
-		_t_step(t_step), //
-		_name_log(name_log), //
-		_t_state_report((t_state_report == 0) ? t_end : t_state_report) {
+		_pHandler(&handler), //
+		_maxIter(max_iter), //
+		_tBegin(t_begin), //
+		_tEnd(t_end), //
+		_tReport(t_report), //
+		_tStep(t_step), //
+		_logFileName(name_log), //
+		_tStateReport((t_state_report == 0) ? t_end : t_state_report) {
 }
 
 SimulationRunParameter::SimulationRunParameter(
 		const SimulationRunParameter& parameter) :
-		_p_handler(parameter._p_handler), //
-		_max_iter(parameter._max_iter), //
-		_t_begin(parameter._t_begin), //
-		_t_end(parameter._t_end), //
-		_t_report(parameter._t_report), //
-		_t_step(parameter._t_step), //
-		_name_log(parameter._name_log), //
-		_t_state_report(parameter._t_state_report) {
+		_pHandler(parameter._pHandler), //
+		_maxIter(parameter._maxIter), //
+		_tBegin(parameter._tBegin), //
+		_tEnd(parameter._tEnd), //
+		_tReport(parameter._tReport), //
+		_tStep(parameter._tStep), //
+		_logFileName(parameter._logFileName), //
+		_tStateReport(parameter._tStateReport) {
 }
 
 SimulationRunParameter& SimulationRunParameter::operator=(
@@ -54,49 +54,50 @@ SimulationRunParameter& SimulationRunParameter::operator=(
 	if (&parameter == this)
 		return *this;
 
-	_p_handler = parameter._p_handler;
+	_pHandler = parameter._pHandler;
 
-	_max_iter = parameter._max_iter;
-	_t_begin = parameter._t_begin;
-	_t_end = parameter._t_end;
-	_t_report = parameter._t_report;
-	_t_step = parameter._t_step;
-	_name_log = parameter._name_log;
-	_t_state_report = parameter._t_state_report;
+	_maxIter = parameter._maxIter;
+	_tBegin = parameter._tBegin;
+	_tEnd = parameter._tEnd;
+	_tReport = parameter._tReport;
+	_tStep = parameter._tStep;
+	_logFileName = parameter._logFileName;
+	_tStateReport = parameter._tStateReport;
 
 	return *this;
 }
 
 Time SimulationRunParameter::getTBegin() const {
-	return _t_begin;
+	return _tBegin;
 }
 
 Time SimulationRunParameter::getTEnd() const {
-	return _t_end;
+	return _tEnd;
 }
 
 Time SimulationRunParameter::getTReport() const {
-	return _t_report;
+	return _tReport;
 }
 
 Time SimulationRunParameter::getTStep() const {
-	return _t_step;
+	return _tStep;
 }
 
 Time SimulationRunParameter::getTState() const {
-	return _t_state_report;
+	return _tStateReport;
 }
 
 std::string SimulationRunParameter::getLogName() const {
-	return _name_log;
+	utilities::FileNameGenerator fg (_logFileName);
+	return fg.getFileName();
 }
 
 const report::handler::AbstractReportHandler& SimulationRunParameter::getHandler() const {
-	return *_p_handler;
+	return *_pHandler;
 }
 
 Number SimulationRunParameter::getMaximumNumberIterations() const {
-	return _max_iter;
+	return _maxIter;
 }
 
 } // end namespace MPILib

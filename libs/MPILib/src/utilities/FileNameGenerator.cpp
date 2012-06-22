@@ -14,7 +14,7 @@ namespace mpi = boost::mpi;
 namespace MPILib {
 namespace utilities {
 
-FileNameGenerator::FileNameGenerator(std::string& fileName, FileType fileType) {
+FileNameGenerator::FileNameGenerator(const std::string& fileName, FileType fileType) {
 	mpi::communicator world;
 
 	int processorId = world.rank();

@@ -43,7 +43,8 @@ public:
 
 	/**
 	 * Constructor
-	 * @param fileName The filename of the output file
+	 * @param fileName The filename of the output file @attention do not provide a extension this is
+	 * done automatically
 	 */
 	AbstractReportHandler(const std::string& fileName) :
 			_streamFileName(fileName) {
@@ -83,13 +84,14 @@ public:
 	 * @return The name of the streamFile
 	 */
 	std::string getStreamFileName() const {
-		return _streamFileName;
+		utilities::FileNameGenerator fg(_streamFileName, utilities::ROOTFILE);
+		return fg.getFileName();
 	}
 
 private:
 
 	/**
-	 * The streamFileName
+	 * The streamFileName without extension
 	 */
 	const std::string _streamFileName;
 

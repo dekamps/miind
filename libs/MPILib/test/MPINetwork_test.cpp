@@ -48,14 +48,14 @@ void test_Constructor() {
 	}
 
 	BOOST_CHECK(network._maxNodeId==0);
-	BOOST_CHECK(network._current_report_time==0);
-	BOOST_CHECK(network._current_state_time==0);
-	BOOST_CHECK(network._current_simulation_time==0);
+	BOOST_CHECK(network._currentReportTime==0);
+	BOOST_CHECK(network._currentStateTime==0);
+	BOOST_CHECK(network._currentSimulationTime==0);
 	BOOST_CHECK(network._isDalesLaw==true);
 	//indirect test
-	BOOST_CHECK(network._state_network._currentTime==0.0);
-	BOOST_CHECK(network._parameter_simulation_run._t_begin==0);
-	BOOST_CHECK(network._stream_log._isTimeAvailable==true);
+	BOOST_CHECK(network._stateNetwork._currentTime==0.0);
+	BOOST_CHECK(network._parameterSimulationRun._tBegin==0);
+	BOOST_CHECK(network._streamLog._isTimeAvailable==true);
 }
 
 void test_AddNode() {

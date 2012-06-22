@@ -29,48 +29,48 @@ void test_Constructor_and_Copy() {
 
 	SimulationRunParameter simParam { handler, 0, 0.0, 0.0, 0.0, 0.0, "" };
 
-	BOOST_CHECK(simParam._p_handler == &handler);
-	BOOST_CHECK(simParam._max_iter == 0);
-	BOOST_CHECK(simParam._t_begin ==0.0);
-	BOOST_CHECK(simParam._t_end==0.0);
-	BOOST_CHECK(simParam._t_report==0.0);
-	BOOST_CHECK(simParam._t_step==0.0);
-	BOOST_CHECK(simParam._name_log=="");
-	BOOST_CHECK(simParam._t_state_report == 0.0);
+	BOOST_CHECK(simParam._pHandler == &handler);
+	BOOST_CHECK(simParam._maxIter == 0);
+	BOOST_CHECK(simParam._tBegin ==0.0);
+	BOOST_CHECK(simParam._tEnd==0.0);
+	BOOST_CHECK(simParam._tReport==0.0);
+	BOOST_CHECK(simParam._tStep==0.0);
+	BOOST_CHECK(simParam._logFileName=="");
+	BOOST_CHECK(simParam._tStateReport == 0.0);
 
 	SimulationRunParameter simParam2 { report::handler::InactiveReportHandler(),
 			1, 1.0, 1.0, 1.0, 1.0, "a", 2.0 };
 
-	BOOST_CHECK(simParam2._p_handler != &handler);
-	BOOST_CHECK(simParam2._max_iter == 1);
-	BOOST_CHECK(simParam2._t_begin ==1.0);
-	BOOST_CHECK(simParam2._t_end==1.0);
-	BOOST_CHECK(simParam2._t_report==1.0);
-	BOOST_CHECK(simParam2._t_step==1.0);
-	BOOST_CHECK(simParam2._name_log=="a");
-	BOOST_CHECK(simParam2._t_state_report == 2.0);
+	BOOST_CHECK(simParam2._pHandler != &handler);
+	BOOST_CHECK(simParam2._maxIter == 1);
+	BOOST_CHECK(simParam2._tBegin ==1.0);
+	BOOST_CHECK(simParam2._tEnd==1.0);
+	BOOST_CHECK(simParam2._tReport==1.0);
+	BOOST_CHECK(simParam2._tStep==1.0);
+	BOOST_CHECK(simParam2._logFileName=="a");
+	BOOST_CHECK(simParam2._tStateReport == 2.0);
 
 	SimulationRunParameter simParam3 { simParam2 };
 
-	BOOST_CHECK(simParam3._p_handler != &handler);
-	BOOST_CHECK(simParam3._max_iter == 1);
-	BOOST_CHECK(simParam3._t_begin ==1.0);
-	BOOST_CHECK(simParam3._t_end==1.0);
-	BOOST_CHECK(simParam3._t_report==1.0);
-	BOOST_CHECK(simParam3._t_step==1.0);
-	BOOST_CHECK(simParam3._name_log=="a");
-	BOOST_CHECK(simParam3._t_state_report == 2.0);
+	BOOST_CHECK(simParam3._pHandler != &handler);
+	BOOST_CHECK(simParam3._maxIter == 1);
+	BOOST_CHECK(simParam3._tBegin ==1.0);
+	BOOST_CHECK(simParam3._tEnd==1.0);
+	BOOST_CHECK(simParam3._tReport==1.0);
+	BOOST_CHECK(simParam3._tStep==1.0);
+	BOOST_CHECK(simParam3._logFileName=="a");
+	BOOST_CHECK(simParam3._tStateReport == 2.0);
 
 	SimulationRunParameter simParam4 = simParam2;
 
-	BOOST_CHECK(simParam4._p_handler != &handler);
-	BOOST_CHECK(simParam4._max_iter == 1);
-	BOOST_CHECK(simParam4._t_begin ==1.0);
-	BOOST_CHECK(simParam4._t_end==1.0);
-	BOOST_CHECK(simParam4._t_report==1.0);
-	BOOST_CHECK(simParam4._t_step==1.0);
-	BOOST_CHECK(simParam4._name_log=="a");
-	BOOST_CHECK(simParam4._t_state_report == 2.0);
+	BOOST_CHECK(simParam4._pHandler != &handler);
+	BOOST_CHECK(simParam4._maxIter == 1);
+	BOOST_CHECK(simParam4._tBegin ==1.0);
+	BOOST_CHECK(simParam4._tEnd==1.0);
+	BOOST_CHECK(simParam4._tReport==1.0);
+	BOOST_CHECK(simParam4._tStep==1.0);
+	BOOST_CHECK(simParam4._logFileName=="a");
+	BOOST_CHECK(simParam4._tStateReport == 2.0);
 }
 
 void test_Getters() {
