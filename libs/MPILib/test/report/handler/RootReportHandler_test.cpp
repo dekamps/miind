@@ -78,24 +78,13 @@ void test_clone() {
 }
 
 void test_initializeHandler() {
-	RootReportHandler rH("", true);
+	//it is not possible anymore to have a empty file
+
+	RootReportHandler rH1("RootTestFile", true);
 	bool thrown = false;
 
 	try {
-		rH.initializeHandler(2);
-	} catch (MPILib::utilities::Exception& e) {
-		thrown = true;
-	} catch (...) {
-		BOOST_ERROR("shouble be catched already");
-	}
-	BOOST_CHECK(thrown==true);
-	BOOST_CHECK(rH._nodes.size()==0);
-
-	RootReportHandler rH1("RootTestFile", true);
-	thrown = false;
-
-	try {
-		rH.initializeHandler(3);
+		rH1.initializeHandler(3);
 	} catch (MPILib::utilities::Exception& e) {
 		thrown = true;
 	} catch (...) {

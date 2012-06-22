@@ -85,7 +85,11 @@ void test_Getters() {
 	BOOST_CHECK(simParam2.getTEnd()==1.0);
 	BOOST_CHECK(simParam2.getTReport()==1.0);
 	BOOST_CHECK(simParam2.getTStep()==1.0);
-	BOOST_CHECK(simParam2.getLogName()=="a");
+	if (world.rank()==0){
+		BOOST_CHECK(simParam2.getLogName()=="a_0.log");
+	}else{
+		BOOST_CHECK(simParam2.getLogName()=="a_1.log");
+	}
 	BOOST_CHECK(simParam2.getTState() == 2.0);
 }
 
