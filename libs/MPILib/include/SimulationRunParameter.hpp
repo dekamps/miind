@@ -67,16 +67,16 @@ public:
 
 	/**
 	 * copy constructor
-	 * @param Another SimulationRunParameter
+	 * @param parameter Another SimulationRunParameter
 	 */
-	SimulationRunParameter(const SimulationRunParameter&);
+	SimulationRunParameter(const SimulationRunParameter& parameter);
 
 	/**
 	 * copy operator
-	 * @param Another SimulationRunParameter
+	 * @param parameter Another SimulationRunParameter
 	 */
 	SimulationRunParameter&
-	operator=(const SimulationRunParameter&);
+	operator=(const SimulationRunParameter& parameter);
 
 	/**
 	 * Getter for the start time
@@ -138,12 +138,10 @@ private:
 	Time _tStep;
 	Time _tStateReport;
 
-
 	std::string _logFileName;
-
 
 };
 
-}// end of namespace MPILib
+} // end of namespace MPILib
 
 #endif // MPILIB_SIMULATIONRUNPARAMETER_HPP_ include guard

@@ -44,18 +44,18 @@ public:
 
 	/**
 	 * Standard constructor for client code
-	 * @param root file name
-	 * @param write out state file
+	 * @param file_name root file name
+	 * @param have_state write out state file
 	 * @param reinstate_rate_graph backward compatibility option for an older ROOT layout
 	 */
-	RootHighThroughputHandler(const std::string&, bool,
+	RootHighThroughputHandler(const std::string& file_name, bool have_state,
 			bool reinstate_rate_graph = false);
 
 	/**
 	 * Copy constructor
-	 * @param another RootHighThroughputHandler
+	 * @param rhs another RootHighThroughputHandler
 	 */
-	RootHighThroughputHandler(const RootHighThroughputHandler&);
+	RootHighThroughputHandler(const RootHighThroughputHandler& rhs);
 
 	virtual ~RootHighThroughputHandler();
 
@@ -73,15 +73,15 @@ public:
 
 	/**
 	 * During Configuration a MPINode will associate itself with the handler.
-	 * @param The NodeId of the Node
+	 * @param nodeId The NodeId of the Node
 	 */
-	virtual void initializeHandler(const NodeId&);
+	virtual void initializeHandler(const NodeId& nodeId);
 
 	/**
 	 * A MPINode will request to be dissociated from the handler at the end of simulation.
-	 * @param The NodeId of the Node
+	 * @param nodeId The NodeId of the Node
 	 */
-	virtual void detachHandler(const NodeId&);
+	virtual void detachHandler(const NodeId& nodeId);
 
 private:
 

@@ -38,24 +38,24 @@ public:
 
 	/**
 	 * Create an AlgorithmGrid with just a state (usually a single number)
-	 * @param The State of the algorithm
+	 * @param array_state The State of the algorithm
 	 */
-	AlgorithmGrid(const std::vector<double>&);
+	AlgorithmGrid(const std::vector<double>& array_state);
 
 	/**
 	 * Construct an AlgorithmGrid from
-	 * @param a state
-	 * @param an interpretation
+	 * @param array_state a state
+	 * @param array_interpretation an interpretation
 	 * @post the size of the state and interpretation array needs to be the same
 	 */
-	AlgorithmGrid(const std::vector<double>&, const std::vector<double>&);
+	AlgorithmGrid(const std::vector<double>& array_state, const std::vector<double>& array_interpretation);
 
 	/**
 	 * Assignment operator
-	 * @param The assigned AlgorithmGrid
+	 * @param rhs The assigned AlgorithmGrid
 	 * @return this
 	 */
-	AlgorithmGrid& operator=(const AlgorithmGrid&);
+	AlgorithmGrid& operator=(const AlgorithmGrid& rhs);
 
 	/**
 	 * Getter for the state vector
@@ -115,9 +115,9 @@ private:
 
 	/**
 	 * Resize the arrays of elements
-	 * @param The new size of the arrays
+	 * @param number_of_new_bins The new size of the arrays
 	 */
-	void resize(Number);
+	void resize(Number number_of_new_bins);
 
 	//! allow iteration over internal values of the state
 	const double* begin_state() const;

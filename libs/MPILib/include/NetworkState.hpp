@@ -57,9 +57,9 @@ struct NetworkState {
 
 	/**
 	 * Set the Result
-	 * @param The Result the Network State should be set
+	 * @param result The Result the Network State should be set
 	 */
-	void setResult(EvolveResult);
+	void setResult(EvolveResult result);
 
 	/**
 	 * Getter for the Network State result

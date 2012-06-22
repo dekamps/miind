@@ -39,12 +39,13 @@ public:
 
 	virtual ~InactiveReportHandler();
 
-	virtual void writeReport(const Report&);
+	virtual void writeReport(const Report& report);
 
 	virtual InactiveReportHandler* clone() const;
 
-	virtual void initializeHandler(const NodeId&);
-	virtual void detachHandler(const NodeId&);
+	virtual void initializeHandler(const NodeId& nodeId);
+
+	virtual void detachHandler(const NodeId& nodeId);
 private:
 
 };

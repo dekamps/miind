@@ -64,16 +64,16 @@ struct GraphKey {
 	 * If the string does not represent a valid key, no object will
 	 * be constructed, but otherwise nothing will happen.
 	 * This allows parsing of heterogeneous object files.
-	 * @param The graph key
+	 * @param key_string The graph key
 	 */
-	GraphKey(const std::string&);
+	GraphKey(const std::string& key_string);
 
 	/**
 	 * construct a graph key from a Report information
-	 * @param The NodeId of the Node
-	 * @param The Timepoint
+	 * @param id The NodeId of the Node
+	 * @param time The Time point
 	 */
-	GraphKey(NodeId, Time);
+	GraphKey(NodeId id, Time time);
 
 	/**
 	 * generates a name of the graph

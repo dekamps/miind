@@ -67,15 +67,15 @@ public:
 
 	/**
 	 * During Configuration a MPINode will associate itself with the handler.
-	 * @param The NodeId of the Node
+	 * @param nodeId The NodeId of the Node
 	 */
-	virtual void initializeHandler(const NodeId&) = 0;
+	virtual void initializeHandler(const NodeId& nodeId) = 0;
 
 	/**
 	 * A MPINode will request to be dissociated from the handler at the end of simulation.
-	 * @param The NodeId of the Node
+	 * @param nodeId The NodeId of the Node
 	 */
-	virtual void detachHandler(const NodeId&) = 0;
+	virtual void detachHandler(const NodeId& nodeId) = 0;
 
 	/**
 	 * Getter for the actual output file, which is modified

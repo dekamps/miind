@@ -20,16 +20,14 @@
 
 #include <MPILib/include/BasicTypes.hpp>
 
-
 namespace MPILib {
 
 /**
- * @class MPINode the class for the actual network nodes. T
+ * MPINode the class for the actual network nodes which are distributed with mpi.
  */
-template <class Weight, class NodeDistribution>
+template<class Weight, class NodeDistribution>
 class MPINode {
 public:
-
 
 	/**
 	 * Constructor
@@ -39,141 +37,135 @@ public:
 	 * @param nodeDistribution The Node Distribution.
 	 * @param localNode The local nodes of this processor
 	 */
-	explicit MPINode(const algorithm::AlgorithmInterface<Weight>& algorithm, NodeType nodeType,
-			NodeId nodeId,
+	explicit MPINode(const algorithm::AlgorithmInterface<Weight>& algorithm,
+			NodeType nodeType, NodeId nodeId,
 			const std::shared_ptr<NodeDistribution>& nodeDistribution,
-			const std::shared_ptr<std::map<NodeId, MPINode<Weight, NodeDistribution>>>& localNode);
+			const std::shared_ptr<
+					std::map<NodeId, MPINode<Weight, NodeDistribution>>>& localNode);
 
+			/**
+			 * Destructor
+			 */
+			virtual ~MPINode();
 
-	/**
-	 * Destructor
-	 */
-	virtual ~MPINode();
+			/**
+			 * Evolve this algorithm over a time
+			 * @param time Time until the algorithm should evolve
+			 * @return Time the algorithm have evolved
+			 */
+			Time evolve(Time time);
 
-	/**
-	 * Evolve this algorithm over a time
-	 * @param time Time until the algorithm should evolve
-	 * @return Time the algorithm have evolved
-	 */
-	Time evolve(Time time);
+			/**
+			 * Configure the Node with the Simulation Parameters
+			 * @param simParam Simulation Parameters
+			 */
+			void configureSimulationRun(const SimulationRunParameter& simParam);
 
-	/**
-	 * Configure the Node with the Simulation Parameters
-	 * @param simParam Simulation Parameters
-	 */
-	void configureSimulationRun(const SimulationRunParameter& simParam);
+			/**
+			 * Add a precursor to the current node
+			 * @param nodeId NodeId the id of the precursor
+			 * @param weight the weight of the connection
+			 */
+			void addPrecursor(NodeId nodeId, const Weight& weight);
 
-	/**
-	 * Add a precursor to the current node
-	 * @param nodeId NodeId the id of the precursor
-	 * @param weight the weight of the connection
-	 */
-	void addPrecursor(NodeId nodeId, const Weight& weight);
+			/**
+			 * Add a successor to the current node
+			 * @param nodeId NodeId the id of the successor
+			 */
+			void addSuccessor(NodeId nodeId);
 
-	/**
-	 * Add a successor to the current node
-	 * @param nodeId NodeId the id of the successor
-	 */
-	void addSuccessor(NodeId nodeId);
+			/**
+			 * Getter for the Nodes activity
+			 * @return The current node activity
+			 */
+			ActivityType getActivity() const;
 
-	/**
-	 * Getter for the Nodes activity
-	 * @return The current node activity
-	 */
-	ActivityType getActivity() const;
+			/**
+			 * The Setter for the node activity
+			 * @param activity The activity the node should be in
+			 */
+			void setActivity(ActivityType activity);
 
-	/**
-	 * The Setter for the node activity
-	 * @param activity The activity the node should be in
-	 */
-	void setActivity(ActivityType activity);
+			/**
+			 * Receive the new data from the precursor nodes
+			 */
+			void receiveData();
 
+			/**
+			 * Send the own state to the successors.
+			 */
+			void sendOwnActivity();
 
-	/**
-	 * Receive the new data from the precursor nodes
-	 */
-	void receiveData();
+			/**
+			 * Report the node state
+			 * @param type The type of Report
+			 * @return The report
+			 */
+			std::string reportAll (report::ReportType type) const;
 
-	/**
-	 * Send the own state to the successors.
-	 */
-	void sendOwnActivity();
+			/**
+			 * finishes the simulation.
+			 */
+			void clearSimulation();
 
-	/**
-	 * Report the node state
-	 * @param The type of Report
-	 * @return The report
-	 */
-	std::string reportAll	(report::ReportType) const;
+			/**
+			 * returns the type of the node
+			 */
+			NodeType getNodeType() const;
 
-	/**
-	 * finishes the simulation.
-	 */
-	void clearSimulation();
+		private:
 
-	/**
-	 * returns the type of the node
-	 */
-	NodeType getNodeType() const;
+			void waitAll();
 
+			std::vector<NodeId> _precursors;
 
-private:
+			std::vector<Weight> _weights;
 
-	void waitAll();
+			std::vector<NodeId> _successors;
 
-	std::vector<NodeId> _precursors;
+			// Timers for mpi and algorithm time
+			static boost::timer::cpu_timer _mpiTimer, _algorithmTimer;
 
-	std::vector<Weight> _weights;
+			// make sure that the log is only printed ones.
+			static bool _isLogPrinted;
 
-	std::vector<NodeId> _successors;
+			NodeType _nodeType;
 
-	// Timers for mpi and algorithm time
-	static boost::timer::cpu_timer _mpiTimer, _algorithmTimer;
+			/**
+			 * the Id of this node
+			 */
+			NodeId _nodeId;
 
-	// make sure that the log is only printed ones.
-	static bool _isLogPrinted;
+			/**
+			 * Pointer to the local nodes of the processor. They are stored by the network.
+			 */
+			std::shared_ptr<std::map<NodeId, MPINode>> _pLocalNodes;
 
+			//this need to be a shared_ptr see here why auto_ptr does not work:
+			//http://stackoverflow.com/a/10894173/992460
+			std::shared_ptr<NodeDistribution> _pNodeDistribution;
 
-	NodeType _nodeType;
+			/**
+			 * Activity of this node
+			 */
+			ActivityType _activity;
 
-	/**
-	 * the Id of this node
-	 */
-	NodeId _nodeId;
+			/**
+			 * Storage for the state of the precursors, to avoid to much communication.
+			 */
+			std::vector<ActivityType> _precursorActivity;
 
-	/**
-	 * Pointer to the local nodes of the processor. They are stored by the network.
-	 */
-	std::shared_ptr<std::map<NodeId, MPINode>> _pLocalNodes;
+			std::vector<boost::mpi::request> _mpiStatus;
 
-	//this need to be a shared_ptr see here why auto_ptr does not work:
-	//http://stackoverflow.com/a/10894173/992460
-	std::shared_ptr<NodeDistribution> _pNodeDistribution;
+			Number _number_iterations;
+			Number _maximum_iterations;
+			NodeType _type;
 
-
-
-	/**
-	 * Activity of this node
-	 */
-	ActivityType _activity;
-
-	/**
-	 * Storage for the state of the precursors, to avoid to much communication.
-	 */
-	std::vector<ActivityType> _precursorActivity;
-
-	std::vector<boost::mpi::request> _mpiStatus;
-
-	Number						_number_iterations;
-	Number						_maximum_iterations;
-	NodeType					_type;
-
-	boost::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
-	mutable boost::shared_ptr<report::handler::AbstractReportHandler>	_pHandler;
-};
+			boost::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
+			mutable boost::shared_ptr<report::handler::AbstractReportHandler> _pHandler;
+		};
 
 typedef MPINode<double, utilities::CircularDistribution> D_MPINode;
-
 
 } //end namespace
 

@@ -41,9 +41,9 @@ public:
 
 	/**
 	 * Adds a report to the ValueHandlerHandler
-	 * @param A Report
+	 * @param report A Report
 	 */
-	void addReport(const Report&);
+	void addReport(const Report& report);
 	/**
 	 * Write the Events to a file
 	 */
@@ -73,9 +73,9 @@ private:
 
 	/**
 	 * Stores a event
-	 * @param a event
+	 * @param ev a event
 	 */
-	void distributeEvent(const Event&);
+	void distributeEvent(const Event& ev);
 
 	bool _is_written { false };
 	std::vector<std::string> _vec_names { };

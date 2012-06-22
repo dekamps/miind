@@ -55,16 +55,16 @@ public:
 
 	/**
 	 * Constructor
-	 * @param The name of the root file
+	 * @param file_name The name of the root file
 	 * @param b_force_state_write True if the state should be written to the root file
 	 */
-	RootReportHandler(const std::string&, bool b_force_state_write = false);
+	RootReportHandler(const std::string& file_name, bool b_force_state_write = false);
 
 	/**
 	 * Copy constructor
-	 * @param another RootReportHandler
+	 * @param rhs another RootReportHandler
 	 */
-	RootReportHandler(const RootReportHandler&);
+	RootReportHandler(const RootReportHandler& rhs);
 
 	/**
 	 * virtual destructor
@@ -85,24 +85,24 @@ public:
 
 	/**
 	 * During Configuration a MPINode will associate itself with the handler.
-	 * @param The NodeId of the Node
+	 * @param nodeId The NodeId of the Node
 	 */
-	virtual void initializeHandler(const NodeId&);
+	virtual void initializeHandler(const NodeId& nodeId);
 
 	/**
 	 * A MPINode will request to be dissociated from the handler at the end of simulation.
-	 * @param The NodeId of the Node
+	 * @param nodeId The NodeId of the Node
 	 */
-	virtual void detachHandler(const NodeId&);
+	virtual void detachHandler(const NodeId& nodeId);
 
 private:
 
 
 	/**
 	 * removes the node from the handler
-	 * @param The NodeId of the node removed
+	 * @param nodeId The NodeId of the node removed
 	 */
-	void removeFromNodeList(NodeId);
+	void removeFromNodeList(NodeId nodeId);
 
 	/**
 	 * Finalize the report Handler
@@ -111,10 +111,10 @@ private:
 
 	/**
 	 * convert the state of the algorithm to a graph
-	 * @param The report
+	 * @param report The report
 	 * @return A graph
 	 */
-	std::unique_ptr<TGraph> convertAlgorithmGridToGraph(const Report&) const;
+	std::unique_ptr<TGraph> convertAlgorithmGridToGraph(const Report& report) const;
 
 	/**
 	 * Check if the Handler is connected to an algorithm
