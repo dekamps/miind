@@ -90,12 +90,15 @@ IF(ENABLE_MPI)
     SET (CBLAS_PREFIX gsl)
     endif (WIN32)
     #############################################################################
-    # coverage
+    # code coverage analysis
     #############################################################################
     
     IF (ENABLE_COVERAGE)
         IF(CMAKE_BUILD_TYPE STREQUAL "Debug" AND ENABLE_TESTING)
             MESSAGE(STATUS "Coverage enabled")
+            MESSAGE(WARNING "At the moment lcov does not work with gcc 4.7, therefore coverage fails")
+            INCLUDE(CodeCoverage)
+            SETUP_TARGET_FOR_COVERAGE(coverage test coverageReport)
         ELSEIF(NOT ENABLE_TESTING)
             MESSAGE(FATAL_ERROR "Coverage analysis requires Testing Enabled")
         ELSE()
@@ -104,16 +107,7 @@ IF(ENABLE_MPI)
     ELSE()
        MESSAGE(STATUS "Coverage disabled")
     ENDIF()
-    #############################################################################
-    # code coverage analysis
-    #############################################################################
-#
-    IF (ENABLE_COVERAGE)
-        IF(CMAKE_BUILD_TYPE STREQUAL "Debug" AND ENABLE_TESTING)
-            INCLUDE(CodeCoverage)
-            SETUP_TARGET_FOR_COVERAGE(coverage test coverageReport)
-        ENDIF()
-    ENDIF(ENABLE_COVERAGE)
+
     
     #############################################################################
     # documentation
