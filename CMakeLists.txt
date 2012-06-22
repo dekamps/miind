@@ -1,7 +1,17 @@
 project( miind )
 cmake_minimum_required(VERSION 2.6)
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake-modules )
-set( CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix." ) # default install prefix. can be set with ccmake
+
+# include cmake scripts
+#############################################################################
+set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake-modules )
+
+# require out-of-source build
+INCLUDE(require_out_of_src_build)
+MACRO_REQUIRE_OUT_OF_SRC_BUILD("Miind requires out-of-source builds.")
+
+# default install prefix. can be set with ccmake
+set( CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix." ) 
 
 
 set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
@@ -17,6 +27,10 @@ set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 
 OPTION(ENABLE_TESTING "Compile tests" ON)
 OPTION(ENABLE_MPI "Enable mpi" FALSE)
+OPTION(ENABLE_COVERAGE "Enable GCov coverage analysis (defines a 'coverage' target and enforces static build of libpipe)" OFF)
+
+
+
 
 ##############################################################################
 # enable MPI dependent build
@@ -76,6 +90,52 @@ IF(ENABLE_MPI)
     else (WIN32)
     SET (CBLAS_PREFIX gsl)
     endif (WIN32)
+    #############################################################################
+    # coverage
+    #############################################################################
+    IF (ENABLE_COVERAGE)
+    IF(CMAKE_BUILD_TYPE STREQUAL "DEBUG" AND ENABLE_TESTING)
+        MESSAGE(STATUS "Coverage enabled")
+    ELSEIF(NOT ENABLE_TESTING)
+        MESSAGE(FATAL_ERROR "Coverage analysis requires Testing Enabled")
+    ELSE()
+        MESSAGE(FATAL_ERROR "Coverage analysis requires DEBUG build")
+    ENDIF()
+    ELSE()
+       MESSAGE(STATUS "Coverage disabled")
+    ENDIF()
+    #############################################################################
+    # code coverage analysis
+    #############################################################################
+#
+#    IF (ENABLE_COVERAGE)
+#        IF(CMAKE_BUILD_TYPE STREQUAL "DEBUG" AND ENABLE_TESTING)
+#            SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage")
+#            CONFIGURE_FILE(${LIBPIPE_SOURCE_DIR}/cmake/scripts/coverage.sh.in
+#                ${LIBPIPE_BINARY_DIR}/cmake/scripts/coverage.sh
+#               @ONLY IMMEDIATE
+#            )
+#            ADD_CUSTOM_TARGET(
+#                coverage COMMAND /bin/bash ${LIBPIPE_BINARY_DIR}/cmake/scripts/coverage.sh
+#            )        
+#        ENDIF()
+#    ENDIF(ENABLE_COVERAGE)
+    
+    #############################################################################
+    # documentation
+    #############################################################################
+    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/doc/Doxyfile.cmake
+    ${CMAKE_BINARY_DIR}/doc/Doxyfile
+    @ONLY IMMEDIATE
+    )
+
+    FIND_PACKAGE(Doxygen)
+
+    # target for doxygen
+    ADD_CUSTOM_TARGET(doc COMMAND ${DOXYGEN} ${CMAKE_BINARY_DIR}/doc/Doxyfile)
+    
+
+    
 ELSE(ENABLE_MPI)
     MESSAGE(STATUS "MPI disabled")
     ##############################################################################
