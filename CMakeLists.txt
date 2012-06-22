@@ -31,7 +31,6 @@ OPTION(ENABLE_COVERAGE "Enable GCov coverage analysis (defines a 'coverage' targ
 
 
 
-
 ##############################################################################
 # enable MPI dependent build
 ##############################################################################
@@ -93,14 +92,15 @@ IF(ENABLE_MPI)
     #############################################################################
     # coverage
     #############################################################################
+    
     IF (ENABLE_COVERAGE)
-    IF(CMAKE_BUILD_TYPE STREQUAL "DEBUG" AND ENABLE_TESTING)
-        MESSAGE(STATUS "Coverage enabled")
-    ELSEIF(NOT ENABLE_TESTING)
-        MESSAGE(FATAL_ERROR "Coverage analysis requires Testing Enabled")
-    ELSE()
-        MESSAGE(FATAL_ERROR "Coverage analysis requires DEBUG build")
-    ENDIF()
+        IF(CMAKE_BUILD_TYPE STREQUAL "Debug" AND ENABLE_TESTING)
+            MESSAGE(STATUS "Coverage enabled")
+        ELSEIF(NOT ENABLE_TESTING)
+            MESSAGE(FATAL_ERROR "Coverage analysis requires Testing Enabled")
+        ELSE()
+            MESSAGE(FATAL_ERROR "Coverage analysis requires DEBUG build")
+        ENDIF()
     ELSE()
        MESSAGE(STATUS "Coverage disabled")
     ENDIF()
@@ -108,18 +108,12 @@ IF(ENABLE_MPI)
     # code coverage analysis
     #############################################################################
 #
-#    IF (ENABLE_COVERAGE)
-#        IF(CMAKE_BUILD_TYPE STREQUAL "DEBUG" AND ENABLE_TESTING)
-#            SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage")
-#            CONFIGURE_FILE(${LIBPIPE_SOURCE_DIR}/cmake/scripts/coverage.sh.in
-#                ${LIBPIPE_BINARY_DIR}/cmake/scripts/coverage.sh
-#               @ONLY IMMEDIATE
-#            )
-#            ADD_CUSTOM_TARGET(
-#                coverage COMMAND /bin/bash ${LIBPIPE_BINARY_DIR}/cmake/scripts/coverage.sh
-#            )        
-#        ENDIF()
-#    ENDIF(ENABLE_COVERAGE)
+    IF (ENABLE_COVERAGE)
+        IF(CMAKE_BUILD_TYPE STREQUAL "Debug" AND ENABLE_TESTING)
+            INCLUDE(CodeCoverage)
+            SETUP_TARGET_FOR_COVERAGE(coverage test coverageReport)
+        ENDIF()
+    ENDIF(ENABLE_COVERAGE)
     
     #############################################################################
     # documentation
