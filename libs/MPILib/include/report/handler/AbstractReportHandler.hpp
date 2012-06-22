@@ -24,7 +24,6 @@
 #include <string>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/report/Report.hpp>
-#include <MPILib/include/utilities/FileNameGenerator.hpp>
 
 namespace MPILib {
 namespace report {
@@ -47,14 +46,12 @@ public:
 	 * @param fileName The filename of the output file @attention do not provide a extension this is
 	 * done automatically
 	 */
-	AbstractReportHandler(const std::string& fileName) :
-			_streamFileName(fileName) {
-	}
+	AbstractReportHandler(const std::string& fileName);
 
 	/**
 	 * Manadatory virtual destructor
 	 */
-	virtual ~AbstractReportHandler(){};
+	virtual ~AbstractReportHandler();
 
 	/**
 	 * Writes the Report to the file.
@@ -84,18 +81,13 @@ public:
 	 * Getter for the actual output file, which is modified
 	 * @return The name of the root output file
 	 */
-	std::string getRootOutputFileName() const {
-		utilities::FileNameGenerator fg(_streamFileName, utilities::ROOTFILE);
-		return fg.getFileName();
-	}
+	std::string getRootOutputFileName() const;
 
 	/**
 	 * Getter for the unmodified stored string needed for copy constructor
 	 * @return The unmodified fileName
 	 */
-	std::string getFileName() const{
-		return _streamFileName;
-	}
+	std::string getFileName() const;
 
 private:
 

@@ -22,13 +22,22 @@ namespace mpi = boost::mpi;
 
 mpi::communicator world;
 
-
-
 void test_Constructor() {
 	InactiveReportHandler iH;
 	BOOST_CHECK(iH._streamFileName=="");
 }
 
+void test_Getters() {
+	InactiveReportHandler iH;
+	BOOST_CHECK(iH.getFileName()=="");
+
+	if (world.rank() == 0) {
+		BOOST_CHECK(iH.getRootOutputFileName()=="_0.root");
+	} else {
+		BOOST_CHECK(iH.getRootOutputFileName()=="_1.root");
+
+	}
+}
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
