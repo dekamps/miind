@@ -94,9 +94,9 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 		const SimulationRunParameter& simParam) {
-	_current_report_time = simParam.getTReport();
-	_current_simulation_time = simParam.getTBegin();
-	_parameter_simulation_run = simParam;
+	_currentReportTime = simParam.getTReport();
+	_currentSimulationTime = simParam.getTBegin();
+	_parameterSimulationRun = simParam;
 
 	initializeLogStream(simParam.getLogName());
 
@@ -107,13 +107,13 @@ void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 		}
 
 	} catch (...) {
-		_stream_log << "error during configuration/n";
-		_stream_log.flush();
+		_streamLog << "error during configuration/n";
+		_streamLog.flush();
 	}
 
-	_state_network.toggleConfigured();
+	_stateNetwork.toggleConfigured();
 
-	_stream_log.flush();
+	_streamLog.flush();
 
 }
 
@@ -122,16 +122,16 @@ template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 	std::string report;
-	if (_state_network.isConfigured()) {
-		_state_network.toggleConfigured();
-		_stream_log << "Starting simulation\n";
-		_stream_log.flush();
+	if (_stateNetwork.isConfigured()) {
+		_stateNetwork.toggleConfigured();
+		_streamLog << "Starting simulation\n";
+		_streamLog.flush();
 
 		try {
 			utilities::ProgressBar pb(
-					getEndTime() / _parameter_simulation_run.getTReport()
+					getEndTime() / _parameterSimulationRun.getTReport()
 							+ getEndTime()
-									/ _parameter_simulation_run.getTState());
+									/ _parameterSimulationRun.getTState());
 
 			do {
 				do {
@@ -153,7 +153,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					//CheckPercentageAndLog(CurrentSimulationTime());
 					updateReportTime();
 					report = collectReport(report::RATE);
-					_stream_log << report;
+					_streamLog << report;
 				}
 				// just a rate or also a state?
 				if (getCurrentSimulationTime() >= getCurrentStateTime()) {
@@ -169,16 +169,16 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 		}
 
 		catch (utilities::IterationNumberException &e) {
-			_stream_log << "NUMBER OF ITERATIONS EXCEEDED\n";
-			_state_network.setResult(NUMBER_ITERATIONS_ERROR);
-			_stream_log.flush();
-			_stream_log.close();
+			_streamLog << "NUMBER OF ITERATIONS EXCEEDED\n";
+			_stateNetwork.setResult(NUMBER_ITERATIONS_ERROR);
+			_streamLog.flush();
+			_streamLog.close();
 		}
 
 		clearSimulation();
-		_stream_log << "Simulation ended, no problems noticed\n";
-		_stream_log << "End time: " << getCurrentSimulationTime() << "\n";
-		_stream_log.close();
+		_streamLog << "Simulation ended, no problems noticed\n";
+		_streamLog << "End time: " << getCurrentSimulationTime() << "\n";
+		_streamLog.close();
 	}
 
 }
@@ -218,8 +218,8 @@ void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
 	std::shared_ptr<std::ostream> p_stream(new std::ofstream(filename.c_str()));
 	if (!p_stream)
 		throw utilities::Exception("MPINetwork cannot open log file.");
-	if (!_stream_log.openStream(p_stream))
-		_stream_log << "WARNING YOU ARE TRYING TO REOPEN THIS LOG FILE\n";
+	if (!_streamLog.openStream(p_stream))
+		_streamLog << "WARNING YOU ARE TRYING TO REOPEN THIS LOG FILE\n";
 }
 
 template<class WeightValue, class NodeDistribution>
@@ -243,37 +243,37 @@ void MPINetwork<WeightValue, NodeDistribution>::setDalesLaw(bool b_law) {
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::updateReportTime() {
-	_current_report_time += _parameter_simulation_run.getTReport();
+	_currentReportTime += _parameterSimulationRun.getTReport();
 }
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::updateSimulationTime() {
-	_current_simulation_time += _parameter_simulation_run.getTStep();
+	_currentSimulationTime += _parameterSimulationRun.getTStep();
 }
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::updateStateTime() {
-	_current_state_time += _parameter_simulation_run.getTState();
+	_currentStateTime += _parameterSimulationRun.getTState();
 }
 
 template<class WeightValue, class NodeDistribution>
 Time MPINetwork<WeightValue, NodeDistribution>::getEndTime() const {
-	return _parameter_simulation_run.getTEnd();
+	return _parameterSimulationRun.getTEnd();
 }
 
 template<class WeightValue, class NodeDistribution>
 Time MPINetwork<WeightValue, NodeDistribution>::getCurrentReportTime() const {
-	return _current_report_time;
+	return _currentReportTime;
 }
 
 template<class WeightValue, class NodeDistribution>
 Time MPINetwork<WeightValue, NodeDistribution>::getCurrentSimulationTime() const {
-	return _current_simulation_time;
+	return _currentSimulationTime;
 }
 
 template<class WeightValue, class NodeDistribution>
 Time MPINetwork<WeightValue, NodeDistribution>::getCurrentStateTime() const {
-	return _current_state_time;
+	return _currentStateTime;
 
 }
 

@@ -20,10 +20,21 @@ enum FileType {
 class FileNameGenerator {
 public:
 
-	explicit FileNameGenerator(std::string& filename, FileType fileType =
+	/**
+	 * Constructor which will generate the filenames in this way:
+	 * filename + "_" + procesorId + "fileIdentifier"(either .root or .log)
+	 * depending on the given fileType
+	 * @param fileName The Filename, do not append an ending
+	 * @param fileType The Type of a file, the file extension depends on this param
+	 */
+	explicit FileNameGenerator(std::string& fileName, FileType fileType =
 			LOGFILE);
 	virtual ~FileNameGenerator();
 
+	/**
+	 * Gives the generated Filename back
+	 * @return A file name
+	 */
 	std::string getFileName() const;
 
 private:

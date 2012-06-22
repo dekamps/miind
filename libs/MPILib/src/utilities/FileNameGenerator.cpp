@@ -14,7 +14,7 @@ namespace mpi = boost::mpi;
 namespace MPILib {
 namespace utilities {
 
-FileNameGenerator::FileNameGenerator(std::string& filename, FileType fileType) {
+FileNameGenerator::FileNameGenerator(std::string& fileName, FileType fileType) {
 	mpi::communicator world;
 
 	int processorId = world.rank();
@@ -22,10 +22,10 @@ FileNameGenerator::FileNameGenerator(std::string& filename, FileType fileType) {
 	std::stringstream tempFileName;
 
 	if (fileType == LOGFILE) {
-		tempFileName << filename << "_" << processorId << ".log";
+		tempFileName << fileName << "_" << processorId << ".log";
 	}
 	if (fileType == ROOTFILE) {
-		tempFileName << filename << "_" << processorId << ".root";
+		tempFileName << fileName << "_" << processorId << ".root";
 	}
 	_fileName = tempFileName.str();
 

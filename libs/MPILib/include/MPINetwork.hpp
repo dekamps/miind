@@ -127,15 +127,15 @@ private:
 	 */
 	int _maxNodeId {0};
 
-	Time _current_report_time {0};
-	Time _current_state_time {0};
-	Time _current_simulation_time {0};
-	NetworkState _state_network {0.0};
+	Time _currentReportTime {0};
+	Time _currentStateTime {0};
+	Time _currentSimulationTime {0};
+	NetworkState _stateNetwork {0.0};
 	bool _isDalesLaw {true};
 
-	SimulationRunParameter _parameter_simulation_run {report::handler::InactiveReportHandler(), 0, 0.0,
+	SimulationRunParameter _parameterSimulationRun {report::handler::InactiveReportHandler(), 0, 0.0,
 		0.0, 0.0, 0.0, ""};
-	utilities::LogStream _stream_log {};
+	utilities::LogStream _streamLog {};
 
 
 
