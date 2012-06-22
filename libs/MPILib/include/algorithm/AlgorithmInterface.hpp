@@ -57,8 +57,8 @@ public:
 	virtual Rate getCurrentRate() const = 0;
 
 	/**
-	 * #FIXME no idear why this is needed.
-	 * @return
+	 * Stores the algorithm state in a Algorithm Grid
+	 * @return The state of the algorithm
 	 */
 	virtual AlgorithmGrid getGrid() const = 0;
 };
