@@ -1,10 +1,11 @@
 add_sources(
-    Exception.cpp
-    IterationNumberException.cpp
-    ParallelException.cpp
     CircularDistribution.cpp
-    ProgressBar.cpp
-    Timer.cpp
-    TimeException.cpp
+    Exception.cpp
+    FileNameGenerator.cpp
+    IterationNumberException.cpp
     LogStream.cpp
+    ParallelException.cpp
+    ProgressBar.cpp
+    TimeException.cpp
+    Timer.cpp
 )

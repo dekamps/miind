@@ -1,11 +1,12 @@
 add_header(
-    Exception.hpp
-    IterationNumberException.hpp
-    ParallelException.hpp
     CircularDistribution.hpp
-    NodeDistributionInterface.hpp
-    ProgressBar.hpp
-    Timer.hpp
-    TimeException.hpp
+    Exception.hpp
+    FileNameGenerator.hpp
+    IterationNumberException.hpp
     LogStream.hpp
+    NodeDistributionInterface.hpp
+    ParallelException.hpp
+    ProgressBar.hpp
+    TimeException.hpp
+    Timer.hpp
 )
