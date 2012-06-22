@@ -88,7 +88,7 @@ RootHighThroughputHandler* RootHighThroughputHandler::clone() const {
 
 void RootHighThroughputHandler::initializeHandler(const NodeId&) {
 	if (!_pFile)
-		_pFile = new TFile(this->getStreamFileName().c_str(), "RECREATE");
+		_pFile = new TFile(this->getRootOutputFileName().c_str(), "RECREATE");
 	if (_pFile->IsZombie())
 		throw utilities::Exception("Couldn't open root file");
 

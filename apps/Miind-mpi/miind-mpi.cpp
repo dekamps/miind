@@ -20,46 +20,29 @@
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 #include <MPILib/include/report/handler/RootHighThroughputHandler.hpp>
 
-
 #include <MPILib/include/algorithm/RateAlgorithm.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
 namespace mpi = boost::mpi;
 using namespace MPILib;
 
-const report::handler::RootHighThroughputHandler WILSONCOWAN_HIGH_HANDLER("test/wilsonresponseHigh.root", // file where the simulation results are written
+const report::handler::RootHighThroughputHandler WILSONCOWAN_HIGH_HANDLER(
+		"test/wilsonresponseHigh", // file where the simulation results are written
 		false // only rate diagrams
 		);
 
-const report::handler::RootReportHandler WILSONCOWAN_HANDLER("test/wilsonresponse.root", // file where the simulation results are written
+const report::handler::RootReportHandler WILSONCOWAN_HANDLER(
+		"test/wilsonresponse", // file where the simulation results are written
 		false // only rate diagrams
 		);
 
-const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HIGH_HANDLER, // the handler object
+const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, // the handler object
 		1000000, // maximum number of iterations
 		0, // start time of simulation
 		0.5, // end time of simulation
 		1e-4, // report time
 		1e-5, // network step time
-		"test/wilsonresponse.log" // log file name
-		);
-
-
-const report::handler::RootHighThroughputHandler WILSONCOWAN_HIGH_HANDLER1("test/wilsonresponseHigh1.root", // file where the simulation results are written
-		false // only rate diagrams
-		);
-
-const report::handler::RootReportHandler WILSONCOWAN_HANDLER1("test/wilsonresponse1.root", // file where the simulation results are written
-		false // only rate diagrams
-		);
-
-const SimulationRunParameter PAR_WILSONCOWAN1(WILSONCOWAN_HIGH_HANDLER1, // the handler object
-		1000000, // maximum number of iterations
-		0, // start time of simulation
-		0.5, // end time of simulation
-		1e-4, // report time
-		1e-5, // network step time
-		"test/wilsonresponse1.log" // log file name
+		"test/wilsonresponse" // log file name without extension
 		);
 
 
@@ -94,12 +77,7 @@ int main(int argc, char* argv[]) {
 		// connect the two nodes
 		network.makeFirstInputOfSecond(id_rate, id, epsilon);
 
-		if (world.rank() == 0) {
-			network.configureSimulation(PAR_WILSONCOWAN);
-
-		} else {
-			network.configureSimulation(PAR_WILSONCOWAN1);
-		}
+		network.configureSimulation(PAR_WILSONCOWAN);
 
 		boost::timer::auto_cpu_timer te;
 		te.start();

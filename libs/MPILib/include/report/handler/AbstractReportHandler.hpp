@@ -24,6 +24,7 @@
 #include <string>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/report/Report.hpp>
+#include <MPILib/include/utilities/FileNameGenerator.hpp>
 
 namespace MPILib {
 namespace report {
@@ -80,12 +81,20 @@ public:
 	virtual void detachHandler(const NodeId&) = 0;
 
 	/**
-	 * Getter for the streamFileName
-	 * @return The name of the streamFile
+	 * Getter for the actual output file, which is modified
+	 * @return The name of the root output file
 	 */
-	std::string getStreamFileName() const {
+	std::string getRootOutputFileName() const {
 		utilities::FileNameGenerator fg(_streamFileName, utilities::ROOTFILE);
 		return fg.getFileName();
+	}
+
+	/**
+	 * Getter for the unmodified stored string needed for copy constructor
+	 * @return The unmodified fileName
+	 */
+	std::string getFileName() const{
+		return _streamFileName;
 	}
 
 private:

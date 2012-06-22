@@ -56,7 +56,7 @@ RootReportHandler::RootReportHandler(const std::string& file_name,
 }
 
 RootReportHandler::RootReportHandler(const RootReportHandler& rhs) :
-		AbstractReportHandler(rhs.getStreamFileName()), //
+		AbstractReportHandler(rhs.getFileName()), //
 		_isStateWriteMandatory(rhs._isStateWriteMandatory) {
 	if (rhs._spCurrentRateGraph)
 		throw utilities::Exception(STR_HANDLER_STALE);
@@ -107,7 +107,7 @@ void RootReportHandler::initializeHandler(const NodeId& nodeId) {
 	// Purpose: this function will be called by MPINode upon configuration.
 	// no canvas are generated as it would cause lot of problems with mpi
 	if (!_pFile) {
-		_pFile = new TFile(this->getStreamFileName().c_str(), "RECREATE");
+		_pFile = new TFile(this->getRootOutputFileName().c_str(), "RECREATE");
 
 		if (_pFile->IsZombie())
 			throw utilities::Exception(STR_ROOT_FILE_OPENED_FAILED);
