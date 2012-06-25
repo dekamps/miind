@@ -159,7 +159,6 @@ public:
 
 			Number _number_iterations;
 			Number _maximum_iterations;
-			NodeType _type;
 
 			boost::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
 			mutable boost::shared_ptr<report::handler::AbstractReportHandler> _pHandler;
