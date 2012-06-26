@@ -32,21 +32,23 @@ public:
 	}
 
 	void configure(const SimulationRunParameter& simParam) {
-
+		// to repress warning
+		int i = simParam.getMaximumNumberIterations();
+		i++;
 	}
 
 	void evolveNodeState(const std::vector<ActivityType>& nodeVector,
 			const std::vector<WeightValue>& weightVector, Time time) {
 		time = 2;
+		time++;
 		unsigned int size = nodeVector.size();
 		size = weightVector.size();
-//FIXME
+		size++;
 		boost::this_thread::sleep(boost::posix_time::seconds(kSleepTime));
 
 	}
 
 	Time getCurrentTime() const {
-		//TODO
 		return 1.0;
 	}
 
