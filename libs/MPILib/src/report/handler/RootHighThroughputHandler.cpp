@@ -26,6 +26,8 @@
 #include <MPILib/include/report/handler/RootHighThroughputHandler.hpp>
 #include <iostream>
 
+#include <boost/mpi/communicator.hpp>
+
 namespace MPILib {
 namespace report {
 namespace handler {
@@ -35,7 +37,15 @@ TTree* RootHighThroughputHandler::_pTree = 0;
 bool RootHighThroughputHandler::_isRecording = false;
 bool RootHighThroughputHandler::_isFirstTimeSliceProcessed = false;
 bool RootHighThroughputHandler::_reinstateNodeGraphs = false;
+bool RootHighThroughputHandler::_isTreeInitialised = false;
+
 std::vector<double> RootHighThroughputHandler::_vData = std::vector<double>(0);
+std::map<int, double> RootHighThroughputHandler::_mData;
+
+int RootHighThroughputHandler::_nrNodes = 0;
+
+std::vector<int> RootHighThroughputHandler::_localNodes = std::vector<int>(0);
+
 TFile* RootHighThroughputHandler::_pFile = 0;
 TVectorD* RootHighThroughputHandler::_pArray = 0;
 
@@ -95,51 +105,41 @@ void RootHighThroughputHandler::initializeHandler(const NodeId&) {
 }
 
 void RootHighThroughputHandler::writeReport(const Report& report) {
+	boost::mpi::communicator world;
 
-	if (report._id == NodeId(0) && _isRecording
-			&& !_isFirstTimeSliceProcessed) {
-		// This is the first time that a complete time slice has been recorded, presumably the simulation time start
-		_isFirstTimeSliceProcessed = true;
-		// so we should have a full fledged version of the data vector. We create a TArrayD which from now on will hold on data. From the vector we know the right size
-		_pArray = new TVectorD(_vData.size() + 1);
-		(*_pArray)[0] = _startTime;
-
-		for (Index i = 0; i < _vData.size(); i++)
-			(*_pArray)[i + 1] = _vData[i];
-	}
-
-	if (report._id == NodeId(1) && !_isRecording) {
+	if (!_isRecording) {
 		_isRecording = true;
 		_pTree = new TTree("Activations", "Times slices");
 		_pTree->Branch("slices", "TVectorT<double>", &_pArray, 32000, 0);
+		_pArray = new TVectorD(report._nrNodes + 1);
 	}
 
-	if (!_isFirstTimeSliceProcessed && _isRecording) {
+	if (_isRecording) {
+		//store the node in a map one below the max number of nodes
+		if (_mData.size() < (report._nrNodes - 1)) {
+			_mData[report._id] = report._rate;
+		}
+		// write the map to the file
+		else {
+			_mData[report._id] = report._rate;
 
-		// Here we are adding events to the first time slice. We don't know how many there are, because here we don't know the size of the network
-		// So we keep adding them to the event vector
-		if (report._id != NodeId(0))
-			_vData.push_back(report._rate);
-
-		// we also need to record the start time, since the slice can only be written once this step is complete, i.e. at the next report time.
-		// But the time use when writing that slice must be the simulation start time
-		_startTime = report._time;
-	}
-
-	if (_isFirstTimeSliceProcessed && _isRecording) {
-		if (report._id == NodeId(1)) {
-			// here we can write the TArrayD of the last time slice, as well as the time and start filling it up again
-			_pTree->Fill();
-			// normal operation, just fill the TVectorD
 			(*_pArray)[0] = report._time;
-			(*_pArray)[report._id] = report._rate;
-		} else {
-			if (report._id != NodeId(0)) {
-				// normal operation, just fill the TVectorD
-				(*_pArray)[report._id] = report._rate;
+			//They have to have the same size
+			assert(_mData.size() == report._nrNodes);
+
+			Index i = 1;
+			for (auto& it : _mData) {
+				(*_pArray)[i] = it.second;
+				i++;
 			}
+
+			//clear the map
+			_mData.clear();
+			_pTree->Fill();
+
 		}
 	}
+
 }
 RootHighThroughputHandler::~RootHighThroughputHandler() {
 }
@@ -162,12 +162,12 @@ bool RootHighThroughputHandler::reinstateNodeGraphs(const char* p) {
 		return false;
 	}
 
-	Number number_of_nodes;
-	Number number_of_slices;
+	Number number_of_nodes = -1;
+	Number number_of_slices = -1;
 	std::vector<double> vec_times;
 
 	collectGraphInformation(&vec_times, &number_of_nodes, &number_of_slices);
-
+	std::cout << number_of_nodes << std::endl;
 	storeRateGraphs(vec_times, number_of_nodes, number_of_slices);
 
 	_pFile->Close(); // the file object does not exist anymore, don't delete the pointer
@@ -198,7 +198,8 @@ void RootHighThroughputHandler::storeRateGraphs(
 		TGraph* p_graph = new TGraph(vec_rate.size(), &(vec_time[0]),
 				&(vec_rate[0]));
 		std::ostringstream stgr;
-		stgr << "rate_" << id_node;
+		boost::mpi::communicator world;
+		stgr << "rate_" << id_node <<"_processId_"<< world.rank();
 		p_graph->SetName(stgr.str().c_str());
 		p_graph->Write();
 		delete p_graph;
@@ -224,7 +225,7 @@ void RootHighThroughputHandler::collectGraphInformation(
 		p_branch->GetEvent(i);
 		p_vec_time->push_back((*_pArray)[0]);
 	}
-	//exclude NodeId(0)
+	//ignore the time in the first entry
 	*p_num_nodes = _pArray->GetNoElements() - 1;
 }
 
