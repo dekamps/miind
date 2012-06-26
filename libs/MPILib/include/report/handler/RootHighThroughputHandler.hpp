@@ -96,13 +96,9 @@ private:
 	static TVectorT<double>* _pArray;
 	static bool _reinstateNodeGraphs;
 	static bool _isRecording;
-	static bool _isFirstTimeSliceProcessed;
-	static bool _isTreeInitialised;
 	static int _nrSlice;
 	static int _nrNodes;
-	static std::vector<double> _vData;
 	static std::map<int, double> _mData;
-	static std::vector<int> _localNodes;
 
 
 };

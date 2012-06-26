@@ -35,16 +35,12 @@ namespace handler {
 Time RootHighThroughputHandler::_startTime = 0;
 TTree* RootHighThroughputHandler::_pTree = 0;
 bool RootHighThroughputHandler::_isRecording = false;
-bool RootHighThroughputHandler::_isFirstTimeSliceProcessed = false;
 bool RootHighThroughputHandler::_reinstateNodeGraphs = false;
-bool RootHighThroughputHandler::_isTreeInitialised = false;
 
-std::vector<double> RootHighThroughputHandler::_vData = std::vector<double>(0);
 std::map<int, double> RootHighThroughputHandler::_mData;
 
 int RootHighThroughputHandler::_nrNodes = 0;
 
-std::vector<int> RootHighThroughputHandler::_localNodes = std::vector<int>(0);
 
 TFile* RootHighThroughputHandler::_pFile = 0;
 TVectorD* RootHighThroughputHandler::_pArray = 0;
@@ -78,9 +74,8 @@ void RootHighThroughputHandler::detachHandler(const NodeId&) {
 	_pArray = 0;
 	_startTime = 0;
 	_isRecording = false;
-	_isFirstTimeSliceProcessed = false;
 	_reinstateNodeGraphs = false;
-	_vData = std::vector<double>(0);
+	_mData.clear();
 	_pTree = 0;
 
 	if (_pFile) {
@@ -105,7 +100,6 @@ void RootHighThroughputHandler::initializeHandler(const NodeId&) {
 }
 
 void RootHighThroughputHandler::writeReport(const Report& report) {
-	boost::mpi::communicator world;
 
 	if (!_isRecording) {
 		_isRecording = true;
