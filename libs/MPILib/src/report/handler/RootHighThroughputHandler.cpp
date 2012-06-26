@@ -22,6 +22,7 @@
 #include <TGraph.h>
 #include <TVectorT.h>
 #include <TTree.h>
+#include <TNTuple.h>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/report/handler/RootHighThroughputHandler.hpp>
 #include <iostream>
@@ -40,7 +41,6 @@ bool RootHighThroughputHandler::_reinstateNodeGraphs = false;
 std::map<int, double> RootHighThroughputHandler::_mData;
 
 int RootHighThroughputHandler::_nrNodes = 0;
-
 
 TFile* RootHighThroughputHandler::_pFile = 0;
 TVectorD* RootHighThroughputHandler::_pArray = 0;
@@ -102,10 +102,28 @@ void RootHighThroughputHandler::initializeHandler(const NodeId&) {
 void RootHighThroughputHandler::writeReport(const Report& report) {
 
 	if (!_isRecording) {
-		_isRecording = true;
+		boost::mpi::communicator world;
+
+		_pTree = new TTree("NodeIds", "Node Ids");
+
+
+		TVectorD* nodeId = new TVectorD(report._nrNodes);
+		_pTree->Branch("GlobalNodeIds", "TVectorT<double>", &nodeId, report._nrNodes, 0);
+
+		for (Index i = 0; i < report._nrNodes; i++) {
+			(*nodeId)[i] = world.size() * i + world.rank();
+		}
+		_pTree->Fill();
+
+
+		_pTree->Write();
+		_pTree = 0;
+		delete nodeId;
+
 		_pTree = new TTree("Activations", "Times slices");
 		_pTree->Branch("slices", "TVectorT<double>", &_pArray, 32000, 0);
 		_pArray = new TVectorD(report._nrNodes + 1);
+		_isRecording = true;
 	}
 
 	if (_isRecording) {
@@ -161,7 +179,7 @@ bool RootHighThroughputHandler::reinstateNodeGraphs(const char* p) {
 	std::vector<double> vec_times;
 
 	collectGraphInformation(&vec_times, &number_of_nodes, &number_of_slices);
-	std::cout << number_of_nodes << std::endl;
+
 	storeRateGraphs(vec_times, number_of_nodes, number_of_slices);
 
 	_pFile->Close(); // the file object does not exist anymore, don't delete the pointer
@@ -193,7 +211,7 @@ void RootHighThroughputHandler::storeRateGraphs(
 				&(vec_rate[0]));
 		std::ostringstream stgr;
 		boost::mpi::communicator world;
-		stgr << "rate_" << id_node <<"_processId_"<< world.rank();
+		stgr << "rate_" << id_node << "_processId_" << world.rank();
 		p_graph->SetName(stgr.str().c_str());
 		p_graph->Write();
 		delete p_graph;

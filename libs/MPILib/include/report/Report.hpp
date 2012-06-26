@@ -69,9 +69,9 @@ struct Report {
 	 */
 	std::vector<ReportValue> _values { };
 	/**
-	 * Number of nodes on the process
+	 * Number of nodes on the process, should be the same for all reports on one node
 	 */
-	int _nrNodes {0};
+	int _nrNodes;
 
 	/**
 	 * Constructor
