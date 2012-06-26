@@ -36,7 +36,7 @@ const report::handler::RootReportHandler WILSONCOWAN_HANDLER(
 		false // only rate diagrams
 		);
 
-const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HANDLER, // the handler object
+const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HIGH_HANDLER, // the handler object
 		1000000, // maximum number of iterations
 		0, // start time of simulation
 		0.5, // end time of simulation

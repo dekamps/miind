@@ -68,6 +68,10 @@ struct Report {
 	 * Ad hoc values that need to be logged in the simulation file
 	 */
 	std::vector<ReportValue> _values { };
+	/**
+	 * Number of nodes on the process
+	 */
+	int _nrNodes {0};
 
 	/**
 	 * Constructor
@@ -87,10 +91,11 @@ struct Report {
 	 * @param log_message Whatever message should appear in the log file
 	 * @param type Information for the handler on how to treat the Report
 	 * @param vec_values Ad hoc values that need to be logged in the simulation file
+	 * @param nrNodes The number of nodes on this processor
 	 */
 	Report(Time time, Rate rate, NodeId id, algorithm::AlgorithmGrid grid,
 			std::string log_message, ReportType type,
-			std::vector<ReportValue> vec_values);
+			std::vector<ReportValue> vec_values, int nrNodes);
 
 	/**
 	 * Add a ReportValue to the report

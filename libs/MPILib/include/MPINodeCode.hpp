@@ -171,7 +171,8 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 	if (type == report::RATE || type == report::STATE) {
 		report::Report report(_pAlgorithm->getCurrentTime(),
 				Rate(this->getActivity()), this->_nodeId,
-				_pAlgorithm->getGrid(), string_return, type, vec_values);
+				_pAlgorithm->getGrid(), string_return, type, vec_values,
+				_pLocalNodes->size());
 
 		_pHandler->writeReport(report);
 	}
