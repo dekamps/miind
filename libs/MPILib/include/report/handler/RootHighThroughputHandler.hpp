@@ -45,12 +45,13 @@ public:
 
 	/**
 	 * Standard constructor for client code
-	 * @param file_name root file name
-	 * @param have_state write out state file
-	 * @param reinstate_rate_graph backward compatibility option for an older ROOT layout
+	 * @param fileName root file name without extension!
+	 * @param haveState write out state file @attention it has to be false, as
+	 * RootHighThroughputHandler cannot write state graphs, if not an exception is thrown
+	 * @param generateGraphs backward compatibility option for an older ROOT layout
 	 */
-	RootHighThroughputHandler(const std::string& file_name, bool have_state,
-			bool reinstate_rate_graph = false);
+	RootHighThroughputHandler(const std::string& fileName, bool haveState =
+			false, bool generateGraphs = false);
 
 	/**
 	 * Copy constructor
@@ -86,20 +87,53 @@ public:
 
 private:
 
-	bool reinstateNodeGraphs(const char*);
-	void collectGraphInformation(std::vector<double>*, Number*, Number*);
-	void storeRateGraphs(const std::vector<double>&, Number, Number);
+	/**
+	 * Generate Noded graphs from all nodes stored in this file
+	 * @param fileName The name of the file
+	 */
+	void generateNodeGraphs(const char* fileName);
 
-	static Time _startTime;
+	/**
+	 * Collects the number of node, slices and the time from the TTree
+	 * @param vecTime Vector where the Time Points are stored
+	 * @param nrNodes contains at the end the number of nodes
+	 * @param nrSlices contains at the end the number of slices
+	 */
+	void collectGraphInformation(std::vector<double>& vecTime, Number& nrNodes,
+			Number& nrSlices);
+
+	/**
+	 * Stores the Graphs in the TFile
+	 * @param vecTime A vector of the time points
+	 * @param nrNodes The number of nodes stored in this file
+	 * @param nrSlices The number of slices stored in this file
+	 */
+	void storeRateGraphs(const std::vector<double>& vecTime, Number nrNodes, Number nrSlices);
+
+	/**
+	 * Pointer to the TTree
+	 */
 	static TTree* _pTree;
+	/**
+	 * Pointer to the TFile
+	 */
 	static TFile* _pFile;
+	/**
+	 * TVector of the stored rates
+	 */
 	static TVectorT<double>* _pArray;
-	static bool _reinstateNodeGraphs;
+	/**
+	 * True if Graphs of the rates should be generated
+	 */
+	static bool _generateNodeGraphs;
+	/**
+	 * True if the initialization is finished
+	 */
 	static bool _isRecording;
-	static int _nrSlice;
-	static int _nrNodes;
+	/**
+	 * Storage for the node rates, to allow asynchronous calls to the write method
+	 */
 	static std::map<int, double> _mData;
-
 
 };
 

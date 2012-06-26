@@ -33,26 +33,24 @@ namespace MPILib {
 namespace report {
 namespace handler {
 
-Time RootHighThroughputHandler::_startTime = 0;
 TTree* RootHighThroughputHandler::_pTree = 0;
 bool RootHighThroughputHandler::_isRecording = false;
-bool RootHighThroughputHandler::_reinstateNodeGraphs = false;
+bool RootHighThroughputHandler::_generateNodeGraphs = false;
 
 std::map<int, double> RootHighThroughputHandler::_mData;
 
-int RootHighThroughputHandler::_nrNodes = 0;
 
 TFile* RootHighThroughputHandler::_pFile = 0;
 TVectorD* RootHighThroughputHandler::_pArray = 0;
 
 RootHighThroughputHandler::RootHighThroughputHandler(
-		const std::string& file_name, bool have_state,
-		bool reinstate_node_graphs) :
-		AbstractReportHandler(file_name) {
-	if(have_state){
+		const std::string& fileName, bool haveState,
+		bool generateGraphs) :
+		AbstractReportHandler(fileName) {
+	if(haveState){
 		throw(utilities::Exception("RootHighThroughputHandler cannot generate State graphs"));
 	}
-	this->_reinstateNodeGraphs = reinstate_node_graphs;
+	this->_generateNodeGraphs = generateGraphs;
 }
 
 RootHighThroughputHandler::RootHighThroughputHandler(
@@ -67,17 +65,16 @@ void RootHighThroughputHandler::detachHandler(const NodeId&) {
 
 		// if so desired, create node rate graphs
 		// note that the file is closed by the first node so that the test for its existence is necessary
-		if (_reinstateNodeGraphs && _pFile)
-			reinstateNodeGraphs(_pFile->GetName());
+		if (_generateNodeGraphs && _pFile)
+			generateNodeGraphs(_pFile->GetName());
 
 	}
 
 	// restore all static definitions
 	delete _pArray;
 	_pArray = 0;
-	_startTime = 0;
 	_isRecording = false;
-	_reinstateNodeGraphs = false;
+	_generateNodeGraphs = false;
 	_mData.clear();
 	_pTree = 0;
 
@@ -115,11 +112,11 @@ void RootHighThroughputHandler::writeReport(const Report& report) {
 
 		for (Index i = 0; i < report._nrNodes; i++) {
 			(*nodeId)[i] = world.size() * i + world.rank();
+			std::cout<<"a"<<(*nodeId)[i]<<"\t"<<i<<std::endl;
 		}
 		_pTree->Fill();
-
-
 		_pTree->Write();
+
 		_pTree = 0;
 		delete nodeId;
 
@@ -159,8 +156,8 @@ void RootHighThroughputHandler::writeReport(const Report& report) {
 RootHighThroughputHandler::~RootHighThroughputHandler() {
 }
 
-bool RootHighThroughputHandler::reinstateNodeGraphs(const char* p) {
-	const std::string file_name(p);
+void RootHighThroughputHandler::generateNodeGraphs(const char* fileName) {
+	const std::string file_name(fileName);
 	//close to flush buffers and reopen to append
 	_pFile->Close();
 	delete _pFile;
@@ -173,15 +170,14 @@ bool RootHighThroughputHandler::reinstateNodeGraphs(const char* p) {
 
 	TGraph* p_graph = (TGraph*) _pFile->Get("rate_1");
 	if (p_graph) {
-		std::cout << "They are already in" << std::endl;
-		return false;
+		utilities::Exception("The Graph already exists");
 	}
 
 	Number number_of_nodes = -1;
 	Number number_of_slices = -1;
 	std::vector<double> vec_times;
 
-	collectGraphInformation(&vec_times, &number_of_nodes, &number_of_slices);
+	collectGraphInformation(vec_times, number_of_nodes, number_of_slices);
 
 	storeRateGraphs(vec_times, number_of_nodes, number_of_slices);
 
@@ -190,31 +186,42 @@ bool RootHighThroughputHandler::reinstateNodeGraphs(const char* p) {
 	delete _pArray;
 	_pArray = 0;
 
-	return true;
 }
 
 void RootHighThroughputHandler::storeRateGraphs(
-		const std::vector<double>& vec_time, Number n_nodes, Number n_slices) {
+		const std::vector<double>& vecTime, Number nrNodes, Number nrSlices) {
+
+	TTree* nodeTree = (TTree*) _pFile->Get("NodeIds");
+	if (!nodeTree)
+		throw utilities::Exception("No valid TTree for the nodeIds");
+	// FIXME why the hell are the elements wrong??????
+	TVectorD* nodeId = new TVectorD(nrNodes);
+	TBranch* nodeBranch = nodeTree->GetBranch("GlobalNodeIds");
+	nodeBranch->SetAddress(&nodeId); //address of pointer!
+	std::cout<<nodeId->GetNoElements()<<(*nodeId)[0]<<(*nodeId)[1]<<std::endl;
+
 	TBranch* p_branch = _pTree->GetBranch("slices");
 	p_branch->SetAddress(&_pArray); //address of pointer!
 
-	for (Index node = 0; node < n_nodes; node++) {
+	for (Index node = 0; node < nrNodes; node++) {
 		Index id_node = node + 1;
 
 		std::vector<double> vec_rate;
-		for (Index slice = 0; slice < n_slices; slice++) {
+		for (Index slice = 0; slice < nrSlices; slice++) {
 			p_branch->GetEvent(slice);
 			vec_rate.push_back((*_pArray)[id_node]);
 		}
-		if (vec_rate.size() != vec_time.size())
+		if (vec_rate.size() != vecTime.size())
 			throw utilities::Exception("Inconsistency between times and rate");
 
 		// Here we have all we need to create a Graph
-		TGraph* p_graph = new TGraph(vec_rate.size(), &(vec_time[0]),
+		TGraph* p_graph = new TGraph(vec_rate.size(), &(vecTime[0]),
 				&(vec_rate[0]));
 		std::ostringstream stgr;
-		boost::mpi::communicator world;
-		stgr << "rate_" << id_node << "_processId_" << world.rank();
+		///@TODO get the global node id for the node why are they wrong????
+		std::cout<<"b"<<(*nodeId)[node]<<"\t"<<node<<std::endl;
+		stgr << "rate_" << int((*nodeId)[node]);
+
 		p_graph->SetName(stgr.str().c_str());
 		p_graph->Write();
 		delete p_graph;
@@ -222,8 +229,8 @@ void RootHighThroughputHandler::storeRateGraphs(
 }
 
 void RootHighThroughputHandler::collectGraphInformation(
-		std::vector<double>* p_vec_time, Number* p_num_nodes,
-		Number* p_num_slices) {
+		std::vector<double>& pVecTime, Number& pNrNodes,
+		Number& pNrSlices) {
 	if (_pTree)
 		throw utilities::Exception("There is a TTree that shouldn't be there");
 
@@ -231,17 +238,17 @@ void RootHighThroughputHandler::collectGraphInformation(
 	if (!_pTree)
 		throw utilities::Exception("No valid TTree");
 
-	*p_num_slices = static_cast<Number>(_pTree->GetEntries());
+	pNrSlices = static_cast<Number>(_pTree->GetEntries());
 
 	TBranch* p_branch = _pTree->GetBranch("slices");
 	p_branch->SetAddress(&_pArray); //address of pointer!
 
-	for (Index i = 0; i < *p_num_slices; i++) {
+	for (Index i = 0; i < pNrSlices; i++) {
 		p_branch->GetEvent(i);
-		p_vec_time->push_back((*_pArray)[0]);
+		pVecTime.push_back((*_pArray)[0]);
 	}
 	//ignore the time in the first entry
-	*p_num_nodes = _pArray->GetNoElements() - 1;
+	pNrNodes = _pArray->GetNoElements() - 1;
 }
 
 } // end namespace of handler
