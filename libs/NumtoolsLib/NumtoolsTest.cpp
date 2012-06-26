@@ -223,7 +223,7 @@ bool NumtoolsTest::TestGsl() const
 
 namespace
 {
-	int Exp(double t, const double y[], double f[], void *params)
+	int Exp(double , const double y[], double f[], void *params)
 	{
 		double beta = *(double *)params;
 		f[0] =   beta*y[0];
@@ -233,7 +233,7 @@ namespace
 	}
 
 
-	int ExpPrime(double t, const double y[], double *dfdy, double dfdt[], void *params)
+	int ExpPrime(double , const double[] , double *dfdy, double dfdt[], void *params)
 	{
 		double beta = *(double *)params;
 		gsl_matrix_view dfdy_mat  = gsl_matrix_view_array (dfdy, 2, 2);

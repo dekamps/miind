@@ -31,19 +31,13 @@ public:
 		return new SleepAlgorithm(*this);
 	}
 
-	void configure(const SimulationRunParameter& simParam) {
-		// to repress warning
-		int i = simParam.getMaximumNumberIterations();
-		i++;
+	void configure(const SimulationRunParameter&) {
+
 	}
 
-	void evolveNodeState(const std::vector<ActivityType>& nodeVector,
-			const std::vector<WeightValue>& weightVector, Time time) {
-		time = 2;
-		time++;
-		unsigned int size = nodeVector.size();
-		size = weightVector.size();
-		size++;
+	void evolveNodeState(const std::vector<ActivityType>&,
+			const std::vector<WeightValue>&, Time) {
+
 		boost::this_thread::sleep(boost::posix_time::seconds(kSleepTime));
 
 	}

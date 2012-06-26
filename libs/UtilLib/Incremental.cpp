@@ -90,7 +90,7 @@ bool Incremental::FromStream(istream& s){
 	return true;
 }
 
-bool Incremental::ToStream(ostream& s) const
+bool Incremental::ToStream(ostream&) const
 {
 	return true;
 }

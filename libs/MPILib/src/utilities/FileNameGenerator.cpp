@@ -18,7 +18,6 @@ FileNameGenerator::FileNameGenerator(const std::string& fileName, FileType fileT
 	mpi::communicator world;
 
 	int processorId = world.rank();
-	int totalProcessors = world.size();
 	std::stringstream tempFileName;
 
 	if (fileType == LOGFILE) {

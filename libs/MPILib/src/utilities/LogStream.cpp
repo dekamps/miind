@@ -33,6 +33,7 @@ LogStream::LogStream(std::shared_ptr<std::ostream> p_stream_log) :
 	try {
 		// just check if there is timing
 		float time_first = _timer.secondsSinceLastCall();
+		time_first+=1.0;
 
 	} catch (TimeException &e) {
 		_isTimeAvailable = false;

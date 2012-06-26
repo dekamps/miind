@@ -36,7 +36,7 @@ Line::~Line()
 void Line::GeneratePs
 			(
 				PositionInCm PosCm, 
-				SizeInCm SizeCm, 
+				SizeInCm,
 				Angle angle, 
 				ostream& s
 			)

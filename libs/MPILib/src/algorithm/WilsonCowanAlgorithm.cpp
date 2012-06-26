@@ -18,7 +18,7 @@
 
 namespace {
 
-int sigmoid(double t, const double y[], double f[], void *params) {
+int sigmoid(double, const double y[], double f[], void *params) {
 	auto p_parameter = (MPILib::algorithm::WilsonCowanParameter *) params;
 
 	f[0] = (-y[0]
@@ -29,7 +29,7 @@ int sigmoid(double t, const double y[], double f[], void *params) {
 	return GSL_SUCCESS;
 }
 
-int sigmoidprime(double t, const double y[], double *dfdy, double dfdt[],
+int sigmoidprime(double , const double[], double *dfdy, double dfdt[],
 		void *params) {
 	auto p_parameter = (MPILib::algorithm::WilsonCowanParameter *) params;
 	gsl_matrix_view dfdy_mat = gsl_matrix_view_array(dfdy, 1, 1);

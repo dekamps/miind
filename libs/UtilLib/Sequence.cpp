@@ -23,7 +23,7 @@
 using namespace UtilLib;
 using namespace std;
 
-Sequence::Sequence(istream& s){
+Sequence::Sequence(istream&){
 }
 
 Sequence::~Sequence(){

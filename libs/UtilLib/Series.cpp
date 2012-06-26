@@ -88,7 +88,7 @@ bool Series::FromStream(istream& s)
 	return true;
 }
 
-bool Series::ToStream(ostream& s) const
+bool Series::ToStream(ostream&) const
 {
 	return true;
 }

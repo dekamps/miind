@@ -115,13 +115,13 @@ namespace NumtoolsLib
 	}
 
 	template <class ParameterObject>
-	bool DVIntegrator<ParameterObject>::FromStream(istream& s)
+	bool DVIntegrator<ParameterObject>::FromStream(istream&)
 	{
 		return true;
 	}
 
 	template <class ParameterObject>
-	bool DVIntegrator<ParameterObject>::ToStream(ostream& s) const
+	bool DVIntegrator<ParameterObject>::ToStream(ostream&) const
 	{
 		return true;
 	}

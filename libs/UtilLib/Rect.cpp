@@ -35,7 +35,7 @@ Rect::~Rect()
 void Rect::GeneratePs
 		(
 			PositionInCm PosCm, 
-			SizeInCm SizeCm, 
+			SizeInCm,
 			Angle angle, 
 			ostream& s
 			) const

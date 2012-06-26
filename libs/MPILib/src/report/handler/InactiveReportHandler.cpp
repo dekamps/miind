@@ -34,9 +34,8 @@ InactiveReportHandler::~InactiveReportHandler()
 {
 }
 
-void InactiveReportHandler::writeReport(const Report& report)
+void InactiveReportHandler::writeReport(const Report&)
 {
-
 }
 
 InactiveReportHandler* InactiveReportHandler::clone() const
@@ -47,7 +46,7 @@ InactiveReportHandler* InactiveReportHandler::clone() const
 
 void InactiveReportHandler::initializeHandler
 (
-	const NodeId& info
+	const NodeId&
 )
 {
 }

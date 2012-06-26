@@ -35,7 +35,8 @@ void RateAlgorithm::configure(
 
 void RateAlgorithm::evolveNodeState(const std::vector<Rate>& nodeVector,
 		const std::vector<double>& weightVector, Time time) {
-
+	nodeVector[0];
+	weightVector[0];
 	_time_current = time;
 }
 

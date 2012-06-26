@@ -33,11 +33,7 @@ void test_Constructor() {
 	MPILib::Rate rate_max = 100.0;
 	double noise = 1.0;
 
-	// define some efficacy
-	MPILib::Efficacy epsilon = 1.0;
 
-	// define some input rate
-	MPILib::Rate nu = 0;
 
 	// Define the receiving node
 	WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
@@ -55,11 +51,6 @@ void test_clone() {
 	MPILib::Rate rate_max = 100.0;
 	double noise = 1.0;
 
-	// define some efficacy
-	MPILib::Efficacy epsilon = 1.0;
-
-	// define some input rate
-	MPILib::Rate nu = 0;
 
 	// Define the receiving node
 	WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
@@ -99,11 +90,6 @@ void test_configure() {
 	MPILib::Rate rate_max = 100.0;
 	double noise = 1.0;
 
-	// define some efficacy
-	MPILib::Efficacy epsilon = 1.0;
-
-	// define some input rate
-	MPILib::Rate nu = 0;
 
 	// Define the receiving node
 	WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
@@ -125,12 +111,6 @@ void test_getCurrentTime() {
 	MPILib::Rate rate_max = 100.0;
 	double noise = 1.0;
 
-	// define some efficacy
-	MPILib::Efficacy epsilon = 1.0;
-
-	// define some input rate
-	MPILib::Rate nu = 0;
-
 	// Define the receiving node
 	WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
 
@@ -143,11 +123,6 @@ void test_getCurrentRate() {
 	MPILib::Rate rate_max = 100.0;
 	double noise = 1.0;
 
-	// define some efficacy
-	MPILib::Efficacy epsilon = 1.0;
-
-	// define some input rate
-	MPILib::Rate nu = 0;
 
 	// Define the receiving node
 	WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
@@ -161,11 +136,6 @@ void test_innerProduct() {
 	MPILib::Rate rate_max = 100.0;
 	double noise = 1.0;
 
-	// define some efficacy
-	MPILib::Efficacy epsilon = 1.0;
-
-	// define some input rate
-	MPILib::Rate nu = 0;
 
 	// Define the receiving node
 	WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
@@ -187,11 +157,6 @@ void test_getInitialState() {
 	MPILib::Rate rate_max = 100.0;
 	double noise = 1.0;
 
-	// define some efficacy
-	MPILib::Efficacy epsilon = 1.0;
-
-	// define some input rate
-	MPILib::Rate nu = 0;
 
 	// Define the receiving node
 	WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
@@ -206,12 +171,6 @@ void test_getGrid() {
 	MPILib::Time tau = 10e-3; //10 ms
 	MPILib::Rate rate_max = 100.0;
 	double noise = 1.0;
-
-	// define some efficacy
-	MPILib::Efficacy epsilon = 1.0;
-
-	// define some input rate
-	MPILib::Rate nu = 0;
 
 	// Define the receiving node
 	WilsonCowanParameter par_sigmoid(tau, rate_max, noise);

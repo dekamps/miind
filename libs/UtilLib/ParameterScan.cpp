@@ -58,12 +58,12 @@ string ParameterScan::Tag() const
 	return string("<ParameterScan>");
 }
 
-bool ParameterScan::ToStream(ostream& s) const
+bool ParameterScan::ToStream(ostream&) const
 {
 	return true;
 }
 
-bool ParameterScan::FromStream(istream& s)
+bool ParameterScan::FromStream(istream&)
 {
 	return true;
 }
