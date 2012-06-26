@@ -136,9 +136,11 @@ private:
 	Time _tEnd;
 	Time _tReport;
 	Time _tStep;
-	Time _tStateReport;
 
 	std::string _logFileName;
+
+	Time _tStateReport;
+
 
 };
 

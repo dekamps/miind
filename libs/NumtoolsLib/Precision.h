@@ -37,6 +37,6 @@ namespace NumtoolsLib {
 		{
 		}
 	};
-};
+}
 
 #endif // include guard

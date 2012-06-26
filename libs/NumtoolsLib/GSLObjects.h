@@ -53,7 +53,7 @@ namespace NumtoolsLib {
 		~GSLObjects();
 
 	};
-};
+}
 
 #endif // include guard
 

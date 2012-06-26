@@ -44,7 +44,7 @@ int sigmoidprime(double t, const double y[], double *dfdy, double dfdt[],
 
 }
 }
-;
+
 
 namespace MPILib {
 namespace algorithm {
