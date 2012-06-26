@@ -29,7 +29,7 @@ AbstractReportHandler::AbstractReportHandler(const std::string& fileName) :
 		_streamFileName(fileName) {
 }
 
-AbstractReportHandler::~AbstractReportHandler(){};
+AbstractReportHandler::~AbstractReportHandler(){}
 
 std::string AbstractReportHandler::getRootOutputFileName() const {
 	utilities::FileNameGenerator fg(_streamFileName, utilities::ROOTFILE);

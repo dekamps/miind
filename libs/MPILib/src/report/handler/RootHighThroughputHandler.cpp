@@ -49,6 +49,9 @@ RootHighThroughputHandler::RootHighThroughputHandler(
 		const std::string& file_name, bool have_state,
 		bool reinstate_node_graphs) :
 		AbstractReportHandler(file_name) {
+	if(have_state){
+		throw(utilities::Exception("RootHighThroughputHandler cannot generate State graphs"));
+	}
 	this->_reinstateNodeGraphs = reinstate_node_graphs;
 }
 

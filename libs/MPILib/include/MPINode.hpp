@@ -129,6 +129,9 @@ public:
 			// make sure that the log is only printed ones.
 			static bool _isLogPrinted;
 
+			boost::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
+
+
 			NodeType _nodeType;
 
 			/**
@@ -160,7 +163,6 @@ public:
 			Number _number_iterations;
 			Number _maximum_iterations;
 
-			boost::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
 			mutable boost::shared_ptr<report::handler::AbstractReportHandler> _pHandler;
 		};
 

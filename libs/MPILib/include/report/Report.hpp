@@ -71,7 +71,7 @@ struct Report {
 	/**
 	 * Number of nodes on the process, should be the same for all reports on one node
 	 */
-	int _nrNodes;
+	unsigned int _nrNodes;
 
 	/**
 	 * Constructor
@@ -95,7 +95,7 @@ struct Report {
 	 */
 	Report(Time time, Rate rate, NodeId id, algorithm::AlgorithmGrid grid,
 			std::string log_message, ReportType type,
-			std::vector<ReportValue> vec_values, int nrNodes);
+			std::vector<ReportValue> vec_values, int nrNodes = 0);
 
 	/**
 	 * Add a ReportValue to the report

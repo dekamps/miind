@@ -111,15 +111,16 @@ private:
 	Time getCurrentSimulationTime() const;
 	Time getCurrentStateTime() const;
 
-	/**
-	 * Shared pointer to the actual distribution of the nodes.
-	 */
-	std::shared_ptr<NodeDistribution> _pNodeDistribution { new NodeDistribution };
 
 	/**
 	 * local nodes of the processor
 	 */
 	std::shared_ptr<std::map<NodeId, MPINode<WeightValue, NodeDistribution>>>_pLocalNodes {new std::map<NodeId, MPINode<WeightValue, NodeDistribution>>};
+
+	/**
+	 * Shared pointer to the actual distribution of the nodes.
+	 */
+	std::shared_ptr<NodeDistribution> _pNodeDistribution { new NodeDistribution };
 
 	/**
 	 * The max Node number assigned so far.

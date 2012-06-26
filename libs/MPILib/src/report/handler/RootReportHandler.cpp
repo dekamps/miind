@@ -181,7 +181,7 @@ std::unique_ptr<TGraph> RootReportHandler::convertAlgorithmGridToGraph(
 	unsigned int i = 0;
 	for (auto& it : vectorOfGridValues) {
 		tempPtrStateGraph->SetPoint(i, vectorOfStateInterpretation[i],
-				vectorOfGridValues[i]);
+				it);
 		i++;
 	}
 
