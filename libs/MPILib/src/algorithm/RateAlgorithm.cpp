@@ -19,7 +19,6 @@ RateAlgorithm::RateAlgorithm(Rate rate) :
 }
 
 RateAlgorithm::~RateAlgorithm() {
-	// TODO Auto-generated destructor stub
 }
 
 RateAlgorithm* RateAlgorithm::clone() const {

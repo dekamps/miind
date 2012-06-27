@@ -58,7 +58,7 @@ void test_writeReport() {
 	BOOST_CHECK(y==2.0);
 	BOOST_CHECK(rH1._nrReports==1);
 
-	//TODO test for state write
+	/// @todo DS test for state write
 
 	rH1.finalize();
 
@@ -142,7 +142,7 @@ void test_finalize() {
 }
 
 void test_convertAlgorithmGridToGraph() {
-	//TODO
+	/// *todo DS implement this test
 }
 
 void test_isConnectedToAlgorithm() {

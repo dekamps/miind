@@ -31,7 +31,6 @@ FileNameGenerator::FileNameGenerator(const std::string& fileName, FileType fileT
 }
 
 FileNameGenerator::~FileNameGenerator() {
-	// TODO Auto-generated destructor stub
 }
 
 std::string FileNameGenerator::getFileName() const {

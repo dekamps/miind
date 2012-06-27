@@ -16,7 +16,6 @@ IterationNumberException::IterationNumberException(const std::string& message):E
 
 
 IterationNumberException::~IterationNumberException() throw(){
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace utilities */

@@ -55,7 +55,7 @@ void test_write() {
 	vh.addReport(r);
 	vh.write();
 	BOOST_CHECK(vh._is_written==true);
-	//TODO improve this test
+	/// @todo DS improve this test
 
 }
 
@@ -125,14 +125,5 @@ int test_main(int argc, char* argv[]) // note the name!
 	test_distributeEvent();
 
 	return 0;
-//    // six ways to detect and report the same error:
-//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
-//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
-//    if( add( 2,2 ) != 4 )
-//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
-//    if( add( 2,2 ) != 4 )
-//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
-//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
-//
-//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
+
 }

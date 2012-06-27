@@ -129,7 +129,7 @@ private:
 	bool isStateWriteMandatory() const;
 
 	/**
-	 * Pointer to the file. @todo change this to smart pointer
+	 * Pointer to the file.
 	 */
 	static TFile* _pFile;
 

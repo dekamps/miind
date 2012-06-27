@@ -16,7 +16,6 @@ TimeException::TimeException(const std::string& message):Exception(message){}
 
 
 TimeException::~TimeException() throw(){
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace utilities */

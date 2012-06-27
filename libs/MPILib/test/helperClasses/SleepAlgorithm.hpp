@@ -12,7 +12,6 @@
 #include <boost/mpi.hpp>
 #include <boost/mpi/communicator.hpp>
 
-
 using namespace MPILib;
 
 template<class WeightValue>
@@ -20,11 +19,9 @@ class SleepAlgorithm: public algorithm::AlgorithmInterface<WeightValue> {
 public:
 
 	SleepAlgorithm() {
-		// TODO Auto-generated constructor stub
 
 	}
 	~SleepAlgorithm() {
-		// TODO Auto-generated destructor stub
 	}
 
 	SleepAlgorithm<WeightValue>* clone() const {
@@ -47,7 +44,6 @@ public:
 	}
 
 	Rate getCurrentRate() const {
-		//TODO
 		mpi::communicator world;
 		return world.rank() + world.size();
 
@@ -63,6 +59,5 @@ private:
 
 	static double constexpr kSleepTime = 1;
 };
-
 
 #endif /* SLEEPALGORITHM_HPP_ */
