@@ -33,22 +33,19 @@ namespace MPILib {
 namespace report {
 namespace handler {
 
-TTree* RootHighThroughputHandler::_pTree = 0;
 bool RootHighThroughputHandler::_isRecording = false;
 bool RootHighThroughputHandler::_generateNodeGraphs = false;
 
 std::map<int, double> RootHighThroughputHandler::_mData;
 
-TFile* RootHighThroughputHandler::_pFile = 0;
-TVectorD* RootHighThroughputHandler::_pArray = 0;
+TTree* RootHighThroughputHandler::_pTree = nullptr;
+TFile* RootHighThroughputHandler::_pFile = nullptr;
+TVectorD* RootHighThroughputHandler::_pArray = nullptr;
 
 RootHighThroughputHandler::RootHighThroughputHandler(
-		const std::string& fileName, bool haveState, bool generateGraphs) :
+		const std::string& fileName,  bool generateGraphs) :
 		AbstractReportHandler(fileName) {
-	if (haveState) {
-		throw(utilities::Exception(
-				"RootHighThroughputHandler cannot generate State graphs"));
-	}
+
 	this->_generateNodeGraphs = generateGraphs;
 }
 
@@ -71,18 +68,18 @@ void RootHighThroughputHandler::detachHandler(const NodeId&) {
 
 	// restore all static definitions
 	delete _pArray;
-	_pArray = 0;
+	_pArray = nullptr;
 	_isRecording = false;
 	_generateNodeGraphs = false;
 	_mData.clear();
-	_pTree = 0;
+	_pTree = nullptr;
 
 	if (_pFile) {
 		// clean up
 		_pFile->Close();
 		delete _pArray;
-		_pArray = 0;
-		_pFile = 0;
+		_pArray = nullptr;
+		_pFile = nullptr;
 	}
 }
 
@@ -152,9 +149,9 @@ void RootHighThroughputHandler::generateNodeGraphs(const char* fileName) {
 	_pFile->Close();
 	delete _pFile;
 	//closing the file has invalidated (destroyed) the tree
-	_pTree = 0;
+	_pTree = nullptr;
 	delete _pArray;
-	_pArray = 0;
+	_pArray = nullptr;
 
 	_pFile = new TFile(file_name.c_str(), "UPDATE");
 
@@ -167,9 +164,9 @@ void RootHighThroughputHandler::generateNodeGraphs(const char* fileName) {
 	storeRateGraphs(vec_times, number_of_nodes, number_of_slices);
 
 	_pFile->Close(); // the file object does not exist anymore, don't delete the pointer
-	_pFile = 0; // just set it to 0
+	_pFile = nullptr; // just set it to nullptr
 	delete _pArray;
-	_pArray = 0;
+	_pArray = nullptr;
 
 }
 

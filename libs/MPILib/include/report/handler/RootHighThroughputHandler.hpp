@@ -46,12 +46,9 @@ public:
 	/**
 	 * Standard constructor for client code
 	 * @param fileName root file name without extension!
-	 * @param haveState write out state file @attention it has to be false, as
-	 * RootHighThroughputHandler cannot write state graphs, if not an exception is thrown
 	 * @param generateGraphs backward compatibility option for an older ROOT layout
 	 */
-	RootHighThroughputHandler(const std::string& fileName, bool haveState =
-			false, bool generateGraphs = false);
+	RootHighThroughputHandler(const std::string& fileName, bool generateGraphs = false);
 
 	/**
 	 * Copy constructor

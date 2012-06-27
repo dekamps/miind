@@ -28,8 +28,7 @@ using namespace MPILib;
 
 const report::handler::RootHighThroughputHandler WILSONCOWAN_HIGH_HANDLER(
 		"test/wilsonresponseHigh", // file where the simulation results are written
-		false, // only rate diagrams
-		true
+		true // generate graphs
 		);
 
 const report::handler::RootReportHandler WILSONCOWAN_HANDLER(
