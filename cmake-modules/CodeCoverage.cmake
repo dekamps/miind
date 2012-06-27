@@ -22,7 +22,9 @@ IF(NOT GCOV_PATH)
 ENDIF() # NOT GCOV_PATH
 
 IF(NOT CMAKE_COMPILER_IS_GNUCXX)
-	MESSAGE(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
+if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+	MESSAGE(FATAL_ERROR "Compiler is not GNU gcc or clang! Aborting...")
+endif()
 ENDIF() # NOT CMAKE_COMPILER_IS_GNUCXX
 
 IF ( NOT CMAKE_BUILD_TYPE STREQUAL "Debug" )
@@ -32,8 +34,15 @@ ENDIF() # NOT CMAKE_BUILD_TYPE STREQUAL "Debug"
 
 # Setup compiler options
 ADD_DEFINITIONS(-fprofile-arcs -ftest-coverage)
+IF(CMAKE_COMPILER_IS_GNUCXX)
 LINK_LIBRARIES(gcov)
-
+ENDIF()
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    ADD_LIBRARY(libprofile_rt STATIC IMPORTED)
+    SET_TARGET_PROPERTIES(libprofile_rt PROPERTIES
+        IMPORTED_LOCATION /usr/lib/libprofile_rt.a)
+    LINK_LIBRARIES(libprofile_rt)
+endif()
 
 # Param _targetname     The name of new the custom make target
 # Param _testrunner     The name of the target which runs the tests
@@ -55,13 +64,13 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
 	ADD_CUSTOM_TARGET(${_targetname}
 		
 		# Cleanup lcov
-		${LCOV_PATH} --directory . --zerocounters
+		${LCOV_PATH} --directory . --zerocounters --gcov-tool /usr/bin/gcov-4.2 
 		
 		# Run tests
 		COMMAND ${_testrunner} ${ARGV3}
 		
 		# Capturing lcov counters and generating report
-		COMMAND ${LCOV_PATH} --directory . --capture --output-file ${_outputname}.info
+		COMMAND ${LCOV_PATH} --directory . --capture --output-file ${_outputname}.info --gcov-tool /usr/bin/gcov-4.2 
 		COMMAND ${LCOV_PATH} --remove ${_outputname}.info 'tests/*' '/usr/*' --output-file ${_outputname}.info.cleaned
 		COMMAND ${GENHTML_PATH} -o ${_outputname} ${_outputname}.info.cleaned
 		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
