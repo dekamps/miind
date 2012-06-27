@@ -117,6 +117,10 @@ void RootHighThroughputHandler::writeReport(const Report& report) {
 
 	if (_isRecording) {
 		//store the node in a map one below the max number of nodes
+		if(_mData.count(report._id)){
+			throw utilities::Exception("The report for this node is already stored");
+		}
+
 		if (_mData.size() < (report._nrNodes - 1)) {
 			_mData[report._id] = report._rate;
 		}

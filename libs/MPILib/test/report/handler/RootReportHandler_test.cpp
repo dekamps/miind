@@ -170,31 +170,16 @@ int test_main(int argc, char* argv[]) // note the name!
 		BOOST_FAIL( "Run the test with two processes!");
 	}
 	// run only one one process as otherwise race conditions occure
-	if (world.rank() == 1) {
-		test_Constructor();
-		test_writeReport();
-		test_clone();
-		test_initializeHandler();
-		test_detachHandler();
-		test_removeFromNodeList();
-		test_finalize();
-		test_convertAlgorithmGridToGraph();
-		test_isConnectedToAlgorithm();
-		test_isStateWriteMandatory();
-	}
-
-	if (world.rank() == 2) {
-		test_Constructor();
-		test_writeReport();
-		test_clone();
-		test_initializeHandler();
-		test_detachHandler();
-		test_removeFromNodeList();
-		test_finalize();
-		test_convertAlgorithmGridToGraph();
-		test_isConnectedToAlgorithm();
-		test_isStateWriteMandatory();
-	}
+	test_Constructor();
+	test_writeReport();
+	test_clone();
+	test_initializeHandler();
+	test_detachHandler();
+	test_removeFromNodeList();
+	test_finalize();
+	test_convertAlgorithmGridToGraph();
+	test_isConnectedToAlgorithm();
+	test_isStateWriteMandatory();
 
 	return 0;
 //    // six ways to detect and report the same error:

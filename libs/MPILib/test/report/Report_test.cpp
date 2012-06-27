@@ -44,6 +44,18 @@ void test_Constructor() {
 	BOOST_CHECK(r1._time==1.0);
 	BOOST_CHECK(r1._type==RATE);
 	BOOST_CHECK(r1._values[0]._name_quantity=="blab");
+	BOOST_CHECK(r1._nrNodes == 0);
+
+	Report r2(1.0, 2.0, 1,  MPILib::algorithm::AlgorithmGrid(2), "blub", RATE, rv, 10);
+
+	BOOST_CHECK(r2._id==1);
+	BOOST_CHECK(r2._log_message=="blub");
+	BOOST_CHECK(r2._grid.getStateSize()==2);
+	BOOST_CHECK(r2._rate==2.0);
+	BOOST_CHECK(r2._time==1.0);
+	BOOST_CHECK(r2._type==RATE);
+	BOOST_CHECK(r2._values[0]._name_quantity=="blab");
+	BOOST_CHECK(r2._nrNodes == 10);
 }
 
 void test_addValue(){
