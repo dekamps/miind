@@ -44,15 +44,15 @@ struct GraphKey {
 	/**
 	 * The nodeId of the node
 	 */
-	NodeId _id { NodeId(0) };
+	NodeId _id = NodeId(0);
 	/**
 	 * The time point of the node
 	 */
-	Time _time { 0.0 };
+	Time _time = 0.0;
 	/**
 	 * The GraphType
 	 */
-	GraphType _type { RATEGRAPH };
+	GraphType _type = RATEGRAPH;
 
 	/**
 	 * Default constructor for use in containers

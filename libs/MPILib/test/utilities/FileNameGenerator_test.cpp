@@ -24,7 +24,7 @@ namespace mpi = boost::mpi;
 mpi::communicator world;
 
 void test_Constructor() {
-	std::string tempStr { "blub" };
+	std::string tempStr ( "blub" );
 	FileNameGenerator fg(tempStr);
 
 	if (world.rank() == 0) {
@@ -42,7 +42,7 @@ void test_Constructor() {
 }
 
 void test_getFileName() {
-	std::string tempStr { "blub" };
+	std::string tempStr ( "blub" );
 
 	FileNameGenerator fg(tempStr);
 	if (world.rank() == 0) {

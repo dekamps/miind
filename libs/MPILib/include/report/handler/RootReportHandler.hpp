@@ -156,12 +156,12 @@ private:
 	/**
 	 * True if the state should be written to the file
 	 */
-	bool _isStateWriteMandatory {false};
+	bool _isStateWriteMandatory = false;
 
 	/**
 	 * Number of reports generated so far
 	 */
-	int _nrReports {0};
+	int _nrReports = 0;
 
 };
 

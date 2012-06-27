@@ -21,7 +21,6 @@
 #include <MPILib/include/report/handler/InactiveReportHandler.hpp>
 #include <MPILib/include/NodeType.hpp>
 
-
 namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
@@ -111,39 +110,38 @@ private:
 	Time getCurrentSimulationTime() const;
 	Time getCurrentStateTime() const;
 
-
 	/**
 	 * local nodes of the processor
 	 */
-	std::shared_ptr<std::map<NodeId, MPINode<WeightValue, NodeDistribution>>>_pLocalNodes {new std::map<NodeId, MPINode<WeightValue, NodeDistribution>>};
+	std::shared_ptr<std::map<NodeId, MPINode<WeightValue, NodeDistribution>>>_pLocalNodes;
 
 	/**
 	 * Shared pointer to the actual distribution of the nodes.
 	 */
-	std::shared_ptr<NodeDistribution> _pNodeDistribution { new NodeDistribution };
+	std::shared_ptr<NodeDistribution> _pNodeDistribution=std::shared_ptr<NodeDistribution>(new NodeDistribution);
 
 	/**
 	 * The max Node number assigned so far.
 	 * @attention This number is only handled by the master node. Therefore never access it direct!
 	 */
-	int _maxNodeId {0};
+	int _maxNodeId = 0;
 
-	Time _currentReportTime {0};
-	Time _currentStateTime {0};
-	Time _currentSimulationTime {0};
-	NetworkState _stateNetwork {0.0};
-	bool _isDalesLaw {true};
+	Time _currentReportTime = 0;
+	Time _currentStateTime = 0;
+	Time _currentSimulationTime = 0;
+	NetworkState _stateNetwork = 0.0;
+	bool _isDalesLaw = true;
 
-	SimulationRunParameter _parameterSimulationRun {report::handler::InactiveReportHandler(), 0, 0.0,
-		0.0, 0.0, 0.0, ""};
-	utilities::LogStream _streamLog {};
-
-
+	SimulationRunParameter _parameterSimulationRun = SimulationRunParameter(report::handler::InactiveReportHandler(), 0, 0.0,
+		0.0, 0.0, 0.0, "");
+	utilities::LogStream _streamLog;
 
 };
 
 //! Standard conversion for operations that depend on efficacy online
-inline double toEfficacy( double efficacy ) { return efficacy; }
+inline double toEfficacy(double efficacy) {
+	return efficacy;
+}
 
 } //end namespace
 

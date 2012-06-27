@@ -32,7 +32,10 @@ void test_Constructor() {
 	BOOST_CHECK(a._arrayInterpretation[0]==0.0);
 	BOOST_CHECK(a._arrayInterpretation[99]==0.0);
 
-	std::vector<double> dv { 1.0, 2.1, 3.0 };
+	std::vector<double> dv;
+	dv.push_back(1.0);
+	dv.push_back(2.1);
+	dv.push_back(3.0);
 	AlgorithmGrid a1(dv);
 	BOOST_CHECK(a1._numberState==3);
 	BOOST_CHECK(a1._arrayState[0]==1.0);
@@ -43,22 +46,28 @@ void test_Constructor() {
 	BOOST_CHECK(a1._arrayInterpretation[1]==0.0);
 	BOOST_CHECK(a1._arrayInterpretation[2]==0.0);
 
-	std::vector<double> dv1 { 1.1, 2.2, 3.3 };
+	std::vector<double> dv1;
+	dv1.push_back(1.2);
+	dv1.push_back(2.3);
+	dv1.push_back(3.3);
 	AlgorithmGrid a2(dv, dv1);
 	BOOST_CHECK(a2._numberState==3);
 	BOOST_CHECK(a2._arrayState[0]==1.0);
 	BOOST_CHECK(a2._arrayState[1]==2.1);
 	BOOST_CHECK(a2._arrayState[2]==3.0);
 
-	BOOST_CHECK(a2._arrayInterpretation[0]==1.1);
-	BOOST_CHECK(a2._arrayInterpretation[1]==2.2);
+	BOOST_CHECK(a2._arrayInterpretation[0]==1.2);
+	BOOST_CHECK(a2._arrayInterpretation[1]==2.3);
 	BOOST_CHECK(a2._arrayInterpretation[2]==3.3);
 
 }
 
 void test_assignment() {
 	AlgorithmGrid a(100);
-	std::vector<double> dv { 1.0, 2.1, 3.0 };
+	std::vector<double> dv;
+	dv.push_back(1.0);
+	dv.push_back(2.1);
+	dv.push_back(3.0);
 	AlgorithmGrid a1(dv);
 
 	a = a1;
@@ -74,8 +83,14 @@ void test_assignment() {
 }
 
 void test_toStateVector() {
-	std::vector<double> dv { 1.0, 2.1, 3.0 };
-	std::vector<double> dv1 { 1.1, 2.2, 3.3 };
+	std::vector<double> dv;
+	dv.push_back(1.0);
+	dv.push_back(2.1);
+	dv.push_back(3.0);
+	std::vector<double> dv1;
+	dv1.push_back(1.2);
+	dv1.push_back(2.3);
+	dv1.push_back(3.3);
 	AlgorithmGrid a(dv, dv1);
 
 	std::vector<double> v;
@@ -88,32 +103,49 @@ void test_toStateVector() {
 }
 
 void test_toInterpretationVector() {
-	std::vector<double> dv { 1.0, 2.1, 3.0 };
-	std::vector<double> dv1 { 1.1, 2.2, 3.3 };
+	std::vector<double> dv;
+	dv.push_back(1.0);
+	dv.push_back(2.1);
+	dv.push_back(3.0);
+	std::vector<double> dv1;
+	dv1.push_back(1.2);
+	dv1.push_back(2.3);
+	dv1.push_back(3.3);
 	AlgorithmGrid a(dv, dv1);
 
 	std::vector<double> v;
 
 	v = a.toInterpretationVector();
-	BOOST_CHECK(v[0]==1.1);
-	BOOST_CHECK(v[1]==2.2);
+	BOOST_CHECK(v[0]==1.2);
+	BOOST_CHECK(v[1]==2.3);
 	BOOST_CHECK(v[2]==3.3);
 }
 
 void test_toValarray() {
-	std::vector<double> dv1 { 1.1, 2.2, 3.3 };
+
+	std::vector<double> dv1;
+	dv1.push_back(1.2);
+	dv1.push_back(2.3);
+	dv1.push_back(3.3);
 	AlgorithmGrid a(dv1);
 	std::valarray<double> d;
 	d = a.toValarray<double>(dv1);
-	BOOST_CHECK(d[0]==1.1);
-	BOOST_CHECK(d[1]==2.2);
+	BOOST_CHECK(d[0]==1.2);
+	BOOST_CHECK(d[1]==2.3);
 	BOOST_CHECK(d[2]==3.3);
 }
 
 void test_toVector() {
 	std::vector<double> dv1;
+	dv1.push_back(1.2);
+	dv1.push_back(2.3);
+	dv1.push_back(3.3);
 	AlgorithmGrid a(dv1);
-	std::valarray<double> d { 1.1, 2.2, 3.3 };
+	std::valarray<double> d;
+	d.resize(3,0.0);
+	d[0]=1.1;
+	d[1]=2.2;
+	d[2]=3.3;
 
 	dv1 = a.toVector<double>(d, 3);
 	BOOST_CHECK(dv1[0]==1.1);
@@ -122,17 +154,29 @@ void test_toVector() {
 }
 
 void test_getters() {
-	std::vector<double> dv { 1.0, 2.1, 3.0 };
-	std::vector<double> dv1 { 1.1, 2.2, 3.3 };
+	std::vector<double> dv;
+	dv.push_back(1.0);
+	dv.push_back(2.1);
+	dv.push_back(3.0);
+	std::vector<double> dv1;
+	dv1.push_back(1.2);
+	dv1.push_back(2.3);
+	dv1.push_back(3.3);
 	AlgorithmGrid a(dv, dv1);
 	BOOST_CHECK(a.getStateSize()==3);
-	BOOST_CHECK(a.getArrayInterpretation()[0]==1.1);
+	BOOST_CHECK(a.getArrayInterpretation()[0]==1.2);
 	BOOST_CHECK(a.getArrayState()[1]==2.1);
 }
 
 void test_resize() {
-	std::vector<double> dv { 1.0, 2.1, 3.0 };
-	std::vector<double> dv1 { 1.1, 2.2, 3.3 };
+	std::vector<double> dv;
+	dv.push_back(1.0);
+	dv.push_back(2.1);
+	dv.push_back(3.0);
+	std::vector<double> dv1;
+	dv1.push_back(1.2);
+	dv1.push_back(2.3);
+	dv1.push_back(3.3);
 	AlgorithmGrid a(dv, dv1);
 	BOOST_CHECK(a.getArrayInterpretation().size()==3);
 	BOOST_CHECK(a.getArrayState().size()==3);
@@ -142,13 +186,19 @@ void test_resize() {
 }
 
 void test_iterators() {
-	std::vector<double> dv { 1.0, 2.1, 3.0 };
-	std::vector<double> dv1 { 1.1, 2.2, 3.3 };
+	std::vector<double> dv;
+	dv.push_back(1.0);
+	dv.push_back(2.1);
+	dv.push_back(3.0);
+	std::vector<double> dv1;
+	dv1.push_back(1.2);
+	dv1.push_back(2.3);
+	dv1.push_back(3.3);
 	AlgorithmGrid a(dv, dv1);
 	BOOST_CHECK((*a.begin_state())==1.0);
 	//TODO implement test for the end state
 //	BOOST_CHECK((*a.end_state())==0.0);
-	BOOST_CHECK((*a.begin_interpretation())==1.1);
+	BOOST_CHECK((*a.begin_interpretation())==1.2);
 	//TODO implement test for the end state
 //	BOOST_CHECK((*a.end_interpretation())==0.0);
 

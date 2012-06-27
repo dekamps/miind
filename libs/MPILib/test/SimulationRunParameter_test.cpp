@@ -27,7 +27,7 @@ mpi::communicator world;
 void test_Constructor_and_Copy() {
 	report::handler::InactiveReportHandler handler;
 
-	SimulationRunParameter simParam { handler, 0, 0.0, 0.0, 0.0, 0.0, "" };
+	SimulationRunParameter simParam ( handler, 0, 0.0, 0.0, 0.0, 0.0, "" );
 
 	BOOST_CHECK(simParam._pHandler == &handler);
 	BOOST_CHECK(simParam._maxIter == 0);
@@ -38,8 +38,8 @@ void test_Constructor_and_Copy() {
 	BOOST_CHECK(simParam._logFileName=="");
 	BOOST_CHECK(simParam._tStateReport == 0.0);
 
-	SimulationRunParameter simParam2 { report::handler::InactiveReportHandler(),
-			1, 1.0, 1.0, 1.0, 1.0, "a", 2.0 };
+	SimulationRunParameter simParam2 ( report::handler::InactiveReportHandler(),
+			1, 1.0, 1.0, 1.0, 1.0, "a", 2.0 );
 
 	BOOST_CHECK(simParam2._pHandler != &handler);
 	BOOST_CHECK(simParam2._maxIter == 1);
@@ -50,7 +50,7 @@ void test_Constructor_and_Copy() {
 	BOOST_CHECK(simParam2._logFileName=="a");
 	BOOST_CHECK(simParam2._tStateReport == 2.0);
 
-	SimulationRunParameter simParam3 { simParam2 };
+	SimulationRunParameter simParam3 ( simParam2 );
 
 	BOOST_CHECK(simParam3._pHandler != &handler);
 	BOOST_CHECK(simParam3._maxIter == 1);
@@ -76,8 +76,8 @@ void test_Constructor_and_Copy() {
 void test_Getters() {
 	report::handler::InactiveReportHandler handler;
 
-	SimulationRunParameter simParam2 { handler,
-			1, 1.0, 1.0, 1.0, 1.0, "a", 2.0 };
+	SimulationRunParameter simParam2 ( handler,
+			1, 1.0, 1.0, 1.0, 1.0, "a", 2.0 );
 
 	BOOST_CHECK(&simParam2.getHandler() == &handler);
 	BOOST_CHECK(simParam2.getMaximumNumberIterations() == 1);

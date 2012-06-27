@@ -77,10 +77,10 @@ private:
 	 */
 	void distributeEvent(const Event& ev);
 
-	bool _is_written { false };
-	std::vector<std::string> _vec_names { };
-	std::vector<std::vector<float> > _vec_time { };
-	std::vector<std::vector<float> > _vec_quantity { };
+	bool _is_written = false;
+	std::vector<std::string> _vec_names;
+	std::vector<std::vector<float> > _vec_time;
+	std::vector<std::vector<float> > _vec_quantity;
 };
 
 } // end namespace of handler

@@ -80,7 +80,8 @@ void test_configure() {
 
 void test_evolveNodeState() {
 	double rate = 2.1;
-	std::vector<double> tempVec = { 1.0 };
+	std::vector<double> tempVec;
+	tempVec.push_back(1.0);
 
 	RateAlgorithm rAlg(rate);
 

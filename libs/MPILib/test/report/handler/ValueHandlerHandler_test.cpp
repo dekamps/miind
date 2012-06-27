@@ -35,7 +35,8 @@ void test_addReport() {
 	ValueHandlerHandler vh;
 
 	MPILib::report::Report r(1.0, 2.0, 1, "blub");
-	r.addValue(MPILib::report::ReportValue{"blab", 3.0, 4.0});
+	MPILib::report::ReportValue rv {"blab", 3.0, 4.0};
+	r.addValue(rv);
 	vh.addReport(r);
 
 	BOOST_CHECK(vh._is_written==false);
@@ -51,7 +52,8 @@ void test_write() {
 	ValueHandlerHandler vh;
 
 	MPILib::report::Report r(1.0, 2.0, 1, "blub");
-	r.addValue(MPILib::report::ReportValue{"blab", 3.0, 4.0});
+	MPILib::report::ReportValue rv {"blab", 3.0, 4.0};
+	r.addValue(rv);
 	vh.addReport(r);
 	vh.write();
 	BOOST_CHECK(vh._is_written==true);
@@ -60,7 +62,9 @@ void test_write() {
 }
 
 void test_Event() {
-	ValueHandlerHandler::Event e { "blub", 1.0, 2.0 };
+	ValueHandlerHandler::Event ev { "blub", 1.0, 2.0 };
+
+	ValueHandlerHandler::Event e(ev);
 	BOOST_CHECK(e._str=="blub");
 	BOOST_CHECK(e._time==1.0);
 	BOOST_CHECK(e._value==2.0);
@@ -76,7 +80,8 @@ void test_isWritten() {
 
 void test_reset() {
 	ValueHandlerHandler vh;
-	vh.distributeEvent(ValueHandlerHandler::Event { "blub", 1.0, 2.0 });
+	ValueHandlerHandler::Event ev { "blub", 1.0, 2.0 };
+	vh.distributeEvent(ev);
 	BOOST_CHECK(vh._is_written==false);
 	BOOST_CHECK(vh._vec_names.empty()==false);
 	BOOST_CHECK(vh._vec_quantity.empty()==false);
@@ -90,12 +95,14 @@ void test_reset() {
 
 void test_distributeEvent() {
 	ValueHandlerHandler vh;
-	vh.distributeEvent(ValueHandlerHandler::Event { "blub", 1.0, 2.0 });
+	ValueHandlerHandler::Event ev1 { "blub", 1.0, 2.0 };
+	vh.distributeEvent(ev1);
 	BOOST_CHECK(vh._is_written==false);
 	BOOST_CHECK(vh._vec_names[0]=="blub");
 	BOOST_CHECK(vh._vec_time[0][0]==1.0);
 	BOOST_CHECK(vh._vec_quantity[0][0]==2.0);
-	vh.distributeEvent(ValueHandlerHandler::Event { "blub", 3.0, 4.0 });
+	ValueHandlerHandler::Event ev { "blub", 3.0, 4.0 };
+	vh.distributeEvent(ev);
 	BOOST_CHECK(vh._is_written==false);
 	BOOST_CHECK(vh._vec_names[0]=="blub");
 	BOOST_CHECK(vh._vec_time[0][0]==1.0);

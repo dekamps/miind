@@ -73,7 +73,7 @@ namespace utilities{
 
 		std::shared_ptr<std::ostream>	_pStreamLog;     // pointer to the log stream
 
-		bool							_isTimeAvailable {true}; // system time available ?
+		bool							_isTimeAvailable  = true; // system time available ?
 
 		Timer							_timer;            // timer, records time between calls of Record
 

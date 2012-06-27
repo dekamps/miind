@@ -33,8 +33,9 @@ void test_Constructor() {
 	BOOST_CHECK(r._log_message=="blub");
 	BOOST_CHECK(r._rate==2.0);
 	BOOST_CHECK(r._time==1.0);
-
-	std::vector<ReportValue> rv {ReportValue{"blab", 1.0, 2.0}};
+	ReportValue tempV {"blab", 1.0, 2.0};
+	std::vector<ReportValue> rv;
+	rv.push_back(tempV);
 	Report r1(1.0, 2.0, 1,  MPILib::algorithm::AlgorithmGrid(2), "blub", RATE, rv);
 
 	BOOST_CHECK(r1._id==1);
@@ -60,8 +61,9 @@ void test_Constructor() {
 
 void test_addValue(){
 	Report r(1.0, 2.0, 1, "blub");
+	ReportValue tempV {"blab", 1.0, 2.0};
 
-	r.addValue(ReportValue{"blab", 1.0, 2.0});
+	r.addValue(tempV);
 	BOOST_CHECK(r._values[0]._name_quantity=="blab");
 
 }

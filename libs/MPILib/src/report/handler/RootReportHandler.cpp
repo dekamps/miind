@@ -171,7 +171,7 @@ std::unique_ptr<TGraph> RootReportHandler::convertAlgorithmGridToGraph(
 
 	auto vectorOfStateInterpretation = report._grid.toInterpretationVector();
 
-	std::unique_ptr < TGraph > tempPtrStateGraph { new TGraph };
+	std::unique_ptr < TGraph > tempPtrStateGraph ( new TGraph);
 
 	GraphKey key(report._id, report._time);
 	tempPtrStateGraph->SetName(key.generateName().c_str());

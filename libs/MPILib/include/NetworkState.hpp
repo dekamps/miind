@@ -36,8 +36,8 @@ enum EvolveResult {
 //! NetworkState
 struct NetworkState {
 	Time _currentTime;
-	bool _isConfigured { false };
-	EvolveResult _result { NOT_RUN };
+	bool _isConfigured = false;
+	EvolveResult _result = NOT_RUN;
 
 	/**
 	 * Constructor

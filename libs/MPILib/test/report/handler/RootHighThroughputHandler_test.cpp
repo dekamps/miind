@@ -69,7 +69,10 @@ void test_writeReport() {
 	RootHighThroughputHandler rH("RootHighTestWrite", true);
 	rH.initializeHandler(1);
 	BOOST_CHECK(rH._pFile!=nullptr);
-	std::vector<ReportValue> rv { ReportValue { "blab", 1.0, 2.0 } };
+	ReportValue tempV {"blab", 1.0, 2.0};
+
+	std::vector<ReportValue> rv;
+	rv.push_back(tempV);
 	Report r1(1.0, 1.0, 1, MPILib::algorithm::AlgorithmGrid(2), "blub", RATE,
 			rv, 3);
 

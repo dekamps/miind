@@ -52,22 +52,22 @@ struct WilsonCowanParameter {
 	/**
 	 * membrane time constant
 	 */
-	Time _time_membrane { 0 };
+	Time _time_membrane = 0;
 
 	/**
 	 * maximum firing rate
 	 */
-	Rate _rate_maximum { 0 };
+	Rate _rate_maximum = 0;
 
 	/**
 	 * noise parameter
 	 */
-	double _f_noise { 0 };
+	double _f_noise = 0;
 
 	/**
 	 * input
 	 */
-	double _f_input { 0 };
+	double _f_input = 0;
 };
 
 }

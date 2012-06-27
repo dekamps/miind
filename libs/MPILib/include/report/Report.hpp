@@ -55,7 +55,7 @@ struct Report {
 	/**
 	 * The state space of the Algorithm
 	 */
-	algorithm::AlgorithmGrid _grid { 0 };
+	algorithm::AlgorithmGrid _grid = (0);
 	/**
 	 * Whatever message should appear in the log file
 	 */
@@ -67,7 +67,7 @@ struct Report {
 	/**
 	 * Ad hoc values that need to be logged in the simulation file
 	 */
-	std::vector<ReportValue> _values { };
+	std::vector<ReportValue> _values;
 	/**
 	 * Number of nodes on the process, should be the same for all reports on one node
 	 */

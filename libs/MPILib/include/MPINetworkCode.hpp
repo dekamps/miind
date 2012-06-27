@@ -18,7 +18,7 @@ namespace mpi = boost::mpi;
 namespace MPILib{
 
 template<class WeightValue, class NodeDistribution>
-MPINetwork<WeightValue, NodeDistribution>::MPINetwork() {
+MPINetwork<WeightValue, NodeDistribution>::MPINetwork(): _pLocalNodes(new std::map<NodeId, MPINode<WeightValue, NodeDistribution>>) {
 }
 
 template<class WeightValue, class NodeDistribution>
