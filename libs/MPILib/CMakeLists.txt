@@ -1,83 +1,35 @@
 
-
 ##############################################################################
 # add the source files
 ##############################################################################
-function(add_sources)
-  get_property(is_defined GLOBAL PROPERTY SRCS_LIST DEFINED)
-  if(NOT is_defined)
-    define_property(GLOBAL PROPERTY SRCS_LIST
-      BRIEF_DOCS "List of source files"
-      FULL_DOCS "List of source files to be compiled in one library")
-  endif()
-  # make absolute paths
-  set(SRCS)
-  foreach(s IN LISTS ARGN)
-    if(NOT IS_ABSOLUTE "${s}")
-      get_filename_component(s "${s}" ABSOLUTE)
-    endif()
-    list(APPEND SRCS "${s}")
-  endforeach()
-  # append to global list
-  set_property(GLOBAL APPEND PROPERTY SRCS_LIST "${SRCS}")
-endfunction(add_sources)
-
-add_subdirectory(src)
-
-set(MPI_SRCS)
-get_property(SRCS GLOBAL PROPERTY SRCS_LIST)
-foreach(s IN LISTS SRCS)
-  file(RELATIVE_PATH rs "${CMAKE_CURRENT_SOURCE_DIR}" "${s}")
-  string(REGEX REPLACE "r$" "" o "${CMAKE_CURRENT_BINARY_DIR}/${rs}")
-  add_custom_command(
-    OUTPUT "${o}"
-    COMMAND ${CMAKE_COMMAND} -E copy "${s}" "${o}"
-    DEPENDS "${s}"
-    COMMENT "Creating ${o}"
-    VERBATIM
-    )
-  list(APPEND MPI_SRCS "${o}")
-endforeach()
-
+set(MPI_SRCS
+    src/algorithm/AlgorithmGrid.cpp
+    src/algorithm/RateAlgorithm.cpp
+    src/algorithm/WilsonCowanAlgorithm.cpp
+    src/report/handler/AbstractReportHandler.cpp
+    src/report/handler/GraphKey.cpp
+    src/report/handler/InactiveReportHandler.cpp
+    src/report/handler/RootHighThroughputHandler.cpp
+    src/report/handler/RootReportHandler.cpp
+    src/report/handler/ValueHandlerHandler.cpp
+    src/report/Report.cpp
+    src/utilities/CircularDistribution.cpp
+    src/utilities/Exception.cpp
+    src/utilities/FileNameGenerator.cpp
+    src/utilities/IterationNumberException.cpp
+    src/utilities/LogStream.cpp
+    src/utilities/ParallelException.cpp
+    src/utilities/ProgressBar.cpp
+    src/utilities/TimeException.cpp
+    src/utilities/Timer.cpp
+    src/NetworkState.cpp
+    src/SimulationRunParameter.cpp
+)
 
 ##############################################################################
-# add the header files
+# include the header files
 ##############################################################################
-function(add_header)
-  get_property(is_defined GLOBAL PROPERTY HEADER_LIST DEFINED)
-  if(NOT is_defined)
-    define_property(GLOBAL PROPERTY HEADER_LIST
-      BRIEF_DOCS "List of header files"
-      FULL_DOCS "List of header files to be compiled in one library")
-  endif()
-  # make absolute paths
-  set(HEADER)
-  foreach(s IN LISTS ARGN)
-    if(NOT IS_ABSOLUTE "${s}")
-      get_filename_component(s "${s}" ABSOLUTE)
-    endif()
-    list(APPEND HEADER "${s}")
-  endforeach()
-  # append to global list
-  set_property(GLOBAL APPEND PROPERTY HEADER_LIST "${HEADER}")
-endfunction(add_header)
-
-add_subdirectory(include)
-
-set(MPI_HEADER)
-get_property(HEADER GLOBAL PROPERTY HEADER_LIST)
-foreach(s IN LISTS HEADER)
-  file(RELATIVE_PATH rs "${CMAKE_CURRENT_SOURCE_DIR}" "${s}")
-  string(REGEX REPLACE "r$" "" o "${CMAKE_CURRENT_BINARY_DIR}/${rs}")
-  add_custom_command(
-    OUTPUT "${o}"
-    COMMAND ${CMAKE_COMMAND} -E copy "${s}" "${o}"
-    DEPENDS "${s}"
-#    COMMENT "Creating ${o}"
-    VERBATIM
-    )
-  list(APPEND MPI_HEADER "${o}")
-endforeach()
+include_directories(include)
      
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
