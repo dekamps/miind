@@ -39,16 +39,15 @@ bool RootHighThroughputHandler::_generateNodeGraphs = false;
 
 std::map<int, double> RootHighThroughputHandler::_mData;
 
-
 TFile* RootHighThroughputHandler::_pFile = 0;
 TVectorD* RootHighThroughputHandler::_pArray = 0;
 
 RootHighThroughputHandler::RootHighThroughputHandler(
-		const std::string& fileName, bool haveState,
-		bool generateGraphs) :
+		const std::string& fileName, bool haveState, bool generateGraphs) :
 		AbstractReportHandler(fileName) {
-	if(haveState){
-		throw(utilities::Exception("RootHighThroughputHandler cannot generate State graphs"));
+	if (haveState) {
+		throw(utilities::Exception(
+				"RootHighThroughputHandler cannot generate State graphs"));
 	}
 	this->_generateNodeGraphs = generateGraphs;
 }
@@ -104,22 +103,15 @@ void RootHighThroughputHandler::writeReport(const Report& report) {
 	if (!_isRecording) {
 		boost::mpi::communicator world;
 
-		_pTree = new TTree("NodeIds", "Node Ids");
-
-
-		TVectorD* nodeId = new TVectorD(report._nrNodes);
-		_pTree->Branch("GlobalNodeIds", "TVectorT<double>", &nodeId, report._nrNodes, 0);
-
+		// Store the global node ids in the array
+		/// @todo use the circular distribution for this step
+		TArrayI nodeIds(report._nrNodes);
 		for (Index i = 0; i < report._nrNodes; i++) {
-			(*nodeId)[i] = world.size() * i + world.rank();
-			std::cout<<"a"<<(*nodeId)[i]<<"\t"<<i<<std::endl;
+			nodeIds[i] = world.size() * i + world.rank();
 		}
-		_pTree->Fill();
-		_pTree->Write();
+		_pFile->WriteObject(&nodeIds, "GlobalNodeIds");
 
-		_pTree = 0;
-		delete nodeId;
-
+		//prepare the tree for the activations
 		_pTree = new TTree("Activations", "Times slices");
 		_pTree->Branch("slices", "TVectorT<double>", &_pArray, 32000, 0);
 		_pArray = new TVectorD(report._nrNodes + 1);
@@ -139,19 +131,17 @@ void RootHighThroughputHandler::writeReport(const Report& report) {
 			//They have to have the same size
 			assert(_mData.size() == report._nrNodes);
 
+			//store the data
 			Index i = 1;
 			for (auto& it : _mData) {
 				(*_pArray)[i] = it.second;
 				i++;
 			}
-
 			//clear the map
 			_mData.clear();
 			_pTree->Fill();
-
 		}
 	}
-
 }
 RootHighThroughputHandler::~RootHighThroughputHandler() {
 }
@@ -167,11 +157,6 @@ void RootHighThroughputHandler::generateNodeGraphs(const char* fileName) {
 	_pArray = 0;
 
 	_pFile = new TFile(file_name.c_str(), "UPDATE");
-
-	TGraph* p_graph = (TGraph*) _pFile->Get("rate_1");
-	if (p_graph) {
-		utilities::Exception("The Graph already exists");
-	}
 
 	Number number_of_nodes = -1;
 	Number number_of_slices = -1;
@@ -191,14 +176,10 @@ void RootHighThroughputHandler::generateNodeGraphs(const char* fileName) {
 void RootHighThroughputHandler::storeRateGraphs(
 		const std::vector<double>& vecTime, Number nrNodes, Number nrSlices) {
 
-	TTree* nodeTree = (TTree*) _pFile->Get("NodeIds");
-	if (!nodeTree)
-		throw utilities::Exception("No valid TTree for the nodeIds");
-	// FIXME why the hell are the elements wrong??????
-	TVectorD* nodeId = new TVectorD(nrNodes);
-	TBranch* nodeBranch = nodeTree->GetBranch("GlobalNodeIds");
-	nodeBranch->SetAddress(&nodeId); //address of pointer!
-	std::cout<<nodeId->GetNoElements()<<(*nodeId)[0]<<(*nodeId)[1]<<std::endl;
+	auto nodeIds = std::unique_ptr<TArrayI>((TArrayI*)_pFile->Get("GlobalNodeIds"));
+	if (!nodeIds) {
+		throw utilities::Exception("No nodeIds found in the root file");
+	}
 
 	TBranch* p_branch = _pTree->GetBranch("slices");
 	p_branch->SetAddress(&_pArray); //address of pointer!
@@ -218,9 +199,7 @@ void RootHighThroughputHandler::storeRateGraphs(
 		TGraph* p_graph = new TGraph(vec_rate.size(), &(vecTime[0]),
 				&(vec_rate[0]));
 		std::ostringstream stgr;
-		///@TODO get the global node id for the node why are they wrong????
-		std::cout<<"b"<<(*nodeId)[node]<<"\t"<<node<<std::endl;
-		stgr << "rate_" << int((*nodeId)[node]);
+		stgr << "rate_" << (*nodeIds)[node];
 
 		p_graph->SetName(stgr.str().c_str());
 		p_graph->Write();
@@ -229,8 +208,7 @@ void RootHighThroughputHandler::storeRateGraphs(
 }
 
 void RootHighThroughputHandler::collectGraphInformation(
-		std::vector<double>& pVecTime, Number& pNrNodes,
-		Number& pNrSlices) {
+		std::vector<double>& vecTime, Number& nrNodes, Number& nrSlices) {
 	if (_pTree)
 		throw utilities::Exception("There is a TTree that shouldn't be there");
 
@@ -238,17 +216,17 @@ void RootHighThroughputHandler::collectGraphInformation(
 	if (!_pTree)
 		throw utilities::Exception("No valid TTree");
 
-	pNrSlices = static_cast<Number>(_pTree->GetEntries());
+	nrSlices = static_cast<Number>(_pTree->GetEntries());
 
 	TBranch* p_branch = _pTree->GetBranch("slices");
 	p_branch->SetAddress(&_pArray); //address of pointer!
 
-	for (Index i = 0; i < pNrSlices; i++) {
+	for (Index i = 0; i < nrSlices; i++) {
 		p_branch->GetEvent(i);
-		pVecTime.push_back((*_pArray)[0]);
+		vecTime.push_back((*_pArray)[0]);
 	}
 	//ignore the time in the first entry
-	pNrNodes = _pArray->GetNoElements() - 1;
+	nrNodes = _pArray->GetNoElements() - 1;
 }
 
 } // end namespace of handler
