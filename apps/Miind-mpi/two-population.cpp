@@ -9,6 +9,10 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/algorithm/RateFunctor.hpp>
+#include <MPILib/include/algorithm/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/algorithm/PopulistParameter.hpp>
+#include <MPILib/include/algorithm/InitialDensityParameter.hpp>
+#include <MPILib/include/BasicTypes.hpp>
 
 namespace mpi = boost::mpi;
 using namespace MPILib;
@@ -33,11 +37,84 @@ const Time TWOPOPULATION_TIME_REPORT = 1e-3; // 10 ms
 const Time TWOPOPULATION_TIME_UPDATE = 1e-2; // 100 ms
 const Time TWOPOPULATION_TIME_NETWORK = 1e-6; // 0.1 ms
 
-const PopulistParameter
+
+const algorithm::OrnsteinUhlenbeckParameter
+	TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER
+	(
+		20e-3, // V_threshold: 20 mV
+		0,     // V_reset: 0 mV
+		0,     // V_reversal
+		2e-3,  // tau refractive
+		10e-3  // tau membrane; 10 ms
+	);
+
+const algorithm::OrnsteinUhlenbeckParameter
+	TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER
+	(
+		20e-3,  // V_threshold; 20 mV
+		0,      // V_reset: 0 mV
+		0,      // V_reversal
+		2e-3,   // tau refractive
+		3e-3    // tau membrane 3 ms
+	);
+
+const algorithm::InitialDensityParameter
+	TWOPOP_INITIAL_DENSITY
+	(
+		0.0,
+		0.0
+	);
+
+const Number TWOPOP_NUMBER_OF_INITIAL_BINS		= 550;
+const Number TWOPOP_NUMBER_OF_BINS_TO_ADD		= 1;
+const Number TWOPOP_MAXIMUM_NUMBER_OF_ITERATIONS	= 1000000;
+
+const double TWOPOP_EXPANSION_FACTOR = 1.1;
+
+const double SIGMA  = 2.0e-3F;
+//! ResponseParameterBrunel
+//! parameter as in Amit & Brunel (1997)
+struct ResponseParameterBrunel {
+
+	double mu;
+	double sigma;
+	double theta;
+	double V_reset;
+	double V_reversal;
+	double tau_refractive;
+	double tau;
+};
+
+const ResponseParameterBrunel
+	RESPONSE_CURVE_PARAMETER =
+	{
+		0,		// mu
+		SIGMA,	// sigma
+		20e-3F,	// theta
+		10e-3F,	// V_reset
+		0,		// V_reversal
+		0.004F,	// tau ref
+		0.020F	// tau exc
+	};
+
+const Potential TWOPOP_V_MIN  = -1.0*RESPONSE_CURVE_PARAMETER.theta;
+
+const algorithm::PopulistSpecificParameter
+	TWOPOP_SPECIFIC
+	(
+		TWOPOP_V_MIN,
+		TWOPOP_NUMBER_OF_INITIAL_BINS,
+		TWOPOP_NUMBER_OF_BINS_TO_ADD,
+		TWOPOP_INITIAL_DENSITY,
+		TWOPOP_EXPANSION_FACTOR,
+		"NumericalZeroLeakEquations"
+	);
+
+const algorithm::PopulistParameter
 TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP(
 		TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER, TWOPOP_SPECIFIC);
 
-const PopulistParameter
+const algorithm::PopulistParameter
 TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP(
 		TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER, TWOPOP_SPECIFIC);
 

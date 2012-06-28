@@ -33,8 +33,9 @@ set ( LIBLIST
 add_executable( miind-mpi
     miind-mpi.cpp )
 
-
-
 target_link_libraries( miind-mpi ${LIBLIST} )
 
+add_executable( two-population
+    two-population.cpp )
 
+target_link_libraries( two-population ${LIBLIST} )
