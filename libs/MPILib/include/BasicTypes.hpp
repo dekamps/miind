@@ -28,6 +28,8 @@ typedef unsigned int Index;
 // RootRortHandler will start with initial display of the first TIME_ROOT_INITIAL_DISPLAY_SECONDS , by default
 const Time TIME_ROOT_INITIAL_DISPLAY = 0.05;
 
+const double EPSILON_INTEGRALRATE = 1e-4;
+
 
 //! Rate Algorithm nodes have a single state
 const int RATE_STATE_DIMENSION = 1;
