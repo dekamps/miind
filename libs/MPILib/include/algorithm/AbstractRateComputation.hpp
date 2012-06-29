@@ -17,60 +17,77 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_ALGORITHMS_ABSTRACTREBINNER_HPP_
-#define MPILIB_ALGORITHMS_ABSTRACTREBINNER_HPP_
+#ifndef MPILIB_ALGORITHMS_ABSTRACTRATECOMPUTATION_HPP_
+#define MPILIB_ALGORITHMS_ABSTRACTRATECOMPUTATION_HPP_
 
 #include <valarray>
-#include <MPILib/include/algorithm/AbstractZeroLeakEquations.hpp>
+
+#include <MPILib/include/algorithm/InputParameterSet.hpp>
+#include <MPILib/include/algorithm/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
-
-
+using std::valarray;
 
 namespace MPILib {
 namespace algorithm {
 
+	//! AbstractRateComputation
+	//! There are several methods to calculate a Population's firing rate from the population density
+	//! A virtual base class is provide, so that the methods can be exchanged in run time and the different
+	//! methods can be compared within a single simulation
 
-	//! AbstractRebinner: Abstract base class for rebinning algorithms.
-	//! 
-	//! Rebinning algorithms serve to represent the density grid in the original grid, which is smaller
-	//! than the current grid, because grids are expanding over time. Various ways of rebinning are conceivable
-	//! and it may be necessary to compare different rebinning algorithms in the same program. The main simulation
-	//! step in PopulationGridController only needs to know that there is a rebinning algorithm.
-	class AbstractRebinner
-	{
+	class AbstractRateComputation {
 	public:
 
-		//!
-		virtual ~AbstractRebinner() = 0;
+		//! constructor
+		AbstractRateComputation();
 
-		//! Configure 
-		//! Here the a reference to the bin contenets, as well as parameters necessary for the rebinning are set
-		virtual bool Configure
-			(	
-				std::valarray<double>&,
-				Index,               //!< reversal bin,
-				Index,               //!< reset bin
-				Number,              //!< number of  bins before rebinning
-				Number               //!< number of  bins after rebinning
-			) = 0;
+		virtual void Configure
+		(
+			// not const since a pointer to an element is needed, it should have been const otherwise:
+			valarray<Density>&,			// state array
+			const InputParameterSet&,	// current input to population
+			const PopulationParameter&,	// neuron parameters
+			Index						// index reversal bin
+		);
 
-		//! every rebinner can do a rebin after it has been configured
-		//! some rebinners need to take refractive probability into account
-		virtual bool Rebin(AbstractZeroLeakEquations*) = 0;
+		virtual ~AbstractRateComputation() = 0;
 
-		virtual AbstractRebinner* Clone() const = 0;
+		virtual AbstractRateComputation* Clone() const = 0;
 
-		//! every rebinner has a name
-		virtual std::string Name() const = 0;
+		virtual Rate CalculateRate
+		(
+			Number    // number current bins
+		) = 0;
 
 	protected:
 
-		void ScaleRefractive(double, AbstractZeroLeakEquations*);
-	};
+		bool DefineRateArea
+		(
+			Potential
+		);
 
+		Potential BinToCurrentPotential(Index);
+
+		Index						_index_reversal;
+		valarray<Density>*			_p_array_state;
+		const InputParameterSet*	_p_input_set;
+		PopulationParameter			_par_population;
+		valarray<Potential>			_array_interpretation;         
+
+		Number		_n_bins;
+		Number		_number_integration_area;      
+		Index		_start_integration_area;       //
+
+		Potential	_delta_v_rel;
+		Potential	_delta_v_abs;
+
+
+	private:
+
+
+	};
 
 }
 } // end of namespace
-
-#endif // include guard MPILIB_ALGORITHMS_ABSTRACTREBINNER_HPP_
+#endif // end of include guard MPILIB_ALGORITHMS_ABSTRACTRATECOMPUTATION_HPP_
