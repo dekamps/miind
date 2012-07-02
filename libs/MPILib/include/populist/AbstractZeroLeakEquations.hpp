@@ -21,10 +21,10 @@
 #ifndef MPILIB_POPULIST_ABSTRACTZEROLEAKEQUATIONS_HPP_
 #define MPILIB_POPULIST_ABSTRACTZEROLEAKEQUATIONS_HPP_
 
-#include "AbstractNonCirculantSolver.h"
-#include "OrnsteinUhlenbeckConnection.h"
 #include "SpecialBins.h"
 
+#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
+#include <MPILib/include/populist/AbstractNonCirculantSolver.hpp>
 #include <MPILib/include/populist/AbstractCirculantSolver.hpp>
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>

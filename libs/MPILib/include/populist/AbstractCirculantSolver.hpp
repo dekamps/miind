@@ -23,6 +23,7 @@
 #include <valarray>
 #include <MPILib/include/populist/LIFConvertor.hpp>
 #include <MPILib/include/BasicTypes.hpp>
+#include <assert.h>
 
 
 

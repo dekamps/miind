@@ -7,6 +7,7 @@ set(MPI_SRCS
     src/algorithm/RateAlgorithm.cpp
     src/algorithm/WilsonCowanAlgorithm.cpp
     src/populist/AbstractCirculantSolver.cpp
+    src/populist/AbstractNonCirculantSolver.cpp
     src/populist/AbstractRateComputation.cpp
     src/populist/AbstractRebinner.cpp
     src/populist/LIFConvertor.cpp

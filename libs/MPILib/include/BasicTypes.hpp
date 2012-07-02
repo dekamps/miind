@@ -62,7 +62,8 @@ const int WILSON_COWAN_STATE_DIMENSION = 1;
 
 //my own
 typedef int NodeId;
-
+//! default maximum term size for AbstractNonCirculantSolver
+const double EPS_J_CIRC_MAX = 1e-10;
 
 const int MAXIMUM_NUMBER_CIRCULANT_BINS     = 100000;
 const int MAXIMUM_NUMBER_NON_CIRCULANT_BINS = 100000;
