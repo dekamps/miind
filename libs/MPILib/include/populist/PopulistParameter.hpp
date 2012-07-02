@@ -1,4 +1,4 @@
-// Copyright (c) 2005 - 2009 Marc de Kamps
+// Copyright (c) 2005 - 2011 Marc de Kamps
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,15 +17,41 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#include <MPILib/include/algorithm/AbstractRebinner.hpp>
+#ifndef MPILIB_POPULIST_POPULISTPARAMETER_HPP_
+#define MPILIB_POPULIST_POPULISTPARAMETER_HPP_
 
-using namespace MPILib::algorithm;
+#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/PopulistSpecificParameter.hpp>
 
-AbstractRebinner::~AbstractRebinner()
-{
-}
-void AbstractRebinner::ScaleRefractive(double scale, AbstractZeroLeakEquations* p_zl)
-{
-	if (p_zl)
-		p_zl->ScaleRefractiveProbability(scale);
-}
+
+
+namespace MPILib {
+namespace populist {
+
+	//! Auxiliary class that brings together the neuronal parameters and the specific 
+	//! algorithmic parameters of the PopulistLib. 
+	//!
+
+	struct PopulistParameter {
+
+		PopulationParameter			_par_pop;	//!< neuronal parameters
+		PopulistSpecificParameter	_par_spec;	//!< grid, and algorithm parameters
+
+		//! default constructor
+		PopulistParameter(){}
+
+		//! standard constructor
+		PopulistParameter
+		(
+			const PopulationParameter& par_pop,
+			const PopulistSpecificParameter& par_spec
+		):
+		_par_pop(par_pop),
+		_par_spec(par_spec)
+		{
+		}
+	};
+} /* namespace populist */
+} /* namespace MPILib */
+
+#endif // include guard MPILIB_POPULIST_POPULISTPARAMETER_HPP_

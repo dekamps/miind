@@ -17,18 +17,18 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_ALGORITHMS_POPULISTSPECIFICPARAMETER_HPP_
-#define MPILIB_ALGORITHMS_POPULISTSPECIFICPARAMETER_HPP_
+#ifndef MPILIB_POPULIST_POPULISTSPECIFICPARAMETER_HPP_
+#define MPILIB_POPULIST_POPULISTSPECIFICPARAMETER_HPP_
 
-#include <MPILib/include/algorithm/AbstractRebinner.hpp>
+#include <MPILib/include/populist/AbstractRebinner.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
 
-#include <MPILib/include/algorithm/AbstractRateComputation.hpp>
-#include <MPILib/include/algorithm/InitialDensityParameter.hpp>
+#include <MPILib/include/populist/AbstractRateComputation.hpp>
+#include <MPILib/include/populist/InitialDensityParameter.hpp>
 
 namespace MPILib {
-namespace algorithm {
+namespace populist {
 
 	//! These are parameters necessary for the configuration of a PopulistAlgorithm and OneDMAlgorithm
 
@@ -122,7 +122,7 @@ namespace algorithm {
 		boost::shared_ptr<AbstractRateComputation>	_p_rate;
 	};
 
-} /* namespace algorithm */
+} /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_ALGORITHMS_POPULISTSPECIFICPARAMETER_HPP_
+#endif // include guard MPILIB_POPULIST_POPULISTSPECIFICPARAMETER_HPP_

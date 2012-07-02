@@ -17,41 +17,32 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_ALGORITHMS_ORNSTEINUHLENBECKPARAMETER_HPP_
-#define MPILIB_ALGORITHMS_ORNSTEINUHLENBECKPARAMETER_HPP_
+#ifndef MPILIB_POPULIST_INITIALDENSITYPARAMETER_HPP_
+#define MPILIB_POPULIST_INITIALDENSITYPARAMETER_HPP_
 
 #include <MPILib/include/BasicTypes.hpp>
 
 namespace MPILib {
-namespace algorithm {
+namespace populist {
+//! Parameter to specify a Gaussian density distribution in an AlgorithmGrid
 
-//! Parameters necessary for the configuration of an OUAlgorithm
-//!
-//! These are the parameters that define a leaky-integrate-and-fire neuron.
-
-struct OrnsteinUhlenbeckParameter {
-
-	Potential _theta = 0.0; //!< threshold potential in V
-	Potential _V_reset = 0.0; //!< reset potential in V
-	Potential _V_reversal = 0.0; //!< reversal potential in V
-	Time _tau_refractive = 0.0; //!< (absolute) refractive time in s
-	Time _tau = 0.0; //!< membrane time constant in s
-
+//! mu specifies the peak of the density, sigma specifies the width.
+//! If sigma = 0, all density is concentrated in a single bin.
+struct InitialDensityParameter {
 	//! default constructor
-	OrnsteinUhlenbeckParameter(){
+	InitialDensityParameter(){
 	}
 
-	//! standard constructor
-	OrnsteinUhlenbeckParameter(Potential theta, Potential V_reset,
-			Potential V_reversal, Time tau_refractive, Time tau) :
-			_theta(theta), _V_reset(V_reset), _V_reversal(V_reversal), _tau_refractive(
-					tau_refractive), _tau(tau) {
+	//! constructor
+	InitialDensityParameter(Potential mu, Potential sigma) :
+			_mu(mu), _sigma(sigma) {
 	}
+
+	Potential _mu = 0;
+	Potential _sigma = 0;
 };
 
-typedef OrnsteinUhlenbeckParameter PopulationParameter;
-
-} /* namespace algorithm */
+} /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_ALGORITHMS_ORNSTEINUHLENBECKPARAMETER_HPP_
+#endif // include guard MPILIB_POPULIST_INITIALDENSITYPARAMETER_HPP_

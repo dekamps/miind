@@ -17,60 +17,41 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_ALGORITHMS_ABSTRACTREBINNER_HPP_
-#define MPILIB_ALGORITHMS_ABSTRACTREBINNER_HPP_
+#ifndef MPILIB_POPULIST_ORNSTEINUHLENBECKPARAMETER_HPP_
+#define MPILIB_POPULIST_ORNSTEINUHLENBECKPARAMETER_HPP_
 
-#include <valarray>
-#include <MPILib/include/algorithm/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
-
-
-
 namespace MPILib {
-namespace algorithm {
+namespace populist {
 
+//! Parameters necessary for the configuration of an OUAlgorithm
+//!
+//! These are the parameters that define a leaky-integrate-and-fire neuron.
 
-	//! AbstractRebinner: Abstract base class for rebinning algorithms.
-	//! 
-	//! Rebinning algorithms serve to represent the density grid in the original grid, which is smaller
-	//! than the current grid, because grids are expanding over time. Various ways of rebinning are conceivable
-	//! and it may be necessary to compare different rebinning algorithms in the same program. The main simulation
-	//! step in PopulationGridController only needs to know that there is a rebinning algorithm.
-	class AbstractRebinner
-	{
-	public:
+struct OrnsteinUhlenbeckParameter {
 
-		//!
-		virtual ~AbstractRebinner() = 0;
+	Potential _theta = 0.0; //!< threshold potential in V
+	Potential _V_reset = 0.0; //!< reset potential in V
+	Potential _V_reversal = 0.0; //!< reversal potential in V
+	Time _tau_refractive = 0.0; //!< (absolute) refractive time in s
+	Time _tau = 0.0; //!< membrane time constant in s
 
-		//! Configure 
-		//! Here the a reference to the bin contenets, as well as parameters necessary for the rebinning are set
-		virtual bool Configure
-			(	
-				std::valarray<double>&,
-				Index,               //!< reversal bin,
-				Index,               //!< reset bin
-				Number,              //!< number of  bins before rebinning
-				Number               //!< number of  bins after rebinning
-			) = 0;
+	//! default constructor
+	OrnsteinUhlenbeckParameter(){
+	}
 
-		//! every rebinner can do a rebin after it has been configured
-		//! some rebinners need to take refractive probability into account
-		virtual bool Rebin(AbstractZeroLeakEquations*) = 0;
+	//! standard constructor
+	OrnsteinUhlenbeckParameter(Potential theta, Potential V_reset,
+			Potential V_reversal, Time tau_refractive, Time tau) :
+			_theta(theta), _V_reset(V_reset), _V_reversal(V_reversal), _tau_refractive(
+					tau_refractive), _tau(tau) {
+	}
+};
 
-		virtual AbstractRebinner* Clone() const = 0;
+typedef OrnsteinUhlenbeckParameter PopulationParameter;
 
-		//! every rebinner has a name
-		virtual std::string Name() const = 0;
+} /* namespace populist */
+} /* namespace MPILib */
 
-	protected:
-
-		void ScaleRefractive(double, AbstractZeroLeakEquations*);
-	};
-
-
-}
-} // end of namespace
-
-#endif // include guard MPILIB_ALGORITHMS_ABSTRACTREBINNER_HPP_
+#endif // include guard MPILIB_POPULIST_ORNSTEINUHLENBECKPARAMETER_HPP_

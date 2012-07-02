@@ -18,49 +18,65 @@
 //      If you use this software in work leading to a scientific publication, you should cite
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
-#ifndef MPILIB_ALGORITHMS_RATEFUNCTOR_CODE_HPP_
-#define MPILIB_ALGORITHMS_RATEFUNCTOR_CODE_HPP_
+#ifndef MPILIB_POPULIST_RATEFUNCTOR_HPP_
+#define MPILIB_POPULIST_RATEFUNCTOR_HPP_
 
-#include <MPILib/include/algorithm/RateFunctor.hpp>
+#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 
 namespace MPILib {
-namespace algorithm {
+namespace populist {
 
-template<class WeightValue>
-RateFunctor<WeightValue>::RateFunctor(RateFunction function) :
-		AlgorithmInterface<WeightValue>(0), _function(function), _current_time(
-				0) {
+typedef Rate (*RateFunction)(Time);
+
+inline Rate Nul(Time) {
+	return 0;
 }
 
+//! An Algorithm that encapsulates a rate as a function of time
+//!
+//! It is sometime necessary to provide a network with external inputs. These inputs are created as
+//! DynamicNode themselves. Their state is trivial and their output firing rate, given by the
+//! CurrentRate method follows a given function of time.
 template<class WeightValue>
-void RateFunctor<WeightValue>::configure(
-		const SimulationRunParameter& parameter_run) {
-}
+class RateFunctor: public AlgorithmInterface<WeightValue> {
+public:
 
-template<class WeightValue>
-void RateFunctor<WeightValue>::evolveNodeState(
-		const std::vector<Rate>& nodeVector,
-		const std::vector<WeightValue>& weightVector, Time time) {
+	//! Constructor must be initialized with pointer a rate function of time.
+	RateFunctor(RateFunction);
 
-	_current_time = time;
-}
+	//! mandatory virtual destructor
+	virtual ~RateFunctor() {
+	}
 
-template<class WeightValue>
-AlgorithmGrid RateFunctor<WeightValue>::getGrid() const {
-	vector<double> vector_grid(1, _function(_current_time));
-	return AlgorithmGrid(vector_grid);
-}
+	//! Essentially just calling the encapsulated rate function. The connection iterators are
+	//! ignored and essentially just the current simulation time is set.
+	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
+			const std::vector<WeightValue>& weightVector, Time time);
 
-template<class WeightValue>
-RateFunctor<WeightValue>* RateFunctor<WeightValue>::clone() const {
-	return new RateFunctor<WeightValue>(*this);
-}
+	//! Gives the current rate according to the original rate function
+	virtual Rate getCurrentRate() const {
+		return _function(_current_time);
+	}
 
-template<class WeightValue>
-Time RateFunctor<WeightValue>::getCurrentTime() const {
-	return _current_time;
-}
-} /* namespace algorithm */
+	//! Mandatory Grid  function, not of practical use.
+	virtual AlgorithmGrid getGrid() const;
+
+	virtual RateFunctor* Clone() const;
+
+	virtual void configure(const SimulationRunParameter&);
+
+	//! Gives the current time that the Algorithm keeps.
+	virtual Time getCurrentTime() const;
+
+private:
+
+	RateFunction _function;
+	Time _current_time;
+
+};
+// end of rateFunctor
+
+} /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_ALGORITHMS_RATEFUNCTOR_CODE_HPP_
+#endif // include guard MPILIB_POPULIST_RATEFUNCTOR_HPP_

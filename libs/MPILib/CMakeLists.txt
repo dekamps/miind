@@ -6,6 +6,8 @@ set(MPI_SRCS
     src/algorithm/AlgorithmGrid.cpp
     src/algorithm/RateAlgorithm.cpp
     src/algorithm/WilsonCowanAlgorithm.cpp
+    src/populist/AbstractRateComputation.cpp
+    src/populist/AbstractRebinner.cpp
     src/report/handler/AbstractReportHandler.cpp
     src/report/handler/GraphKey.cpp
     src/report/handler/InactiveReportHandler.cpp

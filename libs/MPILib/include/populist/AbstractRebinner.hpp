@@ -17,32 +17,60 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_ALGORITHMS_INITIALDENSITYPARAMETER_HPP_
-#define MPILIB_ALGORITHMS_INITIALDENSITYPARAMETER_HPP_
+#ifndef MPILIB_POPULIST_ABSTRACTREBINNER_HPP_
+#define MPILIB_POPULIST_ABSTRACTREBINNER_HPP_
 
+#include <valarray>
+#include <MPILib/include/populist/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
+
+
+
 namespace MPILib {
-namespace algorithm {
-//! Parameter to specify a Gaussian density distribution in an AlgorithmGrid
+namespace populist {
 
-//! mu specifies the peak of the density, sigma specifies the width.
-//! If sigma = 0, all density is concentrated in a single bin.
-struct InitialDensityParameter {
-	//! default constructor
-	InitialDensityParameter(){
-	}
 
-	//! constructor
-	InitialDensityParameter(Potential mu, Potential sigma) :
-			_mu(mu), _sigma(sigma) {
-	}
+	//! AbstractRebinner: Abstract base class for rebinning algorithms.
+	//! 
+	//! Rebinning algorithms serve to represent the density grid in the original grid, which is smaller
+	//! than the current grid, because grids are expanding over time. Various ways of rebinning are conceivable
+	//! and it may be necessary to compare different rebinning algorithms in the same program. The main simulation
+	//! step in PopulationGridController only needs to know that there is a rebinning algorithm.
+	class AbstractRebinner
+	{
+	public:
 
-	Potential _mu = 0;
-	Potential _sigma = 0;
-};
+		//!
+		virtual ~AbstractRebinner() = 0;
 
-} /* namespace algorithm */
+		//! Configure 
+		//! Here the a reference to the bin contenets, as well as parameters necessary for the rebinning are set
+		virtual bool Configure
+			(	
+				std::valarray<double>&,
+				Index,               //!< reversal bin,
+				Index,               //!< reset bin
+				Number,              //!< number of  bins before rebinning
+				Number               //!< number of  bins after rebinning
+			) = 0;
+
+		//! every rebinner can do a rebin after it has been configured
+		//! some rebinners need to take refractive probability into account
+		virtual bool Rebin(AbstractZeroLeakEquations*) = 0;
+
+		virtual AbstractRebinner* Clone() const = 0;
+
+		//! every rebinner has a name
+		virtual std::string Name() const = 0;
+
+	protected:
+
+		void ScaleRefractive(double, AbstractZeroLeakEquations*);
+	};
+
+
+} /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_ALGORITHMS_INITIALDENSITYPARAMETER_HPP_
+#endif // include guard MPILIB_POPULIST_ABSTRACTREBINNER_HPP_

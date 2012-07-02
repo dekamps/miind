@@ -17,19 +17,19 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_ALGORITHMS_ABSTRACTRATECOMPUTATION_HPP_
-#define MPILIB_ALGORITHMS_ABSTRACTRATECOMPUTATION_HPP_
+#ifndef MPILIB_POPULIST_ABSTRACTRATECOMPUTATION_HPP_
+#define MPILIB_POPULIST_ABSTRACTRATECOMPUTATION_HPP_
 
 #include <valarray>
 
-#include <MPILib/include/algorithm/InputParameterSet.hpp>
-#include <MPILib/include/algorithm/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/InputParameterSet.hpp>
+#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
 using std::valarray;
 
 namespace MPILib {
-namespace algorithm {
+namespace populist {
 
 	//! AbstractRateComputation
 	//! There are several methods to calculate a Population's firing rate from the population density
@@ -88,6 +88,6 @@ namespace algorithm {
 
 	};
 
-}
-} // end of namespace
-#endif // end of include guard MPILIB_ALGORITHMS_ABSTRACTRATECOMPUTATION_HPP_
+} /* namespace populist */
+} /* namespace MPILib */
+#endif // end of include guard MPILIB_POPULIST_ABSTRACTRATECOMPUTATION_HPP_

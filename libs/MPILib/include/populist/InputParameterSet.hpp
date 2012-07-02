@@ -17,15 +17,15 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_ALGORITHMS_INPUTPARAMETERSET_HPP_
-#define MPILIB_ALGORITHMS_INPUTPARAMETERSET_HPP_
+#ifndef MPILIB_POPULIST_INPUTPARAMETERSET_HPP_
+#define MPILIB_POPULIST_INPUTPARAMETERSET_HPP_
 
 
-#include <MPILib/include/algorithm/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
 namespace MPILib {
-namespace algorithm {
+namespace populist {
 
 //! This class stores input rate and efficicacies in terms of the number of circulant bins and the number of non-circulant
 //! areas.
@@ -45,7 +45,7 @@ public:
 	Number _n_noncirc_inh; //! Number of non circulant areas for inhibitory input
 };
 
-}
-}
+} /* namespace populist */
+} /* namespace MPILib */
 
-#endif // include guard
+#endif // include guard MPILIB_POPULIST_INPUTPARAMETERSET_HPP_

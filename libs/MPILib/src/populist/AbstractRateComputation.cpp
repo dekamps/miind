@@ -17,10 +17,11 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#include <MPILib/include/algorithm/AbstractRateComputation.hpp>
+#include <MPILib/include/populist/AbstractRateComputation.hpp>
+#include <assert.h>
 
 namespace MPILib{
-namespace algorithm{
+namespace populist{
 
 
 
@@ -87,5 +88,5 @@ Potential AbstractRateComputation::BinToCurrentPotential(Index index)
 	return (static_cast<int>(index) - static_cast<int>(_index_reversal))*_delta_v_rel;
 }
 
-}
-}
+} /* namespace populist */
+} /* namespace MPILib */

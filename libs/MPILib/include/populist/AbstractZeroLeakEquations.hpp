@@ -18,8 +18,8 @@
 
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_ALGORITHMS_ABSTRACTZEROLEAKEQUATIONS_HPP_
-#define MPILIB_ALGORITHMS_ABSTRACTZEROLEAKEQUATIONS_HPP_
+#ifndef MPILIB_POPULIST_ABSTRACTZEROLEAKEQUATIONS_HPP_
+#define MPILIB_POPULIST_ABSTRACTZEROLEAKEQUATIONS_HPP_
 
 #include "AbstractCirculantSolver.h"
 #include "AbstractNonCirculantSolver.h"
@@ -27,11 +27,11 @@
 #include "SpecialBins.h"
 
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
-#include <MPILib/include/algorithm/OrnsteinUhlenbeckParameter.hpp>
-#include <MPILib/include/algorithm/InputParameterSet.hpp>
+#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/InputParameterSet.hpp>
 
 namespace MPILib {
-namespace algorithm {
+namespace populist {
 
 
 	//! A solver for the zero leak master equations in the PopulationAlgorithm.
@@ -123,7 +123,7 @@ namespace algorithm {
 		const InputParameterSet*			_p_set;
 	};
 
-}
-} // end of namespace
+} /* namespace populist */
+} /* namespace MPILib */
 
-#endif // include guard MPILIB_ALGORITHMS_ABSTRACTZEROLEAKEQUATIONS_HPP_
+#endif // include guard MPILIB_POPULIST_ABSTRACTZEROLEAKEQUATIONS_HPP_
