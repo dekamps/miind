@@ -22,6 +22,7 @@
 
 #include <valarray>
 #include <MPILib/include/populist/LIFConvertor.hpp>
+#include <MPILib/include/BasicTypes.hpp>
 
 
 
@@ -76,7 +77,7 @@ namespace populist {
 		//! defined, or the result will be undefined. See the doucmentation of LIFConvertor and InputParameterSet for information.
 		virtual bool Configure
 		(
-			valarray<double>*,
+			std::valarray<double>*,
 			const InputParameterSet&
 		);
 
@@ -133,9 +134,9 @@ namespace populist {
 		//! The fill algorithms store the probability density integrated per non circulant areas in array_rho. The index runs
 		//! from the threshold backwards, i.e. the non circulant area bordering the threshold is area 0, conform Equation 20 in (de Kamps, 2006)
 
-		valarray<double>			_array_rho;			// integrated density in the non-circulant areas (f^0)
-		valarray<double>			_array_circulant;	// storage array for the calculated circulant solution
-		valarray<double>*			_p_array_state;		// pointer to the probability density array
+		std::valarray<double>			_array_rho;			// integrated density in the non-circulant areas (f^0)
+		std::valarray<double>			_array_circulant;	// storage array for the calculated circulant solution
+		std::valarray<double>*			_p_array_state;		// pointer to the probability density array
 
 		const InputParameterSet*	_p_set;      // instantaneous value of the input parameters
 		double						_initial_integral;
@@ -174,7 +175,7 @@ namespace populist {
 
 	inline void AbstractCirculantSolver::AddCirculantInteger(Index i_reversal)
 	{
-		valarray<double>& array_state = *_p_array_state;
+		std::valarray<double>& array_state = *_p_array_state;
 		Index i = i_reversal;
 		int n_circ = static_cast<int>(_p_set->_n_circ_exc);
 		for (int j = 0; j < n_circ; j++ ){
@@ -185,7 +186,7 @@ namespace populist {
 
 	inline void AbstractCirculantSolver::AddCirculantFP(Index i_reversal)
 	{
-		valarray<double>& array_state = *_p_array_state;
+		std::valarray<double>& array_state = *_p_array_state;
 		int n_circ = static_cast<int>(_p_set->_n_circ_exc);
 		for (int j = 0; j < n_circ-1; j++){
 			double h = (_p_set->_H_exc + _p_set->_alpha_exc)*j;

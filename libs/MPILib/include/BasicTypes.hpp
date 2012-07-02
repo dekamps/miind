@@ -36,7 +36,7 @@ namespace MPILib {
 
 //from basicdefinitions
 const int HAVE_ROOT = 1;
-
+typedef double Probability;
 typedef double Rate;
 typedef Rate ActivityType;
 typedef double Time;
@@ -63,6 +63,9 @@ const int WILSON_COWAN_STATE_DIMENSION = 1;
 //my own
 typedef int NodeId;
 
+
+const int MAXIMUM_NUMBER_CIRCULANT_BINS     = 100000;
+const int MAXIMUM_NUMBER_NON_CIRCULANT_BINS = 100000;
 
 //! The parameter vector for Wilson Cowan integration has four elements
 const int WILSON_COWAN_PARAMETER_DIMENSION = 4;

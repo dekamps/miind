@@ -30,7 +30,6 @@ namespace algorithm {
 //! AlgorithmGrid
 class AlgorithmGrid {
 public:
-
 	/**
 	 * Create the state for a AlgorithmGrid with a maximum number of elements
 	 */

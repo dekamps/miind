@@ -40,7 +40,7 @@ _mode				(mode)
 
 bool AbstractCirculantSolver::Configure
 (
-	valarray<Potential>*		p_array_state,
+	std::valarray<Potential>*		p_array_state,
 	const InputParameterSet&	set
 )
 {
@@ -72,7 +72,7 @@ void AbstractCirculantSolver::FillLinear()
 #endif 
 	assert (n_noncirc_exc == _p_set->_n_noncirc_exc);
 
-	valarray<double> array_state = *_p_array_state;
+	std::valarray<double> array_state = *_p_array_state;
 
 
 	for 
@@ -99,7 +99,7 @@ void AbstractCirculantSolver::FillLinear()
 }
 
 void AbstractCirculantSolver::FillFP(){
-	valarray<double> array_state = *_p_array_state;
+	std::valarray<double> array_state = *_p_array_state;
 	double h = _p_set->_H_exc + _p_set->_alpha_exc;
 	Number n_bounds		= (floor(_n_bins/h) - _n_bins/h == 0) ? 
 						static_cast<Number>(floor(_n_bins/h) -1) : 

@@ -27,9 +27,9 @@
 
 #include <MPILib/include/populist/InputParameterSet.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/populist/MuSigma.hpp>
-#include "OrnsteinUhlenbeckConnection.h"
 
 
 namespace MPILib {
@@ -51,7 +51,8 @@ namespace populist {
 	class LIFConvertor {
 	public:
 
-		typedef AbstractAlgorithm<PopulationConnection>::predecessor_iterator predecessor_iterator;
+//		typedef AbstractAlgorithm<PopulationConnection>::predecessor_iterator predecessor_iterator;
+		typedef std::vector<PopulationConnection>::iterator predecessor_iterator;
 
 		typedef MuSigma ScalarProductParameterType;
 
@@ -80,7 +81,7 @@ namespace populist {
 		//! A signaller for when the PopulationGridController starts to configure
 		void Configure
 		(
-			valarray<Potential>&
+			std::valarray<Potential>&
 		);
 
 		//! This function collects the external input, and lays it out internally for use in AdaptParameters. This function must

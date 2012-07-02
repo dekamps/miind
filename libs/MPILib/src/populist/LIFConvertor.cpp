@@ -20,9 +20,9 @@
 #include <assert.h>
 #include <MPILib/include/populist/LIFConvertor.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
-#include "PopulistException.h"
+#include <MPILib/include/populist/MuSigmaScalarProduct.hpp>
+
 #include "SpecialBins.h"
-#include "MuSigmaScalarProduct.h"
 
 
 namespace MPILib {
