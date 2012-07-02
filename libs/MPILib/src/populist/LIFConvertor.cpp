@@ -21,8 +21,7 @@
 #include <MPILib/include/populist/LIFConvertor.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/MuSigmaScalarProduct.hpp>
-
-#include "SpecialBins.h"
+#include <MPILib/include/populist/SpecialBins.hpp>
 
 
 namespace MPILib {
@@ -126,7 +125,7 @@ void LIFConvertor::RecalculateSolverParameters
 
 void LIFConvertor::Configure
 (
-	valarray<Potential>& array_state
+	std::valarray<Potential>& array_state
 )
 {
 }

@@ -59,7 +59,10 @@ const int RATE_STATE_DIMENSION = 1;
 
 //! Wilson Cowan nodes have single double as state
 const int WILSON_COWAN_STATE_DIMENSION = 1;
-
+//! if a double input must mimmick a diffusion process, then a small efficacy must be chosen
+const double DIFFUSION_STEP = 0.03;
+//! if a stepsize is calculated to larger than DIFFUSION_LIMIT\f$ (\theta -V_{rev})\f$, a single input cannot mimmck a diffusion process any more
+const double DIFFUSION_LIMIT = 0.05;
 //my own
 typedef int NodeId;
 //! default maximum term size for AbstractNonCirculantSolver
