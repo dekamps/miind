@@ -31,119 +31,106 @@
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/populist/MuSigma.hpp>
 
-
 namespace MPILib {
 namespace populist {
 
-	class PopulistSpecificParameter;
-	struct SpecialBins;
-	
-	//! Converts external input from other populations in parameters that are suitable for
-	//! AbstractCirculantSolver and AbstractNonCirculantSolver objects.
+class PopulistSpecificParameter;
+struct SpecialBins;
 
-	//! PopulationAlgorithm receives the contribution from its input populations as a list of pointer weight pairs. Via the
-	//! pointers, the input nodes can be queried for their current activation, via the weights their contribution be, well, weighted.
-	//! The list also contains hints as to whether for some inputs they should be interpreted as Gaussian white noise, in which case
-	//! they can be combined into a single input contribution in a way explaned below. Internally, it maintains an instance of
-	//! InputSetParameter, which contains the parameters required for AbstractCirculantSolver and AbstractNonCirculantSolver to operate
-	//! on
+//! Converts external input from other populations in parameters that are suitable for
+//! AbstractCirculantSolver and AbstractNonCirculantSolver objects.
 
-	class LIFConvertor {
-	public:
+//! PopulationAlgorithm receives the contribution from its input populations as a list of pointer weight pairs. Via the
+//! pointers, the input nodes can be queried for their current activation, via the weights their contribution be, well, weighted.
+//! The list also contains hints as to whether for some inputs they should be interpreted as Gaussian white noise, in which case
+//! they can be combined into a single input contribution in a way explaned below. Internally, it maintains an instance of
+//! InputSetParameter, which contains the parameters required for AbstractCirculantSolver and AbstractNonCirculantSolver to operate
+//! on
+
+class LIFConvertor {
+public:
 
 //		typedef AbstractAlgorithm<PopulationConnection>::predecessor_iterator predecessor_iterator;
-		typedef std::vector<PopulationConnection>::iterator predecessor_iterator;
+//		typedef std::vector<PopulationConnection>::iterator predecessor_iterator;
 
-		typedef MuSigma ScalarProductParameterType;
+	typedef MuSigma ScalarProductParameterType;
 
-		//! Constructor registers where the output results must be written, which can happen at construction of PopulationGridController
-		LIFConvertor
-		(
-			VALUE_REF_INIT
-			SpecialBins&				bins,
-			PopulationParameter&		par_pop,
-			PopulistSpecificParameter&	par_spec,
-			Potential&					delta_v,
-			Number&						n_bins
+	//! Constructor registers where the output results must be written, which can happen at construction of PopulationGridController
+	LIFConvertor( VALUE_REF_INIT
+	SpecialBins& bins, PopulationParameter& par_pop,
+			PopulistSpecificParameter& par_spec, Potential& delta_v,
+			Number& n_bins
 
-		):
-		VALUE_MEMBER_INIT
-		_p_bins(&bins),
-		_p_par_pop(&par_pop),
-		_p_par_spec(&par_spec),
-		_p_delta_v(&delta_v),
-		_p_n_bins(&n_bins),
-		_b_toggle_sort(false),
-		_b_toggle_diffusion(false)
-		{
-		}
+			) :
+			VALUE_MEMBER_INIT
+			_p_bins(&bins), _p_par_pop(&par_pop), _p_par_spec(&par_spec), _p_delta_v(
+					&delta_v), _p_n_bins(&n_bins), _b_toggle_sort(false), _b_toggle_diffusion(
+					false) {
+	}
 
-		//! A signaller for when the PopulationGridController starts to configure
-		void Configure
-		(
-			std::valarray<Potential>&
-		);
+	//! A signaller for when the PopulationGridController starts to configure
+	void Configure(std::valarray<Potential>&);
 
-		//! This function collects the external input, and lays it out internally for use in AdaptParameters. This function must
-		//! be called when input charateristics change, for example at the start of an Evolve. It used to be part of AdaptParameters,
-		//! but has been moved out of there to help account for synchronous updating in networks. DynamicNetworkImplementation will now
-		//! first go through a loop calling nodes to update their input, and then a second loop to evolve their states.
-		void SortConnectionvector
-		(
-			predecessor_iterator,
-			predecessor_iterator
-		);
+	//! This function collects the external input, and lays it out internally for use in AdaptParameters. This function must
+	//! be called when input charateristics change, for example at the start of an Evolve. It used to be part of AdaptParameters,
+	//! but has been moved out of there to help account for synchronous updating in networks. DynamicNetworkImplementation will now
+	//! first go through a loop calling nodes to update their input, and then a second loop to evolve their states.
+	void SortConnectionvector(const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector);
 
+	//! This function interprets the  input contribution from other populations and converts them into input parameters for the
+	//! circulant and non circulant solvers. It must be run every time _delta_v changes.
+	void AdaptParameters();
 
-		//! This function interprets the  input contribution from other populations and converts them into input parameters for the
-		//! circulant and non circulant solvers. It must be run every time _delta_v changes.
-		void AdaptParameters();
+	//! This function assumes that the current input is known and stored in the input parameter set, but that the parameters
+	//! for the circulant and non-circulant solver is wrong. One case where this happens is after rebinning: the input firing rates
+	//! and efficacies have changed, but the solver parameters are invalid. This function recalculates them.
+	void RecalculateSolverParameters();
 
-		//! This function assumes that the current input is known and stored in the input parameter set, but that the parameters
-		//! for the circulant and non-circulant solver is wrong. One case where this happens is after rebinning: the input firing rates
-		//! and efficacies have changed, but the solver parameters are invalid. This function recalculates them.
-		void RecalculateSolverParameters
-		(
-		);
+	InputParameterSet& SolverParameter() {
+		return _input_set;
+	}
 
-		InputParameterSet& SolverParameter(){ return  _input_set; }
+	const InputParameterSet& SolverParameter() const {
+		return _input_set;
+	}
 
-		const InputParameterSet& SolverParameter() const { return _input_set; }
+	const PopulationParameter& ParPop() const {
+		return *_p_par_pop;
+	}
 
-		const PopulationParameter& ParPop() const { return *_p_par_pop; }
+	const Index& IndexReversalBin() const;
 
-		const Index& IndexReversalBin() const;
+	const Index& IndexCurrentResetBin() const;
 
-		const Index& IndexCurrentResetBin() const;
-
-		void UpdateRestInputParameters();
+	void UpdateRestInputParameters();
 
 #ifdef _INVESTIGATE_ALGORITHM
-		vector<ReportValue>& Values(){ return _vec_value; }
+	vector<ReportValue>& Values() {return _vec_value;}
 #endif
-	private:
+private:
 
-		bool IsSingleDiffusionProcess(Potential h) const;
+	bool IsSingleDiffusionProcess(Potential h) const;
 
-		void SetDiffusionParameters(const MuSigma&);
+	void SetDiffusionParameters(const MuSigma&);
 
-		VALUE_MEMBER_REF
+	VALUE_MEMBER_REF
 
-		Time*						_p_time;
-		SpecialBins*				_p_bins;
-		InputParameterSet			_input_set;
-		PopulationParameter*		_p_par_pop;
-		PopulistSpecificParameter*	_p_par_spec;
-		Rate**						_pp_rate;
-		Potential*					_p_delta_v;
-		Number*						_p_n_bins;
-		Index*						_p_index_reversal_bin;
-		bool						_b_toggle_sort;
-		bool						_b_toggle_diffusion;
-	
-		std::vector<predecessor_iterator>			_vec_burst;
-		std::vector<predecessor_iterator>			_vec_diffusion;
-	};
+	Time* _p_time;
+	SpecialBins* _p_bins;
+	InputParameterSet _input_set;
+	PopulationParameter* _p_par_pop;
+	PopulistSpecificParameter* _p_par_spec;
+	Rate** _pp_rate;
+	Potential* _p_delta_v;
+	Number* _p_n_bins;
+	Index* _p_index_reversal_bin;
+	bool _b_toggle_sort;
+	bool _b_toggle_diffusion;
+
+	std::vector<NodeId> _vec_burst;
+	std::vector<NodeId> _vec_diffusion;
+};
 
 } /* namespace populist */
 } /* namespace MPILib */

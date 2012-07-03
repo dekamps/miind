@@ -22,7 +22,6 @@
 
 #include <vector>
 #include <utility>
-//#include "../SparseImplementationLib/SparseImplementationLib.h"
 #include <MPILib/include/populist/MuSigma.hpp>
 
 using std::pair;
@@ -49,16 +48,16 @@ public:
 
 	//! Evaluate the inner product over connections which are indicated by the iterators
 	MuSigma Evaluate(const std::vector<Rate>& nodeVector,
-			const std::vector<double>& weightVector, Time //!< membrane time constant
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector, Time //!< membrane time constant
 			) const;
 
 private:
 
 	Potential InnerProduct(const std::vector<Rate>& nodeVector,
-			const std::vector<double>& weightVector) const;
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const;
 
 	Potential InnerSquaredProduct(const std::vector<Rate>& nodeVector,
-			const std::vector<double>& weightVector) const;
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const;
 
 };
 

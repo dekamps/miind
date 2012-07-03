@@ -20,22 +20,25 @@
 #include <MPILib/include/populist/MuSigmaScalarProduct.hpp>
 //#include "ConnectionSquaredProduct.h"
 
-using namespace PopulistLib;
+namespace MPILib {
+namespace populist {
 
 MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<Rate>& nodeVector,
-		const std::vector<double>& weightVector, Time tau) const {
+		const std::vector<PopulationConnection>& weightVector, Time tau) const {
 	MuSigma ret;
 
 	ret._mu = tau * this->InnerProduct(nodeVector, weightVector);
-	ret._sigma = sqrt(tau * this->InnerSquaredProduct(nodeVector, weightVector));
+	ret._sigma = sqrt(
+			tau * this->InnerSquaredProduct(nodeVector, weightVector));
 
 	return ret;
 }
 
-Potential MuSigmaScalarProduct::InnerProduct(const std::vector<Rate>& nodeVector,
-		const std::vector<double>& weightVector) const {
-	connection* p_begin = iter_begin.ConnectionPointer();
-	connection* p_end = iter_end.ConnectionPointer();
+Potential MuSigmaScalarProduct::InnerProduct(
+		const std::vector<Rate>& nodeVector,
+		const std::vector<PopulationConnection>& weightVector) const {
+//	connection* p_begin = iter_begin.ConnectionPointer();
+//	connection* p_end = iter_end.ConnectionPointer();
 
 	return inner_product(p_begin, p_end, p_begin, 0.0 //,
 //				plus<double>(),
@@ -45,10 +48,13 @@ Potential MuSigmaScalarProduct::InnerProduct(const std::vector<Rate>& nodeVector
 
 Potential MuSigmaScalarProduct::InnerSquaredProduct(
 		const std::vector<Rate>& nodeVector,
-		const std::vector<double>& weightVector) const {
-	connection* p_begin = iter_begin.ConnectionPointer();
-	connection* p_end = iter_end.ConnectionPointer();
-
-	return inner_product(p_begin, p_end, p_begin, 0.0, plus<double>(),
-			ConnectionSquaredProduct());
+		const std::vector<PopulationConnection>& weightVector) const {
+//	connection* p_begin = iter_begin.ConnectionPointer();
+//	connection* p_end = iter_end.ConnectionPointer();
+	return -1; //FIXME
+//	return inner_product(p_begin, p_end, p_begin, 0.0, plus<double>(),
+//			ConnectionSquaredProduct());
 }
+
+} /* namespace populist */
+} /* namespace MPILib */
