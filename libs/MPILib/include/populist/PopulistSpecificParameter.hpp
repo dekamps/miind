@@ -58,9 +58,9 @@ namespace populist {
 			Number,									//!< number of bins that is added after one zero-leak evaluation
 			const InitialDensityParameter&,			//!< gaussian (or delta-peak) initial density profile
 			double,									//!< expansion factor
-			const string&	zeroleakequation_name	= "NumericalZeroLeakEquations",		//!< The algorithm for solving the zero leak equations (see documentation at \ref AbstractZeroLeakequations if you want to modify the default choice)
-			const string&	circulant_solver_name	= "CirculantSolver",				//!< The algorithm for solving the circulant equations (see documentation at \ref AbstractCirculant if you want to use a modofied version of this algorithm)
-			const string&	noncirculant_solver_name= "NonCirculantSolver",				//!< The algorithm for solving the circulant equations (see documentation at \ref AbstractCirculant if you want to use a modofied version of this algorithm)
+			const std::string&	zeroleakequation_name	= "NumericalZeroLeakEquations",		//!< The algorithm for solving the zero leak equations (see documentation at \ref AbstractZeroLeakequations if you want to modify the default choice)
+			const std::string&	circulant_solver_name	= "CirculantSolver",				//!< The algorithm for solving the circulant equations (see documentation at \ref AbstractCirculant if you want to use a modofied version of this algorithm)
+			const std::string&	noncirculant_solver_name= "NonCirculantSolver",				//!< The algorithm for solving the circulant equations (see documentation at \ref AbstractCirculant if you want to use a modofied version of this algorithm)
 			const AbstractRebinner*	          = 0,  //!< Use when investigating alternatives to the standard rebinner, which InterpolationRebinner
 			const AbstractRateComputation*    = 0	//!< Use when investigating alternatives to the standard rate computation, which is IntegralRateComputation    
 		);
@@ -100,11 +100,11 @@ namespace populist {
 
 		const AbstractRateComputation& RateComputation() const;
 
-		string ZeroLeakName() const {return _name_zeroleak; }
+		std::string ZeroLeakName() const {return _name_zeroleak; }
 
-		string CirculantName() const { return _name_circulant; }
+		std::string CirculantName() const { return _name_circulant; }
 
-		string NonCirculantName() const {return _name_noncirculant; }
+		std::string NonCirculantName() const {return _name_noncirculant; }
 
 
 	private:
@@ -112,11 +112,11 @@ namespace populist {
 		Potential							_v_min;
 		Number								_n_grid_initial;
 		Number								_n_add;
-		 InitialDensityParameter			_par_dens;
+		InitialDensityParameter			_par_dens;
 		double								_fact_expansion;
-		string								_name_zeroleak;
-		string								_name_circulant;
-		string								_name_noncirculant;
+		std::string								_name_zeroleak;
+		std::string								_name_circulant;
+		std::string								_name_noncirculant;
 
 		boost::shared_ptr<AbstractRebinner>			_p_rebinner;
 		boost::shared_ptr<AbstractRateComputation>	_p_rate;

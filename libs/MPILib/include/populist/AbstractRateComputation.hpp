@@ -69,9 +69,9 @@ namespace populist {
 
 		Potential BinToCurrentPotential(Index);
 
-		Index						_index_reversal;
-		valarray<Density>*			_p_array_state;
-		const InputParameterSet*	_p_input_set;
+		Index						_index_reversal = 0;
+		valarray<Density>*			_p_array_state = nullptr;
+		const InputParameterSet*	_p_input_set = nullptr;
 		PopulationParameter			_par_population;
 		valarray<Potential>			_array_interpretation;         
 

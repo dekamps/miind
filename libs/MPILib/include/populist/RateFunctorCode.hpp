@@ -28,7 +28,7 @@ namespace populist {
 
 template<class WeightValue>
 RateFunctor<WeightValue>::RateFunctor(RateFunction function) :
-		AlgorithmInterface<WeightValue>(0), _function(function), _current_time(
+		algorithm::AlgorithmInterface<WeightValue>(0), _function(function), _current_time(
 				0) {
 }
 

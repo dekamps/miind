@@ -38,21 +38,18 @@ namespace populist {
 		typedef MuSigmaScalarProduct InnerProduct;
 
 		//! effective number, may be fractional
-		double		_number_of_connections;
+		double		_number_of_connections = 0.0;
 
 		//! effective synaptic efficacy from one population on another
-		Efficacy	_efficacy;
+		Efficacy	_efficacy = 0.0;
 
 		//! delay of a connection
-		Time		_delay;
+		Time		_delay = 0.0;
 
 		//! default constructor
 		OrnsteinUhlenbeckConnection
 		(
-		):
-		_number_of_connections(0),
-		_efficacy(0),
-		_delay(0)
+		)
 		{
 		}
 

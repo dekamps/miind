@@ -20,72 +20,55 @@
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
 #include <assert.h>
 
-namespace MPILib{
-namespace populist{
+namespace MPILib {
+namespace populist {
 
-
-
-AbstractRateComputation::AbstractRateComputation():
-_index_reversal(0),
-_p_array_state(0),
-_p_input_set(0)
-{
+AbstractRateComputation::AbstractRateComputation() {
 }
 
-void AbstractRateComputation::Configure
-(
-	      valarray<Density>&	array_state,
-	const InputParameterSet&	input_set,
-	const PopulationParameter&	par_population,
-	      Index			index_reversal
-)
-{
-	_p_array_state  = &array_state;
-	_p_input_set    = &input_set;
+void AbstractRateComputation::Configure(valarray<Density>& array_state,
+		const InputParameterSet& input_set,
+		const PopulationParameter& par_population, Index index_reversal) {
+	_p_array_state = &array_state;
+	_p_input_set = &input_set;
 	_par_population = par_population;
 	_index_reversal = index_reversal;
 }
 
-AbstractRateComputation::~AbstractRateComputation()
-{
+AbstractRateComputation::~AbstractRateComputation() {
 }
 
+bool AbstractRateComputation::DefineRateArea(Potential v_lower) {
 
-bool AbstractRateComputation::DefineRateArea
-(
-	Potential v_lower
- )
-{
-
-	_delta_v_rel = 1.0/(_n_bins - 1 - static_cast<double>(_index_reversal));
-	_delta_v_abs = (_par_population._theta - _par_population._V_reset)*_delta_v_rel;
+	_delta_v_rel = 1.0 / (_n_bins - 1 - static_cast<double>(_index_reversal));
+	_delta_v_abs = (_par_population._theta - _par_population._V_reset)
+			* _delta_v_rel;
 
 	// negative values of v_cutoff are allowed, but the result must be an Index;
-	_start_integration_area  = static_cast<Index>(static_cast<int>(_index_reversal) + static_cast<int>(v_lower/_delta_v_rel));
+	_start_integration_area =
+			static_cast<Index>(static_cast<int>(_index_reversal)
+					+ static_cast<int>(v_lower / _delta_v_rel));
 
 	// if index_start = _n_bins - 1, there is one integration point:
 	_number_integration_area = _n_bins - _start_integration_area;
 
-	assert( _start_integration_area < _n_bins );
+	assert( _start_integration_area < _n_bins);
 	// equal sign may occur, rounding errors could lift BinToCurrentPotential to slightly higher than v_cutoff 
-	assert ( BinToCurrentPotential(_start_integration_area) - EPSILON_INTEGRALRATE  < v_lower );
-	assert ( BinToCurrentPotential(_start_integration_area + 1)                     > v_lower );
+	assert(
+			BinToCurrentPotential(_start_integration_area) - EPSILON_INTEGRALRATE < v_lower);
+	assert( BinToCurrentPotential(_start_integration_area + 1) > v_lower);
 
-	for 
-	( 
-		int index = _start_integration_area;
-		index < static_cast<int>(_n_bins);
-		index++
-	)
+	for (int index = _start_integration_area; index < static_cast<int>(_n_bins);
+			index++)
 		_array_interpretation[index] = BinToCurrentPotential(index);
 
 	return true;
 }
 
-Potential AbstractRateComputation::BinToCurrentPotential(Index index)
-{
+Potential AbstractRateComputation::BinToCurrentPotential(Index index) {
 	assert(index < _n_bins);
-	return (static_cast<int>(index) - static_cast<int>(_index_reversal))*_delta_v_rel;
+	return (static_cast<int>(index) - static_cast<int>(_index_reversal))
+			* _delta_v_rel;
 }
 
 } /* namespace populist */

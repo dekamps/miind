@@ -67,7 +67,7 @@ namespace populist {
 		AbstractCirculantSolver
 		(
 			CirculantMode = INTEGER,
-			double preceison = 0
+			double precision = 0
 		);
 
 		//! virtual destructor, required for pure virtual base class

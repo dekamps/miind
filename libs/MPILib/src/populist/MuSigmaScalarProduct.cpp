@@ -39,8 +39,8 @@ Potential MuSigmaScalarProduct::InnerProduct(
 		const std::vector<PopulationConnection>& weightVector) const {
 //	connection* p_begin = iter_begin.ConnectionPointer();
 //	connection* p_end = iter_end.ConnectionPointer();
-
-	return inner_product(p_begin, p_end, p_begin, 0.0 //,
+//FIXME DS
+	return inner_product(nodeVector.begin(), nodeVector.end(), weightVector.begin(), 0.0 //,
 //				plus<double>(),
 //				ConnectionProduct<double,OrnsteinUhlenbeckConnection>()
 			);
@@ -51,7 +51,7 @@ Potential MuSigmaScalarProduct::InnerSquaredProduct(
 		const std::vector<PopulationConnection>& weightVector) const {
 //	connection* p_begin = iter_begin.ConnectionPointer();
 //	connection* p_end = iter_end.ConnectionPointer();
-	return -1; //FIXME
+	return -1; //FIXME DS
 //	return inner_product(p_begin, p_end, p_begin, 0.0, plus<double>(),
 //			ConnectionSquaredProduct());
 }

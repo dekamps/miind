@@ -38,7 +38,7 @@ inline Rate Nul(Time) {
 //! DynamicNode themselves. Their state is trivial and their output firing rate, given by the
 //! CurrentRate method follows a given function of time.
 template<class WeightValue>
-class RateFunctor: public AlgorithmInterface<WeightValue> {
+class RateFunctor: public algorithm::AlgorithmInterface<WeightValue> {
 public:
 
 	//! Constructor must be initialized with pointer a rate function of time.
