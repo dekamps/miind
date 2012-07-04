@@ -11,17 +11,22 @@
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>
+#include <MPILib/include/NodeType.hpp>
+#include <MPILib/include/utilities/Exception.hpp>
 #include <vector>
 
-
 namespace MPILib {
-namespace algorithm{
+namespace algorithm {
 
-template <class WeightValue>
+template<class WeightValue>
 class AlgorithmInterface {
 public:
-	AlgorithmInterface(){};
-	virtual ~AlgorithmInterface(){};
+	AlgorithmInterface() {
+	}
+	;
+	virtual ~AlgorithmInterface() {
+	}
+	;
 
 	/**
 	 * Cloning operation, to provide each DynamicNode with its own
@@ -42,8 +47,24 @@ public:
 	 * @param time Time point of the algorithm
 	 */
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
-			const std::vector<WeightValue>& weightVector, Time time) = 0;
+			const std::vector<WeightValue>& weightVector, Time time){
+		throw utilities::Exception("You need to overwrite this method in your algorithm"
+				" if you want to use it");
+	}
 
+	/**
+	 * Evolve the node state. Overwrite this function if
+	 * your algorithm needs the NodeTypes of the precursors
+	 * @param nodeVector Vector of the node States
+	 * @param weightVector Vector of the weights of the nodes
+	 * @param time Time point of the algorithm
+	 * @param weightVector Vector of the NodeTypes of the precursors
+	 */
+	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
+			const std::vector<WeightValue>& weightVector, Time time,
+			const std::vector<NodeType>& typeVector) {
+		this->evolveNodeState(nodeVector, weightVector, time);
+	}
 	/**
 	 * The current timepoint
 	 * @return The current time point
