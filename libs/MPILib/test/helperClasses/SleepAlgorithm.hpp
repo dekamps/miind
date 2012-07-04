@@ -57,7 +57,7 @@ public:
 
 private:
 
-	static double constexpr kSleepTime = 1;
+	double kSleepTime = 1;
 };
 
 #endif /* SLEEPALGORITHM_HPP_ */
