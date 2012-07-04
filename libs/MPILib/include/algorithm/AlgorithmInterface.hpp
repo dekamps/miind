@@ -41,7 +41,8 @@ public:
 	virtual void configure(const SimulationRunParameter& simParam) = 0;
 
 	/**
-	 * Evolve the node state
+	 * Evolve the node state. Overwrite this method if your algorithm does not
+	 * need to know the NodeTypes.
 	 * @param nodeVector Vector of the node States
 	 * @param weightVector Vector of the weights of the nodes
 	 * @param time Time point of the algorithm
@@ -53,8 +54,9 @@ public:
 	}
 
 	/**
-	 * Evolve the node state. Overwrite this function if
-	 * your algorithm needs the NodeTypes of the precursors
+	 * Evolve the node state. In the default case it simply calls envolveNodeState
+	 * without the NodeTypes. However if an algorithm needs the nodeTypes
+	 * of the precursors overwrite this function.
 	 * @param nodeVector Vector of the node States
 	 * @param weightVector Vector of the weights of the nodes
 	 * @param time Time point of the algorithm
