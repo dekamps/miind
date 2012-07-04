@@ -115,12 +115,37 @@ public:
 
 		private:
 
+			/**
+			 * Wait that all communication is finished
+			 */
 			void waitAll();
 
+			/**
+			 * exchange the Node Types
+			 *
+			 * It send the own NodeType to remote nodes and collects the NodeTypes of
+			 * the precursor nodes and store them in the vector _precursorTypes
+			 */
+			void exchangeNodeTypes();
+
+			/**
+			 * Store the nodeIds of the Precursors
+			 */
 			std::vector<NodeId> _precursors;
 
+			/**
+			 * Store the weights of the connections to the precursors
+			 */
 			std::vector<Weight> _weights;
 
+			/**
+			 * Store the _precursorTypes
+			 */
+			std::vector<NodeType> _precursorTypes;
+
+			/**
+			 * Store the nodeIds of the successors
+			 */
 			std::vector<NodeId> _successors;
 
 			// Timers for mpi and algorithm time
@@ -129,9 +154,14 @@ public:
 			// make sure that the log is only printed ones.
 			static bool _isLogPrinted;
 
+			/**
+			 * A Pointer that holds the Algorithm
+			 */
 			boost::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
 
-
+			/**
+			 * The type of this node needed for dales law
+			 */
 			NodeType _nodeType;
 
 			/**
@@ -158,12 +188,23 @@ public:
 			 */
 			std::vector<ActivityType> _precursorActivity;
 
+			/**
+			 * Store the mpi request to have assynchronous communication
+			 */
 			std::vector<boost::mpi::request> _mpiStatus;
 
 			Number _number_iterations;
 			Number _maximum_iterations;
 
-			mutable boost::shared_ptr<report::handler::AbstractReportHandler> _pHandler;
+			/**
+			 * True if the node Types are exchanged
+			 */
+			static bool _isInitialised;
+
+			/**
+			 * Pointer to the Report Handler
+			 */
+			boost::shared_ptr<report::handler::AbstractReportHandler> _pHandler;
 		};
 
 typedef MPINode<double, utilities::CircularDistribution> D_MPINode;

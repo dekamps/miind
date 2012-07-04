@@ -17,6 +17,8 @@
 namespace mpi = boost::mpi;
 namespace MPILib {
 
+
+
 template<class Weight, class NodeDistribution>
 MPINode<Weight, NodeDistribution>::MPINode(
 		const algorithm::AlgorithmInterface<Weight>& algorithm,
@@ -44,6 +46,12 @@ MPINode<Weight, NodeDistribution>::~MPINode() {
 
 template<class Weight, class NodeDistribution>
 Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
+
+	if(!_isInitialised){
+		this->exchangeNodeTypes();
+		_isInitialised=true;
+	}
+
 
 	receiveData();
 
@@ -119,13 +127,53 @@ void MPINode<Weight, NodeDistribution>::waitAll() {
 	_mpiTimer.stop();
 
 }
-template<class Weight, class NodeDistribution>
-void MPINode<Weight, NodeDistribution>::receiveData() {
-	_mpiTimer.resume();
 
+template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
+
+	std::vector<boost::mpi::request> mpiStatus;
+	mpi::communicator world;
+	_precursorTypes.resize(_precursors.size());
+	//get the Types from the precursors
 	int i = 0;
 	for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		mpi::communicator world;
+		//do not send the data if the node is local!
+		if (_pNodeDistribution->isLocalNode(*it)) {
+			_precursorTypes[i] =
+					_pLocalNodes->find(*it)->second.getNodeType();
+
+		} else {
+			mpiStatus.push_back(
+					world.irecv(
+							_pNodeDistribution->getResponsibleProcessor(*it),
+							_pNodeDistribution->getRank(),
+							_precursorTypes[i]));
+		}
+	}
+	//send own types to successors
+	for (auto& it : _successors) {
+		//do not send the data if the node is local!
+		if (!_pNodeDistribution->isLocalNode(it)) {
+			mpiStatus.push_back(
+					world.isend(_pNodeDistribution->getResponsibleProcessor(it),
+							it, _nodeType));
+		}
+	}
+
+	//wait that communication finished
+	mpi::wait_all(mpiStatus.begin(), mpiStatus.end());
+
+
+}
+
+template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::receiveData() {
+	_mpiTimer.resume();
+	mpi::communicator world;
+
+	int i = 0;
+	for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		//do not send the data if the node is local!
 		if (_pNodeDistribution->isLocalNode(*it)) {
 			_precursorActivity[i] =
@@ -145,8 +193,8 @@ void MPINode<Weight, NodeDistribution>::receiveData() {
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 	_mpiTimer.resume();
-
 	mpi::communicator world;
+
 
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
@@ -209,6 +257,8 @@ boost::timer::cpu_timer MPINode<Weight, NodeDistribution>::_algorithmTimer =
 template<class Weight, class NodeDistribution>
 bool MPINode<Weight, NodeDistribution>::_isLogPrinted = false;
 
+template<class Weight, class NodeDistribution>
+bool MPINode<Weight, NodeDistribution>::_isInitialised = false;
 } //end namespace MPILib
 
 #endif /* CODE_MPILIB_MPINODE_HPP_ */
