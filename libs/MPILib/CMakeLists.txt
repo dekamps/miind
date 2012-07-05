@@ -11,10 +11,12 @@ set(MPI_SRCS
     src/populist/AbstractNonCirculantSolver.cpp
     src/populist/AbstractRateComputation.cpp
     src/populist/AbstractRebinner.cpp
+    src/populist/CirculantSolver.cpp
     src/populist/InitializeAlgorithmGrid.cpp
     src/populist/LIFConvertor.cpp
     src/populist/MuSigmaScalarProduct.cpp
     src/populist/PopulistSpecificParameter.cpp
+    src/populist/VArray.cpp
     
     src/report/handler/AbstractReportHandler.cpp
     src/report/handler/GraphKey.cpp
