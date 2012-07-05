@@ -78,8 +78,7 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::prepareEvolve(){
-//FIXME DS provide needed parameters
-	_pAlgorithm->prepareEvolve();
+	_pAlgorithm->prepareEvolve(_precursorActivity, _weights, _precursorTypes);
 }
 
 
