@@ -56,6 +56,12 @@ public:
 			Time evolve(Time time);
 
 			/**
+			 * Called before each evolve call during each evolve. Can
+			 * be used to prepare the input for the evolve method.
+			 */
+			void prepareEvolve();
+
+			/**
 			 * Configure the Node with the Simulation Parameters
 			 * @param simParam Simulation Parameters
 			 */

@@ -77,6 +77,13 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 }
 
 template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::prepareEvolve(){
+//FIXME DS provide needed parameters
+	_pAlgorithm->prepareEvolve();
+}
+
+
+template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 		const SimulationRunParameter& simParam) {
 	_maximum_iterations = simParam.getMaximumNumberIterations();

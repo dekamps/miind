@@ -139,6 +139,11 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					// or to update
 					updateSimulationTime();
 
+					for(auto& it: (*_pLocalNodes)){
+						it.second.prepareEvolve();
+					}
+
+
 					//envolve all local nodes
 					for (auto& it : (*_pLocalNodes)) {
 						it.second.evolve(getCurrentSimulationTime());
