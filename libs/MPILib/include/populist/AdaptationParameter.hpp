@@ -17,41 +17,51 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_POPULIST_CONNECTIONSQUAREDPRODUCT_CODE_HPP_
-#define MPILIB_POPULIST_CONNECTIONSQUAREDPRODUCT_CODE_HPP_
+#ifndef MPILIB_POPULIST_ADAPTATIONPARAMETER_HPP_
+#define MPILIB_POPULIST_ADAPTATIONPARAMETER_HPP_
 
-#include <utility>
-#include <functional>
-#include <vector>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
-
-
+#include <MPILib/include/populist/PopulistParameter.hpp>
 
 namespace MPILib {
 namespace populist {
 
+	//! Parameter to store adaptation values for the 1DM Markov process of Muller et al. (2007)
+	//! http://dx.doi.org/10.1162/neco.2007.19.11.2958
 
-	class ConnectionSquaredProduct : public std::binary_function<OrnsteinUhlenbeckConnection, OrnsteinUhlenbeckConnection, OrnsteinUhlenbeckConnection>
-	{
-	public:
+	//! At the moment the only variable relevant for this population are the adaptation time constant $t_s$,
+	//! the adaptation jump value q and the maximum value of $g$ considered in the algorithm. 
+	//! At the moment the base class variables are not used. The derivation is nonetheless required for two
+	//! reasons: The effective
+	//! values for the neuron are implicit in the a and b values that are used to drive the OneDMAlgorithm,
+	//! but in the longer run it may be that these values will be interpolated from input parameters and neuron
+	//! state variables, and then it would make sense to define the other parameters of the neuron population
+	//! in here. A second reason for deriving from PopulationParameter is that it is easier to use the
+	//! existing code of PopulationGridController.
 
-		typedef std::pair<AbstractSparseNode<double, OrnsteinUhlenbeckConnection>*, OrnsteinUhlenbeckConnection> connection;
+	struct AdaptationParameter {
 
-		inline double operator()
+		//! default constructor
+		AdaptationParameter():
+		_t_adaptation(0),
+		_q(0),
+		_g_max(0)
+		{}
+
+		//! Constructor, adaptation parameters only
+		AdaptationParameter
 		(
-			connection connection_first,
-			connection connection_second
-		) const
-		{
-			double f_node_rate = connection_first.first->GetValue();
-			double f_efficacy_squared = connection_second.second._efficacy*connection_second.second._efficacy;
-			double f_number = connection_second.second._number_of_connections;
+			Time,
+			State,
+			State
+		);
 
-			return f_node_rate*f_efficacy_squared*f_number;
-		}
+		Time	_t_adaptation;
+		State	_q;
+		State	_g_max;
+
+		
 	};
-
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard
+#endif // include guard MPILIB_POPULIST_ADAPTATIONPARAMETER_HPP_

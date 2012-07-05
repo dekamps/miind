@@ -17,8 +17,8 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef _CODE_LIBS_POPULATIONLIB_POPULATIONGRIDCONTROLER_INCLUDE_GUARD
-#define _CODE_LIBS_POPULATIONLIB_POPULATIONGRIDCONTROLER_INCLUDE_GUARD
+#ifndef MPILIB_POPULIST_POPULATIONGRIDCONTROLER_HPP_
+#define MPILIB_POPULIST_POPULATIONGRIDCONTROLER_HPP_
 
 #include <valarray>
 #include <gsl/gsl_spline.h>
@@ -258,4 +258,4 @@ namespace populist {
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard
+#endif // include guard MPILIB_POPULIST_POPULATIONGRIDCONTROLER_HPP_

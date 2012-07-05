@@ -17,40 +17,50 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_POPULIST_CONNECTIONSQUAREDPRODUCT_CODE_HPP_
-#define MPILIB_POPULIST_CONNECTIONSQUAREDPRODUCT_CODE_HPP_
+#ifndef MPILIB_POPULIST_POLYNOMIALCIRCULANT_HPP_
+#define MPILIB_POPULIST_POLYNOMIALCIRCULANT_HPP_
 
-#include <utility>
-#include <functional>
-#include <vector>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
-
+#include <MPILib/include/populist/AbstractCirculantSolver.hpp>
 
 
 namespace MPILib {
 namespace populist {
 
-
-	class ConnectionSquaredProduct : public std::binary_function<OrnsteinUhlenbeckConnection, OrnsteinUhlenbeckConnection, OrnsteinUhlenbeckConnection>
-	{
+	//! This uses the short-time polynomial expansion of the analytic solution
+	//! The algorithm can only be used for small values of tau and will throw an
+	//! exception if it enters an unvalid regime.
+	class PolynomialCirculant : public AbstractCirculantSolver {
 	public:
 
-		typedef std::pair<AbstractSparseNode<double, OrnsteinUhlenbeckConnection>*, OrnsteinUhlenbeckConnection> connection;
+		PolynomialCirculant();
 
-		inline double operator()
+		//! virtual destructor
+		virtual ~PolynomialCirculant();
+
+		virtual void Execute
 		(
-			connection connection_first,
-			connection connection_second
-		) const
-		{
-			double f_node_rate = connection_first.first->GetValue();
-			double f_efficacy_squared = connection_second.second._efficacy*connection_second.second._efficacy;
-			double f_number = connection_second.second._number_of_connections;
+			Number,
+			Time,
+			Time = 0 //!< Irrelevant for this solver
+		);
 
-			return f_node_rate*f_efficacy_squared*f_number;
-		}
+		//! PolynomialCirculant computes how many circulant bins make sense
+		virtual Number NrCirculant() const;
+
+		//! Virtual copy constructor
+		virtual PolynomialCirculant* Clone() const;
+
+		//! Some magical numbers are used in this CicrculantSolver
+		Index JMax() const;
+
+	private:
+
+		virtual void FillNonCirculantBins();
+
+		void LoadJArray();
+
+		vector<double>	_j_array;
 	};
-
 } /* namespace populist */
 } /* namespace MPILib */
 

@@ -17,41 +17,18 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_POPULIST_CONNECTIONSQUAREDPRODUCT_CODE_HPP_
-#define MPILIB_POPULIST_CONNECTIONSQUAREDPRODUCT_CODE_HPP_
+#include "OneDMParameter.h"
 
-#include <utility>
-#include <functional>
-#include <vector>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
+using namespace PopulistLib;
 
-
-
-namespace MPILib {
-namespace populist {
-
-
-	class ConnectionSquaredProduct : public std::binary_function<OrnsteinUhlenbeckConnection, OrnsteinUhlenbeckConnection, OrnsteinUhlenbeckConnection>
-	{
-	public:
-
-		typedef std::pair<AbstractSparseNode<double, OrnsteinUhlenbeckConnection>*, OrnsteinUhlenbeckConnection> connection;
-
-		inline double operator()
-		(
-			connection connection_first,
-			connection connection_second
-		) const
-		{
-			double f_node_rate = connection_first.first->GetValue();
-			double f_efficacy_squared = connection_second.second._efficacy*connection_second.second._efficacy;
-			double f_number = connection_second.second._number_of_connections;
-
-			return f_node_rate*f_efficacy_squared*f_number;
-		}
-	};
-
-} /* namespace populist */
-} /* namespace MPILib */
-
-#endif // include guard
+OneDMParameter::OneDMParameter
+(
+		const PopulationParameter&			par_pop,
+		const AdaptationParameter&			par_adapt,
+		const PopulistSpecificParameter&	par_spec
+):
+_par_pop(par_pop),
+_par_adapt(par_adapt),
+_par_spec(par_spec)
+{
+}

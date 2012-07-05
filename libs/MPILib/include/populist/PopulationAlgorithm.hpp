@@ -155,9 +155,12 @@ public:
 	//! Evolve the node's state
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
 			const std::vector<WeightValue>& weightVector, Time time,
-			const std::vector<NodeType>& typeVector);
+			const std::vector<NodeType>& typeVector) override;
 
-
+	//! This algorithm is dependent on synchronous updating, therefore the following function is overloaded
+	virtual void prepareEvolve(const std::vector<Rate>& nodeVector,
+			const std::vector<WeightValue>& weightVector,
+			const std::vector<NodeType>& typeVector) override;
 	//! Current time as maintained by the algorithm
 	virtual Time getCurrentTime() const;
 
@@ -167,19 +170,16 @@ public:
 	//! Provide a copy of the momentary grid
 	virtual AlgorithmGrid getGrid() const;
 
-
 	//! Provide a clone of this algorithm
 	virtual PopulationAlgorithm_<Weight>* clone() const {
 		return new PopulationAlgorithm_<Weight>(*this);
 	}
-
 
 	//! Give the potential that corresponds to a bin number at a specific moment
 	Potential BinToCurrentPotential(Index) const;
 
 	//! Give the bin number that momentarily corresponds to a potential
 	Index CurrentPotentialToBin(Potential) const;
-
 
 private:
 
@@ -203,8 +203,6 @@ private:
 }
 ;
 // end of PopulationAlgorithm
-
-
 
 // default algorithm is with PopulistConnection
 typedef PopulationAlgorithm_<OrnsteinUhlenbeckConnection> PopulationAlgorithm;

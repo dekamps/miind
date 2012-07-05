@@ -13,6 +13,7 @@
 #include <MPILib/include/populist/PopulistParameter.hpp>
 #include <MPILib/include/populist/InitialDensityParameter.hpp>
 #include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/populist/PopulationAlgorithm.hpp>
 
 namespace mpi = boost::mpi;
 using namespace MPILib;
@@ -190,8 +191,6 @@ const SimulationRunParameter TWOPOP_PARAMETER(TWOPOP_HANDLER,
 int main(int argc, char* argv[]) {
 
 	try {
-		//FIXME
-		typedef double OrnsteinUhlenbeckConnection;
 
 		NodeId id_cortical_background;
 		NodeId id_excitatory_main;
@@ -200,8 +199,8 @@ int main(int argc, char* argv[]) {
 		MPINetwork<OrnsteinUhlenbeckConnection, utilities::CircularDistribution> network =
 				CreateTwoPopulationNetwork<
 						populist::PopulationAlgorithm_<
-								OrnsteinUhlenbeckConnection>,
-						OrnsteinUhlenbeckConnection,
+						populist::OrnsteinUhlenbeckConnection>,
+						populist::OrnsteinUhlenbeckConnection,
 						utilities::CircularDistribution>(
 						&id_cortical_background, &id_excitatory_main,
 						&id_inhibitory_main, &id_rate,

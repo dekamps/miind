@@ -44,6 +44,8 @@ typedef Time TimeStep;
 typedef double Density;
 typedef double Potential;
 typedef double Efficacy;
+//! Define anything that has a state as a type
+typedef double State;
 
 typedef unsigned int Number;
 typedef unsigned int Index;

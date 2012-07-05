@@ -19,9 +19,9 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/populist/ZeroLeakBuilder.hpp>
+#include <MPILib/include/populist/CirculantSolver.hpp>
 #include <MPILib/include/populist/LIFZeroLeakEquations.hpp>
 #include <MPILib/include/populist/NumericalZeroLeakEquations.hpp>
-#include <MPILib/include/populist/CirculantSolver.hpp>
 #include <MPILib/include/populist/OldLifZeroLeakEquations.hpp>
 #include <MPILib/include/populist/OneDMZeroLeakEquations.hpp>
 #include <MPILib/include/populist/PolynomialCirculant.hpp>

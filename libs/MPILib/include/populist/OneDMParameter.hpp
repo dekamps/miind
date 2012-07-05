@@ -1,4 +1,4 @@
-// Copyright (c) 2005 - 2009 Marc de Kamps
+// Copyright (c) 2005 - 2011 Marc de Kamps
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,41 +17,32 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef MPILIB_POPULIST_CONNECTIONSQUAREDPRODUCT_CODE_HPP_
-#define MPILIB_POPULIST_CONNECTIONSQUAREDPRODUCT_CODE_HPP_
+#ifndef MPILIB_POPULIST_ONEDMPARAMETER_HPP_
+#define MPILIB_POPULIST_ONEDMPARAMETER_HPP_
 
-#include <utility>
-#include <functional>
-#include <vector>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
-
-
+#include <MPILib/include/populist/AdaptationParameter.hpp>
+#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 
 namespace MPILib {
 namespace populist {
 
+	struct OneDMParameter {
 
-	class ConnectionSquaredProduct : public std::binary_function<OrnsteinUhlenbeckConnection, OrnsteinUhlenbeckConnection, OrnsteinUhlenbeckConnection>
-	{
-	public:
+		OneDMParameter(){}
 
-		typedef std::pair<AbstractSparseNode<double, OrnsteinUhlenbeckConnection>*, OrnsteinUhlenbeckConnection> connection;
-
-		inline double operator()
+		OneDMParameter
 		(
-			connection connection_first,
-			connection connection_second
-		) const
-		{
-			double f_node_rate = connection_first.first->GetValue();
-			double f_efficacy_squared = connection_second.second._efficacy*connection_second.second._efficacy;
-			double f_number = connection_second.second._number_of_connections;
+			const PopulationParameter&,
+			const AdaptationParameter&,
+			const PopulistSpecificParameter&
+		);
 
-			return f_node_rate*f_efficacy_squared*f_number;
-		}
+		PopulationParameter			_par_pop;	//!< Defensive, serves no purpose atm, but probaly will do in the future
+		AdaptationParameter			_par_adapt;	//!< Adaptation specific parameter; accidently also an AdaptationParameter
+		PopulistSpecificParameter	_par_spec;	//!< Grid and algorithm related stuff
+
 	};
-
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard
+#endif // include guard MPILIB_POPULIST_ONEDMPARAMETER_HPP_
