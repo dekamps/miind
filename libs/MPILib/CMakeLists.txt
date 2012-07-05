@@ -7,16 +7,31 @@ set(MPI_SRCS
     src/algorithm/RateAlgorithm.cpp
     src/algorithm/WilsonCowanAlgorithm.cpp
     
+    src/populist/ABConvertor.cpp
     src/populist/AbstractCirculantSolver.cpp
     src/populist/AbstractNonCirculantSolver.cpp
     src/populist/AbstractRateComputation.cpp
     src/populist/AbstractRebinner.cpp
+    src/populist/AdaptationParameter.cpp
     src/populist/CirculantSolver.cpp
     src/populist/InitializeAlgorithmGrid.cpp
     src/populist/LIFConvertor.cpp
+    src/populist/LIFZeroLeakEquations.cpp
+    src/populist/LimitedNonCirculant.cpp
+    src/populist/MatrixNonCirculant.cpp
     src/populist/MuSigmaScalarProduct.cpp
+    src/populist/NonCirculantSolver.cpp
+    src/populist/NumericalZeroLeakEquations.cpp
+    src/populist/OldLifZeroLeakEquations.cpp
+    src/populist/OneDMParameter.cpp
+    src/populist/OneDMZeroLeakEquations.cpp
+    src/populist/PolynomialCirculant.cpp
     src/populist/PopulistSpecificParameter.cpp
+    src/populist/ProbabilityQueue.cpp
+    src/populist/RefractiveCirculantSolver.cpp
+    src/populist/SingleInputZeroLeakEquations.cpp
     src/populist/VArray.cpp
+    src/populist/ZeroLeakBuilder.cpp
     
     src/report/handler/AbstractReportHandler.cpp
     src/report/handler/GraphKey.cpp
