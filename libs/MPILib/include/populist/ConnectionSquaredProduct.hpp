@@ -25,31 +25,24 @@
 #include <vector>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 
-
-
 namespace MPILib {
 namespace populist {
 
+class ConnectionSquaredProduct: public std::binary_function<Rate,
+		OrnsteinUhlenbeckConnection, double> {
+public:
 
-	class ConnectionSquaredProduct : public std::binary_function<OrnsteinUhlenbeckConnection, OrnsteinUhlenbeckConnection, OrnsteinUhlenbeckConnection>
-	{
-	public:
+	inline double operator()(Rate connection_first,
+			OrnsteinUhlenbeckConnection connection_second) const {
 
-		typedef std::pair<AbstractSparseNode<double, OrnsteinUhlenbeckConnection>*, OrnsteinUhlenbeckConnection> connection;
+		double f_node_rate = connection_first;
+		double f_efficacy_squared = connection_second._efficacy
+				* connection_second._efficacy;
+		double f_number = connection_second._number_of_connections;
 
-		inline double operator()
-		(
-			connection connection_first,
-			connection connection_second
-		) const
-		{
-			double f_node_rate = connection_first.first->GetValue();
-			double f_efficacy_squared = connection_second.second._efficacy*connection_second.second._efficacy;
-			double f_number = connection_second.second._number_of_connections;
-
-			return f_node_rate*f_efficacy_squared*f_number;
-		}
-	};
+		return f_node_rate * f_efficacy_squared * f_number;
+	}
+};
 
 } /* namespace populist */
 } /* namespace MPILib */

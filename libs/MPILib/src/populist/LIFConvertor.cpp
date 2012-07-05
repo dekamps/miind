@@ -137,28 +137,27 @@ const Index& LIFConvertor::IndexCurrentResetBin() const {
 }
 
 void LIFConvertor::SortConnectionvector(const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) {
+		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+		const std::vector<NodeType>& typeVector) {
 
 	// sorting depends on network structure and only should be done once
-//	typedef DynamicLib::DynamicNode<PopulationConnection>& Node;
 	if (!_b_toggle_sort) {
 		auto iterWeight= weightVector.begin();
-		for (auto iter = nodeVector.begin(); iter != nodeVector.end(); iter++, iterWeight++) {
-//			AbstractSparseNode<double,PopulationConnection>& sparse_node = *iter;
-			MPINode<PopulationConnection, utilities::CircularDistribution> node =
-					*iter;
+		auto iterType = typeVector.begin();
+		for (auto iter = nodeVector.begin(); iter != nodeVector.end(); iter++, iterType++) {
 
-			if (node.getNodeType() == EXCITATORY_BURST
-					|| node.getNodeType() == INHIBITORY_BURST)
-				_vec_burst.push_back(iter);
+
+			if (*iterType == EXCITATORY_BURST
+					|| *iterType == INHIBITORY_BURST)
+				_vec_burst.push_back(*iter);
 			else
-				_vec_diffusion.push_back(iter);
+				_vec_diffusion.push_back(*iter);
 		}
 		_b_toggle_sort = true;
 	}
 	if (_vec_burst.size() == 1 && _vec_diffusion.size() == 0) {
-		double h = iter_begin.GetWeight()._efficacy;
-		double rate = iter_begin->GetValue();
+		double h = weightVector[0]._efficacy;
+		double rate = nodeVector[0];
 		if (h >= 0) {
 			_input_set._h_exc = h;
 			_input_set._h_inh = 0;
@@ -171,8 +170,9 @@ void LIFConvertor::SortConnectionvector(const std::vector<Rate>& nodeVector,
 			_input_set._rate_inh = rate;
 		}
 
-		iter_begin++;
+
 		// one and only one input
+		assert(weightVector.size()==1);
 	}
 
 	if (_vec_burst.size() == 0 && _vec_diffusion.size() > 0) {

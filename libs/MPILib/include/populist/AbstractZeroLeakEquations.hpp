@@ -28,6 +28,7 @@
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/InputParameterSet.hpp>
+#include <MPILib/include/populist/PopulistSpecificParameter.hpp>
 
 namespace MPILib {
 namespace populist {

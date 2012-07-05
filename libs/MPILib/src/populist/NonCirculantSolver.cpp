@@ -21,8 +21,8 @@
 #include <algorithm>
 #include <MPILib/include/populist/NonCirculantSolver.hpp>
 
-using namespace std;
-using namespace PopulistLib;
+namespace MPILib {
+namespace populist {
 
 NonCirculantSolver::NonCirculantSolver(CirculantMode mode):
 AbstractNonCirculantSolver(mode)
@@ -36,7 +36,7 @@ void NonCirculantSolver::ExecuteIntegerExcitatory
 )
 {
 
-	valarray<double>& array_state = *_p_array_state;
+	std::valarray<double>& array_state = *_p_array_state;
 
 	int H = _p_input_set->_H_exc;
 	int n_non_circulant = _p_input_set->_n_noncirc_exc;
@@ -78,7 +78,7 @@ void NonCirculantSolver::ExecuteIntegerInhibitory
 )
 {
 
-	valarray<double>& array_state = *_p_array_state;
+	std::valarray<double>& array_state = *_p_array_state;
 	int H = _p_input_set->_H_inh;
 	int n_non_circulant = _p_input_set->_n_noncirc_inh;
 
@@ -129,7 +129,7 @@ void NonCirculantSolver::ExecuteFractionExcitatory
 	Time tau
 )
 {
-	valarray<double>& array_state = *_p_array_state;
+	std::valarray<double>& array_state = *_p_array_state;
 	double h = _p_input_set->_H_exc +_p_input_set->_alpha_exc;
 	if (h == 0 )
 		return;
@@ -144,7 +144,7 @@ void NonCirculantSolver::ExecuteFractionExcitatory
 		// in the loop below n_walk_back is the maximum term of array_rho that will be accessed.
 		// this means is must be curtailed to n_term_max-1, to prevent access to elements of array_factor 
 		// that were not calculated because they were to small
-		Number n_walk_back = min(static_cast<Number>(floor(i/h)),n_term_max-1);
+		Number n_walk_back = std::min(static_cast<Number>(floor(i/h)),n_term_max-1);
 		double step_back = 0;
 
 		for (Index j = 1; j <= n_walk_back; j++){
@@ -183,7 +183,7 @@ void NonCirculantSolver::ExecuteFractionInhibitory
 	Time tau
 )
 {
-	valarray<double>& array_state = *_p_array_state;
+	std::valarray<double>& array_state = *_p_array_state;
 	double h = _p_input_set->_H_inh +_p_input_set->_alpha_inh;
 	if (h == 0 )
 		return;
@@ -198,7 +198,7 @@ void NonCirculantSolver::ExecuteFractionInhibitory
 		// this means is must be curtailed to n_term_max-1, to prevent access to elements of array_factor 
 		// that were not calculated because they were to small
 	
-		Number n_walk_forward = min(static_cast<Number>(floor((n_bins- 1 - i)/h)),n_term_max-1);
+		Number n_walk_forward = std::min(static_cast<Number>(floor((n_bins- 1 - i)/h)),n_term_max-1);
 		double step_forward = 0;
 
 		for (Index j = 1; j <= n_walk_forward; j++){
@@ -265,3 +265,6 @@ NonCirculantSolver* NonCirculantSolver::Clone() const
 {
 	return new NonCirculantSolver(*this);
 }
+
+} /* namespace populist */
+} /* namespace MPILib */

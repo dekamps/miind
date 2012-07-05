@@ -24,9 +24,10 @@ ABConvertor::InputSet() const {
 	return _param_input;
 }
 
-void ABConvertor::SortConnectionvector(predecessor_iterator iter_begin,
-		predecessor_iterator iter_end) {
-	_param_input._par_input = _scalar_product.Evaluate(iter_begin, iter_end,
+void ABConvertor::SortConnectionvector(const std::vector<Rate>& nodeVector,
+		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+		const std::vector<NodeType>& typeVector) {
+	_param_input._par_input = _scalar_product.Evaluate(nodeVector, weightVector,
 			_p_pop->_tau);
 	_param_input._par_input._q = _param_onedm._par_adapt._q;
 }

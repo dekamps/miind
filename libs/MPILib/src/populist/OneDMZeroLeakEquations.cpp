@@ -17,10 +17,12 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#include "OneDMZeroLeakEquations.h"
-#include "AdaptiveHazard.h"
+#include <MPILib/include/populist/OneDMZeroLeakEquations.hpp>
+#include <MPILib/include/populist/AdaptiveHazard.hpp>
 
-using namespace PopulistLib;
+namespace MPILib {
+namespace populist {
+
 
 namespace {
 
@@ -245,3 +247,6 @@ Rate OneDMZeroLeakEquations::CalculateRate() const
 	}
 	return  sum;
 }
+
+} /* namespace populist */
+} /* namespace MPILib */

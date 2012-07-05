@@ -17,9 +17,9 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#include "AdaptationParameter.h"
+#include <MPILib/include/populist/AdaptationParameter.hpp>
 
-using namespace PopulistLib;
+using namespace MPILib::populist;
 
 AdaptationParameter::AdaptationParameter
 (

@@ -76,7 +76,8 @@ public:
 	//! but has been moved out of there to help account for synchronous updating in networks. DynamicNetworkImplementation will now
 	//! first go through a loop calling nodes to update their input, and then a second loop to evolve their states.
 	void SortConnectionvector(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector);
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<NodeType>& typeVector);
 
 	//! This function interprets the  input contribution from other populations and converts them into input parameters for the
 	//! circulant and non circulant solvers. It must be run every time _delta_v changes.
@@ -128,8 +129,8 @@ private:
 	bool _b_toggle_sort;
 	bool _b_toggle_diffusion;
 
-	std::vector<NodeId> _vec_burst;
-	std::vector<NodeId> _vec_diffusion;
+	std::vector<Rate> _vec_burst;
+	std::vector<Rate> _vec_diffusion;
 };
 
 } /* namespace populist */

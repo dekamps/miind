@@ -20,15 +20,18 @@
 #ifndef MPILIB_POPULIST_POPULISTSPECIFICPARAMETER_HPP_
 #define MPILIB_POPULIST_POPULISTSPECIFICPARAMETER_HPP_
 
-#include <MPILib/include/populist/AbstractRebinner.hpp>
+//#include <MPILib/include/populist/AbstractRebinner.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 
 
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
 #include <MPILib/include/populist/InitialDensityParameter.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace MPILib {
 namespace populist {
+
+class AbstractRebinner;
 
 	//! These are parameters necessary for the configuration of a PopulistAlgorithm and OneDMAlgorithm
 

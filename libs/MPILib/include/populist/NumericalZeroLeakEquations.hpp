@@ -21,7 +21,7 @@
 #define MPILIB_POPULIST_NUMERICALZEROLEAKEQUATIONS_HPP_
 
 #include <boost/shared_ptr.hpp>
-#include "../NumtoolsLib/NumtoolsLib.h"
+#include <NumtoolsLib/NumtoolsLib.h>
 #include <MPILib/include/populist/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
 #include <MPILib/include/BasicTypes.hpp>
@@ -35,74 +35,62 @@ using NumtoolsLib::ExStateDVIntegrator;
 namespace MPILib {
 namespace populist {
 
+//! Provides a numerical solution for the zero leak equations.
+class NumericalZeroLeakEquations: public AbstractZeroLeakEquations {
+public:
 
 
-	//! Provides a numerical solution for the zero leak equations.
-	class NumericalZeroLeakEquations : public AbstractZeroLeakEquations {
-	public:
-
-		typedef AbstractAlgorithm<PopulationConnection>::predecessor_iterator predecessor_iterator;
-
-		NumericalZeroLeakEquations
-		(
-			Number&,					//!< reference to the current number of bins
+	NumericalZeroLeakEquations(Number&,	//!< reference to the current number of bins
 			valarray<Potential>&,		//!< reference to state array
 			Potential&,					//!< reference to the check sum variable
-			SpecialBins&,		
-			PopulationParameter&,		//!< reference to the PopulationParameter 
+			SpecialBins&, PopulationParameter&,	//!< reference to the PopulationParameter
 			PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
-			Potential&					//!< reference to the current scale variable
-		);
+			Potential&				//!< reference to the current scale variable
+			);
 
-		virtual ~NumericalZeroLeakEquations(){}
+	virtual ~NumericalZeroLeakEquations() {
+	}
 
-		virtual void Configure
-		(
-			void*
-		);
+	virtual void Configure(void*);
 
-		//! Get input parameters at start of every Evolve
-		virtual void SortConnectionvector
-		(
-			predecessor_iterator,
-			predecessor_iterator
-		);
+	//! Get input parameters at start of every Evolve
+	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<NodeType>& typeVector);
 
-		//! Adapt input parameters every simulation step
-		virtual void AdaptParameters
-		(
-		);
+	//! Adapt input parameters every simulation step
+	virtual void AdaptParameters();
 
-		virtual void RecalculateSolverParameters();
+	virtual void RecalculateSolverParameters();
 
-		virtual void Apply(Time);
+	virtual void Apply(Time);
 
-		Rate CalculateRate() const;
+	Rate CalculateRate() const;
 
-		// overload to account for refractive probability
-		virtual Probability RefractiveProbability() const { return _queue.TotalProbability(); }
+	// overload to account for refractive probability
+	virtual Probability RefractiveProbability() const {
+		return _queue.TotalProbability();
+	}
 
-	private:
+private:
 
-		void InitializeIntegrators();
-		void PushOnQueue(Time, double);
-		void PopFromQueue(Time);
+	void InitializeIntegrators();
+	void PushOnQueue(Time, double);
+	void PopFromQueue(Time);
 
-		Time									_time_current;
-		Number*									_p_n_bins;
-		PopulationParameter*					_p_par_pop;
-		valarray<Potential>*					_p_array_state;
-		Potential*								_p_check_sum;
-		LIFConvertor							_convertor;
-		auto_ptr<AbstractRateComputation>		_p_rate_calc;
+	Time _time_current;
+	Number* _p_n_bins;
+	PopulationParameter* _p_par_pop;
+	valarray<Potential>* _p_array_state;
+	Potential* _p_check_sum;
+	LIFConvertor _convertor;
+	auto_ptr<AbstractRateComputation> _p_rate_calc;
 
-		boost::shared_ptr< ExStateDVIntegrator<NumericalZeroLeakParameter> >	
-				_p_integrator;   
-		boost::shared_ptr< ExStateDVIntegrator<NumericalZeroLeakParameter> >
-				_p_reset;
-		NumericalZeroLeakParameter				_parameter;
-		ProbabilityQueue						_queue;
-	};
+	boost::shared_ptr<ExStateDVIntegrator<NumericalZeroLeakParameter> > _p_integrator;
+	boost::shared_ptr<ExStateDVIntegrator<NumericalZeroLeakParameter> > _p_reset;
+	NumericalZeroLeakParameter _parameter;
+	ProbabilityQueue _queue;
+};
 
 } /* namespace populist */
 } /* namespace MPILib */

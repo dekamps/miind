@@ -17,9 +17,9 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#include "OneDMParameter.h"
+#include <MPILib/include/populist/OneDMParameter.hpp>
 
-using namespace PopulistLib;
+using namespace MPILib::populist;
 
 OneDMParameter::OneDMParameter
 (

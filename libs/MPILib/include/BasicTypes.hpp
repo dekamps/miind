@@ -70,6 +70,11 @@ typedef int NodeId;
 //! default maximum term size for AbstractNonCirculantSolver
 const double EPS_J_CIRC_MAX = 1e-10;
 
+//TODO: restore
+const double RELATIVE_LEAKAGE_PRECISION = 1e-4;//1e-10;
+
+const double ALPHA_LIMIT = 1e-6;
+
 const int MAXIMUM_NUMBER_CIRCULANT_BINS     = 100000;
 const int MAXIMUM_NUMBER_NON_CIRCULANT_BINS = 100000;
 
@@ -82,6 +87,18 @@ const double WC_RELATIVE_PRECISION = 0;
 const int N_FRACT_PERCENTAGE_SMALL = 100;
 const int N_PERCENTAGE_SMALL       = 5;
 const int N_FRACT_PERCENTAGE_BIG   = 10;
+
+const Number CIRCULANT_POLY_DEGREE = 4;
+
+const Index CIRCULANT_POLY_JMAX = 7;
+
+const int MAXIMUM_NUMBER_GAMMAZ_VALUES = 500;
+
+
+const Number NONCIRC_LIMIT = 5;
+
+//! Even if refraction is not considered, for some algorithms it is convenient to set it artificially to a non zero value
+const Time TIME_REFRACT_MIN = 0.1e-3;
 
 const int KEY_PRECISION = 8;
 

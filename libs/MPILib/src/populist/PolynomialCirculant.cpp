@@ -17,124 +17,97 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#include "PolynomialCirculant.h"
-#include "LocalDefinitions.h"
+#include <MPILib/include/populist/PolynomialCirculant.hpp>
 
-using namespace PopulistLib;
-
-PolynomialCirculant::PolynomialCirculant():
-_j_array(vector<double>(CIRCULANT_POLY_JMAX))
-{
+namespace MPILib {
+namespace populist {
+PolynomialCirculant::PolynomialCirculant() :
+		_j_array(vector<double>(CIRCULANT_POLY_JMAX)) {
 }
 
-PolynomialCirculant::~PolynomialCirculant()
-{
+PolynomialCirculant::~PolynomialCirculant() {
 }
 
-PolynomialCirculant* PolynomialCirculant::Clone() const
-{
+PolynomialCirculant* PolynomialCirculant::Clone() const {
 	return new PolynomialCirculant;
 }
 
-void PolynomialCirculant::Execute(Number n_bins, Time tau, Time t_irrelevant)
-{
-	assert( _p_set->_n_circ_exc    < MAXIMUM_NUMBER_GAMMAZ_VALUES );
-	assert( _p_set->_n_noncirc_exc < MAXIMUM_NUMBER_GAMMAZ_VALUES );
+void PolynomialCirculant::Execute(Number n_bins, Time tau, Time t_irrelevant) {
+	assert( _p_set->_n_circ_exc < MAXIMUM_NUMBER_GAMMAZ_VALUES);
+	assert( _p_set->_n_noncirc_exc < MAXIMUM_NUMBER_GAMMAZ_VALUES);
 
 	_n_bins = n_bins;
-	_tau	= tau;
+	_tau = tau;
 
 	FillNonCirculantBins();
 
 	LoadJArray();
 
-
-	for 
-	( 
-		Index i_circulant = 0;
-		i_circulant < CIRCULANT_POLY_DEGREE;
-		i_circulant++
-	){
+	for (Index i_circulant = 0; i_circulant < CIRCULANT_POLY_DEGREE;
+			i_circulant++) {
 		_array_circulant[i_circulant] = 0;
-		for 
-		(
-			Index i_non_circulant = 0;
-			i_non_circulant < CIRCULANT_POLY_DEGREE  - i_circulant; 
-			i_non_circulant++
-		){	
-			_array_circulant[i_circulant] +=  _j_array[i_circulant + i_non_circulant]*_array_rho[i_non_circulant];
-			
+		for (Index i_non_circulant = 0;
+				i_non_circulant < CIRCULANT_POLY_DEGREE - i_circulant;
+				i_non_circulant++) {
+			_array_circulant[i_circulant] += _j_array[i_circulant
+					+ i_non_circulant] * _array_rho[i_non_circulant];
+
 		}
 	}
 }
 
-
-Number PolynomialCirculant::NrCirculant() const
-{
+Number PolynomialCirculant::NrCirculant() const {
 	return CIRCULANT_POLY_DEGREE;
 }
 
-Index PolynomialCirculant::JMax() const
-{
+Index PolynomialCirculant::JMax() const {
 	return CIRCULANT_POLY_JMAX;
 }
 
-void PolynomialCirculant::LoadJArray()
-{
-	double sum   = 1.0;
+void PolynomialCirculant::LoadJArray() {
+	double sum = 1.0;
 	double fac_p = 1.0;
 
-	for (Index p = 1; p <= CIRCULANT_POLY_DEGREE; p++)
-	{
-		fac_p *= -_tau/static_cast<double>(p);
+	for (Index p = 1; p <= CIRCULANT_POLY_DEGREE; p++) {
+		fac_p *= -_tau / static_cast<double>(p);
 		sum += fac_p;
 	}
 
 	double fac_j = 1.0;
 
-
-	for (Index j = 1; j <= CIRCULANT_POLY_JMAX; j++ )
-	{
-		fac_j *= _tau/static_cast<double>(j);
-		_j_array[j-1] = fac_j*sum;
+	for (Index j = 1; j <= CIRCULANT_POLY_JMAX; j++) {
+		fac_j *= _tau / static_cast<double>(j);
+		_j_array[j - 1] = fac_j * sum;
 	}
 
 	return;
 }
 
-void PolynomialCirculant::FillNonCirculantBins()
-{
+void PolynomialCirculant::FillNonCirculantBins() {
 	// Purpose: Integrate the density in the non-circulant areas. This produces the vector f^0.
 	// Assumptions: none
 	// Author: Marc de Kamps
 	// Date:   01-09-2005
 	// Modified: 10-07-2006; Insert break after CIRCULANT_POLY_J_MAX
 
-	valarray<double> array_state = *_p_array_state;
+	std::valarray<double> array_state = *_p_array_state;
 
-
-	for 
-	(
-		Index index_non_circulant = 0;
-		index_non_circulant < _p_set->_n_noncirc_exc; 
-		index_non_circulant++
-	)
+	for (Index index_non_circulant = 0;
+			index_non_circulant < _p_set->_n_noncirc_exc; index_non_circulant++)
 		_array_rho[index_non_circulant] = 0;
 
-
-	for
-	(
-		int index_density = _n_bins - 1;
-		index_density >= 0; 
-		index_density--
-	){	
-		Index index_non_circulant_area = (_n_bins - 1 - index_density)/(_p_set->_H_exc); 
+	for (int index_density = _n_bins - 1; index_density >= 0; index_density--) {
+		Index index_non_circulant_area = (_n_bins - 1 - index_density)
+				/ (_p_set->_H_exc);
 
 		if (index_non_circulant_area > CIRCULANT_POLY_JMAX)
 			break;
 
-		assert( index_non_circulant_area >= 0 && index_non_circulant_area < static_cast<int>( _array_rho.size() ) );
+		assert(
+				index_non_circulant_area >= 0 && index_non_circulant_area < static_cast<int>( _array_rho.size() ));
 
-		_array_rho[index_non_circulant_area] += array_state[index_density]; 
+		_array_rho[index_non_circulant_area] += array_state[index_density];
 	}
 }
+} /* namespace populist */
+} /* namespace MPILib */

@@ -18,13 +18,17 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <MPILib/include/populist/MuSigmaScalarProduct.hpp>
-//#include "ConnectionSquaredProduct.h"
+#include <MPILib/include/populist/ConnectionSquaredProduct.hpp>
+#include <math.h>
+#include <functional>
+#include <numeric>
 
 namespace MPILib {
 namespace populist {
 
 MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<Rate>& nodeVector,
-		const std::vector<PopulationConnection>& weightVector, Time tau) const {
+		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+		Time tau) const {
 	MuSigma ret;
 
 	ret._mu = tau * this->InnerProduct(nodeVector, weightVector);
@@ -36,24 +40,19 @@ MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<Rate>& nodeVector,
 
 Potential MuSigmaScalarProduct::InnerProduct(
 		const std::vector<Rate>& nodeVector,
-		const std::vector<PopulationConnection>& weightVector) const {
-//	connection* p_begin = iter_begin.ConnectionPointer();
-//	connection* p_end = iter_end.ConnectionPointer();
-//FIXME DS
-	return inner_product(nodeVector.begin(), nodeVector.end(), weightVector.begin(), 0.0 //,
-//				plus<double>(),
-//				ConnectionProduct<double,OrnsteinUhlenbeckConnection>()
-			);
+		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const {
+
+	return std::inner_product(nodeVector.begin(), nodeVector.end(),
+			weightVector.begin(), 0.0);
 }
 
 Potential MuSigmaScalarProduct::InnerSquaredProduct(
 		const std::vector<Rate>& nodeVector,
-		const std::vector<PopulationConnection>& weightVector) const {
-//	connection* p_begin = iter_begin.ConnectionPointer();
-//	connection* p_end = iter_end.ConnectionPointer();
-	return -1; //FIXME DS
-//	return inner_product(p_begin, p_end, p_begin, 0.0, plus<double>(),
-//			ConnectionSquaredProduct());
+		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const {
+
+	return inner_product(nodeVector.begin(), nodeVector.end(),
+			weightVector.begin(), 0.0, std::plus<double>(),
+			ConnectionSquaredProduct());
 }
 
 } /* namespace populist */

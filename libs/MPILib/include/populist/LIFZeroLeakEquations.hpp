@@ -33,7 +33,6 @@ namespace populist {
 class LIFZeroLeakEquations: public AbstractZeroLeakEquations {
 public:
 
-	typedef AbstractAlgorithm<PopulationConnection>::predecessor_iterator predecessor_iterator;
 
 	LIFZeroLeakEquations( VALUE_REF_INIT
 	Number&,						//!< reference to the current number of bins
@@ -53,8 +52,9 @@ public:
 	virtual void Apply(Time) {
 	}
 
-	virtual void SortConnectionvector(predecessor_iterator,
-			predecessor_iterator);
+	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<NodeType>& typeVector);
 
 	virtual void AdaptParameters();
 

@@ -21,81 +21,75 @@
 #define MPILIB_POPULIST_ONEDMZEROLEAKEQUATIONS_HPP_
 
 #include <gsl/gsl_odeiv.h>
+#include <gsl/gsl_errno.h>
 #include <MPILib/include/populist/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/populist/ABConvertor.hpp>
 #include <MPILib/include/populist/OneDMInputSetParameter.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 
-
-
 namespace MPILib {
 namespace populist {
 
-	class AbConvertor;
-	class PopulistSpecificParameter;
+class AbConvertor;
+class PopulistSpecificParameter;
 
-	class OneDMZeroLeakEquations : public AbstractZeroLeakEquations {
-	public:
+class OneDMZeroLeakEquations: public AbstractZeroLeakEquations {
+public:
 
-		typedef AbstractAlgorithm<PopulationConnection>::predecessor_iterator predecessor_iterator;
+	OneDMZeroLeakEquations(Number&,	//<! reference to the variable keeping track of the current number of bins
+			std::valarray<Potential>&,		//<! reference to the state array
+			Potential&, SpecialBins&, PopulationParameter&,	//!< serves now mainly to communicate t_s
+			PopulistSpecificParameter&, Potential&//!< current potential interval covered by one bin, delta_v
 
-		OneDMZeroLeakEquations
-		(
-			Number&,							//<! reference to the variable keeping track of the current number of bins
-			std::valarray<Potential>&,				//<! reference to the state array
-			Potential&,
-			SpecialBins&,
-			PopulationParameter&,				//!< serves now mainly to communicate t_s
-			PopulistSpecificParameter&,
-			Potential&							//!< current potential interval covered by one bin, delta_v
+			);
 
-		);
+	virtual ~OneDMZeroLeakEquations();
 
-		virtual ~OneDMZeroLeakEquations();
+	virtual void Configure(void*);
 
-		virtual void Configure
-		(
-			void*					
-		);
+	virtual void Apply(Time);
 
-		virtual void Apply(Time);
+	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<NodeType>& typeVector) {
+		_convertor.SortConnectionvector(nodeVector, weightVector, typeVector);
+	}
+	virtual void AdaptParameters() {
+		_convertor.AdaptParameters();
+	}
 
-		virtual void SortConnectionvector
-		(
-			predecessor_iterator iter_begin,
-			predecessor_iterator iter_end
-			){ _convertor.SortConnectionvector(iter_begin,iter_end);}
-		virtual void AdaptParameters
-		(
-		){ _convertor.AdaptParameters();}
+	virtual void RecalculateSolverParameters() {
+		_convertor.RecalculateSolverParameters();
+	}
 
-		virtual void RecalculateSolverParameters(){_convertor.RecalculateSolverParameters();}
+	virtual Time CalculateRate() const;
 
-		virtual Time CalculateRate() const;
+private:
 
-	private:
+	gsl_odeiv_system InitializeSystem() const;
 
-		gsl_odeiv_system InitializeSystem() const;
+	//! OneDMZeroLeakEquations does not need this, but the base class requires this
+	InputParameterSet Set() {
+		InputParameterSet set;
+		return set;
+	}
 
-		//! OneDMZeroLeakEquations does not need this, but the base class requires this
-		InputParameterSet Set(){InputParameterSet set; return set;} 
+	Number& _n_bins;
+	std::valarray<Potential>* _p_state;
+	gsl_odeiv_system _system;		// moving frame prevents use of DVIntegrator
 
-		Number&						_n_bins;
-		std::valarray<Potential>*		_p_state;
-		gsl_odeiv_system			_system;		// moving frame prevents use of DVIntegrator
+	ABConvertor _convertor;
+	Number _n_max;
 
-		ABConvertor					_convertor;
-		Number						_n_max;
+	gsl_odeiv_step* _p_step;
+	gsl_odeiv_control* _p_control;
+	gsl_odeiv_evolve* _p_evolve;
 
-		gsl_odeiv_step*				_p_step;
-		gsl_odeiv_control*			_p_control; 
-		gsl_odeiv_evolve*			_p_evolve;
+	gsl_odeiv_system _sys;
 
-		gsl_odeiv_system			_sys;
+	OneDMInputSetParameter _params;
 
-		OneDMInputSetParameter		_params;
-
-	};
+};
 
 } /* namespace populist */
 } /* namespace MPILib */

@@ -18,23 +18,18 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <cassert>
-#include "../NumtoolsLib/NumtoolsLib.h"
-#include "AbstractCirculantSolver.h"
-#include "AbstractNonCirculantSolver.h"
-#include "AbstractRateComputation.h"
-#include "CirculantSolver.h"
-#include "LocalDefinitions.h"
-#include "NumericalZeroLeakEquations.h"
-#include "NonCirculantSolver.h"
-#include "PopulistException.h"
-#include "PopulistSpecificParameter.h"
+#include <NumtoolsLib/NumtoolsLib.h>
+#include <MPILib/include/populist/AbstractCirculantSolver.hpp>
+#include <MPILib/include/populist/AbstractNonCirculantSolver.hpp>
+#include <MPILib/include/populist/AbstractRateComputation.hpp>
+#include <MPILib/include/populist/CirculantSolver.hpp>
+#include <MPILib/include/populist/NumericalZeroLeakEquations.hpp>
+#include <MPILib/include/populist/NonCirculantSolver.hpp>
+#include <MPILib/include/populist/PopulistSpecificParameter.hpp>
 
-using namespace NumtoolsLib;
-using namespace PopulistLib;
 
-namespace {
-
-}
+namespace MPILib {
+namespace populist {
 
 int DerivReset(double t, const double y[], double dydt[], void * params){
 
@@ -183,7 +178,7 @@ void NumericalZeroLeakEquations::InitializeIntegrators()
 	_p_reset->Parameter()._nr_max_bins		= this->ArrayState().size();
 }
 
-void NumericalZeroLeakEquations::Apply(DynamicLib::Time time)
+void NumericalZeroLeakEquations::Apply(Time time)
 {
 	InitializeIntegrators();
 
@@ -194,8 +189,8 @@ void NumericalZeroLeakEquations::Apply(DynamicLib::Time time)
 	time += _time_current;
  
 
-	DynamicLib::Time t_integrator = 0;
-	DynamicLib::Time t_reset = 0;
+	Time t_integrator = 0;
+	Time t_reset = 0;
 
 	Index i_reset = _convertor.IndexCurrentResetBin();
 	double before= (*_p_array_state)[i_reset];
@@ -209,7 +204,7 @@ void NumericalZeroLeakEquations::Apply(DynamicLib::Time time)
 		t_integrator = _p_integrator->Evolve(time);
 }
 
-void NumericalZeroLeakEquations::PushOnQueue(DynamicLib::Time t, double before)
+void NumericalZeroLeakEquations::PushOnQueue(Time t, double before)
 {
 	Index i_reset = _convertor.IndexCurrentResetBin();
 	double dif = (*_p_array_state)[i_reset] - before;
@@ -221,7 +216,7 @@ void NumericalZeroLeakEquations::PushOnQueue(DynamicLib::Time t, double before)
 	_queue.push(prob);
 }
 
-void NumericalZeroLeakEquations::PopFromQueue(DynamicLib::Time t)
+void NumericalZeroLeakEquations::PopFromQueue(Time t)
 {
 	Index i_reset = _convertor.IndexCurrentResetBin();
 	double p_pop = _queue.CollectAndRemove(t);
@@ -241,7 +236,7 @@ void NumericalZeroLeakEquations::Configure
 							this->ParSpec().MaxNumGridPoints(),
 							1e-7,					// time step
 							0.0,					// initial time
-							Precision(1e-5,	0.0),	// precision,
+							NumtoolsLib::Precision(1e-5,	0.0),	// precision,
 							Deriv
 						)
 					);
@@ -255,7 +250,7 @@ void NumericalZeroLeakEquations::Configure
 							this->ParSpec().MaxNumGridPoints(),
 							1e-7,					// time step
 							0.0,					// initial time
-							Precision(1e-5,	0.0),	// precision,
+							NumtoolsLib::Precision(1e-5,	0.0),	// precision,
 							DerivReset
 						)
 					);
@@ -294,14 +289,18 @@ void NumericalZeroLeakEquations::AdaptParameters
 
 void NumericalZeroLeakEquations::SortConnectionvector
 (
-	predecessor_iterator iter_begin,
-	predecessor_iterator iter_end
+		const std::vector<Rate>& nodeVector,
+		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+		const std::vector<NodeType>& typeVector
 )
 {
-	_convertor.SortConnectionvector(iter_begin,iter_end);
+	_convertor.SortConnectionvector(nodeVector, weightVector, typeVector);
 }
 
 void NumericalZeroLeakEquations::RecalculateSolverParameters()
 {
 	_convertor.RecalculateSolverParameters();
 }
+
+} /* namespace populist */
+} /* namespace MPILib */

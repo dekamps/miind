@@ -18,83 +18,57 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <cassert>
-#include "../NumtoolsLib/NumtoolsLib.h"
-#include "AbstractCirculantSolver.h"
-#include "AbstractNonCirculantSolver.h"
-#include "AbstractRateComputation.h"
-#include "CirculantSolver.h"
-#include "LocalDefinitions.h"
-#include "OldLifZeroLeakEquations.h"
-#include "NonCirculantSolver.h"
-#include "PopulistException.h"
-#include "PopulistSpecificParameter.h"
+#include <NumtoolsLib/NumtoolsLib.h>
+#include <MPILib/include/populist/AbstractCirculantSolver.hpp>
+#include <MPILib/include/populist/AbstractNonCirculantSolver.hpp>
+#include <MPILib/include/populist/AbstractRateComputation.hpp>
+#include <MPILib/include/populist/CirculantSolver.hpp>
+#include <MPILib/include/populist/OldLifZeroLeakEquations.hpp>
+#include <MPILib/include/populist/NonCirculantSolver.hpp>
+#include <MPILib/include/populist/PopulistSpecificParameter.hpp>
 
-using namespace PopulistLib;
 using NumtoolsLib::IsApproximatelyEqualTo;
 
-OldLIFZeroLeakEquations::OldLIFZeroLeakEquations
-(
-	Number&								n_bins,		
-	valarray<Potential>&				array_state,
-	Potential&							check_sum,
-	SpecialBins&						bins,		
-	PopulationParameter&				par_pop,		//!< reference to the PopulationParameter 
-	PopulistSpecificParameter&			par_spec,		//!< reference to the PopulistSpecificParameter
-	Potential&							delta_v,		//!< reference to the current scale variable
-	const AbstractCirculantSolver&		circ,
-	const AbstractNonCirculantSolver&	noncirc
-):
-LIFZeroLeakEquations
-(
-	n_bins,
-	array_state,
-	check_sum,
-	bins,
-	par_pop,
-	par_spec,
-	delta_v,
-	circ,
-	noncirc
-),
-_time_current(0),
-_p_n_bins(&n_bins),
-_p_array_state(&array_state),
-_p_check_sum(&check_sum),
-_convertor
-(
-	VALUE_REF_INIT
-	bins,
-	par_pop,
-	par_spec,
-	delta_v,
-	n_bins
-),
-_p_solver_circulant(circ.Clone()),
-_p_solver_non_circulant(noncirc.Clone())
-{
+namespace MPILib {
+namespace populist {
+
+OldLIFZeroLeakEquations::OldLIFZeroLeakEquations(Number& n_bins,
+		valarray<Potential>& array_state, Potential& check_sum,
+		SpecialBins& bins,
+		PopulationParameter& par_pop,//!< reference to the PopulationParameter
+		PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
+		Potential& delta_v,		//!< reference to the current scale variable
+		const AbstractCirculantSolver& circ,
+		const AbstractNonCirculantSolver& noncirc) :
+		LIFZeroLeakEquations(n_bins, array_state, check_sum, bins, par_pop,
+				par_spec, delta_v, circ, noncirc), _time_current(0), _p_n_bins(
+				&n_bins), _p_array_state(&array_state), _p_check_sum(
+				&check_sum), _convertor( VALUE_REF_INIT
+		bins, par_pop, par_spec, delta_v, n_bins), _p_solver_circulant(
+				circ.Clone()), _p_solver_non_circulant(noncirc.Clone()) {
 	this->SetInputParameter(_convertor.SolverParameter());
 }
 
-void OldLIFZeroLeakEquations::Apply(Time time)
-{
+void OldLIFZeroLeakEquations::Apply(Time time) {
 	_time_current += time;
-	assert( IsApproximatelyEqualTo(_p_array_state->sum()/(*_p_check_sum), 1.0, RELATIVE_LEAKAGE_PRECISION) );
+	assert(
+			IsApproximatelyEqualTo(_p_array_state->sum()/(*_p_check_sum), 1.0, RELATIVE_LEAKAGE_PRECISION));
 
 	ApplyZeroLeakEquationsAlphaInhibitory(time);
 	ApplyZeroLeakEquationsAlphaExcitatory(time);
 
-	assert ( IsApproximatelyEqualTo( _p_array_state->sum()/(*_p_check_sum), 1.0, RELATIVE_LEAKAGE_PRECISION ) );
+	assert(
+			IsApproximatelyEqualTo( _p_array_state->sum()/(*_p_check_sum), 1.0, RELATIVE_LEAKAGE_PRECISION ));
 }
 
-void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaExcitatory(Time time)
-{
+void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaExcitatory(Time time) {
 	InputParameterSet& input_set = _convertor.SolverParameter();
 
-	double tau_e    = input_set._rate_exc*time;
-	double alpha_e  = input_set._alpha_exc;
+	double tau_e = input_set._rate_exc * time;
+	double alpha_e = input_set._alpha_exc;
 
 	// added to ignore zero input, which is legitimate (MdK: 11/06/2010)
-	if (input_set._rate_exc == 0 && input_set._H_exc == 0 )
+	if (input_set._rate_exc == 0 && input_set._H_exc == 0)
 		return;
 
 #ifdef _INVESTIGATE_ALGORITHM
@@ -102,15 +76,16 @@ void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaExcitatory(Time time)
 	val._time = _time_current;
 	CirculantSolver* p_solver = dynamic_cast<CirculantSolver*>(_p_solver_circulant.get());
 	if (p_solver == 0)
-			throw PopulistException("Can not downcast to CirculantSolver");
+	throw PopulistException("Can not downcast to CirculantSolver");
 #endif
 
-	assert (alpha_e <= 1.0 && alpha_e >= 0.0);
-	if ( input_set._n_circ_exc != 0 && tau_e > 0 )
-	{
-		_p_solver_circulant->Execute(*_p_n_bins, (1-alpha_e)*tau_e);
-		_p_solver_non_circulant->ExecuteExcitatory(*_p_n_bins,(1-alpha_e)*tau_e);
-		_p_solver_circulant->AddCirculantToState(Bins()._index_current_reset_bin);
+	assert(alpha_e <= 1.0 && alpha_e >= 0.0);
+	if (input_set._n_circ_exc != 0 && tau_e > 0) {
+		_p_solver_circulant->Execute(*_p_n_bins, (1 - alpha_e) * tau_e);
+		_p_solver_non_circulant->ExecuteExcitatory(*_p_n_bins,
+				(1 - alpha_e) * tau_e);
+		_p_solver_circulant->AddCirculantToState(
+				Bins()._index_current_reset_bin);
 		// if alpha_e is close to zero, this is all that's necessary but if not then:
 		// (this is always the case within the diffusion limit
 #ifdef _INVESTIGATE_ALGORITHM
@@ -118,13 +93,14 @@ void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaExcitatory(Time time)
 		val._name_quantity = "alpha_e_pos_small";
 		_p_convertor->Values().push_back(val);
 #endif
-		if ( alpha_e > ALPHA_LIMIT )
-		{
+		if (alpha_e > ALPHA_LIMIT) {
 			input_set._H_exc++;
 			_convertor.UpdateRestInputParameters();
-			_p_solver_circulant->Execute(*_p_n_bins, alpha_e*tau_e);
-			_p_solver_non_circulant->ExecuteExcitatory(*_p_n_bins,alpha_e*tau_e);
-			_p_solver_circulant->AddCirculantToState(Bins()._index_current_reset_bin);
+			_p_solver_circulant->Execute(*_p_n_bins, alpha_e * tau_e);
+			_p_solver_non_circulant->ExecuteExcitatory(*_p_n_bins,
+					alpha_e * tau_e);
+			_p_solver_circulant->AddCirculantToState(
+					Bins()._index_current_reset_bin);
 #ifdef _INVESTIGATE_ALGORITHM
 			val._value = input_set._rate_exc*p_solver->Flux(*_p_n_bins, tau_e);
 			val._name_quantity = "alpha_e_pos_large";
@@ -134,87 +110,65 @@ void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaExcitatory(Time time)
 	}
 }
 
-void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaInhibitory(Time time)
-{
+void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaInhibitory(Time time) {
 	InputParameterSet& input_set = _convertor.SolverParameter();
 
 	// added to ignore zero input, which is legitimate (MdK: 11/06/2010)
-	if (input_set._rate_inh == 0 && input_set._H_inh == 0 )
+	if (input_set._rate_inh == 0 && input_set._H_inh == 0)
 		return;
 
-	double tau_i   = input_set._rate_inh*time;
+	double tau_i = input_set._rate_inh * time;
 	double alpha_i = input_set._alpha_inh;
 
-	assert (alpha_i <= 1.0 && alpha_i >= 0.0);
-	if ( input_set._rate_inh > 0 && tau_i > 0 )
-	{
-		_p_solver_non_circulant->ExecuteInhibitory(*_p_n_bins,(1-alpha_i)*tau_i);
-			// alpha_i is close to zero, this is all that's necessary but if not then:
-			// (this is always the case within the diffusion limit
-		if ( alpha_i > ALPHA_LIMIT )
-		{
+	assert(alpha_i <= 1.0 && alpha_i >= 0.0);
+	if (input_set._rate_inh > 0 && tau_i > 0) {
+		_p_solver_non_circulant->ExecuteInhibitory(*_p_n_bins,
+				(1 - alpha_i) * tau_i);
+		// alpha_i is close to zero, this is all that's necessary but if not then:
+		// (this is always the case within the diffusion limit
+		if (alpha_i > ALPHA_LIMIT) {
 			input_set._H_inh++;
 			_convertor.UpdateRestInputParameters();
-			_p_solver_non_circulant->ExecuteInhibitory(*_p_n_bins,alpha_i*tau_i);
+			_p_solver_non_circulant->ExecuteInhibitory(*_p_n_bins,
+					alpha_i * tau_i);
 		}
 	}
 }
 
-void OldLIFZeroLeakEquations::Configure
-(
-	void*					p_par					// irrelevant for LIFZeroLeakequations
-)
-{
+void OldLIFZeroLeakEquations::Configure(void* p_par	// irrelevant for LIFZeroLeakequations
+		) {
 	_convertor.Configure(this->ArrayState());
 	InputParameterSet& input_set = _convertor.SolverParameter();
 
-	_p_solver_circulant->Configure
-	(
-		_p_array_state,
-		input_set
-	);
+	_p_solver_circulant->Configure(_p_array_state, input_set);
 
+	_p_solver_non_circulant->Configure(*_p_array_state, input_set);
 
-	_p_solver_non_circulant->Configure
-	(
-		*_p_array_state,
-		input_set
-	);
+	_p_rate_calc = auto_ptr<AbstractRateComputation>(
+			this->ParSpec().RateComputation().Clone());
 
-	_p_rate_calc = auto_ptr<AbstractRateComputation>(this->ParSpec().RateComputation().Clone());
-
-	_p_rate_calc->Configure
-	(
-		*_p_array_state,
-		input_set,
-		_convertor.ParPop(), 
-		_convertor.IndexReversalBin()
-	);
+	_p_rate_calc->Configure(*_p_array_state, input_set, _convertor.ParPop(),
+			_convertor.IndexReversalBin());
 }
 
-Rate OldLIFZeroLeakEquations::CalculateRate() const
-{
+Rate OldLIFZeroLeakEquations::CalculateRate() const {
 	return _p_rate_calc->CalculateRate(*_p_n_bins);
 }
 
-void OldLIFZeroLeakEquations::RecalculateSolverParameters()
-{
+void OldLIFZeroLeakEquations::RecalculateSolverParameters() {
 	_convertor.RecalculateSolverParameters();
 }
 
-
-void OldLIFZeroLeakEquations::SortConnectionvector
-(
-	predecessor_iterator iter_begin,
-	predecessor_iterator iter_end
-)
-{
-	_convertor.SortConnectionvector(iter_begin,iter_end);
+void OldLIFZeroLeakEquations::SortConnectionvector(
+		const std::vector<Rate>& nodeVector,
+		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+		const std::vector<NodeType>& typeVector) {
+	_convertor.SortConnectionvector(nodeVector, weightVector, typeVector);
 }
 
-void OldLIFZeroLeakEquations::AdaptParameters
-(
-)
-{
+void OldLIFZeroLeakEquations::AdaptParameters() {
 	_convertor.AdaptParameters();
 }
+
+} /* namespace populist */
+} /* namespace MPILib */

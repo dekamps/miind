@@ -17,10 +17,13 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#include "MatrixNonCirculant.h"
-#include "PopulistException.h"
+#include <MPILib/include/populist/MatrixNonCirculant.hpp>
+#include <MPILib/include/utilities/Exception.hpp>
 
-using namespace PopulistLib;
+
+namespace MPILib {
+namespace populist {
+
 
 MatrixNonCirculant::MatrixNonCirculant():
 AbstractNonCirculantSolver(INTEGER)
@@ -58,7 +61,7 @@ void MatrixNonCirculant::ExecuteExcitatory
 	for (i = static_cast<int>(n_bins) - 1,  j = 0; i >=0; i-=H, j++)
 		_matrix_row[i] = _array_factor[j];
 
-	valarray<Potential>& array_state = *_p_array_state;
+	std::valarray<Potential>& array_state = *_p_array_state;
 
 	for( int i = n_bins - 1; i >= 0; i-- )
 	{
@@ -78,12 +81,12 @@ void MatrixNonCirculant::ExecuteInhibitory
 	Time tau
 )
 {
-	throw PopulistException("Not yet implemented");
+	throw utilities::Exception("Not yet implemented");
 }
 
 bool MatrixNonCirculant::Configure
 (
-	valarray<double>&		 array_state, 
+	std::valarray<double>&		 array_state,
 	const InputParameterSet& input_set
 )
 {
@@ -95,3 +98,6 @@ bool MatrixNonCirculant::Configure
 	_matrix_row = array_state;
 	return true;
 }
+
+} /* namespace populist */
+} /* namespace MPILib */

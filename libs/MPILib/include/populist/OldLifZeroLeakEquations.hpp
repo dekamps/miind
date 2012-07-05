@@ -33,8 +33,6 @@ namespace populist {
 	class OldLIFZeroLeakEquations : public LIFZeroLeakEquations {
 	public:
 
-		typedef AbstractAlgorithm<PopulationConnection>::predecessor_iterator predecessor_iterator;
-
 		OldLIFZeroLeakEquations
 		(
 			VALUE_REF_INIT
@@ -60,9 +58,9 @@ namespace populist {
 		virtual void Apply(Time);
 
 		virtual void SortConnectionvector
-		(
-			predecessor_iterator,
-			predecessor_iterator
+		(const std::vector<Rate>& nodeVector,
+				const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+				const std::vector<NodeType>& typeVector
 		);
 
 		virtual void AdaptParameters

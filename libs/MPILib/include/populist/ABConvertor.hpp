@@ -33,74 +33,60 @@
 #include <MPILib/include/populist/OneDMInputSetParameter.hpp>
 #include <MPILib/include/populist/SpecialBins.hpp>
 
-using DynamicLib::AbstractAlgorithm;
-
 namespace MPILib {
 namespace populist {
 
-	class ABConvertor {
-	public:
+class ABConvertor {
+public:
 
-		typedef AbstractAlgorithm<PopulationConnection>::predecessor_iterator predecessor_iterator;
+	typedef OneDMInputSetParameter SolverParameterType;
+	typedef ABQStruct ScalarProductParameterType;
 
-		typedef  OneDMInputSetParameter SolverParameterType;
-		typedef	 ABQStruct ScalarProductParameterType;
+	ABConvertor( VALUE_REF
+	SpecialBins&, PopulationParameter&,	//!< serves now mainly to communicate t_s
+			PopulistSpecificParameter&, Potential&,	//!< current potential interval covered by one bin, delta_v
+			Number&);
+	void Configure(std::valarray<Potential>&, std::valarray<Potential>&,
+			const OneDMParameter& par_onedm) {
+		_param_onedm = par_onedm;
+	}
 
+	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<NodeType>& typeVector);
 
-		ABConvertor
-		(
-			VALUE_REF
-			SpecialBins&,
-			PopulationParameter&,			//!< serves now mainly to communicate t_s
-			PopulistSpecificParameter&,
-			Potential&,						//!< current potential interval covered by one bin, delta_v
-			Number&
-		);
-		void Configure
-		(
-			std::valarray<Potential>&,
-			std::valarray<Potential>&,
-			const OneDMParameter& par_onedm
-		){_param_onedm = par_onedm;}
+	virtual void AdaptParameters();
 
-		
-		virtual void SortConnectionvector
-		(
-			predecessor_iterator,
-			predecessor_iterator
-		);
+	void RecalculateSolverParameters();
 
-		virtual void AdaptParameters
-		(
-		);
+	void Rebin() {
+	}
 
-		void RecalculateSolverParameters();
+	const PopulistSpecificParameter&
+	PopSpecific() const;
 
-		void Rebin(){}
+	const OneDMInputSetParameter&
+	InputSet() const;
 
-		const PopulistSpecificParameter& 
-			PopSpecific() const;
-	
-		const OneDMInputSetParameter&
-			InputSet() const;
+	const PopulationParameter& ParPop() const {
+		return *_p_pop;
+	}
 
-		const PopulationParameter& ParPop() const { return *_p_pop; }
+private:
 
-	private:
+	ABConvertor(const ABConvertor&);
 
-		ABConvertor(const ABConvertor&);
+	VALUE_MEMBER_REF
 
-		VALUE_MEMBER_REF
-
-		OneDMInputSetParameter				_param_input;
-		OneDMParameter						_param_onedm;
-		ABScalarProduct						_scalar_product;
-		const PopulistSpecificParameter*	_p_specific;
-		const PopulationParameter*			_p_pop;
-		const Number*						_p_n_bins;
-		const Potential*					_p_delta_v;
-		Rate**								_pp_rate;
-	};
+	OneDMInputSetParameter _param_input;
+	OneDMParameter _param_onedm;
+	ABScalarProduct _scalar_product;
+	const PopulistSpecificParameter* _p_specific;
+	const PopulationParameter* _p_pop;
+	const Number* _p_n_bins;
+	const Potential* _p_delta_v;
+	Rate** _pp_rate;
+};
 } /* namespace populist */
 } /* namespace MPILib */
 

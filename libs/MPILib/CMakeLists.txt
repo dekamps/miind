@@ -13,6 +13,7 @@ set(MPI_SRCS
     src/populist/AbstractRateComputation.cpp
     src/populist/AbstractRebinner.cpp
     src/populist/AdaptationParameter.cpp
+    src/populist/AdaptiveHazard.cpp
     src/populist/CirculantSolver.cpp
     src/populist/InitializeAlgorithmGrid.cpp
     src/populist/LIFConvertor.cpp

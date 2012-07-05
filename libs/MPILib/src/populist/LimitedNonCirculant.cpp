@@ -17,11 +17,12 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#include "LimitedNonCirculant.h"
-#include "AbstractCirculantSolver.h"
-#include "LocalDefinitions.h"
+#include <MPILib/include/populist/LimitedNonCirculant.hpp>
+#include <MPILib/include/populist/AbstractCirculantSolver.hpp>
+#include <MPILib/include/BasicTypes.hpp>
 
-using namespace PopulistLib;
+namespace MPILib {
+namespace populist {
 
 LimitedNonCirculant::LimitedNonCirculant():
 AbstractNonCirculantSolver(INTEGER)
@@ -44,7 +45,7 @@ void LimitedNonCirculant::ExecuteExcitatory
 )
 {
 
-	valarray<double>& array_state = *_p_array_state;
+	std::valarray<double>& array_state = *_p_array_state;
 
 	int H = _p_input_set->_H_exc;
 	int n_non_circulant = _p_input_set->_n_noncirc_exc;
@@ -64,7 +65,7 @@ void LimitedNonCirculant::ExecuteExcitatory
 
 		double sum = (i_first >= 0) ? _array_factor[area_n_c]*array_state[i_first] : 0; 
 
-		int i_lower = max(1, area_n_c - static_cast<int>(NONCIRC_LIMIT) );
+		int i_lower = std::max(1, area_n_c - static_cast<int>(NONCIRC_LIMIT) );
 		for (int i_n_c = i_lower; i_n_c <= area_n_c; i_n_c++ ){
 
 			int i_stride = i_first + i_n_c*H;
@@ -132,3 +133,5 @@ void LimitedNonCirculant::InitializeArrayFactor
 	for (Index i = 1; i < NONCIRC_LIMIT; i++)
 		_array_factor[i] = tau*_array_factor[i - 1]/i;
 }
+} /* namespace populist */
+} /* namespace MPILib */
