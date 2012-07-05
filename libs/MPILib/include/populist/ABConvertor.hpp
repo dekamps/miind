@@ -58,8 +58,8 @@ namespace populist {
 		);
 		void Configure
 		(
-			valarray<Potential>&,
-			valarray<Potential>&,
+			std::valarray<Potential>&,
+			std::valarray<Potential>&,
 			const OneDMParameter& par_onedm
 		){_param_onedm = par_onedm;}
 
