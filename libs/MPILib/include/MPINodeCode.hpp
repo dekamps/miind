@@ -46,13 +46,6 @@ MPINode<Weight, NodeDistribution>::~MPINode() {
 
 template<class Weight, class NodeDistribution>
 Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
-
-	if(!_isInitialised){
-		this->exchangeNodeTypes();
-		_isInitialised=true;
-	}
-
-
 	receiveData();
 
 	waitAll();
@@ -78,6 +71,12 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::prepareEvolve(){
+
+	if(!_isInitialised){
+		this->exchangeNodeTypes();
+		_isInitialised=true;
+	}
+
 	_pAlgorithm->prepareEvolve(_precursorActivity, _weights, _precursorTypes);
 }
 
