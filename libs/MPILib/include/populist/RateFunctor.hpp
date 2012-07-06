@@ -51,22 +51,22 @@ public:
 	//! Essentially just calling the encapsulated rate function. The connection iterators are
 	//! ignored and essentially just the current simulation time is set.
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
-			const std::vector<WeightValue>& weightVector, Time time);
+			const std::vector<WeightValue>& weightVector, Time time) override;
 
 	//! Gives the current rate according to the original rate function
-	virtual Rate getCurrentRate() const {
+	virtual Rate getCurrentRate() const override{
 		return _function(_current_time);
 	}
 
 	//! Mandatory Grid  function, not of practical use.
-	virtual AlgorithmGrid getGrid() const;
+	virtual algorithm::AlgorithmGrid getGrid() const override;
 
-	virtual RateFunctor* Clone() const;
+	virtual RateFunctor* clone() const override;
 
-	virtual void configure(const SimulationRunParameter&);
+	virtual void configure(const SimulationRunParameter&) override;
 
 	//! Gives the current time that the Algorithm keeps.
-	virtual Time getCurrentTime() const;
+	virtual Time getCurrentTime() const override;
 
 private:
 

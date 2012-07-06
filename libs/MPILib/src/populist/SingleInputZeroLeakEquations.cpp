@@ -18,18 +18,19 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <cassert>
-#include "../NumtoolsLib/NumtoolsLib.h"
-#include "AbstractCirculantSolver.h"
-#include "AbstractNonCirculantSolver.h"
-#include "AbstractRateComputation.h"
-#include "CirculantSolver.h"
-#include "LocalDefinitions.h"
-#include "SingleInputZeroLeakEquations.h"
-#include "NonCirculantSolver.h"
-#include "PopulistException.h"
+#include <NumtoolsLib/NumtoolsLib.h>
+#include <MPILib/include/populist/AbstractCirculantSolver.hpp>
+#include <MPILib/include/populist/AbstractNonCirculantSolver.hpp>
+#include <MPILib/include/populist/AbstractRateComputation.hpp>
+#include <MPILib/include/populist/CirculantSolver.hpp>
+#include <MPILib/include/populist/SingleInputZeroLeakEquations.hpp>
+#include <MPILib/include/populist/NonCirculantSolver.hpp>
+#include <MPILib/include/utilities/Exception.hpp>
 
-using namespace PopulistLib;
 using NumtoolsLib::IsApproximatelyEqualTo;
+
+namespace MPILib {
+namespace populist {
 
 SingleInputZeroLeakEquations::SingleInputZeroLeakEquations
 (
@@ -81,3 +82,6 @@ void SingleInputZeroLeakEquations::Apply(Time time)
 	// CirculantAlgorithm slowly builds up a proability mismatch over longer times
 	assert( IsApproximatelyEqualTo(_p_array_state->sum() + _p_solver_circulant->RefractiveProbability(),1.0,1e-7));
 }
+
+} /* namespace populist */
+} /* namespace MPILib */

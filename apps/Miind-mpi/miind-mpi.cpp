@@ -20,7 +20,7 @@
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 #include <MPILib/include/report/handler/RootHighThroughputHandler.hpp>
 
-#include <MPILib/include/algorithm/RateAlgorithm.hpp>
+#include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
 namespace mpi = boost::mpi;
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
 		Rate nu = 0;
 
 		// Define a node with a fixed output rate
-		algorithm::RateAlgorithm rate_alg(nu);
+		algorithm::RateAlgorithm<double> rate_alg(nu);
 		int id_rate = network.addNode(rate_alg, EXCITATORY);
 
 		// Define the receiving node

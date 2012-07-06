@@ -20,24 +20,15 @@
 #ifndef MPILIB_POPULIST_POPOULATIONALGORITHM_HPP_
 #define MPILIB_POPULIST_POPOULATIONALGORITHM_HPP_
 
-#include "PopulationGridControllerCode.h"
+#include <MPILib/include/populist/PopulationGridControllerCode.hpp>
 #include <MPILib/include/populist/PopulistParameter.hpp>
+#include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
+#include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
 #include <sstream>
 
-//using DynamicLib::AbstractAlgorithm;
-//using DynamicLib::AlgorithmGrid;
-//using DynamicLib::DynamicNetwork;
-//using DynamicLib::DynamicNetworkImplementation;
-//using DynamicLib::DynamicNode;
-//using DynamicLib::NodeState;
-//using DynamicLib::RateAlgorithm;
-//using DynamicLib::RateFunctor;
-//using DynamicLib::ReportValue;
-//using DynamicLib::SimulationRunParameter;
-//using SparseImplementationLib::SparseNode;
 
 namespace MPILib {
 namespace populist {
@@ -154,12 +145,12 @@ public:
 
 	//! Evolve the node's state
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
-			const std::vector<WeightValue>& weightVector, Time time,
+			const std::vector<Weight>& weightVector, Time time,
 			const std::vector<NodeType>& typeVector) override;
 
 	//! This algorithm is dependent on synchronous updating, therefore the following function is overloaded
 	virtual void prepareEvolve(const std::vector<Rate>& nodeVector,
-			const std::vector<WeightValue>& weightVector,
+			const std::vector<Weight>& weightVector,
 			const std::vector<NodeType>& typeVector) override;
 	//! Current time as maintained by the algorithm
 	virtual Time getCurrentTime() const;
@@ -168,7 +159,7 @@ public:
 	virtual Rate getCurrentRate() const;
 
 	//! Provide a copy of the momentary grid
-	virtual AlgorithmGrid getGrid() const;
+	virtual algorithm::AlgorithmGrid getGrid() const;
 
 	//! Provide a clone of this algorithm
 	virtual PopulationAlgorithm_<Weight>* clone() const {
@@ -195,7 +186,7 @@ private:
 	PopulationParameter _parameter_population;
 	PopulistSpecificParameter _parameter_specific;
 	mutable ostringstream _stream_log; // before AlgorithmGrid, which receives a pointer to this stream
-	AlgorithmGrid _grid;
+	algorithm::AlgorithmGrid _grid;
 	PopulationGridController<Weight> _controller_grid;
 	Time _current_time;
 	Rate _current_rate;

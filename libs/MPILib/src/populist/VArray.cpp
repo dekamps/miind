@@ -28,6 +28,7 @@
 
 namespace MPILib {
 namespace populist {
+
 VArray::VArray() :
 		_vector_array(MAX_V_ARRAY) {
 }

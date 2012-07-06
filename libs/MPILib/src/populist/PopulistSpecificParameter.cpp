@@ -43,14 +43,14 @@ _p_rate				(boost::shared_ptr<IntegralRateComputation>(new IntegralRateComputati
 
 PopulistSpecificParameter::PopulistSpecificParameter
 (
-	PopulistLib::Potential				v_min,
+	Potential				v_min,
 	Number								n_grid_initial,
 	Number								n_add,
 	const InitialDensityParameter&		par_dens,
 	double								fact_expansion,
-	const string&						name_zeroleak,
-	const string&						name_circulant,
-	const string&						name_noncirculant,
+	const std::string&						name_zeroleak,
+	const std::string&						name_circulant,
+	const std::string&						name_noncirculant,
 	const AbstractRebinner*				p_rebinner,
 	const AbstractRateComputation*		p_rate
 ):
@@ -110,7 +110,7 @@ PopulistSpecificParameter& PopulistSpecificParameter::operator=
 	return *this;
 }
 
-PopulistLib::Potential PopulistSpecificParameter::VMin() const
+Potential PopulistSpecificParameter::VMin() const
 {
 	return _v_min;
 }

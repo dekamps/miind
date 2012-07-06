@@ -18,9 +18,9 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
-#include "RefractiveCirculantSolver.h"
-
-using namespace PopulistLib;
+#include  <MPILib/include/populist/RefractiveCirculantSolver.hpp>
+namespace MPILib {
+namespace populist {
 
 
 
@@ -54,3 +54,7 @@ void RefractiveCirculantSolver::AddCirculantToState(Index i_reset)
 	 (*_p_array_state)[i_reset] += _off_queue;
 	 _off_queue = 0;  // remember that this value would otherwise influence queries about the total probility in the queue.
 }
+
+
+} /* namespace populist */
+} /* namespace MPILib */

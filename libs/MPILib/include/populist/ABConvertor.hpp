@@ -32,6 +32,7 @@
 #include <MPILib/include/populist/OneDMParameter.hpp>
 #include <MPILib/include/populist/OneDMInputSetParameter.hpp>
 #include <MPILib/include/populist/SpecialBins.hpp>
+#include <MPILib/include/NodeType.hpp>
 
 namespace MPILib {
 namespace populist {

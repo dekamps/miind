@@ -21,7 +21,7 @@
 #define MPILIB_POPULIST_VARRAY_HPP_
 
 #include <MPILib/include/BasicTypes.hpp>
-
+#include <vector>
 
 namespace MPILib {
 namespace populist {
@@ -64,7 +64,7 @@ namespace populist {
 				Number
 			);
 
-		vector<double> _vector_array;
+		std::vector<double> _vector_array;
 		Number         _number_of_circulant_bins;
 		Number         _number_of_non_circulant_areas;
 	};

@@ -32,228 +32,173 @@
 #include <MPILib/include/populist/PopulistSpecificParameter.hpp>
 #include <MPILib/include/populist/ZeroLeakBuilder.hpp>
 
-//using std::valarray;
-//using DynamicLib::AbstractAlgorithm;
-//using DynamicLib::AlgorithmGrid;
-//using DynamicLib::ReportValue;
-//using DynamicLib::SimulationRunParameter;
 using NumtoolsLib::D_Matrix;
 
 namespace MPILib {
 namespace populist {
 
-	//! PopulationGridController. Maintains the density profile.
-	//!
-	//! This class maintains the population density profile. Its main functions are
-	//! - to miantain the density profile
-	//! - to keep track of the instantaneous relation between bin number and membrane potential
-	//! - to maintain references to the circulant and the non-circulant solver
-	//! - to delegate the computation of the circulant and the non-circulant solution to respective solvers
-	//!
-	//! but not:
-	//!
-	//! - to compute the (non-)circulant solutions itelf, which is a task of the (Non)CirculantSolver classess
-	//! - to interpret input from other nodes, this is done by the PopulistAlgorithm, which makes input rates and
-	//!   efficacies available to the PopulistGridController
+//! PopulationGridController. Maintains the density profile.
+//!
+//! This class maintains the population density profile. Its main functions are
+//! - to miantain the density profile
+//! - to keep track of the instantaneous relation between bin number and membrane potential
+//! - to maintain references to the circulant and the non-circulant solver
+//! - to delegate the computation of the circulant and the non-circulant solution to respective solvers
+//!
+//! but not:
+//!
+//! - to compute the (non-)circulant solutions itelf, which is a task of the (Non)CirculantSolver classess
+//! - to interpret input from other nodes, this is done by the PopulistAlgorithm, which makes input rates and
+//!   efficacies available to the PopulistGridController
 
-	// Modification: 20-03-2009; Introduce template argument for decoding input parameters, this has become necessary
-	// by the introduction of the OneDMAlgorithm and some assumptions on how to convert input into parameters for the zero
-	// leak equation that were hardwired, have to be resolved by  the template argument.
+// Modification: 20-03-2009; Introduce template argument for decoding input parameters, this has become necessary
+// by the introduction of the OneDMAlgorithm and some assumptions on how to convert input into parameters for the zero
+// leak equation that were hardwired, have to be resolved by  the template argument.
 
-	template <class Weight>
-	class PopulationGridController {
-	public:
+template<class Weight>
+class PopulationGridController {
+public:
 
-		typedef typename AbstractAlgorithm<Weight>::predecessor_iterator predecessor_iterator;
+	//! constructor: receives references to the density array and the potential array which maintains the
+	//! current membrane potential to which each density bin corresponds
+	PopulationGridController( VALUE_REF
 
+	const PopulationParameter&,
 
-		//! constructor: receives references to the density array and the potential array which maintains the
-		//! current membrane potential to which each density bin corresponds
-		PopulationGridController
-			(
-				VALUE_REF
+	const PopulistSpecificParameter&,
 
-				const PopulationParameter&,
+	//! density array
+			valarray<double>&,
 
-				const PopulistSpecificParameter&,
+			//! potential array
+			valarray<double>&,
 
-				//! density array
-				valarray<double>&,
+			Number*,
 
-				//! potential array
-				valarray<double>&,
-
-				Number*,
-
-				//!
-				Rate*,
-
-				//! log filestream
-				ostringstream*
-			);
-
-		~PopulationGridController();
-
-		//! Is newly configured whenever a new Configuration of a PopulationNode takes place, which in turn is triggered
-		//! by a new configuration of the simulation
-		void Configure
-		(
-			//! Starting time of simulation, etc
-			const SimulationRunParameter&
-		);
-
-		//! This step calls the (Non)CirculantSolver and adapts the bin size aftwerwards. If it is time for rebinning,
-		//! the AbstractRebinner will be called
-		bool Evolve
-		(
-			Time,
-			Time*,
+			//!
 			Rate*,
-			predecessor_iterator,
-			predecessor_iterator
-		);
 
-		//! Before the algorithm is carried out, the input parameters are calculated in all nodes so that
-		//! the network as a whole is updated synchronously
-		bool CollectExternalInput
-		(
-			predecessor_iterator,
-			predecessor_iterator
-		);
+			//! log filestream
+			ostringstream*);
 
-		// EmbedGrid receives the initial density valarrays from the parent Algorithm
-		// The state represented by these valarrays must be embed in the larger valarrays
-		// of the Controller and also of the ParentAlgorithm.
-		void EmbedGrid
-		(
-			Number,
-			const valarray<double>&,
-			const valarray<double>&,
-			void* p_param = 0		// Some algorithms need to pass parameters to their ZeroLeakEquations, PopulationGridController does want to know about their type
+	~PopulationGridController();
 
-		);
+	//! Is newly configured whenever a new Configuration of a PopulationNode takes place, which in turn is triggered
+	//! by a new configuration of the simulation
+	void Configure(
+	//! Starting time of simulation, etc
+			const SimulationRunParameter&);
 
-		//! Number of current bins in the grid that are used to represent the density
-		Number NumberOfCurrentBins() const;
+	//! This step calls the (Non)CirculantSolver and adapts the bin size aftwerwards. If it is time for rebinning,
+	//! the AbstractRebinner will be called
+	bool Evolve(Time, Time*, Rate*, const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector);
 
-		//! Current simulation time.
-		Time CurrentTime() const;
+	//! Before the algorithm is carried out, the input parameters are calculated in all nodes so that
+	//! the network as a whole is updated synchronously
+	bool CollectExternalInput(const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<NodeType>& typeVector);
 
-		bool FillGammaZMatrix
-		(
-			Number,
-			Number,
-			Time 
-		);
+	// EmbedGrid receives the initial density valarrays from the parent Algorithm
+	// The state represented by these valarrays must be embed in the larger valarrays
+	// of the Controller and also of the ParentAlgorithm.
+	void EmbedGrid(Number, const valarray<double>&, const valarray<double>&,
+			void* p_param = 0// Some algorithms need to pass parameters to their ZeroLeakEquations, PopulationGridController does want to know about their type
 
-		//! Convert an density bn index to a membrane potential
-		Potential BinToCurrentPotential(Index) const;
-
-		//! Convert a membrane potential to a density bin index
-		Index CurrentPotentialToBin(Potential) const;
-
-		//! converts a circulant index, which can have values 0, ..., n_circ into the corresponding state array values
-		Index 
-			CirculantBinIndexToStateIndex
-			(
-				Index,
-				const PopulationParameter&,
-				const SpecialBins&
-			) const;	
-
-	private:
-
-		PopulationGridController
-		(
-			const PopulationGridController&
-		);
-
-		PopulationGridController&
-			operator=
-			(
-				const PopulationGridController&
 			);
 
-		bool IsReportPending
-		(
-			Time
-		) const;
+	//! Number of current bins in the grid that are used to represent the density
+	Number NumberOfCurrentBins() const;
 
+	//! Current simulation time.
+	Time CurrentTime() const;
 
-		void      Rebin						();
-		void      AddNewBins				();
-		void      AdaptInterpretationArray	();
-		bool      UpdateCheckSum			();
-		double    NumberOfGrowingBins		() const;
-		bool      IsTimeToRebin				() const;
-		Potential DeltaV					() const;
-		bool      IsFinite					() const;
+	bool FillGammaZMatrix(Number, Number, Time);
 
-		Time DeltaTimeNextBinAdded
-		(
-			Time
-		) const;
+	//! Convert an density bn index to a membrane potential
+	Potential BinToCurrentPotential(Index) const;
 
-		void RescaleInputParameters
-		(
-			Rate,
-			Efficacy
-		);
+	//! Convert a membrane potential to a density bin index
+	Index CurrentPotentialToBin(Potential) const;
 
+	//! converts a circulant index, which can have values 0, ..., n_circ into the corresponding state array values
+	Index
+	CirculantBinIndexToStateIndex(Index, const PopulationParameter&,
+			const SpecialBins&) const;
 
-		Index IndexReversalBin() const;
+private:
 
-		Index IndexOriginalResetBin
-		(
-		) const;
+	PopulationGridController(const PopulationGridController&);
 
+	PopulationGridController&
+	operator=(const PopulationGridController&);
 
-		bool DefineRateArea	();
+	bool IsReportPending(Time) const;
 
-		VALUE_MEMBER_REF
+	void Rebin();
+	void AddNewBins();
+	void AdaptInterpretationArray();
+	bool UpdateCheckSum();
+	double NumberOfGrowingBins() const;
+	bool IsTimeToRebin() const;
+	Potential DeltaV() const;
+	bool IsFinite() const;
 
-		Number   _maximum_number_of_evolution_steps;
-		Number   _number_of_evolution_steps;
+	Time DeltaTimeNextBinAdded(Time) const;
 
-		Number   _n_initial_bins;
-		Number   _n_bins_to_add;
-		Number*  _p_number_of_current_bins;
-		Number   _n_bins;
+	void RescaleInputParameters(Rate, Efficacy);
 
-		Time     _time_membrane_constant;
-		Time     _time_report;
-		Time     _time_next_report;
-		Time     _time_network_step;
-		Time     _time_current;
+	Index IndexReversalBin() const;
 
-		SpecialBins					_bins;
-		PopulationParameter			_par_pop;
-		PopulistSpecificParameter	_par_spec;
+	Index IndexOriginalResetBin() const;
 
-		double _f_current_scale;
-		double _f_expansion_factor;
+	bool DefineRateArea();
 
-		Potential					_delta_v;
-		Potential					_check_sum;
+	VALUE_MEMBER_REF
 
-		Rate*						_p_current_rate;
-		// reference to the algorithm's grid state
-		valarray<Density>&			_array_state_reference;
+	Number _maximum_number_of_evolution_steps;
+	Number _number_of_evolution_steps;
 
-		// local copy of _array_state, which need not be normalized during
-		// evolution
-		valarray<Density>			_array_state;	
+	Number _n_initial_bins;
+	Number _n_bins_to_add;
+	Number* _p_number_of_current_bins;
+	Number _n_bins;
 
-		// interpretation array is only used during reports, hence
-		// no local copy needed
-		valarray<Potential>&							_array_interpretation;
-		boost::shared_ptr<AbstractRebinner>				_p_rebinner;
-		ostringstream*									_p_stream;
+	Time _time_membrane_constant;
+	Time _time_report;
+	Time _time_next_report;
+	Time _time_network_step;
+	Time _time_current;
 
-		ZeroLeakBuilder									_builder;							
-		boost::shared_ptr<AbstractZeroLeakEquations>	_p_zl;
+	SpecialBins _bins;
+	PopulationParameter _par_pop;
+	PopulistSpecificParameter _par_spec;
 
-	};
+	double _f_current_scale;
+	double _f_expansion_factor;
+
+	Potential _delta_v;
+	Potential _check_sum;
+
+	Rate* _p_current_rate;
+	// reference to the algorithm's grid state
+	valarray<Density>& _array_state_reference;
+
+	// local copy of _array_state, which need not be normalized during
+	// evolution
+	valarray<Density> _array_state;
+
+	// interpretation array is only used during reports, hence
+	// no local copy needed
+	valarray<Potential>& _array_interpretation;
+	boost::shared_ptr<AbstractRebinner> _p_rebinner;
+	ostringstream* _p_stream;
+
+	ZeroLeakBuilder _builder;
+	boost::shared_ptr<AbstractZeroLeakEquations> _p_zl;
+
+};
 
 } /* namespace populist */
 } /* namespace MPILib */

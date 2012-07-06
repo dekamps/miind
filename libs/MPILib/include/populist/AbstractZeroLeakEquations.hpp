@@ -33,8 +33,6 @@
 namespace MPILib {
 namespace populist {
 
-typedef std::vector<PopulationConnection>::iterator predecessor_iterator;
-
 //! A solver for the zero leak master equations in the PopulationAlgorithm.
 
 //! PopulationAlgorithm models the combined effect from leaky-integrate-and-fire (LIF) dynamics and Poisson input
@@ -70,8 +68,9 @@ public:
 	virtual void Apply(Time) = 0;
 
 	//! Every Evolve step (but not every time step, see below), the input parameters must be updated
-	virtual void SortConnectionvector(predecessor_iterator,
-			predecessor_iterator) = 0;
+	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<NodeType>& typeVector) = 0;
 
 	//! Every time step the input parameters must be adapated, even if the input doesn't change, because the are affected
 	//! by LIF dynamics (see \ref population_algorithm).

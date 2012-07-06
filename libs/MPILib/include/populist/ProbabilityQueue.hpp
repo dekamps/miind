@@ -80,7 +80,7 @@ private:
 	public:
 
 		void Scale(double scale) {
-			for (deque<StampedProbability>::iterator iter = this->c.begin();
+			for (std::deque<StampedProbability>::iterator iter = this->c.begin();
 					iter != this->c.end(); iter++)
 				iter->_prob *= scale;
 		}

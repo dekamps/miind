@@ -17,16 +17,19 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#include "ProbabilityQueue.h"
-#include "PopulistException.h"
+#include <MPILib/include/populist/ProbabilityQueue.hpp>
+#include <MPILib/include/utilities/Exception.hpp>
+#include <cassert>
+#include <math.h>
 
-using namespace PopulistLib;
+namespace MPILib {
+namespace populist {
 
 void ProbabilityQueue::push(const StampedProbability& prob)
 {
 	assert(prob._time >= _current._time); // accept 0 == 0
 	if (prob._time < _time_current)
-		throw PopulistException("Pushed an old event on queue.");
+		throw utilities::Exception("Pushed an old event on queue.");
 
 	_total +=  prob._prob;
 	if ( prob._time -_current._time > _time_step){
@@ -69,3 +72,6 @@ void ProbabilityQueue::Scale(double scale){
 
 	_queue.Scale(scale);
 }
+
+} /* namespace populist */
+} /* namespace MPILib */

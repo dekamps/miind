@@ -9,11 +9,13 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/populist/RateFunctor.hpp>
+#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/PopulistParameter.hpp>
 #include <MPILib/include/populist/InitialDensityParameter.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/populist/PopulationAlgorithm.hpp>
+#include <MPILib/include/report/handler/RootReportHandler.hpp>
 
 namespace mpi = boost::mpi;
 using namespace MPILib;
@@ -116,23 +118,23 @@ MPINetwork<WeightValue, NodeDistribution> CreateTwoPopulationNetwork //Edited by
 
 	// Create cortical background, and add to network
 	populist::RateFunctor<WeightValue> cortical_background(CorticalBackground);
-	*p_id_cortical_background = network.AddNode(cortical_background,
+	*p_id_cortical_background = network.addNode(cortical_background,
 			EXCITATORY);
 
 	// Create excitatory main population
 	Algorithm algorithm_excitatory(par_exc);
-	*p_id_excitatory_main = network.AddNode(algorithm_excitatory, EXCITATORY);
+	*p_id_excitatory_main = network.addNode(algorithm_excitatory, EXCITATORY);
 
 	// Create inhibitory main population
 	Algorithm algorithm_inhibitory(par_inh);
-	*p_id_inhibitory_main = network.AddNode(algorithm_inhibitory, INHIBITORY);
+	*p_id_inhibitory_main = network.addNode(algorithm_inhibitory, INHIBITORY);
 
 	// Background and excitatory connection only differ in x, 1- x
 	WeightValue connection_J_EE_BG(
 			TWOPOPULATION_C_E * (1 - TWOPOPULATION_FRACTION),
 			TWOPOPULATION_J_EE);
 
-	network.MakeFirstInputOfSecond(*p_id_cortical_background,
+	network.makeFirstInputOfSecond(*p_id_cortical_background,
 			*p_id_excitatory_main, connection_J_EE_BG);
 
 	// Excitatory connection to itself
@@ -140,7 +142,7 @@ MPINetwork<WeightValue, NodeDistribution> CreateTwoPopulationNetwork //Edited by
 	WeightValue connection_J_EE(TWOPOPULATION_C_E * TWOPOPULATION_FRACTION,
 			TWOPOPULATION_J_EE);
 
-	network.MakeFirstInputOfSecond(*p_id_excitatory_main, *p_id_excitatory_main,
+	network.makeFirstInputOfSecond(*p_id_excitatory_main, *p_id_excitatory_main,
 			connection_J_EE);
 
 	// Background connection to I
@@ -149,7 +151,7 @@ MPINetwork<WeightValue, NodeDistribution> CreateTwoPopulationNetwork //Edited by
 			static_cast<Number>(TWOPOPULATION_C_E * (1 - TWOPOPULATION_FRACTION)),
 			TWOPOPULATION_J_IE);
 
-	network.MakeFirstInputOfSecond(*p_id_cortical_background,
+	network.makeFirstInputOfSecond(*p_id_cortical_background,
 			*p_id_inhibitory_main, connection_J_IE_BG);
 
 	// E to I
@@ -157,19 +159,19 @@ MPINetwork<WeightValue, NodeDistribution> CreateTwoPopulationNetwork //Edited by
 			static_cast<Number>(TWOPOPULATION_C_E * TWOPOPULATION_FRACTION),
 			TWOPOPULATION_J_IE);
 
-	network.MakeFirstInputOfSecond(*p_id_excitatory_main, *p_id_inhibitory_main,
+	network.makeFirstInputOfSecond(*p_id_excitatory_main, *p_id_inhibitory_main,
 			connection_J_IE);
 
 	// I to E
 	WeightValue connection_J_EI(TWOPOPULATION_C_I, -TWOPOPULATION_J_EI);
 
-	network.MakeFirstInputOfSecond(*p_id_inhibitory_main, *p_id_excitatory_main,
+	network.makeFirstInputOfSecond(*p_id_inhibitory_main, *p_id_excitatory_main,
 			connection_J_EI);
 
 	// I to I
 	WeightValue connection_J_II(TWOPOPULATION_C_I, -TWOPOPULATION_J_II);
 
-	network.MakeFirstInputOfSecond(*p_id_inhibitory_main, *p_id_inhibitory_main,
+	network.makeFirstInputOfSecond(*p_id_inhibitory_main, *p_id_inhibitory_main,
 			connection_J_II);
 
 	return network;
@@ -186,17 +188,21 @@ const Time TWOPOP_T_NETWORK = 1e-5;
 
 const SimulationRunParameter TWOPOP_PARAMETER(TWOPOP_HANDLER,
 		TWOPOP_MAXIMUM_NUMBER_OF_ITERATIONS, TWOPOP_T_BEGIN, TWOPOP_T_END,
-		TWOPOP_T_REPORT, TWOPOP_T_REPORT, TWOPOP_T_NETWORK, "test/twopoptest");
+		TWOPOP_T_REPORT, TWOPOP_T_NETWORK, "test/twopoptest");
+
+namespace mpi = boost::mpi;
+
 
 int main(int argc, char* argv[]) {
-
+	mpi::environment env(argc, argv);
+	mpi::communicator world;
 	try {
 
 		NodeId id_cortical_background;
 		NodeId id_excitatory_main;
 		NodeId id_inhibitory_main;
 		NodeId id_rate;
-		MPINetwork<OrnsteinUhlenbeckConnection, utilities::CircularDistribution> network =
+		MPINetwork<populist::OrnsteinUhlenbeckConnection, utilities::CircularDistribution> network(
 				CreateTwoPopulationNetwork<
 						populist::PopulationAlgorithm_<
 						populist::OrnsteinUhlenbeckConnection>,
@@ -205,7 +211,7 @@ int main(int argc, char* argv[]) {
 						&id_cortical_background, &id_excitatory_main,
 						&id_inhibitory_main, &id_rate,
 						TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP,
-						TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP);
+						TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP));
 
 
 
@@ -238,4 +244,4 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
-}
+

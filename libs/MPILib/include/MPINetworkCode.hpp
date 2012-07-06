@@ -14,6 +14,8 @@
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/utilities/ProgressBar.hpp>
 
+#include <boost/mpi/collectives.hpp>
+
 namespace mpi = boost::mpi;
 namespace MPILib{
 
