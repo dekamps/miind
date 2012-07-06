@@ -153,6 +153,11 @@ void PopulationAlgorithm_<Weight>::configure(
 
 }
 
+template <class Weight>
+void PopulationAlgorithm_<Weight>::WriteConfigurationToLog()
+{
+}
+
 template<class Weight>
 algorithm::AlgorithmGrid PopulationAlgorithm_<Weight>::getGrid() const {
 	return _grid;
