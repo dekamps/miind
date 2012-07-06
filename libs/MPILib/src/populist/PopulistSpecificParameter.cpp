@@ -18,14 +18,13 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <boost/lexical_cast.hpp>
-#include "InterpolationRebinner.h"
-#include "IntegralRateComputation.h"
-#include "PopulistException.h"
+#include <MPILib/include/populist/InterpolationRebinner.hpp>
+#include <MPILib/include/populist/IntegralRateComputation.hpp>
 
-#include <MPILib/include/algorithm/PopulistSpecificParameter.hpp>
+#include <MPILib/include/populist/PopulistSpecificParameter.hpp>
 
 namespace MPILib{
-namespace algorithm{
+namespace populist{
 
 
 
@@ -157,5 +156,5 @@ Number PopulistSpecificParameter::NrAdd() const
 }
 
 
-}//end namespace algorithm
+}//end namespace populist
 }//end namespace MPILib

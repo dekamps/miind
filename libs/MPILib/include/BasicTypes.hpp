@@ -94,6 +94,8 @@ const Index CIRCULANT_POLY_JMAX = 7;
 
 const int MAXIMUM_NUMBER_GAMMAZ_VALUES = 500;
 
+const Number NUMBER_INTEGRATION_WORKSPACE = 10000;
+
 
 const Number NONCIRC_LIMIT = 5;
 
@@ -246,6 +248,11 @@ const std::string STR_ROOT_FILE_OPENED_FAILED
 				(
 					"Could not open ROOT file"
 				);
+
+const std::string WORKSPACE_EXCESSION
+		(
+			"Interpolation workspace exceeded. Recompile if necessary"
+		);
 
 const std::string SIMRUNPAR_UNEXPECTED("Unexpected tag for SimulationRunParameter");
 

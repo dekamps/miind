@@ -16,6 +16,8 @@ set(MPI_SRCS
     src/populist/AdaptiveHazard.cpp
     src/populist/CirculantSolver.cpp
     src/populist/InitializeAlgorithmGrid.cpp
+    src/populist/IntegralRateComputation.cpp
+    src/populist/InterpolationRebinner.cpp
     src/populist/LIFConvertor.cpp
     src/populist/LIFZeroLeakEquations.cpp
     src/populist/LimitedNonCirculant.cpp
