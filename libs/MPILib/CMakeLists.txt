@@ -4,7 +4,6 @@
 ##############################################################################
 set(MPI_SRCS
     src/algorithm/AlgorithmGrid.cpp
-    src/algorithm/RateAlgorithm.cpp
     src/algorithm/WilsonCowanAlgorithm.cpp
     
     src/populist/ABConvertor.cpp

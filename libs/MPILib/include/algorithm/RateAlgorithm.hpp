@@ -14,8 +14,8 @@
 namespace MPILib {
 namespace algorithm{
 
-
-class RateAlgorithm: public AlgorithmInterface<double> {
+template<class Weight>
+class RateAlgorithm: public AlgorithmInterface<Weight> {
 public:
 
 	/**
@@ -45,7 +45,7 @@ public:
 	 * @param time Time point of the algorithm
 	 */
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
-			const std::vector<double>& weightVector, Time time);
+			const std::vector<Weight>& weightVector, Time time);
 
 	/**
 	 * The current timepoint

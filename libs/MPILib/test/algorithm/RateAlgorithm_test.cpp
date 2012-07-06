@@ -11,7 +11,7 @@
 //Hack to test privat members
 #define private public
 #define protected public
-#include <MPILib/include/algorithm/RateAlgorithm.hpp>
+#include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
 #undef protected
 #undef private
 
@@ -30,7 +30,7 @@ void test_Constructor() {
 
 	double rate = 2.1;
 
-	RateAlgorithm rAlg(rate);
+	RateAlgorithm<double> rAlg(rate);
 	BOOST_CHECK(rAlg._time_current == std::numeric_limits<double>::max());
 	BOOST_CHECK(rAlg._rate == 2.1);
 
@@ -40,18 +40,18 @@ void test_clone() {
 
 	double rate = 2.1;
 
-	RateAlgorithm rAlg(rate);
+	RateAlgorithm<double> rAlg(rate);
 
-	RateAlgorithm* alg = rAlg.clone();
+	RateAlgorithm<double>* alg = rAlg.clone();
 	BOOST_CHECK(alg->_rate == 2.1);
 	delete alg;
 
 	AlgorithmInterface<double>* algI;
 	algI = rAlg.clone();
 
-	if (dynamic_cast<RateAlgorithm *>(algI)) {
+	if (dynamic_cast<RateAlgorithm<double> *>(algI)) {
 	} else {
-		BOOST_ERROR("should be of dynamic type RateAlgorithm");
+		BOOST_ERROR("should be of dynamic type RateAlgorithm<double>");
 	}
 	delete algI;
 }
@@ -73,7 +73,7 @@ void test_configure() {
 
 	double rate = 2.1;
 
-	RateAlgorithm rAlg(rate);
+	RateAlgorithm<double> rAlg(rate);
 	rAlg.configure(PAR_WILSONCOWAN);
 	BOOST_CHECK(rAlg._time_current==0);
 }
@@ -83,7 +83,7 @@ void test_evolveNodeState() {
 	std::vector<double> tempVec;
 	tempVec.push_back(1.0);
 
-	RateAlgorithm rAlg(rate);
+	RateAlgorithm<double> rAlg(rate);
 
 	rAlg.evolveNodeState(tempVec, tempVec, 2.1);
 
@@ -96,7 +96,7 @@ void test_getCurrentTime() {
 	std::vector<double> tempVec;
 	tempVec.push_back(1.0);
 
-	RateAlgorithm rAlg(rate);
+	RateAlgorithm<double> rAlg(rate);
 	BOOST_CHECK(rAlg.getCurrentTime()==std::numeric_limits<double>::max());
 
 	rAlg.evolveNodeState(tempVec, tempVec, 2.1);
@@ -107,13 +107,13 @@ void test_getCurrentTime() {
 void test_getCurrentRate() {
 
 	double rate = 2.1;
-	RateAlgorithm rAlg(rate);
+	RateAlgorithm<double> rAlg(rate);
 	BOOST_CHECK(rAlg.getCurrentRate() == 2.1);
 }
 
 void test_getGrid() {
 	double rate = 2.1;
-	RateAlgorithm rAlg(rate);
+	RateAlgorithm<double> rAlg(rate);
 	AlgorithmGrid grid = rAlg.getGrid();
 
 	BOOST_CHECK(grid._arrayState[0]==2.1);
