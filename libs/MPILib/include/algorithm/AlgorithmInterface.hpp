@@ -95,6 +95,28 @@ public:
 	 * @return The state of the algorithm
 	 */
 	virtual AlgorithmGrid getGrid() const = 0;
+
+
+	std::valarray<double>& ArrayState(AlgorithmGrid& grid) const
+	{
+		return grid.getArrayState();
+	}
+
+	std::valarray<double>& ArrayInterpretation(AlgorithmGrid& grid) const
+	{
+		return grid.getArrayInterpretation();
+	}
+
+	Number& StateSize(AlgorithmGrid& grid) const
+	{
+		return grid.getStateSize();
+	}
+
+	Number StateSize(const AlgorithmGrid & grid) const
+	{
+		return grid.getStateSize();
+	}
+
 };
 
 } /* namespace algorithm */

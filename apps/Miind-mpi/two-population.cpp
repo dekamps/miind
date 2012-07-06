@@ -8,13 +8,13 @@
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
-#include <MPILib/include/populist/RateFunctor.hpp>
+#include <MPILib/include/populist/RateFunctorCode.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/PopulistParameter.hpp>
 #include <MPILib/include/populist/InitialDensityParameter.hpp>
 #include <MPILib/include/BasicTypes.hpp>
-#include <MPILib/include/populist/PopulationAlgorithm.hpp>
+#include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 
 namespace mpi = boost::mpi;

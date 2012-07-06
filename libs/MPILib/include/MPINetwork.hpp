@@ -24,7 +24,7 @@
 namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
-class MPINetwork/*: private boost::noncopyable */{
+class MPINetwork /*: private boost::noncopyable */{
 
 public:
 

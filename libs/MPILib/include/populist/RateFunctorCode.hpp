@@ -28,7 +28,7 @@ namespace populist {
 
 template<class WeightValue>
 RateFunctor<WeightValue>::RateFunctor(RateFunction function) :
-		algorithm::AlgorithmInterface<WeightValue>(0), _function(function), _current_time(
+		algorithm::AlgorithmInterface<WeightValue>(), _function(function), _current_time(
 				0) {
 }
 
@@ -46,9 +46,9 @@ void RateFunctor<WeightValue>::evolveNodeState(
 }
 
 template<class WeightValue>
-AlgorithmGrid RateFunctor<WeightValue>::getGrid() const {
-	vector<double> vector_grid(1, _function(_current_time));
-	return AlgorithmGrid(vector_grid);
+algorithm::AlgorithmGrid RateFunctor<WeightValue>::getGrid() const {
+	std::vector<double> vector_grid(1, _function(_current_time));
+	return algorithm::AlgorithmGrid(vector_grid);
 }
 
 template<class WeightValue>
