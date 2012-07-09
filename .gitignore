@@ -4,3 +4,4 @@ build/
 .DS_*
 .pydevproject
 .settings
+org.eclipse.cdt.core.prefs

@@ -30,7 +30,7 @@ namespace MiindLib {
 
 	template <class Connection>
 	Simulation<Connection>::Simulation():
-	_p_run_par(boost::shared_ptr<XMLRunParameter>(new XMLRunParameter("simulaton_template",true,true,true))),
+	_p_run_par(XMLRunParameter("simulaton_template",true,true,true)),
 	_p_handler(boost::shared_ptr<AbstractReportHandler>(new InactiveReportHandler)),
 	_par_sim
 		(

@@ -24,7 +24,7 @@
 #include "Perceptron.h"
 
 template<class VectorList>
-Perceptron<VectorList>::Perceptron( const std::vector<value_type>& weights, value_type bias = 1, value_type active = 1, value_type inactive = 0 ) : 
+Perceptron<VectorList>::Perceptron( const std::vector<value_type>& weights, value_type bias, value_type active, value_type inactive) :
 	_weights( weights ),
 	_bias( bias )
 {

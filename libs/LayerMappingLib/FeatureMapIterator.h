@@ -64,7 +64,7 @@ namespace LayerMappingLib
 			int x_skip,
 			int y_skip,
 			int row_stride,
-			int padding_width );
+			int padding_width = 0);
 
 		T* _p_position;
 		T* _p_row_start;

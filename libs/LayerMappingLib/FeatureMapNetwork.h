@@ -137,7 +137,7 @@ namespace LayerMappingLib
 		int nr_feature_maps( int i ) const;
 
 		/*! \brief The activation of all input nodes.*/
-		vector<FeatureMap<T> > layer_activation( int i );
+		vector<FeatureMap<T> > layer_activation( int i = 0);
 
 		/*! \brief Update the network
 			Update every node in the network. The order is defined by the order of insertion of nodes. Nodes that are added first are updated first.*/
