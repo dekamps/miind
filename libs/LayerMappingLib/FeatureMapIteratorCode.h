@@ -30,7 +30,7 @@ inline FeatureMapIterator<T>::FeatureMapIterator( T* position,
 		int x_skip,
 		int y_skip,
 		int row_stride,
-		int _padding_width = 0 ) :
+		int _padding_width) :
 	_p_position( position ),
 	_p_row_start( position ),
 	_x_skip( x_skip ),

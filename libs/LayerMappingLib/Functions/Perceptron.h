@@ -42,7 +42,7 @@ namespace LayerMappingLib
 		typedef typename AbstractFunction<VectorList>::iterator iterator;
 		typedef typename AbstractFunction<VectorList>::value_type value_type;
 
-		Perceptron( const std::vector<value_type>& weights, value_type bias, value_type active, value_type inactive );
+		Perceptron( const std::vector<value_type>& weights, value_type bias = 1, value_type active = 1, value_type inactive = 0 );
 
 		virtual ~Perceptron() {};
 

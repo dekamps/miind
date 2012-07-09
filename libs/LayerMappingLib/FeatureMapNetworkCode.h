@@ -409,7 +409,7 @@ typename FeatureMapNetwork<T>::iterator FeatureMapNetwork<T>::end()
 }
 
 template<class T>
-vector<FeatureMap<T> > FeatureMapNetwork<T>::layer_activation( int i = 0 )
+vector<FeatureMap<T> > FeatureMapNetwork<T>::layer_activation( int i)
 {
 	vector<FeatureMap<T> > v;
 

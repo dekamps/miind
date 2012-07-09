@@ -81,8 +81,7 @@ namespace PopulistLib {
 			(
 				handlername.c_str(),
 				ONSCREEN,
-				INFILE,
-				RESPONSE_CURVE_T_END
+				INFILE
 			);
 	
 		SimulationRunParameter
@@ -345,8 +344,7 @@ namespace PopulistLib {
 			(
 				handlername.c_str(),
 				ONSCREEN,
-				INFILE,
-				RESPONSE_CURVE_T_END
+				INFILE
 			);
 
 		SimulationRunParameter
