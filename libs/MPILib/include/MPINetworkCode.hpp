@@ -17,10 +17,12 @@
 #include <boost/mpi/collectives.hpp>
 
 namespace mpi = boost::mpi;
-namespace MPILib{
+namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
-MPINetwork<WeightValue, NodeDistribution>::MPINetwork(): _pLocalNodes(new std::map<NodeId, MPINode<WeightValue, NodeDistribution>>) {
+MPINetwork<WeightValue, NodeDistribution>::MPINetwork() :
+		_pLocalNodes(
+				new std::map<NodeId, MPINode<WeightValue, NodeDistribution>>) {
 }
 
 template<class WeightValue, class NodeDistribution>
@@ -128,6 +130,10 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 		_stateNetwork.toggleConfigured();
 		_streamLog << "Starting simulation\n";
 		_streamLog.flush();
+		//init the nodes
+		for (auto& it : (*_pLocalNodes)) {
+			it.second.initNode();
+		}
 
 		try {
 			utilities::ProgressBar pb(
@@ -141,7 +147,9 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					// or to update
 					updateSimulationTime();
 
-					for(auto& it: (*_pLocalNodes)){
+					MPINode<WeightValue, NodeDistribution>::waitAll();
+
+					for (auto& it : (*_pLocalNodes)) {
 						it.second.prepareEvolve();
 					}
 
@@ -284,4 +292,4 @@ Time MPINetwork<WeightValue, NodeDistribution>::getCurrentStateTime() const {
 
 }
 
-}//end namespace MPILib
+}					//end namespace MPILib

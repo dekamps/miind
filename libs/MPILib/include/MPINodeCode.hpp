@@ -10,14 +10,13 @@
 
 #include <MPILib/include/MPINode.hpp>
 #include <iostream>
+#include <MPILib/include/utilities/ParallelException.hpp>
 
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/nonblocking.hpp>
 
 namespace mpi = boost::mpi;
 namespace MPILib {
-
-
 
 template<class Weight, class NodeDistribution>
 MPINode<Weight, NodeDistribution>::MPINode(
@@ -47,25 +46,13 @@ MPINode<Weight, NodeDistribution>::~MPINode() {
 template<class Weight, class NodeDistribution>
 Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 
-
-	if(!_isInitialised){
-		this->exchangeNodeTypes();
-		_isInitialised=true;
-		//wait that communication finished
-		waitAll();
-	}
-
-	std::cout<<"#"<<std::endl;
-	receiveData();
-
-	waitAll();
-
 	_algorithmTimer.resume();
 
 	while (_pAlgorithm->getCurrentTime() < time) {
 		++_number_iterations;
 
-		_pAlgorithm->evolveNodeState(_precursorActivity, _weights, time, _precursorTypes);
+		_pAlgorithm->evolveNodeState(_precursorActivity, _weights, time,
+				_precursorTypes);
 
 	}
 
@@ -75,22 +62,17 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 	_algorithmTimer.stop();
 
 	sendOwnActivity();
+	receiveData();
 
 	return _pAlgorithm->getCurrentTime();
 }
 
 template<class Weight, class NodeDistribution>
-void MPINode<Weight, NodeDistribution>::prepareEvolve(){
-
-	if(!_isInitialised){
-		this->exchangeNodeTypes();
-		_isInitialised=true;
-		std::cout<<"init finished. Node Types lenght: "<<_precursorTypes.size()<<" number of precursors: "<<_precursors.size()<<std::endl;
-	}
+void MPINode<Weight, NodeDistribution>::prepareEvolve() {
 
 	_pAlgorithm->prepareEvolve(_precursorActivity, _weights, _precursorTypes);
-}
 
+}
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::configureSimulationRun(
@@ -136,7 +118,7 @@ template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::waitAll() {
 
 	_mpiTimer.resume();
-
+	std::cout<<"waitAll with size: "<<_mpiStatus.size()<<std::endl;
 	mpi::wait_all(_mpiStatus.begin(), _mpiStatus.end());
 	_mpiStatus.clear();
 
@@ -145,10 +127,22 @@ void MPINode<Weight, NodeDistribution>::waitAll() {
 }
 
 template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::initNode() {
+	if (!_isInitialised) {
+		this->exchangeNodeTypes();
+		_isInitialised = true;
+		std::cout << "init finished. Node Types lenght: "
+				<< _precursorTypes.size() << " number of precursors: "
+				<< _precursors.size() << std::endl;
+	} else {
+		throw utilities::ParallelException("init called more than once.");
+	}
+}
+
+template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 
 	mpi::communicator world;
-
 
 	_precursorTypes.resize(_precursors.size());
 	//get the Types from the precursors
@@ -157,15 +151,13 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 		mpi::communicator world;
 		//do not send the data if the node is local!
 		if (_pNodeDistribution->isLocalNode(*it)) {
-			_precursorTypes[i] =
-					_pLocalNodes->find(*it)->second.getNodeType();
+			_precursorTypes[i] = _pLocalNodes->find(*it)->second.getNodeType();
 
 		} else {
 			_mpiStatus.push_back(
 					world.irecv(
 							_pNodeDistribution->getResponsibleProcessor(*it),
-							_pNodeDistribution->getRank(),
-							_precursorTypes[i]));
+							_pNodeDistribution->getRank(), _precursorTypes[i]));
 		}
 	}
 	//send own types to successors
@@ -207,7 +199,6 @@ template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 	_mpiTimer.resume();
 	mpi::communicator world;
-
 
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
@@ -272,7 +263,6 @@ bool MPINode<Weight, NodeDistribution>::_isLogPrinted = false;
 
 template<class Weight, class NodeDistribution>
 std::vector<boost::mpi::request> MPINode<Weight, NodeDistribution>::_mpiStatus;
-
 
 } //end namespace MPILib
 

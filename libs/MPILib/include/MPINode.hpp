@@ -20,6 +20,7 @@
 
 #include <MPILib/include/BasicTypes.hpp>
 
+
 namespace MPILib {
 
 /**
@@ -119,12 +120,16 @@ public:
 			 */
 			NodeType getNodeType() const;
 
-		private:
-
 			/**
 			 * Wait that all communication is finished
 			 */
-			void waitAll();
+			static void waitAll();
+
+			void initNode();
+
+		private:
+
+
 
 			/**
 			 * exchange the Node Types
