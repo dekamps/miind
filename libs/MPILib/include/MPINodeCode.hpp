@@ -46,6 +46,16 @@ MPINode<Weight, NodeDistribution>::~MPINode() {
 
 template<class Weight, class NodeDistribution>
 Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
+
+
+	if(!_isInitialised){
+		this->exchangeNodeTypes();
+		_isInitialised=true;
+		//wait that communication finished
+		waitAll();
+	}
+
+	std::cout<<"#"<<std::endl;
 	receiveData();
 
 	waitAll();
@@ -75,6 +85,7 @@ void MPINode<Weight, NodeDistribution>::prepareEvolve(){
 	if(!_isInitialised){
 		this->exchangeNodeTypes();
 		_isInitialised=true;
+		std::cout<<"init finished. Node Types lenght: "<<_precursorTypes.size()<<" number of precursors: "<<_precursors.size()<<std::endl;
 	}
 
 	_pAlgorithm->prepareEvolve(_precursorActivity, _weights, _precursorTypes);
@@ -136,8 +147,9 @@ void MPINode<Weight, NodeDistribution>::waitAll() {
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 
-	std::vector<boost::mpi::request> mpiStatus;
 	mpi::communicator world;
+
+
 	_precursorTypes.resize(_precursors.size());
 	//get the Types from the precursors
 	int i = 0;
@@ -149,7 +161,7 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 					_pLocalNodes->find(*it)->second.getNodeType();
 
 		} else {
-			mpiStatus.push_back(
+			_mpiStatus.push_back(
 					world.irecv(
 							_pNodeDistribution->getResponsibleProcessor(*it),
 							_pNodeDistribution->getRank(),
@@ -160,15 +172,11 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
 		if (!_pNodeDistribution->isLocalNode(it)) {
-			mpiStatus.push_back(
+			_mpiStatus.push_back(
 					world.isend(_pNodeDistribution->getResponsibleProcessor(it),
 							it, _nodeType));
 		}
 	}
-
-	//wait that communication finished
-	mpi::wait_all(mpiStatus.begin(), mpiStatus.end());
-
 
 }
 
@@ -263,7 +271,9 @@ template<class Weight, class NodeDistribution>
 bool MPINode<Weight, NodeDistribution>::_isLogPrinted = false;
 
 template<class Weight, class NodeDistribution>
-bool MPINode<Weight, NodeDistribution>::_isInitialised = false;
+std::vector<boost::mpi::request> MPINode<Weight, NodeDistribution>::_mpiStatus;
+
+
 } //end namespace MPILib
 
 #endif /* CODE_MPILIB_MPINODE_HPP_ */

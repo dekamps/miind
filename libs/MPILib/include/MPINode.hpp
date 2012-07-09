@@ -197,7 +197,7 @@ public:
 			/**
 			 * Store the mpi request to have assynchronous communication
 			 */
-			std::vector<boost::mpi::request> _mpiStatus;
+			static std::vector<boost::mpi::request> _mpiStatus;
 
 			Number _number_iterations;
 			Number _maximum_iterations;
@@ -205,7 +205,7 @@ public:
 			/**
 			 * True if the node Types are exchanged
 			 */
-			static bool _isInitialised;
+			bool _isInitialised = false;
 
 			/**
 			 * Pointer to the Report Handler
