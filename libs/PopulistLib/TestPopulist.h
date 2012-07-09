@@ -171,7 +171,9 @@ namespace PopulistLib
 		bool LeakGaussTest				() const;
 		bool PotentialToBinTest			() const;
 		bool OrnsteinUhlenbeckProcessTest() const;
+	public:
 		bool TwoPopulationTest			() const;
+	private:
 		bool GenerateVDataTest			() const;
 		bool ResponseCurveExample		() const;
 		bool PrintResponseCurve			() const;

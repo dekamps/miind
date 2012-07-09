@@ -26,6 +26,9 @@ include_directories( ../../libs/PopulistLib )
 
 add_executable( populistTest
     PopulistTest.cpp )
+    
+add_executable( twoPopulistTest
+    TwoPopulistTest.cpp )
 
 add_executable( populistExample
     PopulistExample.cpp )
@@ -72,6 +75,9 @@ endif ( Boost_FOUND )
 target_link_libraries( ExperimentResponseCurve ${LIBLIST} )
 
 target_link_libraries( populistTest ${LIBLIST} )
+
+target_link_libraries( twoPopulistTest ${LIBLIST} )
+
 
 target_link_libraries( populistExample ${LIBLIST} )
 

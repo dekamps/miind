@@ -19,7 +19,6 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <iostream>
 #include <PopulistLib/PopulistLib.h>
-
 #include <PopulistLib/TestPopulist.h>
 #include <MiindLib/MiindLib.h>
 using NetLib::NetLibException;
@@ -37,10 +36,10 @@ int main(int argc, char* argv[])
 
 	try 
 	{
-		if (test.Execute())
-			cout << "Populist test suite succeeded" << endl;
+		if (test.TwoPopulationTest())
+			cout << "TwoPopulist test succeeded" << endl;
 		else
-			cout << "Populist test suite failed"    << endl;
+			cout << "TwoPopulist test failed"    << endl;
 	}
 
 	catch (PopulistLib::PopulistException& exception)
