@@ -26,19 +26,21 @@ ENDIF()
 ##############################################################################
 
 OPTION(ENABLE_TESTING "Compile tests" ON)
+OPTION(INCLUDE_MPI_LIB "Compile the MPILib" TRUE)
 OPTION(ENABLE_MPI "Enable mpi" FALSE)
-OPTION(ENABLE_COVERAGE "Enable GCov coverage analysis (defines a 'coverage' target and enforces static build of libpipe)" OFF)
-
+OPTION(ENABLE_COVERAGE "Enable GCov coverage analysis (defines a 'coverage' target and enforces static build of miind)" OFF)
+OPTION(DEBUG "Enable debug information" FALSE)
 
 
 ##############################################################################
 # enable MPI dependent build
 ##############################################################################
-IF(ENABLE_MPI)
+IF(INCLUDE_MPI_LIB)
     MESSAGE(STATUS "MPI enabled")
     # Require MPI for this project:
-    find_package(MPI REQUIRED)
-    
+    IF(ENABLE_MPI)
+        find_package(MPI REQUIRED)
+    ENDIF(ENABLE_MPI)
     
     if(CMAKE_COMPILER_IS_GNUCXX)
         execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
@@ -57,18 +59,21 @@ IF(ENABLE_MPI)
         message(WARNING "C++11 activated, if you get any compile errors please use a C++11 compatible compiler like GNU gcc 4.7")
         add_definitions("-std=c++11") 
     endif(CMAKE_COMPILER_IS_GNUCXX)
-    
-    
-    
-          
+       
     set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
     set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
-    include_directories(${MPI_INCLUDE_PATH})
     
+    IF(ENABLE_MPI)
+        include_directories(${MPI_INCLUDE_PATH})
+    ENDIF(ENABLE_MPI)
     ##############################################################################
     # find boost with mpi
     ##############################################################################
-    find_package( Boost COMPONENTS unit_test_framework program_options mpi thread serialization timer system)
+    IF(ENABLE_MPI)
+        find_package( Boost COMPONENTS unit_test_framework program_options mpi thread serialization timer system)
+    ELSE(ENABLE_MPI)
+        find_package( Boost COMPONENTS unit_test_framework program_options thread serialization timer system)
+    ENDIF(ENABLE_MPI)
     if( Boost_FOUND )
        message(STATUS "Boost found setting up directories")
        message(STATUS "BOOST_ROOT: " ${BOOST_ROOT} )
@@ -128,7 +133,7 @@ IF(ENABLE_MPI)
     
 
     
-ELSE(ENABLE_MPI)
+ELSE(INCLUDE_MPI_LIB)
     MESSAGE(STATUS "MPI disabled")
     ##############################################################################
     # find boost without mpi
@@ -198,7 +203,7 @@ ELSE(ENABLE_MPI)
     
     SET( CMAKE_SWIG_FLAGS "" )
       
-ENDIF(ENABLE_MPI)
+ENDIF(INCLUDE_MPI_LIB)
 
 IF(ENABLE_TESTING)
     MESSAGE(STATUS "Testing enabled")

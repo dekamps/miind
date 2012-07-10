@@ -47,6 +47,7 @@ set(MPI_SRCS
     src/utilities/FileNameGenerator.cpp
     src/utilities/IterationNumberException.cpp
     src/utilities/LogStream.cpp
+    src/utilities/MPIProxy.cpp
     src/utilities/ParallelException.cpp
     src/utilities/ProgressBar.cpp
     src/utilities/TimeException.cpp

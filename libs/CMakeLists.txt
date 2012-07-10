@@ -1,9 +1,9 @@
-if(ENABLE_MPI)
+if(INCLUDE_MPI_LIB)
     ADD_SUBDIRECTORY( MPILib)
     ADD_SUBDIRECTORY( NumtoolsLib )
     ADD_SUBDIRECTORY( UtilLib )
     
-else(ENABLE_MPI)
+else(INCLUDE_MPI_LIB)
     if (AGENT)
     ADD_SUBDIRECTORY( AgentLib )
     endif  (AGENT)
@@ -21,6 +21,6 @@ else(ENABLE_MPI)
       ADD_SUBDIRECTORY( DynamicLib )
       ADD_SUBDIRECTORY( PopulistLib )
     endif ( ROOT_FOUND )
-endif(ENABLE_MPI)
+endif(INCLUDE_MPI_LIB)
 
 
