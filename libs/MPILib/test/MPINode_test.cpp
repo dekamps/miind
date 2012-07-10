@@ -160,7 +160,7 @@ void test_exchangeNodeTypes() {
 	}
 
 	node->exchangeNodeTypes();
-
+	MPINode<double, utilities::CircularDistribution>::waitAll();
 	if (world.rank() == 0) {
 		BOOST_CHECK(node->_precursorTypes[0]==INHIBITORY_BURST);
 	} else {
