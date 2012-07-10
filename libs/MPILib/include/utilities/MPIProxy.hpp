@@ -24,9 +24,9 @@ public:
 	int getSize() const;
 
 private:
-	int _rank = 0;
+	static int _rank;
 
-	int _size = 1;
+	static int _size;
 };
 
 } /* namespace utilities */

@@ -6,7 +6,8 @@
  */
 
 #include <MPILib/include/utilities/ProgressBar.hpp>
-#include <boost/mpi/communicator.hpp>
+#include <MPILib/include/utilities/MPIProxy.hpp>
+
 
 namespace MPILib {
 namespace utilities {
@@ -14,9 +15,8 @@ namespace utilities {
 ProgressBar::ProgressBar(unsigned long expectedCount,
 		const std::string & description, std::ostream& os) :
 		_description(description), _outputStream(os) {
-	boost::mpi::communicator world;
-
-	if (world.rank() == 0) {
+	MPIProxy mpiProxy;
+	if (mpiProxy.getRank() == 0) {
 		restart(expectedCount);
 	}
 }
@@ -32,9 +32,8 @@ void ProgressBar::restart(unsigned long expected_count) {
 }
 
 unsigned long ProgressBar::operator+=(unsigned long increment) {
-	boost::mpi::communicator world;
-
-	if (world.rank() == 0) {
+	MPIProxy mpiProxy;
+	if (mpiProxy.getRank() == 0) {
 		if ((_count += increment) >= _nextTicCount) {
 			display_tic();
 		}

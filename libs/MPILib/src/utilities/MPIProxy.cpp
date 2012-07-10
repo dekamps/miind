@@ -10,17 +10,22 @@
 #ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
 namespace mpi = boost::mpi;
+mpi::communicator world;
 #endif
+
 
 
 namespace MPILib {
 namespace utilities {
 
+int MPIProxy::_rank = 0;
+int MPIProxy::_size = 1;
+
 MPIProxy::MPIProxy() {
 #ifdef ENABLE_MPI
 	mpi::communicator world;
-	int _rank = world.rank();
-	int _size = world.size();
+	_rank = world.rank();
+	_size = world.size();
 #endif
 }
 
@@ -28,7 +33,7 @@ MPIProxy::~MPIProxy() {
 }
 
 int MPIProxy::getRank() const{
-	return _rank;
+	return  _rank;
 }
 
 int MPIProxy::getSize() const{
