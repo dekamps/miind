@@ -14,11 +14,8 @@
 #include <MPILib/include/MPINetwork.hpp>
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/utilities/ProgressBar.hpp>
-#ifdef ENABLE_MPI
-#include <boost/mpi/collectives.hpp>
+#include <MPILib/include/utilities/MPIProxy.hpp>
 
-namespace mpi = boost::mpi;
-#endif
 
 namespace MPILib {
 
@@ -203,10 +200,8 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 template<class WeightValue, class NodeDistribution>
 int MPINetwork<WeightValue, NodeDistribution>::getMaxNodeId() {
-#ifdef ENABLE_MPI
-	mpi::communicator world;
-	mpi::broadcast(world, _maxNodeId, 0);
-#endif
+	utilities::MPIProxy mpiProxy;
+	mpiProxy.broadcast(_maxNodeId, 0);
 	return _maxNodeId;
 }
 

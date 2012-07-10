@@ -9,6 +9,11 @@
 #define MPILIB_UTILITIES_MPIPROXY_HPP_
 #include <MPILib/config.hpp>
 
+#ifdef ENABLE_MPI
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/collectives.hpp>
+namespace mpi = boost::mpi;
+#endif
 
 
 namespace MPILib {
@@ -23,11 +28,24 @@ public:
 
 	int getSize() const;
 
+	template<typename T>
+	void broadcast(T& value, int root);
+
 private:
 	static int _rank;
 
 	static int _size;
 };
+
+
+template<typename T>
+void MPIProxy::broadcast(T& value, int root){
+#ifdef ENABLE_MPI
+	mpi::communicator world;
+	boost::mpi::broadcast(world, value, root);
+#endif
+
+}
 
 } /* namespace utilities */
 } /* namespace MPILib */

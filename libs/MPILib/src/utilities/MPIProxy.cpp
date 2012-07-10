@@ -7,11 +7,8 @@
 
 #include <MPILib/config.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
-#ifdef ENABLE_MPI
-#include <boost/mpi/communicator.hpp>
-namespace mpi = boost::mpi;
-mpi::communicator world;
-#endif
+#include <MPILib/include/utilities/Exception.hpp>
+
 
 
 
@@ -39,6 +36,8 @@ int MPIProxy::getRank() const{
 int MPIProxy::getSize() const{
 	return _size;
 }
+
+
 
 
 } /* namespace utilities */
