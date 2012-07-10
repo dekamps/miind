@@ -49,19 +49,6 @@ public:
 	 */
 	virtual bool isMaster() const = 0;
 
-	/**
-	 * Get the rank of the processor
-	 * @return the rank of the processor
-	 */
-	virtual int getRank() const = 0;
-
-	/**
-	 * Get the size of the system
-	 * @return the size of the system
-	 */
-	virtual int getSize() const = 0;
-
-
 };
 }//end namespace
 }//end namespace

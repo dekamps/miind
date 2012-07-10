@@ -7,7 +7,7 @@
 
 #include <MPILib/config.hpp>
 #include <MPILib/include/utilities/ParallelException.hpp>
-#include <MPILib/include/utilities/CircularDistribution.hpp>
+#include <MPILib/include/utilities/MPIProxy.hpp>
 #include <sstream>
 
 using namespace MPILib::utilities;
@@ -15,19 +15,19 @@ using namespace MPILib::utilities;
 
 ParallelException::ParallelException(const char* message) :
 		Exception(message) {
-	CircularDistribution cd;
+	MPIProxy mpiProxy;
 	std::stringstream sstream;
-	sstream <<std::endl<< "Parallel Exception on processor: " << cd.getRank() << " from: "
-			<< cd.getSize() << " with error message: " << msg_<<std::endl;
+	sstream <<std::endl<< "Parallel Exception on processor: " << mpiProxy.getRank() << " from: "
+			<< mpiProxy.getSize() << " with error message: " << msg_<<std::endl;
 	msg_ = sstream.str();
 }
 
 ParallelException::ParallelException(const std::string& message) :
 		Exception(message) {
-	CircularDistribution cd;
+	MPIProxy mpiProxy;
 	std::stringstream sstream;
-	sstream <<std::endl<< "Parallel Exception on processor: " << cd.getRank() << " from: "
-			<< cd.getSize() << " with error message: " << msg_<<std::endl;
+	sstream <<std::endl<< "Parallel Exception on processor: " << mpiProxy.getRank() << " from: "
+			<< mpiProxy.getSize() << " with error message: " << msg_<<std::endl;
 	msg_ = sstream.str();
 }
 

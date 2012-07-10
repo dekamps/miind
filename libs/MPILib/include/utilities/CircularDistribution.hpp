@@ -9,6 +9,7 @@
 #define MPILIB_UTILITIES_CIRCULARDISTRIBUTION_HPP_
 
 #include <MPILib/include/utilities/NodeDistributionInterface.hpp>
+#include <MPILib/include/utilities/MPIProxy.hpp>
 
 namespace MPILib {
 namespace utilities {
@@ -36,29 +37,9 @@ public:
 	 * @return true if the node is the master.
 	 */
 	virtual bool isMaster() const;
-
-	/**
-	 * Get the rank of the processor
-	 * @return the rank of the processor
-	 */
-	virtual int getRank() const;
-
-	/**
-	 * Get the size of the system
-	 * @return the size of the system
-	 */
-	virtual int getSize() const;
-
 private:
-	/**
-	 * The local processor id
-	 */
-	int _processorId = 0;
+	MPIProxy _mpiProxy;
 
-	/**
-	 * The total number of processors
-	 */
-	int _totalProcessors = 1;
 };
 
 } /* namespace MPILib */
