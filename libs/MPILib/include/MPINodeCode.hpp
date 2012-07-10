@@ -118,7 +118,6 @@ template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::waitAll() {
 
 	_mpiTimer.resume();
-	std::cout<<"waitAll with size: "<<_mpiStatus.size()<<std::endl;
 	mpi::wait_all(_mpiStatus.begin(), _mpiStatus.end());
 	_mpiStatus.clear();
 
@@ -154,19 +153,26 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 			_precursorTypes[i] = _pLocalNodes->find(*it)->second.getNodeType();
 
 		} else {
+			std::cout << "resv source: "
+					<< _pNodeDistribution->getResponsibleProcessor(*it) << "\ttag: "
+					<< *it <<"\tnodeID: "<<world.rank()<< std::endl;
 			_mpiStatus.push_back(
 					world.irecv(
 							_pNodeDistribution->getResponsibleProcessor(*it),
-							_pNodeDistribution->getRank(), _precursorTypes[i]));
+							*it, _precursorTypes[i]));
 		}
 	}
 	//send own types to successors
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
 		if (!_pNodeDistribution->isLocalNode(it)) {
+			std::cout << "send dest: "
+					<< _pNodeDistribution->getResponsibleProcessor(it) << "\ttag: "
+					<< _nodeId <<"\tnodeID: "<<world.rank()<< std::endl;
+
 			_mpiStatus.push_back(
 					world.isend(_pNodeDistribution->getResponsibleProcessor(it),
-							it, _nodeType));
+							_nodeId, _nodeType));
 		}
 	}
 
@@ -188,7 +194,7 @@ void MPINode<Weight, NodeDistribution>::receiveData() {
 			_mpiStatus.push_back(
 					world.irecv(
 							_pNodeDistribution->getResponsibleProcessor(*it),
-							_pNodeDistribution->getRank(),
+							*it,
 							_precursorActivity[i]));
 		}
 	}
@@ -205,7 +211,7 @@ void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 		if (!_pNodeDistribution->isLocalNode(it)) {
 			_mpiStatus.push_back(
 					world.isend(_pNodeDistribution->getResponsibleProcessor(it),
-							it, _activity));
+							_nodeId, _activity));
 		}
 	}
 
