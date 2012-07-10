@@ -6,25 +6,23 @@
  */
 
 #include <MPILib/include/utilities/FileNameGenerator.hpp>
+#include <MPILib/include/utilities/MPIProxy.hpp>
 
-#include <boost/mpi/communicator.hpp>
 #include <sstream>
-namespace mpi = boost::mpi;
 
 namespace MPILib {
 namespace utilities {
 
 FileNameGenerator::FileNameGenerator(const std::string& fileName, FileType fileType) {
-	mpi::communicator world;
+	MPIProxy mpiProxy;
 
-	int processorId = world.rank();
 	std::stringstream tempFileName;
 
 	if (fileType == LOGFILE) {
-		tempFileName << fileName << "_" << processorId << ".log";
+		tempFileName << fileName << "_" << mpiProxy.getRank() << ".log";
 	}
 	if (fileType == ROOTFILE) {
-		tempFileName << fileName << "_" << processorId << ".root";
+		tempFileName << fileName << "_" << mpiProxy.getRank() << ".root";
 	}
 	_fileName = tempFileName.str();
 
