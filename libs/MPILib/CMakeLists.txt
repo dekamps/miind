@@ -93,6 +93,14 @@ add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${MPI_SRCS} ${MPI_HEADER})
 
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} )
 
+#############################################################################
+# Cmake generated header files
+#############################################################################
+CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.cmake 
+    ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp
+)
+
 
 #############################################################################
 # tests
@@ -102,7 +110,7 @@ IF (ENABLE_TESTING)
   ADD_SUBDIRECTORY(test)
 ENDIF (ENABLE_TESTING)
 
-install( FILES ${mpi_HEADERS}
+install( FILES ${MPI_HEADERS}
     DESTINATION include/miind/MPILib )
 
 install( TARGETS ${MIIND_LIBRARY_PREFIX}mpi

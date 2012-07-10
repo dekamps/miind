@@ -8,11 +8,14 @@
 #ifndef MPILIB_MPINODE_HPP_
 #define MPILIB_MPINODE_HPP_
 
+#include <MPILib/config.hpp>
 #include <vector>
 #include <map>
 #include <memory>
 #include <boost/timer/timer.hpp>
+#ifdef ENABLE_MPI
 #include <boost/mpi/request.hpp>
+#endif
 
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
@@ -168,7 +171,7 @@ public:
 			/**
 			 * A Pointer that holds the Algorithm
 			 */
-			boost::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
+			std::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
 
 			/**
 			 * The type of this node needed for dales law
@@ -192,7 +195,7 @@ public:
 			/**
 			 * Activity of this node
 			 */
-			ActivityType _activity;
+			ActivityType _activity = 0;
 
 			/**
 			 * Storage for the state of the precursors, to avoid to much communication.
@@ -202,7 +205,9 @@ public:
 			/**
 			 * Store the mpi request to have assynchronous communication
 			 */
+#ifdef ENABLE_MPI
 			static std::vector<boost::mpi::request> _mpiStatus;
+#endif
 
 			Number _number_iterations;
 			Number _maximum_iterations;
@@ -215,7 +220,7 @@ public:
 			/**
 			 * Pointer to the Report Handler
 			 */
-			boost::shared_ptr<report::handler::AbstractReportHandler> _pHandler;
+			std::shared_ptr<report::handler::AbstractReportHandler> _pHandler;
 		};
 
 typedef MPINode<double, utilities::CircularDistribution> D_MPINode;

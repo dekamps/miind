@@ -5,17 +5,23 @@
  *      Author: david
  */
 
+#include <MPILib/config.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
+#ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
+namespace mpi = boost::mpi;
+#endif
 
 using namespace MPILib::utilities;
-namespace mpi = boost::mpi;
 
 CircularDistribution::CircularDistribution() {
+#ifdef ENABLE_MPI
+
 	mpi::communicator world;
 
 	_processorId = world.rank();
 	_totalProcessors = world.size();
+#endif
 }
 
 CircularDistribution::~CircularDistribution() {
@@ -23,7 +29,6 @@ CircularDistribution::~CircularDistribution() {
 
 bool CircularDistribution::isLocalNode(NodeId nodeId) const {
 	return getResponsibleProcessor(nodeId) == _processorId;
-
 }
 
 int CircularDistribution::getResponsibleProcessor(NodeId nodeId) const {

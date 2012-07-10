@@ -5,29 +5,29 @@
  *      Author: david
  */
 
+#include <MPILib/config.hpp>
 #include <MPILib/include/utilities/ParallelException.hpp>
-#include <boost/mpi/communicator.hpp>
+#include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <sstream>
 
-namespace mpi = boost::mpi;
 using namespace MPILib::utilities;
 
 
 ParallelException::ParallelException(const char* message) :
 		Exception(message) {
-	mpi::communicator world;
+	CircularDistribution cd;
 	std::stringstream sstream;
-	sstream <<std::endl<< "Parallel Exception on processor: " << world.rank() << " from: "
-			<< world.size() << " with error message: " << msg_<<std::endl;
+	sstream <<std::endl<< "Parallel Exception on processor: " << cd.getRank() << " from: "
+			<< cd.getSize() << " with error message: " << msg_<<std::endl;
 	msg_ = sstream.str();
 }
 
 ParallelException::ParallelException(const std::string& message) :
 		Exception(message) {
-	mpi::communicator world;
+	CircularDistribution cd;
 	std::stringstream sstream;
-	sstream <<std::endl<< "Parallel Exception on processor: " << world.rank() << " from: "
-			<< world.size() << " with error message: " << msg_<<std::endl;
+	sstream <<std::endl<< "Parallel Exception on processor: " << cd.getRank() << " from: "
+			<< cd.getSize() << " with error message: " << msg_<<std::endl;
 	msg_ = sstream.str();
 }
 

@@ -4,6 +4,7 @@
  *  Created on: 25.05.2012
  *      Author: david
  */
+#include <MPILib/config.hpp>
 #include <sstream>
 #include <iostream>
 #include <fstream>
@@ -13,10 +14,12 @@
 #include <MPILib/include/MPINetwork.hpp>
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/utilities/ProgressBar.hpp>
-
+#ifdef ENABLE_MPI
 #include <boost/mpi/collectives.hpp>
 
 namespace mpi = boost::mpi;
+#endif
+
 namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
@@ -200,9 +203,10 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 template<class WeightValue, class NodeDistribution>
 int MPINetwork<WeightValue, NodeDistribution>::getMaxNodeId() {
-
+#ifdef ENABLE_MPI
 	mpi::communicator world;
 	mpi::broadcast(world, _maxNodeId, 0);
+#endif
 	return _maxNodeId;
 }
 

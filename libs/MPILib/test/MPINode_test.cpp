@@ -126,7 +126,7 @@ void test_sendRecvWait() {
 	node->setActivity(world.rank());
 	node->sendOwnActivity();
 	node->receiveData();
-	node->waitAll();
+	MPINode<double, utilities::CircularDistribution>::waitAll();
 	if (world.rank() == 0) {
 		BOOST_CHECK(node->_precursorActivity[0]==1);
 	} else {

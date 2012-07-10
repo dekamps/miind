@@ -53,12 +53,12 @@ private:
 	/**
 	 * The local processor id
 	 */
-	int _processorId;
+	int _processorId = 0;
 
 	/**
 	 * The total number of processors
 	 */
-	int _totalProcessors;
+	int _totalProcessors = 1;
 };
 
 } /* namespace MPILib */
