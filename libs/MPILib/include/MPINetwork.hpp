@@ -8,7 +8,6 @@
 #ifndef MPILIB_MPINETWORK_HPP_
 #define MPILIB_MPINETWORK_HPP_
 
-#include <boost/noncopyable.hpp>
 #include <string>
 #include <map>
 #include <memory>
@@ -24,7 +23,7 @@
 namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
-class MPINetwork /*: private boost::noncopyable */{
+class MPINetwork{
 
 public:
 

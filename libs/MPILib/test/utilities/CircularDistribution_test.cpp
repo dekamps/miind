@@ -28,11 +28,11 @@ void test_Constructor() {
 	CircularDistribution circularD;
 
 	if (world.rank() == 0) {
-		BOOST_CHECK(circularD._processorId==0);
-		BOOST_CHECK(circularD._totalProcessors==world.size());
+		BOOST_CHECK(circularD._mpiProxy.getRank()==0);
+		BOOST_CHECK(circularD._mpiProxy.getSize()==world.size());
 	} else if (world.rank() == 1) {
-		BOOST_CHECK(circularD._processorId==1);
-		BOOST_CHECK(circularD._totalProcessors==world.size());
+		BOOST_CHECK(circularD._mpiProxy.getRank()==1);
+		BOOST_CHECK(circularD._mpiProxy.getSize()==world.size());
 	}
 
 }
@@ -64,15 +64,7 @@ void test_isMaster() {
 	}
 }
 
-void test_getRank() {
-	CircularDistribution circularD;
-	BOOST_CHECK(circularD.getRank() == world.rank());
-}
 
-void test_getSize() {
-	CircularDistribution circularD;
-	BOOST_CHECK(circularD.getSize() == world.size());
-}
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
@@ -86,8 +78,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	test_isLocalNode();
 	test_getResponsibleProcessor();
 	test_isMaster();
-	test_getRank();
-	test_getSize();
+
 
 	return 0;
 //    // six ways to detect and report the same error:
