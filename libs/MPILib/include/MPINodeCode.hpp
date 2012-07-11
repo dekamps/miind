@@ -144,8 +144,6 @@ void MPINode<Weight, NodeDistribution>::initNode() {
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
-#ifdef ENABLE_MPI
-	mpi::communicator world;
 	_precursorTypes.resize(_precursors.size());
 	//get the Types from the precursors
 	int i = 0;
@@ -155,6 +153,8 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 			_precursorTypes[i] = _pLocalNodes->find(*it)->second.getNodeType();
 
 		} else {
+#ifdef ENABLE_MPI
+			mpi::communicator world;
 #ifdef DEBUG
 			std::cout << "resv source: "
 			<< _pNodeDistribution->getResponsibleProcessor(*it) << "\ttag: "
@@ -164,8 +164,13 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 					world.irecv(
 							_pNodeDistribution->getResponsibleProcessor(*it),
 							*it, _precursorTypes[i]));
+#else
+			MPILib::utilities::Exception("MPI Code called from serial code in exchangeNodeTypes in MPINodeCode");
+#endif
 		}
 	}
+#ifdef ENABLE_MPI
+	mpi::communicator world;
 	//send own types to successors
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
@@ -180,25 +185,12 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 							_nodeId, _nodeType));
 		}
 	}
-#else
-	_precursorTypes.resize(_precursors.size());
-	//get the Types from the precursors
-	int i = 0;
-	for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
-		_precursorTypes[i] = _pLocalNodes->find(*it)->second.getNodeType();
-	}
 #endif
 
 }
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::receiveData() {
-
-#ifdef ENABLE_MPI
-
-	_mpiTimer.resume();
-	mpi::communicator world;
-
 	int i = 0;
 	for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		//do not send the data if the node is local!
@@ -207,6 +199,10 @@ void MPINode<Weight, NodeDistribution>::receiveData() {
 			_pLocalNodes->find(*it)->second.getActivity();
 
 		} else {
+#ifdef ENABLE_MPI
+			_mpiTimer.resume();
+			mpi::communicator world;
+
 #ifdef DEBUG
 			std::cout << "resv source: "
 			<< _pNodeDistribution->getResponsibleProcessor(*it) << "\ttag: "
@@ -217,23 +213,20 @@ void MPINode<Weight, NodeDistribution>::receiveData() {
 							_pNodeDistribution->getResponsibleProcessor(*it),
 							*it,
 							_precursorActivity[i]));
+			_mpiTimer.stop();
 		}
-	}
-	_mpiTimer.stop();
 #else
-	int i = 0;
-	for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
-		_precursorActivity[i] = _pLocalNodes->find(*it)->second.getActivity();
-	}
+		}
+		MPILib::utilities::Exception("MPI Code called from serial code in receiveData in MPINodeCode");
 #endif
+	}
 }
+
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 #ifdef ENABLE_MPI
-
 	_mpiTimer.resume();
 	mpi::communicator world;
-
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
 		if (!_pNodeDistribution->isLocalNode(it)) {
