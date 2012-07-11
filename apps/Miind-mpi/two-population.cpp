@@ -16,6 +16,7 @@
 #include <MPILib/include/populist/InitialDensityParameter.hpp>
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
+#include <MPILib/include/utilities/MPIProxy.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 #ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
@@ -197,8 +198,8 @@ const SimulationRunParameter TWOPOP_PARAMETER(TWOPOP_HANDLER,
 int main(int argc, char* argv[]) {
 #ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
-	boost::mpi::communicator world;
 #endif
+	utilities::MPIProxy mpiProxy;
 	try {
 
 		NodeId id_cortical_background;
@@ -230,18 +231,13 @@ int main(int argc, char* argv[]) {
 		te.start();
 
 		//timed calculation
-#ifdef ENABLE_MPI
-		world.barrier();
-#endif
+		mpiProxy.barrier();
 		te.stop();
-#ifdef ENABLE_MPI
-		if (world.rank() == 0) {
-#endif
+		if (mpiProxy.getRank() == 0) {
+
 			std::cout << "Time of Envolve methode of processor 0: \n";
 			te.report();
-#ifdef ENABLE_MPI
 		}
-#endif
 
 	} catch (std::exception & e) {
 		std::cout << e.what();

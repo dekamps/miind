@@ -37,6 +37,13 @@ int MPIProxy::getSize() const{
 	return _size;
 }
 
+void MPIProxy::barrier(){
+#ifdef ENABLE_MPI
+	mpi::communicator world;
+	world.barrier();
+#endif
+}
+
 
 
 

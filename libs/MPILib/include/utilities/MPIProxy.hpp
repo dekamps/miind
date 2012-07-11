@@ -28,6 +28,8 @@ public:
 
 	int getSize() const;
 
+	void barrier();
+
 	template<typename T>
 	void broadcast(T& value, int root);
 

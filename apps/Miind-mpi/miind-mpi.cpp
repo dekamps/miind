@@ -6,7 +6,9 @@
  */
 
 #include <MPILib/config.hpp>
+#ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
+#endif
 #include <boost/timer/timer.hpp>
 #include <iostream>
 #include <string>
@@ -23,6 +25,8 @@
 
 #include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
+#include <MPILib/include/utilities/MPIProxy.hpp>
+
 
 using namespace MPILib;
 
@@ -47,12 +51,11 @@ const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HIGH_HANDLER, // the ha
 
 
 int main(int argc, char* argv[]) {
-	// initialize mpi
-	//boost::timer::auto_cpu_timer t;
 #ifdef ENABLE_MPI
+	// initialise the mpi environment this cannot be forwarded to a class
 	boost::mpi::environment env(argc, argv);
-	boost::mpi::communicator world;
 #endif
+	utilities::MPIProxy mpiProxy;
 	try {
 		MPINetwork<double, utilities::CircularDistribution> network;
 
@@ -85,22 +88,17 @@ int main(int argc, char* argv[]) {
 		te.start();
 
 		network.evolve();
-#ifdef ENABLE_MPI
-		world.barrier();
-#endif
+		mpiProxy.barrier();
 		te.stop();
-#ifdef ENABLE_MPI
-		if (world.rank() == 0) {
-#endif
+		if (mpiProxy.getRank() == 0) {
 			std::cout << "Time of Envolve methode of processor 0: \n";
 			te.report();
-#ifdef ENABLE_MPI
 		}
-#endif
 
 	} catch (std::exception & e) {
 		std::cout << e.what();
 #ifdef ENABLE_MPI
+		//Abort the MPI environment in the correct way :)
 		env.abort(1);
 #endif
 		return 1;
