@@ -1,3 +1,19 @@
+##############################################################################
+# include the header files
+##############################################################################
+
+#one below that MPILib is included in the paths they are needed for the camke config files
+INCLUDE_DIRECTORIES(
+   ${CMAKE_CURRENT_SOURCE_DIR}/../
+   ${CMAKE_CURRENT_BINARY_DIR}/../
+)
+
+include_directories(include)
+
+include_directories( ${GSL_INCLUDE_DIRS} )
+link_directories( ${GSL_LIBRARY_DIRS} )
+include_directories( ${ROOT_INCLUDE_DIRS} )
+link_directories( ${ROOT_LIBRARY_DIRS} )
 
 ##############################################################################
 # add the source files
@@ -56,16 +72,9 @@ set(MPI_SRCS
     src/SimulationRunParameter.cpp
 )
 
-##############################################################################
-# include the header files
-##############################################################################
-include_directories(include)
-     
-include_directories( ${GSL_INCLUDE_DIRS} )
-link_directories( ${GSL_LIBRARY_DIRS} )
-include_directories( ${ROOT_INCLUDE_DIRS} )
-link_directories( ${ROOT_LIBRARY_DIRS} )
-
+#############################################################################
+# Libraries
+#############################################################################
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
@@ -91,7 +100,6 @@ set ( LIBLIST
 
 add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${MPI_SRCS} ${MPI_HEADER})
 
-
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} )
 
 #############################################################################
@@ -99,12 +107,12 @@ target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} )
 #############################################################################
 CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.cmake 
-    ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp
+    ${CMAKE_CURRENT_BINARY_DIR}/config.hpp
 )
 
 
 #############################################################################
-# tests
+# testing
 #############################################################################
 
 IF (ENABLE_TESTING)
