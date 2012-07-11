@@ -21,13 +21,13 @@
 #include <TFile.h>
 #include <TGraph.h>
 #include <TVectorT.h>
+#include <TVectorD.h>
 #include <TTree.h>
 #include <TNTuple.h>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/report/handler/RootHighThroughputHandler.hpp>
 #include <iostream>
-
-#include <boost/mpi/communicator.hpp>
+#include <MPILib/include/utilities/MPIProxy.hpp>
 
 namespace MPILib {
 namespace report {
@@ -98,13 +98,13 @@ void RootHighThroughputHandler::initializeHandler(const NodeId&) {
 void RootHighThroughputHandler::writeReport(const Report& report) {
 
 	if (!_isRecording) {
-		boost::mpi::communicator world;
+		utilities::MPIProxy mpiProxy;
 
 		// Store the global node ids in the array
 		/// @todo use the circular distribution for this step
 		TArrayI nodeIds(report._nrNodes);
 		for (Index i = 0; i < report._nrNodes; i++) {
-			nodeIds[i] = world.size() * i + world.rank();
+			nodeIds[i] = mpiProxy.getSize() * i + mpiProxy.getRank();
 		}
 		_pFile->WriteObject(&nodeIds, "GlobalNodeIds");
 
