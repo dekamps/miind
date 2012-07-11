@@ -131,8 +131,18 @@ IF(INCLUDE_MPI_LIB)
     # target for doxygen
     ADD_CUSTOM_TARGET(doc COMMAND ${DOXYGEN} ${CMAKE_BINARY_DIR}/doc/Doxyfile)
     
-
-    
+    IF(ENABLE_TESTING)
+        IF (ENABLE_MPI)
+             MESSAGE(STATUS "Testing enabled")
+             INCLUDE(CTest)
+             ENABLE_TESTING()
+        ELSE(ENABLE_MPI)
+            MESSAGE(WARNING "test are only enabled if mpi is enabled")
+        ENDIF(ENABLE_MPI)
+    ELSE(ENABLE_TESTING)
+        MESSAGE(STATUS "Testing disabled")
+    ENDIF(ENABLE_TESTING)
+        
 ELSE(INCLUDE_MPI_LIB)
     MESSAGE(STATUS "MPI disabled")
     ##############################################################################
@@ -205,13 +215,7 @@ ELSE(INCLUDE_MPI_LIB)
       
 ENDIF(INCLUDE_MPI_LIB)
 
-IF(ENABLE_TESTING)
-    MESSAGE(STATUS "Testing enabled")
-    INCLUDE(CTest)
-    ENABLE_TESTING()
-ELSE(ENABLE_TESTING)
-    MESSAGE(STATUS "Testing disabled")
-ENDIF(ENABLE_TESTING)
+
 
 include_directories( ./libs )
 message("========================================Common settings done going on with libs===================================")

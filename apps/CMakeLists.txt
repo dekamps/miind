@@ -1,6 +1,6 @@
-if(ENABLE_MPI)
+if(INCLUDE_MPI_LIB)
     ADD_SUBDIRECTORY( Miind-mpi )  
-else()
+else(INCLUDE_MPI_LIB)
 
     if( ROOT_FOUND )
     ADD_SUBDIRECTORY( Populist )
@@ -22,4 +22,4 @@ else()
     	ADD_SUBDIRECTORY( LayerMappingTest )
     endif( IMAGEMAGICKLIB_FOUND )
 
-endif()
+endif(INCLUDE_MPI_LIB)

@@ -4,6 +4,10 @@
  *  Created on: 25.05.2012
  *      Author: david
  */
+
+#ifndef MPILIB_MPINETWORK_CODE_HPP_
+#define MPILIB_MPINETWORK_CODE_HPP_
+
 #include <MPILib/config.hpp>
 #include <sstream>
 #include <iostream>
@@ -292,3 +296,6 @@ Time MPINetwork<WeightValue, NodeDistribution>::getCurrentStateTime() const {
 }
 
 }					//end namespace MPILib
+
+#endif //MPILIB_MPINETWORK_CODE_HPP_
+

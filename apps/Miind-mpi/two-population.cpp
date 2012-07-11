@@ -5,6 +5,7 @@
  *      Author: david
  */
 
+#include <MPILib/config.hpp>
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
@@ -16,8 +17,10 @@
 #include <MPILib/include/BasicTypes.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
+#ifdef ENABLE_MPI
+#include <boost/mpi/communicator.hpp>
+#endif
 
-namespace mpi = boost::mpi;
 using namespace MPILib;
 
 const Rate RATE_TWOPOPULATION_EXCITATORY_BACKGROUND = 2.0; // Hz
@@ -190,12 +193,12 @@ const SimulationRunParameter TWOPOP_PARAMETER(TWOPOP_HANDLER,
 		TWOPOP_MAXIMUM_NUMBER_OF_ITERATIONS, TWOPOP_T_BEGIN, TWOPOP_T_END,
 		TWOPOP_T_REPORT, TWOPOP_T_NETWORK, "test/twopoptest");
 
-namespace mpi = boost::mpi;
-
 
 int main(int argc, char* argv[]) {
-	mpi::environment env(argc, argv);
-	mpi::communicator world;
+#ifdef ENABLE_MPI
+	boost::mpi::environment env(argc, argv);
+	boost::mpi::communicator world;
+#endif
 	try {
 
 		NodeId id_cortical_background;
@@ -227,18 +230,24 @@ int main(int argc, char* argv[]) {
 		te.start();
 
 		//timed calculation
+#ifdef ENABLE_MPI
 		world.barrier();
+#endif
 		te.stop();
-
+#ifdef ENABLE_MPI
 		if (world.rank() == 0) {
-
+#endif
 			std::cout << "Time of Envolve methode of processor 0: \n";
 			te.report();
+#ifdef ENABLE_MPI
 		}
+#endif
 
 	} catch (std::exception & e) {
 		std::cout << e.what();
+#ifdef ENABLE_MPI
 		env.abort(1);
+#endif
 		return 1;
 	}
 

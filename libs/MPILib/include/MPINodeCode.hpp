@@ -248,8 +248,6 @@ void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 		}
 	}
 	_mpiTimer.stop();
-#else
-	throw utilities::Exception("MPI Code called from serial code");
 #endif
 }
 

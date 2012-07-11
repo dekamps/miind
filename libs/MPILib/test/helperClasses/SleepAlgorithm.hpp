@@ -9,8 +9,6 @@
 #define SLEEPALGORITHM_HPP_
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/mpi.hpp>
-#include <boost/mpi/communicator.hpp>
 
 using namespace MPILib;
 
@@ -44,8 +42,7 @@ public:
 	}
 
 	Rate getCurrentRate() const {
-		mpi::communicator world;
-		return world.rank() + world.size();
+		return 9;
 
 	}
 

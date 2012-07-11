@@ -28,6 +28,7 @@
 #include <MPILib/include/report/handler/RootHighThroughputHandler.hpp>
 #include <iostream>
 #include <MPILib/include/utilities/MPIProxy.hpp>
+#include <cassert>
 
 namespace MPILib {
 namespace report {

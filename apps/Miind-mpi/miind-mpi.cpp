@@ -5,7 +5,8 @@
  *      Author: david
  */
 
-#include <boost/mpi.hpp>
+#include <MPILib/config.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <boost/timer/timer.hpp>
 #include <iostream>
 #include <string>
@@ -23,7 +24,6 @@
 #include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 
-namespace mpi = boost::mpi;
 using namespace MPILib;
 
 const report::handler::RootHighThroughputHandler WILSONCOWAN_HIGH_HANDLER(
@@ -49,8 +49,10 @@ const SimulationRunParameter PAR_WILSONCOWAN(WILSONCOWAN_HIGH_HANDLER, // the ha
 int main(int argc, char* argv[]) {
 	// initialize mpi
 	//boost::timer::auto_cpu_timer t;
-	mpi::environment env(argc, argv);
-	mpi::communicator world;
+#ifdef ENABLE_MPI
+	boost::mpi::environment env(argc, argv);
+	boost::mpi::communicator world;
+#endif
 	try {
 		MPINetwork<double, utilities::CircularDistribution> network;
 
@@ -83,18 +85,24 @@ int main(int argc, char* argv[]) {
 		te.start();
 
 		network.evolve();
+#ifdef ENABLE_MPI
 		world.barrier();
+#endif
 		te.stop();
-
+#ifdef ENABLE_MPI
 		if (world.rank() == 0) {
-
+#endif
 			std::cout << "Time of Envolve methode of processor 0: \n";
 			te.report();
+#ifdef ENABLE_MPI
 		}
+#endif
 
 	} catch (std::exception & e) {
 		std::cout << e.what();
+#ifdef ENABLE_MPI
 		env.abort(1);
+#endif
 		return 1;
 	}
 
