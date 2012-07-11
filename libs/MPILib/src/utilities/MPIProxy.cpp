@@ -44,7 +44,16 @@ void MPIProxy::barrier(){
 #endif
 }
 
+void MPIProxy::waitAll(){
+#ifdef ENABLE_MPI
+	mpi::wait_all(_mpiStatus.begin(), _mpiStatus.end());
+	_mpiStatus.clear();
+#endif
+}
 
+#ifdef ENABLE_MPI
+std::vector<boost::mpi::request> MPIProxy::_mpiStatus;
+#endif
 
 
 } /* namespace utilities */

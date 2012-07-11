@@ -13,9 +13,6 @@
 #include <map>
 #include <memory>
 #include <boost/timer/timer.hpp>
-#ifdef ENABLE_MPI
-#include <boost/mpi/request.hpp>
-#endif
 
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
@@ -163,7 +160,7 @@ public:
 			std::vector<NodeId> _successors;
 
 			// Timers for mpi and algorithm time
-			static boost::timer::cpu_timer _mpiTimer, _algorithmTimer;
+			static boost::timer::cpu_timer _algorithmTimer;
 
 			// make sure that the log is only printed ones.
 			static bool _isLogPrinted;
@@ -201,13 +198,6 @@ public:
 			 * Storage for the state of the precursors, to avoid to much communication.
 			 */
 			std::vector<ActivityType> _precursorActivity;
-
-			/**
-			 * Store the mpi request to have assynchronous communication
-			 */
-#ifdef ENABLE_MPI
-			static std::vector<boost::mpi::request> _mpiStatus;
-#endif
 
 			Number _number_iterations;
 			Number _maximum_iterations;

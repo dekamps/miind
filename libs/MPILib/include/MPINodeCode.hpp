@@ -12,11 +12,6 @@
 #include <MPILib/include/MPINode.hpp>
 #include <iostream>
 #include <MPILib/include/utilities/Exception.hpp>
-#ifdef ENABLE_MPI
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/nonblocking.hpp>
-namespace mpi = boost::mpi;
-#endif
 namespace MPILib {
 
 template<class Weight, class NodeDistribution>
@@ -33,8 +28,6 @@ MPINode<Weight, NodeDistribution>::MPINode(
 		_pNodeDistribution(nodeDistribution)
 		{
 			//hope this sets the timer to zero.
-			_mpiTimer.start();
-			_mpiTimer.stop();
 			_algorithmTimer.start();
 			_algorithmTimer.stop();
 
@@ -84,8 +77,8 @@ void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 	// Add this line or other nodes will not get a proper input at the first simulation step!
 	this->setActivity(_pAlgorithm->getCurrentRate());
 
-	_pHandler = std::shared_ptr<report::handler::AbstractReportHandler>(
-			simParam.getHandler().clone());
+	_pHandler = std::shared_ptr < report::handler::AbstractReportHandler
+			> (simParam.getHandler().clone());
 
 	_pHandler->initializeHandler(_nodeId);
 
@@ -117,14 +110,8 @@ void MPINode<Weight, NodeDistribution>::setActivity(ActivityType activity) {
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::waitAll() {
-#ifdef ENABLE_MPI
-	_mpiTimer.resume();
-	mpi::wait_all(_mpiStatus.begin(), _mpiStatus.end());
-	_mpiStatus.clear();
-
-	_mpiTimer.stop();
-#endif
-
+	utilities::MPIProxy mpiProxy;
+	mpiProxy.waitAll();
 }
 
 template<class Weight, class NodeDistribution>
@@ -153,40 +140,19 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 			_precursorTypes[i] = _pLocalNodes->find(*it)->second.getNodeType();
 
 		} else {
-#ifdef ENABLE_MPI
-			mpi::communicator world;
-#ifdef DEBUG
-			std::cout << "resv source: "
-			<< _pNodeDistribution->getResponsibleProcessor(*it) << "\ttag: "
-			<< *it <<"\tnodeID: "<<world.rank()<< std::endl;
-#endif
-			_mpiStatus.push_back(
-					world.irecv(
-							_pNodeDistribution->getResponsibleProcessor(*it),
-							*it, _precursorTypes[i]));
-#else
-			MPILib::utilities::Exception("MPI Code called from serial code in exchangeNodeTypes in MPINodeCode");
-#endif
+			utilities::MPIProxy mpiProxy;
+			mpiProxy.irecv(_pNodeDistribution->getResponsibleProcessor(*it),
+					*it, _precursorTypes[i]);
 		}
 	}
-#ifdef ENABLE_MPI
-	mpi::communicator world;
-	//send own types to successors
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
 		if (!_pNodeDistribution->isLocalNode(it)) {
-#ifdef DEBUG
-			std::cout << "send dest: "
-			<< _pNodeDistribution->getResponsibleProcessor(it) << "\ttag: "
-			<< _nodeId <<"\tnodeID: "<<world.rank()<< std::endl;
-#endif
-			_mpiStatus.push_back(
-					world.isend(_pNodeDistribution->getResponsibleProcessor(it),
-							_nodeId, _nodeType));
+			utilities::MPIProxy mpiProxy;
+			mpiProxy.isend(_pNodeDistribution->getResponsibleProcessor(it),
+					_nodeId, _nodeType);
 		}
 	}
-#endif
-
 }
 
 template<class Weight, class NodeDistribution>
@@ -196,52 +162,27 @@ void MPINode<Weight, NodeDistribution>::receiveData() {
 		//do not send the data if the node is local!
 		if (_pNodeDistribution->isLocalNode(*it)) {
 			_precursorActivity[i] =
-			_pLocalNodes->find(*it)->second.getActivity();
+					_pLocalNodes->find(*it)->second.getActivity();
 
 		} else {
-#ifdef ENABLE_MPI
-			_mpiTimer.resume();
-			mpi::communicator world;
-
-#ifdef DEBUG
-			std::cout << "resv source: "
-			<< _pNodeDistribution->getResponsibleProcessor(*it) << "\ttag: "
-			<< *it <<"\tnodeID: "<<world.rank()<< std::endl;
-#endif
-			_mpiStatus.push_back(
-					world.irecv(
-							_pNodeDistribution->getResponsibleProcessor(*it),
-							*it,
-							_precursorActivity[i]));
-			_mpiTimer.stop();
+			utilities::MPIProxy mpiProxy;
+			mpiProxy.irecv(_pNodeDistribution->getResponsibleProcessor(*it),
+					*it, _precursorActivity[i]);
 		}
-#else
-		}
-		MPILib::utilities::Exception("MPI Code called from serial code in receiveData in MPINodeCode");
-#endif
 	}
 }
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
-#ifdef ENABLE_MPI
-	_mpiTimer.resume();
-	mpi::communicator world;
+
+	utilities::MPIProxy mpiProxy;
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
 		if (!_pNodeDistribution->isLocalNode(it)) {
-#ifdef DEBUG
-			std::cout << "send dest: "
-			<< _pNodeDistribution->getResponsibleProcessor(it) << "\ttag: "
-			<< _nodeId <<"\tnodeID: "<<world.rank()<< std::endl;
-#endif
-			_mpiStatus.push_back(
-					world.isend(_pNodeDistribution->getResponsibleProcessor(it),
-							_nodeId, _activity));
+			mpiProxy.isend(_pNodeDistribution->getResponsibleProcessor(it),
+					_nodeId, _activity);
 		}
 	}
-	_mpiTimer.stop();
-#endif
 }
 
 template<class Weight, class NodeDistribution>
@@ -269,7 +210,7 @@ void MPINode<Weight, NodeDistribution>::clearSimulation() {
 	_pHandler->detachHandler(_nodeId);
 
 	if (_pNodeDistribution->isMaster() && !_isLogPrinted) {
-		std::cout << "MPI Timer: " << _mpiTimer.format() << std::endl;
+
 		std::cout << "Algorithm Timer: " << _algorithmTimer.format()
 				<< std::endl;
 		_isLogPrinted = true;
@@ -283,21 +224,13 @@ NodeType MPINode<Weight, NodeDistribution>::getNodeType() const {
 }
 
 template<class Weight, class NodeDistribution>
-boost::timer::cpu_timer MPINode<Weight, NodeDistribution>::_mpiTimer =
-		boost::timer::cpu_timer();
-
-template<class Weight, class NodeDistribution>
 boost::timer::cpu_timer MPINode<Weight, NodeDistribution>::_algorithmTimer =
 		boost::timer::cpu_timer();
 
 template<class Weight, class NodeDistribution>
 bool MPINode<Weight, NodeDistribution>::_isLogPrinted = false;
-#ifdef ENABLE_MPI
-template<class Weight, class NodeDistribution>
-std::vector<boost::mpi::request> MPINode<Weight, NodeDistribution>::_mpiStatus;
-#endif
 
 }
- //end namespace MPILib
+//end namespace MPILib
 
 #endif /* CODE_MPILIB_MPINODE_HPP_ */
