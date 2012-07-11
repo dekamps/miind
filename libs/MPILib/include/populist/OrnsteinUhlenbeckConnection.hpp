@@ -21,7 +21,7 @@
 #define MPILIB_POPULIST_ORNSTEINUHLENBECKCONNECTION_HPP_
 
 #include <iostream>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/MuSigmaScalarProduct.hpp>
 #include <UtilLib/IsNan.h>
 

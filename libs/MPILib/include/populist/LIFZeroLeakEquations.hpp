@@ -22,7 +22,7 @@
 
 #include <MPILib/include/populist/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {
@@ -36,7 +36,7 @@ public:
 
 	LIFZeroLeakEquations( VALUE_REF_INIT
 	Number&,						//!< reference to the current number of bins
-			valarray<Potential>&,				//!< reference to state array
+			std::valarray<Potential>&,				//!< reference to state array
 			Potential&,					//!< reference to the check sum variable
 			SpecialBins&,//!< reference to bins variable: reversal bin, reset bin, etc
 			PopulationParameter&,	//!< reference to the PopulationParameter
@@ -81,7 +81,7 @@ protected:
 
 	Time _time_current;
 	Number* _p_n_bins;
-	valarray<Potential>* _p_array_state;
+	std::valarray<Potential>* _p_array_state;
 	Potential* _p_check_sum;
 	LIFConvertor _convertor;
 	boost::shared_ptr<AbstractCirculantSolver> _p_solver_circulant;

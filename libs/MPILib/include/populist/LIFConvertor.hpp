@@ -28,8 +28,10 @@
 #include <MPILib/include/populist/InputParameterSet.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/MuSigma.hpp>
+#include <MPILib/include/BasicDefinitions.hpp>
+
 
 namespace MPILib {
 namespace populist {
@@ -49,9 +51,6 @@ struct SpecialBins;
 
 class LIFConvertor {
 public:
-
-//		typedef AbstractAlgorithm<PopulationConnection>::predecessor_iterator predecessor_iterator;
-//		typedef std::vector<PopulationConnection>::iterator predecessor_iterator;
 
 	typedef MuSigma ScalarProductParameterType;
 

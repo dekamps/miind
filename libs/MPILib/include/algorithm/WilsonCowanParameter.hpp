@@ -21,7 +21,7 @@
 #ifndef MPILIB_ALGORITHMS_WILSONCOWANPARAMETER_HPP_
 #define MPILIB_ALGORITHMS_WILSONCOWANPARAMETER_HPP_
 
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 namespace algorithm {

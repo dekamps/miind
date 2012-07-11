@@ -115,7 +115,7 @@ namespace {
 OneDMZeroLeakEquations::OneDMZeroLeakEquations
 (
 	Number&						n_bins,
-	valarray<Potential>&		state,
+	std::valarray<Potential>&		state,
 	Potential&					check_sum,
 	SpecialBins&				bins,
 	PopulationParameter&		par_pop,		//!< serves now mainly to communicate t_s
@@ -184,7 +184,7 @@ void OneDMZeroLeakEquations::Configure
 	_sys.params    = static_cast<void*>(&_params);
 
 	// the valarrays don't play a role but are required by the base class
-	valarray<Potential> val;
+	std::valarray<Potential> val;
 	_convertor.Configure(val, val,*(static_cast<OneDMParameter*>(p_par)));
 
 }

@@ -21,8 +21,10 @@
 #define MPILIB_POPULIST_PRIORITYQUEUE_HPP_
 
 #include <queue>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/StampedProbability.hpp>
+#include <MPILib/include/BasicDefinitions.hpp>
+
 
 namespace MPILib {
 namespace populist {

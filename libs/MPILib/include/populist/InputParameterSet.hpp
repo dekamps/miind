@@ -22,7 +22,7 @@
 
 
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {

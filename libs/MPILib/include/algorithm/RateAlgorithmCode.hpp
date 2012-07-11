@@ -9,7 +9,7 @@
 #define MPILIB_ALGORITHMS_RATEALGORITHM_CODE_HPP_
 
 #include <MPILib/include/utilities/ParallelException.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/BasicDefinitions.hpp>
 #include <MPILib/include/algorithm/RateAlgorithm.hpp>
 
 namespace MPILib {

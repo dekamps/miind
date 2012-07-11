@@ -20,10 +20,7 @@
 #ifndef MPILIB_POPULIST_POPULISTSPECIFICPARAMETER_HPP_
 #define MPILIB_POPULIST_POPULISTSPECIFICPARAMETER_HPP_
 
-//#include <MPILib/include/populist/AbstractRebinner.hpp>
-#include <MPILib/include/BasicTypes.hpp>
-
-
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
 #include <MPILib/include/populist/InitialDensityParameter.hpp>
 #include <boost/shared_ptr.hpp>

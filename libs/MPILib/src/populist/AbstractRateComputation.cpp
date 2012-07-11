@@ -19,6 +19,7 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
 #include <assert.h>
+#include <MPILib/include/BasicDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {
@@ -26,7 +27,7 @@ namespace populist {
 AbstractRateComputation::AbstractRateComputation() {
 }
 
-void AbstractRateComputation::Configure(valarray<Density>& array_state,
+void AbstractRateComputation::Configure(std::valarray<Density>& array_state,
 		const InputParameterSet& input_set,
 		const PopulationParameter& par_population, Index index_reversal) {
 	_p_array_state = &array_state;

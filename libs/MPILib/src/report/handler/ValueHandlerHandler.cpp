@@ -26,7 +26,6 @@
 #include <TGraph.h>
 #include <TDirectory.h>
 #include <MPILib/include/report/handler/ValueHandlerHandler.hpp>
-#include <MPILib/include/BasicTypes.hpp>
 
 namespace MPILib {
 namespace report {

@@ -21,7 +21,8 @@
 #include <boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
 #include <MPILib/include/report/handler/GraphKey.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/BasicDefinitions.hpp>
+
 
 namespace MPILib {
 namespace report {

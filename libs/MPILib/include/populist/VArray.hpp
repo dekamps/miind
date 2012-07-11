@@ -20,7 +20,7 @@
 #ifndef MPILIB_POPULIST_VARRAY_HPP_
 #define MPILIB_POPULIST_VARRAY_HPP_
 
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <vector>
 
 namespace MPILib {

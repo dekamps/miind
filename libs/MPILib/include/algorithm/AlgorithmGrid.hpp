@@ -22,7 +22,7 @@
 
 #include <vector>
 #include <valarray>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 namespace algorithm {

@@ -22,7 +22,7 @@
 #define MPILIB_REPORT_HANDLER_ABSTRACTREPORTHANDLER_HPP_
 
 #include <string>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/report/Report.hpp>
 
 namespace MPILib {

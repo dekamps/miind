@@ -25,7 +25,11 @@
 #pragma warning(disable: 4996)
 #endif 
 
-#include <MPILib/include/BasicTypes.hpp>
+#include <iostream>
+
+#include <MPILib/include/TypeDefinitions.hpp>
+#include <MPILib/include/BasicDefinitions.hpp>
+
 #include <MPILib/include/populist/ABStruct.hpp>
 #include <MPILib/include/populist/ABScalarProduct.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>

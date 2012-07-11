@@ -19,7 +19,6 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <MPILib/include/populist/LimitedNonCirculant.hpp>
 #include <MPILib/include/populist/AbstractCirculantSolver.hpp>
-#include <MPILib/include/BasicTypes.hpp>
 
 namespace MPILib {
 namespace populist {

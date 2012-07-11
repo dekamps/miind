@@ -22,7 +22,7 @@
 #define MPILIB_POPULIST_ONEDMSETPARAMETER_HPP_
 
 #include <MPILib/include/populist/ABStruct.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {

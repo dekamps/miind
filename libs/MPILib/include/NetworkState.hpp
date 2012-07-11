@@ -21,7 +21,7 @@
 #define MPILIB_NETWORKSTATE_HPP_
 
 #include <iostream>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 enum EvolveResult {

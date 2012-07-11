@@ -25,7 +25,7 @@
 #include <vector>
 #include <memory>
 #include <MPILib/include/report/handler/AbstractReportHandler.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/report/handler/ValueHandlerHandler.hpp>
 
 // forward declarations 

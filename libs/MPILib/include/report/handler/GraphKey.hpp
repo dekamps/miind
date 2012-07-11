@@ -21,7 +21,7 @@
 #define MPILIB_REPORT_HANDLER_GRAPHKEY_HPP_
 
 #include <string>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 namespace report {

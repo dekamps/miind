@@ -20,7 +20,7 @@
 #ifndef _CODE_LIBS_POPULISTLIB_STAMPEDPROBABILITY_INCLUDE_GUARD
 #define _CODE_LIBS_POPULISTLIB_STAMPEDPROBABILITY_INCLUDE_GUARD
 
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {

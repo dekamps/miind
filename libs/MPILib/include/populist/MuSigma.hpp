@@ -20,7 +20,7 @@
 #ifndef MPILIB_POPULIST_MUSIGMA_HPP_
 #define MPILIB_POPULIST_MUSIGMA_HPP_
 
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {

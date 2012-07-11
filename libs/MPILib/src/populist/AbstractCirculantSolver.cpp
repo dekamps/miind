@@ -19,7 +19,7 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <assert.h>
 #include <MPILib/include/populist/AbstractCirculantSolver.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/BasicDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {

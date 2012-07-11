@@ -18,7 +18,7 @@
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/NodeType.hpp>
 
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 
 namespace MPILib {

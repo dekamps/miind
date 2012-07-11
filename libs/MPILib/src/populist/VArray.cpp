@@ -25,6 +25,8 @@
 #include <functional>
 #include <gsl/gsl_math.h>
 #include <MPILib/include/populist/VArray.hpp>
+#include <MPILib/include/BasicDefinitions.hpp>
+
 
 namespace MPILib {
 namespace populist {

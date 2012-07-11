@@ -23,6 +23,10 @@
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_errno.h>
 #include <iostream>
+#include <MPILib/include/BasicDefinitions.hpp>
+#include <MPILib/include/StringDefinitions.hpp>
+
+
 namespace MPILib {
 namespace populist {
 namespace {
@@ -52,7 +56,7 @@ _p_workspace(0)
 
 void IntegralRateComputation::Configure
 (
-	      valarray<Density>&	array_state,
+	      std::valarray<Density>&	array_state,
 	const InputParameterSet&	input_set,
 	const PopulationParameter&	par_population,
 	      Index					index_reversal

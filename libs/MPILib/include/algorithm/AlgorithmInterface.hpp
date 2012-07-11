@@ -8,7 +8,7 @@
 #ifndef MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
 #define MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
 
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 #include <MPILib/include/NodeType.hpp>

@@ -18,7 +18,6 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <MPILib/include/populist/InterpolationRebinner.hpp>
-#include <MPILib/include/BasicTypes.hpp>
 #include <cassert>
 #include <limits>
 #include <iostream>
@@ -90,7 +89,7 @@ void InterpolationRebinner::SmoothResetBin
 
 bool InterpolationRebinner::Configure
 (
-	valarray<double>& array,
+	std::valarray<double>& array,
 	Index             index_reversal_bin,
 	Index             index_reset_bin,
 	Number            number_original_bins,
@@ -127,7 +126,7 @@ void InterpolationRebinner::PrepareLocalCopies
 (
 )
 {
-	valarray<double>& array = *_p_array;
+	std::valarray<double>& array = *_p_array;
 
 	if ( _number_original_bins > _x_array.size() ){
 		_x_array.resize(_number_original_bins);
@@ -164,7 +163,7 @@ int InterpolationRebinner::IndexNewResetBin()
 
 void InterpolationRebinner::ResetOvershoot()
 {
-	valarray<double>& array = *_p_array;
+	std::valarray<double>& array = *_p_array;
 	for
 	( 
 		int index_rest_bins = static_cast<int>(_number_new_bins);
@@ -176,7 +175,7 @@ void InterpolationRebinner::ResetOvershoot()
 
 void InterpolationRebinner::Interpolate()
 {
-	valarray<double>& array = *_p_array;
+	std::valarray<double>& array = *_p_array;
 	gsl_spline_init 
 		(
 			_p_spline, 
@@ -209,7 +208,7 @@ void InterpolationRebinner::Interpolate()
 void InterpolationRebinner::ReplaceResetBin(AbstractZeroLeakEquations* p_zl)
 {
 	double refractive = p_zl ? p_zl->RefractiveProbability() : 0.0;
-	valarray<double>& array = *_p_array;
+	std::valarray<double>& array = *_p_array;
 	array[this->IndexNewResetBin()] += 1.0 - _p_array->sum() - refractive;
 }
 

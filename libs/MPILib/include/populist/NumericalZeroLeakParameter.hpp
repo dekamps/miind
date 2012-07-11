@@ -20,7 +20,7 @@
 #ifndef MPILIB_POPULIST_NUMERICALZEROLEAKPARAMETER_HPP_
 #define MPILIB_POPULIST_NUMERICALZEROLEAKPARAMETER_HPP_
 
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/ProbabilityQueue.hpp>
 
 namespace MPILib {

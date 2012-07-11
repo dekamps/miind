@@ -21,7 +21,7 @@
 #define MPILIB_POPULIST_OLDLIFZEROLEAKEQUATIONS_HPP_
 
 #include <MPILib/include/populist/LIFZeroLeakEquations.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 
 namespace MPILib {

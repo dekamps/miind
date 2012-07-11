@@ -24,9 +24,7 @@
 
 #include <MPILib/include/populist/InputParameterSet.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
-#include <MPILib/include/BasicTypes.hpp>
-
-using std::valarray;
+#include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {
@@ -45,7 +43,7 @@ namespace populist {
 		virtual void Configure
 		(
 			// not const since a pointer to an element is needed, it should have been const otherwise:
-			valarray<Density>&,			// state array
+			std::valarray<Density>&,			// state array
 			const InputParameterSet&,	// current input to population
 			const PopulationParameter&,	// neuron parameters
 			Index						// index reversal bin
@@ -70,10 +68,10 @@ namespace populist {
 		Potential BinToCurrentPotential(Index);
 
 		Index						_index_reversal = 0;
-		valarray<Density>*			_p_array_state = nullptr;
+		std::valarray<Density>*			_p_array_state = nullptr;
 		const InputParameterSet*	_p_input_set = nullptr;
 		PopulationParameter			_par_population;
-		valarray<Potential>			_array_interpretation;         
+		std::valarray<Potential>			_array_interpretation;
 
 		Number		_n_bins;
 		Number		_number_integration_area;      

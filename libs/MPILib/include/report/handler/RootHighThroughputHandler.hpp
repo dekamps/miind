@@ -25,7 +25,7 @@
 #include <vector>
 #include <map>
 #include <MPILib/include/report/handler/AbstractReportHandler.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 class TTree;
 class TFile;

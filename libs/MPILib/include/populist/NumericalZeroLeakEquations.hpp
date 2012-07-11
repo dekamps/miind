@@ -24,7 +24,7 @@
 #include <NumtoolsLib/NumtoolsLib.h>
 #include <MPILib/include/populist/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/LIFConvertor.hpp>
 #include <MPILib/include/populist/NumericalZeroLeakParameter.hpp>
 #include <MPILib/include/populist/ProbabilityQueue.hpp>

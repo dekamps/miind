@@ -9,6 +9,7 @@
 #define SLEEPALGORITHM_HPP_
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 #include <boost/thread/thread.hpp>
+#include <MPILib/include/BasicDefinitions.hpp>
 
 using namespace MPILib;
 

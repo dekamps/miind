@@ -26,9 +26,10 @@
 #include <UtilLib/UtilLib.h>
 #include <MPILib/include/populist/PopulationGridController.hpp>
 #include <MPILib/include/populist/IntegralRateComputation.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/utilities/IterationNumberException.hpp>
+#include <MPILib/include/StringDefinitions.hpp>
 
 
 #ifdef WIN32

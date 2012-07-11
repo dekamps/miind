@@ -28,8 +28,9 @@
 #include <assert.h>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
+#include <MPILib/include/StringDefinitions.hpp>
 
-#include <MPILib/include/BasicTypes.hpp>
+
 #include <MPILib/include/report/handler/GraphKey.hpp>
 
 #include <TApplication.h>

@@ -25,6 +25,7 @@
 #include <gsl/gsl_integration.h>
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
 
+
 namespace MPILib {
 namespace populist {
 
@@ -39,7 +40,7 @@ public:
 
 	//! configuring gives access to density profile, the input parameters (effective efficacy and variance of eff. eff.)
 	//! and the neuron parameters
-	virtual void Configure(valarray<Density>&,	//! density valarray
+	virtual void Configure(std::valarray<Density>&,	//! density valarray
 			const InputParameterSet&, const PopulationParameter&, Index);
 
 	virtual ~IntegralRateComputation();

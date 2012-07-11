@@ -23,12 +23,10 @@
 #include <valarray>
 #include <NumtoolsLib/NumtoolsLib.h>
 #include <MPILib/include/populist/AbstractCirculantSolver.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/InputParameterSet.hpp>
 #include <MPILib/include/populist/VArray.hpp>
 
-using std::valarray;
-using std::slice;
 using NumtoolsLib::C_Matrix;
 using NumtoolsLib::D_Matrix;
 

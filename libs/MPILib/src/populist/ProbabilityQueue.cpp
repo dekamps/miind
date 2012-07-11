@@ -19,6 +19,7 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <MPILib/include/populist/ProbabilityQueue.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
+
 #include <cassert>
 #include <math.h>
 

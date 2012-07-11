@@ -23,7 +23,7 @@
 
 #include <string>
 #include <MPILib/include/report/handler/AbstractReportHandler.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 //! Parameter determining how a simulation is run. Specifiying begin and end time, log file names, etc.

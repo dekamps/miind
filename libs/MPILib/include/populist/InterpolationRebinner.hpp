@@ -94,7 +94,7 @@ private:
 	double _sum_before;
 	double _dv_before;
 	double _dv_after;
-	valarray<double>* _p_array;
+	std::valarray<double>* _p_array;
 	int _index_reversal_bin;
 	int _index_reset_bin;
 	Number _number_original_bins;

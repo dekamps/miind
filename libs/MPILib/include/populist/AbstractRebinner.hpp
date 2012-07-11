@@ -22,7 +22,7 @@
 
 #include <valarray>
 #include <MPILib/include/populist/AbstractZeroLeakEquations.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 
 
 

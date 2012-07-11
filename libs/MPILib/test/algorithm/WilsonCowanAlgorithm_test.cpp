@@ -7,7 +7,6 @@
 
 #include <boost/mpi.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <MPILib/include/BasicTypes.hpp>
 
 //Hack to test privat members
 #define private public

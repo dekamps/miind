@@ -10,6 +10,8 @@
 
 
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
+
 
 namespace MPILib {
 namespace algorithm{

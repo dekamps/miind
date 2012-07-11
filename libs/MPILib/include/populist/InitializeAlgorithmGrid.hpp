@@ -21,7 +21,7 @@
 #define MPILIB_POPULIST_INITIALPOTENTIALVECTOR_HPP_
 
 #include <vector>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/InitialDensityParameter.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>

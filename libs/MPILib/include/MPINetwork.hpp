@@ -13,7 +13,7 @@
 #include <memory>
 
 #include <MPILib/include/MPINode.hpp>
-#include <MPILib/include/BasicTypes.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/NetworkState.hpp>
 #include <MPILib/include/utilities/LogStream.hpp>
