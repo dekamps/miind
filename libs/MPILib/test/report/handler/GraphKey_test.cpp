@@ -33,12 +33,12 @@ void test_Constructor() {
 
 	BOOST_CHECK(gk._id==0);
 	BOOST_CHECK(gk._time==0.0);
-	BOOST_CHECK(gk._type==RATEGRAPH);
+	BOOST_CHECK(gk._type==STATEGRAPH);
 
 	GraphKey gk2(1, 2.0);
 	BOOST_CHECK(gk2._id==1);
 	BOOST_CHECK(gk2._time==2.0);
-	BOOST_CHECK(gk2._type==RATEGRAPH);
+	BOOST_CHECK(gk2._type==STATEGRAPH);
 
 	std::string key = "grid_3_3.0";
 	GraphKey gk3(key);

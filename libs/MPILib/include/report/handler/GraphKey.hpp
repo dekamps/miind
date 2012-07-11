@@ -52,7 +52,7 @@ struct GraphKey {
 	/**
 	 * The GraphType
 	 */
-	GraphType _type = RATEGRAPH;
+	GraphType _type = STATEGRAPH;
 
 	/**
 	 * Default constructor for use in containers
