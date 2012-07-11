@@ -43,10 +43,10 @@ PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 				_vec_value,
 #endif
 				_parameter_population, _parameter_specific,
-				algorithm::AlgorithmInterface<Weight>::ArrayState(_grid),
-				algorithm::AlgorithmInterface<Weight>::ArrayInterpretation(
+				algorithm::AlgorithmInterface<Weight>::getArrayState(_grid),
+				algorithm::AlgorithmInterface<Weight>::getArrayInterpretation(
 						_grid),
-				&algorithm::AlgorithmInterface<Weight>::StateSize(_grid),
+				&algorithm::AlgorithmInterface<Weight>::getStateSize(_grid),
 				&_current_rate, &_stream_log), _current_time(0), _current_rate(
 				0) {
 	Embed();
@@ -88,9 +88,9 @@ PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 				_vec_value,
 #endif
 				_parameter_population, _parameter_specific,
-				algorithm::AlgorithmInterface<Weight>::ArrayState(_grid),
-				algorithm::AlgorithmInterface<Weight>::ArrayInterpretation(_grid),
-				&algorithm::AlgorithmInterface<Weight>::StateSize(_grid), &_current_rate,
+				algorithm::AlgorithmInterface<Weight>::getArrayState(_grid),
+				algorithm::AlgorithmInterface<Weight>::getArrayInterpretation(_grid),
+				&algorithm::AlgorithmInterface<Weight>::getStateSize(_grid), &_current_rate,
 				&_stream_log), _current_time(0), _current_rate(0) {
 	Embed();
 }
@@ -112,8 +112,8 @@ void PopulationAlgorithm_<Weight>::Embed() {
 	// So this is done by the controller, since it maintans a local copy of the relevant
 	// valarrays and needs insert the initial grid in the right sized valarray anyway.
 	_controller_grid.EmbedGrid(_parameter_specific.NrGridInitial(),
-			this->ArrayState(grid_initial), // only Algorithms can unpack the valarrays
-			this->ArrayInterpretation(grid_initial) // so they must be sent to the controller
+			this->getArrayState(grid_initial), // only Algorithms can unpack the valarrays
+			this->getArrayInterpretation(grid_initial) // so they must be sent to the controller
 					);
 }
 

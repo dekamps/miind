@@ -97,22 +97,22 @@ public:
 	virtual AlgorithmGrid getGrid() const = 0;
 
 
-	std::valarray<double>& ArrayState(AlgorithmGrid& grid) const
+	std::valarray<double>& getArrayState(AlgorithmGrid& grid) const
 	{
 		return grid.getArrayState();
 	}
 
-	std::valarray<double>& ArrayInterpretation(AlgorithmGrid& grid) const
+	std::valarray<double>& getArrayInterpretation(AlgorithmGrid& grid) const
 	{
 		return grid.getArrayInterpretation();
 	}
 
-	Number& StateSize(AlgorithmGrid& grid) const
+	Number& getStateSize(AlgorithmGrid& grid) const
 	{
 		return grid.getStateSize();
 	}
 
-	Number StateSize(const AlgorithmGrid & grid) const
+	Number getStateSize(const AlgorithmGrid & grid) const
 	{
 		return grid.getStateSize();
 	}

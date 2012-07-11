@@ -38,7 +38,7 @@ void NetworkState::setResult(EvolveResult result) {
 	_result = result;
 }
 
-EvolveResult NetworkState::getResult() {
+EvolveResult NetworkState::getResult() const {
 	return _result;
 }
 

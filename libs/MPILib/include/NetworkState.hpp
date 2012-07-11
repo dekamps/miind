@@ -65,7 +65,7 @@ struct NetworkState {
 	 * Getter for the Network State result
 	 * @return The current State of the Network
 	 */
-	EvolveResult getResult();
+	EvolveResult getResult() const;
 
 };
 // end of NetworkState

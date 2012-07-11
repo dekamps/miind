@@ -141,7 +141,7 @@ public:
 	virtual ~PopulationAlgorithm_();
 
 	//!
-	void configure(const SimulationRunParameter&);
+	virtual void configure(const SimulationRunParameter&) override;
 
 	//! Evolve the node's state
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
@@ -153,16 +153,16 @@ public:
 			const std::vector<Weight>& weightVector,
 			const std::vector<NodeType>& typeVector) override;
 	//! Current time as maintained by the algorithm
-	virtual Time getCurrentTime() const;
+	virtual Time getCurrentTime() const override;
 
 	//! Give the current output rate
-	virtual Rate getCurrentRate() const;
+	virtual Rate getCurrentRate() const override;
 
 	//! Provide a copy of the momentary grid
-	virtual algorithm::AlgorithmGrid getGrid() const;
+	virtual algorithm::AlgorithmGrid getGrid() const override;
 
 	//! Provide a clone of this algorithm
-	virtual PopulationAlgorithm_<Weight>* clone() const {
+	virtual PopulationAlgorithm_<Weight>* clone() const override{
 		return new PopulationAlgorithm_<Weight>(*this);
 	}
 
