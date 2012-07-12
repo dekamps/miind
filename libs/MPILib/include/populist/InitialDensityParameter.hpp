@@ -29,9 +29,6 @@ namespace populist {
 //! mu specifies the peak of the density, sigma specifies the width.
 //! If sigma = 0, all density is concentrated in a single bin.
 struct InitialDensityParameter {
-	//! default constructor
-	InitialDensityParameter(){
-	}
 
 	//! constructor
 	InitialDensityParameter(Potential mu, Potential sigma) :

@@ -52,8 +52,8 @@ public:
 
 private:
 
-	gsl_interp_accel* _p_accelerator;                //
-	gsl_integration_workspace* _p_workspace;           // need to be initialized
+	gsl_interp_accel* _p_accelerator = nullptr;                //
+	gsl_integration_workspace* _p_workspace = nullptr;           // need to be initialized
 
 };
 } /* namespace populist */

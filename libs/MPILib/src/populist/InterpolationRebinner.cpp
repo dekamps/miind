@@ -24,20 +24,6 @@
 namespace MPILib {
 namespace populist {
 
-InterpolationRebinner::InterpolationRebinner():
-_p_accelerator(gsl_interp_accel_alloc () ),
-_x_array				(0),
-_y_array				(0),
-_sum_before				(0),
-_dv_before				(0),
-_dv_after				(0),
-_index_reversal_bin		(0),
-_index_reset_bin		(0),
-_number_original_bins	(0),
-_number_new_bins		(0),
-_p_spline				(0)
-{
-}
 
 InterpolationRebinner::~InterpolationRebinner()
 {

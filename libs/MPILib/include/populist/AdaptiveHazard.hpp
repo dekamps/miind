@@ -26,12 +26,9 @@ namespace populist {
 class AdaptiveHazard {
 public:
 
-	AdaptiveHazard(double,			//!< a
-			double			//!< b,
-			);
+	AdaptiveHazard(double a, double b);
 
-	double operator()(double			//!< g
-			) const;
+	double operator()(double g) const;
 
 private:
 

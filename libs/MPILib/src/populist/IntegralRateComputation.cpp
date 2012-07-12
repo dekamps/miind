@@ -26,147 +26,107 @@
 #include <MPILib/include/BasicDefinitions.hpp>
 #include <MPILib/include/StringDefinitions.hpp>
 
-
 namespace MPILib {
 namespace populist {
 namespace {
 
-	gsl_spline*       P_SPLINE;
-	gsl_interp_accel* P_ACCEL;
+gsl_spline* P_SPLINE;
+gsl_interp_accel* P_ACCEL;
 
-
-	double density
-		(
-			double x, 
-			void* params = 0
-		)
-	{
-		return gsl_spline_eval(P_SPLINE, x, P_ACCEL);
-	}
+double density(double x, void* params = 0) {
+	return gsl_spline_eval(P_SPLINE, x, P_ACCEL);
+}
 }
 
-IntegralRateComputation::IntegralRateComputation():
-_p_accelerator(0),
-_p_workspace(0)
-{
+IntegralRateComputation::IntegralRateComputation() {
 #ifndef DEBUG
 	gsl_set_error_handler_off();
 #endif
 }
 
-void IntegralRateComputation::Configure
-(
-	      std::valarray<Density>&	array_state,
-	const InputParameterSet&	input_set,
-	const PopulationParameter&	par_population,
-	      Index					index_reversal
-)
-{
-	AbstractRateComputation::Configure
-	(
-		array_state,
-		input_set,
-		par_population,
-		index_reversal
-	);
+void IntegralRateComputation::Configure(std::valarray<Density>& array_state,
+		const InputParameterSet& input_set,
+		const PopulationParameter& par_population, Index index_reversal) {
+	AbstractRateComputation::Configure(array_state, input_set, par_population,
+			index_reversal);
 
-	_p_accelerator        = gsl_interp_accel_alloc();
-	_p_workspace          = gsl_integration_workspace_alloc (NUMBER_INTEGRATION_WORKSPACE);
-	_array_interpretation .resize(_p_array_state->size());
+	_p_accelerator = gsl_interp_accel_alloc();
+	_p_workspace = gsl_integration_workspace_alloc(
+			NUMBER_INTEGRATION_WORKSPACE);
+	_array_interpretation.resize(_p_array_state->size());
 
 }
 
-
-IntegralRateComputation::~IntegralRateComputation()
-{
-	if ( _p_accelerator)
-		gsl_interp_accel_free           (_p_accelerator);
-	if ( _p_workspace)
-		gsl_integration_workspace_free  (_p_workspace);
+IntegralRateComputation::~IntegralRateComputation() {
+	if (_p_accelerator)
+		gsl_interp_accel_free(_p_accelerator);
+	if (_p_workspace)
+		gsl_integration_workspace_free(_p_workspace);
 }
 
-Rate IntegralRateComputation::CalculateRate
-(
-	Number    nr_bins
-)
-{
+Rate IntegralRateComputation::CalculateRate(Number nr_bins) {
 	_n_bins = nr_bins;
 	const InputParameterSet& _input_set = *_p_input_set;
 
 	if (_input_set._rate_exc == 0)
-		return  0.0;
+		return 0.0;
 
-	Potential v_cutoff =  1.0 -_input_set._h_exc/(_par_population._theta - _par_population._V_reversal);
+	Potential v_cutoff = 1.0
+			- _input_set._h_exc
+					/ (_par_population._theta - _par_population._V_reversal);
 	DefineRateArea(v_cutoff);
 
-	if ( _number_integration_area + 1 > NUMBER_INTEGRATION_WORKSPACE )
+	if (_number_integration_area + 1 > NUMBER_INTEGRATION_WORKSPACE)
 		throw utilities::Exception(WORKSPACE_EXCESSION);
 
 	//TODO: flexible application of spline
 	if (_number_integration_area < 4)
-		P_SPLINE = gsl_spline_alloc(gsl_interp_linear, _number_integration_area);
-	else 
+		P_SPLINE = gsl_spline_alloc(gsl_interp_linear,
+				_number_integration_area);
+	else
 		P_SPLINE = gsl_spline_alloc(gsl_interp_akima, _number_integration_area);
 
-	if (!P_SPLINE && _number_integration_area >= 4){
-		P_SPLINE = gsl_spline_alloc(gsl_interp_linear, _number_integration_area);
+	if (!P_SPLINE && _number_integration_area >= 4) {
+		P_SPLINE = gsl_spline_alloc(gsl_interp_linear,
+				_number_integration_area);
 		std::cout << "Akima couldn't handle" << std::endl;
 	}
 
 	if (P_SPLINE == 0)
-		throw utilities::Exception("spline could not be defined in rate integral calculation");
+		throw utilities::Exception(
+				"spline could not be defined in rate integral calculation");
 
 	double* p_rho = &(_p_array_state->operator[](_start_integration_area));
-	double* p_v   = &_array_interpretation[_start_integration_area];
+	double* p_v = &_array_interpretation[_start_integration_area];
 
-
-	gsl_spline_init
-	(
-		P_SPLINE, 
-		p_v, 
-		p_rho, 
-		_number_integration_area
-	);
+	gsl_spline_init(P_SPLINE, p_v, p_rho, _number_integration_area);
 
 	void* dummy = 0;
 	gsl_function F;
 	F.function = density;
-	F.params   = dummy;
+	F.params = dummy;
 
 	double result, error;
 
-	int error_code = gsl_integration_qags 
-	(
-		&F, 
-		v_cutoff, 
-		1.0, 
-		1e-1, 
-		0, 
-		NUMBER_INTEGRATION_WORKSPACE,
-		_p_workspace, 
-		&result, 
-		&error
-	); 
-	
-	if (! ::IsFinite(result) )
-	{
+	int error_code = gsl_integration_qags(&F, v_cutoff, 1.0, 1e-1, 0,
+			NUMBER_INTEGRATION_WORKSPACE, _p_workspace, &result, &error);
+
+	if (!::IsFinite(result)) {
 		exit(1);
 	}
 
-	if ( error_code == GSL_EROUND )
+	if (error_code == GSL_EROUND)
 		throw utilities::Exception("GSL rounding error");
 
-	if ( error_code != GSL_SUCCESS)
+	if (error_code != GSL_SUCCESS)
 		throw utilities::Exception("Integration fuck up");
 
 	gsl_spline_free(P_SPLINE);
 
-	return result*_input_set._rate_exc/_delta_v_rel;
+	return result * _input_set._rate_exc / _delta_v_rel;
 }
 
-
-IntegralRateComputation* IntegralRateComputation::Clone() const
-{
+IntegralRateComputation* IntegralRateComputation::Clone() const {
 	return new IntegralRateComputation;
 }
 } /* namespace populist */

@@ -27,22 +27,66 @@
 namespace MPILib {
 namespace populist {
 
-//! This class stores input rate and efficicacies in terms of the number of circulant bins and the number of non-circulant
-//! areas.
+/**
+ * @brief This class stores input rate and efficicacies in terms of the number of
+ * circulant bins and the number of non-circulant areas.
+ *
+ */
 class InputParameterSet {
 public:
 
-	int _H_exc; //! Excitatory efficacy in terms of bins. The real number of bins is rounded to the next integer, for historical reasons. To obtain the floating point value, add _alpha_exc. Do not use _h_exc instead because this is the efficacy in whatever units are given, usually mV or V and does not correspond to a number of bins.
-	int _H_inh; //! Inhibitory efficacy in terms of bins. The real number of bins is rounded to the next integer, for historical reasons. To obtain the floating point value, add _alpha_exc. Do not use _h_inh instead because this is the efficacy in whatever units are given, usually mV or V and does not correspond to a number of bins.
-	Potential _h_exc; //! Synaptic efficacy in mV or V, do not interpret as a number of bins
-	Potential _h_inh; //! Synaptic efficacy in mV or V, do not interpret as a number of bins
-	Potential _alpha_exc; //! When the efficacy needs to be expressed as a number of bins, add this number to _H_exc for an accurate floating point value
-	Potential _alpha_inh; //! When the efficacy needs to be expressed as a number of bins, add this number to _H_inh for an accurate floating point value
-	Rate _rate_exc; //! Excitatory input rate driving the population, usually in spikes/s
-	Rate _rate_inh; //! Inhibitory input rate driving the population, usually in spikes/s
-	Number _n_circ_exc; //! Number of circulant bins
-	Number _n_noncirc_exc; //! Number of non circulant areas for excitatory input
-	Number _n_noncirc_inh; //! Number of non circulant areas for inhibitory input
+	/**
+	 * Excitatory efficacy in terms of bins. The real number of bins is rounded
+	 * to the next integer, for historical reasons. To obtain the floating point value,
+	 * add _alpha_exc. Do not use _h_exc instead because this is the efficacy in
+	 * whatever units are given, usually mV or V and does not correspond to a number of bins.
+	 */
+	int _H_exc;
+	/**
+	 * Inhibitory efficacy in terms of bins. The real number of bins is rounded to the
+	 * next integer, for historical reasons. To obtain the floating point value, add
+	 * _alpha_exc. Do not use _h_inh instead because this is the efficacy in whatever
+	 * units are given, usually mV or V and does not correspond to a number of bins.
+	 */
+	int _H_inh;
+	/**
+	 * Synaptic efficacy in mV or V, do not interpret as a number of bins
+	 */
+	Potential _h_exc;
+	/**
+	 * Synaptic efficacy in mV or V, do not interpret as a number of bins
+	 */
+	Potential _h_inh;
+	/**
+	 * When the efficacy needs to be expressed as a number of bins, add this
+	 * number to _H_exc for an accurate floating point value
+	 */
+	Potential _alpha_exc;
+	/**
+	 * When the efficacy needs to be expressed as a number of bins, add
+	 * this number to _H_inh for an accurate floating point value
+	 */
+	Potential _alpha_inh;
+	/**
+	 * Excitatory input rate driving the population, usually in spikes/s
+	 */
+	Rate _rate_exc;
+	/**
+	 * Inhibitory input rate driving the population, usually in spikes/s
+	 */
+	Rate _rate_inh;
+	/**
+	 * Number of circulant bins
+	 */
+	Number _n_circ_exc;
+	/**
+	 * Number of non circulant areas for excitatory input
+	 */
+	Number _n_noncirc_exc;
+	/**
+	 * Number of non circulant areas for inhibitory input
+	 */
+	Number _n_noncirc_inh;
 };
 
 } /* namespace populist */

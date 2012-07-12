@@ -46,8 +46,10 @@ namespace populist {
 class InterpolationRebinner: public AbstractRebinner {
 public:
 
-	//! Allocates spline resources in GLS
-	InterpolationRebinner();
+	InterpolationRebinner()=default;
+
+	InterpolationRebinner(const InterpolationRebinner&)=delete;
+	InterpolationRebinner& operator=(const InterpolationRebinner&)=delete;
 
 	//! destructor
 	virtual ~InterpolationRebinner();
@@ -55,12 +57,12 @@ public:
 	//! Configure
 	virtual bool Configure(
 
-			std::valarray<double>&,	//!< array with density profile that needs rebinning
-			Index,				//!< reversal bin,
-			Index,				//!< reset bin
-			Number,				//!< number of  bins before rebinning
-			Number			//!< number of  bins after rebinning
-			);
+			std::valarray<double>&,//!< array with density profile that needs rebinning
+			Index,//!< reversal bin,
+			Index,//!< reset bin
+			Number,//!< number of  bins before rebinning
+			Number//!< number of  bins after rebinning
+	);
 
 	//! carry out rebinning as specified in configuration. The pointer to AbstractZeroLeakequations allows access to the refractive probability.
 	//! passing in a null pointer is legal and leads to a no-operation
@@ -76,9 +78,6 @@ public:
 
 private:
 
-	InterpolationRebinner(const InterpolationRebinner&);
-	InterpolationRebinner& operator=(const InterpolationRebinner&);
-
 	void SmoothResetBin();
 	void PrepareLocalCopies();
 	void ResetOvershoot();
@@ -88,20 +87,19 @@ private:
 	void ReplaceResetBin(AbstractZeroLeakEquations*);
 	void RescaleAllProbability(AbstractZeroLeakEquations*);
 
-	gsl_interp_accel* _p_accelerator;
-	vector<double> _x_array;
-	vector<double> _y_array;
-	double _sum_before;
-	double _dv_before;
-	double _dv_after;
-	std::valarray<double>* _p_array;
-	int _index_reversal_bin;
-	int _index_reset_bin;
-	Number _number_original_bins;
-	Number _number_new_bins;
-	gsl_spline* _p_spline;
-};
-} /* namespace populist */
+	gsl_interp_accel* _p_accelerator = gsl_interp_accel_alloc();
+	vector<double> _x_array = std::vector<double>();
+	vector<double> _y_array = std::vector<double>();
+	double _sum_before = 0.0;
+	double _dv_before = 0.0;
+	double _dv_after = 0.0;
+	std::valarray<double>* _p_array = nullptr;
+	int _index_reversal_bin = 0;
+	int _index_reset_bin = 0;
+	Number _number_original_bins = 0;
+	Number _number_new_bins = 0;
+	gsl_spline* _p_spline = nullptr;
+};} /* namespace populist */
 } /* namespace MPILib */
 
 #endif // include guard MPILIB_POPULIST_INTERPOLATIONREBINNER_HPP_
