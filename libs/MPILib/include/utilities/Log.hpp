@@ -10,6 +10,8 @@
 
 #include <iostream>
 #include <memory>
+#include <time.h>
+#include <string>
 #include <MPILib/include/utilities/Exception.hpp>
 
 namespace MPILib {
@@ -176,7 +178,16 @@ LogLevel Log<OutputPolicy>::ReportingLevel = logDEBUG4;
 
 template<typename OutputPolicy>
 std::ostringstream& Log<OutputPolicy>::writeReport(LogLevel level) {
-	_buffer << "- " << "TIME";
+	//generate time in the format Date HH::MM::SS
+	time_t rawtime;
+	time(&rawtime);
+	struct tm foo;
+	struct tm *mytm;
+	mytm = localtime_r (&rawtime, &foo);
+	char outstr[200];
+	strftime(outstr, sizeof(outstr), "%x% %H:%M:%S", mytm);
+
+	_buffer << "- " << outstr;
 	_buffer << " " << logLevelToString(level) << ": ";
 	return _buffer;
 }
