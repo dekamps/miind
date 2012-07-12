@@ -18,6 +18,11 @@
 namespace MPILib {
 namespace algorithm {
 
+/**
+ * @brief The interface for all algorithm classes.
+ *
+ * This class provides the interface to which all developed algorithms need to implement.
+ */
 template<class WeightValue>
 class AlgorithmInterface {
 public:
