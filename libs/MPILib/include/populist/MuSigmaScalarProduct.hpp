@@ -24,9 +24,6 @@
 #include <utility>
 #include <MPILib/include/populist/MuSigma.hpp>
 
-using std::pair;
-using std::vector;
-
 namespace MPILib {
 namespace populist {
 

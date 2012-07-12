@@ -47,7 +47,7 @@ namespace populist {
 
 	private:
 
-		Time _time_current;
+		Time _time_current = 0.0;
 	};
 } /* namespace populist */
 } /* namespace MPILib */

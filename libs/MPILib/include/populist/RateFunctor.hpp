@@ -71,7 +71,7 @@ public:
 private:
 
 	RateFunction _function;
-	Time _current_time;
+	Time _current_time = 0.0;
 
 };
 // end of rateFunctor

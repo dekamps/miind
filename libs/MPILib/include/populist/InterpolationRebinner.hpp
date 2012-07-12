@@ -88,8 +88,8 @@ private:
 	void RescaleAllProbability(AbstractZeroLeakEquations*);
 
 	gsl_interp_accel* _p_accelerator = gsl_interp_accel_alloc();
-	vector<double> _x_array = std::vector<double>();
-	vector<double> _y_array = std::vector<double>();
+	std::vector<double> _x_array = std::vector<double>();
+	std::vector<double> _y_array = std::vector<double>();
 	double _sum_before = 0.0;
 	double _dv_before = 0.0;
 	double _dv_after = 0.0;

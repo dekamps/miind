@@ -63,8 +63,7 @@ public:
 			) :
 			VALUE_MEMBER_INIT
 			_p_bins(&bins), _p_par_pop(&par_pop), _p_par_spec(&par_spec), _p_delta_v(
-					&delta_v), _p_n_bins(&n_bins), _b_toggle_sort(false), _b_toggle_diffusion(
-					false) {
+					&delta_v), _p_n_bins(&n_bins) {
 	}
 
 	//! A signaller for when the PopulationGridController starts to configure
@@ -121,12 +120,11 @@ private:
 	InputParameterSet _input_set;
 	PopulationParameter* _p_par_pop;
 	PopulistSpecificParameter* _p_par_spec;
-	Rate** _pp_rate;
 	Potential* _p_delta_v;
 	Number* _p_n_bins;
 	Index* _p_index_reversal_bin;
-	bool _b_toggle_sort;
-	bool _b_toggle_diffusion;
+	bool _b_toggle_sort = false;
+	bool _b_toggle_diffusion = false;
 
 	std::vector<Rate> _vec_burst;
 	std::vector<Rate> _vec_diffusion;

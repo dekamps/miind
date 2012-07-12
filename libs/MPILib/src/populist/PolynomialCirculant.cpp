@@ -22,7 +22,7 @@
 namespace MPILib {
 namespace populist {
 PolynomialCirculant::PolynomialCirculant() :
-		_j_array(vector<double>(CIRCULANT_POLY_JMAX)) {
+		_j_array(std::vector<double>(CIRCULANT_POLY_JMAX)) {
 }
 
 PolynomialCirculant::~PolynomialCirculant() {

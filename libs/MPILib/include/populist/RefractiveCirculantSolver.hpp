@@ -42,7 +42,7 @@ namespace populist {
 			Time t_batch = 1e-4,					//! Batch size for storing the probability density in the queue, i.e. the precision by which proability density is maintained.
 			double precision = 0,					//! Specifying a probability implies the assumption that in the NonCirculantSolver all calculations are broken off after terms such as $\f  \frac{\tau^k}{\tau !}e^{-tau}
 			CirculantMode mode = INTEGER			//! Integer only transports probability between bins that are an integer step away
-		):AbstractCirculantSolver(mode),_t_ref(t_ref),_t_batch(t_batch),_precision(precision),_off_queue(0){}
+		):AbstractCirculantSolver(mode),_t_ref(t_ref),_t_batch(t_batch),_precision(precision){}
 
 		//! Carry out solver operation
 		virtual void 
@@ -83,7 +83,7 @@ namespace populist {
 		Time				_t_batch;
 		ProbabilityQueue	_queue;
 		double				_precision;
-		double				_off_queue;
+		double				_off_queue = 0.0;
 	};
 } /* namespace populist */
 } /* namespace MPILib */

@@ -28,17 +28,15 @@ namespace populist {
 //! A time stamped measure of probability
 struct StampedProbability {
 
-	StampedProbability() :
-			_prob(0), _time(0) {
-	}
+	StampedProbability()=default;
+
 	StampedProbability(Probability prob, Time time) :
-			_prob(prob), _time(time) {
+	_prob(prob), _time(time) {
 	}
 
-	Probability _prob;
-	Time _time;
-};
-} /* namespace populist */
+	Probability _prob = 0.0;
+	Time _time = 0.0;
+};} /* namespace populist */
 } /* namespace MPILib */
 
 #endif // include guard

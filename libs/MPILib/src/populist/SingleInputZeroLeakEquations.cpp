@@ -55,9 +55,7 @@ LIFZeroLeakEquations
 	delta_v,
 	circ,
 	noncirc
-),
-_time_current(0)
-{
+){
 	this->SetMode(FLOATING_POINT,*_p_solver_circulant);
 	this->SetMode(FLOATING_POINT,*_p_solver_non_circulant);
 	this->SetInputParameter(_convertor.SolverParameter());

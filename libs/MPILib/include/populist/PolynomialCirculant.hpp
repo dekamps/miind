@@ -59,7 +59,7 @@ namespace populist {
 
 		void LoadJArray();
 
-		vector<double>	_j_array;
+		std::vector<double>	_j_array;
 	};
 } /* namespace populist */
 } /* namespace MPILib */
