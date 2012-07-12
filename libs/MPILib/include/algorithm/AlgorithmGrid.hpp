@@ -27,7 +27,11 @@
 namespace MPILib {
 namespace algorithm {
 
-//! AlgorithmGrid
+/**
+ * @brief AlgorithmGrid
+ *
+ * Stored the internal state of an algorithm
+ */
 class AlgorithmGrid {
 public:
 	/**
