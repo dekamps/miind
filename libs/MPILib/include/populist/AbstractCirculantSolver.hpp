@@ -23,7 +23,7 @@
 #include <valarray>
 #include <MPILib/include/populist/LIFConvertor.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <assert.h>
+#include <cassert>
 
 
 
@@ -137,10 +137,10 @@ namespace populist {
 
 		std::valarray<double>			_array_rho;			// integrated density in the non-circulant areas (f^0)
 		std::valarray<double>			_array_circulant;	// storage array for the calculated circulant solution
-		std::valarray<double>*			_p_array_state;		// pointer to the probability density array
+		std::valarray<double>*			_p_array_state = nullptr;		// pointer to the probability density array
 
-		const InputParameterSet*	_p_set;      // instantaneous value of the input parameters
-		double						_initial_integral;
+		const InputParameterSet*	_p_set = nullptr;      // instantaneous value of the input parameters
+		double						_initial_integral = 0.0;
 
 	private:
 

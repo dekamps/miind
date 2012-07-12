@@ -95,12 +95,12 @@ namespace populist {
 
 
 		std::valarray<double>			_array_factor;
-		std::valarray<double>*			_p_array_state;
-		const InputParameterSet*	_p_input_set;
-		double						_epsilon;
-		int							_j_circ_max;			// maximum j for which exp(-tau) tau^k/k! is relevant
+		std::valarray<double>*			_p_array_state = nullptr;
+		const InputParameterSet*		_p_input_set;
+		double							_epsilon;
+		int								_j_circ_max = -1;			// maximum j for which exp(-tau) tau^k/k! is relevant
 															// helps to cut computation short
-		CirculantMode				_mode;
+		CirculantMode					_mode;
 
 	};
 	

@@ -31,9 +31,6 @@ AbstractCirculantSolver::AbstractCirculantSolver
 ):
 _array_rho			(MAXIMUM_NUMBER_CIRCULANT_BINS + 1),
 _array_circulant	(MAXIMUM_NUMBER_CIRCULANT_BINS + 1),
-_p_array_state		(0),
-_p_set				(0),
-_initial_integral	(0),
 _mode				(mode)
 {
 }

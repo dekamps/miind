@@ -25,9 +25,7 @@ namespace populist {
 
 AbstractNonCirculantSolver::AbstractNonCirculantSolver(CirculantMode mode):
 _array_factor  (0),
-_p_array_state (0),
 _epsilon(EPS_J_CIRC_MAX),
-_j_circ_max(-1),
 _mode(mode)
 {
 }

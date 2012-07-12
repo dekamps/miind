@@ -38,10 +38,10 @@ public:
 		// for now a comes from the first population and b from the second. This will need to change.
 		ABQStruct par_ret;
 
-		if ((*nodeVector.begin()) == 6.0) {
+		if ((nodeVector.begin()) == 6.0) {
 			par_ret._a = 6.91423056;
 			par_ret._b = 0.13299526;
-		} else if ((*nodeVector.begin()) == 8.0) {
+		} else if ((nodeVector.begin()) == 8.0) {
 			par_ret._a = 129.43365395;
 			par_ret._b = 0.08430153;
 		} else

@@ -51,16 +51,17 @@ public:
 	SpecialBins&, PopulationParameter&,	//!< serves now mainly to communicate t_s
 			PopulistSpecificParameter&, Potential&,	//!< current potential interval covered by one bin, delta_v
 			Number&);
+
 	void Configure(std::valarray<Potential>&, std::valarray<Potential>&,
 			const OneDMParameter& par_onedm) {
 		_param_onedm = par_onedm;
 	}
 
-	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
+	void SortConnectionvector(const std::vector<Rate>& nodeVector,
 			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
 			const std::vector<NodeType>& typeVector);
 
-	virtual void AdaptParameters();
+	void AdaptParameters();
 
 	void RecalculateSolverParameters();
 
@@ -90,7 +91,6 @@ private:
 	const PopulationParameter* _p_pop;
 	const Number* _p_n_bins;
 	const Potential* _p_delta_v;
-	Rate** _pp_rate;
 };
 } /* namespace populist */
 } /* namespace MPILib */

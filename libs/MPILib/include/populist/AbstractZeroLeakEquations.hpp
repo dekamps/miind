@@ -130,7 +130,7 @@ private:
 	const PopulationParameter& _par_pop;
 	const PopulistSpecificParameter& _par_spec;
 	const SpecialBins& _bins;
-	const InputParameterSet* _p_set;
+	const InputParameterSet* _p_set = nullptr;
 };
 
 } /* namespace populist */
