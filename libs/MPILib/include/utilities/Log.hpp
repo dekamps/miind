@@ -18,7 +18,7 @@ namespace MPILib {
 namespace utilities {
 
 /**
- * The debug levels
+ * The log levels
  */
 enum LogLevel {
 	logERROR,  //!< logERROR
@@ -31,8 +31,6 @@ enum LogLevel {
 	logDEBUG4  //!< logDEBUG4
 };
 
-
-
 /**
  * @brief class for logging reports.
  *
@@ -43,7 +41,7 @@ enum LogLevel {
  *
  * To set the reporting level the following code is needed:
  * @code
- * 	utilities::Log::ReportingLevel = utilities::logWARNING;
+ * 	utilities::Log::setReportingLevel(utilities::logWARNING);
  * @endcode
  *
  * In the default version log messages are printed with std::cerr. To print the log messages
@@ -102,12 +100,25 @@ public:
 	 * @param msg The message written to the stream
 	 */
 	static void writeOutput(const std::string& msg);
-public:
+
+	/**
+	 * getter for the current report level
+	 * @return
+	 */
+	static LogLevel getReportingLevel();
+
+	/**
+	 * setter for the report level
+	 * @param level The new report level
+	 */
+	static void setReportingLevel(LogLevel level);
+
+private:
 	/**
 	 * The current reporting level of the Log, all messages with a level below this level
 	 * are printed the rest is ignored
 	 */
-	static LogLevel ReportingLevel;
+	static LogLevel _reportingLevel;
 
 	/**
 	 * The buffer for the log message
@@ -122,7 +133,7 @@ public:
  * this will improve the efficiency significantly as the checks are conducted at compile time.
  */
 #define LOG(level) \
-if (level > utilities::Log::ReportingLevel || !utilities::Log::getStream()) ; \
+if (level > utilities::Log::getReportingLevel() || !utilities::Log::getStream()) ; \
 else utilities::Log().writeReport(level)
 
 } /* namespace MPILib */

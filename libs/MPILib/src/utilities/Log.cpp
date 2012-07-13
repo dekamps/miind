@@ -5,16 +5,13 @@
  *      Author: david
  */
 
-
-
 #include <MPILib/include/utilities/Log.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 
 namespace MPILib {
 namespace utilities {
 
-
-namespace{
+namespace {
 /**
  * helper function to convert debug levels to stings
  * @param level the debug level
@@ -56,7 +53,7 @@ std::string logLevelToString(LogLevel& level) {
 /**
  * The default log level is set to the finest possible, everything is logged.
  */
-LogLevel Log::ReportingLevel = logDEBUG4;
+LogLevel Log::_reportingLevel = logDEBUG4;
 
 std::ostream*& Log::getStream() {
 	static std::ostream* pStream = &std::cerr;
@@ -72,28 +69,36 @@ void Log::writeOutput(const std::string& msg) {
 	pStream->flush();
 }
 
-
 std::ostringstream& Log::writeReport(LogLevel level) {
 	//generate time in the format Date HH::MM::SS
 	time_t rawtime;
 	time(&rawtime);
-	struct tm foo;
-	struct tm *mytm;
-	mytm = localtime_r (&rawtime, &foo);
+	struct tm tempTm1;
+	struct tm *tempTm2;
+	tempTm2 = localtime_r(&rawtime, &tempTm1);
 	char outstr[200];
-	strftime(outstr, sizeof(outstr), "%x% %H:%M:%S", mytm);
+	strftime(outstr, sizeof(outstr), "%x% %H:%M:%S", tempTm2);
 
 	_buffer << "- " << outstr;
-	_buffer << " " << logLevelToString(level) << ": ";
+	_buffer << " " << logLevelToString(level) << ":\t";
 	return _buffer;
 }
+
+void Log::setReportingLevel(LogLevel level) {
+	LOG(logINFO) << "Report Level changed from "
+			<< logLevelToString(_reportingLevel) << " to "
+			<< logLevelToString(level);
+	_reportingLevel = level;
+}
+
+LogLevel Log::getReportingLevel(){
+		return _reportingLevel;
+	}
 
 Log::~Log() {
 	_buffer << std::endl;
 	Log::writeOutput(_buffer.str());
 }
-
-
 
 }
 }
