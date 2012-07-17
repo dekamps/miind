@@ -17,10 +17,17 @@ ENABLE_COVERAGE [Default: FALSE]
 </dt>
 <dd>allows to generate a coverage report</dd>
 <dt>
-<dt>
 ENABLE_MPI [Default: FALSE]
 </dt>
-<dd>generate miind mpi</dd>
+<dd>enable mpi for the miind mpi lib</dd>
+<dt>
+INCLUDE_MPI_LIB [Default: TRUE]
+</dt>
+<dd>build the miind mpi lib</dd>
+<dt>
+MPIEXEC
+</dt>
+<dd>the path to the mpirun executable</dd>
 <dt>
 CMAKE_INSTALL_PREFIX [Default: /usr/local]
 </dt>
@@ -40,15 +47,15 @@ CMAKE_BUILD_TYPE
 
 e.g. run cmake like this
 
-\code cmake path_to_miind_src -DENABLE_EXAMPLES=TRUE -DENABLE_COVERAGE=TRUE -DCMAKE_BUILD_TYPE=Debug \endcode
+\code cmake path_to_miind_src -DENABLE_MPI=TRUE -DCMAKE_BUILD_TYPE=Debug -DMPIEXEC=/opt/local/bin/openmpirun\endcode
 </li>
 <li> To compile the project run:
 
 \code make \endcode
 </li>
-<li> To install miind run:
+<li> To build the docs:
 
-\code make install \endcode
+\code make doc \endcode
 </li>
 </ol>
 
