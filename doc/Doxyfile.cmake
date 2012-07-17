@@ -18,7 +18,7 @@
 # exceed 55 pixels and the maximum width should not exceed 200 pixels. 
 # Doxygen will copy the logo to the output directory.
 
-PROJECT_LOGO           = @CMAKE_BINARY_DIR@/doc/libpipe.png
+PROJECT_LOGO           = @CMAKE_SOURCE_DIR@/doc/miind_logo.png
 
 # This tag specifies the encoding used for all characters in the config file
 # that follow. The default is UTF-8 which is also the encoding used for all
