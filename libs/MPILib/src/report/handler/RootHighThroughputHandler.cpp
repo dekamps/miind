@@ -101,7 +101,6 @@ void RootHighThroughputHandler::writeReport(const Report& report) {
 		utilities::MPIProxy mpiProxy;
 
 		// Store the global node ids in the array
-		/// @todo use the circular distribution for this step
 		TArrayI nodeIds(report._nrNodes);
 		for (Index i = 0; i < report._nrNodes; i++) {
 			nodeIds[i] = mpiProxy.getSize() * i + mpiProxy.getRank();
