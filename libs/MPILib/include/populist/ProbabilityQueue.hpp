@@ -77,17 +77,10 @@ public:
 	void Scale(double);
 
 private:
-	class HackedQueue: public std::queue<StampedProbability> {
-	public:
 
-		void Scale(double scale) {
-			for (std::deque<StampedProbability>::iterator iter = this->c.begin();
-					iter != this->c.end(); iter++)
-				iter->_prob *= scale;
-		}
-	};
+	void Scale(double scale,  std::queue<StampedProbability>);
 
-	HackedQueue _queue;
+	std::queue<StampedProbability> _queue;
 	Time _time_step;
 	Probability _total;
 	StampedProbability _current;

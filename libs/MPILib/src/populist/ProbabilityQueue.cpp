@@ -25,15 +25,15 @@
 namespace MPILib {
 namespace populist {
 
-void ProbabilityQueue::push(const StampedProbability& prob)
-{
-	assert(prob._time >= _current._time); // accept 0 == 0
+void ProbabilityQueue::push(const StampedProbability& prob) {
+	assert(prob._time >= _current._time);
+	// accept 0 == 0
 	if (prob._time < _time_current)
 		throw utilities::Exception("Pushed an old event on queue.");
 
-	_total +=  prob._prob;
-	if ( prob._time -_current._time > _time_step){
-		_current._time = floor(prob._time/_time_step)*_time_step;
+	_total += prob._prob;
+	if (prob._time - _current._time > _time_step) {
+		_current._time = floor(prob._time / _time_step) * _time_step;
 		_queue.push(_current);
 		_current._prob = 0.;
 	}
@@ -41,36 +41,37 @@ void ProbabilityQueue::push(const StampedProbability& prob)
 
 }
 
-Probability ProbabilityQueue::CollectAndRemove(Time time)
-{
-	_time_current = floor(time/_time_step)*_time_step;
+Probability ProbabilityQueue::CollectAndRemove(Time time) {
+	_time_current = floor(time / _time_step) * _time_step;
 	Probability total = 0;
-	while ( !_queue.empty() && _queue.front()._time <= time )
-	{
+	while (!_queue.empty() && _queue.front()._time <= time) {
 		total += _queue.front()._prob;
 		_queue.pop();
 	}
-	
+
 	_total -= total;
 	return total;
 }
 
-bool ProbabilityQueue::HasProbability(Time time) const
-{
-	if (_queue.empty() )
+bool ProbabilityQueue::HasProbability(Time time) const {
+	if (_queue.empty())
 		return false;
+	else if (_queue.front()._time <= time)
+		return true;
 	else
-		if (_queue.front()._time <= time )
-			return true;
-		else
-			return false;
+		return false;
+}
+void ProbabilityQueue::Scale(double scale,
+		std::queue<StampedProbability> queue) {
+	for (auto& it : queue.c) {
+		it._prob *= scale;
+	}
 }
 
-void ProbabilityQueue::Scale(double scale){
+void ProbabilityQueue::Scale(double scale) {
 	_current._prob *= scale;
 	_total *= scale;
-
-	_queue.Scale(scale);
+	this->Scale(scale, _queue);
 }
 
 } /* namespace populist */
