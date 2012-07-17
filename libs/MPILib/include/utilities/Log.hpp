@@ -48,11 +48,11 @@ namespace utilities {
  * into a log file the following code is needed:
  *
  * @code{.cpp}
- * 	std::ostream* pStream = new std::ofstream("MYLOGFILENAME");
+ * 	std::shared_ptr<std::ostream> pStream( new std::ofstream("MYLOGFILENAME"));
  *	if (!pStream){
  *         throw utilities::Exception("cannot open log file.");
  *	}
- *	utilities::Log::getStream()=pStream;
+ *	utilities::Log::setStream(pStream);
  * @endcode
  *
  * This code would redirect the log messages to the file with the name MYLOGFILENAME.
@@ -155,17 +155,17 @@ public:
 	 * The Stream it writes to the standard is std::cerr
 	 * @return The Stream it writes to
 	 */
-	static std::ostream*& getStream();
+	static std::shared_ptr<std::ostream> getStream();
 
 	/**
-	 * writes the output to the stream
-	 * @param msg The message written to the stream
+	 * Setter for the stream
+	 * @param pStream The Stream the log class should print to.
 	 */
-	static void writeOutput(const std::string& msg);
+	static void setStream(std::shared_ptr<std::ostream> pStream);
 
 	/**
 	 * getter for the current report level
-	 * @return
+	 * @return the current report level
 	 */
 	static LogLevel getReportingLevel();
 
@@ -176,12 +176,24 @@ public:
 	static void setReportingLevel(LogLevel level);
 
 private:
+
+
+	/**
+	 * writes the output to the stream
+	 * @param msg The message written to the stream
+	 */
+	static void writeOutput(const std::string& msg);
+
 	/**
 	 * The current reporting level of the Log, all messages with a level below this level
 	 * are printed the rest is ignored
 	 */
 	static LogLevel _reportingLevel;
 
+	/**
+	 * pointer to the stream
+	 */
+	static std::shared_ptr<std::ostream> _pStream;
 	/**
 	 * The buffer for the log message
 	 */

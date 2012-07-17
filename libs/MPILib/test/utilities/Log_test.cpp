@@ -30,14 +30,14 @@ void test_Constructor() {
 
 void test_Destructor() {
 	Log* lg = new Log();
-	std::ostringstream* pStream = new std::ostringstream();
+	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
 
-	Log::getStream() = pStream;
+	Log::setStream(pStream);
 
 	lg->writeReport() << "blub";
-	BOOST_CHECK(pStream->str().find("blub")!=26);
+	BOOST_CHECK(pStream->str().find("blub")!=38);
 	delete lg;
-	BOOST_CHECK(pStream->str().find("blub")==26);
+	BOOST_CHECK(pStream->str().find("blub")==38);
 
 }
 
@@ -56,25 +56,27 @@ void test_writeReport() {
 	Log lg;
 
 	lg.writeReport() << "blub" << 42;
-	BOOST_CHECK(lg._buffer.str().find("blub")==26);
-	BOOST_CHECK(lg._buffer.str().find("42")==30);
+	BOOST_CHECK(lg._buffer.str().find("blub")==38);
+	BOOST_CHECK(lg._buffer.str().find("42")==42);
 
 }
 
-void test_getStream() {
+void test_setGetStream() {
 	Log* lg = new Log();
-	std::ostringstream* pStream = new std::ostringstream();
+	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
 
-	Log::getStream() = pStream;
+	Log::setStream(pStream);
 
 	BOOST_CHECK(pStream == Log::getStream());
 	delete lg;
 }
 
-void test_writeOutput() {
-	std::ostringstream* pStream = new std::ostringstream();
 
-	Log::getStream() = pStream;
+
+void test_writeOutput() {
+	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
+
+	Log::setStream( pStream);
 	Log::writeOutput(std::string("blub"));
 	BOOST_CHECK(pStream->str().find("blub")==0);
 
@@ -86,38 +88,38 @@ void test_getReportingLevel() {
 
 void test_setReportingLevel() {
 	BOOST_CHECK(Log::getReportingLevel()==logDEBUG4);
-	std::ostringstream* pStream = new std::ostringstream();
+	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
 
-	Log::getStream() = pStream;
+	Log::setStream( pStream);
 	Log::setReportingLevel(logERROR);
-	BOOST_CHECK(pStream->str().find("Report")==26);
+	BOOST_CHECK(pStream->str().find("Report")==38);
 	BOOST_CHECK(Log::getReportingLevel()==logERROR);
 
 }
 
 void test_Macro() {
-	std::ostringstream* pStream = new std::ostringstream();
+	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
 
-	Log::getStream() = pStream;
+	Log::setStream( pStream);
 
 	LOG(logERROR) << "blub" << 42;
 
-	BOOST_CHECK(pStream->str().find("blub")==27);
-	BOOST_CHECK(pStream->str().find("42")==31);
+	BOOST_CHECK(pStream->str().find("blub")==39);
+	BOOST_CHECK(pStream->str().find("42")==43);
 	Log::setReportingLevel(logERROR);
-	pStream = new std::ostringstream();
+	std::shared_ptr<std::ostringstream> pStream1 ( new std::ostringstream());
 
-	Log::getStream() = pStream;
+	Log::setStream( pStream1);
 	LOG(logDEBUG) << "blub" << 42;
-	BOOST_CHECK(pStream->str().find("blub")!=27);
-	BOOST_CHECK(pStream->str().find("42")!=31);
-	pStream = new std::ostringstream();
+	BOOST_CHECK(pStream1->str().find("blub")!=39);
+	BOOST_CHECK(pStream1->str().find("42")!=43);
+	std::shared_ptr<std::ostringstream> pStream2 ( new std::ostringstream());
 
-	Log::getStream() = pStream;
+	Log::setStream( pStream2);
 	LOG(logERROR) << "blub" << 42;
 
-	BOOST_CHECK(pStream->str().find("blub")==27);
-	BOOST_CHECK(pStream->str().find("42")==31);
+	BOOST_CHECK(pStream2->str().find("blub")==39);
+	BOOST_CHECK(pStream2->str().find("42")==43);
 }
 
 }
@@ -136,7 +138,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	MPILib::utilities::test_Destructor();
 	MPILib::utilities::test_LogLevel();
 	MPILib::utilities::test_writeReport();
-	MPILib::utilities::test_getStream();
+	MPILib::utilities::test_setGetStream();
 	MPILib::utilities::test_writeOutput();
 	MPILib::utilities::test_getReportingLevel();
 	MPILib::utilities::test_setReportingLevel();

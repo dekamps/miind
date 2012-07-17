@@ -4,7 +4,8 @@
  *  Created on: 13.07.2012
  *      Author: david
  */
-
+#include <MPILib/config.hpp>
+#include <MPILib/include/utilities/MPIProxy.hpp>
 #include <MPILib/include/utilities/Log.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 
@@ -48,20 +49,33 @@ std::string logLevelToString(LogLevel& level) {
 	}
 	return std::string("");
 }
+
+struct null_deleter {
+	void operator()(void const *) const {
+	}
+};
 }
 
 /**
  * The default log level is set to the finest possible, everything is logged.
  */
 LogLevel Log::_reportingLevel = logDEBUG4;
+/**
+ * Default the log is printed to std::cerr. To avoid the deletion of std::cerr
+ * a null_deleter is provided.
+ */
+std::shared_ptr<std::ostream> Log::_pStream(&std::cerr, null_deleter());
 
-std::ostream*& Log::getStream() {
-	static std::ostream* pStream = &std::cerr;
-	return pStream;
+std::shared_ptr<std::ostream> Log::getStream(){
+	return _pStream;
+}
+
+void Log::setStream(std::shared_ptr<std::ostream> pStream) {
+	_pStream = pStream;
 }
 
 void Log::writeOutput(const std::string& msg) {
-	std::ostream* pStream = getStream();
+	std::shared_ptr<std::ostream> pStream = getStream();
 	if (!pStream)
 		throw utilities::Exception(
 				"The stream is not available. There must have an error occurred.");
@@ -80,6 +94,8 @@ std::ostringstream& Log::writeReport(LogLevel level) {
 	strftime(outstr, sizeof(outstr), "%x% %H:%M:%S", tempTm2);
 
 	_buffer << "- " << outstr;
+	MPIProxy mpiProxy;
+	_buffer << " Proc " << mpiProxy.getRank() << " of " << mpiProxy.getSize();
 	_buffer << " " << logLevelToString(level) << ":\t";
 	return _buffer;
 }
@@ -91,9 +107,9 @@ void Log::setReportingLevel(LogLevel level) {
 	_reportingLevel = level;
 }
 
-LogLevel Log::getReportingLevel(){
-		return _reportingLevel;
-	}
+LogLevel Log::getReportingLevel() {
+	return _reportingLevel;
+}
 
 Log::~Log() {
 	_buffer << std::endl;
