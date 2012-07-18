@@ -25,7 +25,7 @@
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 
 #include <MPILib/include/populist/parameters/InputParameterSet.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/MuSigma.hpp>

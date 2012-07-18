@@ -21,7 +21,7 @@
 
 #include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
 #include <MPILib/include/populist/parameters/AdaptationParameter.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 
 namespace MPILib {
 namespace populist {

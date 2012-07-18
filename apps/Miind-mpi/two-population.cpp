@@ -11,7 +11,7 @@
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/populist/RateFunctorCode.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/PopulistParameter.hpp>
 #include <MPILib/include/populist/parameters/InitialDensityParameter.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>

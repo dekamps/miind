@@ -20,7 +20,7 @@
 #define MPILIB_POPULIST_PARAMETERS_INPUTPARAMETERSET_HPP_
 
 
-#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {

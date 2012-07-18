@@ -16,55 +16,62 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_INITIALPOTENTIALVECTOR_HPP_
-#define MPILIB_POPULIST_INITIALPOTENTIALVECTOR_HPP_
+
+#include <boost/mpi.hpp>
+#include <boost/mpi/communicator.hpp>
 
 #include <vector>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/parameters/InitialDensityParameter.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
-#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
 
-namespace MPILib {
-namespace populist {
+namespace mpi = boost::mpi;
 
-	class InitializeAlgorithmGrid
-	{
-	public:
-		algorithm::AlgorithmGrid
-			InitializeGrid
-			(
-				Number,
-				Potential,
-				const PopulationParameter&,
-				const InitialDensityParameter&
-			) const;
+mpi::communicator world;
 
-		double ExpansionFactorDoubleRebinner
-			(
-				Number,
-				Potential,
-				const PopulationParameter&
-			) const;
+void test_Constructor() {
 
-		Potential 
-			DeltaV
-			(
-				Number,
-				Potential,
-				const PopulationParameter&
-			) const;
-		Index 
-			IndexReversal
-			(
-				Number,
-				Potential,
-				const PopulationParameter& 
-			) const;
-	
-	};
-} /* namespace populist */
-} /* namespace MPILib */
+	OrnsteinUhlenbeckParameter test1;
 
-#endif // include guard MPILIB_POPULIST_INITIALPOTENTIALVECTOR_HPP_
+	BOOST_CHECK(test1._V_reset == 0.0);
+	BOOST_CHECK(test1._V_reversal == 0.0);
+	BOOST_CHECK(test1._tau == 0.0);
+	BOOST_CHECK(test1._tau_refractive == 0.0);
+	BOOST_CHECK(test1._theta == 0.0);
+
+	OrnsteinUhlenbeckParameter test2(1.0, 2.0, 3.0, 4.0, 5.0);
+
+	BOOST_CHECK(test2._theta == 1.0);
+	BOOST_CHECK(test2._V_reset == 2.0);
+	BOOST_CHECK(test2._V_reversal == 3.0);
+	BOOST_CHECK(test2._tau_refractive == 4.0);
+	BOOST_CHECK(test2._tau == 5.0);
+}
+
+int test_main(int argc, char* argv[]) // note the name!
+		{
+
+	boost::mpi::environment env(argc, argv);
+	// we use only two processors for this testing
+
+	if (world.size() != 2) {
+		BOOST_FAIL( "Run the test with two processes!");
+	}
+
+	test_Constructor();
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
+}

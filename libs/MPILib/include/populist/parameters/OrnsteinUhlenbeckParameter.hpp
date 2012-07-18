@@ -16,35 +16,59 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_ORNSTEINUHLENBECKPARAMETER_HPP_
-#define MPILIB_POPULIST_ORNSTEINUHLENBECKPARAMETER_HPP_
+#ifndef MPILIB_POPULIST_PARAMETERS_ORNSTEINUHLENBECKPARAMETER_HPP_
+#define MPILIB_POPULIST_PARAMETERS_ORNSTEINUHLENBECKPARAMETER_HPP_
 
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {
 
-//! Parameters necessary for the configuration of an OUAlgorithm
-//!
-//! These are the parameters that define a leaky-integrate-and-fire neuron.
-
+/**
+ * @brief Parameters necessary for the configuration of an OUAlgorithm
+ *
+ * These are the parameters that define a leaky-integrate-and-fire neuron.
+ */
 struct OrnsteinUhlenbeckParameter {
 
-	Potential _theta = 0.0; //!< threshold potential in V
-	Potential _V_reset = 0.0; //!< reset potential in V
-	Potential _V_reversal = 0.0; //!< reversal potential in V
-	Time _tau_refractive = 0.0; //!< (absolute) refractive time in s
-	Time _tau = 0.0; //!< membrane time constant in s
+	/**
+	 * threshold potential in V
+	 */
+	Potential _theta = 0.0;
+	/**
+	 * reset potential in V
+	 */
+	Potential _V_reset = 0.0;
+	/**
+	 * reversal potential in V
+	 */
+	Potential _V_reversal = 0.0;
+	/**
+	 * (absolute) refractive time in s
+	 */
+	Time _tau_refractive = 0.0;
+	/**
+	 * membrane time constant in s
+	 */
+	Time _tau = 0.0;
 
-	//! default constructor
-	OrnsteinUhlenbeckParameter(){
-	}
+	/**
+	 * default constructor
+	 */
+	OrnsteinUhlenbeckParameter()=default;
 
-	//! standard constructor
+	/**
+	 * standard constructor
+	 * @param theta threshold potential in V
+	 * @param V_reset reset potential in V
+	 * @param V_reversal reversal potential in V
+	 * @param tau_refractive (absolute) refractive time in s
+	 * @param tau membrane time constant in s
+	 */
 	OrnsteinUhlenbeckParameter(Potential theta, Potential V_reset,
 			Potential V_reversal, Time tau_refractive, Time tau) :
-			_theta(theta), _V_reset(V_reset), _V_reversal(V_reversal), _tau_refractive(
-					tau_refractive), _tau(tau) {
+	_theta(theta), _V_reset(V_reset), _V_reversal(V_reversal), _tau_refractive(
+			tau_refractive), _tau(tau) {
 	}
 };
 
@@ -53,4 +77,4 @@ typedef OrnsteinUhlenbeckParameter PopulationParameter;
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_ORNSTEINUHLENBECKPARAMETER_HPP_
+#endif // include guard MPILIB_POPULIST_PARAMETERS_ORNSTEINUHLENBECKPARAMETER_HPP_

@@ -18,7 +18,7 @@
 //
 #include <assert.h>
 #include <MPILib/include/populist/LIFConvertor.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/MuSigmaScalarProduct.hpp>
 #include <MPILib/include/populist/SpecialBins.hpp>
 #include <MPILib/include/MPINode.hpp>

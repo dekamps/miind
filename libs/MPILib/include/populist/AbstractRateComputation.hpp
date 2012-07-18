@@ -22,7 +22,7 @@
 #include <valarray>
 
 #include <MPILib/include/populist/parameters/InputParameterSet.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
