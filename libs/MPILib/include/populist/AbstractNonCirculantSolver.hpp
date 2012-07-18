@@ -22,7 +22,7 @@
 #include <valarray>
 #include <MPILib/include/populist/AbstractCirculantSolver.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/InputParameterSet.hpp>
+#include <MPILib/include/populist/parameters/InputParameterSet.hpp>
 
 
 namespace MPILib {
