@@ -36,7 +36,7 @@ namespace handler {
 class ValueHandlerHandler {
 public:
 
-	ValueHandlerHandler();
+	ValueHandlerHandler()=default;
 
 	/**
 	 * Adds a report to the ValueHandlerHandler

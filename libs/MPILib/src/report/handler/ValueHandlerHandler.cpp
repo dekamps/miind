@@ -42,8 +42,7 @@ ValueHandlerHandler::Event processValues(const ReportValue& value, NodeId id) {
 }
 
 
-ValueHandlerHandler::ValueHandlerHandler() {
-}
+
 
 void ValueHandlerHandler::addReport(const Report& report) {
 	// strip all ReportValues and store them in Events
@@ -66,6 +65,7 @@ void ValueHandlerHandler::write() {
 				&(_vec_quantity[i][0]));
 		p_graph->SetName(_vec_names[i].c_str());
 		p_graph->Write();
+		delete p_graph;
 	}
 	_is_written = true;
 
