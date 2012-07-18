@@ -8,8 +8,8 @@
 # by the KDevelop project, www.kdevelop.org
 #
 
-from os import system, remove, environ, defpath, path, pathsep, X_OK, access, sep
-from sys import exit, stdout
+from os import system, name, remove, environ, defpath, path, pathsep, X_OK, access, sep
+from sys import exit, stdout, platform
 from subprocess import Popen, PIPE
 from xml.dom.minidom import parse, parseString
 
@@ -21,11 +21,12 @@ def garbage(line):
 def memcheck(test):
     ''' run valgrind-memcheck on test in testdir. return xml output as string '''
     v = find_valgrind()
-    cmd = v+" --tool=memcheck --child-silent-after-fork=yes --leak-check=full --xml=yes --xml-fd=3 --num-callers=50 " + test + " 3>memcheck.tmp"
-    #print cmd
+    if platform == "darwin": #mac stuff
+        cmd = v+" --tool=memcheck --dsymutil=yes --child-silent-after-fork=yes --leak-check=full --xml=yes --xml-fd=3 --num-callers=50 " + test + " 3>memcheck.tmp"
+    else: #linux stuff
+        cmd = v+" --tool=memcheck --child-silent-after-fork=yes --leak-check=full --xml=yes --xml-fd=3 --num-callers=50 " + test + " 3>memcheck.tmp"
     system(cmd)
     out = open("memcheck.tmp").readlines()
-    #remove("/tmp/.memcheck.tmp")
     out = filter(garbage, out)
     return ''.join(out)
 
@@ -59,8 +60,6 @@ class Frame:
             out += "\t" + self.func
         if self.sfile and self.sline:
             out += " (" + self.sfile + ":" + self.sline + ")"
-        #if self.obj:
-            #out += "\t" + self.obj + "\n"
         out += "\n"
         return out
 
@@ -79,19 +78,9 @@ class BackTrace:
     def is_definitely_lost(self):
         return self.kind == u'Leak_DefinitelyLost'
 
-    def is_qtest(self):
-        is_interesting = False
-        for frame in self.stack:
-            if frame.func:
-                if frame.func.find("vigra") != -1 or frame.func.find("TestSuite") != -1:
-                    is_interesting = True
-            if frame.sfile:
-                if frame.sfile.find("-test.cpp") != -1:
-                    is_interesting = True
-        return is_interesting
 
     def __str__(self):
-        out = self.what + "\n"
+        out = ""
         for frame in self.stack:
             out += str(frame)
         return out
@@ -104,7 +93,7 @@ def parse_errors(out):
     errors_ = []
     for error in errors:
         bt = BackTrace(error)
-        if bt.is_definitely_lost() and bt.is_qtest():
+        if bt.is_definitely_lost():
             errors_.append(bt)
     return errors_
 
@@ -128,17 +117,17 @@ def find_valgrind():
     if valgrind != None:
         return valgrind
     else:
-        print "valgrind NOT FOUND"
+        print ("valgrind NOT FOUND")
         exit(-1)
 
 def run_single_test(exe_name):
     if access(exe_name, X_OK):
         pass
     else:
-        print "executable "+exe_name+" NOT FOUND"
+        print ("executable "+exe_name+" NOT FOUND")
         exit(-1)
 
-    print ">> running valgrind memcheck on " + exe_name
+    print (">> running valgrind memcheck on " + exe_name)
     out = memcheck(exe_name)
     errors = parse_errors(out)
     if len(errors) == 0:
@@ -146,8 +135,9 @@ def run_single_test(exe_name):
         exit(0)
     else:
         for trace in errors:
-            print trace,
+            print (trace),
             print "---------------------------------------------------"
+        print("FAIL")
         exit(-1)
 
 ################### ENTRY ####################################################

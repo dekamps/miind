@@ -95,8 +95,7 @@ MACRO(ADD_MIIND_TEST src)
     )
 
     TARGET_LINK_LIBRARIES(${exe} ${TEST_LIBS})
-
-        
+   
     ADD_TEST(${name} ${exe})
     MESSAGE(STATUS "Adding unit test for: ${name}: ${exe}.")
     # add target for the test
