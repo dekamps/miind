@@ -27,7 +27,7 @@
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
 #include <MPILib/include/populist/CirculantSolver.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
 #include <MPILib/include/populist/ZeroLeakBuilder.hpp>
 

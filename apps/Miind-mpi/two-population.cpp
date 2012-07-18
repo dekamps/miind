@@ -12,7 +12,7 @@
 #include <MPILib/include/populist/RateFunctorCode.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
-#include <MPILib/include/populist/PopulistParameter.hpp>
+#include <MPILib/include/populist/parameters/PopulistParameter.hpp>
 #include <MPILib/include/populist/parameters/InitialDensityParameter.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>

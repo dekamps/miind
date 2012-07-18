@@ -16,41 +16,50 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_POPULISTPARAMETER_HPP_
-#define MPILIB_POPULIST_POPULISTPARAMETER_HPP_
+#ifndef MPILIB_POPULIST_PARAMETERS_POPULISTPARAMETER_HPP_
+#define MPILIB_POPULIST_PARAMETERS_POPULISTPARAMETER_HPP_
 
-#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
-
-
 
 namespace MPILib {
 namespace populist {
 
-	//! Auxiliary class that brings together the neuronal parameters and the specific 
-	//! algorithmic parameters of the PopulistLib. 
-	//!
+/**
+ * @brief Auxiliary class that brings together the neuronal parameters and the specific
+ * algorithmic parameters of the PopulistLib.
+ */
+struct PopulistParameter {
 
-	struct PopulistParameter {
+	/**
+	 * neuronal parameters
+	 */
+	PopulationParameter _par_pop;
+	/**
+	 * grid, and algorithm parameters
+	 */
+	PopulistSpecificParameter _par_spec;
 
-		PopulationParameter			_par_pop;	//!< neuronal parameters
-		PopulistSpecificParameter	_par_spec;	//!< grid, and algorithm parameters
+	/**
+	 * default constructor
+	 */
+	PopulistParameter()=default;
 
-		//! default constructor
-		PopulistParameter(){}
-
-		//! standard constructor
-		PopulistParameter
-		(
+	/**
+	 * standard constructor
+	 * @param par_pop neuronal parameters
+	 * @param par_spec grid, and algorithm parameters
+	 */
+	PopulistParameter
+	(
 			const PopulationParameter& par_pop,
 			const PopulistSpecificParameter& par_spec
-		):
-		_par_pop(par_pop),
-		_par_spec(par_spec)
-		{
-		}
-	};
-} /* namespace populist */
+	):
+	_par_pop(par_pop),
+	_par_spec(par_spec)
+	{
+	}
+};} /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_POPULISTPARAMETER_HPP_
+#endif // include guard MPILIB_POPULIST_PARAMETERS_POPULISTPARAMETER_HPP_
