@@ -24,7 +24,7 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 #define private public
 #define protected public
-#include <MPILib/include/populist/PopulistSpecificParameter.hpp>
+#include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
 #undef protected
 #undef private
 #include <boost/test/minimal.hpp>

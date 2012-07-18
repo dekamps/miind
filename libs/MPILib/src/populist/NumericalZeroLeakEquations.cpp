@@ -24,7 +24,7 @@
 #include <MPILib/include/populist/CirculantSolver.hpp>
 #include <MPILib/include/populist/NumericalZeroLeakEquations.hpp>
 #include <MPILib/include/populist/NonCirculantSolver.hpp>
-#include <MPILib/include/populist/PopulistSpecificParameter.hpp>
+#include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
 
 
 namespace MPILib {

@@ -19,7 +19,7 @@
 
 #include <MPILib/include/populist/ABConvertor.hpp>
 #include <MPILib/include/populist/AbstractCirculantSolver.hpp>
-#include <MPILib/include/populist/PopulistSpecificParameter.hpp>
+#include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
 
 namespace MPILib {
 namespace populist {

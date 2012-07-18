@@ -22,6 +22,8 @@ set(MPI_SRCS
     src/algorithm/AlgorithmGrid.cpp
     src/algorithm/WilsonCowanAlgorithm.cpp
     
+    src/populist/parameters/PopulistSpecificParameter.cpp
+    
     src/populist/ABConvertor.cpp
     src/populist/AbstractCirculantSolver.cpp
     src/populist/AbstractNonCirculantSolver.cpp
@@ -44,7 +46,6 @@ set(MPI_SRCS
     src/populist/OneDMParameter.cpp
     src/populist/OneDMZeroLeakEquations.cpp
     src/populist/PolynomialCirculant.cpp
-    src/populist/PopulistSpecificParameter.cpp
     src/populist/ProbabilityQueue.cpp
     src/populist/RefractiveCirculantSolver.cpp
     src/populist/SingleInputZeroLeakEquations.cpp

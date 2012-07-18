@@ -21,7 +21,7 @@
 
 #include <vector>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/InitialDensityParameter.hpp>
+#include <MPILib/include/populist/parameters/InitialDensityParameter.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 

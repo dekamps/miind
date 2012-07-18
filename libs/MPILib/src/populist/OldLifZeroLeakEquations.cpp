@@ -24,7 +24,7 @@
 #include <MPILib/include/populist/CirculantSolver.hpp>
 #include <MPILib/include/populist/OldLifZeroLeakEquations.hpp>
 #include <MPILib/include/populist/NonCirculantSolver.hpp>
-#include <MPILib/include/populist/PopulistSpecificParameter.hpp>
+#include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
 
 using NumtoolsLib::IsApproximatelyEqualTo;
 

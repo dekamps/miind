@@ -22,7 +22,7 @@
 
 #include <vector>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/InitialDensityParameter.hpp>
+#include <MPILib/include/populist/parameters/InitialDensityParameter.hpp>
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;

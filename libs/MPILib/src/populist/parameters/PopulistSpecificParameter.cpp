@@ -20,7 +20,7 @@
 #include <MPILib/include/populist/InterpolationRebinner.hpp>
 #include <MPILib/include/populist/IntegralRateComputation.hpp>
 
-#include <MPILib/include/populist/PopulistSpecificParameter.hpp>
+#include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
 
 namespace MPILib {
 namespace populist {
@@ -28,8 +28,7 @@ namespace populist {
 PopulistSpecificParameter::PopulistSpecificParameter() :
 		_p_rebinner(
 				std::shared_ptr<AbstractRebinner>(new InterpolationRebinner)), _p_rate(
-				std::shared_ptr<IntegralRateComputation>(
-						new IntegralRateComputation)) {
+				std::shared_ptr<IntegralRateComputation>(new IntegralRateComputation)) {
 }
 
 PopulistSpecificParameter::PopulistSpecificParameter(Potential v_min,
