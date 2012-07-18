@@ -16,10 +16,6 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-
-#include <boost/mpi.hpp>
-#include <boost/mpi/communicator.hpp>
-
 #include <vector>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/InitialDensityParameter.hpp>
@@ -29,9 +25,6 @@ using namespace boost::unit_test;
 using namespace MPILib::populist;
 using namespace MPILib;
 
-namespace mpi = boost::mpi;
-
-mpi::communicator world;
 
 void test_Constructor() {
 
@@ -44,13 +37,6 @@ void test_Constructor() {
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
-
-	boost::mpi::environment env(argc, argv);
-	// we use only two processors for this testing
-
-	if (world.size() != 2) {
-		BOOST_FAIL( "Run the test with two processes!");
-	}
 
 	test_Constructor();
 	return 0;

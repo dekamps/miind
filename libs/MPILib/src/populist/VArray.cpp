@@ -120,7 +120,7 @@ bool VArray::FillArrayWithGarbage() {
 bool VArray::CheckInNumbers(Number number_of_circulant_bins,
 		Number number_of_non_circulant_areas) {
 	_number_of_circulant_bins = number_of_circulant_bins;
-	_number_of_non_circulant_areas = _number_of_non_circulant_areas;
+	_number_of_non_circulant_areas = number_of_non_circulant_areas;
 
 	return true;
 }

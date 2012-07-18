@@ -118,9 +118,7 @@ CONFIGURE_FILE(
 #############################################################################
 
 IF (ENABLE_TESTING)
-    IF (ENABLE_MPI)
         ADD_SUBDIRECTORY(test)
-    ENDIF(ENABLE_MPI)
 ENDIF (ENABLE_TESTING)
 
 install( FILES ${MPI_HEADERS}

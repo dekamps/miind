@@ -19,17 +19,10 @@
 
 #include <MPILib/include/utilities/Timer.hpp>
 #include <ctime>
-
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
-
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
 using namespace MPILib::utilities;
 
-namespace mpi = boost::mpi;
-
-mpi::communicator world;
 
 void test_Timer() {
 
@@ -60,13 +53,6 @@ void test_Timer() {
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
-	mpi::environment env(argc, argv);
-
-	if (world.size() != 2) {
-		BOOST_FAIL( "Run the test with two processes!");
-	}
-
-	// we use only two processors for this testing
 	test_Timer();
 
 	return 0;

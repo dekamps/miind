@@ -17,8 +17,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#include <boost/mpi.hpp>
-#include <boost/mpi/communicator.hpp>
 
 #include <vector>
 #include <MPILib/include/TypeDefinitions.hpp>
@@ -32,10 +30,6 @@
 using namespace boost::unit_test;
 using namespace MPILib::populist;
 using namespace MPILib;
-
-namespace mpi = boost::mpi;
-
-mpi::communicator world;
 
 void test_Evaluate() {
 
@@ -74,13 +68,6 @@ void test_Evaluate() {
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
-
-	boost::mpi::environment env(argc, argv);
-	// we use only two processors for this testing
-
-	if (world.size() != 2) {
-		BOOST_FAIL( "Run the test with two processes!");
-	}
 
 	test_Evaluate();
 	return 0;

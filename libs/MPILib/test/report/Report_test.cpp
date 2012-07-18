@@ -17,9 +17,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#include <boost/mpi.hpp>
-#include <boost/mpi/communicator.hpp>
-
 //Hack to test privat members
 #define private public
 #define protected public
@@ -34,9 +31,6 @@
 using namespace boost::unit_test;
 using namespace MPILib::report;
 
-namespace mpi = boost::mpi;
-
-mpi::communicator world;
 
 void test_Constructor() {
 	Report r(1.0, 2.0, 1, "blub");
@@ -82,13 +76,6 @@ void test_addValue(){
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
-
-	boost::mpi::environment env(argc, argv);
-	// we use only two processors for this testing
-
-	if (world.size() != 2) {
-		BOOST_FAIL( "Run the test with two processes!");
-	}
 
 	test_Constructor();
 	test_addValue();

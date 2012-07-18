@@ -16,8 +16,6 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#include <boost/mpi.hpp>
-#include <boost/mpi/communicator.hpp>
 
 //Hack to test privat members
 #define private public
@@ -33,9 +31,6 @@
 using namespace boost::unit_test;
 using namespace MPILib::algorithm;
 
-namespace mpi = boost::mpi;
-
-mpi::communicator world;
 
 void test_Constructor() {
 
@@ -134,13 +129,6 @@ void test_getGrid() {
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
-
-	boost::mpi::environment env(argc, argv);
-	// we use only two processors for this testing
-
-	if (world.size() != 2) {
-		BOOST_FAIL( "Run the test with two processes!");
-	}
 
 	test_Constructor();
 	test_clone();

@@ -13,6 +13,10 @@ ENABLE_TESTING [Default: TRUE]
 </dt>
 <dd>compiles the tests</dd>
 <dt>
+ENABLE_MEMORY_TEST [Default: FALSE]
+</dt>
+<dd>compiles the memory tests. Attention this increase the duration of the test run significantly</dd>
+<dt>
 ENABLE_COVERAGE [Default: FALSE]
 </dt>
 <dd>allows to generate a coverage report</dd>
