@@ -33,7 +33,7 @@
 #include <MPILib/include/populist/ABScalarProduct.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/populist/OneDMParameter.hpp>
-#include <MPILib/include/populist/OneDMInputSetParameter.hpp>
+#include <MPILib/include/populist/parameters/OneDMInputSetParameter.hpp>
 #include <MPILib/include/populist/SpecialBins.hpp>
 #include <MPILib/include/NodeType.hpp>
 
