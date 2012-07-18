@@ -23,13 +23,13 @@ set(MPI_SRCS
     src/algorithm/WilsonCowanAlgorithm.cpp
     
     src/populist/parameters/PopulistSpecificParameter.cpp
+    src/populist/parameters/AdaptationParameter.cpp
     
     src/populist/ABConvertor.cpp
     src/populist/AbstractCirculantSolver.cpp
     src/populist/AbstractNonCirculantSolver.cpp
     src/populist/AbstractRateComputation.cpp
     src/populist/AbstractRebinner.cpp
-    src/populist/AdaptationParameter.cpp
     src/populist/AdaptiveHazard.cpp
     src/populist/CirculantSolver.cpp
     src/populist/InitializeAlgorithmGrid.cpp

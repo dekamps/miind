@@ -16,33 +16,59 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_ONEDMPARAMETER_HPP_
-#define MPILIB_POPULIST_ONEDMPARAMETER_HPP_
 
-#include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
+#include <boost/mpi.hpp>
+#include <boost/mpi/communicator.hpp>
+
+#include <vector>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/AdaptationParameter.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 
-namespace MPILib {
-namespace populist {
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
 
-	struct OneDMParameter {
+namespace mpi = boost::mpi;
 
-		OneDMParameter(){}
+mpi::communicator world;
 
-		OneDMParameter
-		(
-			const PopulationParameter&,
-			const AdaptationParameter&,
-			const PopulistSpecificParameter&
-		);
+void test_Constructor() {
 
-		PopulationParameter			_par_pop;	//!< Defensive, serves no purpose atm, but probaly will do in the future
-		AdaptationParameter			_par_adapt;	//!< Adaptation specific parameter; accidently also an AdaptationParameter
-		PopulistSpecificParameter	_par_spec;	//!< Grid and algorithm related stuff
+	AdaptationParameter test;
 
-	};
-} /* namespace populist */
-} /* namespace MPILib */
+	BOOST_CHECK(test._g_max == 0.0);
+	BOOST_CHECK(test._q==0.0);
+	BOOST_CHECK(test._t_adaptation==0.0);
 
-#endif // include guard MPILIB_POPULIST_ONEDMPARAMETER_HPP_
+	AdaptationParameter test1(1.0, 2.0, 3.0);
+
+	BOOST_CHECK(test1._t_adaptation==1.0);
+	BOOST_CHECK(test1._q==2.0);
+	BOOST_CHECK(test1._g_max == 3.0);
+
+}
+
+int test_main(int argc, char* argv[]) // note the name!
+		{
+
+	boost::mpi::environment env(argc, argv);
+	// we use only two processors for this testing
+
+	if (world.size() != 2) {
+		BOOST_FAIL( "Run the test with two processes!");
+	}
+
+	test_Constructor();
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
+}

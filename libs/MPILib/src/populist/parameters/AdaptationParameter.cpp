@@ -16,19 +16,12 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#include <MPILib/include/populist/AdaptationParameter.hpp>
+#include <MPILib/include/populist/parameters/AdaptationParameter.hpp>
 
 using namespace MPILib::populist;
 
-AdaptationParameter::AdaptationParameter
-(
-	Time	t_adaptation, 
-	State	q, 
-	State	g_max
-):
-_t_adaptation(t_adaptation),
-_q(q),
-_g_max(g_max)
-{
+AdaptationParameter::AdaptationParameter(Time t_adaptation, State q,
+		State g_max) :
+		_t_adaptation(t_adaptation), _q(q), _g_max(g_max) {
 }
 
