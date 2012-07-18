@@ -16,41 +16,52 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_INITIALDENSITYPARAMETER_HPP_
-#define MPILIB_POPULIST_INITIALDENSITYPARAMETER_HPP_
 
+#include <boost/mpi.hpp>
+#include <boost/mpi/communicator.hpp>
+
+#include <vector>
 #include <MPILib/include/TypeDefinitions.hpp>
+#include <MPILib/include/populist/InitialDensityParameter.hpp>
 
-namespace MPILib {
-namespace populist {
-/**
- * @brief Parameter to specify a Gaussian density distribution in an AlgorithmGrid
- *
- * mu specifies the peak of the density, sigma specifies the width.
- * If sigma = 0, all density is concentrated in a single bin.
- */
-struct InitialDensityParameter {
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
 
-	/**
-	 * Constructor
-	 * @param mu The peak of the density
-	 * @param sigma The width of the peak
-	 */
-	InitialDensityParameter(Potential mu, Potential sigma) :
-			_mu(mu), _sigma(sigma) {
+namespace mpi = boost::mpi;
+
+mpi::communicator world;
+
+void test_Constructor() {
+
+	InitialDensityParameter test(1.0, 2.0);
+
+	BOOST_CHECK(test._mu == 1.0);
+	BOOST_CHECK(test._sigma==2.0);
+
+}
+
+int test_main(int argc, char* argv[]) // note the name!
+		{
+
+	boost::mpi::environment env(argc, argv);
+	// we use only two processors for this testing
+
+	if (world.size() != 2) {
+		BOOST_FAIL( "Run the test with two processes!");
 	}
 
-	/**
-	 * The peak of the density
-	 */
-	Potential _mu = 0;
-	/**
-	 * The width of the peak
-	 */
-	Potential _sigma = 0;
-};
-
-} /* namespace populist */
-} /* namespace MPILib */
-
-#endif // include guard MPILIB_POPULIST_INITIALDENSITYPARAMETER_HPP_
+	test_Constructor();
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
+}
