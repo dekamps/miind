@@ -27,9 +27,18 @@
 namespace MPILib {
 namespace populist {
 
+/**
+ * @brief calculates the AB Scalar Product
+ */
 class ABScalarProduct {
 public:
-	//! Evaluate the inner product over connections which are indicated by the iterators
+	/**
+	 * Evaluate the inner product over connections
+	 * @param nodeVector Vector of the Rates of the precursor
+	 * @param weightVector Vector of the weights of the connections
+	 * @param time The current time
+	 * @return A ABQ struct
+	 */
 	ABQStruct Evaluate(const std::vector<Rate>& nodeVector,
 			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
 			Time time) const {
@@ -48,8 +57,6 @@ public:
 
 		return par_ret;
 	}
-private:
-
 };
 
 } /* namespace populist */

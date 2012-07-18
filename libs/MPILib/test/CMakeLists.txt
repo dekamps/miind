@@ -90,6 +90,7 @@ message("######################## Unit tests ########################")
 MESSAGE(STATUS "Adding test for:")
 
 add_subdirectory(algorithm)
+add_subdirectory(populist)
 add_subdirectory(report)
 add_subdirectory(utilities)
 
