@@ -60,13 +60,13 @@ void ABConvertor::AdaptParameters(
 
 void ABConvertor::RecalculateSolverParameters() {
 	_param_input._n_current_bins = *_p_n_bins;
-	_param_input._n_max_bins = _p_specific->MaxNumGridPoints();
+	_param_input._n_max_bins = _p_specific->getMaxNumGridPoints();
 
 	// current expansion factor is current number of bins
 	// divided by number of initial bins
 
 	double f = static_cast<double>(_param_input._n_current_bins)
-			/ static_cast<double>(_p_specific->NrGridInitial());
+			/ static_cast<double>(_p_specific->getNrGridInitial());
 	_param_input._q_expanded = f * _param_input._par_input._q;
 	_param_input._t_since_rebinning = _p_pop->_tau * log(f);
 	_param_input._g_max = _p_pop->_theta;

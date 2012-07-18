@@ -24,6 +24,7 @@
 #endif 
 
 #include <iostream>
+#include <valarray>
 
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>

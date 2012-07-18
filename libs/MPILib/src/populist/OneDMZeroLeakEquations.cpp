@@ -164,7 +164,7 @@ void OneDMZeroLeakEquations::Configure
 	void*								p_par //OneDMParameter
 )
 {
-	_n_max  = _convertor.PopSpecific().MaxNumGridPoints();
+	_n_max  = _convertor.PopSpecific().getMaxNumGridPoints();
 
 	if (_p_step)
 		gsl_odeiv_step_free (_p_step);

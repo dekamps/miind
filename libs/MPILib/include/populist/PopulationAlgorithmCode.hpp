@@ -37,7 +37,7 @@ PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 		algorithm::AlgorithmInterface<PopulationConnection>(), _parameter_population(
 				par_populist._par_pop), _parameter_specific(
 				par_populist._par_spec), _grid(
-				algorithm::AlgorithmGrid(_parameter_specific.MaxNumGridPoints())), _controller_grid(
+				algorithm::AlgorithmGrid(_parameter_specific.getMaxNumGridPoints())), _controller_grid(
 #ifdef _INVESTIGATE_ALGORITHM
 				_vec_value,
 #endif
@@ -55,7 +55,7 @@ template<class Weight>
 PopulationAlgorithm_<Weight>::PopulationAlgorithm_(istream& s) :
 		algorithm::AlgorithmInterface<PopulationConnection>(), _parameter_population(
 				ParPopFromStream(s)), _parameter_specific(ParSpecFromStream(s)), _grid(
-				AlgorithmGrid(_parameter_specific.MaxNumGridPoints())), _controller_grid(
+				AlgorithmGrid(_parameter_specific.getMaxNumGridPoints())), _controller_grid(
 #ifdef _INVESTIGATE_ALGORITHM
 				_vec_value,
 #endif
@@ -67,11 +67,11 @@ PopulationAlgorithm_<Weight>::PopulationAlgorithm_(istream& s) :
 				&_current_rate, &_stream_log), _current_time(0), _current_rate(
 				0) {
 	_stream_log << "Running with ZeroLeakEquations: "
-			<< _parameter_specific.ZeroLeakName() << "\n";
+			<< _parameter_specific.getZeroLeakName() << "\n";
 	_stream_log << "Running with Circulant: "
-			<< _parameter_specific.CirculantName() << "\n";
+			<< _parameter_specific.getCirculantName() << "\n";
 	_stream_log << "Running with NonCirculant"
-			<< _parameter_specific.NonCirculantName() << "\n";
+			<< _parameter_specific.getNonCirculantName() << "\n";
 	Embed();
 	StripFooter(s);
 }
@@ -82,7 +82,7 @@ PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 		algorithm::AlgorithmInterface<PopulationConnection>(algorithm), _parameter_population(
 				algorithm._parameter_population), _parameter_specific(
 				algorithm._parameter_specific), _grid(
-				algorithm::AlgorithmGrid(_parameter_specific.MaxNumGridPoints())), _controller_grid(
+				algorithm::AlgorithmGrid(_parameter_specific.getMaxNumGridPoints())), _controller_grid(
 #ifdef _INVESTIGATE_ALGORITHM
 				_vec_value,
 #endif
@@ -103,14 +103,14 @@ void PopulationAlgorithm_<Weight>::Embed() {
 	// by the initial number of bins
 	InitializeAlgorithmGrid init;
 	algorithm::AlgorithmGrid grid_initial = init.InitializeGrid(
-			_parameter_specific.NrGridInitial(), _parameter_specific.VMin(),
-			_parameter_population, _parameter_specific.InitialDensity());
+			_parameter_specific.getNrGridInitial(), _parameter_specific.getVMin(),
+			_parameter_population, _parameter_specific.getInitialDensity());
 	// The initial grid now must be embedded in the local grid, which is generally larger.
 	// In general the local grid of the PopulationAlgorithm is out of sync with the
 	// valarrays maintained by the controller and it is only updated when a Report is due.
 	// So this is done by the controller, since it maintans a local copy of the relevant
 	// valarrays and needs insert the initial grid in the right sized valarray anyway.
-	_controller_grid.EmbedGrid(_parameter_specific.NrGridInitial(),
+	_controller_grid.EmbedGrid(_parameter_specific.getNrGridInitial(),
 			this->getArrayState(grid_initial), // only Algorithms can unpack the valarrays
 			this->getArrayInterpretation(grid_initial) // so they must be sent to the controller
 					);

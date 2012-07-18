@@ -232,7 +232,7 @@ void NumericalZeroLeakEquations::Configure
 						(
 							100000000,
 							&((*_p_array_state)[0]),
-							this->ParSpec().MaxNumGridPoints(),
+							this->ParSpec().getMaxNumGridPoints(),
 							1e-7,					// time step
 							0.0,					// initial time
 							NumtoolsLib::Precision(1e-5,	0.0),	// precision,
@@ -246,7 +246,7 @@ void NumericalZeroLeakEquations::Configure
 						(
 							100000000,
 							&((*_p_array_state)[0]),
-							this->ParSpec().MaxNumGridPoints(),
+							this->ParSpec().getMaxNumGridPoints(),
 							1e-7,					// time step
 							0.0,					// initial time
 							NumtoolsLib::Precision(1e-5,	0.0),	// precision,
@@ -256,7 +256,7 @@ void NumericalZeroLeakEquations::Configure
 
 	InputParameterSet& input_set = _convertor.SolverParameter();
 
-	_p_rate_calc = auto_ptr<AbstractRateComputation>(this->ParSpec().RateComputation().Clone());
+	_p_rate_calc = auto_ptr<AbstractRateComputation>(this->ParSpec().getRateComputation().Clone());
 
 	_p_rate_calc->Configure
 	(
@@ -267,7 +267,7 @@ void NumericalZeroLeakEquations::Configure
 	);
 
 	_p_integrator->Parameter()._nr_current_bins = *_p_n_bins;
-	_p_integrator->Parameter()._nr_max_bins     = this->ParSpec().MaxNumGridPoints();
+	_p_integrator->Parameter()._nr_max_bins     = this->ParSpec().getMaxNumGridPoints();
 	_p_integrator->Parameter()._i_reversal		= _convertor.IndexReversalBin();
 	_p_integrator->Parameter()._i_reset			= _convertor.IndexCurrentResetBin();
 	_p_integrator->Parameter()._i_reset_orig	= _convertor.IndexCurrentResetBin();

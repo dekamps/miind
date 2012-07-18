@@ -20,106 +20,187 @@
 #define MPILIB_POPULIST_POPULISTSPECIFICPARAMETER_HPP_
 
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/AbstractRateComputation.hpp>
+//#include <MPILib/include/populist/AbstractRateComputation.hpp>
 #include <MPILib/include/populist/InitialDensityParameter.hpp>
-#include <boost/shared_ptr.hpp>
+#include <string>
+#include <memory>
 
 namespace MPILib {
 namespace populist {
 
 class AbstractRebinner;
+class AbstractRateComputation;
 
-	//! These are parameters necessary for the configuration of a PopulistAlgorithm and OneDMAlgorithm
+//! These are parameters necessary for the configuration of a PopulistAlgorithm and OneDMAlgorithm
 
-	//! and not neuronal parameters. Number of bins, but also the algorithms for calculating
-	//! the circulant and the non-circulant solutions are specified here.
-	//! One important parameter that is calculated here is the maximum number of
-	//! grid points that emerge from the initial number of bins specified by the user,
-	//! v_min and the expansion factor
-	class PopulistSpecificParameter{
+//! and not neuronal parameters. Number of bins, but also the algorithms for calculating
+//! the circulant and the non-circulant solutions are specified here.
+//! One important parameter that is calculated here is the maximum number of
+//! grid points that emerge from the initial number of bins specified by the user,
+//! v_min and the expansion factor
+class PopulistSpecificParameter {
 
-	public:
+public:
 
-		//! default constructor
-		PopulistSpecificParameter();
+	/**
+	 * default constructor
+	 */
+	PopulistSpecificParameter();
 
-		//! copy constructor
-		PopulistSpecificParameter
-		(
-			const PopulistSpecificParameter&
-		);
+	/**
+	 * copy constructor
+	 * @param Another PopulistSpecificParameter
+	 */
+	PopulistSpecificParameter(const PopulistSpecificParameter&);
 
-		//! constructor
-		PopulistSpecificParameter
-		(
-			Potential,								//!< minimum potential of the grid, (typically negative or below the reversal potential
-			Number,									//!< initial number of bins
-			Number,									//!< number of bins that is added after one zero-leak evaluation
-			const InitialDensityParameter&,			//!< gaussian (or delta-peak) initial density profile
-			double,									//!< expansion factor
-			const std::string&	zeroleakequation_name	= "NumericalZeroLeakEquations",		//!< The algorithm for solving the zero leak equations (see documentation at \ref AbstractZeroLeakequations if you want to modify the default choice)
-			const std::string&	circulant_solver_name	= "CirculantSolver",				//!< The algorithm for solving the circulant equations (see documentation at \ref AbstractCirculant if you want to use a modofied version of this algorithm)
-			const std::string&	noncirculant_solver_name= "NonCirculantSolver",				//!< The algorithm for solving the circulant equations (see documentation at \ref AbstractCirculant if you want to use a modofied version of this algorithm)
-			const AbstractRebinner*	          = 0,  //!< Use when investigating alternatives to the standard rebinner, which InterpolationRebinner
-			const AbstractRateComputation*    = 0	//!< Use when investigating alternatives to the standard rate computation, which is IntegralRateComputation    
-		);
+	/**
+	 * constructor
+	 * @param v_min minimum potential of the grid, (typically negative or below the reversal potential)
+	 * @param n_grid_initial initial number of bins
+	 * @param n_add number of bins that is added after one zero-leak evaluation
+	 * @param par_dens gaussian (or delta-peak) initial density profile
+	 * @param fact_expansion expansion factor
+	 * @param name_zeroleak The algorithm for solving the zero leak equations (see documentation at \ref AbstractZeroLeakequations if you want to modify the default choice)
+	 * @param name_circulant The algorithm for solving the circulant equations (see documentation at \ref AbstractCirculant if you want to use a modified version of this algorithm)
+	 * @param name_noncirculant The algorithm for solving the non circulant equations (see documentation at \ref AbstractNonCirculant if you want to use a modified version of this algorithm)
+	 * @param p_rebinner Use when investigating alternatives to the standard rebinner, which InterpolationRebinner
+	 * @param p_rate Use when investigating alternatives to the standard rate computation, which is IntegralRateComputation
+	 */
+	PopulistSpecificParameter(Potential v_min, Number n_grid_initial,
+			Number n_add, const InitialDensityParameter& par_dens,
+			double fact_expansion, const std::string& name_zeroleak= "NumericalZeroLeakEquations",
+			const std::string& name_circulant  = "CirculantSolver" ,
+			const std::string& name_noncirculant = "NonCirculantSolver",
+			const AbstractRebinner* p_rebinner = nullptr,
+			const AbstractRateComputation* p_rate = nullptr);
 
-		//! destructor 
-		virtual ~PopulistSpecificParameter();
+	/**
+	 * destructor
+	 */
+	virtual ~PopulistSpecificParameter();
 
-		//! copy operator
-		PopulistSpecificParameter&
-			operator=
-			(
-				const PopulistSpecificParameter&
-			);
+	/**
+	 * copy operator
+	 * @param another PopulistSpecificParameter
+	 * @return a copy of this
+	 */
+	PopulistSpecificParameter&
+	operator=(const PopulistSpecificParameter&);
 
-		virtual PopulistSpecificParameter* Clone() const;
+	/**
+	 * clones this class
+	 * @return A clone of this class
+	 */
+	virtual PopulistSpecificParameter* Clone() const;
 
-		//! Minumum Potential of Grid at initialization time
-		Potential VMin() const;
-		
-		//! Number of bins at initialization time
-		Number    NrGridInitial() const;
+	/**
+	 * Getter for minimum potential
+	 * @return Minimum Potential of Grid at initialization time
+	 */
+	Potential getVMin() const;
 
-		//! Number of bins to be added, during evolution (almost always 1)
-		Number    NrAdd() const;
+	/**
+	 * Getter for number of bins
+	 * @return Number of bins at initialization time
+	 */
+	Number getNrGridInitial() const;
 
-		//! Maximum number of grid points that can result from the initial number of points and the
-		//! expansion factor
-		Number	  MaxNumGridPoints() const;
+	/**
+	 * Getter for number of bins to be added
+	 * @return Number of bins to be added, during evolution (almost always 1)
+	 */
+	Number getNrAdd() const;
 
-		//! Initial probability density profile
-		InitialDensityParameter InitialDensity() const;
+	/**
+	 * Getter for maximum number of grid points
+	 * @return Maximum number of grid points that can result from the initial number of points and the expansion factor
+	 */
+	Number getMaxNumGridPoints() const;
 
-		//! Expansion factor
-		double ExpansionFactor() const;
+	/**
+	 * Getter for initial probability density profile
+	 * @return Initial probability density profile
+	 */
+	InitialDensityParameter getInitialDensity() const;
 
-		const AbstractRebinner& Rebin() const;
+	/**
+	 * Getter for the expansion factor
+	 * @return Expansion factor
+	 */
+	double getExpansionFactor() const;
 
-		const AbstractRateComputation& RateComputation() const;
+	/**
+	 * Getter for the AbstractRebinner
+	 * @return The AbstractRebinner
+	 */
+	const AbstractRebinner& getRebin() const;
 
-		std::string ZeroLeakName() const {return _name_zeroleak; }
+	/**
+	 * Getter for the AbstractRateComputation
+	 * @return The AbstractRateComputation
+	 */
+	const AbstractRateComputation& getRateComputation() const;
 
-		std::string CirculantName() const { return _name_circulant; }
+	/**
+	 * Getter for the name of the algorithm for solving the zero leak equations
+	 * @return The name of the algorithm for solving the zero leak equations
+	 */
+	std::string getZeroLeakName() const;
+	/**
+	 * Getter for the name of the algorithm for solving the circulant equations
+	 * @return The name of the algorithm for solving the circulant equations
+	 */
+	std::string getCirculantName() const;
+	/**
+	 * Getter for the name of the algorithm for solving the non circulant equations
+	 * @return The name of the algorithm for solving the non circulant equations
+	 */
+	std::string getNonCirculantName() const;
 
-		std::string NonCirculantName() const {return _name_noncirculant; }
+private:
 
+	/**
+	 * minimum potential of the grid
+	 */
+	Potential _v_min = 0.0;
+	/**
+	 * initial number of bins
+	 */
+	Number _n_grid_initial = 0;
+	/**
+	 * number of bins that is added after one zero-leak evaluation
+	 */
+	Number _n_add = 0;
+	/**
+	 * gaussian (or delta-peak) initial density profile
+	 */
+	InitialDensityParameter _par_dens = InitialDensityParameter(0.0, 0.0);
+	/**
+	 * expansion factor
+	 */
+	double _fact_expansion = 0.0;
+	/**
+	 * The name of the algorithm for solving the zero leak equations
+	 */
+	std::string _name_zeroleak;
+	/**
+	 * The name of the algorithm for solving the circulant equations
+	 */
+	std::string _name_circulant;
+	/**
+	 * The name of the algorithm for solving the non circulant equations
+	 */
+	std::string _name_noncirculant;
 
-	private:
-
-		Potential							_v_min;
-		Number								_n_grid_initial;
-		Number								_n_add;
-		InitialDensityParameter			_par_dens;
-		double								_fact_expansion;
-		std::string								_name_zeroleak;
-		std::string								_name_circulant;
-		std::string								_name_noncirculant;
-
-		boost::shared_ptr<AbstractRebinner>			_p_rebinner;
-		boost::shared_ptr<AbstractRateComputation>	_p_rate;
-	};
+	/**
+	 * Use when investigating alternatives to the standard rebinner
+	 */
+	std::shared_ptr<AbstractRebinner> _p_rebinner;
+	/**
+	 * Use when investigating alternatives to the standard rate computation
+	 */
+	std::shared_ptr<AbstractRateComputation> _p_rate;
+};
 
 } /* namespace populist */
 } /* namespace MPILib */

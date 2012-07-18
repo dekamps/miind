@@ -22,138 +22,129 @@
 
 #include <MPILib/include/populist/PopulistSpecificParameter.hpp>
 
-namespace MPILib{
-namespace populist{
+namespace MPILib {
+namespace populist {
 
-
-
-PopulistSpecificParameter::PopulistSpecificParameter
-(
-):
-_v_min				(0.0),
-_n_grid_initial		(0),
-_n_add				(0),
-_par_dens			(0.0,0.0),
-_fact_expansion		(0),
-_p_rebinner			(boost::shared_ptr<AbstractRebinner>(new InterpolationRebinner)),
-_p_rate				(boost::shared_ptr<IntegralRateComputation>(new IntegralRateComputation))
-{
+PopulistSpecificParameter::PopulistSpecificParameter() :
+		_p_rebinner(
+				std::shared_ptr<AbstractRebinner>(new InterpolationRebinner)), _p_rate(
+				std::shared_ptr<IntegralRateComputation>(
+						new IntegralRateComputation)) {
 }
 
-PopulistSpecificParameter::PopulistSpecificParameter
-(
-	Potential				v_min,
-	Number								n_grid_initial,
-	Number								n_add,
-	const InitialDensityParameter&		par_dens,
-	double								fact_expansion,
-	const std::string&						name_zeroleak,
-	const std::string&						name_circulant,
-	const std::string&						name_noncirculant,
-	const AbstractRebinner*				p_rebinner,
-	const AbstractRateComputation*		p_rate
-):
-_v_min				(v_min),
-_n_grid_initial		(n_grid_initial),
-_n_add				(n_add),
-_par_dens			(par_dens),
-_fact_expansion		(fact_expansion),
-_name_zeroleak		(name_zeroleak),
-_name_circulant		(name_circulant),
-_name_noncirculant	(name_noncirculant),
-_p_rebinner			(p_rebinner ? boost::shared_ptr<AbstractRebinner>(p_rebinner->Clone()) : boost::shared_ptr<AbstractRebinner>(new InterpolationRebinner) ),
-_p_rate				(p_rate ? boost::shared_ptr<AbstractRateComputation>(p_rate->Clone()): boost::shared_ptr<IntegralRateComputation>(new IntegralRateComputation) )
-{
+PopulistSpecificParameter::PopulistSpecificParameter(Potential v_min,
+		Number n_grid_initial, Number n_add,
+		const InitialDensityParameter& par_dens, double fact_expansion,
+		const std::string& name_zeroleak, const std::string& name_circulant,
+		const std::string& name_noncirculant,
+		const AbstractRebinner* p_rebinner,
+		const AbstractRateComputation* p_rate) :
+		_v_min(v_min), _n_grid_initial(n_grid_initial), _n_add(n_add), _par_dens(
+				par_dens), _fact_expansion(fact_expansion), _name_zeroleak(
+				name_zeroleak), _name_circulant(name_circulant), _name_noncirculant(
+				name_noncirculant), _p_rebinner(
+				p_rebinner ?
+						std::shared_ptr<AbstractRebinner>(p_rebinner->Clone()) :
+						std::shared_ptr<AbstractRebinner>(
+								new InterpolationRebinner)), _p_rate(
+				p_rate ?
+						std::shared_ptr<AbstractRateComputation>(
+								p_rate->Clone()) :
+						std::shared_ptr<IntegralRateComputation>(
+								new IntegralRateComputation)) {
 }
 
-PopulistSpecificParameter::PopulistSpecificParameter
-(
-	const PopulistSpecificParameter& rhs
-):
-_v_min				(rhs._v_min),
-_n_grid_initial		(rhs._n_grid_initial),
-_n_add				(rhs._n_add),
-_par_dens			(rhs._par_dens),
-_fact_expansion		(rhs._fact_expansion),
-_name_zeroleak		(rhs._name_zeroleak),
-_name_circulant		(rhs._name_circulant),
-_name_noncirculant	(rhs._name_noncirculant),
-_p_rebinner			((rhs._p_rebinner.get() == 0 ) ? rhs._p_rebinner : boost::shared_ptr<AbstractRebinner>(rhs._p_rebinner->Clone())),
-_p_rate				((rhs._p_rate.get() == 0 ) ? rhs._p_rate : boost::shared_ptr<AbstractRateComputation>(rhs._p_rate->Clone()))
-{
+PopulistSpecificParameter::PopulistSpecificParameter(
+		const PopulistSpecificParameter& rhs) :
+		_v_min(rhs._v_min), _n_grid_initial(rhs._n_grid_initial), _n_add(
+				rhs._n_add), _par_dens(rhs._par_dens), _fact_expansion(
+				rhs._fact_expansion), _name_zeroleak(rhs._name_zeroleak), _name_circulant(
+				rhs._name_circulant), _name_noncirculant(
+				rhs._name_noncirculant), _p_rebinner(
+				(rhs._p_rebinner.get() == nullptr) ?
+				rhs._p_rebinner :
+				std::shared_ptr<AbstractRebinner>(
+						rhs._p_rebinner->Clone())), _p_rate(
+						(rhs._p_rate.get() == nullptr) ?
+						rhs._p_rate :
+						std::shared_ptr<AbstractRateComputation>(
+								rhs._p_rate->Clone())) {
+				}
+
+PopulistSpecificParameter::~PopulistSpecificParameter() {
 }
 
-PopulistSpecificParameter::~PopulistSpecificParameter()
-{
-}
-
-PopulistSpecificParameter& PopulistSpecificParameter::operator=
-(
-	const PopulistSpecificParameter& rhs
-)
-{
+PopulistSpecificParameter& PopulistSpecificParameter::operator=(
+		const PopulistSpecificParameter& rhs) {
 	if (this == &rhs)
 		return *this;
 
-	_v_min				= rhs._v_min;
-	_n_grid_initial		= rhs._n_grid_initial;
-	_n_add				= rhs._n_add;
-	_par_dens			= rhs._par_dens;
-	_fact_expansion		= rhs._fact_expansion;
-	_p_rebinner			= (rhs._p_rebinner.get() == 0 ) ? rhs._p_rebinner : boost::shared_ptr<AbstractRebinner>(rhs._p_rebinner->Clone());
-	_p_rate				= (rhs._p_rate.get() == 0 ) ? rhs._p_rate : boost::shared_ptr<AbstractRateComputation>(rhs._p_rate->Clone());
-	_name_zeroleak		= rhs._name_zeroleak;
-	_name_circulant		= rhs._name_circulant;
-	_name_noncirculant	= rhs._name_noncirculant;
+	_v_min = rhs._v_min;
+	_n_grid_initial = rhs._n_grid_initial;
+	_n_add = rhs._n_add;
+	_par_dens = rhs._par_dens;
+	_fact_expansion = rhs._fact_expansion;
+	_p_rebinner = (rhs._p_rebinner.get() == nullptr) ?
+	rhs._p_rebinner :
+	std::shared_ptr<AbstractRebinner>(rhs._p_rebinner->Clone());
+	_p_rate = (rhs._p_rate.get() == nullptr) ?
+	rhs._p_rate :
+	std::shared_ptr<AbstractRateComputation>(
+			rhs._p_rate->Clone());
+	_name_zeroleak = rhs._name_zeroleak;
+	_name_circulant = rhs._name_circulant;
+	_name_noncirculant = rhs._name_noncirculant;
 
 	return *this;
 }
 
-Potential PopulistSpecificParameter::VMin() const
-{
+Potential PopulistSpecificParameter::getVMin() const {
 	return _v_min;
 }
 
-Number PopulistSpecificParameter::NrGridInitial() const
-{
+Number PopulistSpecificParameter::getNrGridInitial() const {
 	return _n_grid_initial;
 }
 
-InitialDensityParameter PopulistSpecificParameter::InitialDensity() const
-{
+InitialDensityParameter PopulistSpecificParameter::getInitialDensity() const {
 	return _par_dens;
 }
 
-PopulistSpecificParameter* PopulistSpecificParameter::Clone() const
-{
+PopulistSpecificParameter* PopulistSpecificParameter::Clone() const {
 	return new PopulistSpecificParameter(*this);
 }
 
-Number PopulistSpecificParameter::MaxNumGridPoints() const
-{
-	return static_cast<Number>(_n_grid_initial*_fact_expansion);
+Number PopulistSpecificParameter::getMaxNumGridPoints() const {
+	return static_cast<Number>(_n_grid_initial * _fact_expansion);
 }
 
-const AbstractRebinner& PopulistSpecificParameter::Rebin() const
-{
+const AbstractRebinner& PopulistSpecificParameter::getRebin() const {
 	return *_p_rebinner;
 }
 
-const AbstractRateComputation& PopulistSpecificParameter::RateComputation() const
-{
+const AbstractRateComputation& PopulistSpecificParameter::getRateComputation() const {
 	return *_p_rate;
 }
 
-double PopulistSpecificParameter::ExpansionFactor() const
-{
+double PopulistSpecificParameter::getExpansionFactor() const {
 	return _fact_expansion;
 }
 
-Number PopulistSpecificParameter::NrAdd() const
-{
+Number PopulistSpecificParameter::getNrAdd() const {
 	return _n_add;
 }
 
+std::string PopulistSpecificParameter::getZeroLeakName() const {
+	return _name_zeroleak;
+}
 
-}//end namespace populist
-}//end namespace MPILib
+std::string PopulistSpecificParameter::getCirculantName() const {
+	return _name_circulant;
+}
+
+std::string PopulistSpecificParameter::getNonCirculantName() const {
+	return _name_noncirculant;
+}
+
+} //end namespace populist
+} //end namespace MPILib
