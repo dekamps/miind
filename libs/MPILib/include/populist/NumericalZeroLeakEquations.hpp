@@ -25,7 +25,7 @@
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/LIFConvertor.hpp>
-#include <MPILib/include/populist/NumericalZeroLeakParameter.hpp>
+#include <MPILib/include/populist/parameters/NumericalZeroLeakParameter.hpp>
 #include <MPILib/include/populist/ProbabilityQueue.hpp>
 
 using boost::shared_ptr;
