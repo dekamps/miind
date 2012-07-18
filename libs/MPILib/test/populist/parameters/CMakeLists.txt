@@ -1,4 +1,5 @@
 ADD_MIIND_MPI_TEST( AdaptionParameter_test.cpp)
 ADD_MIIND_MPI_TEST( InitialDensityParameter_test.cpp)
 ADD_MIIND_MPI_TEST( NumericalZeroLeakParameter_test.cpp)
+ADD_MIIND_MPI_TEST( OneDMParameter_test.cpp)
 ADD_MIIND_MPI_TEST( PopulistSpecificParameter_test.cpp)

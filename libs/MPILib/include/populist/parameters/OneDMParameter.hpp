@@ -28,18 +28,36 @@ namespace populist {
 
 	struct OneDMParameter {
 
-		OneDMParameter(){}
+		/**
+		 * default constructor
+		 */
+		OneDMParameter()=default;
 
+		/**
+		 * constructor
+		 * @param par_pop Defensive, serves no purpose atm
+		 * @param par_adapt Adaptation specific parameter
+		 * @param par_spec Grid and algorithm related stuff
+		 */
 		OneDMParameter
 		(
-			const PopulationParameter&,
-			const AdaptationParameter&,
-			const PopulistSpecificParameter&
+				const PopulationParameter&			par_pop,
+				const AdaptationParameter&			par_adapt,
+				const PopulistSpecificParameter&	par_spec
 		);
 
-		PopulationParameter			_par_pop;	//!< Defensive, serves no purpose atm, but probaly will do in the future
-		AdaptationParameter			_par_adapt;	//!< Adaptation specific parameter; accidently also an AdaptationParameter
-		PopulistSpecificParameter	_par_spec;	//!< Grid and algorithm related stuff
+		/**
+		 * Defensive, serves no purpose atm, but probably will do in the future
+		 */
+		PopulationParameter			_par_pop;
+		/**
+		 * Adaptation specific parameter; accidently also an AdaptationParameter
+		 */
+		AdaptationParameter			_par_adapt;
+		/**
+		 * Grid and algorithm related stuff
+		 */
+		PopulistSpecificParameter	_par_spec;
 
 	};
 } /* namespace populist */

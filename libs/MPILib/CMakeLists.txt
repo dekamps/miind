@@ -24,6 +24,7 @@ set(MPI_SRCS
     
     src/populist/parameters/PopulistSpecificParameter.cpp
     src/populist/parameters/AdaptationParameter.cpp
+    src/populist/parameters/OneDMParameter.cpp
     
     src/populist/ABConvertor.cpp
     src/populist/AbstractCirculantSolver.cpp
@@ -43,7 +44,6 @@ set(MPI_SRCS
     src/populist/NonCirculantSolver.cpp
     src/populist/NumericalZeroLeakEquations.cpp
     src/populist/OldLifZeroLeakEquations.cpp
-    src/populist/OneDMParameter.cpp
     src/populist/OneDMZeroLeakEquations.cpp
     src/populist/PolynomialCirculant.cpp
     src/populist/ProbabilityQueue.cpp
