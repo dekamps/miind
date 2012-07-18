@@ -13,7 +13,7 @@
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/PopulistParameter.hpp>
-#include <MPILib/include/populist/InitialDensityParameter.hpp>
+#include <MPILib/include/populist/parameters/InitialDensityParameter.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>

@@ -28,7 +28,7 @@
 #include <MPILib/include/populist/CirculantSolver.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckParameter.hpp>
-#include <MPILib/include/populist/PopulistSpecificParameter.hpp>
+#include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
 #include <MPILib/include/populist/ZeroLeakBuilder.hpp>
 
 using NumtoolsLib::D_Matrix;
