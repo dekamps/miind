@@ -181,6 +181,7 @@ void test_exchangeNodeTypes() {
 			BOOST_CHECK(node->_precursorTypes[0]==EXCITATORY);
 		}
 	}
+	delete node;
 
 }
 
