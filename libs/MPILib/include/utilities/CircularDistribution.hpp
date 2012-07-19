@@ -22,6 +22,7 @@
 
 #include <MPILib/include/utilities/NodeDistributionInterface.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
+#include <memory>
 
 namespace MPILib {
 namespace utilities {
@@ -50,7 +51,6 @@ public:
 	 */
 	virtual bool isMaster() const;
 private:
-	MPIProxy _mpiProxy;
 
 };
 

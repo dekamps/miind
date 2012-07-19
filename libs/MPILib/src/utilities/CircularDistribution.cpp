@@ -30,16 +30,21 @@ CircularDistribution::~CircularDistribution() {
 }
 
 bool CircularDistribution::isLocalNode(NodeId nodeId) const {
-	return getResponsibleProcessor(nodeId) == _mpiProxy.getRank();
+	MPIProxy mpiProxy;
+	return getResponsibleProcessor(nodeId) == mpiProxy.getRank();
 }
 
 int CircularDistribution::getResponsibleProcessor(NodeId nodeId) const {
-	return nodeId % _mpiProxy.getSize();
+	MPIProxy mpiProxy;
+
+	return nodeId % mpiProxy.getSize();
 
 }
 
 bool CircularDistribution::isMaster() const {
-	return _mpiProxy.getRank() == 0;
+	MPIProxy mpiProxy;
+
+	return mpiProxy.getRank() == 0;
 }
 
 

@@ -39,14 +39,6 @@ void test_Constructor() {
 
 	CircularDistribution circularD;
 
-	if (world.rank() == 0) {
-		BOOST_CHECK(circularD._mpiProxy.getRank()==0);
-		BOOST_CHECK(circularD._mpiProxy.getSize()==world.size());
-	} else if (world.rank() == 1) {
-		BOOST_CHECK(circularD._mpiProxy.getRank()==1);
-		BOOST_CHECK(circularD._mpiProxy.getSize()==world.size());
-	}
-
 }
 
 void test_isLocalNode() {
@@ -76,7 +68,6 @@ void test_isMaster() {
 	}
 }
 
-
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
@@ -90,7 +81,6 @@ int test_main(int argc, char* argv[]) // note the name!
 	test_isLocalNode();
 	test_getResponsibleProcessor();
 	test_isMaster();
-
 
 	return 0;
 //    // six ways to detect and report the same error:

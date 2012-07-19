@@ -48,17 +48,16 @@ void test_Constructor() {
 	NodeType nodeType = EXCITATORY;
 	MPILib::NodeId nodeId = 1;
 	MPINode<double, utilities::CircularDistribution> node(alg, nodeType, nodeId,
-			network._pNodeDistribution, network._pLocalNodes);
+			network._nodeDistribution, network._localNodes);
 
 // TODO DS test if the algorithm is the same
 //	BOOST_CHECK(alg==node._algorithm);
 	BOOST_CHECK(nodeType==node._nodeType);
 	BOOST_CHECK(nodeId==node._nodeId);
-	BOOST_CHECK(network._pNodeDistribution==node._pNodeDistribution);
+	//indirect test
+	BOOST_CHECK(network._nodeDistribution.isMaster()==node._rNodeDistribution.isMaster());
 	//indirect comparision
-	BOOST_CHECK(network._pLocalNodes->size()==node._pLocalNodes->size());
-	//make sure the shared_ptr works :)
-	BOOST_CHECK(network._pNodeDistribution.use_count()==2);
+	BOOST_CHECK(network._localNodes.size()==node._rLocalNodes.size());
 }
 
 void test_addPrecursor() {
@@ -68,7 +67,7 @@ void test_addPrecursor() {
 	SleepAlgorithm<double> alg;
 
 	MPINode<double, utilities::CircularDistribution> node(alg, EXCITATORY, 1,
-			network._pNodeDistribution, network._pLocalNodes);
+			network._nodeDistribution, network._localNodes);
 
 	MPILib::NodeId nodeId = 4;
 	double weight = 2.1;
@@ -87,7 +86,7 @@ void test_addSuccessor() {
 	SleepAlgorithm<double> alg;
 
 	MPINode<double, utilities::CircularDistribution> node(alg, EXCITATORY, 1,
-			network._pNodeDistribution, network._pLocalNodes);
+			network._nodeDistribution, network._localNodes);
 
 	MPILib::NodeId nodeId = 4;
 
@@ -105,7 +104,7 @@ void test_setGetState() {
 	SleepAlgorithm<double> alg;
 
 	MPINode<double, utilities::CircularDistribution> node(alg, EXCITATORY, 1,
-			network._pNodeDistribution, network._pLocalNodes);
+			network._nodeDistribution, network._localNodes);
 
 	node.setActivity(3);
 	BOOST_CHECK(node.getActivity()==3);
@@ -120,16 +119,16 @@ void test_sendRecvWait() {
 	if (world.rank() == 0) {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
-				EXCITATORY, 0, network._pNodeDistribution,
-				network._pLocalNodes);
+				EXCITATORY, 0, network._nodeDistribution,
+				network._localNodes);
 
 		node->addSuccessor(1);
 		node->addPrecursor(1, 2.1);
 	} else {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
-				EXCITATORY, 1, network._pNodeDistribution,
-				network._pLocalNodes);
+				EXCITATORY, 1, network._nodeDistribution,
+				network._localNodes);
 
 		node->addSuccessor(0);
 		node->addPrecursor(0, 1.2);
@@ -156,16 +155,16 @@ void test_exchangeNodeTypes() {
 	if (world.rank() == 0) {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
-				EXCITATORY, 0, network._pNodeDistribution,
-				network._pLocalNodes);
+				EXCITATORY, 0, network._nodeDistribution,
+				network._localNodes);
 
 		node->addSuccessor(1);
 		node->addPrecursor(1, 2.1);
 	} else {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
-				INHIBITORY_BURST, 1, network._pNodeDistribution,
-				network._pLocalNodes);
+				INHIBITORY_BURST, 1, network._nodeDistribution,
+				network._localNodes);
 
 		node->addSuccessor(0);
 		node->addPrecursor(0, 1.2);
