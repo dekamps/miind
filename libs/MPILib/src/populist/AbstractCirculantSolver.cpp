@@ -64,7 +64,7 @@ void AbstractCirculantSolver::FillLinear()
 	
 #ifndef NDEBUG
 	int remainder      = (_p_set->_H_exc != 0 && (_n_bins)%_p_set->_H_exc == 0 ) ? 0 : 1;
-	int n_noncirc_exc  = (_p_set->_H_exc != 0) ? (_n_bins)/_p_set->_H_exc + remainder : 0;
+	unsigned int n_noncirc_exc  = (_p_set->_H_exc != 0) ? (_n_bins)/_p_set->_H_exc + remainder : 0;
 #endif 
 	assert (n_noncirc_exc == _p_set->_n_noncirc_exc);
 
@@ -88,7 +88,7 @@ void AbstractCirculantSolver::FillLinear()
 	){	
 		Index index_non_circulant_area = (_n_bins - 1 - index_density)/(_p_set->_H_exc); 
 
-		assert( index_non_circulant_area >= 0 && index_non_circulant_area < static_cast<int>( _array_rho.size() ) );
+		assert( index_non_circulant_area >= 0 && index_non_circulant_area < static_cast<unsigned int>( _array_rho.size() ) );
 
 		_array_rho[index_non_circulant_area] += array_state[index_density]; 
 	}

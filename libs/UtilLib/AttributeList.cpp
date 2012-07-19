@@ -32,3 +32,4 @@ string AttributeList::operator[](const string& in) const
 			iter_comp = iter;
 	return ( iter_comp != _vec_attributes.end() ) ? iter_comp->second.substr(1,iter_comp->second.size()-2) : "";
 }
+

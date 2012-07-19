@@ -26,3 +26,4 @@ double SequenceIterator::operator*() const
 { 
 	return (*_p_seq)[_ind]; 
 }
+

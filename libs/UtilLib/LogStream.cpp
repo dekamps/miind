@@ -38,8 +38,6 @@ _b_time_available(true)
 		// just check if there is timing
 		float time_first = _timer.SecondsSinceLastCall();
 
-		//use variable to suppress warning
-		time_first = time_first;
 	}
 	catch (TimeException)
 	{

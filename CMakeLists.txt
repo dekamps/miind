@@ -18,7 +18,7 @@ set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 
 #activate all warnings
 IF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wno-long-long -pedantic")
+    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-long-long -Wno-error=unused-parameter -O0 -pedantic")
 ENDIF()
 
 ##############################################################################
@@ -55,7 +55,7 @@ IF(INCLUDE_MPI_LIB)
     else(CMAKE_COMPILER_IS_GNUCXX)
         if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
             add_definitions("-std=c++11")
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ ")    
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -g -Wall -Wextra -Wno-long-long -Wno-unused-parameter -O0 -pedantic")    
         endif()
         message(WARNING "C++11 activated, if you get any compile errors please use a C++11 compatible compiler like GNU gcc 4.7")
         add_definitions("-std=c++11") 
@@ -212,6 +212,10 @@ ELSE(INCLUDE_MPI_LIB)
       
 ENDIF(INCLUDE_MPI_LIB)
 
+message("========================================compiler flags====================================")
+MESSAGE(STATUS "Compiler flags:" ${CMAKE_CXX_COMPILE_FLAGS})
+MESSAGE(STATUS "Compiler debug flags:" ${CMAKE_CXX_FLAGS_DEBUG})
+MESSAGE(STATUS "Compiler cxx flags:" ${CMAKE_CXX_FLAGS})
 
 
 include_directories( ./libs )
@@ -219,3 +223,5 @@ message("========================================Common settings done going on w
 ADD_SUBDIRECTORY( libs )
 message("========================================libs set and done continuing with apps====================================")
 ADD_SUBDIRECTORY( apps )
+
+

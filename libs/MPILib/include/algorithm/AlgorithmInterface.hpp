@@ -18,8 +18,9 @@
 //
 
 #ifndef MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
-#define MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
+#define MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_\
 
+#include <MPILib/config.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>

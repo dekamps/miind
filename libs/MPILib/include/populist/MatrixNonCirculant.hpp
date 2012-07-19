@@ -23,47 +23,34 @@
 namespace MPILib {
 namespace populist {
 
-	//! MatrixNonCirculant
-	//! This is a circulant solver, which calculates the exponentiated non circulant matrix directly
-	//! The aim is to get rid of numerical artefacts that use the analytic expression for the non-circulant
-	//! solution directly.
-	class MatrixNonCirculant : public AbstractNonCirculantSolver
-	{
-	public:
+//! MatrixNonCirculant
+//! This is a circulant solver, which calculates the exponentiated non circulant matrix directly
+//! The aim is to get rid of numerical artefacts that use the analytic expression for the non-circulant
+//! solution directly.
+class MatrixNonCirculant: public AbstractNonCirculantSolver {
+public:
 
-		MatrixNonCirculant();
+	MatrixNonCirculant();
 
-		//! destructor
-		virtual ~MatrixNonCirculant();
+	//! destructor
+	virtual ~MatrixNonCirculant();
 
-		//! calculate the non-circulant solution for the excitatory part of the matrix
-		virtual void ExecuteExcitatory
-		(
-			Number,
-			Time
-		);
+	//! calculate the non-circulant solution for the excitatory part of the matrix
+	virtual void ExecuteExcitatory(Number, Time);
 
-		virtual void ExecuteInhibitory
-		(
-			Number,
-			Time
-		);
+	virtual void ExecuteInhibitory(Number, Time);
 
-		//! Virtual copy constructor
-		virtual MatrixNonCirculant* Clone() const;
+	//! Virtual copy constructor
+	virtual MatrixNonCirculant* Clone() const;
 
-		//! Configure
-		virtual bool Configure
-		(
-				std::valarray<double>&,
-			const InputParameterSet&
-		);
+	//! Configure
+	virtual bool Configure(std::valarray<double>&, const InputParameterSet&,
+			double = 0);
 
+private:
 
-	private:
-
-		std::valarray<Potential> _matrix_row;
-	};
+	std::valarray<Potential> _matrix_row;
+};
 } /* namespace populist */
 } /* namespace MPILib */
 #endif // include guard MPILIB_POPULIST_MATRIXNONCIRCULANT_HPP_

@@ -19,6 +19,7 @@
 #ifndef MPILIB_POPULIST_ABSCALARPRODUCT_HPP_
 #define MPILIB_POPULIST_ABSCALARPRODUCT_HPP_
 
+#include <MPILib/config.hpp>
 #include <MPILib/include/populist/ABStruct.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/utilities/Exception.hpp>

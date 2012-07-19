@@ -33,7 +33,7 @@ void CirculantSolver::Execute
 (
 	Number n_bins,
 	Time tau,
-	Time t_irrelevant // absolute simulation time, not required for this circulant
+	Time // absolute simulation time, not required for this circulant
 )
 {
 	assert( _p_set->_n_circ_exc    < MAXIMUM_NUMBER_CIRCULANT_BINS );

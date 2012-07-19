@@ -62,7 +62,7 @@ double InitializeAlgorithmGrid::ExpansionFactorDoubleRebinner(
 			v_min, parameter_population));
 	int number_growing_bins = number_initial_bins - index_reversal_bin;
 
-	int number_original_bins = number_growing_bins + index_reversal_bin;
+	unsigned int number_original_bins = number_growing_bins + index_reversal_bin;
 	assert( number_original_bins == number_initial_bins);
 
 	int number_new_bins = 2 * number_growing_bins + index_reversal_bin;

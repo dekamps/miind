@@ -41,7 +41,7 @@ public:
 	TestExceptionWithOverload() :
 			Exception("qwerty") {
 	}
-	virtual const char * what(void) {
+	virtual const char * what(void) const throw (){
 		return Exception::what();
 	}
 };

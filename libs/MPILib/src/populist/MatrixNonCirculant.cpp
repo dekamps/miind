@@ -86,7 +86,8 @@ void MatrixNonCirculant::ExecuteInhibitory
 bool MatrixNonCirculant::Configure
 (
 	std::valarray<double>&		 array_state,
-	const InputParameterSet& input_set
+	const InputParameterSet& input_set,
+	double
 )
 {
 	// Normally this is done in the base class 

@@ -103,7 +103,7 @@ void PolynomialCirculant::FillNonCirculantBins() {
 			break;
 
 		assert(
-				index_non_circulant_area >= 0 && index_non_circulant_area < static_cast<int>( _array_rho.size() ));
+				index_non_circulant_area >= 0 && index_non_circulant_area < static_cast<unsigned int>( _array_rho.size() ));
 
 		_array_rho[index_non_circulant_area] += array_state[index_density];
 	}
