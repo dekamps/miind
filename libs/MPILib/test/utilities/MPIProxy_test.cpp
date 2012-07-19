@@ -17,6 +17,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+#include <MPILib/config.hpp>
+#ifdef ENABLE_MPI
+#include <boost/mpi/communicator.hpp>
+namespace mpi = boost::mpi;
+
+mpi::communicator world;
+#endif
+
 #define private public
 #define protected public
 #include <MPILib/include/utilities/MPIProxy.hpp>
@@ -30,22 +38,27 @@
 using namespace boost::unit_test;
 using namespace MPILib::utilities;
 
-namespace mpi = boost::mpi;
 
-mpi::communicator world;
 
 void test_Constructor() {
 
 	MPIProxy mpiProxy;
+#ifdef ENABLE_MPI
 
 	BOOST_CHECK(mpiProxy._rank == world.rank());
 	BOOST_CHECK(mpiProxy._size == world.size());
+#endif
+
 }
 
 void test_Getter() {
 	MPIProxy mpiProxy;
+#ifdef ENABLE_MPI
+
 	BOOST_CHECK(mpiProxy.getRank() == world.rank());
 	BOOST_CHECK(mpiProxy.getSize() == world.size());
+#endif
+
 
 }
 
@@ -53,6 +66,8 @@ void test_Broadcast(){
 
 	int blub = 0;
 	BOOST_CHECK(blub == 0);
+#ifdef ENABLE_MPI
+
 	if(world.rank()==0){
 		blub = 9;
 		BOOST_CHECK(blub == 9);
@@ -61,9 +76,13 @@ void test_Broadcast(){
 	mpiProxy.broadcast(blub, 0);
 
 	BOOST_CHECK(blub == 9);
+#endif
+
 
 	blub = 0;
 	BOOST_CHECK(blub == 0);
+#ifdef ENABLE_MPI
+
 	if(world.rank()==0){
 		blub = 9;
 		BOOST_CHECK(blub == 9);
@@ -71,17 +90,19 @@ void test_Broadcast(){
 	mpiProxy.broadcast(blub, 1);
 
 	BOOST_CHECK(blub == 0);
+#endif
 }
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
+#ifdef ENABLE_MPI
 
 	mpi::environment env(argc, argv);
 
 	if (world.size() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
-
+#endif
 	// we use only two processors for this testing
 	test_Constructor();
 	test_Getter();

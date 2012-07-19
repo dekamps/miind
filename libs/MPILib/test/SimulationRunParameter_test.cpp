@@ -16,9 +16,12 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#include <boost/mpi.hpp>
+#include <MPILib/config.hpp>
+#ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
-
+#endif
+#include <MPILib/include/utilities/MPIProxy.hpp>
+MPILib::utilities::MPIProxy mpiProxy;
 //Hack to test privat members
 #define private public
 #define protected public
@@ -31,9 +34,7 @@
 using namespace boost::unit_test;
 using namespace MPILib;
 
-namespace mpi = boost::mpi;
 
-mpi::communicator world;
 
 void test_Constructor_and_Copy() {
 	report::handler::InactiveReportHandler handler;
@@ -96,7 +97,7 @@ void test_Getters() {
 	BOOST_CHECK(simParam2.getTEnd()==1.0);
 	BOOST_CHECK(simParam2.getTReport()==1.0);
 	BOOST_CHECK(simParam2.getTStep()==1.0);
-	if (world.rank()==0){
+	if (mpiProxy.getRank()==0){
 		BOOST_CHECK(simParam2.getLogName()=="a_0.log");
 	}else{
 		BOOST_CHECK(simParam2.getLogName()=="a_1.log");
@@ -106,14 +107,13 @@ void test_Getters() {
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
-
+#ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
-// we use only two processors for this testing
-
-	if (world.size() != 2) {
+	// we use only two processors for this testing
+	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
-
+#endif
 	test_Constructor_and_Copy();
 	test_Getters();
 

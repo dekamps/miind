@@ -31,21 +31,22 @@ ENDIF(MPIEXEC STREQUAL "MPIEXEC-NOTFOUND")
 
 # MPI test that is only executed if MPI is enabled
 MACRO(ADD_MIIND_MPI_TEST src)
+    IF(ENABLE_MPI)
 
-    #make sure that the tests all end with _test.cpp
-    STRING(REGEX MATCH "_test.cpp$" result ${src})
-    IF(NOT(${result} MATCHES "_test.cpp"))
-        MESSAGE(FATAL_ERROR "test need to end with _test.cpp")
-    ENDIF() 
-    #set the test name by removing the _test.cpp from the source file
-    STRING(REGEX REPLACE "_test.cpp" "" name ${src})
+        #make sure that the tests all end with _test.cpp
+        STRING(REGEX MATCH "_test.cpp$" result ${src})
+        IF(NOT(${result} MATCHES "_test.cpp"))
+            MESSAGE(FATAL_ERROR "test need to end with _test.cpp")
+        ENDIF() 
+        #set the test name by removing the _test.cpp from the source file
+        STRING(REGEX REPLACE "_test.cpp" "" name ${src})
+        
+        #set the name of executable by prepending test_ to the beginning
+        SET(exe "test_" ${name})
+        #and replace all / with _
+        STRING(REGEX REPLACE "/" "_" exe ${exe})
     
-    #set the name of executable by prepending test_ to the beginning
-    SET(exe "test_" ${name})
-    #and replace all / with _
-    STRING(REGEX REPLACE "/" "_" exe ${exe})
-    
-    IF (ENABLE_MPI)
+   
         # build the test
         ADD_EXECUTABLE(${exe} ${src})
         
@@ -65,7 +66,7 @@ MACRO(ADD_MIIND_MPI_TEST src)
         ADD_CUSTOM_TARGET(${unittest_target} COMMAND mpirun -np 2 ${CMAKE_CURRENT_BINARY_DIR}/${exe})
 
     ELSE(ENABLE_MPI)
-         MESSAGE(STATUS "DISABLE TEST as this test need MPI ${name}: ${exe}.")
+         ADD_MIIND_TEST(${src})
     ENDIF(ENABLE_MPI) 
 ENDMACRO(ADD_MIIND_MPI_TEST src)
 

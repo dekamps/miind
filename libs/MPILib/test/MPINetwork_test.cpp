@@ -16,9 +16,12 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#include <boost/mpi.hpp>
+#include <MPILib/config.hpp>
+#ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
-
+#endif
+#include <MPILib/include/utilities/MPIProxy.hpp>
+MPILib::utilities::MPIProxy mpiProxy;
 //Hack to test privat members
 #define private public
 #define protected public
@@ -37,24 +40,17 @@ using namespace boost::unit_test;
 using namespace MPILib;
 
 #include <boost/thread/thread.hpp>
-#include <boost/mpi.hpp>
-#include <boost/mpi/communicator.hpp>
 
 #include "helperClasses/SleepAlgorithm.hpp"
-
-
-namespace mpi = boost::mpi;
-
-mpi::communicator world;
 
 void test_Constructor() {
 
 	MPINetwork<double, utilities::CircularDistribution> network;
 
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(network._nodeDistribution.isMaster()==true);
 		BOOST_CHECK(network._localNodes.size()==0);
-	} else if (world.rank() == 1) {
+	} else if (mpiProxy.getRank() == 1) {
 		BOOST_CHECK(network._localNodes.size()==0);
 	}
 
@@ -73,10 +69,10 @@ void test_AddNode() {
 
 	MPINetwork<double, utilities::CircularDistribution> network;
 
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==0);
 		BOOST_CHECK(network._localNodes.size()==0);
-	} else if (world.rank() == 1) {
+	} else if (mpiProxy.getRank() == 1) {
 		BOOST_CHECK(network._localNodes.size()==0);
 	}
 
@@ -84,19 +80,23 @@ void test_AddNode() {
 
 	network.addNode(alg, EXCITATORY);
 
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==1);
 		BOOST_CHECK(network._localNodes.size()==1);
-	} else if (world.rank() == 1) {
+	} else if (mpiProxy.getRank() == 1) {
 		BOOST_CHECK(network._localNodes.size()==0);
 	}
 
 	network.addNode(alg, EXCITATORY);
 
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==2);
-		BOOST_CHECK(network._localNodes.size()==1);
-	} else if (world.rank() == 1) {
+		if (mpiProxy.getSize() == 1) {
+			BOOST_CHECK(network._localNodes.size()==2);
+		} else {
+			BOOST_CHECK(network._localNodes.size()==1);
+		}
+	} else if (mpiProxy.getRank() == 1) {
 		BOOST_CHECK(network._localNodes.size()==1);
 	}
 }
@@ -117,7 +117,7 @@ void test_MakeFirstInputOfSecond() {
 		exceptionThrown = true;
 	}
 	BOOST_CHECK(exceptionThrown==false);
-	if (world.rank() == 1) {
+	if (mpiProxy.getRank() == 1) {
 
 		BOOST_CHECK(
 				network._localNodes.find(node1)->second._precursors.size()==1);
@@ -161,16 +161,16 @@ void test_getMaxNodeId() {
 void test_incrementMaxNodeId() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==0);
 	}
 	network.incrementMaxNodeId();
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==1);
 	}
 	network.incrementMaxNodeId();
 	network.incrementMaxNodeId();
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==3);
 	}
 }
@@ -178,12 +178,13 @@ void test_incrementMaxNodeId() {
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
+#ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
 	// we use only two processors for this testing
-
-	if (world.size() != 2) {
+	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
+#endif
 
 	test_Constructor();
 	test_AddNode();

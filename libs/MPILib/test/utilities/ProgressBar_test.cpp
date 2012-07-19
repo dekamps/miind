@@ -17,6 +17,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+
+#include <MPILib/config.hpp>
+#ifdef ENABLE_MPI
+#include <boost/mpi/communicator.hpp>
+#endif
+#include <MPILib/include/utilities/MPIProxy.hpp>
+MPILib::utilities::MPIProxy mpiProxy;
 #define private public
 #define protected public
 #include <MPILib/include/utilities/ProgressBar.hpp>
@@ -26,16 +33,11 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
 using namespace MPILib::utilities;
 
-namespace mpi = boost::mpi;
-
-mpi::communicator world;
 
 void test_Constructor() {
 
@@ -43,12 +45,12 @@ void test_Constructor() {
 
 	ProgressBar pb(100, "blub", os);
 
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(pb._expectedCount==100);
 	}
 	BOOST_CHECK(pb._description=="blub");
 
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 
 		std::stringstream tempStream;
 		tempStream << "blub" << "\n"
@@ -77,12 +79,13 @@ void test_Constructor() {
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
-	mpi::environment env(argc, argv);
-
-	if (world.size() != 2) {
+#ifdef ENABLE_MPI
+	boost::mpi::environment env(argc, argv);
+	// we use only two processors for this testing
+	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
-
+#endif
 	// we use only two processors for this testing
 	test_Constructor();
 

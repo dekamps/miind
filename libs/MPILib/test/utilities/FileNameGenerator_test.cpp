@@ -17,9 +17,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#include <boost/mpi.hpp>
+#include <MPILib/config.hpp>
+#ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
-
+#endif
+#include <MPILib/include/utilities/MPIProxy.hpp>
+MPILib::utilities::MPIProxy mpiProxy;
 //Hack to test privat members
 #define private public
 #define protected public
@@ -31,22 +34,20 @@
 using namespace boost::unit_test;
 using namespace MPILib::utilities;
 #include <string>
-namespace mpi = boost::mpi;
 
-mpi::communicator world;
 
 void test_Constructor() {
 	std::string tempStr ( "blub" );
 	FileNameGenerator fg(tempStr);
 
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(fg._fileName == "blub_0.log");
 	} else {
 		BOOST_CHECK(fg._fileName == "blub_1.log");
 	}
 
 	FileNameGenerator fg1(tempStr, ROOTFILE);
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(fg1._fileName == "blub_0.root");
 	} else {
 		BOOST_CHECK(fg1._fileName == "blub_1.root");
@@ -57,14 +58,14 @@ void test_getFileName() {
 	std::string tempStr ( "blub" );
 
 	FileNameGenerator fg(tempStr);
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(fg.getFileName() == "blub_0.log");
 	} else {
 		BOOST_CHECK(fg.getFileName() == "blub_1.log");
 	}
 
 	FileNameGenerator fg1(tempStr, ROOTFILE);
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(fg1.getFileName() == "blub_0.root");
 	} else {
 		BOOST_CHECK(fg1.getFileName() == "blub_1.root");
@@ -73,13 +74,13 @@ void test_getFileName() {
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
-
+#ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
-// we use only two processors for this testing
-
-	if (world.size() != 2) {
+	// we use only two processors for this testing
+	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
+#endif
 	test_Constructor();
 	test_getFileName();
 

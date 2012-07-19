@@ -17,8 +17,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#include <boost/mpi.hpp>
+#include <MPILib/config.hpp>
+#ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
+#endif
+#include <MPILib/include/utilities/MPIProxy.hpp>
+
 
 //Hack to test privat members
 #define private public
@@ -30,10 +34,6 @@
 using namespace boost::unit_test;
 using namespace MPILib::report::handler;
 
-namespace mpi = boost::mpi;
-
-mpi::communicator world;
-
 void test_Constructor() {
 	InactiveReportHandler iH;
 	BOOST_CHECK(iH._streamFileName=="");
@@ -42,8 +42,8 @@ void test_Constructor() {
 void test_Getters() {
 	InactiveReportHandler iH;
 	BOOST_CHECK(iH.getFileName()=="");
-
-	if (world.rank() == 0) {
+	MPILib::utilities::MPIProxy mpiProxy;
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(iH.getRootOutputFileName()=="_0.root");
 	} else {
 		BOOST_CHECK(iH.getRootOutputFileName()=="_1.root");
@@ -53,14 +53,13 @@ void test_Getters() {
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
-
+#ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
 	// we use only two processors for this testing
-
-	if (world.size() != 2) {
+	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
-
+#endif
 	test_Constructor();
 
 	return 0;

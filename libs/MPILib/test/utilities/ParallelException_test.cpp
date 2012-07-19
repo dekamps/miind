@@ -16,28 +16,29 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-
+#include <MPILib/config.hpp>
+#ifdef ENABLE_MPI
+#include <boost/mpi/communicator.hpp>
+#endif
+#include <MPILib/include/utilities/MPIProxy.hpp>
+MPILib::utilities::MPIProxy mpiProxy;
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <cstring>
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
+
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
 using namespace MPILib::utilities;
 
-namespace mpi = boost::mpi;
-
-mpi::communicator world;
 
 void test_Constructor() {
 	ParallelException e("message");
 	std::stringstream sstream;
-	sstream << std::endl << "Parallel Exception on processor: " << world.rank()
-			<< " from: " << world.size() << " with error message: message"
+	sstream << std::endl << "Parallel Exception on processor: " << mpiProxy.getRank()
+			<< " from: " << mpiProxy.getSize() << " with error message: message"
 			<< std::endl;
 
 	BOOST_CHECK(
@@ -53,8 +54,8 @@ void test_Macros() {
 	// also test the macros
 	bool thrown = false;
 	std::stringstream sstream;
-	sstream << std::endl << "Parallel Exception on processor: " << world.rank()
-			<< " from: " << world.size() << " with error message: abc"
+	sstream << std::endl << "Parallel Exception on processor: " << mpiProxy.getRank()
+			<< " from: " << mpiProxy.getSize() << " with error message: abc"
 			<< std::endl;
 
 	try {
@@ -127,11 +128,13 @@ void test_catch() {
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
-	mpi::environment env(argc, argv);
-
-	if (world.size() != 2) {
+#ifdef ENABLE_MPI
+	boost::mpi::environment env(argc, argv);
+	// we use only two processors for this testing
+	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
+#endif
 
 	// we use only two processors for this testing
 	test_Constructor();

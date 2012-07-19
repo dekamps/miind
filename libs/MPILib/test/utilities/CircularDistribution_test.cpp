@@ -17,8 +17,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#include <boost/mpi.hpp>
+#include <MPILib/config.hpp>
+#ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
+#endif
+#include <MPILib/include/utilities/MPIProxy.hpp>
+MPILib::utilities::MPIProxy mpiProxy;
 
 //Hack to test privat members
 #define private public
@@ -31,10 +35,6 @@
 using namespace boost::unit_test;
 using namespace MPILib::utilities;
 
-namespace mpi = boost::mpi;
-
-mpi::communicator world;
-
 void test_Constructor() {
 
 	CircularDistribution circularD;
@@ -43,25 +43,36 @@ void test_Constructor() {
 
 void test_isLocalNode() {
 	CircularDistribution circularD;
-	if (world.rank() == 0) {
-		BOOST_CHECK(circularD.isLocalNode(0)==true);
-		BOOST_CHECK(circularD.isLocalNode(1)==false);
+	if (mpiProxy.getSize() == 2) {
+		if (mpiProxy.getRank() == 0) {
+			BOOST_CHECK(circularD.isLocalNode(0)==true);
+			BOOST_CHECK(circularD.isLocalNode(1)==false);
 
-	} else if (world.rank() == 1) {
-		BOOST_CHECK(circularD.isLocalNode(0)==false);
+		} else if (mpiProxy.getRank() == 1) {
+			BOOST_CHECK(circularD.isLocalNode(0)==false);
+			BOOST_CHECK(circularD.isLocalNode(1)==true);
+		}
+	} else {
+		BOOST_CHECK(circularD.isLocalNode(0)==true);
 		BOOST_CHECK(circularD.isLocalNode(1)==true);
+
 	}
 }
 
 void test_getResponsibleProcessor() {
 	CircularDistribution circularD;
-	BOOST_CHECK(circularD.getResponsibleProcessor(1)==1);
-	BOOST_CHECK(circularD.getResponsibleProcessor(0)==0);
+	if (mpiProxy.getSize() == 2) {
+		BOOST_CHECK(circularD.getResponsibleProcessor(1)==1);
+		BOOST_CHECK(circularD.getResponsibleProcessor(0)==0);
+	} else {
+		BOOST_CHECK(circularD.getResponsibleProcessor(1)==0);
+		BOOST_CHECK(circularD.getResponsibleProcessor(0)==0);
+	}
 }
 
 void test_isMaster() {
 	CircularDistribution circularD;
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(circularD.isMaster()==true);
 	} else {
 		BOOST_CHECK(circularD.isMaster()==false);
@@ -71,12 +82,13 @@ void test_isMaster() {
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
+#ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
 	// we use only two processors for this testing
-
-	if (world.size() != 2) {
+	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
+#endif
 	test_Constructor();
 	test_isLocalNode();
 	test_getResponsibleProcessor();

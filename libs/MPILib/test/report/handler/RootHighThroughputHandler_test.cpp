@@ -17,8 +17,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#include <boost/mpi.hpp>
+#include <MPILib/config.hpp>
+#ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
+#endif
+#include <MPILib/include/utilities/MPIProxy.hpp>
 
 //Hack to test privat members
 #define private public
@@ -39,12 +42,6 @@
 using namespace boost::unit_test;
 using namespace MPILib::report::handler;
 using namespace MPILib::report;
-
-
-
-namespace mpi = boost::mpi;
-
-mpi::communicator world;
 
 void test_Constructor() {
 	RootHighThroughputHandler rH("blub");
@@ -81,7 +78,7 @@ void test_writeReport() {
 	RootHighThroughputHandler rH("RootHighTestWrite", true);
 	rH.initializeHandler(1);
 	BOOST_CHECK(rH._pFile!=nullptr);
-	ReportValue tempV {"blab", 1.0, 2.0};
+	ReportValue tempV { "blab", 1.0, 2.0 };
 
 	std::vector<ReportValue> rv;
 	rv.push_back(tempV);
@@ -98,12 +95,18 @@ void test_writeReport() {
 	BOOST_CHECK(rH._pArray != nullptr);
 	BOOST_CHECK(rH._mData.size()==1);
 	BOOST_CHECK(rH._mData[1]==1.0);
-	auto nodeIds = std::unique_ptr<TArrayI>((TArrayI*)rH._pFile->Get("GlobalNodeIds"));
+	auto nodeIds = std::unique_ptr<TArrayI>(
+			(TArrayI*) rH._pFile->Get("GlobalNodeIds"));
 	BOOST_CHECK(nodeIds->GetSize()==3);
-	if(world.rank()==0){
-		BOOST_CHECK((*nodeIds)[2]==4);
-	}else{
-		BOOST_CHECK((*nodeIds)[2]==5);
+	MPILib::utilities::MPIProxy mpiProxy;
+	if (mpiProxy.getSize() == 2) {
+		if (mpiProxy.getRank() == 0) {
+			BOOST_CHECK((*nodeIds)[2]==4);
+		} else {
+			BOOST_CHECK((*nodeIds)[2]==5);
+		}
+	} else {
+		BOOST_CHECK((*nodeIds)[2]==2);
 	}
 
 	Report r2(1.0, 2.0, 2, MPILib::algorithm::AlgorithmGrid(2), "blub", RATE,
@@ -122,21 +125,19 @@ void test_writeReport() {
 	BOOST_CHECK((*rH._pArray)[2]==1.0);
 	BOOST_CHECK((*rH._pArray)[3]==2.0);
 
-	bool thrown=false;
+	bool thrown = false;
 	rH.writeReport(r1);
-	try{
+	try {
 		rH.writeReport(r1);
-	}catch(MPILib::utilities::Exception& e){
-		thrown=true;
+	} catch (MPILib::utilities::Exception& e) {
+		thrown = true;
 	}
 	BOOST_CHECK(thrown==true);
 
 }
 
-
-
 void test_initializeHandler() {
-	//it is not possible anymore to have a empty file they contain at least to extension
+//it is not possible anymore to have a empty file they contain at least to extension
 
 	RootHighThroughputHandler rH("RootTestFile", true);
 	bool thrown = false;
@@ -164,26 +165,27 @@ void test_detachHandler() {
 	BOOST_CHECK(rH._mData.size()==0);
 }
 
-void test_generateNodeGraphs(){
-	///*todo DS implement this test
+void test_generateNodeGraphs() {
+///*todo DS implement this test
 }
-void test_collectGraphInformation(){
-	///*todo DS implement this test
+void test_collectGraphInformation() {
+///*todo DS implement this test
 }
-void test_storeRateGraphs(){
-	///*todo DS implement this test
+void test_storeRateGraphs() {
+///*todo DS implement this test
 }
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
+#ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
-	// we use only two processors for this testing
-
-	if (world.size() != 2) {
+// we use only two processors for this testing
+	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
-	// run only one one process as otherwise race conditions occure
+#endif
+// run only one one process as otherwise race conditions occure
 
 	test_Constructor();
 	test_clone();

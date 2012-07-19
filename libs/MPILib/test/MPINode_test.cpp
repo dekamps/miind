@@ -17,9 +17,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#include <boost/mpi.hpp>
+#include <MPILib/config.hpp>
+#ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
-
+#endif
+#include <MPILib/include/utilities/MPIProxy.hpp>
+MPILib::utilities::MPIProxy mpiProxy;
 //Hack to test privat members
 #define private public
 #define protected public
@@ -36,10 +39,6 @@
 using namespace boost::unit_test;
 using namespace MPILib;
 
-namespace mpi = boost::mpi;
-
-mpi::communicator world;
-
 void test_Constructor() {
 
 	// make node global
@@ -55,7 +54,8 @@ void test_Constructor() {
 	BOOST_CHECK(nodeType==node._nodeType);
 	BOOST_CHECK(nodeId==node._nodeId);
 	//indirect test
-	BOOST_CHECK(network._nodeDistribution.isMaster()==node._rNodeDistribution.isMaster());
+	BOOST_CHECK(
+			network._nodeDistribution.isMaster()==node._rNodeDistribution.isMaster());
 	//indirect comparision
 	BOOST_CHECK(network._localNodes.size()==node._rLocalNodes.size());
 }
@@ -116,32 +116,35 @@ void test_sendRecvWait() {
 	MPINode<double, utilities::CircularDistribution>* node;
 	MPINetwork<double, utilities::CircularDistribution> network;
 	SleepAlgorithm<double> alg;
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
-				EXCITATORY, 0, network._nodeDistribution,
-				network._localNodes);
+				EXCITATORY, 0, network._nodeDistribution, network._localNodes);
 
 		node->addSuccessor(1);
 		node->addPrecursor(1, 2.1);
 	} else {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
-				EXCITATORY, 1, network._nodeDistribution,
-				network._localNodes);
+				EXCITATORY, 1, network._nodeDistribution, network._localNodes);
 
 		node->addSuccessor(0);
 		node->addPrecursor(0, 1.2);
 	}
 
-	node->setActivity(world.rank());
+	node->setActivity(mpiProxy.getRank());
 	node->sendOwnActivity();
 	node->receiveData();
 	MPINode<double, utilities::CircularDistribution>::waitAll();
-	if (world.rank() == 0) {
-		BOOST_CHECK(node->_precursorActivity[0]==1);
+	if (mpiProxy.getSize() == 2) {
+		if (mpiProxy.getRank() == 0) {
+			BOOST_CHECK(node->_precursorActivity[0]==1);
+		} else {
+			BOOST_CHECK(node->_precursorActivity[0]==0);
+		}
 	} else {
-		BOOST_CHECK(node->_precursorActivity[0]==0);
+		BOOST_CHECK(node->_precursorActivity[1]==0);
+
 	}
 
 	delete node;
@@ -152,11 +155,10 @@ void test_exchangeNodeTypes() {
 	MPINode<double, utilities::CircularDistribution>* node;
 	MPINetwork<double, utilities::CircularDistribution> network;
 	SleepAlgorithm<double> alg;
-	if (world.rank() == 0) {
+	if (mpiProxy.getRank() == 0) {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
-				EXCITATORY, 0, network._nodeDistribution,
-				network._localNodes);
+				EXCITATORY, 0, network._nodeDistribution, network._localNodes);
 
 		node->addSuccessor(1);
 		node->addPrecursor(1, 2.1);
@@ -172,22 +174,26 @@ void test_exchangeNodeTypes() {
 
 	node->exchangeNodeTypes();
 	MPINode<double, utilities::CircularDistribution>::waitAll();
-	if (world.rank() == 0) {
-		BOOST_CHECK(node->_precursorTypes[0]==INHIBITORY_BURST);
-	} else {
-		BOOST_CHECK(node->_precursorTypes[0]==EXCITATORY);
+	if (mpiProxy.getSize() == 2) {
+		if (mpiProxy.getRank() == 0) {
+			BOOST_CHECK(node->_precursorTypes[0]==INHIBITORY_BURST);
+		} else {
+			BOOST_CHECK(node->_precursorTypes[0]==EXCITATORY);
+		}
 	}
+
 }
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
+#ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
 	// we use only two processors for this testing
-
-	if (world.size() != 2) {
+	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
+#endif
 
 	test_Constructor();
 	test_addPrecursor();
