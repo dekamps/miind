@@ -144,24 +144,27 @@ void MPINode<Weight, NodeDistribution>::initNode() {
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 	_precursorTypes.resize(_precursors.size());
+	//lock the weak pointers to access them.
+	auto tempLocalNodesPtr = _pLocalNodes.lock();
+	auto tempNodeDistributionPtr = _pNodeDistribution.lock();
 	//get the Types from the precursors
 	int i = 0;
 	for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		//do not send the data if the node is local!
-		if (_pNodeDistribution->isLocalNode(*it)) {
-			_precursorTypes[i] = _pLocalNodes->find(*it)->second.getNodeType();
+		if (tempNodeDistributionPtr->isLocalNode(*it)) {
+			_precursorTypes[i] = tempLocalNodesPtr->find(*it)->second.getNodeType();
 
 		} else {
 			utilities::MPIProxy mpiProxy;
-			mpiProxy.irecv(_pNodeDistribution->getResponsibleProcessor(*it),
+			mpiProxy.irecv(tempNodeDistributionPtr->getResponsibleProcessor(*it),
 					*it, _precursorTypes[i]);
 		}
 	}
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
-		if (!_pNodeDistribution->isLocalNode(it)) {
+		if (!tempNodeDistributionPtr->isLocalNode(it)) {
 			utilities::MPIProxy mpiProxy;
-			mpiProxy.isend(_pNodeDistribution->getResponsibleProcessor(it),
+			mpiProxy.isend(tempNodeDistributionPtr->getResponsibleProcessor(it),
 					_nodeId, _nodeType);
 		}
 	}
@@ -170,15 +173,19 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::receiveData() {
 	int i = 0;
+	auto tempLocalNodesPtr = _pLocalNodes.lock();
+	auto tempNodeDistributionPtr = _pNodeDistribution.lock();
+
+
 	for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		//do not send the data if the node is local!
-		if (_pNodeDistribution->isLocalNode(*it)) {
+		if (tempNodeDistributionPtr->isLocalNode(*it)) {
 			_precursorActivity[i] =
-					_pLocalNodes->find(*it)->second.getActivity();
+					tempLocalNodesPtr->find(*it)->second.getActivity();
 
 		} else {
 			utilities::MPIProxy mpiProxy;
-			mpiProxy.irecv(_pNodeDistribution->getResponsibleProcessor(*it),
+			mpiProxy.irecv(tempNodeDistributionPtr->getResponsibleProcessor(*it),
 					*it, _precursorActivity[i]);
 		}
 	}
@@ -186,12 +193,13 @@ void MPINode<Weight, NodeDistribution>::receiveData() {
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
+	auto tempNodeDistributionPtr = _pNodeDistribution.lock();
 
 	utilities::MPIProxy mpiProxy;
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
-		if (!_pNodeDistribution->isLocalNode(it)) {
-			mpiProxy.isend(_pNodeDistribution->getResponsibleProcessor(it),
+		if (!tempNodeDistributionPtr->isLocalNode(it)) {
+			mpiProxy.isend(tempNodeDistributionPtr->getResponsibleProcessor(it),
 					_nodeId, _activity);
 		}
 	}
@@ -204,12 +212,13 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 	std::string string_return("");
 
 	std::vector<report::ReportValue> vec_values;
+	auto tempLocalNodesPtr = _pLocalNodes.lock();
 
 	if (type == report::RATE || type == report::STATE) {
 		report::Report report(_pAlgorithm->getCurrentTime(),
 				Rate(this->getActivity()), this->_nodeId,
 				_pAlgorithm->getGrid(), string_return, type, vec_values,
-				_pLocalNodes->size());
+				tempLocalNodesPtr->size());
 
 		_pHandler->writeReport(report);
 	}
@@ -220,8 +229,9 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::clearSimulation() {
 	_pHandler->detachHandler(_nodeId);
+	auto tempNodeDistributionPtr = _pNodeDistribution.lock();
 
-	if (_pNodeDistribution->isMaster() && !_isLogPrinted) {
+	if (tempNodeDistributionPtr->isMaster() && !_isLogPrinted) {
 
 		std::cout << "Algorithm Timer: " << _algorithmTimer.format()
 				<< std::endl;

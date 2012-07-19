@@ -193,13 +193,14 @@ public:
 			NodeId _nodeId;
 
 			/**
-			 * Pointer to the local nodes of the processor. They are stored by the network.
+			 * Pointer to the local nodes of the processor. They are owned by the network.
 			 */
-			std::shared_ptr<std::map<NodeId, MPINode>> _pLocalNodes;
+			std::weak_ptr<std::map<NodeId, MPINode>> _pLocalNodes;
 
-			//this need to be a shared_ptr see here why auto_ptr does not work:
-			//http://stackoverflow.com/a/10894173/992460
-			std::shared_ptr<NodeDistribution> _pNodeDistribution;
+			/**
+			 * Pointer to the NodeDistribution. This is owned by the network.
+			 */
+			std::weak_ptr<NodeDistribution> _pNodeDistribution;
 
 			/**
 			 * Activity of this node
