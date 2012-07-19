@@ -124,12 +124,11 @@ private:
 	/**
 	 * local nodes of the processor
 	 */
-	std::shared_ptr<std::map<NodeId, MPINode<WeightValue, NodeDistribution>>>_pLocalNodes;
-
+	static std::map<NodeId, MPINode<WeightValue, NodeDistribution>> _localNodes;
 	/**
 	 * The actual distribution of the nodes.
 	 */
-	NodeDistribution _nodeDistribution;
+	static NodeDistribution _nodeDistribution;
 
 	/**
 	 * The max Node number assigned so far.

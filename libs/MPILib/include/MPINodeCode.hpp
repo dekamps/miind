@@ -31,14 +31,13 @@ MPINode<Weight, NodeDistribution>::MPINode(
 		const algorithm::AlgorithmInterface<Weight>& algorithm,
 		NodeType nodeType, NodeId nodeId,
 		const NodeDistribution& nodeDistribution,
-		const std::shared_ptr<
-				std::map<NodeId, MPINode<Weight, NodeDistribution>>>& localNode) :
+		const std::map<NodeId, MPINode<Weight, NodeDistribution>>& localNode) :
 		_pAlgorithm(algorithm.clone()), //
-		_nodeType(nodeType),//
-		_nodeId(nodeId),//
-		_pLocalNodes(localNode),//
-		_nodeDistribution(nodeDistribution)
-		{}
+		_nodeType(nodeType), //
+		_nodeId(nodeId), //
+		_rLocalNodes(localNode), //
+		_rNodeDistribution(nodeDistribution) {
+}
 
 template<class Weight, class NodeDistribution>
 MPINode<Weight, NodeDistribution>::~MPINode() {
@@ -46,7 +45,6 @@ MPINode<Weight, NodeDistribution>::~MPINode() {
 
 template<class Weight, class NodeDistribution>
 Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
-
 
 	while (_pAlgorithm->getCurrentTime() < time) {
 		++_number_iterations;
@@ -58,7 +56,6 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 
 	// update state
 	this->setActivity(_pAlgorithm->getCurrentRate());
-
 
 	sendOwnActivity();
 	receiveData();
@@ -82,8 +79,8 @@ void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 	// Add this line or other nodes will not get a proper input at the first simulation step!
 	this->setActivity(_pAlgorithm->getCurrentRate());
 
-	_pHandler = std::shared_ptr < report::handler::AbstractReportHandler
-			> (simParam.getHandler().clone());
+	_pHandler = std::shared_ptr<report::handler::AbstractReportHandler>(
+			simParam.getHandler().clone());
 
 	_pHandler->initializeHandler(_nodeId);
 
@@ -137,26 +134,25 @@ void MPINode<Weight, NodeDistribution>::initNode() {
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 	_precursorTypes.resize(_precursors.size());
-	//lock the weak pointers to access them.
-	auto tempLocalNodesPtr = _pLocalNodes.lock();
 	//get the Types from the precursors
 	int i = 0;
 	for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		//do not send the data if the node is local!
-		if (_nodeDistribution.isLocalNode(*it)) {
-			_precursorTypes[i] = tempLocalNodesPtr->find(*it)->second.getNodeType();
+		if (_rNodeDistribution.isLocalNode(*it)) {
+			_precursorTypes[i] =
+					_rLocalNodes.find(*it)->second.getNodeType();
 
 		} else {
 			utilities::MPIProxy mpiProxy;
-			mpiProxy.irecv(_nodeDistribution.getResponsibleProcessor(*it),
-					*it, _precursorTypes[i]);
+			mpiProxy.irecv(_rNodeDistribution.getResponsibleProcessor(*it), *it,
+					_precursorTypes[i]);
 		}
 	}
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
-		if (!_nodeDistribution.isLocalNode(it)) {
+		if (!_rNodeDistribution.isLocalNode(it)) {
 			utilities::MPIProxy mpiProxy;
-			mpiProxy.isend(_nodeDistribution.getResponsibleProcessor(it),
+			mpiProxy.isend(_rNodeDistribution.getResponsibleProcessor(it),
 					_nodeId, _nodeType);
 		}
 	}
@@ -165,19 +161,17 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::receiveData() {
 	int i = 0;
-	auto tempLocalNodesPtr = _pLocalNodes.lock();
-
 
 	for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		//do not send the data if the node is local!
-		if (_nodeDistribution.isLocalNode(*it)) {
+		if (_rNodeDistribution.isLocalNode(*it)) {
 			_precursorActivity[i] =
-					tempLocalNodesPtr->find(*it)->second.getActivity();
+					_rLocalNodes.find(*it)->second.getActivity();
 
 		} else {
 			utilities::MPIProxy mpiProxy;
-			mpiProxy.irecv(_nodeDistribution.getResponsibleProcessor(*it),
-					*it, _precursorActivity[i]);
+			mpiProxy.irecv(_rNodeDistribution.getResponsibleProcessor(*it), *it,
+					_precursorActivity[i]);
 		}
 	}
 }
@@ -188,8 +182,8 @@ void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 	utilities::MPIProxy mpiProxy;
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
-		if (!_nodeDistribution.isLocalNode(it)) {
-			mpiProxy.isend(_nodeDistribution.getResponsibleProcessor(it),
+		if (!_rNodeDistribution.isLocalNode(it)) {
+			mpiProxy.isend(_rNodeDistribution.getResponsibleProcessor(it),
 					_nodeId, _activity);
 		}
 	}
@@ -202,13 +196,12 @@ std::string MPINode<Weight, NodeDistribution>::reportAll(
 	std::string string_return("");
 
 	std::vector<report::ReportValue> vec_values;
-	auto tempLocalNodesPtr = _pLocalNodes.lock();
 
 	if (type == report::RATE || type == report::STATE) {
 		report::Report report(_pAlgorithm->getCurrentTime(),
 				Rate(this->getActivity()), this->_nodeId,
 				_pAlgorithm->getGrid(), string_return, type, vec_values,
-				tempLocalNodesPtr->size());
+				_rLocalNodes.size());
 
 		_pHandler->writeReport(report);
 	}
@@ -220,15 +213,12 @@ template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::clearSimulation() {
 	_pHandler->detachHandler(_nodeId);
 
-
 }
 
 template<class Weight, class NodeDistribution>
 NodeType MPINode<Weight, NodeDistribution>::getNodeType() const {
 	return _nodeType;
 }
-
-
 
 }
 //end namespace MPILib

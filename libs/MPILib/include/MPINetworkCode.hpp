@@ -36,14 +36,15 @@
 namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
-MPINetwork<WeightValue, NodeDistribution>::MPINetwork() :
-		_pLocalNodes(
-				new std::map<NodeId, MPINode<WeightValue, NodeDistribution>>) {
+MPINetwork<WeightValue, NodeDistribution>::MPINetwork() {
 }
+//		_pLocalNodes(
+//				new std::map<NodeId, MPINode<WeightValue, NodeDistribution>>) {
+//}
 
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::~MPINetwork() {
-	_pLocalNodes->clear();
+//	_pLocalNodes->clear();
 }
 
 template<class WeightValue, class NodeDistribution>
@@ -58,8 +59,8 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 	if (_nodeDistribution.isLocalNode(tempNodeId)) {
 		MPINode<WeightValue, NodeDistribution> node = MPINode<WeightValue,
 				NodeDistribution>(alg, nodeType, tempNodeId, _nodeDistribution,
-				_pLocalNodes);
-		_pLocalNodes->insert(std::make_pair(tempNodeId, node));
+				_localNodes);
+		_localNodes.insert(std::make_pair(tempNodeId, node));
 	}
 	//increment the max NodeId to make sure that it is not assigned twice.
 	incrementMaxNodeId();
@@ -72,8 +73,8 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 
 	//Make sure that the node exists and then add the successor
 	if (_nodeDistribution.isLocalNode(first)) {
-		if (_pLocalNodes->count(first) > 0) {
-			_pLocalNodes->find(first)->second.addSuccessor(second);
+		if (_localNodes.count(first) > 0) {
+			_localNodes.find(first)->second.addSuccessor(second);
 		} else {
 			std::stringstream tempStream;
 			tempStream << "the node " << first << "does not exist on this node";
@@ -85,7 +86,7 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 	if (_nodeDistribution.isLocalNode(first)) {
 		if (isDalesLawSet()) {
 
-			auto tempNode = _pLocalNodes->find(first)->second;
+			auto tempNode = _localNodes.find(first)->second;
 
 			if ((tempNode.getNodeType() == EXCITATORY && toEfficacy(weight) < 0)
 					|| (tempNode.getNodeType() == INHIBITORY
@@ -99,8 +100,8 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 
 	// Make sure that the second node exist and then set the precursor
 	if (_nodeDistribution.isLocalNode(second)) {
-		if (_pLocalNodes->count(second) > 0) {
-			_pLocalNodes->find(second)->second.addPrecursor(first, weight);
+		if (_localNodes.count(second) > 0) {
+			_localNodes.find(second)->second.addPrecursor(first, weight);
 		} else {
 			std::stringstream tempStream;
 			tempStream << "the node " << second
@@ -122,7 +123,7 @@ void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 
 	try {
 		//loop over all local nodes!
-		for (auto& it : (*_pLocalNodes)) {
+		for (auto& it : _localNodes) {
 			it.second.configureSimulationRun(simParam);
 		}
 
@@ -147,7 +148,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 		_streamLog << "Starting simulation\n";
 		_streamLog.flush();
 		//init the nodes
-		for (auto& it : (*_pLocalNodes)) {
+		for (auto& it : _localNodes) {
 			it.second.initNode();
 		}
 
@@ -165,12 +166,12 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 					MPINode<WeightValue, NodeDistribution>::waitAll();
 
-					for (auto& it : (*_pLocalNodes)) {
+					for (auto& it : _localNodes) {
 						it.second.prepareEvolve();
 					}
 
 					//envolve all local nodes
-					for (auto& it : (*_pLocalNodes)) {
+					for (auto& it : _localNodes) {
 						it.second.evolve(getCurrentSimulationTime());
 					}
 
@@ -233,7 +234,7 @@ std::string MPINetwork<WeightValue, NodeDistribution>::collectReport(
 
 	std::string string_return;
 
-	for (auto& it : (*_pLocalNodes)) {
+	for (auto& it : _localNodes) {
 		string_return += it.second.reportAll(type);
 	}
 
@@ -254,7 +255,7 @@ void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::clearSimulation() {
 
-	for (auto& it : (*_pLocalNodes)) {
+	for (auto& it : _localNodes) {
 		it.second.clearSimulation();
 	}
 
@@ -305,6 +306,13 @@ Time MPINetwork<WeightValue, NodeDistribution>::getCurrentStateTime() const {
 	return _currentStateTime;
 
 }
+
+template<class WeightValue, class NodeDistribution>
+std::map<NodeId, MPINode<WeightValue, NodeDistribution>> MPINetwork<WeightValue,
+		NodeDistribution>::_localNodes;
+
+template<class WeightValue, class NodeDistribution>
+NodeDistribution MPINetwork<WeightValue, NodeDistribution>::_nodeDistribution;
 
 }					//end namespace MPILib
 

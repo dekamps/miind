@@ -51,170 +51,169 @@ public:
 	explicit MPINode(const algorithm::AlgorithmInterface<Weight>& algorithm,
 			NodeType nodeType, NodeId nodeId,
 			const NodeDistribution& nodeDistribution,
-			const std::shared_ptr<
-					std::map<NodeId, MPINode<Weight, NodeDistribution>>>& localNode);
 
-			/**
-			 * Destructor
-			 */
-			virtual ~MPINode();
+			const std::map<NodeId, MPINode<Weight, NodeDistribution>>& localNode);
 
-			/**
-			 * Evolve this algorithm over a time
-			 * @param time Time until the algorithm should evolve
-			 * @return Time the algorithm have evolved
-			 */
-			Time evolve(Time time);
+	/**
+	 * Destructor
+	 */
+	virtual ~MPINode();
 
-			/**
-			 * Called before each evolve call during each evolve. Can
-			 * be used to prepare the input for the evolve method.
-			 */
-			void prepareEvolve();
+	/**
+	 * Evolve this algorithm over a time
+	 * @param time Time until the algorithm should evolve
+	 * @return Time the algorithm have evolved
+	 */
+	Time evolve(Time time);
 
-			/**
-			 * Configure the Node with the Simulation Parameters
-			 * @param simParam Simulation Parameters
-			 */
-			void configureSimulationRun(const SimulationRunParameter& simParam);
+	/**
+	 * Called before each evolve call during each evolve. Can
+	 * be used to prepare the input for the evolve method.
+	 */
+	void prepareEvolve();
 
-			/**
-			 * Add a precursor to the current node
-			 * @param nodeId NodeId the id of the precursor
-			 * @param weight the weight of the connection
-			 */
-			void addPrecursor(NodeId nodeId, const Weight& weight);
+	/**
+	 * Configure the Node with the Simulation Parameters
+	 * @param simParam Simulation Parameters
+	 */
+	void configureSimulationRun(const SimulationRunParameter& simParam);
 
-			/**
-			 * Add a successor to the current node
-			 * @param nodeId NodeId the id of the successor
-			 */
-			void addSuccessor(NodeId nodeId);
+	/**
+	 * Add a precursor to the current node
+	 * @param nodeId NodeId the id of the precursor
+	 * @param weight the weight of the connection
+	 */
+	void addPrecursor(NodeId nodeId, const Weight& weight);
 
-			/**
-			 * Getter for the Nodes activity
-			 * @return The current node activity
-			 */
-			ActivityType getActivity() const;
+	/**
+	 * Add a successor to the current node
+	 * @param nodeId NodeId the id of the successor
+	 */
+	void addSuccessor(NodeId nodeId);
 
-			/**
-			 * The Setter for the node activity
-			 * @param activity The activity the node should be in
-			 */
-			void setActivity(ActivityType activity);
+	/**
+	 * Getter for the Nodes activity
+	 * @return The current node activity
+	 */
+	ActivityType getActivity() const;
 
-			/**
-			 * Receive the new data from the precursor nodes
-			 */
-			void receiveData();
+	/**
+	 * The Setter for the node activity
+	 * @param activity The activity the node should be in
+	 */
+	void setActivity(ActivityType activity);
 
-			/**
-			 * Send the own state to the successors.
-			 */
-			void sendOwnActivity();
+	/**
+	 * Receive the new data from the precursor nodes
+	 */
+	void receiveData();
 
-			/**
-			 * Report the node state
-			 * @param type The type of Report
-			 * @return The report
-			 */
-			std::string reportAll (report::ReportType type) const;
+	/**
+	 * Send the own state to the successors.
+	 */
+	void sendOwnActivity();
 
-			/**
-			 * finishes the simulation.
-			 */
-			void clearSimulation();
+	/**
+	 * Report the node state
+	 * @param type The type of Report
+	 * @return The report
+	 */
+	std::string reportAll(report::ReportType type) const;
 
-			/**
-			 * returns the type of the node
-			 */
-			NodeType getNodeType() const;
+	/**
+	 * finishes the simulation.
+	 */
+	void clearSimulation();
 
-			/**
-			 * Wait that all communication is finished
-			 */
-			static void waitAll();
+	/**
+	 * returns the type of the node
+	 */
+	NodeType getNodeType() const;
 
-			void initNode();
+	/**
+	 * Wait that all communication is finished
+	 */
+	static void waitAll();
 
-		private:
+	void initNode();
 
-			/**
-			 * exchange the Node Types
-			 *
-			 * It send the own NodeType to remote nodes and collects the NodeTypes of
-			 * the precursor nodes and store them in the vector _precursorTypes
-			 */
-			void exchangeNodeTypes();
+private:
 
-			/**
-			 * Store the nodeIds of the Precursors
-			 */
-			std::vector<NodeId> _precursors;
+	/**
+	 * exchange the Node Types
+	 *
+	 * It send the own NodeType to remote nodes and collects the NodeTypes of
+	 * the precursor nodes and store them in the vector _precursorTypes
+	 */
+	void exchangeNodeTypes();
 
-			/**
-			 * Store the weights of the connections to the precursors
-			 */
-			std::vector<Weight> _weights;
+	/**
+	 * Store the nodeIds of the Precursors
+	 */
+	std::vector<NodeId> _precursors;
 
-			/**
-			 * Store the _precursorTypes
-			 */
-			std::vector<NodeType> _precursorTypes;
+	/**
+	 * Store the weights of the connections to the precursors
+	 */
+	std::vector<Weight> _weights;
 
-			/**
-			 * Store the nodeIds of the successors
-			 */
-			std::vector<NodeId> _successors;
+	/**
+	 * Store the _precursorTypes
+	 */
+	std::vector<NodeType> _precursorTypes;
 
-			/**
-			 * A Pointer that holds the Algorithm
-			 */
-			std::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
+	/**
+	 * Store the nodeIds of the successors
+	 */
+	std::vector<NodeId> _successors;
 
-			/**
-			 * The type of this node needed for dales law
-			 */
-			NodeType _nodeType;
+	/**
+	 * A Pointer that holds the Algorithm
+	 */
+	std::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
 
-			/**
-			 * the Id of this node
-			 */
-			NodeId _nodeId;
+	/**
+	 * The type of this node needed for dales law
+	 */
+	NodeType _nodeType;
 
-			/**
-			 * Pointer to the local nodes of the processor. They are owned by the network.
-			 */
-			std::weak_ptr<std::map<NodeId, MPINode<Weight,NodeDistribution>>> _pLocalNodes;
+	/**
+	 * the Id of this node
+	 */
+	NodeId _nodeId;
 
-			/**
-			 * Pointer to the NodeDistribution. This is owned by the network.
-			 */
-			NodeDistribution _nodeDistribution;
+	/**
+	 * Reference to the local nodes of the processor. They are owned by the network.
+	 */
+	const std::map<NodeId, MPINode<Weight, NodeDistribution>>& _rLocalNodes;
+	/**
+	 * Reference to the NodeDistribution. This is owned by the network.
+	 */
+	const NodeDistribution& _rNodeDistribution;
 
-			/**
-			 * Activity of this node
-			 */
-			ActivityType _activity = 0;
+	/**
+	 * Activity of this node
+	 */
+	ActivityType _activity = 0;
 
-			/**
-			 * Storage for the state of the precursors, to avoid to much communication.
-			 */
-			std::vector<ActivityType> _precursorActivity;
+	/**
+	 * Storage for the state of the precursors, to avoid to much communication.
+	 */
+	std::vector<ActivityType> _precursorActivity;
 
-			Number _number_iterations;
-			Number _maximum_iterations;
+	Number _number_iterations = 0;
+	Number _maximum_iterations = 0;
 
-			/**
-			 * True if the node Types are exchanged
-			 */
-			bool _isInitialised = false;
+	/**
+	 * True if the node Types are exchanged
+	 */
+	bool _isInitialised = false;
 
-			/**
-			 * Pointer to the Report Handler
-			 */
-			std::shared_ptr<report::handler::AbstractReportHandler> _pHandler;
-		};
+	/**
+	 * Pointer to the Report Handler
+	 */
+	std::shared_ptr<report::handler::AbstractReportHandler> _pHandler;
+};
 
 typedef MPINode<double, utilities::CircularDistribution> D_MPINode;
 
