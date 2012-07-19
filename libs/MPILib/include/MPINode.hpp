@@ -24,14 +24,12 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include <boost/timer/timer.hpp>
 
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/NodeType.hpp>
 
 #include <MPILib/include/TypeDefinitions.hpp>
-
 
 namespace MPILib {
 
@@ -52,7 +50,7 @@ public:
 	 */
 	explicit MPINode(const algorithm::AlgorithmInterface<Weight>& algorithm,
 			NodeType nodeType, NodeId nodeId,
-			const std::shared_ptr<NodeDistribution>& nodeDistribution,
+			const NodeDistribution& nodeDistribution,
 			const std::shared_ptr<
 					std::map<NodeId, MPINode<Weight, NodeDistribution>>>& localNode);
 
@@ -141,8 +139,6 @@ public:
 
 		private:
 
-
-
 			/**
 			 * exchange the Node Types
 			 *
@@ -171,12 +167,6 @@ public:
 			 */
 			std::vector<NodeId> _successors;
 
-			// Timers for mpi and algorithm time
-			static boost::timer::cpu_timer _algorithmTimer;
-
-			// make sure that the log is only printed ones.
-			static bool _isLogPrinted;
-
 			/**
 			 * A Pointer that holds the Algorithm
 			 */
@@ -195,12 +185,12 @@ public:
 			/**
 			 * Pointer to the local nodes of the processor. They are owned by the network.
 			 */
-			std::weak_ptr<std::map<NodeId, MPINode>> _pLocalNodes;
+			std::weak_ptr<std::map<NodeId, MPINode<Weight,NodeDistribution>>> _pLocalNodes;
 
 			/**
 			 * Pointer to the NodeDistribution. This is owned by the network.
 			 */
-			std::weak_ptr<NodeDistribution> _pNodeDistribution;
+			NodeDistribution _nodeDistribution;
 
 			/**
 			 * Activity of this node

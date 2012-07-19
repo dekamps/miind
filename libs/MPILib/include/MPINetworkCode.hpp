@@ -23,6 +23,7 @@
 #include <MPILib/config.hpp>
 #include <sstream>
 #include <iostream>
+#include <cassert>
 #include <fstream>
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/utilities/IterationNumberException.hpp>
@@ -31,7 +32,6 @@
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/utilities/ProgressBar.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
-
 
 namespace MPILib {
 
@@ -43,7 +43,7 @@ MPINetwork<WeightValue, NodeDistribution>::MPINetwork() :
 
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::~MPINetwork() {
-
+	_pLocalNodes->clear();
 }
 
 template<class WeightValue, class NodeDistribution>
@@ -55,9 +55,9 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 			nodeType == EXCITATORY || nodeType == INHIBITORY || nodeType == NEUTRAL || nodeType == EXCITATORY_BURST || nodeType == INHIBITORY_BURST);
 
 	int tempNodeId = getMaxNodeId();
-	if (_pNodeDistribution->isLocalNode(tempNodeId)) {
+	if (_nodeDistribution.isLocalNode(tempNodeId)) {
 		MPINode<WeightValue, NodeDistribution> node = MPINode<WeightValue,
-				NodeDistribution>(alg, nodeType, tempNodeId, _pNodeDistribution,
+				NodeDistribution>(alg, nodeType, tempNodeId, _nodeDistribution,
 				_pLocalNodes);
 		_pLocalNodes->insert(std::make_pair(tempNodeId, node));
 	}
@@ -71,7 +71,7 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 		NodeId first, NodeId second, const WeightValue& weight) {
 
 	//Make sure that the node exists and then add the successor
-	if (_pNodeDistribution->isLocalNode(first)) {
+	if (_nodeDistribution.isLocalNode(first)) {
 		if (_pLocalNodes->count(first) > 0) {
 			_pLocalNodes->find(first)->second.addSuccessor(second);
 		} else {
@@ -82,7 +82,7 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 	}
 
 	// Make sure the Dales Law holds
-	if (_pNodeDistribution->isLocalNode(first)) {
+	if (_nodeDistribution.isLocalNode(first)) {
 		if (isDalesLawSet()) {
 
 			auto tempNode = _pLocalNodes->find(first)->second;
@@ -98,7 +98,7 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 	}
 
 	// Make sure that the second node exist and then set the precursor
-	if (_pNodeDistribution->isLocalNode(second)) {
+	if (_nodeDistribution.isLocalNode(second)) {
 		if (_pLocalNodes->count(second) > 0) {
 			_pLocalNodes->find(second)->second.addPrecursor(first, weight);
 		} else {
@@ -169,7 +169,6 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 						it.second.prepareEvolve();
 					}
 
-
 					//envolve all local nodes
 					for (auto& it : (*_pLocalNodes)) {
 						it.second.evolve(getCurrentSimulationTime());
@@ -223,7 +222,7 @@ int MPINetwork<WeightValue, NodeDistribution>::getMaxNodeId() {
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::incrementMaxNodeId() {
-	if (_pNodeDistribution->isMaster()) {
+	if (_nodeDistribution.isMaster()) {
 		_maxNodeId++;
 	}
 }
@@ -310,4 +309,3 @@ Time MPINetwork<WeightValue, NodeDistribution>::getCurrentStateTime() const {
 }					//end namespace MPILib
 
 #endif //MPILIB_MPINETWORK_CODE_HPP_
-

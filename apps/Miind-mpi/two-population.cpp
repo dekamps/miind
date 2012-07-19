@@ -17,6 +17,8 @@
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
+#include <boost/timer/timer.hpp>
+
 #ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
 #endif

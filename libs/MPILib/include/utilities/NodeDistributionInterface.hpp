@@ -20,7 +20,6 @@
 #ifndef MPILIB_UTILITIES_NODEDISTRIBUTIONINTERFACE_HPP_
 #define MPILIB_UTILITIES_NODEDISTRIBUTIONINTERFACE_HPP_
 
-#include <boost/noncopyable.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 
 
@@ -31,17 +30,17 @@ namespace utilities{
 /**
  * NodeDistributionInterface abstract interface for implementing concrete distributions
  */
-class NodeDistributionInterface: private boost::noncopyable{
+class NodeDistributionInterface{
 public:
 	/**
 	 * constructor
 	 */
-	NodeDistributionInterface(){};
+	NodeDistributionInterface()=default;
 
 	/**
 	 * destructor virtual to allow inheritance
 	 */
-	virtual ~NodeDistributionInterface(){};
+	virtual ~NodeDistributionInterface()=default;
 
 	/** check is a node is local to the processor
 	 * @param nodeId The Id of the Node

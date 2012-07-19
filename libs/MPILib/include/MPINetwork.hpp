@@ -127,9 +127,9 @@ private:
 	std::shared_ptr<std::map<NodeId, MPINode<WeightValue, NodeDistribution>>>_pLocalNodes;
 
 	/**
-	 * Shared pointer to the actual distribution of the nodes.
+	 * The actual distribution of the nodes.
 	 */
-	std::shared_ptr<NodeDistribution> _pNodeDistribution=std::shared_ptr<NodeDistribution>(new NodeDistribution);
+	NodeDistribution _nodeDistribution;
 
 	/**
 	 * The max Node number assigned so far.
