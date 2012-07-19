@@ -29,7 +29,6 @@
 
 // forward declarations 
 
-class TApplication;
 class TGraph;
 class TFile;
 

@@ -32,7 +32,6 @@
 
 #include <MPILib/include/report/handler/GraphKey.hpp>
 
-#include <TApplication.h>
 #include <TFile.h>
 #include <TGraph.h>
 
@@ -40,8 +39,6 @@ namespace MPILib {
 namespace report {
 namespace handler {
 
-// need one global application object
-TApplication APPLICATION("application", 0, 0);
 
 TFile* RootReportHandler::_pFile = nullptr;
 

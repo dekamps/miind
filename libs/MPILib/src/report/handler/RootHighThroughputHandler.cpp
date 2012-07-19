@@ -78,6 +78,7 @@ void RootHighThroughputHandler::detachHandler(const NodeId&) {
 		// clean up
 		_pFile->Close();
 		delete _pArray;
+		delete _pFile;
 		_pArray = nullptr;
 		_pFile = nullptr;
 	}
