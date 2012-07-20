@@ -18,7 +18,7 @@
 //
 #include <MPILib/include/populist/parameters/OneDMParameter.hpp>
 
-using namespace MPILib::populist;
+using namespace MPILib::populist::parameters;
 
 OneDMParameter::OneDMParameter
 (

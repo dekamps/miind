@@ -34,8 +34,8 @@ namespace populist {
 OldLIFZeroLeakEquations::OldLIFZeroLeakEquations(Number& n_bins,
 		valarray<Potential>& array_state, Potential& check_sum,
 		SpecialBins& bins,
-		PopulationParameter& par_pop,//!< reference to the PopulationParameter
-		PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
+		parameters::PopulationParameter& par_pop,//!< reference to the PopulationParameter
+		parameters::PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
 		Potential& delta_v,		//!< reference to the current scale variable
 		const AbstractCirculantSolver& circ,
 		const AbstractNonCirculantSolver& noncirc) :
@@ -61,7 +61,7 @@ void OldLIFZeroLeakEquations::Apply(Time time) {
 }
 
 void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaExcitatory(Time time) {
-	InputParameterSet& input_set = _convertor.SolverParameter();
+	parameters::InputParameterSet& input_set = _convertor.SolverParameter();
 
 	double tau_e = input_set._rate_exc * time;
 	double alpha_e = input_set._alpha_exc;
@@ -110,7 +110,7 @@ void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaExcitatory(Time time) {
 }
 
 void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaInhibitory(Time time) {
-	InputParameterSet& input_set = _convertor.SolverParameter();
+	parameters::InputParameterSet& input_set = _convertor.SolverParameter();
 
 	// added to ignore zero input, which is legitimate (MdK: 11/06/2010)
 	if (input_set._rate_inh == 0 && input_set._H_inh == 0)
@@ -137,7 +137,7 @@ void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaInhibitory(Time time) {
 void OldLIFZeroLeakEquations::Configure(void* p_par	// irrelevant for LIFZeroLeakequations
 		) {
 	_convertor.Configure(this->ArrayState());
-	InputParameterSet& input_set = _convertor.SolverParameter();
+	parameters::InputParameterSet& input_set = _convertor.SolverParameter();
 
 	_p_solver_circulant->Configure(_p_array_state, input_set);
 

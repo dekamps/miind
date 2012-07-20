@@ -38,8 +38,8 @@ public:
 			std::valarray<Potential>&,				//!< reference to state array
 			Potential&,					//!< reference to the check sum variable
 			SpecialBins&,//!< reference to bins variable: reversal bin, reset bin, etc
-			PopulationParameter&,	//!< reference to the PopulationParameter
-			PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
+			parameters::PopulationParameter&,	//!< reference to the PopulationParameter
+			parameters::PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
 			Potential&,				//!< reference to the current scale variable
 			const AbstractCirculantSolver&, const AbstractNonCirculantSolver&);
 

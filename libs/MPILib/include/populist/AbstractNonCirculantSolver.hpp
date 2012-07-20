@@ -46,7 +46,7 @@ namespace populist {
 		virtual bool Configure
 		(
 			std::valarray<double>&,			//!< State array containing the population density
-			const InputParameterSet&,	//!< Current input parameters, see InputParameterSet for documentation,
+			const parameters::InputParameterSet&,	//!< Current input parameters, see InputParameterSet for documentation,
 			double	= 0					//!< epsilon precision value overruling EPS_J_CIRC_MAX, when set to zero, EPS_J_CIRC_MAX is used
 		);
 
@@ -95,7 +95,7 @@ namespace populist {
 
 		std::valarray<double>			_array_factor;
 		std::valarray<double>*			_p_array_state = nullptr;
-		const InputParameterSet*		_p_input_set;
+		const parameters::InputParameterSet*		_p_input_set;
 		double							_epsilon;
 		int								_j_circ_max = -1;			// maximum j for which exp(-tau) tau^k/k! is relevant
 															// helps to cut computation short

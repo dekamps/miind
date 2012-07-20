@@ -45,8 +45,7 @@ struct OrnsteinUhlenbeckConnection {
 	Time _delay = 0.0;
 
 	//! default constructor
-	OrnsteinUhlenbeckConnection() {
-	}
+	OrnsteinUhlenbeckConnection()=default;
 
 	//! construct, using effective number of connections and effectivie efficacy
 	OrnsteinUhlenbeckConnection(double number_of_connections, //!< effective number of connections

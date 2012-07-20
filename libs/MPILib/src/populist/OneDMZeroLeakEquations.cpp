@@ -31,7 +31,7 @@ namespace {
 		const double					y[],  
 		int								i,
 		const AdaptiveHazard&			hazard, 
-		const OneDMInputSetParameter&	par
+		const parameters::OneDMInputSetParameter&	par
 	)
 	{
 		int n_max            = par._n_max_bins;
@@ -84,7 +84,7 @@ namespace {
     int    Meq(double t, const double y[], double f[],
            void *params)
      {
-       OneDMInputSetParameter par = *((OneDMInputSetParameter*)params);
+    	parameters::OneDMInputSetParameter par = *((parameters::OneDMInputSetParameter*)params);
 
 	   // build the hazard function
 	  AdaptiveHazard
@@ -117,8 +117,8 @@ OneDMZeroLeakEquations::OneDMZeroLeakEquations
 	std::valarray<Potential>&		state,
 	Potential&					check_sum,
 	SpecialBins&				bins,
-	PopulationParameter&		par_pop,		//!< serves now mainly to communicate t_s
-	PopulistSpecificParameter&	par_spec,
+	parameters::PopulationParameter&		par_pop,		//!< serves now mainly to communicate t_s
+	parameters::PopulistSpecificParameter&	par_spec,
 	Potential&					delta_v		//!< current potential interval covered by one bin, delta_v
 ):
 AbstractZeroLeakEquations
@@ -184,7 +184,7 @@ void OneDMZeroLeakEquations::Configure
 
 	// the valarrays don't play a role but are required by the base class
 	std::valarray<Potential> val;
-	_convertor.Configure(val, val,*(static_cast<OneDMParameter*>(p_par)));
+	_convertor.Configure(val, val,*(static_cast<parameters::OneDMParameter*>(p_par)));
 
 }
 

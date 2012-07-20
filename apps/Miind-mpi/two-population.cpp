@@ -46,7 +46,7 @@ const Time TWOPOPULATION_TIME_REPORT = 1e-3; // 10 ms
 const Time TWOPOPULATION_TIME_UPDATE = 1e-2; // 100 ms
 const Time TWOPOPULATION_TIME_NETWORK = 1e-6; // 0.1 ms
 
-const populist::OrnsteinUhlenbeckParameter TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER(
+const populist::parameters::OrnsteinUhlenbeckParameter TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER(
 		20e-3, // V_threshold: 20 mV
 		0,     // V_reset: 0 mV
 		0,     // V_reversal
@@ -54,7 +54,7 @@ const populist::OrnsteinUhlenbeckParameter TWOPOPULATION_NETWORK_EXCITATORY_PARA
 		10e-3  // tau membrane; 10 ms
 		);
 
-const populist::OrnsteinUhlenbeckParameter TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER(
+const populist::parameters::OrnsteinUhlenbeckParameter TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER(
 		20e-3,  // V_threshold; 20 mV
 		0,      // V_reset: 0 mV
 		0,      // V_reversal
@@ -62,7 +62,7 @@ const populist::OrnsteinUhlenbeckParameter TWOPOPULATION_NETWORK_INHIBITORY_PARA
 		3e-3    // tau membrane 3 ms
 		);
 
-const populist::InitialDensityParameter TWOPOP_INITIAL_DENSITY(0.0, 0.0);
+const populist::parameters::InitialDensityParameter TWOPOP_INITIAL_DENSITY(0.0, 0.0);
 
 const Number TWOPOP_NUMBER_OF_INITIAL_BINS = 550;
 const Number TWOPOP_NUMBER_OF_BINS_TO_ADD = 1;
@@ -95,15 +95,15 @@ const ResponseParameterBrunel RESPONSE_CURVE_PARAMETER = { 0,		// mu
 
 const Potential TWOPOP_V_MIN = -1.0 * RESPONSE_CURVE_PARAMETER.theta;
 
-const populist::PopulistSpecificParameter TWOPOP_SPECIFIC(TWOPOP_V_MIN,
+const populist::parameters::PopulistSpecificParameter TWOPOP_SPECIFIC(TWOPOP_V_MIN,
 		TWOPOP_NUMBER_OF_INITIAL_BINS, TWOPOP_NUMBER_OF_BINS_TO_ADD,
 		TWOPOP_INITIAL_DENSITY, TWOPOP_EXPANSION_FACTOR,
 		"NumericalZeroLeakEquations");
 
-const populist::PopulistParameter TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP(
+const populist::parameters::PopulistParameter TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP(
 		TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER, TWOPOP_SPECIFIC);
 
-const populist::PopulistParameter TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP(
+const populist::parameters::PopulistParameter TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP(
 		TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER, TWOPOP_SPECIFIC);
 
 inline Rate CorticalBackground(Time t) {

@@ -28,7 +28,7 @@ namespace populist {
 namespace {
 
 double gaussian(Potential potential,
-		const InitialDensityParameter& parameter_density) {
+		const parameters::InitialDensityParameter& parameter_density) {
 	if (parameter_density._sigma == 0 && potential == parameter_density._mu)
 		return 1.0;
 	if (parameter_density._sigma == 0 && potential != parameter_density._mu)
@@ -43,12 +43,12 @@ double gaussian(Potential potential,
 
 Potential InitializeAlgorithmGrid::DeltaV(Number number_of_initial_bins,
 		Potential v_min,
-		const PopulationParameter& parameter_population) const {
+		const parameters::PopulationParameter& parameter_population) const {
 	return (parameter_population._theta - v_min) / (number_of_initial_bins - 1);
 }
 
 Index InitializeAlgorithmGrid::IndexReversal(Number number_of_initial_bins,
-		Potential v_min, const PopulationParameter& parameter_population
+		Potential v_min, const parameters::PopulationParameter& parameter_population
 
 		) const {
 	return static_cast<Index>((parameter_population._V_reversal - v_min)
@@ -57,7 +57,7 @@ Index InitializeAlgorithmGrid::IndexReversal(Number number_of_initial_bins,
 
 double InitializeAlgorithmGrid::ExpansionFactorDoubleRebinner(
 		Number number_initial_bins, Potential v_min,
-		const PopulationParameter& parameter_population) const {
+		const parameters::PopulationParameter& parameter_population) const {
 	int index_reversal_bin = static_cast<int>(IndexReversal(number_initial_bins,
 			v_min, parameter_population));
 	int number_growing_bins = number_initial_bins - index_reversal_bin;
@@ -73,9 +73,9 @@ double InitializeAlgorithmGrid::ExpansionFactorDoubleRebinner(
 
 algorithm::AlgorithmGrid InitializeAlgorithmGrid::InitializeGrid(
 		Number number_of_initial_bins, Potential v_min,
-		const PopulationParameter& parameter_population,
-		const InitialDensityParameter& parameter_density) const {
-	InitialDensityParameter parameter_initial = parameter_density;
+		const parameters::PopulationParameter& parameter_population,
+		const parameters::InitialDensityParameter& parameter_density) const {
+	parameters::InitialDensityParameter parameter_initial = parameter_density;
 
 	std::vector<double> vector_potential(number_of_initial_bins, 0);
 	std::vector<double> vector_state(number_of_initial_bins, 0);

@@ -44,8 +44,8 @@ IntegralRateComputation::IntegralRateComputation() {
 }
 
 void IntegralRateComputation::Configure(std::valarray<Density>& array_state,
-		const InputParameterSet& input_set,
-		const PopulationParameter& par_population, Index index_reversal) {
+		const parameters::InputParameterSet& input_set,
+		const parameters::PopulationParameter& par_population, Index index_reversal) {
 	AbstractRateComputation::Configure(array_state, input_set, par_population,
 			index_reversal);
 
@@ -65,7 +65,7 @@ IntegralRateComputation::~IntegralRateComputation() {
 
 Rate IntegralRateComputation::CalculateRate(Number nr_bins) {
 	_n_bins = nr_bins;
-	const InputParameterSet& _input_set = *_p_input_set;
+	const parameters::InputParameterSet& _input_set = *_p_input_set;
 
 	if (_input_set._rate_exc == 0)
 		return 0.0;

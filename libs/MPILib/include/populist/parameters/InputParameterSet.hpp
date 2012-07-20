@@ -25,6 +25,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace parameters{
 
 /**
  * @brief This class stores input rate and efficicacies in terms of the number of
@@ -88,6 +89,7 @@ public:
 	Number _n_noncirc_inh;
 };
 
+} /* namespace parameters */
 } /* namespace populist */
 } /* namespace MPILib */
 

@@ -43,8 +43,8 @@ namespace populist {
 		(
 			// not const since a pointer to an element is needed, it should have been const otherwise:
 			std::valarray<Density>&,			// state array
-			const InputParameterSet&,	// current input to population
-			const PopulationParameter&,	// neuron parameters
+			const parameters::InputParameterSet&,	// current input to population
+			const parameters::PopulationParameter&,	// neuron parameters
 			Index						// index reversal bin
 		);
 
@@ -68,8 +68,8 @@ namespace populist {
 
 		Index						_index_reversal = 0;
 		std::valarray<Density>*			_p_array_state = nullptr;
-		const InputParameterSet*	_p_input_set = nullptr;
-		PopulationParameter			_par_population;
+		const parameters::InputParameterSet*	_p_input_set = nullptr;
+		parameters::PopulationParameter			_par_population;
 		std::valarray<Potential>			_array_interpretation;
 
 		Number		_n_bins;

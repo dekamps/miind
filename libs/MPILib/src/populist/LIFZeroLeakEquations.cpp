@@ -32,8 +32,8 @@ using NumtoolsLib::IsApproximatelyEqualTo;
 LIFZeroLeakEquations::LIFZeroLeakEquations(Number& n_bins,
 		valarray<Potential>& array_state, Potential& check_sum,
 		SpecialBins& bins,
-		PopulationParameter& par_pop,//!< reference to the PopulationParameter (TODO: is this necessary?)
-		PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
+		parameters::PopulationParameter& par_pop,//!< reference to the PopulationParameter (TODO: is this necessary?)
+		parameters::PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
 		Potential& delta_v,		//!< reference to the current scale variable
 		const AbstractCirculantSolver& circ,
 		const AbstractNonCirculantSolver& noncirc) :
@@ -49,7 +49,7 @@ LIFZeroLeakEquations::LIFZeroLeakEquations(Number& n_bins,
 void LIFZeroLeakEquations::Configure(void* p_par// irrelevant for LIFZeroLeakequations
 		) {
 	_convertor.Configure(this->ArrayState());
-	InputParameterSet& input_set = _convertor.SolverParameter();
+	parameters::InputParameterSet& input_set = _convertor.SolverParameter();
 
 	_p_solver_circulant->Configure(_p_array_state, input_set);
 

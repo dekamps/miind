@@ -24,6 +24,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace parameters{
 
 /**
  * @brief To be used internally by NumericalZeroLeakEquations
@@ -49,6 +50,9 @@ struct NumericalZeroLeakParameter {
 	 * default constructor
 	 */
 	NumericalZeroLeakParameter()= default;
-};} /* namespace populist */
+};
+} /* namespace parameters */
+
+} /* namespace populist */
 } /* namespace MPILib */
 #endif //include guard MPILIB_POPULIST_PARAMETERS_NUMERICALZEROLEAKPARAMETER_HPP_

@@ -122,16 +122,14 @@ template<class Weight>
 class PopulationAlgorithm_: public algorithm::AlgorithmInterface<Weight> {
 public:
 
-	//!
-//		typedef typename AbstractAlgorithm<Weight>::predecessor_iterator predecessor_iterator;
 	//! An algorithm should export its parameter type
-	typedef PopulistParameter Parameter;
+	typedef parameters::PopulistParameter Parameter;
 
 	//! Construct an Algorithm from a stream
 	PopulationAlgorithm_(istream&);
 
 	//! Create a PopulistAlgorithm with settings defined in a PopulistParameter
-	PopulationAlgorithm_(const PopulistParameter&);
+	PopulationAlgorithm_(const parameters::PopulistParameter&);
 
 	//! copy constructor
 	PopulationAlgorithm_(const PopulationAlgorithm_<Weight>&);
@@ -176,14 +174,14 @@ private:
 	void StripHeader(istream&);
 	void StripFooter(istream&);
 
-	PopulationParameter ParPopFromStream(istream&);
-	PopulistSpecificParameter ParSpecFromStream(istream&);
+	parameters::PopulationParameter ParPopFromStream(istream&);
+	parameters::PopulistSpecificParameter ParSpecFromStream(istream&);
 
 	void WriteConfigurationToLog();
 	void Embed();
 
-	PopulationParameter _parameter_population;
-	PopulistSpecificParameter _parameter_specific;
+	parameters::PopulationParameter _parameter_population;
+	parameters::PopulistSpecificParameter _parameter_specific;
 	mutable ostringstream _stream_log; // before AlgorithmGrid, which receives a pointer to this stream
 	algorithm::AlgorithmGrid _grid;
 	PopulationGridController<Weight> _controller_grid;

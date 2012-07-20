@@ -34,8 +34,8 @@ int DerivReset(double t, const double y[], double dydt[], void * params){
 
 	// the reset current is treated differently so that we know exactly what the refractive contribution is.
 
-	NumericalZeroLeakParameter* p_param = 
-		static_cast<NumericalZeroLeakParameter*>(params);
+	parameters::NumericalZeroLeakParameter* p_param =
+		static_cast<parameters::NumericalZeroLeakParameter*>(params);
 
 	Number n_current = p_param->_nr_current_bins;
 	Number n_max     = p_param->_nr_max_bins;
@@ -67,8 +67,8 @@ int Deriv(double t, const double y[], double dydt[], void * params){
 
 	// The reset current is now treated differently because this is the part that will be refractive
 	
-	NumericalZeroLeakParameter* p_param = 
-		static_cast<NumericalZeroLeakParameter*>(params);
+	parameters::NumericalZeroLeakParameter* p_param =
+		static_cast<parameters::NumericalZeroLeakParameter*>(params);
 
 	Number n_current = p_param->_nr_current_bins;
 	Number n_max     = p_param->_nr_max_bins;
@@ -123,8 +123,8 @@ NumericalZeroLeakEquations::NumericalZeroLeakEquations
 	valarray<Potential>&		array_state,
 	Potential&					check_sum,
 	SpecialBins&				bins,		
-	PopulationParameter&		par_pop,		
-	PopulistSpecificParameter&	par_spec,	
+	parameters::PopulationParameter&		par_pop,
+	parameters::PopulistSpecificParameter&	par_spec,
 	Potential&					delta_v
 ):
 AbstractZeroLeakEquations
@@ -226,9 +226,9 @@ void NumericalZeroLeakEquations::Configure
 	void*
 )
 {
-	_p_integrator = boost::shared_ptr< ExStateDVIntegrator<NumericalZeroLeakParameter> >
+	_p_integrator = boost::shared_ptr< ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> >
 					( 
-						new ExStateDVIntegrator<NumericalZeroLeakParameter>
+						new ExStateDVIntegrator<parameters::NumericalZeroLeakParameter>
 						(
 							100000000,
 							&((*_p_array_state)[0]),
@@ -240,9 +240,9 @@ void NumericalZeroLeakEquations::Configure
 						)
 					);
 
-	_p_reset = boost::shared_ptr< ExStateDVIntegrator<NumericalZeroLeakParameter> >
+	_p_reset = boost::shared_ptr< ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> >
 					( 
-						new ExStateDVIntegrator<NumericalZeroLeakParameter>
+						new ExStateDVIntegrator<parameters::NumericalZeroLeakParameter>
 						(
 							100000000,
 							&((*_p_array_state)[0]),
@@ -254,7 +254,7 @@ void NumericalZeroLeakEquations::Configure
 						)
 					);
 
-	InputParameterSet& input_set = _convertor.SolverParameter();
+	parameters::InputParameterSet& input_set = _convertor.SolverParameter();
 
 	_p_rate_calc = auto_ptr<AbstractRateComputation>(this->ParSpec().getRateComputation().Clone());
 

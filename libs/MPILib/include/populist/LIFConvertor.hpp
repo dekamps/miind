@@ -31,11 +31,11 @@
 #include <MPILib/include/populist/MuSigma.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 
-
 namespace MPILib {
 namespace populist {
-
+namespace parameters {
 class PopulistSpecificParameter;
+}
 struct SpecialBins;
 
 //! Converts external input from other populations in parameters that are suitable for
@@ -55,8 +55,8 @@ public:
 
 	//! Constructor registers where the output results must be written, which can happen at construction of PopulationGridController
 	LIFConvertor( VALUE_REF_INIT
-	SpecialBins& bins, PopulationParameter& par_pop,
-			PopulistSpecificParameter& par_spec, Potential& delta_v,
+	SpecialBins& bins, parameters::PopulationParameter& par_pop,
+			parameters::PopulistSpecificParameter& par_spec, Potential& delta_v,
 			Number& n_bins
 
 			) :
@@ -85,15 +85,15 @@ public:
 	//! and efficacies have changed, but the solver parameters are invalid. This function recalculates them.
 	void RecalculateSolverParameters();
 
-	InputParameterSet& SolverParameter() {
+	parameters::InputParameterSet& SolverParameter() {
 		return _input_set;
 	}
 
-	const InputParameterSet& SolverParameter() const {
+	const parameters::InputParameterSet& SolverParameter() const {
 		return _input_set;
 	}
 
-	const PopulationParameter& ParPop() const {
+	const parameters::PopulationParameter& ParPop() const {
 		return *_p_par_pop;
 	}
 
@@ -116,9 +116,9 @@ private:
 
 	Time* _p_time;
 	SpecialBins* _p_bins;
-	InputParameterSet _input_set;
-	PopulationParameter* _p_par_pop;
-	PopulistSpecificParameter* _p_par_spec;
+	parameters::InputParameterSet _input_set;
+	parameters::PopulationParameter* _p_par_pop;
+	parameters::PopulistSpecificParameter* _p_par_spec;
 	Potential* _p_delta_v;
 	Number* _p_n_bins;
 	Index* _p_index_reversal_bin;

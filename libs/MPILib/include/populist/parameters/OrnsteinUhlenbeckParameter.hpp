@@ -23,6 +23,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace parameters{
 
 /**
  * @brief Parameters necessary for the configuration of an OUAlgorithm
@@ -73,6 +74,7 @@ struct OrnsteinUhlenbeckParameter {
 };
 
 typedef OrnsteinUhlenbeckParameter PopulationParameter;
+} /* namespace parameters */
 
 } /* namespace populist */
 } /* namespace MPILib */

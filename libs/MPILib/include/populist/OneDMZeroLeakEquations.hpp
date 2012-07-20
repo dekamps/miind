@@ -37,8 +37,8 @@ public:
 
 	OneDMZeroLeakEquations(Number&,	//<! reference to the variable keeping track of the current number of bins
 			std::valarray<Potential>&,		//<! reference to the state array
-			Potential&, SpecialBins&, PopulationParameter&,	//!< serves now mainly to communicate t_s
-			PopulistSpecificParameter&, Potential&//!< current potential interval covered by one bin, delta_v
+			Potential&, SpecialBins&, parameters::PopulationParameter&,	//!< serves now mainly to communicate t_s
+			parameters::PopulistSpecificParameter&, Potential&//!< current potential interval covered by one bin, delta_v
 
 			);
 
@@ -68,8 +68,8 @@ private:
 	gsl_odeiv_system InitializeSystem() const;
 
 	//! OneDMZeroLeakEquations does not need this, but the base class requires this
-	InputParameterSet Set() {
-		InputParameterSet set;
+	parameters::InputParameterSet Set() {
+		parameters::InputParameterSet set;
 		return set;
 	}
 
@@ -86,7 +86,7 @@ private:
 
 	gsl_odeiv_system _sys;
 
-	OneDMInputSetParameter _params;
+	parameters::OneDMInputSetParameter _params;
 
 };
 

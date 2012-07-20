@@ -78,7 +78,7 @@ namespace populist {
 		virtual bool Configure
 		(
 			std::valarray<double>*,
-			const InputParameterSet&
+			const parameters::InputParameterSet&
 		);
 
 		//! Only concrete CirculantSolvers know how to compute their contribution. At this stage it is assumed that
@@ -138,7 +138,7 @@ namespace populist {
 		std::valarray<double>			_array_circulant;	// storage array for the calculated circulant solution
 		std::valarray<double>*			_p_array_state = nullptr;		// pointer to the probability density array
 
-		const InputParameterSet*	_p_set = nullptr;      // instantaneous value of the input parameters
+		const parameters::InputParameterSet*	_p_set = nullptr;      // instantaneous value of the input parameters
 		double						_initial_integral = 0.0;
 
 	private:

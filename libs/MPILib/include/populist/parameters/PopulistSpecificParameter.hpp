@@ -22,14 +22,18 @@
 #include <MPILib/config.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/InitialDensityParameter.hpp>
+//#include <MPILib/include/populist/AbstractRebinner.hpp>
+
 #include <string>
 #include <memory>
 
 namespace MPILib {
 namespace populist {
-
 class AbstractRebinner;
 class AbstractRateComputation;
+namespace parameters{
+
+
 
 //! These are parameters necessary for the configuration of a PopulistAlgorithm and OneDMAlgorithm
 
@@ -201,6 +205,7 @@ private:
 	 */
 	std::shared_ptr<AbstractRateComputation> _p_rate;
 };
+} /* namespace parameters */
 } /* namespace populist */
 } /* namespace MPILib */
 

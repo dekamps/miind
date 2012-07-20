@@ -42,7 +42,7 @@ namespace populist {
 
 template<class Weight>
 PopulationGridController<Weight>::PopulationGridController( VALUE_REF_INIT
-const PopulationParameter& par_pop, const PopulistSpecificParameter& par_spec,
+const parameters::PopulationParameter& par_pop, const parameters::PopulistSpecificParameter& par_spec,
 		valarray<double>& array_state, valarray<double>& array_interpretation,
 		Number* p_grid_size, Rate* p_rate, ostringstream* p_stream) :
 		VALUE_MEMBER_INIT

@@ -22,7 +22,7 @@
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
-using namespace MPILib::populist;
+using namespace MPILib::populist::parameters;
 using namespace MPILib;
 
 

@@ -25,6 +25,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace parameters{
 
 	struct OneDMParameter {
 
@@ -49,17 +50,19 @@ namespace populist {
 		/**
 		 * Defensive, serves no purpose atm, but probably will do in the future
 		 */
-		PopulationParameter			_par_pop;
+		parameters::PopulationParameter			_par_pop;
 		/**
 		 * Adaptation specific parameter; accidently also an AdaptationParameter
 		 */
-		AdaptationParameter			_par_adapt;
+		parameters::AdaptationParameter			_par_adapt;
 		/**
 		 * Grid and algorithm related stuff
 		 */
-		PopulistSpecificParameter	_par_spec;
+		parameters::PopulistSpecificParameter	_par_spec;
 
 	};
+} /* namespace parameters */
+
 } /* namespace populist */
 } /* namespace MPILib */
 

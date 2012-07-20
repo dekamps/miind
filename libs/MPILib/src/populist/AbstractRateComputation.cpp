@@ -27,8 +27,8 @@ AbstractRateComputation::AbstractRateComputation() {
 }
 
 void AbstractRateComputation::Configure(std::valarray<Density>& array_state,
-		const InputParameterSet& input_set,
-		const PopulationParameter& par_population, Index index_reversal) {
+		const parameters::InputParameterSet& input_set,
+		const parameters::PopulationParameter& par_population, Index index_reversal) {
 	_p_array_state = &array_state;
 	_p_input_set = &input_set;
 	_par_population = par_population;

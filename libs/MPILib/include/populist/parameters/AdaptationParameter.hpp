@@ -23,6 +23,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace parameters{
 /**
  * @brief Parameter to store adaptation values for the 1DM Markov process of Muller et al. (2007)
  * http://dx.doi.org/10.1162/neco.2007.19.11.2958
@@ -65,7 +66,9 @@ struct AdaptationParameter {
 	 */
 	State _g_max = 0.0;
 
-};} /* namespace populist */
+};
+} /* namespace parameters */
+} /* namespace populist */
 } /* namespace MPILib */
 
 #endif // include guard MPILIB_POPULIST_PARAMETERS_ADAPTATIONPARAMETER_HPP_

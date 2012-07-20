@@ -39,8 +39,8 @@ ZeroLeakBuilder::ZeroLeakBuilder
 	valarray<Potential>&		array_state,
 	Potential&					checksum,	
 	SpecialBins&				bins,		
-	PopulationParameter&		par_pop,	
-	PopulistSpecificParameter&	par_spec,	
+	parameters::PopulationParameter&		par_pop,
+	parameters::PopulistSpecificParameter&	par_spec,
 	Potential&					delta_v
 ):
 _n_bins(n_bins),

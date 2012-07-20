@@ -43,16 +43,16 @@ namespace populist {
 class ABConvertor {
 public:
 
-	typedef OneDMInputSetParameter SolverParameterType;
+	typedef parameters::OneDMInputSetParameter SolverParameterType;
 	typedef ABQStruct ScalarProductParameterType;
 
 	ABConvertor( VALUE_REF
-	SpecialBins&, PopulationParameter&,	//!< serves now mainly to communicate t_s
-			PopulistSpecificParameter&, Potential&,	//!< current potential interval covered by one bin, delta_v
+	SpecialBins&, parameters::PopulationParameter&,	//!< serves now mainly to communicate t_s
+	parameters::PopulistSpecificParameter&, Potential&,	//!< current potential interval covered by one bin, delta_v
 			Number&);
 
 	void Configure(std::valarray<Potential>&, std::valarray<Potential>&,
-			const OneDMParameter& par_onedm) {
+			const parameters::OneDMParameter& par_onedm) {
 		_param_onedm = par_onedm;
 	}
 
@@ -67,13 +67,13 @@ public:
 	void Rebin() {
 	}
 
-	const PopulistSpecificParameter&
+	const parameters::PopulistSpecificParameter&
 	PopSpecific() const;
 
-	const OneDMInputSetParameter&
+	const parameters::OneDMInputSetParameter&
 	InputSet() const;
 
-	const PopulationParameter& ParPop() const {
+	const parameters::PopulationParameter& ParPop() const {
 		return *_p_pop;
 	}
 
@@ -83,11 +83,11 @@ private:
 
 	VALUE_MEMBER_REF
 
-	OneDMInputSetParameter _param_input;
-	OneDMParameter _param_onedm;
+	parameters::OneDMInputSetParameter _param_input;
+	parameters::OneDMParameter _param_onedm;
 	ABScalarProduct _scalar_product;
-	const PopulistSpecificParameter* _p_specific;
-	const PopulationParameter* _p_pop;
+	const parameters::PopulistSpecificParameter* _p_specific;
+	const parameters::PopulationParameter* _p_pop;
 	const Number* _p_n_bins;
 	const Potential* _p_delta_v;
 };

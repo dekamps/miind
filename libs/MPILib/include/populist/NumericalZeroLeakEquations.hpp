@@ -42,8 +42,8 @@ public:
 	NumericalZeroLeakEquations(Number&,	//!< reference to the current number of bins
 			valarray<Potential>&,		//!< reference to state array
 			Potential&,					//!< reference to the check sum variable
-			SpecialBins&, PopulationParameter&,	//!< reference to the PopulationParameter
-			PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
+			SpecialBins&, parameters::PopulationParameter&,	//!< reference to the PopulationParameter
+			parameters::PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
 			Potential&				//!< reference to the current scale variable
 			);
 
@@ -79,15 +79,15 @@ private:
 
 	Time _time_current;
 	Number* _p_n_bins;
-	PopulationParameter* _p_par_pop;
+	parameters::PopulationParameter* _p_par_pop;
 	valarray<Potential>* _p_array_state;
 	Potential* _p_check_sum;
 	LIFConvertor _convertor;
 	auto_ptr<AbstractRateComputation> _p_rate_calc;
 
-	boost::shared_ptr<ExStateDVIntegrator<NumericalZeroLeakParameter> > _p_integrator;
-	boost::shared_ptr<ExStateDVIntegrator<NumericalZeroLeakParameter> > _p_reset;
-	NumericalZeroLeakParameter _parameter;
+	boost::shared_ptr<ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_integrator;
+	boost::shared_ptr<ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_reset;
+	parameters::NumericalZeroLeakParameter _parameter;
 	ProbabilityQueue _queue;
 };
 

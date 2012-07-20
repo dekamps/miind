@@ -25,20 +25,20 @@ namespace MPILib {
 namespace populist {
 
 ABConvertor::ABConvertor( VALUE_REF_INIT
-SpecialBins&, PopulationParameter& par_pop,
-		PopulistSpecificParameter& par_specific, Potential& delta_v,
+SpecialBins&, parameters::PopulationParameter& par_pop,
+		parameters::PopulistSpecificParameter& par_specific, Potential& delta_v,
 		Number& n_current_bins) :
 		VALUE_MEMBER_INIT
 		_p_specific(&par_specific), _p_pop(&par_pop), _p_n_bins(
 				&n_current_bins), _p_delta_v(&delta_v) {
 }
 
-const PopulistSpecificParameter&
+const parameters::PopulistSpecificParameter&
 ABConvertor::PopSpecific() const {
 	return *_p_specific;
 }
 
-const OneDMInputSetParameter&
+const parameters::OneDMInputSetParameter&
 ABConvertor::InputSet() const {
 	return _param_input;
 }

@@ -37,15 +37,15 @@ namespace populist {
 			(
 				Number,
 				Potential,
-				const PopulationParameter&,
-				const InitialDensityParameter&
+				const parameters::PopulationParameter&,
+				const parameters::InitialDensityParameter&
 			) const;
 
 		double ExpansionFactorDoubleRebinner
 			(
 				Number,
 				Potential,
-				const PopulationParameter&
+				const parameters::PopulationParameter&
 			) const;
 
 		Potential 
@@ -53,14 +53,14 @@ namespace populist {
 			(
 				Number,
 				Potential,
-				const PopulationParameter&
+				const parameters::PopulationParameter&
 			) const;
 		Index 
 			IndexReversal
 			(
 				Number,
 				Potential,
-				const PopulationParameter& 
+				const parameters::PopulationParameter&
 			) const;
 	
 	};

@@ -24,6 +24,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace parameters{
 	/**
 	 * @todo documentation about members
 	 */
@@ -37,6 +38,8 @@ namespace populist {
 		Time		_t_since_rebinning;
 		Time		_tau;
 	};
+} /* namespace parameters */
+
 } /* namespace populist */
 } /* namespace MPILib */
 

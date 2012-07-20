@@ -23,6 +23,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace parameters{
 /**
  * @brief Parameter to specify a Gaussian density distribution in an AlgorithmGrid
  *
@@ -50,6 +51,7 @@ struct InitialDensityParameter {
 	Potential _sigma = 0;
 };
 
+} /* namespace parameters */
 } /* namespace populist */
 } /* namespace MPILib */
 

@@ -33,7 +33,7 @@ namespace populist {
 
 template<class Weight>
 PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
-		const PopulistParameter& par_populist) :
+		const parameters::PopulistParameter& par_populist) :
 		algorithm::AlgorithmInterface<PopulationConnection>(), _parameter_population(
 				par_populist._par_pop), _parameter_specific(
 				par_populist._par_spec), _grid(

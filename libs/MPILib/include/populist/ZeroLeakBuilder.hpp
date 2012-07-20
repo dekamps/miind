@@ -37,8 +37,8 @@ namespace populist {
 			std::valarray<Potential>&,		//!< reference to state array
 			Potential&,					//!< reference to the check sum variable
 			SpecialBins&,		
-			PopulationParameter&,		//!< reference to the PopulationParameter 
-			PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
+			parameters::PopulationParameter&,		//!< reference to the PopulationParameter
+			parameters::PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
 			Potential&					//!< reference to the current scale variable
 		);
 
@@ -56,8 +56,8 @@ namespace populist {
 		std::valarray<Potential>&	_array_state;
 		Potential&					_checksum;
 		SpecialBins&				_bins;
-		PopulationParameter&		_par_pop;	
-		PopulistSpecificParameter&	_par_spec;	
+		parameters::PopulationParameter&		_par_pop;
+		parameters::PopulistSpecificParameter&	_par_spec;
 		Potential&					_delta_v;
 
 	};

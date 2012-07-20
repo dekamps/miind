@@ -33,7 +33,7 @@ _mode(mode)
 bool AbstractNonCirculantSolver::Configure
 (
 	std::valarray<double>&			array_state,
-	const InputParameterSet&	input_set,
+	const parameters::InputParameterSet&	input_set,
 	double						epsilon
 )
 {

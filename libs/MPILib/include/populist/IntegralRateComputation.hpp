@@ -40,7 +40,7 @@ public:
 	//! configuring gives access to density profile, the input parameters (effective efficacy and variance of eff. eff.)
 	//! and the neuron parameters
 	virtual void Configure(std::valarray<Density>&,	//! density valarray
-			const InputParameterSet&, const PopulationParameter&, Index);
+			const parameters::InputParameterSet&, const parameters::PopulationParameter&, Index);
 
 	virtual ~IntegralRateComputation();
 

@@ -37,7 +37,7 @@ _mode				(mode)
 bool AbstractCirculantSolver::Configure
 (
 	std::valarray<Potential>*		p_array_state,
-	const InputParameterSet&	set
+	const parameters::InputParameterSet&	set
 )
 {
 	_p_array_state	= p_array_state;

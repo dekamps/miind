@@ -24,6 +24,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace parameters{
 
 /**
  * @brief Auxiliary class that brings together the neuronal parameters and the specific
@@ -59,7 +60,9 @@ struct PopulistParameter {
 	_par_spec(par_spec)
 	{
 	}
-};} /* namespace populist */
+};
+} /* namespace parameters */
+} /* namespace populist */
 } /* namespace MPILib */
 
 #endif // include guard MPILIB_POPULIST_PARAMETERS_POPULISTPARAMETER_HPP_

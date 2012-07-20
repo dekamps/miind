@@ -62,9 +62,9 @@ public:
 	//! current membrane potential to which each density bin corresponds
 	PopulationGridController( VALUE_REF
 
-	const PopulationParameter&,
+	const parameters::PopulationParameter&,
 
-	const PopulistSpecificParameter&,
+	const parameters::PopulistSpecificParameter&,
 
 	//! density array
 			valarray<double>&,
@@ -123,7 +123,7 @@ public:
 
 	//! converts a circulant index, which can have values 0, ..., n_circ into the corresponding state array values
 	Index
-	CirculantBinIndexToStateIndex(Index, const PopulationParameter&,
+	CirculantBinIndexToStateIndex(Index, const parameters::PopulationParameter&,
 			const SpecialBins&) const;
 
 private:
@@ -171,8 +171,8 @@ private:
 	Time _time_current;
 
 	SpecialBins _bins;
-	PopulationParameter _par_pop;
-	PopulistSpecificParameter _par_spec;
+	parameters::PopulationParameter _par_pop;
+	parameters::PopulistSpecificParameter _par_spec;
 
 	double _f_current_scale;
 	double _f_expansion_factor;

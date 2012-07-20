@@ -47,8 +47,8 @@ public:
 	Number&,						//!< reference to the current number of bins
 			std::valarray<Potential>& state,	//!< reference to state array
 			Potential&,					//!< reference to the check sum variable
-			SpecialBins& bins, PopulationParameter& par_pop,//!< reference to the PopulationParameter
-			PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
+			SpecialBins& bins, parameters::PopulationParameter& par_pop,//!< reference to the PopulationParameter
+			parameters::PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
 			Potential& delta_v		//!< reference to the current scale variable
 			) :
 			_array_state(state), _par_pop(par_pop), _par_spec(par_spec), _bins(
@@ -87,7 +87,7 @@ public:
 
 protected:
 
-	void SetInputParameter(const InputParameterSet& set) {
+	void SetInputParameter(const parameters::InputParameterSet& set) {
 		_p_set = &set;
 	}
 
@@ -105,13 +105,13 @@ protected:
 	std::valarray<double>& ArrayState() {
 		return _array_state;
 	}
-	const PopulistSpecificParameter& ParSpec() const {
+	const parameters::PopulistSpecificParameter& ParSpec() const {
 		return _par_spec;
 	}
 	const SpecialBins& Bins() const {
 		return _bins;
 	}
-	const InputParameterSet& Set() const {
+	const parameters::InputParameterSet& Set() const {
 		return *_p_set;
 	}
 
@@ -125,10 +125,10 @@ private:
 	}
 
 	std::valarray<double>& _array_state;
-	const PopulationParameter& _par_pop;
-	const PopulistSpecificParameter& _par_spec;
+	const parameters::PopulationParameter& _par_pop;
+	const parameters::PopulistSpecificParameter& _par_spec;
 	const SpecialBins& _bins;
-	const InputParameterSet* _p_set = nullptr;
+	const parameters::InputParameterSet* _p_set = nullptr;
 };
 
 } /* namespace populist */
