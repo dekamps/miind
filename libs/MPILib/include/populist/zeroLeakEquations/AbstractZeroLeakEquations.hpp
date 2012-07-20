@@ -30,76 +30,113 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/NodeType.hpp>
 
-
 namespace MPILib {
 namespace populist {
 
-//! A solver for the zero leak master equations in the PopulationAlgorithm.
-
-//! PopulationAlgorithm models the combined effect from leaky-integrate-and-fire (LIF) dynamics and Poisson input
-//! spike trains on individual neurons. The effects of LIF dynamics are accounted for by maintaining the density
-//! in a PopulationGridController. The PopulationGridController implements exponential shrinkage (LIF decay) by
-//! relabeling the potential density every time step and by adding points. The principle is explained in \ref population_algorithm.
-//! Every time step the M equation governing the Poisson statistics of input spike trains must be executed.
-//! This is handled by ZeroLeakEquations.
+/**
+ * @brief A solver for the zero leak master equations in the PopulationAlgorithm.
+ *
+ * PopulationAlgorithm models the combined effect from leaky-integrate-and-fire (LIF) dynamics
+ * and Poisson input spike trains on individual neurons. The effects of LIF dynamics are
+ * accounted for by maintaining the density in a PopulationGridController. The PopulationGridController
+ * implements exponential shrinkage (LIF decay) by relabeling the potential density every
+ * time step and by adding points. The principle is explained in \ref population_algorithm.
+ * Every time step the M equation governing the Poisson statistics of input spike trains
+ * must be executed. This is handled by ZeroLeakEquations.
+ */
 class AbstractZeroLeakEquations {
 public:
 
-	//! Constructor, giving access to most relevant state variables held by PopulationGridController
-	AbstractZeroLeakEquations( VALUE_REF_INIT
-			Number&,				//!< reference to the current number of bins
-			std::valarray<Potential>& state,//!< reference to state array
-			Potential&,//!< reference to the check sum variable
-			SpecialBins& bins, parameters::PopulationParameter& par_pop,//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
-			Potential& delta_v//!< reference to the current scale variable
-	) :
-	_array_state(state), _par_pop(par_pop), _par_spec(par_spec), _bins(
-			bins), _p_set(0) {
+	/**
+	 * Constructor, giving access to most relevant state variables held by PopulationGridController
+	 * @param n_bins reference to the current number of bins
+	 * @param array_state reference to state array
+	 * @param check_sum reference to the check sum variable
+	 * @param bins reference to bins variable: reversal bin, reset bin, etc
+	 * @param par_pop reference to the PopulationParameter
+	 * @param par_spec reference to the PopulistSpecificParameter
+	 * @param delta_v reference to the current scale variable
+	 */
+	AbstractZeroLeakEquations(VALUE_REF_INIT
+	Number& n_bins, valarray<Potential>& array_state, Potential& check_sum,
+			SpecialBins& bins, parameters::PopulationParameter& par_pop, //!< reference to the PopulationParameter (TODO: is this necessary?)
+			parameters::PopulistSpecificParameter& par_spec, //!< reference to the PopulistSpecificParameter
+			Potential& delta_v //!< reference to the current scale variable
+			) :
+			_array_state(array_state), _par_pop(par_pop), _par_spec(par_spec), _bins(
+					bins) {
 	}
 
 	virtual ~AbstractZeroLeakEquations() {
 	}
 	;
 
-	//! Pass in whatever other parameters are needed. This is explicitly necessary for OneDMZeroLeakEquations
+	/**
+	 * Pass in whatever other parameters are needed. This is explicitly necessary for OneDMZeroLeakEquations
+	 * @param any pointer to a parameter
+	 */
 	virtual void Configure(void*) = 0;
 
-	//! Given input parameters, derived classes are free to implement their own solution for ZeroLeakEquations
+	/**
+	 * Given input parameters, derived classes are free to implement their own solution for ZeroLeakEquations
+	 * @param The time
+	 */
 	virtual void Apply(Time) = 0;
 
-	//! Every Evolve step (but not every time step, see below), the input parameters must be updated
+	/**
+	 * Every Evolve step (but not every time step, see below), the input parameters must be updated
+	 * @param nodeVector The vector which stores the Rates of the precursor nodes
+	 * @param weightVector The vector which stores the Weights of the precursor nodes
+	 * @param typeVector The vector which stores the NodeTypes of the precursor nodes
+	 */
 	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
 			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
 			const std::vector<NodeType>& typeVector) = 0;
 
-	//! Every time step the input parameters must be adapated, even if the input doesn't change, because the are affected
-	//! by LIF dynamics (see \ref population_algorithm).
+	/**
+	 * Every time step the input parameters must be adapted, even if the input doesn't
+	 * change, because the are affected by LIF dynamics (see \ref population_algorithm).
+	 */
 	virtual void AdaptParameters() = 0;
 
+	/**
+	 * @todo write description
+	 */
 	virtual void RecalculateSolverParameters() = 0;
-
+	/**
+	 * @todo write description
+	 */
 	virtual Rate CalculateRate() const = 0;
 
-	//! Some  AbstractZeroLeakEquations have derived classes which keep track of refractive probability.
-	//! These derived classes can overload this method, and make this amount available. For example,
-	//! when rebinning this probability must be taken into account. See, e.g. RefractiveCirculantSolver.
+	/** Some  AbstractZeroLeakEquations have derived classes which keep track of refractive probability.
+	* These derived classes can overload this method, and make this amount available. For example,
+	* when rebinning this probability must be taken into account. See, e.g. RefractiveCirculantSolver.
+	*/
 	virtual Probability RefractiveProbability() const {
 		return 0.0;
 	}
 
 protected:
-
+	/**
+	 * @todo write description
+	 */
 	void SetInputParameter(const parameters::InputParameterSet& set) {
 		_p_set = &set;
 	}
 
-	//! concrete instances of ZeroLeakEquations need to be able to manipulate mode
+	/**
+	 * concrete instances of ZeroLeakEquations need to be able to manipulate mode
+	 * @param mode
+	 * @param solver
+	 */
 	void SetMode(CirculantMode mode, AbstractCirculantSolver& solver) {
 		solver._mode = mode;
 	}
-	//! concrete instances of ZeroLeakEquations need to be able to manipulate mode
-	void SetMode(CirculantMode mode, AbstractNonCirculantSolver& solver) {
+	/**
+	 * concrete instances of ZeroLeakEquations need to be able to manipulate mode
+	 * @param mode
+	 * @param solver
+	 */	void SetMode(CirculantMode mode, AbstractNonCirculantSolver& solver) {
 		solver._mode = mode;
 	}
 
