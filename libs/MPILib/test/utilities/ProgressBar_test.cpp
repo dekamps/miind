@@ -23,7 +23,6 @@
 #include <boost/mpi/communicator.hpp>
 #endif
 #include <MPILib/include/utilities/MPIProxy.hpp>
-MPILib::utilities::MPIProxy mpiProxy;
 #define private public
 #define protected public
 #include <MPILib/include/utilities/ProgressBar.hpp>
@@ -44,6 +43,7 @@ void test_Constructor() {
 	std::stringstream os;
 
 	ProgressBar pb(100, "blub", os);
+	MPILib::utilities::MPIProxy mpiProxy;
 
 	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(pb._expectedCount==100);
@@ -81,6 +81,8 @@ int test_main(int argc, char* argv[]) // note the name!
 
 #ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
+	MPILib::utilities::MPIProxy mpiProxy;
+
 	// we use only two processors for this testing
 	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");

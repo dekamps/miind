@@ -22,7 +22,6 @@
 #include <boost/mpi/communicator.hpp>
 #endif
 #include <MPILib/include/utilities/MPIProxy.hpp>
-MPILib::utilities::MPIProxy mpiProxy;
 //Hack to test privat members
 #define private public
 #define protected public
@@ -39,6 +38,7 @@ using namespace MPILib::utilities;
 void test_Constructor() {
 	std::string tempStr ( "blub" );
 	FileNameGenerator fg(tempStr);
+	MPILib::utilities::MPIProxy mpiProxy;
 
 	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(fg._fileName == "blub_0.log");
@@ -56,6 +56,7 @@ void test_Constructor() {
 
 void test_getFileName() {
 	std::string tempStr ( "blub" );
+	MPILib::utilities::MPIProxy mpiProxy;
 
 	FileNameGenerator fg(tempStr);
 	if (mpiProxy.getRank() == 0) {
@@ -76,6 +77,8 @@ int test_main(int argc, char* argv[]) // note the name!
 		{
 #ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
+	MPILib::utilities::MPIProxy mpiProxy;
+
 	// we use only two processors for this testing
 	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");

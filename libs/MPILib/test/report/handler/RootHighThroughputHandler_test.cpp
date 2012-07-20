@@ -98,6 +98,7 @@ void test_writeReport() {
 	auto nodeIds = std::unique_ptr<TArrayI>(
 			(TArrayI*) rH._pFile->Get("GlobalNodeIds"));
 	BOOST_CHECK(nodeIds->GetSize()==3);
+
 	MPILib::utilities::MPIProxy mpiProxy;
 	if (mpiProxy.getSize() == 2) {
 		if (mpiProxy.getRank() == 0) {
@@ -180,6 +181,8 @@ int test_main(int argc, char* argv[]) // note the name!
 
 #ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
+	MPILib::utilities::MPIProxy mpiProxy;
+
 // we use only two processors for this testing
 	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");

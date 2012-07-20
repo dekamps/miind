@@ -21,7 +21,6 @@
 #include <boost/mpi/communicator.hpp>
 #endif
 #include <MPILib/include/utilities/MPIProxy.hpp>
-MPILib::utilities::MPIProxy mpiProxy;
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <cstring>
 #include <string>
@@ -36,6 +35,8 @@ using namespace MPILib::utilities;
 
 void test_Constructor() {
 	ParallelException e("message");
+	MPILib::utilities::MPIProxy mpiProxy;
+
 	std::stringstream sstream;
 	sstream << std::endl << "Parallel Exception on processor: " << mpiProxy.getRank()
 			<< " from: " << mpiProxy.getSize() << " with error message: message"
@@ -53,6 +54,8 @@ void test_Constructor() {
 void test_Macros() {
 	// also test the macros
 	bool thrown = false;
+	MPILib::utilities::MPIProxy mpiProxy;
+
 	std::stringstream sstream;
 	sstream << std::endl << "Parallel Exception on processor: " << mpiProxy.getRank()
 			<< " from: " << mpiProxy.getSize() << " with error message: abc"
@@ -130,6 +133,8 @@ int test_main(int argc, char* argv[]) // note the name!
 
 #ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
+	MPILib::utilities::MPIProxy mpiProxy;
+
 	// we use only two processors for this testing
 	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");

@@ -21,7 +21,6 @@
 #include <boost/mpi/communicator.hpp>
 #endif
 #include <MPILib/include/utilities/MPIProxy.hpp>
-MPILib::utilities::MPIProxy mpiProxy;
 //Hack to test privat members
 #define private public
 #define protected public
@@ -46,6 +45,7 @@ using namespace MPILib;
 void test_Constructor() {
 
 	MPINetwork<double, utilities::CircularDistribution> network;
+	MPILib::utilities::MPIProxy mpiProxy;
 
 	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(network._nodeDistribution.isMaster()==true);
@@ -68,6 +68,7 @@ void test_Constructor() {
 void test_AddNode() {
 
 	MPINetwork<double, utilities::CircularDistribution> network;
+	MPILib::utilities::MPIProxy mpiProxy;
 
 	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==0);
@@ -105,6 +106,7 @@ void test_MakeFirstInputOfSecond() {
 
 	MPINetwork<double, utilities::CircularDistribution> network;
 	SleepAlgorithm<double> alg;
+	MPILib::utilities::MPIProxy mpiProxy;
 
 	int node0 = network.addNode(alg, EXCITATORY);
 	int node1 = network.addNode(alg, EXCITATORY);
@@ -160,6 +162,7 @@ void test_getMaxNodeId() {
 
 void test_incrementMaxNodeId() {
 	MPINetwork<double, utilities::CircularDistribution> network;
+	MPILib::utilities::MPIProxy mpiProxy;
 
 	if (mpiProxy.getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==0);
@@ -180,6 +183,8 @@ int test_main(int argc, char* argv[]) // note the name!
 
 #ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
+	MPILib::utilities::MPIProxy mpiProxy;
+
 	// we use only two processors for this testing
 	if (mpiProxy.getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
