@@ -19,7 +19,7 @@
 #ifndef MPILIB_POPULIST_SINGLEINPUTZEROLEAKEQUATIONS_HPP_
 #define MPILIB_POPULIST_SINGLEINPUTZEROLEAKEQUATIONS_HPP_
 
-#include <MPILib/include/populist/LIFZeroLeakEquations.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/LIFZeroLeakEquations.hpp>
 
 namespace MPILib {
 namespace populist {

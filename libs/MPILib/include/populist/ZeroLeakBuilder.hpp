@@ -24,7 +24,7 @@
 #include <boost/shared_ptr.hpp>
 #include <MPILib/include/populist/AbstractCirculantSolver.hpp>
 #include <MPILib/include/populist/AbstractNonCirculantSolver.hpp>
-#include <MPILib/include/populist/AbstractZeroLeakEquations.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
 
 namespace MPILib {
 namespace populist {

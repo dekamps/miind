@@ -34,7 +34,7 @@
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/populist/parameters/OneDMParameter.hpp>
 #include <MPILib/include/populist/parameters/OneDMInputSetParameter.hpp>
-#include <MPILib/include/populist/SpecialBins.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/SpecialBins.hpp>
 #include <MPILib/include/NodeType.hpp>
 
 namespace MPILib {

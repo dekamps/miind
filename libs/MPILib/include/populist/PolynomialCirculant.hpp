@@ -20,7 +20,8 @@
 #define MPILIB_POPULIST_POLYNOMIALCIRCULANT_HPP_
 
 #include <MPILib/include/populist/AbstractCirculantSolver.hpp>
-
+#include <MPILib/include/BasicDefinitions.hpp>
+#include <vector>
 
 namespace MPILib {
 namespace populist {

@@ -22,7 +22,7 @@
 
 #include <gsl/gsl_spline.h>
 #include <MPILib/include/populist/AbstractRebinner.hpp>
-#include <MPILib/include/populist/AbstractZeroLeakEquations.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
 
 namespace MPILib {
 namespace populist {

@@ -18,6 +18,7 @@
 //
 #include <MPILib/include/populist/LimitedNonCirculant.hpp>
 #include <MPILib/include/populist/AbstractCirculantSolver.hpp>
+#include <MPILib/include/BasicDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {

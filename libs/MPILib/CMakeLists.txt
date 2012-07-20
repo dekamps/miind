@@ -25,6 +25,12 @@ set(MPI_SRCS
     src/populist/parameters/PopulistSpecificParameter.cpp
     src/populist/parameters/AdaptationParameter.cpp
     src/populist/parameters/OneDMParameter.cpp
+    src/populist/zeroLeakEquations/LIFConvertor.cpp
+    src/populist/zeroLeakEquations/LIFZeroLeakEquations.cpp
+    src/populist/zeroLeakEquations/NumericalZeroLeakEquations.cpp
+    src/populist/zeroLeakEquations/OldLifZeroLeakEquations.cpp
+    src/populist/zeroLeakEquations/OneDMZeroLeakEquations.cpp
+    src/populist/zeroLeakEquations/SingleInputZeroLeakEquations.cpp
     
     src/populist/ABConvertor.cpp
     src/populist/AbstractCirculantSolver.cpp
@@ -36,19 +42,13 @@ set(MPI_SRCS
     src/populist/InitializeAlgorithmGrid.cpp
     src/populist/IntegralRateComputation.cpp
     src/populist/InterpolationRebinner.cpp
-    src/populist/LIFConvertor.cpp
-    src/populist/LIFZeroLeakEquations.cpp
     src/populist/LimitedNonCirculant.cpp
     src/populist/MatrixNonCirculant.cpp
     src/populist/MuSigmaScalarProduct.cpp
     src/populist/NonCirculantSolver.cpp
-    src/populist/NumericalZeroLeakEquations.cpp
-    src/populist/OldLifZeroLeakEquations.cpp
-    src/populist/OneDMZeroLeakEquations.cpp
     src/populist/PolynomialCirculant.cpp
     src/populist/ProbabilityQueue.cpp
     src/populist/RefractiveCirculantSolver.cpp
-    src/populist/SingleInputZeroLeakEquations.cpp
     src/populist/VArray.cpp
     src/populist/ZeroLeakBuilder.cpp
     

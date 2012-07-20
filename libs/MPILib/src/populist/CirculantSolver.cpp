@@ -18,7 +18,7 @@
 //
 #include <gsl/gsl_math.h>
 #include <MPILib/include/populist/CirculantSolver.hpp>
-
+#include <MPILib/include/BasicDefinitions.hpp>
 #include <iostream>
 
 namespace MPILib {

@@ -20,7 +20,7 @@
 #define MPILIB_POPULIST_ABSTRACTCIRCULANTSOLVER_HPP_
 
 #include <valarray>
-#include <MPILib/include/populist/LIFConvertor.hpp>
+#include <MPILib/include/populist/parameters/InputParameterSet.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <cassert>
 

@@ -20,7 +20,7 @@
 #define MPILIB_POPULIST_ABSTRACTREBINNER_HPP_
 
 #include <valarray>
-#include <MPILib/include/populist/AbstractZeroLeakEquations.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 
 

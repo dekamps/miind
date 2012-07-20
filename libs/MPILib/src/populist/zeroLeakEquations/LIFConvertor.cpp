@@ -17,10 +17,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 #include <assert.h>
-#include <MPILib/include/populist/LIFConvertor.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/LIFConvertor.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/MuSigmaScalarProduct.hpp>
-#include <MPILib/include/populist/SpecialBins.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/SpecialBins.hpp>
 #include <MPILib/include/MPINode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 

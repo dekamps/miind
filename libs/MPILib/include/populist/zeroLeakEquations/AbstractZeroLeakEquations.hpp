@@ -19,14 +19,17 @@
 #ifndef MPILIB_POPULIST_ABSTRACTZEROLEAKEQUATIONS_HPP_
 #define MPILIB_POPULIST_ABSTRACTZEROLEAKEQUATIONS_HPP_
 
-#include <MPILib/include/populist/SpecialBins.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/SpecialBins.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/populist/AbstractNonCirculantSolver.hpp>
 #include <MPILib/include/populist/AbstractCirculantSolver.hpp>
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/parameters/InputParameterSet.hpp>
 #include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
+#include <MPILib/include/BasicDefinitions.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
+#include <MPILib/include/NodeType.hpp>
+
 
 namespace MPILib {
 namespace populist {
@@ -44,15 +47,15 @@ public:
 
 	//! Constructor, giving access to most relevant state variables held by PopulationGridController
 	AbstractZeroLeakEquations( VALUE_REF_INIT
-	Number&,						//!< reference to the current number of bins
-			std::valarray<Potential>& state,	//!< reference to state array
-			Potential&,					//!< reference to the check sum variable
+			Number&,				//!< reference to the current number of bins
+			std::valarray<Potential>& state,//!< reference to state array
+			Potential&,//!< reference to the check sum variable
 			SpecialBins& bins, parameters::PopulationParameter& par_pop,//!< reference to the PopulationParameter
 			parameters::PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
-			Potential& delta_v		//!< reference to the current scale variable
-			) :
-			_array_state(state), _par_pop(par_pop), _par_spec(par_spec), _bins(
-					bins), _p_set(0) {
+			Potential& delta_v//!< reference to the current scale variable
+	) :
+	_array_state(state), _par_pop(par_pop), _par_spec(par_spec), _bins(
+			bins), _p_set(0) {
 	}
 
 	virtual ~AbstractZeroLeakEquations() {
