@@ -143,9 +143,6 @@ void test_sendRecvWait() {
 		} else {
 			BOOST_CHECK(node->_precursorActivity[0]==0);
 		}
-	} else {
-		BOOST_CHECK(node->_precursorActivity[1]==0);
-
 	}
 
 	delete node;
