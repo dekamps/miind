@@ -159,8 +159,8 @@ void RootHighThroughputHandler::generateNodeGraphs(const char* fileName) {
 
 	_pFile = new TFile(file_name.c_str(), "UPDATE");
 
-	Number number_of_nodes = -1;
-	Number number_of_slices = -1;
+	Number number_of_nodes = 0;
+	Number number_of_slices = 0;
 	std::vector<double> vec_times;
 
 	collectGraphInformation(vec_times, number_of_nodes, number_of_slices);
