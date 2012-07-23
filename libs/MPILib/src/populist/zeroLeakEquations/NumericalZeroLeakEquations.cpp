@@ -152,25 +152,25 @@ _convertor
 	n_bins
 )
 {
-	this->SetInputParameter(_convertor.SolverParameter());
+	this->SetInputParameter(_convertor.getSolverParameter());
 }
 
 void NumericalZeroLeakEquations::InitializeIntegrators()
 {
-	Index i_reset = _convertor.IndexCurrentResetBin();
-	_p_integrator->Parameter()._alpha_e			= _convertor.SolverParameter()._alpha_exc;
-	_p_integrator->Parameter()._alpha_i			= _convertor.SolverParameter()._alpha_inh;
-	_p_integrator->Parameter()._eff_rate_exc	= _convertor.SolverParameter()._rate_exc;
-	_p_integrator->Parameter()._eff_rate_inh	= _convertor.SolverParameter()._rate_inh;
-	_p_integrator->Parameter()._H				= _convertor.SolverParameter()._H_exc;
+	Index i_reset = _convertor.getIndexCurrentResetBin();
+	_p_integrator->Parameter()._alpha_e			= _convertor.getSolverParameter()._alpha_exc;
+	_p_integrator->Parameter()._alpha_i			= _convertor.getSolverParameter()._alpha_inh;
+	_p_integrator->Parameter()._eff_rate_exc	= _convertor.getSolverParameter()._rate_exc;
+	_p_integrator->Parameter()._eff_rate_inh	= _convertor.getSolverParameter()._rate_inh;
+	_p_integrator->Parameter()._H				= _convertor.getSolverParameter()._H_exc;
 	_p_integrator->Parameter()._i_reset			=  i_reset;
 	_p_integrator->Parameter()._nr_current_bins = *_p_n_bins;
 
-	_p_reset->Parameter()._alpha_e			= _convertor.SolverParameter()._alpha_exc;
-	_p_reset->Parameter()._alpha_i			= _convertor.SolverParameter()._alpha_inh;
-	_p_reset->Parameter()._eff_rate_exc		= _convertor.SolverParameter()._rate_exc;
-	_p_reset->Parameter()._eff_rate_inh		= _convertor.SolverParameter()._rate_inh;
-	_p_reset->Parameter()._H				= _convertor.SolverParameter()._H_exc;
+	_p_reset->Parameter()._alpha_e			= _convertor.getSolverParameter()._alpha_exc;
+	_p_reset->Parameter()._alpha_i			= _convertor.getSolverParameter()._alpha_inh;
+	_p_reset->Parameter()._eff_rate_exc		= _convertor.getSolverParameter()._rate_exc;
+	_p_reset->Parameter()._eff_rate_inh		= _convertor.getSolverParameter()._rate_inh;
+	_p_reset->Parameter()._H				= _convertor.getSolverParameter()._H_exc;
 	_p_reset->Parameter()._i_reset			=  i_reset;
 	_p_reset->Parameter()._nr_current_bins  = *_p_n_bins;
 	_p_reset->Parameter()._nr_current_bins	= *_p_n_bins;
@@ -191,7 +191,7 @@ void NumericalZeroLeakEquations::Apply(Time time)
 	Time t_integrator = 0;
 	Time t_reset = 0;
 
-	Index i_reset = _convertor.IndexCurrentResetBin();
+	Index i_reset = _convertor.getIndexCurrentResetBin();
 	double before= (*_p_array_state)[i_reset];
 	while( t_reset < time )
 		t_reset      = _p_reset->Evolve(time);
@@ -205,7 +205,7 @@ void NumericalZeroLeakEquations::Apply(Time time)
 
 void NumericalZeroLeakEquations::PushOnQueue(Time t, double before)
 {
-	Index i_reset = _convertor.IndexCurrentResetBin();
+	Index i_reset = _convertor.getIndexCurrentResetBin();
 	double dif = (*_p_array_state)[i_reset] - before;
 	(*_p_array_state)[i_reset] -= dif;
 
@@ -217,7 +217,7 @@ void NumericalZeroLeakEquations::PushOnQueue(Time t, double before)
 
 void NumericalZeroLeakEquations::PopFromQueue(Time t)
 {
-	Index i_reset = _convertor.IndexCurrentResetBin();
+	Index i_reset = _convertor.getIndexCurrentResetBin();
 	double p_pop = _queue.CollectAndRemove(t);
 	(*_p_array_state)[i_reset] += p_pop;
 }
@@ -254,7 +254,7 @@ void NumericalZeroLeakEquations::Configure
 						)
 					);
 
-	parameters::InputParameterSet& input_set = _convertor.SolverParameter();
+	parameters::InputParameterSet& input_set = _convertor.getSolverParameter();
 
 	_p_rate_calc = auto_ptr<AbstractRateComputation>(this->ParSpec().getRateComputation().Clone());
 
@@ -262,15 +262,15 @@ void NumericalZeroLeakEquations::Configure
 	(
 		*_p_array_state,
 		input_set,
-		_convertor.ParPop(), 
-		_convertor.IndexReversalBin()
+		_convertor.getParPop(),
+		_convertor.getIndexReversalBin()
 	);
 
 	_p_integrator->Parameter()._nr_current_bins = *_p_n_bins;
 	_p_integrator->Parameter()._nr_max_bins     = this->ParSpec().getMaxNumGridPoints();
-	_p_integrator->Parameter()._i_reversal		= _convertor.IndexReversalBin();
-	_p_integrator->Parameter()._i_reset			= _convertor.IndexCurrentResetBin();
-	_p_integrator->Parameter()._i_reset_orig	= _convertor.IndexCurrentResetBin();
+	_p_integrator->Parameter()._i_reversal		= _convertor.getIndexReversalBin();
+	_p_integrator->Parameter()._i_reset			= _convertor.getIndexCurrentResetBin();
+	_p_integrator->Parameter()._i_reset_orig	= _convertor.getIndexCurrentResetBin();
 
 }
 

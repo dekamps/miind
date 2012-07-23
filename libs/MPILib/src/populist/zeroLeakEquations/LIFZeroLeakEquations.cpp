@@ -43,13 +43,13 @@ LIFZeroLeakEquations::LIFZeroLeakEquations(Number& n_bins,
 				VALUE_REF_INIT
 				bins, par_pop, par_spec, delta_v, n_bins), _p_solver_circulant(
 				circ.Clone()), _p_solver_non_circulant(noncirc.Clone()) {
-	this->SetInputParameter(_convertor.SolverParameter());
+	this->SetInputParameter(_convertor.getSolverParameter());
 }
 
 void LIFZeroLeakEquations::Configure(void* p_par// irrelevant for LIFZeroLeakequations
 		) {
 	_convertor.Configure(this->ArrayState());
-	parameters::InputParameterSet& input_set = _convertor.SolverParameter();
+	parameters::InputParameterSet& input_set = _convertor.getSolverParameter();
 
 	_p_solver_circulant->Configure(_p_array_state, input_set);
 
@@ -58,8 +58,8 @@ void LIFZeroLeakEquations::Configure(void* p_par// irrelevant for LIFZeroLeakequ
 	_p_rate_calc = auto_ptr<AbstractRateComputation>(
 			this->ParSpec().getRateComputation().Clone());
 
-	_p_rate_calc->Configure(*_p_array_state, input_set, _convertor.ParPop(),
-			_convertor.IndexReversalBin());
+	_p_rate_calc->Configure(*_p_array_state, input_set, _convertor.getParPop(),
+			_convertor.getIndexReversalBin());
 }
 
 Rate LIFZeroLeakEquations::CalculateRate() const {

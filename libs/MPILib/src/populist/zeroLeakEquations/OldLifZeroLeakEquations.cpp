@@ -45,7 +45,7 @@ OldLIFZeroLeakEquations::OldLIFZeroLeakEquations(Number& n_bins,
 				&check_sum), _convertor( VALUE_REF_INIT
 		bins, par_pop, par_spec, delta_v, n_bins), _p_solver_circulant(
 				circ.Clone()), _p_solver_non_circulant(noncirc.Clone()) {
-	this->SetInputParameter(_convertor.SolverParameter());
+	this->SetInputParameter(_convertor.getSolverParameter());
 }
 
 void OldLIFZeroLeakEquations::Apply(Time time) {
@@ -61,7 +61,7 @@ void OldLIFZeroLeakEquations::Apply(Time time) {
 }
 
 void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaExcitatory(Time time) {
-	parameters::InputParameterSet& input_set = _convertor.SolverParameter();
+	parameters::InputParameterSet& input_set = _convertor.getSolverParameter();
 
 	double tau_e = input_set._rate_exc * time;
 	double alpha_e = input_set._alpha_exc;
@@ -110,7 +110,7 @@ void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaExcitatory(Time time) {
 }
 
 void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaInhibitory(Time time) {
-	parameters::InputParameterSet& input_set = _convertor.SolverParameter();
+	parameters::InputParameterSet& input_set = _convertor.getSolverParameter();
 
 	// added to ignore zero input, which is legitimate (MdK: 11/06/2010)
 	if (input_set._rate_inh == 0 && input_set._H_inh == 0)
@@ -137,7 +137,7 @@ void OldLIFZeroLeakEquations::ApplyZeroLeakEquationsAlphaInhibitory(Time time) {
 void OldLIFZeroLeakEquations::Configure(void* p_par	// irrelevant for LIFZeroLeakequations
 		) {
 	_convertor.Configure(this->ArrayState());
-	parameters::InputParameterSet& input_set = _convertor.SolverParameter();
+	parameters::InputParameterSet& input_set = _convertor.getSolverParameter();
 
 	_p_solver_circulant->Configure(_p_array_state, input_set);
 
@@ -146,8 +146,8 @@ void OldLIFZeroLeakEquations::Configure(void* p_par	// irrelevant for LIFZeroLea
 	_p_rate_calc = auto_ptr<AbstractRateComputation>(
 			this->ParSpec().getRateComputation().Clone());
 
-	_p_rate_calc->Configure(*_p_array_state, input_set, _convertor.ParPop(),
-			_convertor.IndexReversalBin());
+	_p_rate_calc->Configure(*_p_array_state, input_set, _convertor.getParPop(),
+			_convertor.getIndexReversalBin());
 }
 
 Rate OldLIFZeroLeakEquations::CalculateRate() const {

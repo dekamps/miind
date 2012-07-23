@@ -124,14 +124,12 @@ void LIFConvertor::RecalculateSolverParameters() {
 	UpdateRestInputParameters();
 }
 
-void LIFConvertor::Configure(std::valarray<Potential>& array_state) {
-}
 
-const Index& LIFConvertor::IndexReversalBin() const {
+const Index& LIFConvertor::getIndexReversalBin() const {
 	return _p_bins->_index_reversal_bin;
 }
 
-const Index& LIFConvertor::IndexCurrentResetBin() const {
+const Index& LIFConvertor::getIndexCurrentResetBin() const {
 	return _p_bins->_index_current_reset_bin;
 }
 
@@ -144,7 +142,6 @@ void LIFConvertor::SortConnectionvector(const std::vector<Rate>& nodeVector,
 		auto iterWeight= weightVector.begin();
 		auto iterType = typeVector.begin();
 		for (auto iter = nodeVector.begin(); iter != nodeVector.end(); iter++, iterType++) {
-
 
 			if (*iterType == EXCITATORY_BURST
 					|| *iterType == INHIBITORY_BURST)
@@ -168,8 +165,6 @@ void LIFConvertor::SortConnectionvector(const std::vector<Rate>& nodeVector,
 			_input_set._rate_exc = 0.0;
 			_input_set._rate_inh = rate;
 		}
-
-
 		// one and only one input
 		assert(weightVector.size()==1);
 	}
@@ -179,6 +174,8 @@ void LIFConvertor::SortConnectionvector(const std::vector<Rate>& nodeVector,
 		MuSigma par = scalar.Evaluate(nodeVector, weightVector, _p_par_pop->_tau);
 		SetDiffusionParameters(par);
 	}
+
+	///@todo implement test for last case
 }
 
 } /* namespace populist */

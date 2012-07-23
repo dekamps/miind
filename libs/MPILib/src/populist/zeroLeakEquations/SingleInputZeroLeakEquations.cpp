@@ -57,7 +57,7 @@ LIFZeroLeakEquations
 ){
 	this->SetMode(FLOATING_POINT,*_p_solver_circulant);
 	this->SetMode(FLOATING_POINT,*_p_solver_non_circulant);
-	this->SetInputParameter(_convertor.SolverParameter());
+	this->SetInputParameter(_convertor.getSolverParameter());
 }
 
 void SingleInputZeroLeakEquations::Apply(Time time)
