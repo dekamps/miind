@@ -58,7 +58,7 @@ public:
 	 * @param delta_v reference to the current scale variable
 	 */
 	AbstractZeroLeakEquations(VALUE_REF_INIT
-	Number& n_bins, valarray<Potential>& array_state, Potential& check_sum,
+	Number& n_bins, std::valarray<Potential>& array_state, Potential& check_sum,
 			SpecialBins& bins, parameters::PopulationParameter& par_pop, //!< reference to the PopulationParameter (TODO: is this necessary?)
 			parameters::PopulistSpecificParameter& par_spec, //!< reference to the PopulistSpecificParameter
 			Potential& delta_v //!< reference to the current scale variable
