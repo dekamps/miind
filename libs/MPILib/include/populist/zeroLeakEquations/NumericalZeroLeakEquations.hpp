@@ -19,7 +19,7 @@
 #ifndef MPILIB_POPULIST_NUMERICALZEROLEAKEQUATIONS_HPP_
 #define MPILIB_POPULIST_NUMERICALZEROLEAKEQUATIONS_HPP_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <NumtoolsLib/NumtoolsLib.h>
 #include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
@@ -34,59 +34,104 @@ using NumtoolsLib::ExStateDVIntegrator;
 namespace MPILib {
 namespace populist {
 
-//! Provides a numerical solution for the zero leak equations.
+/**
+ * @brief Provides a numerical solution for the zero leak equations.
+ */
 class NumericalZeroLeakEquations: public AbstractZeroLeakEquations {
 public:
 
-
-	NumericalZeroLeakEquations(Number&,	//!< reference to the current number of bins
-			valarray<Potential>&,		//!< reference to state array
-			Potential&,					//!< reference to the check sum variable
-			SpecialBins&, parameters::PopulationParameter&,	//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
-			Potential&				//!< reference to the current scale variable
-			);
+	/**
+	 * Constructor, giving access to most relevant state variables held by PopulationGridController
+	 * @param n_bins reference to the current number of bins
+	 * @param array_state reference to state array
+	 * @param check_sum reference to the check sum variable
+	 * @param bins reference to bins variable: reversal bin, reset bin, etc
+	 * @param par_pop reference to the PopulationParameter
+	 * @param par_spec reference to the PopulistSpecificParameter
+	 * @param delta_v reference to the current scale variable
+	 */
+	NumericalZeroLeakEquations(Number& n_bins,
+			std::valarray<Potential>& array_state, Potential& check_sum,
+			SpecialBins& bins, parameters::PopulationParameter& par_pop,
+			parameters::PopulistSpecificParameter& par_spec,
+			Potential& delta_v);
 
 	virtual ~NumericalZeroLeakEquations() {
 	}
 
+	/**
+	 * Pass in whatever other parameters are needed. This is explicitly necessary for OneDMZeroLeakEquations
+	 * @param any pointer to a parameter
+	 */
 	virtual void Configure(void*);
 
-	//! Get input parameters at start of every Evolve
+	/**
+	 * Every Evolve step (but not every time step, see below), the input parameters must be updated
+	 * @param nodeVector The vector which stores the Rates of the precursor nodes
+	 * @param weightVector The vector which stores the Weights of the precursor nodes
+	 * @param typeVector The vector which stores the NodeTypes of the precursor nodes
+	 */
 	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
 			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
 			const std::vector<NodeType>& typeVector);
 
-	//! Adapt input parameters every simulation step
+	/**
+	 * Every time step the input parameters must be adapted, even if the input doesn't
+	 * change, because the are affected by LIF dynamics (see \ref population_algorithm).
+	 */
 	virtual void AdaptParameters();
-
+	/**
+	 * @todo write description
+	 */
 	virtual void RecalculateSolverParameters();
-
+	/**
+	 * Given input parameters, derived classes are free to implement their own solution for ZeroLeakEquations
+	 * @param The time
+	 */
 	virtual void Apply(Time);
-
+	/**
+	 * @todo write description
+	 */
 	Rate CalculateRate() const;
 
-	// overload to account for refractive probability
+	/** Some  AbstractZeroLeakEquations have derived classes which keep track of refractive probability.
+	 * These derived classes can overload this method, and make this amount available. For example,
+	 * when rebinning this probability must be taken into account. See, e.g. RefractiveCirculantSolver.
+	 * overload to account for refractive probability
+	 */
 	virtual Probability RefractiveProbability() const {
 		return _queue.TotalProbability();
 	}
 
 private:
-
+	/**
+	 * @todo write description
+	 */
 	void InitializeIntegrators();
+	/**
+	 * @todo write description
+	 */
 	void PushOnQueue(Time, double);
+	/**
+	 * @todo write description
+	 */
 	void PopFromQueue(Time);
 
-	Time _time_current;
+	/**
+	 * @todo write member doc
+	 */
+	Time _time_current = 0;
 	Number* _p_n_bins;
 	parameters::PopulationParameter* _p_par_pop;
 	valarray<Potential>* _p_array_state;
 	Potential* _p_check_sum;
 	LIFConvertor _convertor;
-	auto_ptr<AbstractRateComputation> _p_rate_calc;
+	std::unique_ptr<AbstractRateComputation> _p_rate_calc;
 
-	boost::shared_ptr<ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_integrator;
-	boost::shared_ptr<ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_reset;
+	std::shared_ptr<
+			ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_integrator;
+	std::shared_ptr<
+			ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_reset;
 	parameters::NumericalZeroLeakParameter _parameter;
 	ProbabilityQueue _queue;
 };

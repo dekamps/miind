@@ -137,7 +137,6 @@ AbstractZeroLeakEquations
 	par_spec,
 	delta_v
 ),
-_time_current(0),
 _p_n_bins(&n_bins),
 _p_par_pop(&par_pop),
 _p_array_state(&array_state),
@@ -226,7 +225,7 @@ void NumericalZeroLeakEquations::Configure
 	void*
 )
 {
-	_p_integrator = boost::shared_ptr< ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> >
+	_p_integrator = std::shared_ptr< ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> >
 					( 
 						new ExStateDVIntegrator<parameters::NumericalZeroLeakParameter>
 						(
@@ -240,7 +239,7 @@ void NumericalZeroLeakEquations::Configure
 						)
 					);
 
-	_p_reset = boost::shared_ptr< ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> >
+	_p_reset = std::shared_ptr< ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> >
 					( 
 						new ExStateDVIntegrator<parameters::NumericalZeroLeakParameter>
 						(

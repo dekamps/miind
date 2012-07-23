@@ -59,9 +59,9 @@ public:
 	 */
 	AbstractZeroLeakEquations(VALUE_REF_INIT
 	Number& n_bins, std::valarray<Potential>& array_state, Potential& check_sum,
-			SpecialBins& bins, parameters::PopulationParameter& par_pop, //!< reference to the PopulationParameter (TODO: is this necessary?)
-			parameters::PopulistSpecificParameter& par_spec, //!< reference to the PopulistSpecificParameter
-			Potential& delta_v //!< reference to the current scale variable
+			SpecialBins& bins, parameters::PopulationParameter& par_pop,
+			parameters::PopulistSpecificParameter& par_spec,
+			Potential& delta_v
 			) :
 			_array_state(array_state), _par_pop(par_pop), _par_spec(par_spec), _bins(
 					bins) {

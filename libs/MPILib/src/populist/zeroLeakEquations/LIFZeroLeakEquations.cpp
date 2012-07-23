@@ -38,7 +38,7 @@ LIFZeroLeakEquations::LIFZeroLeakEquations(Number& n_bins,
 		const AbstractCirculantSolver& circ,
 		const AbstractNonCirculantSolver& noncirc) :
 		AbstractZeroLeakEquations(n_bins, array_state, check_sum, bins, par_pop,
-				par_spec, delta_v), _time_current(0), _p_n_bins(&n_bins), _p_array_state(
+				par_spec, delta_v), _p_n_bins(&n_bins), _p_array_state(
 				&array_state), _p_check_sum(&check_sum), _convertor(
 				VALUE_REF_INIT
 				bins, par_pop, par_spec, delta_v, n_bins), _p_solver_circulant(
