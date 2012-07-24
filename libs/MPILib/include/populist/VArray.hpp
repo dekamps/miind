@@ -21,6 +21,7 @@
 
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <vector>
+#include <algorithm>
 
 namespace MPILib {
 namespace populist {
