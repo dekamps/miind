@@ -26,6 +26,7 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
+#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 #include <sstream>
 
 
