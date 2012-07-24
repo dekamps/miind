@@ -26,7 +26,7 @@ using namespace MPILib::utilities;
 CircularDistribution::CircularDistribution() {
 }
 
-CircularDistribution::~CircularDistribution() {
+CircularDistribution::~CircularDistribution() throw(){
 }
 
 bool CircularDistribution::isLocalNode(NodeId nodeId) const {
