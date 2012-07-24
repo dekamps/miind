@@ -22,7 +22,7 @@
 #include <TVectorT.h>
 #include <TVectorD.h>
 #include <TTree.h>
-#include <TNTuple.h>
+#include <TNtuple.h>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/report/handler/RootHighThroughputHandler.hpp>
 #include <iostream>
