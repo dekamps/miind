@@ -52,7 +52,8 @@ void test_Destructor() {
 	BOOST_CHECK(pStream->str().find("blub")!=38);
 	delete lg;
 	std::cout<<pStream->str()<<"\t"<<pStream->str().find("blub")<<std::endl;
-	BOOST_CHECK(pStream->str().find("blub")==38);
+	//depending on the os an additional % sign is added.
+	BOOST_CHECK(pStream->str().find("blub")==38 || pStream->str().find("blub")==39);
 
 }
 
@@ -71,8 +72,8 @@ void test_writeReport() {
 	Log lg;
 
 	lg.writeReport() << "blub" << 42;
-	BOOST_CHECK(lg._buffer.str().find("blub")==38);
-	BOOST_CHECK(lg._buffer.str().find("42")==42);
+	BOOST_CHECK(lg._buffer.str().find("blub")==38 || lg._buffer.str().find("blub")==39);
+	BOOST_CHECK(lg._buffer.str().find("42")==42 || lg._buffer.str().find("42")==43);
 
 }
 
@@ -107,7 +108,7 @@ void test_setReportingLevel() {
 
 	Log::setStream( pStream);
 	Log::setReportingLevel(logERROR);
-	BOOST_CHECK(pStream->str().find("Report")==38);
+	BOOST_CHECK(pStream->str().find("Report")==38 || pStream->str().find("Report")==39);
 	BOOST_CHECK(Log::getReportingLevel()==logERROR);
 
 }
@@ -119,22 +120,22 @@ void test_Macro() {
 
 	LOG(logERROR) << "blub" << 42;
 
-	BOOST_CHECK(pStream->str().find("blub")==39);
-	BOOST_CHECK(pStream->str().find("42")==43);
+	BOOST_CHECK(pStream->str().find("blub")==39 || pStream->str().find("blub")==39);
+	BOOST_CHECK(pStream->str().find("42")==43 || pStream->str().find("42")==44);
 	Log::setReportingLevel(logERROR);
 	std::shared_ptr<std::ostringstream> pStream1 ( new std::ostringstream());
 
 	Log::setStream( pStream1);
 	LOG(logDEBUG) << "blub" << 42;
-	BOOST_CHECK(pStream1->str().find("blub")!=39);
-	BOOST_CHECK(pStream1->str().find("42")!=43);
+	BOOST_CHECK(pStream1->str().find("blub")!=39 || pStream1->str().find("blub")!=40);
+	BOOST_CHECK(pStream1->str().find("42")!=43 || pStream1->str().find("42")!=44);
 	std::shared_ptr<std::ostringstream> pStream2 ( new std::ostringstream());
 
 	Log::setStream( pStream2);
 	LOG(logERROR) << "blub" << 42;
 
-	BOOST_CHECK(pStream2->str().find("blub")==39);
-	BOOST_CHECK(pStream2->str().find("42")==43);
+	BOOST_CHECK(pStream2->str().find("blub")==39 || pStream2->str().find("blub")==40);
+	BOOST_CHECK(pStream2->str().find("42")==43 || pStream2->str().find("42")==44);
 }
 
 }
