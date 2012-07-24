@@ -120,7 +120,7 @@ void test_Macro() {
 
 	LOG(logERROR) << "blub" << 42;
 
-	BOOST_CHECK(pStream->str().find("blub")==39 || pStream->str().find("blub")==39);
+	BOOST_CHECK(pStream->str().find("blub")==39 || pStream->str().find("blub")==40);
 	BOOST_CHECK(pStream->str().find("42")==43 || pStream->str().find("42")==44);
 	Log::setReportingLevel(logERROR);
 	std::shared_ptr<std::ostringstream> pStream1 ( new std::ostringstream());
