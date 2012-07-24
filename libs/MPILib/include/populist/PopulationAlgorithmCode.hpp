@@ -24,6 +24,7 @@
 #include <MPILib/include/populist/PopulationAlgorithm.hpp>
 #include <MPILib/include/populist/InitializeAlgorithmGrid.hpp>
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/PopulistParameter.hpp>
 #include <vector>
