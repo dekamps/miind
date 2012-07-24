@@ -51,6 +51,7 @@ void test_Destructor() {
 	lg->writeReport() << "blub";
 	BOOST_CHECK(pStream->str().find("blub")!=38);
 	delete lg;
+	std::cout<<pStream->str()<<"\t"<<pStream->str().find("blub")<<std::endl;
 	BOOST_CHECK(pStream->str().find("blub")==38);
 
 }
