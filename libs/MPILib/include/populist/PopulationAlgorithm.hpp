@@ -126,7 +126,7 @@ public:
 	typedef parameters::PopulistParameter Parameter;
 
 	//! Construct an Algorithm from a stream
-	PopulationAlgorithm_(istream&);
+	PopulationAlgorithm_(istream& s);
 
 	//! Create a PopulistAlgorithm with settings defined in a PopulistParameter
 	PopulationAlgorithm_(const parameters::PopulistParameter&);
