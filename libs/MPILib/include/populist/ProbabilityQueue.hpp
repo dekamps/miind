@@ -19,7 +19,7 @@
 #ifndef MPILIB_POPULIST_PRIORITYQUEUE_HPP_
 #define MPILIB_POPULIST_PRIORITYQUEUE_HPP_
 
-#include <queue>
+#include <list>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/StampedProbability.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
@@ -78,9 +78,9 @@ public:
 
 private:
 
-	void Scale(double scale,  std::queue<StampedProbability>);
+	void Scale(double scale,  std::list<StampedProbability>);
 
-	std::queue<StampedProbability> _queue;
+	std::list<StampedProbability> _queue;
 	Time _time_step;
 	Probability _total;
 	StampedProbability _current;

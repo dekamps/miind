@@ -34,7 +34,7 @@ void ProbabilityQueue::push(const StampedProbability& prob) {
 	_total += prob._prob;
 	if (prob._time - _current._time > _time_step) {
 		_current._time = floor(prob._time / _time_step) * _time_step;
-		_queue.push(_current);
+		_queue.push_back(_current);
 		_current._prob = 0.;
 	}
 	_current._prob += prob._prob;
@@ -46,7 +46,7 @@ Probability ProbabilityQueue::CollectAndRemove(Time time) {
 	Probability total = 0;
 	while (!_queue.empty() && _queue.front()._time <= time) {
 		total += _queue.front()._prob;
-		_queue.pop();
+		_queue.pop_front();
 	}
 
 	_total -= total;
@@ -62,8 +62,8 @@ bool ProbabilityQueue::HasProbability(Time time) const {
 		return false;
 }
 void ProbabilityQueue::Scale(double scale,
-		std::queue<StampedProbability> queue) {
-	for (auto& it : queue.c) {
+		std::list<StampedProbability> queue) {
+	for (auto& it : queue) {
 		it._prob *= scale;
 	}
 }
