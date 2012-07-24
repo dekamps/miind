@@ -19,6 +19,8 @@
 #ifndef MPILIB_POPULIST_ABSTRUCT_HPP_
 #define MPILIB_POPULIST_ABSTRUCT_HPP_
 
+#include <iostream>
+
 namespace MPILib {
 namespace populist {
 
