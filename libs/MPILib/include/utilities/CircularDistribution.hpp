@@ -30,7 +30,7 @@ namespace utilities {
 class CircularDistribution: public NodeDistributionInterface {
 public:
 	CircularDistribution();
-	virtual ~CircularDistribution();
+	virtual ~CircularDistribution() throw();
 
 
 	/**
