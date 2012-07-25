@@ -16,10 +16,6 @@ set( CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix." )
 
 set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 
-#activate all warnings
-#IF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-#    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-long-long -Wno-error=unused-parameter -O0 -pedantic -fpermissive")
-#ENDIF()
 ##############################################################################
 # compile flags
 ##############################################################################
@@ -56,7 +52,8 @@ IF(INCLUDE_MPI_LIB)
     IF(ENABLE_MPI)
         find_package(MPI REQUIRED)
     ENDIF(ENABLE_MPI)
-#   add the flags for C++11 
+
+     #   add the flags for C++11 
     if(CMAKE_COMPILER_IS_GNUCXX)
         execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
                     OUTPUT_VARIABLE GCC_VERSION)
@@ -74,11 +71,10 @@ IF(INCLUDE_MPI_LIB)
         message(WARNING "C++11 activated, if you get any compile errors please use a C++11 compatible compiler like GNU gcc 4.7")
         add_definitions("-std=c++11") 
     endif(CMAKE_COMPILER_IS_GNUCXX)
-       
-    set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
-    set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
-    
+      
     IF(ENABLE_MPI)
+        set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
+        set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
         include_directories(${MPI_INCLUDE_PATH})
     ENDIF(ENABLE_MPI)
     ##############################################################################
