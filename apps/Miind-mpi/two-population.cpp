@@ -62,7 +62,8 @@ const populist::parameters::OrnsteinUhlenbeckParameter TWOPOPULATION_NETWORK_INH
 		3e-3    // tau membrane 3 ms
 		);
 
-const populist::parameters::InitialDensityParameter TWOPOP_INITIAL_DENSITY(0.0, 0.0);
+const populist::parameters::InitialDensityParameter TWOPOP_INITIAL_DENSITY(0.0,
+		0.0);
 
 const Number TWOPOP_NUMBER_OF_INITIAL_BINS = 550;
 const Number TWOPOP_NUMBER_OF_BINS_TO_ADD = 1;
@@ -95,10 +96,10 @@ const ResponseParameterBrunel RESPONSE_CURVE_PARAMETER = { 0,		// mu
 
 const Potential TWOPOP_V_MIN = -1.0 * RESPONSE_CURVE_PARAMETER.theta;
 
-const populist::parameters::PopulistSpecificParameter TWOPOP_SPECIFIC(TWOPOP_V_MIN,
-		TWOPOP_NUMBER_OF_INITIAL_BINS, TWOPOP_NUMBER_OF_BINS_TO_ADD,
-		TWOPOP_INITIAL_DENSITY, TWOPOP_EXPANSION_FACTOR,
-		"NumericalZeroLeakEquations");
+const populist::parameters::PopulistSpecificParameter TWOPOP_SPECIFIC(
+		TWOPOP_V_MIN, TWOPOP_NUMBER_OF_INITIAL_BINS,
+		TWOPOP_NUMBER_OF_BINS_TO_ADD, TWOPOP_INITIAL_DENSITY,
+		TWOPOP_EXPANSION_FACTOR, "NumericalZeroLeakEquations");
 
 const populist::parameters::PopulistParameter TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP(
 		TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER, TWOPOP_SPECIFIC);
@@ -196,8 +197,9 @@ const SimulationRunParameter TWOPOP_PARAMETER(TWOPOP_HANDLER,
 		TWOPOP_MAXIMUM_NUMBER_OF_ITERATIONS, TWOPOP_T_BEGIN, TWOPOP_T_END,
 		TWOPOP_T_REPORT, TWOPOP_T_NETWORK, "test/twopoptest");
 
-
 int main(int argc, char* argv[]) {
+	boost::timer::auto_cpu_timer t;
+
 #ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
 #endif
@@ -208,10 +210,11 @@ int main(int argc, char* argv[]) {
 		NodeId id_excitatory_main;
 		NodeId id_inhibitory_main;
 		NodeId id_rate;
-		MPINetwork<populist::OrnsteinUhlenbeckConnection, utilities::CircularDistribution> network(
+		MPINetwork<populist::OrnsteinUhlenbeckConnection,
+				utilities::CircularDistribution> network(
 				CreateTwoPopulationNetwork<
 						populist::PopulationAlgorithm_<
-						populist::OrnsteinUhlenbeckConnection>,
+								populist::OrnsteinUhlenbeckConnection>,
 						populist::OrnsteinUhlenbeckConnection,
 						utilities::CircularDistribution>(
 						&id_cortical_background, &id_excitatory_main,
@@ -219,7 +222,8 @@ int main(int argc, char* argv[]) {
 						TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP,
 						TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP));
 
-
+		boost::timer::auto_cpu_timer te;
+		te.start();
 
 		try {
 			network.configureSimulation(TWOPOP_PARAMETER);
@@ -229,15 +233,12 @@ int main(int argc, char* argv[]) {
 			std::cout << e.what() << std::endl;
 		}
 
-		boost::timer::auto_cpu_timer te;
-		te.start();
-
 		//timed calculation
 		mpiProxy.barrier();
 		te.stop();
 		if (mpiProxy.getRank() == 0) {
 
-			std::cout << "Time of Envolve methode of processor 0: \n";
+			std::cout << "Time of configuration and envolve: \n";
 			te.report();
 		}
 
@@ -248,7 +249,15 @@ int main(int argc, char* argv[]) {
 #endif
 		return 1;
 	}
+	mpiProxy.barrier();
+	t.stop();
+	if (mpiProxy.getRank() == 0) {
+
+		std::cout << "Overall time spend\n";
+		t.report();
+	}
 
 	return 0;
+
 }
 
