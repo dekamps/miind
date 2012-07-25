@@ -28,6 +28,7 @@
 #include <iostream>
 #include <MPILib/include/utilities/MPIProxy.hpp>
 #include <cassert>
+#include <memory>
 
 namespace MPILib {
 namespace report {
