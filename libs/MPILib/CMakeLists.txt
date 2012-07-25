@@ -117,9 +117,9 @@ CONFIGURE_FILE(
 # testing
 #############################################################################
 
-IF (ENABLE_TESTING)
+IF(ENABLE_TESTING AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
         ADD_SUBDIRECTORY(test)
-ENDIF (ENABLE_TESTING)
+ENDIF (ENABLE_TESTING AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
 
 install( FILES ${MPI_HEADERS}
     DESTINATION include/miind/MPILib )

@@ -17,9 +17,22 @@ set( CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix." )
 set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 
 #activate all warnings
-IF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+#IF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+#    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-long-long -Wno-error=unused-parameter -O0 -pedantic -fpermissive")
+#ENDIF()
+##############################################################################
+# compile flags
+##############################################################################
+if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-long-long -Wno-error=unused-parameter -O0 -pedantic -fpermissive")
-ENDIF()
+else()
+    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-long-long -Wno-error=unused-parameter -O0 -pedantic")
+endif()
+    
+#for cross compiling remove the -march=native flag!
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
+
 
 ##############################################################################
 # cmake options
@@ -42,7 +55,7 @@ IF(INCLUDE_MPI_LIB)
     IF(ENABLE_MPI)
         find_package(MPI REQUIRED)
     ENDIF(ENABLE_MPI)
-    
+#   add the flags for C++11 
     if(CMAKE_COMPILER_IS_GNUCXX)
         execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
                     OUTPUT_VARIABLE GCC_VERSION)
@@ -54,8 +67,8 @@ IF(INCLUDE_MPI_LIB)
         endif()
     else(CMAKE_COMPILER_IS_GNUCXX)
         if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-            add_definitions("-std=c++11")
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -g -Wall -Wextra -Wno-long-long -Wno-unused-parameter -O0 -pedantic")    
+            add_definitions("-std=c++11")            
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
         endif()
         message(WARNING "C++11 activated, if you get any compile errors please use a C++11 compatible compiler like GNU gcc 4.7")
         add_definitions("-std=c++11") 
@@ -134,13 +147,13 @@ IF(INCLUDE_MPI_LIB)
     # target for doxygen
     ADD_CUSTOM_TARGET(doc COMMAND ${DOXYGEN} ${CMAKE_BINARY_DIR}/doc/Doxyfile)
     
-    IF(ENABLE_TESTING)
+    IF(ENABLE_TESTING AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
         MESSAGE(STATUS "Testing enabled")
         INCLUDE(CTest)
         ENABLE_TESTING()
-    ELSE(ENABLE_TESTING)
-        MESSAGE(STATUS "Testing disabled")
-    ENDIF(ENABLE_TESTING)
+    ELSE(ENABLE_TESTING AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
+        MESSAGE(STATUS "Testing disabled, enable testing and Debug build")
+    ENDIF(ENABLE_TESTING AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
         
 ELSE(INCLUDE_MPI_LIB)
     MESSAGE(STATUS "MPI disabled")
@@ -214,10 +227,7 @@ ELSE(INCLUDE_MPI_LIB)
       
 ENDIF(INCLUDE_MPI_LIB)
 
-message("========================================compiler flags====================================")
-MESSAGE(STATUS "Compiler flags:" ${CMAKE_CXX_COMPILE_FLAGS})
-MESSAGE(STATUS "Compiler debug flags:" ${CMAKE_CXX_FLAGS_DEBUG})
-MESSAGE(STATUS "Compiler cxx flags:" ${CMAKE_CXX_FLAGS})
+
 
 
 include_directories( ./libs )
@@ -225,5 +235,11 @@ message("========================================Common settings done going on w
 ADD_SUBDIRECTORY( libs )
 message("========================================libs set and done continuing with apps====================================")
 ADD_SUBDIRECTORY( apps )
-
+message("========================================compiler flags====================================")
+MESSAGE(STATUS "Build type: " ${CMAKE_BUILD_TYPE})
+MESSAGE(STATUS "Compiler flags:" ${CMAKE_CXX_COMPILE_FLAGS})
+MESSAGE(STATUS "Compiler cxx debug flags:" ${CMAKE_CXX_FLAGS_DEBUG})
+MESSAGE(STATUS "Compiler cxx release flags:" ${CMAKE_CXX_FLAGS_RELEASE})
+MESSAGE(STATUS "Compiler cxx min size flags:" ${CMAKE_CXX_FLAGS_MINSIZEREL})
+MESSAGE(STATUS "Compiler cxx flags:" ${CMAKE_CXX_FLAGS})
 
