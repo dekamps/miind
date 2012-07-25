@@ -46,7 +46,7 @@ void test_Destructor() {
 	Log* lg = new Log();
 	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
 
-	Log::setStream(pStream);
+	Log::setStream(std::dynamic_pointer_cast<std::ostream>(pStream));
 
 	lg->writeReport() << "blub";
 	BOOST_CHECK(pStream->str().find("blub")!=38);
@@ -81,7 +81,7 @@ void test_setGetStream() {
 	Log* lg = new Log();
 	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
 
-	Log::setStream(pStream);
+	Log::setStream(std::dynamic_pointer_cast<std::ostream>(pStream));
 
 	BOOST_CHECK(pStream == Log::getStream());
 	delete lg;
@@ -92,7 +92,7 @@ void test_setGetStream() {
 void test_writeOutput() {
 	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
 
-	Log::setStream( pStream);
+	Log::setStream( std::dynamic_pointer_cast<std::ostream>(pStream));
 	Log::writeOutput(std::string("blub"));
 	BOOST_CHECK(pStream->str().find("blub")==0);
 
@@ -106,7 +106,7 @@ void test_setReportingLevel() {
 	BOOST_CHECK(Log::getReportingLevel()==logDEBUG4);
 	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
 
-	Log::setStream( pStream);
+	Log::setStream( std::dynamic_pointer_cast<std::ostream>(pStream));
 	Log::setReportingLevel(logERROR);
 	BOOST_CHECK(pStream->str().find("Report")==38 || pStream->str().find("Report")==39);
 	BOOST_CHECK(Log::getReportingLevel()==logERROR);
@@ -116,7 +116,7 @@ void test_setReportingLevel() {
 void test_Macro() {
 	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
 
-	Log::setStream( pStream);
+	Log::setStream( std::dynamic_pointer_cast<std::ostream>(pStream));
 
 	LOG(logERROR) << "blub" << 42;
 
@@ -125,13 +125,13 @@ void test_Macro() {
 	Log::setReportingLevel(logERROR);
 	std::shared_ptr<std::ostringstream> pStream1 ( new std::ostringstream());
 
-	Log::setStream( pStream1);
+	Log::setStream( std::dynamic_pointer_cast<std::ostream>(pStream1));
 	LOG(logDEBUG) << "blub" << 42;
 	BOOST_CHECK(pStream1->str().find("blub")!=39 || pStream1->str().find("blub")!=40);
 	BOOST_CHECK(pStream1->str().find("42")!=43 || pStream1->str().find("42")!=44);
 	std::shared_ptr<std::ostringstream> pStream2 ( new std::ostringstream());
 
-	Log::setStream( pStream2);
+	Log::setStream( std::dynamic_pointer_cast<std::ostream>(pStream2));
 	LOG(logERROR) << "blub" << 42;
 
 	BOOST_CHECK(pStream2->str().find("blub")==39 || pStream2->str().find("blub")==40);
