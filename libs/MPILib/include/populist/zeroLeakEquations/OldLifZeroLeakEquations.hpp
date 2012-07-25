@@ -21,76 +21,95 @@
 
 #include <MPILib/include/populist/zeroLeakEquations/LIFZeroLeakEquations.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-
+#include <memory>
 
 namespace MPILib {
 namespace populist {
 
-	//! \deprecated DEPRECATED! In response to the discivery in (deKamps, 2006) that probability density sometimes must be transported from one bin to 
-	//! a point between two bins a quick hack was devised, essentially running the NonCirculantSolver twice, using the time to express the proportionality
-	//! of each bin. This is ugly and doubles simulation time.  OldZeroLeakEquations will not be available for use in the XML version of MIIND.
-	class OldLIFZeroLeakEquations : public LIFZeroLeakEquations {
-	public:
+/**
+ * \deprecated DEPRECATED! In response to the discivery in (deKamps, 2006) that probability density
+ * sometimes must be transported from one bin to a point between two bins a quick hack was devised,
+ * essentially running the NonCirculantSolver twice, using the time to express the proportionality
+ * of each bin. This is ugly and doubles simulation time.  OldZeroLeakEquations will not be available
+ * for use in the XML version of MIIND.
+ */
+class OldLIFZeroLeakEquations: public LIFZeroLeakEquations {
+public:
+	/**
+	 * Constructor, giving access to most relevant state variables held by PopulationGridController
+	 * @param n_bins reference to the current number of bins
+	 * @param array_state reference to state array
+	 * @param check_sum reference to the check sum variable
+	 * @param bins reference to bins variable: reversal bin, reset bin, etc
+	 * @param par_pop reference to the PopulationParameter
+	 * @param par_spec reference to the PopulistSpecificParameter
+	 * @param delta_v reference to the current scale variable
+	 */
+	OldLIFZeroLeakEquations( VALUE_REF_INIT
+			Number& n_bins,
+			std::valarray<Potential>& array_state, Potential& check_sum,
+			SpecialBins& bins, parameters::PopulationParameter& par_pop,
+			parameters::PopulistSpecificParameter& par_spec,
+			Potential& delta_v,
+			const AbstractCirculantSolver&, const AbstractNonCirculantSolver&);
 
-		OldLIFZeroLeakEquations
-		(
-			VALUE_REF_INIT
-			Number&,								//!< reference to the current number of bins
-			valarray<Potential>&,					//!< reference to state array
-			Potential&,								//!< reference to the check sum variable
-			SpecialBins&,							//!< reference to bins variable: reversal bin, reset bin, etc		
-			parameters::PopulationParameter&,					//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter&,				//!< reference to the PopulistSpecificParameter
-			Potential&,								//!< reference to the current scale variable
-			const AbstractCirculantSolver&,
-			const AbstractNonCirculantSolver& 
-		);
+	virtual ~OldLIFZeroLeakEquations() {
+	}
 
-		virtual ~OldLIFZeroLeakEquations(){}
+	/**
+	 * No-op for OldLIFZeroLeakEquations
+	 * @param p_void
+	 */
+	virtual void Configure(void* p_void = 0);
+	/**
+	 * Given input parameters, derived classes are free to implement their own solution for ZeroLeakEquations
+	 * @param The time
+	 */
+	virtual void Apply(Time);
+	/**
+	 * Every Evolve step (but not every time step, see below), the input parameters must be updated
+	 * @param nodeVector The vector which stores the Rates of the precursor nodes
+	 * @param weightVector The vector which stores the Weights of the precursor nodes
+	 * @param typeVector The vector which stores the NodeTypes of the precursor nodes
+	 */
+	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<NodeType>& typeVector);
+	/**
+	 * Every time step the input parameters must be adapted, even if the input doesn't
+	 * change, because the are affected by LIF dynamics (see \ref population_algorithm).
+	 */
+	virtual void AdaptParameters();
+	/**
+	 * @todo write description
+	 */
+	virtual void RecalculateSolverParameters();
+	/**
+	 * @todo write description
+	 */
+	virtual Rate CalculateRate() const;
 
-		//! No-op for OldLIFZeroLeakEquations
-		virtual void Configure
-		(
-			void* p_void = 0
-		);
-
-		virtual void Apply(Time);
-
-		virtual void SortConnectionvector
-		(const std::vector<Rate>& nodeVector,
-				const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
-				const std::vector<NodeType>& typeVector
-		);
-
-		virtual void AdaptParameters
-		(
-		);
-
-		virtual void RecalculateSolverParameters();
-
-		virtual Rate CalculateRate() const;
-
-	private:
-
-		void ApplyZeroLeakEquationsAlphaExcitatory
-		(
-			Time
-		);
-
-		void ApplyZeroLeakEquationsAlphaInhibitory
-		(
-			Time
-		);
-
-		Time									_time_current;
-		Number*									_p_n_bins;
-		valarray<Potential>*					_p_array_state;
-		Potential*								_p_check_sum;
-		LIFConvertor							_convertor;
-		auto_ptr<AbstractCirculantSolver>		_p_solver_circulant;
-		auto_ptr<AbstractNonCirculantSolver>	_p_solver_non_circulant;
-		auto_ptr<AbstractRateComputation>		_p_rate_calc;
-	};
+private:
+	/**
+	 * @todo write description
+	 */
+	void ApplyZeroLeakEquationsAlphaExcitatory(Time);
+	/**
+	 * @todo write description
+	 */
+	void ApplyZeroLeakEquationsAlphaInhibitory(Time);
+	/**
+	 * @todo write member description
+	 */
+	Time _time_current;
+	Number* _p_n_bins;
+	std::valarray<Potential>* _p_array_state;
+	Potential* _p_check_sum;
+	LIFConvertor _convertor;
+	std::unique_ptr<AbstractCirculantSolver> _p_solver_circulant;
+	std::unique_ptr<AbstractNonCirculantSolver> _p_solver_non_circulant;
+	std::unique_ptr<AbstractRateComputation> _p_rate_calc;
+};
 } /* namespace populist */
 } /* namespace MPILib */
 

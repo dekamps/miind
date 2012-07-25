@@ -24,6 +24,7 @@
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
+#include <memory>
 
 namespace MPILib {
 namespace populist {
@@ -47,7 +48,7 @@ public:
 	 * @param noncirc reference to the AbstractNonCirculantSolver
 	 */
 	LIFZeroLeakEquations(VALUE_REF_INIT Number& n_bins,
-			valarray<Potential>& array_state, Potential& check_sum,
+			std::valarray<Potential>& array_state, Potential& check_sum,
 			SpecialBins& bins, parameters::PopulationParameter& par_pop,
 			parameters::PopulistSpecificParameter& par_spec, Potential& delta_v,
 			const AbstractCirculantSolver& circ,
@@ -119,9 +120,9 @@ protected:
 	std::valarray<Potential>* _p_array_state;
 	Potential* _p_check_sum;
 	LIFConvertor _convertor;
-	boost::shared_ptr<AbstractCirculantSolver> _p_solver_circulant;
-	boost::shared_ptr<AbstractNonCirculantSolver> _p_solver_non_circulant;
-	boost::shared_ptr<AbstractRateComputation> _p_rate_calc;
+	std::shared_ptr<AbstractCirculantSolver> _p_solver_circulant;
+	std::shared_ptr<AbstractNonCirculantSolver> _p_solver_non_circulant;
+	std::shared_ptr<AbstractRateComputation> _p_rate_calc;
 };
 
 } /* namespace populist */
