@@ -23,11 +23,12 @@
 #include <memory>
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_integration.h>
-#include "../NumtoolsLib/NumtoolsLib.h"
+#include <NumtoolsLib/NumtoolsLib.h>
+#include <MPILib/include/TypeDefinitions.hpp>
+#include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/populist/rebinner/AbstractRebinner.hpp>
 #include <MPILib/include/populist/rateComputation/AbstractRateComputation.hpp>
 #include <MPILib/include/populist/circulantSolvers/CirculantSolver.hpp>
-#include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
 #include <MPILib/include/populist/ZeroLeakBuilder.hpp>

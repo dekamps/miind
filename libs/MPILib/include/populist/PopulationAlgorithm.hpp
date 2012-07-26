@@ -18,9 +18,12 @@
 //
 #ifndef MPILIB_POPULIST_POPOULATIONALGORITHM_HPP_
 #define MPILIB_POPULIST_POPOULATIONALGORITHM_HPP_
+#include <MPILib/include/MPINode.hpp>
+#include <MPILib/include/MPINetwork.hpp>
 
 #include <MPILib/include/populist/PopulationGridControllerCode.hpp>
 #include <MPILib/include/populist/parameters/PopulistParameter.hpp>
+#include <MPILib/include/populist/RateFunctorCode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
