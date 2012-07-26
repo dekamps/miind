@@ -16,68 +16,40 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#include <MPILib/include/populist/AbstractNonCirculantSolver.hpp>
-#include <MPILib/include/BasicDefinitions.hpp>
-#include <assert.h>
 
-namespace MPILib {
-namespace populist {
+#include <vector>
+#include <MPILib/include/TypeDefinitions.hpp>
+#define private public
+#define protected public
+#include <MPILib/include/populist/nonCirculantSolvers/NonCirculantSolver.hpp>
+#undef protected
+#undef private
 
-AbstractNonCirculantSolver::AbstractNonCirculantSolver(CirculantMode mode):
-_array_factor  (0),
-_epsilon(EPS_J_CIRC_MAX),
-_mode(mode)
-{
+
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
+
+void test_Constructor() {
+	///@todo implement test for this class
+
 }
 
-
-bool AbstractNonCirculantSolver::Configure
-(
-	std::valarray<double>&			array_state,
-	const parameters::InputParameterSet&	input_set,
-	double						epsilon
-)
-{
-	if (epsilon == 0)
-		_epsilon = EPS_J_CIRC_MAX;
-	else
-		_epsilon = epsilon;
-
-	_p_array_state = &array_state;
-
-	_p_input_set = &input_set;
-
-	return true;
-}
-
-void AbstractNonCirculantSolver::InitializeArrayFactor
-(
-	Time   tau,
-	Number n_non_circulant
-)
-{
-	assert (_epsilon > 0 );
-	if (_epsilon < EPS_J_CIRC_MAX)
-		_epsilon = EPS_J_CIRC_MAX;
-
-	if ( n_non_circulant > _array_factor.size() )
-		_array_factor.resize(n_non_circulant);
-
-	_array_factor = 0.0;
-	_array_factor[0] = exp(-tau);
-	for (int i = 1; i < static_cast<int>(n_non_circulant); i++)
-	{
-		// Let some precision criterion determine where this breaks off
-		// and store the break off value
-		_array_factor[i] = tau*_array_factor[i - 1]/i;
-		if (_array_factor[i] < _epsilon )
+int test_main(int argc, char* argv[]) // note the name!
 		{
-			_j_circ_max = i;
-			return;
-		}
-	}
-	_j_circ_max = n_non_circulant;
-	return;
+
+	test_Constructor();
+
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
 }
-} /* namespace populist */
-} /* namespace MPILib */

@@ -18,7 +18,7 @@
 //
 #include <cassert>
 #include <algorithm>
-#include <MPILib/include/populist/NonCirculantSolver.hpp>
+#include <MPILib/include/populist/nonCirculantSolvers/NonCirculantSolver.hpp>
 
 namespace MPILib {
 namespace populist {

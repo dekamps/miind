@@ -19,11 +19,10 @@
 #include <cassert>
 #include <NumtoolsLib/NumtoolsLib.h>
 #include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
-#include <MPILib/include/populist/AbstractNonCirculantSolver.hpp>
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
 #include <MPILib/include/populist/circulantSolvers/CirculantSolver.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/LIFZeroLeakEquations.hpp>
-#include <MPILib/include/populist/NonCirculantSolver.hpp>
+#include <MPILib/include/populist/nonCirculantSolvers/NonCirculantSolver.hpp>
 
 namespace MPILib {
 namespace populist {

@@ -19,7 +19,7 @@
 #ifndef MPILIB_POPULIST_MATRIXNONCIRCULANT_HPP_
 #define MPILIB_POPULIST_MATRIXNONCIRCULANT_HPP_
 
-#include <MPILib/include/populist/AbstractNonCirculantSolver.hpp>
+#include <MPILib/include/populist/nonCirculantSolvers/AbstractNonCirculantSolver.hpp>
 namespace MPILib {
 namespace populist {
 

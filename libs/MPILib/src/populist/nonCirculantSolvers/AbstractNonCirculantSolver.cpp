@@ -16,51 +16,68 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-
-#ifndef MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
-#define MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
-
-#include <string>
-#include <boost/shared_ptr.hpp>
 #include <MPILib/include/populist/nonCirculantSolvers/AbstractNonCirculantSolver.hpp>
-#include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
+#include <MPILib/include/BasicDefinitions.hpp>
+#include <assert.h>
 
 namespace MPILib {
 namespace populist {
 
-	class ZeroLeakBuilder {
-	public:
+AbstractNonCirculantSolver::AbstractNonCirculantSolver(CirculantMode mode):
+_array_factor  (0),
+_epsilon(EPS_J_CIRC_MAX),
+_mode(mode)
+{
+}
 
-		ZeroLeakBuilder(
-			Number&,					//!< reference to the current number of bins
-			std::valarray<Potential>&,		//!< reference to state array
-			Potential&,					//!< reference to the check sum variable
-			SpecialBins&,		
-			parameters::PopulationParameter&,		//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
-			Potential&					//!< reference to the current scale variable
-		);
 
-	boost::shared_ptr<AbstractZeroLeakEquations> 
-		GenerateZeroLeakEquations
-		(
-			const std::string&,
-			const std::string&,
-			const std::string&
-		);
+bool AbstractNonCirculantSolver::Configure
+(
+	std::valarray<double>&			array_state,
+	const parameters::InputParameterSet&	input_set,
+	double						epsilon
+)
+{
+	if (epsilon == 0)
+		_epsilon = EPS_J_CIRC_MAX;
+	else
+		_epsilon = epsilon;
 
-	private:
+	_p_array_state = &array_state;
 
-		Number&						_n_bins;
-		std::valarray<Potential>&	_array_state;
-		Potential&					_checksum;
-		SpecialBins&				_bins;
-		parameters::PopulationParameter&		_par_pop;
-		parameters::PopulistSpecificParameter&	_par_spec;
-		Potential&					_delta_v;
+	_p_input_set = &input_set;
 
-	};
+	return true;
+}
+
+void AbstractNonCirculantSolver::InitializeArrayFactor
+(
+	Time   tau,
+	Number n_non_circulant
+)
+{
+	assert (_epsilon > 0 );
+	if (_epsilon < EPS_J_CIRC_MAX)
+		_epsilon = EPS_J_CIRC_MAX;
+
+	if ( n_non_circulant > _array_factor.size() )
+		_array_factor.resize(n_non_circulant);
+
+	_array_factor = 0.0;
+	_array_factor[0] = exp(-tau);
+	for (int i = 1; i < static_cast<int>(n_non_circulant); i++)
+	{
+		// Let some precision criterion determine where this breaks off
+		// and store the break off value
+		_array_factor[i] = tau*_array_factor[i - 1]/i;
+		if (_array_factor[i] < _epsilon )
+		{
+			_j_circ_max = i;
+			return;
+		}
+	}
+	_j_circ_max = n_non_circulant;
+	return;
+}
 } /* namespace populist */
 } /* namespace MPILib */
-
-#endif // include guard MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_

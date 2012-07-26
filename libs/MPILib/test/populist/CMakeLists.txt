@@ -1,5 +1,6 @@
 
 add_subdirectory(circulantSolvers)
+add_subdirectory(nonCirculantSolvers)
 add_subdirectory(parameters)
 add_subdirectory(zeroLeakEquations)
 

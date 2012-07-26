@@ -16,51 +16,44 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+#ifndef MPILIB_POPULIST_LIMITEDNONCIRCULANT_HPP_
+#define MPILIB_POPULIST_LIMITEDNONCIRCULANT_HPP_
 
-#ifndef MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
-#define MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
-
-#include <string>
-#include <boost/shared_ptr.hpp>
 #include <MPILib/include/populist/nonCirculantSolvers/AbstractNonCirculantSolver.hpp>
-#include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
 
 namespace MPILib {
 namespace populist {
 
-	class ZeroLeakBuilder {
+	class LimitedNonCirculant : public AbstractNonCirculantSolver {
 	public:
 
-		ZeroLeakBuilder(
-			Number&,					//!< reference to the current number of bins
-			std::valarray<Potential>&,		//!< reference to state array
-			Potential&,					//!< reference to the check sum variable
-			SpecialBins&,		
-			parameters::PopulationParameter&,		//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
-			Potential&					//!< reference to the current scale variable
-		);
+		LimitedNonCirculant();
 
-	boost::shared_ptr<AbstractZeroLeakEquations> 
-		GenerateZeroLeakEquations
-		(
-			const std::string&,
-			const std::string&,
-			const std::string&
-		);
+		virtual ~LimitedNonCirculant();
 
-	private:
+		virtual void ExecuteExcitatory
+			(
+				Number,	//!< Number of current bins in the state array
+				Time	//!< Time by which to evolve
+			);
 
-		Number&						_n_bins;
-		std::valarray<Potential>&	_array_state;
-		Potential&					_checksum;
-		SpecialBins&				_bins;
-		parameters::PopulationParameter&		_par_pop;
-		parameters::PopulistSpecificParameter&	_par_spec;
-		Potential&					_delta_v;
+		virtual void ExecuteInhibitory
+			 (
+				Number,	//!< Number of current bins in the state array
+				Time	//!< Time by which to evolve
+			 );
 
+
+		virtual LimitedNonCirculant* Clone() const;
+
+	protected:
+
+		virtual void InitializeArrayFactor
+			(
+				Time, 
+				Number
+			);
 	};
 } /* namespace populist */
 } /* namespace MPILib */
-
-#endif // include guard MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
+#endif // include guard MPILIB_POPULIST_LIMITEDNONCIRCULANT_HPP_
