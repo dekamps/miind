@@ -2,6 +2,7 @@
 ADD_MIIND_TEST( ABConvertor_test.cpp)
 ADD_MIIND_TEST( ABQStruct_test.cpp)
 ADD_MIIND_TEST( ABScalarProduct_test.cpp)
+ADD_MIIND_TEST( AdaptiveHazard_test.cpp)
 ADD_MIIND_TEST( ConnectionSquaredProduct_test.cpp)
 ADD_MIIND_TEST( LIFConvertor_test.cpp)
 ADD_MIIND_TEST( LIFZeroLeakEquation_test.cpp)

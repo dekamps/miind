@@ -16,34 +16,41 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#include <cmath>
-#include <MPILib/include/populist/AdaptiveHazard.hpp>
+
+#include <vector>
+#include <MPILib/include/TypeDefinitions.hpp>
+#define private public
+#define protected public
+#include <MPILib/include/populist/zeroLeakEquations/MuSigma.hpp>
+#undef protected
+#undef private
 
 
-namespace MPILib {
-namespace populist {
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
 
-AdaptiveHazard::AdaptiveHazard
-(
-	double a,
-	double b
-):
-_a(a),
-_b(b)
-{
+void test_Constructor() {
+	///@todo implement test
+
+
 }
 
+int test_main(int argc, char* argv[]) // note the name!
+		{
 
-double AdaptiveHazard::operator () 
-(
-	double g
-) const
-{
-	// negative g's are meaningless and there should not be hazard there
-	if (g < 0)
-		return 0.0F;
+	test_Constructor();
 
-	return _a*exp(-_b*g);
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
 }
-} /* namespace populist */
-} /* namespace MPILib */
