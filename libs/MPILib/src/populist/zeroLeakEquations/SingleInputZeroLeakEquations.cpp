@@ -28,53 +28,41 @@ using NumtoolsLib::IsApproximatelyEqualTo;
 namespace MPILib {
 namespace populist {
 
-SingleInputZeroLeakEquations::SingleInputZeroLeakEquations
-(
-	Number&								n_bins,		
-	valarray<Potential>&				array_state,
-	Potential&							check_sum,
-	SpecialBins&						bins,		
-	parameters::PopulationParameter&				par_pop,		//!< reference to the PopulationParameter
-	parameters::PopulistSpecificParameter&			par_spec,		//!< reference to the PopulistSpecificParameter
-	Potential&							delta_v,		//!< reference to the current scale variable
-	const circulantSolvers::AbstractCirculantSolver&		circ,
-	const AbstractNonCirculantSolver&	noncirc
-):
-LIFZeroLeakEquations
-(
-	n_bins,
-	array_state,
-	check_sum,
-	bins,
-	par_pop,
-	par_spec,
-	delta_v,
-	circ,
-	noncirc
-){
-	this->SetMode(FLOATING_POINT,*_p_solver_circulant);
-	this->SetMode(FLOATING_POINT,*_p_solver_non_circulant);
+SingleInputZeroLeakEquations::SingleInputZeroLeakEquations(Number& n_bins,
+		valarray<Potential>& array_state, Potential& check_sum,
+		SpecialBins& bins,
+		parameters::PopulationParameter& par_pop,//!< reference to the PopulationParameter
+		parameters::PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
+		Potential& delta_v,		//!< reference to the current scale variable
+		const circulantSolvers::AbstractCirculantSolver& circ,
+		const nonCirculantSolvers::AbstractNonCirculantSolver& noncirc) :
+		LIFZeroLeakEquations(n_bins, array_state, check_sum, bins, par_pop,
+				par_spec, delta_v, circ, noncirc) {
+	this->SetMode(FLOATING_POINT, *_p_solver_circulant);
+	this->SetMode(FLOATING_POINT, *_p_solver_non_circulant);
 	this->SetInputParameter(_convertor.getSolverParameter());
 }
 
-void SingleInputZeroLeakEquations::Apply(Time time)
-{
-	Time t_evolve = time *Set()._rate_exc;
-	if (_p_solver_circulant->BeforeNonCirculant() ){
-		_p_solver_circulant->Execute(*_p_n_bins,t_evolve,_time_current);
-		_p_solver_non_circulant->ExecuteExcitatory(*_p_n_bins,t_evolve);
-		_p_solver_circulant->AddCirculantToState(Bins()._index_current_reset_bin);
+void SingleInputZeroLeakEquations::Apply(Time time) {
+	Time t_evolve = time * Set()._rate_exc;
+	if (_p_solver_circulant->BeforeNonCirculant()) {
+		_p_solver_circulant->Execute(*_p_n_bins, t_evolve, _time_current);
+		_p_solver_non_circulant->ExecuteExcitatory(*_p_n_bins, t_evolve);
+		_p_solver_circulant->AddCirculantToState(
+				Bins()._index_current_reset_bin);
 	} else {
-		_p_solver_non_circulant->ExecuteExcitatory(*_p_n_bins,t_evolve);
-		_p_solver_circulant->Execute(*_p_n_bins,t_evolve,_time_current);
-		_p_solver_circulant->AddCirculantToState(Bins()._index_current_reset_bin);
+		_p_solver_non_circulant->ExecuteExcitatory(*_p_n_bins, t_evolve);
+		_p_solver_circulant->Execute(*_p_n_bins, t_evolve, _time_current);
+		_p_solver_circulant->AddCirculantToState(
+				Bins()._index_current_reset_bin);
 	}
 
 	_time_current += time;
 
 	// This assert may be triggered if the algorithm is run for more  0.5 s.
 	// CirculantAlgorithm slowly builds up a proability mismatch over longer times
-	assert( IsApproximatelyEqualTo(_p_array_state->sum() + _p_solver_circulant->RefractiveProbability(),1.0,1e-7));
+	assert(
+			IsApproximatelyEqualTo(_p_array_state->sum() + _p_solver_circulant->RefractiveProbability(),1.0,1e-7));
 }
 
 } /* namespace populist */

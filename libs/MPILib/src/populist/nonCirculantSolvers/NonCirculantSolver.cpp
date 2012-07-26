@@ -22,6 +22,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace nonCirculantSolvers {
 
 NonCirculantSolver::NonCirculantSolver(CirculantMode mode):
 AbstractNonCirculantSolver(mode)
@@ -265,5 +266,6 @@ NonCirculantSolver* NonCirculantSolver::Clone() const
 	return new NonCirculantSolver(*this);
 }
 
+} /* namespace nonCirculantSolvers */
 } /* namespace populist */
 } /* namespace MPILib */

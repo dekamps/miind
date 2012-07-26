@@ -16,12 +16,13 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_MATRIXNONCIRCULANT_HPP_
-#define MPILIB_POPULIST_MATRIXNONCIRCULANT_HPP_
+#ifndef MPILIB_POPULIST_NONCIRCULANTSOLVERS_MATRIXNONCIRCULANT_HPP_
+#define MPILIB_POPULIST_NONCIRCULANTSOLVERS_MATRIXNONCIRCULANT_HPP_
 
 #include <MPILib/include/populist/nonCirculantSolvers/AbstractNonCirculantSolver.hpp>
 namespace MPILib {
 namespace populist {
+namespace nonCirculantSolvers {
 
 //! MatrixNonCirculant
 //! This is a circulant solver, which calculates the exponentiated non circulant matrix directly
@@ -51,6 +52,7 @@ private:
 
 	std::valarray<Potential> _matrix_row;
 };
+} /* namespace nonCirculantSolvers */
 } /* namespace populist */
 } /* namespace MPILib */
-#endif // include guard MPILIB_POPULIST_MATRIXNONCIRCULANT_HPP_
+#endif // include guard MPILIB_POPULIST_NONCIRCULANTSOLVERS_MATRIXNONCIRCULANT_HPP_

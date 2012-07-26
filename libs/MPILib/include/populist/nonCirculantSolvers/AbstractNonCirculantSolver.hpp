@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_ABSTRACTNONCIRCULANTSOLVER_HPP_
-#define MPILIB_POPULIST_ABSTRACTNONCIRCULANTSOLVER_HPP_
+#ifndef MPILIB_POPULIST_NONCIRCULANTSOLVERS_ABSTRACTNONCIRCULANTSOLVER_HPP_
+#define MPILIB_POPULIST_NONCIRCULANTSOLVERS_ABSTRACTNONCIRCULANTSOLVER_HPP_
 
 #include <valarray>
 #include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
@@ -27,7 +27,7 @@
 
 namespace MPILib {
 namespace populist {
-
+namespace nonCirculantSolvers {
 
 	//! A base class for all non-circulant solvers. 
 	//! 
@@ -76,8 +76,10 @@ namespace populist {
 		//! Only valid after InitializeArrayFactor was run
 		Number NumberFactor() const { assert (_j_circ_max > 0); return _j_circ_max; } 
 
-		//! zero leak equations must sometimes interfere with solvers, for example by setting mode
-		friend class AbstractZeroLeakEquations;
+		void setMode(CirculantMode mode){
+			_mode = mode;
+		}
+
 
 	protected:
 		//! Initialises an array with values \f$ e^{-tau}, \tau e^{-\tau}, \cdots \frac{\tau^k}{k!}e^{-\tau} \f$, but breaks the series
@@ -106,7 +108,8 @@ namespace populist {
 	inline AbstractNonCirculantSolver::~AbstractNonCirculantSolver()
 	{
 	}
+} /* namespace nonCirculantSolvers */
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_ABSTRACTNONCIRCULANTSOLVER_HPP_
+#endif // include guard MPILIB_POPULIST_NONCIRCULANTSOLVERS_ABSTRACTNONCIRCULANTSOLVER_HPP_

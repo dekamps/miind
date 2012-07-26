@@ -22,6 +22,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace nonCirculantSolvers {
 
 AbstractNonCirculantSolver::AbstractNonCirculantSolver(CirculantMode mode):
 _array_factor  (0),
@@ -79,5 +80,6 @@ void AbstractNonCirculantSolver::InitializeArrayFactor
 	_j_circ_max = n_non_circulant;
 	return;
 }
+} /* namespace nonCirculantSolvers */
 } /* namespace populist */
 } /* namespace MPILib */

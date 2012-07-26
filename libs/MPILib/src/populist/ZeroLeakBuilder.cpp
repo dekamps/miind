@@ -77,15 +77,15 @@ std::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEqua
 				throw utilities::Exception("Unknown Circulant");
 		
 
-	std::shared_ptr<AbstractNonCirculantSolver> p_noncirc;
+	std::shared_ptr< nonCirculantSolvers::AbstractNonCirculantSolver> p_noncirc;
 	if ( noncirculant_solver_name == "NonCirculantSolver" )
-		p_noncirc = std::shared_ptr<AbstractNonCirculantSolver>(new NonCirculantSolver );
+		p_noncirc = std::shared_ptr< nonCirculantSolvers::AbstractNonCirculantSolver>(new  nonCirculantSolvers::NonCirculantSolver );
 	else
 		if (noncirculant_solver_name == "LimitedNonCirculant" )
-			p_noncirc = std::shared_ptr<AbstractNonCirculantSolver>(new LimitedNonCirculant);
+			p_noncirc = std::shared_ptr< nonCirculantSolvers::AbstractNonCirculantSolver>(new  nonCirculantSolvers::LimitedNonCirculant);
 		else
 			if (noncirculant_solver_name == "MatrixNonCirculant" )
-				p_noncirc = std::shared_ptr<AbstractNonCirculantSolver>(new MatrixNonCirculant);
+				p_noncirc = std::shared_ptr< nonCirculantSolvers::AbstractNonCirculantSolver>(new  nonCirculantSolvers::MatrixNonCirculant);
 			else
 				throw utilities::Exception("Unknown NonCirculant solver");
 
@@ -129,7 +129,7 @@ std::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEqua
 	if (zeroleakequations_name == "OldLIFZeroLeakEquations"){
 
 		// This choice will overule the choice for the NonCirculantSolver
-		p_noncirc = std::shared_ptr<AbstractNonCirculantSolver>(new NonCirculantSolver(INTEGER) );
+		p_noncirc = std::shared_ptr< nonCirculantSolvers::AbstractNonCirculantSolver>(new  nonCirculantSolvers::NonCirculantSolver(INTEGER) );
 
 		p_ret = std::shared_ptr<LIFZeroLeakEquations>
 				(

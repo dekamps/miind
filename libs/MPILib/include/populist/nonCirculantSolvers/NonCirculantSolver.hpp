@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_NONCIRCULANTSOLVER_HPP_
-#define MPILIB_POPULIST_NONCIRCULANTSOLVER_HPP_
+#ifndef MPILIB_POPULIST_NONCIRCULANTSOLVERS_NONCIRCULANTSOLVER_HPP_
+#define MPILIB_POPULIST_NONCIRCULANTSOLVERS_NONCIRCULANTSOLVER_HPP_
 
 #include <valarray>
 #include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
@@ -29,6 +29,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace nonCirculantSolvers {
 
 
 	//! The algorithm that runs the Poisson master process for probability density corresponding to neurons that have not yet passed threshold.
@@ -80,7 +81,7 @@ namespace populist {
 
 	}; // end of NonCirculantSolver
 
-
+} /* namespace nonCirculantSolvers */
 } /* namespace populist */
 } /* namespace MPILib */
-#endif // include guard MPILIB_POPULIST_NONCIRCULANTSOLVER_HPP_
+#endif // include guard MPILIB_POPULIST_NONCIRCULANTSOLVERS_NONCIRCULANTSOLVER_HPP_

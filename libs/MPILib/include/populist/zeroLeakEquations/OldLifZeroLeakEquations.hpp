@@ -52,7 +52,7 @@ public:
 			SpecialBins& bins, parameters::PopulationParameter& par_pop,
 			parameters::PopulistSpecificParameter& par_spec,
 			Potential& delta_v,
-			const circulantSolvers::AbstractCirculantSolver&, const AbstractNonCirculantSolver&);
+			const circulantSolvers::AbstractCirculantSolver&, const  nonCirculantSolvers::AbstractNonCirculantSolver&);
 
 	virtual ~OldLIFZeroLeakEquations() {
 	}
@@ -108,7 +108,7 @@ private:
 	Potential* _p_check_sum;
 	LIFConvertor _convertor;
 	std::unique_ptr<circulantSolvers::AbstractCirculantSolver> _p_solver_circulant;
-	std::unique_ptr<AbstractNonCirculantSolver> _p_solver_non_circulant;
+	std::unique_ptr<nonCirculantSolvers::AbstractNonCirculantSolver> _p_solver_non_circulant;
 	std::unique_ptr<AbstractRateComputation> _p_rate_calc;
 };
 } /* namespace populist */

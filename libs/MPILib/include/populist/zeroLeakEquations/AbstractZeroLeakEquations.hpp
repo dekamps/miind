@@ -137,8 +137,8 @@ protected:
 	 * concrete instances of ZeroLeakEquations need to be able to manipulate mode
 	 * @param mode
 	 * @param solver
-	 */	void SetMode(CirculantMode mode, AbstractNonCirculantSolver& solver) {
-		solver._mode = mode;
+	 */	void SetMode(CirculantMode mode, nonCirculantSolvers::AbstractNonCirculantSolver& solver) {
+		solver.setMode(mode);
 	}
 
 protected:

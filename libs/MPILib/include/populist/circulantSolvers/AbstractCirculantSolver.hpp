@@ -107,8 +107,6 @@ namespace circulantSolvers {
 		//! The total amount of density which has ended up in the circulant bins
 		Density IntegratedFlux() const;
 
-		//! zero leak equations must sometimes interfere with solvers, for example by setting mode
-		friend class AbstractZeroLeakEquations;
 
 		//! It wil transfer the contributions calculated in the AbstractCirculantSolver, which knows nothing about the neuronal
 		//! parameters to the state array. Therefor it needs to receive the index of the current reset bin.

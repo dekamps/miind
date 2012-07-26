@@ -22,6 +22,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace nonCirculantSolvers {
 
 
 MatrixNonCirculant::MatrixNonCirculant():
@@ -98,6 +99,6 @@ bool MatrixNonCirculant::Configure
 	_matrix_row = array_state;
 	return true;
 }
-
+} /* namespace nonCirculantSolvers */
 } /* namespace populist */
 } /* namespace MPILib */

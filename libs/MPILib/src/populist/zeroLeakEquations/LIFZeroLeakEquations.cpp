@@ -35,7 +35,7 @@ LIFZeroLeakEquations::LIFZeroLeakEquations(Number& n_bins,
 		parameters::PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
 		Potential& delta_v,		//!< reference to the current scale variable
 		const circulantSolvers::AbstractCirculantSolver& circ,
-		const AbstractNonCirculantSolver& noncirc) :
+		const  nonCirculantSolvers::AbstractNonCirculantSolver& noncirc) :
 		AbstractZeroLeakEquations(n_bins, array_state, check_sum, bins, par_pop,
 				par_spec, delta_v), _p_n_bins(&n_bins), _p_array_state(
 				&array_state), _p_check_sum(&check_sum), _convertor(

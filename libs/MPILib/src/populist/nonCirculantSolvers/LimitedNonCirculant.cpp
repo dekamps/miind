@@ -21,6 +21,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace nonCirculantSolvers {
 
 LimitedNonCirculant::LimitedNonCirculant():
 AbstractNonCirculantSolver(INTEGER)
@@ -131,5 +132,6 @@ void LimitedNonCirculant::InitializeArrayFactor
 	for (Index i = 1; i < NONCIRC_LIMIT; i++)
 		_array_factor[i] = tau*_array_factor[i - 1]/i;
 }
+} /* namespace nonCirculantSolvers */
 } /* namespace populist */
 } /* namespace MPILib */

@@ -52,7 +52,7 @@ public:
 			SpecialBins& bins, parameters::PopulationParameter& par_pop,
 			parameters::PopulistSpecificParameter& par_spec, Potential& delta_v,
 			const circulantSolvers::AbstractCirculantSolver& circ,
-			const AbstractNonCirculantSolver& noncirc);
+			const nonCirculantSolvers::AbstractNonCirculantSolver& noncirc);
 
 	virtual ~LIFZeroLeakEquations() {
 	}
@@ -91,9 +91,9 @@ public:
 	virtual Rate CalculateRate() const;
 
 	/** Some  AbstractZeroLeakEquations have derived classes which keep track of refractive probability.
-	* These derived classes can overload this method, and make this amount available. For example,
-	* when rebinning this probability must be taken into account. See, e.g. RefractiveCirculantSolver.
-	*/
+	 * These derived classes can overload this method, and make this amount available. For example,
+	 * when rebinning this probability must be taken into account. See, e.g. RefractiveCirculantSolver.
+	 */
 	virtual Probability RefractiveProbability() const {
 		return _p_solver_circulant->RefractiveProbability();
 	}
@@ -121,7 +121,7 @@ protected:
 	Potential* _p_check_sum;
 	LIFConvertor _convertor;
 	std::shared_ptr<circulantSolvers::AbstractCirculantSolver> _p_solver_circulant;
-	std::shared_ptr<AbstractNonCirculantSolver> _p_solver_non_circulant;
+	std::shared_ptr<nonCirculantSolvers::AbstractNonCirculantSolver> _p_solver_non_circulant;
 	std::shared_ptr<AbstractRateComputation> _p_rate_calc;
 };
 
