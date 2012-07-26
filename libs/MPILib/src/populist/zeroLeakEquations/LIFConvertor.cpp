@@ -19,7 +19,7 @@
 #include <assert.h>
 #include <MPILib/include/populist/zeroLeakEquations/LIFConvertor.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
-#include <MPILib/include/populist/MuSigmaScalarProduct.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/MuSigmaScalarProduct.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/SpecialBins.hpp>
 #include <MPILib/include/MPINode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>

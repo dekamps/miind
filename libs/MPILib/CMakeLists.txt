@@ -45,6 +45,7 @@ set(MPI_SRCS
     src/populist/zeroLeakEquations/ABConvertor.cpp
     src/populist/zeroLeakEquations/LIFConvertor.cpp
     src/populist/zeroLeakEquations/LIFZeroLeakEquations.cpp
+    src/populist/zeroLeakEquations/MuSigmaScalarProduct.cpp
     src/populist/zeroLeakEquations/NumericalZeroLeakEquations.cpp
     src/populist/zeroLeakEquations/OldLifZeroLeakEquations.cpp
     src/populist/zeroLeakEquations/OneDMZeroLeakEquations.cpp
@@ -52,7 +53,6 @@ set(MPI_SRCS
     
     src/populist/AdaptiveHazard.cpp
     src/populist/InitializeAlgorithmGrid.cpp
-    src/populist/MuSigmaScalarProduct.cpp
     src/populist/ProbabilityQueue.cpp
     src/populist/VArray.cpp
     src/populist/ZeroLeakBuilder.cpp

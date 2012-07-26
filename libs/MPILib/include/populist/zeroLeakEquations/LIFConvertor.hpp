@@ -28,7 +28,7 @@
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/MuSigma.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/MuSigma.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 
 namespace MPILib {

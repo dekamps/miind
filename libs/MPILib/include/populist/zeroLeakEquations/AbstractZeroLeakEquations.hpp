@@ -29,6 +29,7 @@
 #include <MPILib/include/BasicDefinitions.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/NodeType.hpp>
+#include <vector>
 
 namespace MPILib {
 namespace populist {

@@ -16,48 +16,41 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_MUSIGMASCALARPRODUCT_HPP_
-#define MPILIB_POPULIST_MUSIGMASCALARPRODUCT_HPP_
 
 #include <vector>
-#include <utility>
-#include <MPILib/include/populist/MuSigma.hpp>
-
-namespace MPILib {
-namespace populist {
-
-// forward declaration
-struct OrnsteinUhlenbeckConnection;
-
-//! Evaluates the scalar product of an input which arrives over OU_Connections.
-//! The formulae are:
-//! \f[
-//! \mu = N \tau \sum_i \nu_i J_i
-//! \f]
-//! and
-//! \f[
-//! \sigma^2 = N \tau \sum_i \nu_i J^2_i
-//! \f]
-class MuSigmaScalarProduct {
-public:
+#include <MPILib/include/TypeDefinitions.hpp>
+#define private public
+#define protected public
+#include <MPILib/include/populist/zeroLeakEquations/MuSigmaScalarProduct.hpp>
+#undef protected
+#undef private
 
 
-	//! Evaluate the inner product over connections which are indicated by the iterators
-	MuSigma Evaluate(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector, Time //!< membrane time constant
-			) const;
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
 
-private:
+void test_Constructor() {
+	///@todo implement test
 
-	Potential InnerProduct(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const;
 
-	Potential InnerSquaredProduct(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const;
+}
 
-};
+int test_main(int argc, char* argv[]) // note the name!
+		{
 
-} /* namespace populist */
-} /* namespace MPILib */
+	test_Constructor();
 
-#endif // include guard MPILIB_POPULIST_MUSIGMASCALARPRODUCT_HPP_
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
+}

@@ -16,43 +16,48 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#include <MPILib/include/populist/MuSigmaScalarProduct.hpp>
-#include <MPILib/include/populist/ConnectionSquaredProduct.hpp>
-#include <math.h>
-#include <functional>
-#include <numeric>
+#ifndef MPILIB_POPULIST_MUSIGMASCALARPRODUCT_HPP_
+#define MPILIB_POPULIST_MUSIGMASCALARPRODUCT_HPP_
+
+#include <vector>
+#include <utility>
+#include <MPILib/include/populist/zeroLeakEquations/MuSigma.hpp>
 
 namespace MPILib {
 namespace populist {
 
-MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
-		Time tau) const {
-	MuSigma ret;
+// forward declaration
+struct OrnsteinUhlenbeckConnection;
 
-	ret._mu = tau * this->InnerProduct(nodeVector, weightVector);
-	ret._sigma = sqrt(
-			tau * this->InnerSquaredProduct(nodeVector, weightVector));
+//! Evaluates the scalar product of an input which arrives over OU_Connections.
+//! The formulae are:
+//! \f[
+//! \mu = N \tau \sum_i \nu_i J_i
+//! \f]
+//! and
+//! \f[
+//! \sigma^2 = N \tau \sum_i \nu_i J^2_i
+//! \f]
+class MuSigmaScalarProduct {
+public:
 
-	return ret;
-}
 
-Potential MuSigmaScalarProduct::InnerProduct(
-		const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const {
+	//! Evaluate the inner product over connections which are indicated by the iterators
+	MuSigma Evaluate(const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector, Time //!< membrane time constant
+			) const;
 
-	return std::inner_product(nodeVector.begin(), nodeVector.end(),
-			weightVector.begin(), 0.0);
-}
+private:
 
-Potential MuSigmaScalarProduct::InnerSquaredProduct(
-		const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const {
+	Potential InnerProduct(const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const;
 
-	return inner_product(nodeVector.begin(), nodeVector.end(),
-			weightVector.begin(), 0.0, std::plus<double>(),
-			ConnectionSquaredProduct());
-}
+	Potential InnerSquaredProduct(const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const;
+
+};
 
 } /* namespace populist */
 } /* namespace MPILib */
+
+#endif // include guard MPILIB_POPULIST_MUSIGMASCALARPRODUCT_HPP_

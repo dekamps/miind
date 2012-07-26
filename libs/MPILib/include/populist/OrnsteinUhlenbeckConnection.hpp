@@ -21,7 +21,6 @@
 
 #include <iostream>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/MuSigmaScalarProduct.hpp>
 #include <UtilLib/IsNan.h>
 
 namespace MPILib {
@@ -31,9 +30,6 @@ namespace populist {
 //! need two parameters: a number parameter, which is not squared in the
 //! calculation of sigma, and an efficacy, which is squared.
 struct OrnsteinUhlenbeckConnection {
-
-	//! In PopulistLib the connections have an associated inner product
-	typedef MuSigmaScalarProduct InnerProduct;
 
 	//! effective number, may be fractional
 	double _number_of_connections = 0.0;

@@ -20,7 +20,6 @@
 #define MPILIB_POPULIST_POPOULATIONALGORITHM_CODE_HPP_
 
 #include <MPILib/include/populist/PopulationAlgorithm.hpp>
-#include <MPILib/include/populist/ConnectionSquaredProduct.hpp>
 #include <MPILib/include/populist/PopulationAlgorithm.hpp>
 #include <MPILib/include/populist/InitializeAlgorithmGrid.hpp>
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
