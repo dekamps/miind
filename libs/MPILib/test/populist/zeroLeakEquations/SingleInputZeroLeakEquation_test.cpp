@@ -16,39 +16,43 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_SINGLEINPUTZEROLEAKEQUATIONS_HPP_
-#define MPILIB_POPULIST_SINGLEINPUTZEROLEAKEQUATIONS_HPP_
 
-#include <MPILib/include/populist/zeroLeakEquations/LIFZeroLeakEquations.hpp>
+#include <vector>
+#include <MPILib/include/TypeDefinitions.hpp>
+#define private public
+#define protected public
+#include <MPILib/include/populist/zeroLeakEquations/SingleInputZeroLeakEquations.hpp>
+#undef protected
+#undef private
+#include <MPILib/include/populist/zeroLeakEquations/SpecialBins.hpp>
+#include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
+#include <MPILib/include/populist/parameters/PopulistParameter.hpp>
 
-namespace MPILib {
-namespace populist {
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
 
-	class SingleInputZeroLeakEquations : public LIFZeroLeakEquations {
+void test_Constructor() {
+	///@todo implement test if needed. But as this class does more or less forward all calls this seem not be needed.
 
-	public:
+}
 
-		SingleInputZeroLeakEquations
-		(
-			VALUE_REF_INIT
-			Number&,								//!< reference to the current number of bins
-			std::valarray<Potential>&,					//!< reference to state array
-			Potential&,								//!< reference to the check sum variable
-			SpecialBins&				bins,		
-			parameters::PopulationParameter&		par_pop,	//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter&	par_spec,	//!< reference to the PopulistSpecificParameter
-			Potential&					delta_v,	//!< reference to the current scale variable
-			const AbstractCirculantSolver&,
-			const AbstractNonCirculantSolver& 
-		);
 
-		virtual void Apply(Time);
+int test_main(int argc, char* argv[]) // note the name!
+		{
 
-	private:
+	test_Constructor();
 
-		Time _time_current = 0.0;
-	};
-} /* namespace populist */
-} /* namespace MPILib */
-
-#endif // include guard
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
+}

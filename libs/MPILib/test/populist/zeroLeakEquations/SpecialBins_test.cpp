@@ -16,39 +16,44 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_SINGLEINPUTZEROLEAKEQUATIONS_HPP_
-#define MPILIB_POPULIST_SINGLEINPUTZEROLEAKEQUATIONS_HPP_
 
-#include <MPILib/include/populist/zeroLeakEquations/LIFZeroLeakEquations.hpp>
+#include <vector>
+#include <MPILib/include/TypeDefinitions.hpp>
+#define private public
+#define protected public
+#include <MPILib/include/populist/zeroLeakEquations/SpecialBins.hpp>
+#undef protected
+#undef private
 
-namespace MPILib {
-namespace populist {
 
-	class SingleInputZeroLeakEquations : public LIFZeroLeakEquations {
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
 
-	public:
+void test_Constructor() {
+	SpecialBins bins{1,2,3};
 
-		SingleInputZeroLeakEquations
-		(
-			VALUE_REF_INIT
-			Number&,								//!< reference to the current number of bins
-			std::valarray<Potential>&,					//!< reference to state array
-			Potential&,								//!< reference to the check sum variable
-			SpecialBins&				bins,		
-			parameters::PopulationParameter&		par_pop,	//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter&	par_spec,	//!< reference to the PopulistSpecificParameter
-			Potential&					delta_v,	//!< reference to the current scale variable
-			const AbstractCirculantSolver&,
-			const AbstractNonCirculantSolver& 
-		);
+	BOOST_CHECK(bins._index_reversal_bin==1);
+	BOOST_CHECK(bins._index_original_reset_bin==2);
+	BOOST_CHECK(bins._index_current_reset_bin==3);
+}
 
-		virtual void Apply(Time);
 
-	private:
+int test_main(int argc, char* argv[]) // note the name!
+		{
 
-		Time _time_current = 0.0;
-	};
-} /* namespace populist */
-} /* namespace MPILib */
+	test_Constructor();
 
-#endif // include guard
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
+}
