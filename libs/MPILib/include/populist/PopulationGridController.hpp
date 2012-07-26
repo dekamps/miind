@@ -192,7 +192,7 @@ private:
 	// interpretation array is only used during reports, hence
 	// no local copy needed
 	std::valarray<Potential>& _array_interpretation;
-	std::shared_ptr<AbstractRebinner> _p_rebinner;
+	std::shared_ptr<rebinner::AbstractRebinner> _p_rebinner;
 	ostringstream* _p_stream;
 
 	ZeroLeakBuilder _builder;

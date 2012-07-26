@@ -158,7 +158,7 @@ protected:
 
 private:
 
-	friend class AbstractRebinner;
+	friend class rebinner::AbstractRebinner;
 
 	// Upon rebinning the refractive probability that an AbstractZeroLeakEquations subclass maintains must be
 	// rescaled. This is only allowed to AbstractRebinners.

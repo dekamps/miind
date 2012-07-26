@@ -17,8 +17,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#ifndef MPILIB_POPULIST_INTERPOLATIONREBINNER_HPP_
-#define MPILIB_POPULIST_INTERPOLATIONREBINNER_HPP_
+#ifndef MPILIB_POPULIST_REBINNER_INTERPOLATIONREBINNER_HPP_
+#define MPILIB_POPULIST_REBINNER_INTERPOLATIONREBINNER_HPP_
 
 #include <gsl/gsl_spline.h>
 #include <MPILib/include/populist/rebinner/AbstractRebinner.hpp>
@@ -26,6 +26,8 @@
 
 namespace MPILib {
 namespace populist {
+namespace rebinner {
+
 
 //! Interprolation rebinner is an important rebinning object
 //!
@@ -98,7 +100,9 @@ private:
 	Number _number_original_bins = 0;
 	Number _number_new_bins = 0;
 	gsl_spline* _p_spline = nullptr;
-};} /* namespace populist */
+};
+} /* namespace rebinner */
+} /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_INTERPOLATIONREBINNER_HPP_
+#endif // include guard MPILIB_POPULIST_REBINNER_INTERPOLATIONREBINNER_HPP_

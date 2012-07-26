@@ -22,14 +22,15 @@
 #include <MPILib/config.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/InitialDensityParameter.hpp>
-//#include <MPILib/include/populist/AbstractRebinner.hpp>
 
 #include <string>
 #include <memory>
 
 namespace MPILib {
 namespace populist {
+namespace rebinner{
 class AbstractRebinner;
+}
 namespace rateComputation {
 class AbstractRateComputation;
 }
@@ -76,7 +77,7 @@ public:
 					"NumericalZeroLeakEquations",
 			const std::string& name_circulant = "CirculantSolver",
 			const std::string& name_noncirculant = "NonCirculantSolver",
-			const AbstractRebinner* p_rebinner = nullptr,
+			const rebinner::AbstractRebinner* p_rebinner = nullptr,
 			const rateComputation::AbstractRateComputation* p_rate = nullptr);
 
 			/**
@@ -138,7 +139,7 @@ public:
 			 * Getter for the AbstractRebinner
 			 * @return The AbstractRebinner
 			 */
-			const AbstractRebinner& getRebin() const;
+			const rebinner::AbstractRebinner& getRebin() const;
 
 			/**
 			 * Getter for the AbstractRateComputation
@@ -200,7 +201,7 @@ public:
 	/**
 	 * Use when investigating alternatives to the standard rebinner
 	 */
-	std::shared_ptr<AbstractRebinner> _p_rebinner;
+	std::shared_ptr<rebinner::AbstractRebinner> _p_rebinner;
 	/**
 	 * Use when investigating alternatives to the standard rate computation
 	 */

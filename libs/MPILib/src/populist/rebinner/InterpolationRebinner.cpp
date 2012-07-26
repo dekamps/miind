@@ -22,7 +22,7 @@
 #include <iostream>
 namespace MPILib {
 namespace populist {
-
+namespace rebinner {
 
 InterpolationRebinner::~InterpolationRebinner()
 {
@@ -210,6 +210,7 @@ void InterpolationRebinner::RescaleAllProbability(AbstractZeroLeakEquations* p_z
 	*_p_array *=  scale;
 	// do not scale refractive probability here
 }
+} /* namespace rebinner */
 } /* namespace populist */
 } /* namespace MPILib */
 

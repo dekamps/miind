@@ -54,7 +54,7 @@ const parameters::PopulationParameter& par_pop, const parameters::PopulistSpecif
 				0), _p_current_rate(p_rate), _array_state_reference(
 				array_state), _array_state(array_state), _array_interpretation(
 				array_interpretation), _p_rebinner(
-				auto_ptr<AbstractRebinner>(par_spec.getRebin().Clone())), _p_stream(
+				std::unique_ptr<rebinner::AbstractRebinner>(par_spec.getRebin().Clone())), _p_stream(
 				p_stream), _builder( VALUE_MEMBER_ARG
 		_n_bins, _array_state, _check_sum, _bins, _par_pop, _par_spec,
 				_delta_v), _p_zl(

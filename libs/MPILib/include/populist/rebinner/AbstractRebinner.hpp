@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_ABSTRACTREBINNER_HPP_
-#define MPILIB_POPULIST_ABSTRACTREBINNER_HPP_
+#ifndef MPILIB_POPULIST_REBINNER_ABSTRACTREBINNER_HPP_
+#define MPILIB_POPULIST_REBINNER_ABSTRACTREBINNER_HPP_
 
 #include <valarray>
 #include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
@@ -28,7 +28,7 @@
 
 namespace MPILib {
 namespace populist {
-
+namespace rebinner {
 
 	//! AbstractRebinner: Abstract base class for rebinning algorithms.
 	//! 
@@ -68,8 +68,8 @@ namespace populist {
 		void ScaleRefractive(double, AbstractZeroLeakEquations*);
 	};
 
-
+} /* namespace rebinner */
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_ABSTRACTREBINNER_HPP_
+#endif // include guard MPILIB_POPULIST_REBINNER_ABSTRACTREBINNER_HPP_
