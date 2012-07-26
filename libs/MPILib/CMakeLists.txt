@@ -22,9 +22,16 @@ set(MPI_SRCS
     src/algorithm/AlgorithmGrid.cpp
     src/algorithm/WilsonCowanAlgorithm.cpp
     
+    src/populist/circulantSolvers/AbstractCirculantSolver.cpp
+    src/populist/circulantSolvers//CirculantSolver.cpp
+    src/populist/circulantSolvers/PolynomialCirculant.cpp
+    src/populist/circulantSolvers/RefractiveCirculantSolver.cpp
+    
     src/populist/parameters/PopulistSpecificParameter.cpp
     src/populist/parameters/AdaptationParameter.cpp
     src/populist/parameters/OneDMParameter.cpp
+    
+    src/populist/zeroLeakEquations/ABConvertor.cpp
     src/populist/zeroLeakEquations/LIFConvertor.cpp
     src/populist/zeroLeakEquations/LIFZeroLeakEquations.cpp
     src/populist/zeroLeakEquations/NumericalZeroLeakEquations.cpp
@@ -32,13 +39,10 @@ set(MPI_SRCS
     src/populist/zeroLeakEquations/OneDMZeroLeakEquations.cpp
     src/populist/zeroLeakEquations/SingleInputZeroLeakEquations.cpp
     
-    src/populist/ABConvertor.cpp
-    src/populist/AbstractCirculantSolver.cpp
     src/populist/AbstractNonCirculantSolver.cpp
     src/populist/AbstractRateComputation.cpp
     src/populist/AbstractRebinner.cpp
     src/populist/AdaptiveHazard.cpp
-    src/populist/CirculantSolver.cpp
     src/populist/InitializeAlgorithmGrid.cpp
     src/populist/IntegralRateComputation.cpp
     src/populist/InterpolationRebinner.cpp
@@ -46,9 +50,7 @@ set(MPI_SRCS
     src/populist/MatrixNonCirculant.cpp
     src/populist/MuSigmaScalarProduct.cpp
     src/populist/NonCirculantSolver.cpp
-    src/populist/PolynomialCirculant.cpp
     src/populist/ProbabilityQueue.cpp
-    src/populist/RefractiveCirculantSolver.cpp
     src/populist/VArray.cpp
     src/populist/ZeroLeakBuilder.cpp
     

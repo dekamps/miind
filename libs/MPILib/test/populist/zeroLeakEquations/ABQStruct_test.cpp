@@ -17,50 +17,43 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#ifndef MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
-#define MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
+#include <vector>
+#include <MPILib/include/TypeDefinitions.hpp>
+#define private public
+#define protected public
+#include <MPILib/include/populist/zeroLeakEquations/ABQStruct.hpp>
+#undef protected
+#undef private
 
-#include <string>
-#include <boost/shared_ptr.hpp>
-#include <MPILib/include/populist/AbstractNonCirculantSolver.hpp>
-#include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
 
-namespace MPILib {
-namespace populist {
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
 
-	class ZeroLeakBuilder {
-	public:
+void test_Constructor() {
+	ABQStruct s{1,2,3};
 
-		ZeroLeakBuilder(
-			Number&,					//!< reference to the current number of bins
-			std::valarray<Potential>&,		//!< reference to state array
-			Potential&,					//!< reference to the check sum variable
-			SpecialBins&,		
-			parameters::PopulationParameter&,		//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
-			Potential&					//!< reference to the current scale variable
-		);
+	BOOST_CHECK(s._a==1);
+	BOOST_CHECK(s._b==2);
+	BOOST_CHECK(s._q==3);
+}
 
-	boost::shared_ptr<AbstractZeroLeakEquations> 
-		GenerateZeroLeakEquations
-		(
-			const std::string&,
-			const std::string&,
-			const std::string&
-		);
 
-	private:
+int test_main(int argc, char* argv[]) // note the name!
+		{
 
-		Number&						_n_bins;
-		std::valarray<Potential>&	_array_state;
-		Potential&					_checksum;
-		SpecialBins&				_bins;
-		parameters::PopulationParameter&		_par_pop;
-		parameters::PopulistSpecificParameter&	_par_spec;
-		Potential&					_delta_v;
+	test_Constructor();
 
-	};
-} /* namespace populist */
-} /* namespace MPILib */
-
-#endif // include guard MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
+}

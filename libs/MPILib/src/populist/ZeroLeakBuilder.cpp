@@ -18,16 +18,17 @@
 //
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/populist/ZeroLeakBuilder.hpp>
-#include <MPILib/include/populist/CirculantSolver.hpp>
+#include <MPILib/include/populist/circulantSolvers/CirculantSolver.hpp>
+#include <MPILib/include/populist/circulantSolvers/PolynomialCirculant.hpp>
+#include <MPILib/include/populist/circulantSolvers/RefractiveCirculantSolver.hpp>
+
 #include <MPILib/include/populist/zeroLeakEquations/LIFZeroLeakEquations.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/NumericalZeroLeakEquations.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/OldLifZeroLeakEquations.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/OneDMZeroLeakEquations.hpp>
-#include <MPILib/include/populist/PolynomialCirculant.hpp>
 #include <MPILib/include/populist/NonCirculantSolver.hpp>
 #include <MPILib/include/populist/LimitedNonCirculant.hpp>
 #include <MPILib/include/populist/MatrixNonCirculant.hpp>
-#include <MPILib/include/populist/RefractiveCirculantSolver.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/SingleInputZeroLeakEquations.hpp>
 
 namespace MPILib {

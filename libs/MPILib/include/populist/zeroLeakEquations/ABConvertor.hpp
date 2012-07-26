@@ -29,8 +29,8 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 
-#include <MPILib/include/populist/ABStruct.hpp>
-#include <MPILib/include/populist/ABScalarProduct.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/ABQStruct.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/ABScalarProduct.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/populist/parameters/OneDMParameter.hpp>
 #include <MPILib/include/populist/parameters/OneDMInputSetParameter.hpp>

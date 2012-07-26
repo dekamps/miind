@@ -22,7 +22,7 @@
 #include <gsl/gsl_odeiv.h>
 #include <gsl/gsl_errno.h>
 #include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
-#include <MPILib/include/populist/ABConvertor.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/ABConvertor.hpp>
 #include <MPILib/include/populist/parameters/OneDMInputSetParameter.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 

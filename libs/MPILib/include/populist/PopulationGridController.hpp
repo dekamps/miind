@@ -25,7 +25,7 @@
 #include "../NumtoolsLib/NumtoolsLib.h"
 #include <MPILib/include/populist/AbstractRebinner.hpp>
 #include <MPILib/include/populist/AbstractRateComputation.hpp>
-#include <MPILib/include/populist/CirculantSolver.hpp>
+#include <MPILib/include/populist/circulantSolvers/CirculantSolver.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>

@@ -17,8 +17,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#include <MPILib/include/populist/ABConvertor.hpp>
-#include <MPILib/include/populist/AbstractCirculantSolver.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/ABConvertor.hpp>
 #include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
 
 namespace MPILib {

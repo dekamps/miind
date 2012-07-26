@@ -17,43 +17,39 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#include  <MPILib/include/populist/RefractiveCirculantSolver.hpp>
-namespace MPILib {
-namespace populist {
+#include <vector>
+#include <MPILib/include/TypeDefinitions.hpp>
+#define private public
+#define protected public
+#include <MPILib/include/populist/circulantSolvers/PolynomialCirculant.hpp>
+#undef protected
+#undef private
 
 
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
 
-double RefractiveCirculantSolver::AboveThreshold(Time tau) const 
-{
-	double sum = 0.0;
-	Number n =  NumberOfSolverTerms(tau, _precision, _p_set->_n_noncirc_exc);
-	for (Index i = 0; i < n; i++)
-		sum += _array_rho[i];
-	return _initial_integral - sum  - _queue.TotalProbability();
+void test_Constructor() {
+	///@todo implement test for this class
+
 }
 
-void RefractiveCirculantSolver::Execute(Number n_bins, Time tau, Time t_sim)
-{
-	_n_bins = n_bins;
-	_tau	= tau;
-	// tau is the time that the simulation has to run for
-	this->FillNonCirculantBins();
-	StampedProbability prob;
-	prob._prob = this->AboveThreshold(tau);
-	// Most Solvers just run for time tau,
-	// but this Solver needs to keep track of total simulation time to make sense of queue unpacking
-	prob._time = _t_ref + t_sim; 
-	_queue.push(prob);
+int test_main(int argc, char* argv[]) // note the name!
+		{
 
-	_off_queue = _queue.CollectAndRemove(t_sim);
+	test_Constructor();
+
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
 }
-
-void RefractiveCirculantSolver::AddCirculantToState(Index i_reset)
-{
-	 (*_p_array_state)[i_reset] += _off_queue;
-	 _off_queue = 0;  // remember that this value would otherwise influence queries about the total probility in the queue.
-}
-
-
-} /* namespace populist */
-} /* namespace MPILib */

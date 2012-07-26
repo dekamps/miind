@@ -19,7 +19,7 @@
 #ifndef MPILIB_POPULIST_POLYNOMIALCIRCULANT_HPP_
 #define MPILIB_POPULIST_POLYNOMIALCIRCULANT_HPP_
 
-#include <MPILib/include/populist/AbstractCirculantSolver.hpp>
+#include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 #include <vector>
 

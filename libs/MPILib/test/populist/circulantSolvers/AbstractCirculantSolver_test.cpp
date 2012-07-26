@@ -16,51 +16,40 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_ABSCALARPRODUCT_HPP_
-#define MPILIB_POPULIST_ABSCALARPRODUCT_HPP_
 
-#include <MPILib/config.hpp>
-#include <MPILib/include/populist/ABStruct.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
-#include <MPILib/include/utilities/Exception.hpp>
 #include <vector>
+#include <MPILib/include/TypeDefinitions.hpp>
+#define private public
+#define protected public
+#include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
+#undef protected
+#undef private
 
-namespace MPILib {
-namespace populist {
 
-/**
- * @brief calculates the AB Scalar Product
- */
-class ABScalarProduct {
-public:
-	/**
-	 * Evaluate the inner product over connections
-	 * @param nodeVector Vector of the Rates of the precursor
-	 * @param weightVector Vector of the weights of the connections
-	 * @param time The current time
-	 * @return A ABQ struct
-	 */
-	ABQStruct Evaluate(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
-			Time time) const {
-		// for now a comes from the first population and b from the second. This will need to change.
-		ABQStruct par_ret;
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
 
-		if ((*nodeVector.begin()) == 6.0) {
-			par_ret._a = 6.91423056;
-			par_ret._b = 0.13299526;
-		} else if ((*nodeVector.begin()) == 8.0) {
-			par_ret._a = 129.43365395;
-			par_ret._b = 0.08430153;
-		} else
-			throw utilities::Exception(
-					"Input rate cannot be decoded by ABScalarProduct");
+void test_Constructor() {
+	///@todo implement test for this class
 
-		return par_ret;
-	}
-};
+}
 
-} /* namespace populist */
-} /* namespace MPILib */
+int test_main(int argc, char* argv[]) // note the name!
+		{
 
-#endif // include guard MPILIB_POPULIST_ABSCALARPRODUCT_HPP_
+	test_Constructor();
+
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
+}

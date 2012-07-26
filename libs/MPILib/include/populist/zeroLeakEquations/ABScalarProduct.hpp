@@ -16,63 +16,51 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_CIRCULANTSOLVER_HPP_
-#define MPILIB_POPULIST_CIRCULANTSOLVER_HPP_
+#ifndef MPILIB_POPULIST_ABSCALARPRODUCT_HPP_
+#define MPILIB_POPULIST_ABSCALARPRODUCT_HPP_
 
-#include <valarray>
-#include <NumtoolsLib/NumtoolsLib.h>
-#include <MPILib/include/populist/AbstractCirculantSolver.hpp>
-#include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/parameters/InputParameterSet.hpp>
-#include <MPILib/include/populist/VArray.hpp>
-
-using NumtoolsLib::C_Matrix;
-using NumtoolsLib::D_Matrix;
+#include <MPILib/config.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/ABQStruct.hpp>
+#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
+#include <MPILib/include/utilities/Exception.hpp>
+#include <vector>
 
 namespace MPILib {
 namespace populist {
 
-	//! CirculantSolver
-	//! This is the literal implementation of the analytic solution from (de Kamps, 2006)
-	//! It is not efficient and should probably not be used in realistic applications, but
-	//! is important in the benchmarking of other circulant solvers
-	class CirculantSolver : public AbstractCirculantSolver
-	{
-	public:
+/**
+ * @brief calculates the AB Scalar Product
+ */
+class ABScalarProduct {
+public:
+	/**
+	 * Evaluate the inner product over connections
+	 * @param nodeVector Vector of the Rates of the precursor
+	 * @param weightVector Vector of the weights of the connections
+	 * @param time The current time
+	 * @return A ABQ struct
+	 */
+	ABQStruct Evaluate(const std::vector<Rate>& nodeVector,
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			Time time) const {
+		// for now a comes from the first population and b from the second. This will need to change.
+		ABQStruct par_ret;
 
-		CirculantSolver(CirculantMode = INTEGER);
+		if ((*nodeVector.begin()) == 6.0) {
+			par_ret._a = 6.91423056;
+			par_ret._b = 0.13299526;
+		} else if ((*nodeVector.begin()) == 8.0) {
+			par_ret._a = 129.43365395;
+			par_ret._b = 0.08430153;
+		} else
+			throw utilities::Exception(
+					"Input rate cannot be decoded by ABScalarProduct");
 
-		virtual void Execute
-		(
-			Number,
-			Time,
-			Time = 0 //!< Irrelevant for this solver
-		);
+		return par_ret;
+	}
+};
 
-
-		double Integrate(Number) const;
-
-		double Flux
-		(
-			Number, 
-			Time
-		) const;
-
-		//! Clone operation
-		CirculantSolver* Clone() const;
-
-		//! 
-		virtual bool BeforeNonCirculant() {return true;}
-
-	private:
-
-		void CalculateInnerProduct();
-
-
-		Index				_index_reversal_bin;
-		VArray				_array_V;
-	};
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_CIRCULANTSOLVER_HPP_
+#endif // include guard MPILIB_POPULIST_ABSCALARPRODUCT_HPP_

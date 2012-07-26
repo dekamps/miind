@@ -22,7 +22,7 @@
 #include <MPILib/include/populist/zeroLeakEquations/SpecialBins.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/populist/AbstractNonCirculantSolver.hpp>
-#include <MPILib/include/populist/AbstractCirculantSolver.hpp>
+#include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/populist/parameters/InputParameterSet.hpp>
 #include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>

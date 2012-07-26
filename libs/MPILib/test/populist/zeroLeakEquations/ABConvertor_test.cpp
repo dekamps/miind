@@ -17,59 +17,82 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-
 #include <vector>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/ABScalarProduct.hpp>
-
-#include <MPILib/include/populist/ABStruct.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
-#include <MPILib/include/utilities/Exception.hpp>
+#define private public
+#define protected public
+#include <MPILib/include/populist/zeroLeakEquations/ABConvertor.hpp>
+#undef protected
+#undef private
+#include <MPILib/include/populist/zeroLeakEquations/SpecialBins.hpp>
+#include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
+#include <MPILib/include/populist/parameters/PopulistParameter.hpp>
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
 using namespace MPILib::populist;
 using namespace MPILib;
 
-void test_Evaluate() {
+void test_Constructor() {
+	parameters::PopulistSpecificParameter popSpecParam;
+	parameters::OrnsteinUhlenbeckParameter popParam;
 
-	ABScalarProduct test;
-	ABQStruct abStruct;
-	std::vector<Rate> rateVector;
-	std::vector<OrnsteinUhlenbeckConnection> weightVector;
-	Time t = 1.0;
-	rateVector.push_back(6.0);
+	SpecialBins specBins { 4, 5, 6 };
+	Potential pot = 2.0;
+	Number num = 3;
 
-	abStruct = test.Evaluate(rateVector, weightVector, t);
+	ABConvertor converter(specBins, popParam, popSpecParam, pot, num);
 
-	BOOST_CHECK(abStruct._a== 6.91423056);
-	BOOST_CHECK(abStruct._b== 0.13299526);
+	BOOST_CHECK(converter._p_pop==&popParam);
+	BOOST_CHECK(converter._p_specific==&popSpecParam);
+	BOOST_CHECK((*converter._p_delta_v)==2.0);
+	BOOST_CHECK(converter._p_delta_v==&pot);
 
-	rateVector.clear();
-	rateVector.push_back(8.0);
+	BOOST_CHECK((*converter._p_n_bins)==3.0);
+	BOOST_CHECK(converter._p_n_bins==&num);
 
-	abStruct = test.Evaluate(rateVector, weightVector, t);
 
-	BOOST_CHECK(abStruct._a== 129.43365395);
-	BOOST_CHECK(abStruct._b== 0.08430153);
+}
 
-	rateVector.clear();
-	rateVector.push_back(9.0);
-	bool thrown = false;
+void test_SortConnectionvector(){
+	parameters::PopulistSpecificParameter popSpecParam;
+	parameters::OrnsteinUhlenbeckParameter popParam;
+	SpecialBins specBins { 4, 5, 6 };
+	Potential pot = 2.0;
+	Number num = 3;
+	ABConvertor converter(specBins, popParam, popSpecParam, pot, num);
 
-	try {
-		abStruct = test.Evaluate(rateVector, weightVector, t);
-	} catch (utilities::Exception& e) {
-		thrown = true;
-	}
-	BOOST_CHECK(thrown==true);
+	std::vector<Rate> rates;
+	std::vector<OrnsteinUhlenbeckConnection> weights;
+	std::vector<NodeType> types;
 
+	rates.push_back(6.0);
+	weights.push_back(OrnsteinUhlenbeckConnection(2.0,3.0));
+	types.push_back(EXCITATORY_BURST);
+	rates.push_back(2.0);
+	weights.push_back(OrnsteinUhlenbeckConnection(4.0,5.0));
+	types.push_back(INHIBITORY_BURST);
+	rates.push_back(3.0);
+	weights.push_back(OrnsteinUhlenbeckConnection(6.0,7.0));
+	types.push_back(INHIBITORY);
+
+	converter.SortConnectionvector(rates, weights, types);
+	BOOST_CHECK(converter._param_input._par_input._a==6.91423056);
+	BOOST_CHECK(converter._param_input._par_input._b==0.13299526);
+	BOOST_CHECK(converter._param_input._par_input._q==0.0);
+
+}
+
+void test_RecalculateSolverParameters(){
+	///@todo implement this test
 }
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
 
-	test_Evaluate();
+	test_Constructor();
+	test_SortConnectionvector();
+	test_RecalculateSolverParameters();
 	return 0;
 //    // six ways to detect and report the same error:
 //    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error

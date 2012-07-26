@@ -1,3 +1,7 @@
+
+ADD_MIIND_TEST( ABConvertor_test.cpp)
+ADD_MIIND_TEST( ABQStruct_test.cpp)
+ADD_MIIND_TEST( ABScalarProduct_test.cpp)
 ADD_MIIND_TEST( LIFConvertor_test.cpp)
 ADD_MIIND_TEST( LIFZeroLeakEquation_test.cpp)
 ADD_MIIND_TEST( NumericalZeroLeakEquation_test.cpp)

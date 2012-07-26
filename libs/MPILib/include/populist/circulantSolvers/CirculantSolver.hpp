@@ -16,51 +16,63 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+#ifndef MPILIB_POPULIST_CIRCULANTSOLVER_HPP_
+#define MPILIB_POPULIST_CIRCULANTSOLVER_HPP_
 
-#ifndef MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
-#define MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
+#include <valarray>
+#include <NumtoolsLib/NumtoolsLib.h>
+#include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
+#include <MPILib/include/populist/parameters/InputParameterSet.hpp>
+#include <MPILib/include/populist/VArray.hpp>
 
-#include <string>
-#include <boost/shared_ptr.hpp>
-#include <MPILib/include/populist/AbstractNonCirculantSolver.hpp>
-#include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
+using NumtoolsLib::C_Matrix;
+using NumtoolsLib::D_Matrix;
 
 namespace MPILib {
 namespace populist {
 
-	class ZeroLeakBuilder {
+	//! CirculantSolver
+	//! This is the literal implementation of the analytic solution from (de Kamps, 2006)
+	//! It is not efficient and should probably not be used in realistic applications, but
+	//! is important in the benchmarking of other circulant solvers
+	class CirculantSolver : public AbstractCirculantSolver
+	{
 	public:
 
-		ZeroLeakBuilder(
-			Number&,					//!< reference to the current number of bins
-			std::valarray<Potential>&,		//!< reference to state array
-			Potential&,					//!< reference to the check sum variable
-			SpecialBins&,		
-			parameters::PopulationParameter&,		//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
-			Potential&					//!< reference to the current scale variable
+		CirculantSolver(CirculantMode = INTEGER);
+
+		virtual void Execute
+		(
+			Number,
+			Time,
+			Time = 0 //!< Irrelevant for this solver
 		);
 
-	boost::shared_ptr<AbstractZeroLeakEquations> 
-		GenerateZeroLeakEquations
+
+		double Integrate(Number) const;
+
+		double Flux
 		(
-			const std::string&,
-			const std::string&,
-			const std::string&
-		);
+			Number, 
+			Time
+		) const;
+
+		//! Clone operation
+		CirculantSolver* Clone() const;
+
+		//! 
+		virtual bool BeforeNonCirculant() {return true;}
 
 	private:
 
-		Number&						_n_bins;
-		std::valarray<Potential>&	_array_state;
-		Potential&					_checksum;
-		SpecialBins&				_bins;
-		parameters::PopulationParameter&		_par_pop;
-		parameters::PopulistSpecificParameter&	_par_spec;
-		Potential&					_delta_v;
+		void CalculateInnerProduct();
 
+
+		Index				_index_reversal_bin;
+		VArray				_array_V;
 	};
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
+#endif // include guard MPILIB_POPULIST_CIRCULANTSOLVER_HPP_

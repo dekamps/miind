@@ -19,7 +19,7 @@
 #ifndef MPILIB_POPULIST_PARAMETERS_ONEDMSETPARAMETER_HPP_
 #define MPILIB_POPULIST_PARAMETERS_ONEDMSETPARAMETER_HPP_
 
-#include <MPILib/include/populist/ABStruct.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/ABQStruct.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
