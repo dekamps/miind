@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_MUSIGMASCALARPRODUCT_HPP_
-#define MPILIB_POPULIST_MUSIGMASCALARPRODUCT_HPP_
+#ifndef MPILIB_POPULIST_ZEROLEAKEQUATIONS_MUSIGMASCALARPRODUCT_HPP_
+#define MPILIB_POPULIST_ZEROLEAKEQUATIONS_MUSIGMASCALARPRODUCT_HPP_
 
 #include <vector>
 #include <utility>
@@ -25,9 +25,10 @@
 
 namespace MPILib {
 namespace populist {
-
 // forward declaration
 struct OrnsteinUhlenbeckConnection;
+namespace zeroLeakEquations{
+
 
 //! Evaluates the scalar product of an input which arrives over OU_Connections.
 //! The formulae are:
@@ -56,8 +57,8 @@ private:
 			const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const;
 
 };
-
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_MUSIGMASCALARPRODUCT_HPP_
+#endif // include guard MPILIB_POPULIST_ZEROLEAKEQUATIONS_MUSIGMASCALARPRODUCT_HPP_

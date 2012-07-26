@@ -16,21 +16,22 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_MUSIGMA_HPP_
-#define MPILIB_POPULIST_MUSIGMA_HPP_
+#ifndef MPILIB_POPULIST_ZEROLEAKEQUATIONS_MUSIGMA_HPP_
+#define MPILIB_POPULIST_ZEROLEAKEQUATIONS_MUSIGMA_HPP_
 
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 	//! Scalar product of OrnsteinUhlenbeckConnection has a dyadic output: mu and sigma
 	struct MuSigma
 	{
 		Potential _mu;
 		Potential _sigma;
 	};
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // incllude guard MPILIB_POPULIST_MUSIGMA_HPP_
+#endif // incllude guard MPILIB_POPULIST_ZEROLEAKEQUATIONS_MUSIGMA_HPP_

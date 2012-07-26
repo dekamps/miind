@@ -26,6 +26,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace zeroLeakEquations{
 using NumtoolsLib::IsApproximatelyEqualTo;
 
 LIFZeroLeakEquations::LIFZeroLeakEquations(Number& n_bins,
@@ -79,6 +80,6 @@ void LIFZeroLeakEquations::SortConnectionvector(
 void LIFZeroLeakEquations::AdaptParameters() {
 	_convertor.AdaptParameters();
 }
-
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */

@@ -30,7 +30,7 @@ using NumtoolsLib::IsApproximatelyEqualTo;
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 OldLIFZeroLeakEquations::OldLIFZeroLeakEquations(Number& n_bins,
 		valarray<Potential>& array_state, Potential& check_sum,
 		SpecialBins& bins,
@@ -168,6 +168,6 @@ void OldLIFZeroLeakEquations::SortConnectionvector(
 void OldLIFZeroLeakEquations::AdaptParameters() {
 	_convertor.AdaptParameters();
 }
-
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */

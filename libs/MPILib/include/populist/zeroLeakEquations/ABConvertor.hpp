@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_ABCONVERTOR_HPP_
-#define MPILIB_POPULIST_ABCONVERTOR_HPP_
+#ifndef MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABCONVERTOR_HPP_
+#define MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABCONVERTOR_HPP_
 
 #ifdef WIN32
 #pragma warning(disable: 4996)
@@ -39,6 +39,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace zeroLeakEquations{
 
 class ABConvertor {
 public:
@@ -91,7 +92,8 @@ private:
 	const Number* _p_n_bins;
 	const Potential* _p_delta_v;
 };
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif //include guard MPILIB_POPULIST_ABCONVERTOR_HPP_
+#endif //include guard MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABCONVERTOR_HPP_

@@ -36,13 +36,13 @@ namespace populist {
 			Number&,					//!< reference to the current number of bins
 			std::valarray<Potential>&,		//!< reference to state array
 			Potential&,					//!< reference to the check sum variable
-			SpecialBins&,		
+			zeroLeakEquations::SpecialBins&,
 			parameters::PopulationParameter&,		//!< reference to the PopulationParameter
 			parameters::PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
 			Potential&					//!< reference to the current scale variable
 		);
 
-	std::shared_ptr<AbstractZeroLeakEquations>
+	std::shared_ptr<zeroLeakEquations::AbstractZeroLeakEquations>
 		GenerateZeroLeakEquations
 		(
 			const std::string&,
@@ -55,7 +55,7 @@ namespace populist {
 		Number&						_n_bins;
 		std::valarray<Potential>&	_array_state;
 		Potential&					_checksum;
-		SpecialBins&				_bins;
+		zeroLeakEquations::SpecialBins&				_bins;
 		parameters::PopulationParameter&		_par_pop;
 		parameters::PopulistSpecificParameter&	_par_spec;
 		Potential&					_delta_v;

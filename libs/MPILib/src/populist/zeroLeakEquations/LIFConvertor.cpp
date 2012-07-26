@@ -26,7 +26,7 @@
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 void LIFConvertor::AdaptParameters() {
 	// Purpose: Adaption from stride size to current scale, to be called after every new AddBin, or rebinning
 	// Assumes correct values for _delta_v and _set_input, so DeltaV() must be called before this routine
@@ -177,6 +177,6 @@ void LIFConvertor::SortConnectionvector(const std::vector<Rate>& nodeVector,
 
 	///@todo implement test for last case
 }
-
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */

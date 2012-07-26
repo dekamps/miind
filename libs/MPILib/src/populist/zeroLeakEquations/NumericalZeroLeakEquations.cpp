@@ -29,7 +29,7 @@
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 int DerivReset(double t, const double y[], double dydt[], void * params){
 
 	// the reset current is treated differently so that we know exactly what the refractive contribution is.
@@ -299,6 +299,6 @@ void NumericalZeroLeakEquations::RecalculateSolverParameters()
 {
 	_convertor.RecalculateSolverParameters();
 }
-
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */

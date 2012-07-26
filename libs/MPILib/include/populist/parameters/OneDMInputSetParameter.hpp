@@ -30,7 +30,7 @@ namespace parameters{
 	 */
 	struct OneDMInputSetParameter {
 
-		ABQStruct	_par_input;
+		zeroLeakEquations::ABQStruct	_par_input;
 		Number		_n_current_bins;
 		Number		_n_max_bins;
 		Potential	_q_expanded;

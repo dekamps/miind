@@ -21,7 +21,7 @@
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 
 namespace {
 
@@ -246,6 +246,6 @@ Rate OneDMZeroLeakEquations::CalculateRate() const
 	}
 	return  sum;
 }
-
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */

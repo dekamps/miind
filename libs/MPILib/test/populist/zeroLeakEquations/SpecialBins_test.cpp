@@ -29,6 +29,7 @@
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
 using namespace MPILib::populist;
+using namespace MPILib::populist::zeroLeakEquations;
 using namespace MPILib;
 
 void test_Constructor() {

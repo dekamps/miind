@@ -22,7 +22,7 @@
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 AdaptiveHazard::AdaptiveHazard
 (
 	double a,
@@ -45,5 +45,6 @@ double AdaptiveHazard::operator ()
 
 	return _a*exp(-_b*g);
 }
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */

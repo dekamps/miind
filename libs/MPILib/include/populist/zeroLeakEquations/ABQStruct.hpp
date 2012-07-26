@@ -16,14 +16,14 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_ABSTRUCT_HPP_
-#define MPILIB_POPULIST_ABSTRUCT_HPP_
+#ifndef MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABSTRUCT_HPP_
+#define MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABSTRUCT_HPP_
 
 #include <iostream>
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 	struct ABQStruct {
 		double _a;
 		double _b;
@@ -32,6 +32,7 @@ namespace populist {
 
 	std::istream& operator>>(std::istream&, ABQStruct& );
 	std::ostream& operator<<(std::ostream&, const ABQStruct& );
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
-#endif // include guard
+#endif // include guard MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABSTRUCT_HPP_

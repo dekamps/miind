@@ -67,7 +67,7 @@ public:
 
 	//! carry out rebinning as specified in configuration. The pointer to AbstractZeroLeakequations allows access to the refractive probability.
 	//! passing in a null pointer is legal and leads to a no-operation
-	virtual bool Rebin(AbstractZeroLeakEquations* = 0);
+	virtual bool Rebin(zeroLeakEquations::AbstractZeroLeakEquations* = 0);
 
 	//! virtual constructor
 	InterpolationRebinner* Clone() const;
@@ -85,8 +85,8 @@ private:
 	int IndexNewResetBin();
 	void Interpolate();
 
-	void ReplaceResetBin(AbstractZeroLeakEquations*);
-	void RescaleAllProbability(AbstractZeroLeakEquations*);
+	void ReplaceResetBin(zeroLeakEquations::AbstractZeroLeakEquations*);
+	void RescaleAllProbability(zeroLeakEquations::AbstractZeroLeakEquations*);
 
 	gsl_interp_accel* _p_accelerator = gsl_interp_accel_alloc();
 	std::vector<double> _x_array = std::vector<double>();

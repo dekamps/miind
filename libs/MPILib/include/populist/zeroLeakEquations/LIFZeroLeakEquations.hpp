@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_LIFZEROLEAKEQUATIONS_HPP_
-#define MPILIB_POPULIST_LIFZEROLEAKEQUATIONS_HPP_
+#ifndef MPILIB_POPULIST_ZEROLEAKEQUATIONS_LIFZEROLEAKEQUATIONS_HPP_
+#define MPILIB_POPULIST_ZEROLEAKEQUATIONS_LIFZEROLEAKEQUATIONS_HPP_
 
 #include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/LIFConvertor.hpp>
@@ -29,7 +29,7 @@
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 /**
  * @brief This is the base class for population density methods based on leaky-integrate-and-fire neurons
  */
@@ -125,7 +125,7 @@ protected:
 	std::unique_ptr<nonCirculantSolvers::AbstractNonCirculantSolver> _p_solver_non_circulant;
 	std::unique_ptr<rateComputation::AbstractRateComputation> _p_rate_calc;
 };
-
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
-#endif // include guard
+#endif // include guard MPILIB_POPULIST_ZEROLEAKEQUATIONS_LIFZEROLEAKEQUATIONS_HPP_

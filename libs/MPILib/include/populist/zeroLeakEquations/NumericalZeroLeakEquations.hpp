@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_NUMERICALZEROLEAKEQUATIONS_HPP_
-#define MPILIB_POPULIST_NUMERICALZEROLEAKEQUATIONS_HPP_
+#ifndef MPILIB_POPULIST_ZEROLEAKEQUATIONS_NUMERICALZEROLEAKEQUATIONS_HPP_
+#define MPILIB_POPULIST_ZEROLEAKEQUATIONS_NUMERICALZEROLEAKEQUATIONS_HPP_
 
 #include <memory>
 #include <NumtoolsLib/NumtoolsLib.h>
@@ -33,7 +33,7 @@ using NumtoolsLib::ExStateDVIntegrator;
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 /**
  * @brief Provides a numerical solution for the zero leak equations.
  */
@@ -135,8 +135,8 @@ private:
 	parameters::NumericalZeroLeakParameter _parameter;
 	ProbabilityQueue _queue;
 };
-
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_NUMERICALZEROLEAKEQUATIONS_HPP_
+#endif // include guard MPILIB_POPULIST_ZEROLEAKEQUATIONS_NUMERICALZEROLEAKEQUATIONS_HPP_

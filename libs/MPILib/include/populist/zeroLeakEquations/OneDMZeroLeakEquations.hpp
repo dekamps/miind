@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_ONEDMZEROLEAKEQUATIONS_HPP_
-#define MPILIB_POPULIST_ONEDMZEROLEAKEQUATIONS_HPP_
+#ifndef MPILIB_POPULIST_ZEROLEAKEQUATIONS_ONEDMZEROLEAKEQUATIONS_HPP_
+#define MPILIB_POPULIST_ZEROLEAKEQUATIONS_ONEDMZEROLEAKEQUATIONS_HPP_
 
 #include <gsl/gsl_odeiv.h>
 #include <gsl/gsl_errno.h>
@@ -28,9 +28,8 @@
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 class AbConvertor;
-class PopulistSpecificParameter;
 
 class OneDMZeroLeakEquations: public AbstractZeroLeakEquations {
 public:
@@ -89,8 +88,8 @@ private:
 	parameters::OneDMInputSetParameter _params;
 
 };
-
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_ONEDMZEROLEAKEQUATIONS_HPP_
+#endif // include guard MPILIB_POPULIST_ZEROLEAKEQUATIONS_ONEDMZEROLEAKEQUATIONS_HPP_

@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_ABSTRACTZEROLEAKEQUATIONS_HPP_
-#define MPILIB_POPULIST_ABSTRACTZEROLEAKEQUATIONS_HPP_
+#ifndef MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABSTRACTZEROLEAKEQUATIONS_HPP_
+#define MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABSTRACTZEROLEAKEQUATIONS_HPP_
 
 #include <MPILib/include/populist/zeroLeakEquations/SpecialBins.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
@@ -33,7 +33,7 @@
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 /**
  * @brief A solver for the zero leak master equations in the PopulationAlgorithm.
  *
@@ -171,8 +171,8 @@ private:
 	const SpecialBins& _bins;
 	const parameters::InputParameterSet* _p_set = nullptr;
 };
-
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_ABSTRACTZEROLEAKEQUATIONS_HPP_
+#endif // include guard MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABSTRACTZEROLEAKEQUATIONS_HPP_

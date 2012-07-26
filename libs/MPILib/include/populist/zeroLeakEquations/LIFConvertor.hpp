@@ -17,8 +17,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#ifndef MPILIB_POPULIST_LIFCONVERTOR_HPP_
-#define MPILIB_POPULIST_LIFCONVERTOR_HPP_
+#ifndef MPILIB_POPULIST_ZEROLEAKEQUATIONS_LIFCONVERTOR_HPP_
+#define MPILIB_POPULIST_ZEROLEAKEQUATIONS_LIFCONVERTOR_HPP_
 
 #include <vector>
 
@@ -37,6 +37,7 @@ namespace populist {
 namespace parameters {
 class PopulistSpecificParameter;
 }
+namespace zeroLeakEquations{
 struct SpecialBins;
 
 /**
@@ -173,8 +174,8 @@ private:
 	std::vector<Rate> _vec_burst;
 	std::vector<Rate> _vec_diffusion;
 };
-
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif //include guard MPILIB_POPULIST_LIFCONVERTOR_HPP_
+#endif //include guard MPILIB_POPULIST_ZEROLEAKEQUATIONS_LIFCONVERTOR_HPP_

@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_ABSCALARPRODUCT_HPP_
-#define MPILIB_POPULIST_ABSCALARPRODUCT_HPP_
+#ifndef MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABSCALARPRODUCT_HPP_
+#define MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABSCALARPRODUCT_HPP_
 
 #include <MPILib/config.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/ABQStruct.hpp>
@@ -27,7 +27,7 @@
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 /**
  * @brief calculates the AB Scalar Product
  */
@@ -59,8 +59,8 @@ public:
 		return par_ret;
 	}
 };
-
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_ABSCALARPRODUCT_HPP_
+#endif // include guard MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABSCALARPRODUCT_HPP_

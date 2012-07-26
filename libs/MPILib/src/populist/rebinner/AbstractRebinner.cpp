@@ -24,7 +24,7 @@ namespace rebinner {
 AbstractRebinner::~AbstractRebinner()
 {
 }
-void AbstractRebinner::ScaleRefractive(double scale, AbstractZeroLeakEquations* p_zl)
+void AbstractRebinner::ScaleRefractive(double scale, zeroLeakEquations::AbstractZeroLeakEquations* p_zl)
 {
 	if (p_zl)
 		p_zl->ScaleRefractiveProbability(scale);

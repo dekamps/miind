@@ -125,7 +125,7 @@ public:
 	//! converts a circulant index, which can have values 0, ..., n_circ into the corresponding state array values
 	Index
 	CirculantBinIndexToStateIndex(Index, const parameters::PopulationParameter&,
-			const SpecialBins&) const;
+			const zeroLeakEquations::SpecialBins&) const;
 
 private:
 
@@ -171,7 +171,7 @@ private:
 	Time _time_network_step;
 	Time _time_current;
 
-	SpecialBins _bins;
+	zeroLeakEquations::SpecialBins _bins;
 	parameters::PopulationParameter _par_pop;
 	parameters::PopulistSpecificParameter _par_spec;
 
@@ -196,7 +196,7 @@ private:
 	ostringstream* _p_stream;
 
 	ZeroLeakBuilder _builder;
-	std::shared_ptr<AbstractZeroLeakEquations> _p_zl;
+	std::shared_ptr<zeroLeakEquations::AbstractZeroLeakEquations> _p_zl;
 
 };
 

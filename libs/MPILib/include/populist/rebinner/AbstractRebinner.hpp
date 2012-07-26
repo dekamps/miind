@@ -56,7 +56,7 @@ namespace rebinner {
 
 		//! every rebinner can do a rebin after it has been configured
 		//! some rebinners need to take refractive probability into account
-		virtual bool Rebin(AbstractZeroLeakEquations*) = 0;
+		virtual bool Rebin(zeroLeakEquations::AbstractZeroLeakEquations*) = 0;
 
 		virtual AbstractRebinner* Clone() const = 0;
 
@@ -65,7 +65,7 @@ namespace rebinner {
 
 	protected:
 
-		void ScaleRefractive(double, AbstractZeroLeakEquations*);
+		void ScaleRefractive(double, zeroLeakEquations::AbstractZeroLeakEquations*);
 	};
 
 } /* namespace rebinner */

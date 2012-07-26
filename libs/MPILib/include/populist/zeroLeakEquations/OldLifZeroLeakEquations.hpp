@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_OLDLIFZEROLEAKEQUATIONS_HPP_
-#define MPILIB_POPULIST_OLDLIFZEROLEAKEQUATIONS_HPP_
+#ifndef MPILIB_POPULIST_ZEROLEAKEQUATIONS_OLDLIFZEROLEAKEQUATIONS_HPP_
+#define MPILIB_POPULIST_ZEROLEAKEQUATIONS_OLDLIFZEROLEAKEQUATIONS_HPP_
 
 #include <MPILib/include/populist/zeroLeakEquations/LIFZeroLeakEquations.hpp>
 #include <MPILib/include/populist/rateComputation/AbstractRateComputation.hpp>
@@ -26,7 +26,7 @@
 
 namespace MPILib {
 namespace populist {
-
+namespace zeroLeakEquations{
 /**
  * \deprecated DEPRECATED! In response to the discivery in (deKamps, 2006) that probability density
  * sometimes must be transported from one bin to a point between two bins a quick hack was devised,
@@ -111,7 +111,8 @@ private:
 	std::unique_ptr<nonCirculantSolvers::AbstractNonCirculantSolver> _p_solver_non_circulant;
 	std::unique_ptr<rateComputation::AbstractRateComputation> _p_rate_calc;
 };
+} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_OLDLIFZEROLEAKEQUATIONS_HPP_
+#endif // include guard MPILIB_POPULIST_ZEROLEAKEQUATIONS_OLDLIFZEROLEAKEQUATIONS_HPP_

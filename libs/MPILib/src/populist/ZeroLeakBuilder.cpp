@@ -41,7 +41,7 @@ ZeroLeakBuilder::ZeroLeakBuilder
 	Number&						n_bins,		
 	valarray<Potential>&		array_state,
 	Potential&					checksum,	
-	SpecialBins&				bins,		
+	zeroLeakEquations::SpecialBins&				bins,
 	parameters::PopulationParameter&		par_pop,
 	parameters::PopulistSpecificParameter&	par_spec,
 	Potential&					delta_v
@@ -57,7 +57,7 @@ _delta_v(delta_v)
 }
 
 
-std::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEquations
+std::shared_ptr<zeroLeakEquations::AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEquations
 ( 
 	const string&									zeroleakequations_name,
 	const string&									circulant_solver_name, 
@@ -89,11 +89,11 @@ std::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEqua
 			else
 				throw utilities::Exception("Unknown NonCirculant solver");
 
-	std::shared_ptr<AbstractZeroLeakEquations> p_ret;
+	std::shared_ptr<zeroLeakEquations::AbstractZeroLeakEquations> p_ret;
 	if (zeroleakequations_name == "NumericalZeroLeakEquations"){
-		p_ret = std::shared_ptr<NumericalZeroLeakEquations>
+		p_ret = std::shared_ptr<zeroLeakEquations::NumericalZeroLeakEquations>
 				(
-					new NumericalZeroLeakEquations
+					new zeroLeakEquations::NumericalZeroLeakEquations
 					(
 						_n_bins,
 						_array_state,
@@ -108,9 +108,9 @@ std::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEqua
 	}
 
 	if (zeroleakequations_name == "LIFZeroLeakEquations"){
-		p_ret = std::shared_ptr<LIFZeroLeakEquations>
+		p_ret = std::shared_ptr<zeroLeakEquations::LIFZeroLeakEquations>
 				(
-					new LIFZeroLeakEquations
+					new zeroLeakEquations::LIFZeroLeakEquations
 					(
 						_n_bins,
 						_array_state,
@@ -131,9 +131,9 @@ std::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEqua
 		// This choice will overule the choice for the NonCirculantSolver
 		p_noncirc = std::shared_ptr< nonCirculantSolvers::AbstractNonCirculantSolver>(new  nonCirculantSolvers::NonCirculantSolver(INTEGER) );
 
-		p_ret = std::shared_ptr<LIFZeroLeakEquations>
+		p_ret = std::shared_ptr<zeroLeakEquations::LIFZeroLeakEquations>
 				(
-					new OldLIFZeroLeakEquations
+					new zeroLeakEquations::OldLIFZeroLeakEquations
 					(
 						_n_bins,
 						_array_state,
@@ -149,9 +149,9 @@ std::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEqua
 		return p_ret;
 	}
 	if (zeroleakequations_name == "OneDMZeroLeakEquations" ){
-		p_ret = std::shared_ptr<OneDMZeroLeakEquations>
+		p_ret = std::shared_ptr<zeroLeakEquations::OneDMZeroLeakEquations>
 				(
-					new OneDMZeroLeakEquations
+					new zeroLeakEquations::OneDMZeroLeakEquations
 					(
 						_n_bins,
 						_array_state,
@@ -166,9 +166,9 @@ std::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEqua
 	}
 
 	if (zeroleakequations_name == "SingleInputZeroLeakEquations" ){
-		p_ret = std::shared_ptr<SingleInputZeroLeakEquations>
+		p_ret = std::shared_ptr<zeroLeakEquations::SingleInputZeroLeakEquations>
 				(
-					new SingleInputZeroLeakEquations
+					new zeroLeakEquations::SingleInputZeroLeakEquations
 					(
 						_n_bins,
 						_array_state,

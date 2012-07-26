@@ -24,36 +24,29 @@ namespace MPILib {
 namespace populist {
 namespace rebinner {
 
-InterpolationRebinner::~InterpolationRebinner()
-{
-     //freeing 0 ptr leads to crash in gsl 1.4
-     if ( _p_spline )
-	     gsl_spline_free(_p_spline );
+InterpolationRebinner::~InterpolationRebinner() {
+	//freeing 0 ptr leads to crash in gsl 1.4
+	if (_p_spline)
+		gsl_spline_free(_p_spline);
 
-     gsl_interp_accel_free (_p_accelerator);
+	gsl_interp_accel_free(_p_accelerator);
 }
 
-bool InterpolationRebinner::Rebin
-(
-	AbstractZeroLeakEquations* p_zl
-)
-{
-	
+bool InterpolationRebinner::Rebin(
+		zeroLeakEquations::AbstractZeroLeakEquations* p_zl) {
+
 	_sum_before = _p_array->sum();
 
-	SmoothResetBin			();
-	PrepareLocalCopies		();
-	Interpolate				();
-	ResetOvershoot			();		// set the shrunk negative part of probability to zero
-	RescaleAllProbability	(p_zl); // because the scale factor in PopulationGridController will be reset to 1
-	ReplaceResetBin			(p_zl); // take reafactive probability into account
+	SmoothResetBin();
+	PrepareLocalCopies();
+	Interpolate();
+	ResetOvershoot();	// set the shrunk negative part of probability to zero
+	RescaleAllProbability(p_zl); // because the scale factor in PopulationGridController will be reset to 1
+	ReplaceResetBin(p_zl); // take reafactive probability into account
 	return true;
 }
 
-void InterpolationRebinner::SmoothResetBin
-(
-)
-{
+void InterpolationRebinner::SmoothResetBin() {
 	// Purpose: the reset bin usually contains a spike. It is simply being replaced with
 	// the average density of its neighbours. The missing density will be reapplied after
 	// the rebinning
@@ -64,150 +57,114 @@ void InterpolationRebinner::SmoothResetBin
 
 	if (_index_reset_bin == 0)
 		array[_index_reset_bin] = array[_index_reset_bin + 1];
+	else if (_index_reset_bin == static_cast<int>(_number_original_bins) - 1)
+		// quaint !!
+		array[_index_reset_bin] = array[_index_reset_bin - 1];
 	else
-		if (_index_reset_bin == static_cast<int>(_number_original_bins) - 1)
-			// quaint !!
-			array[_index_reset_bin] = array[_index_reset_bin - 1];
-		else
-			array[_index_reset_bin] = (array[_index_reset_bin - 1] + array[_index_reset_bin + 1])/2;
+		array[_index_reset_bin] = (array[_index_reset_bin - 1]
+				+ array[_index_reset_bin + 1]) / 2;
 }
 
-bool InterpolationRebinner::Configure
-(
-	std::valarray<double>& array,
-	Index             index_reversal_bin,
-	Index             index_reset_bin,
-	Number            number_original_bins,
-	Number            number_new_bins
-)
-{
-	assert( number_new_bins - 1 > index_reversal_bin   );
-	assert( number_new_bins     <= number_original_bins );
+bool InterpolationRebinner::Configure(std::valarray<double>& array,
+		Index index_reversal_bin, Index index_reset_bin,
+		Number number_original_bins, Number number_new_bins) {
+	assert( number_new_bins - 1 > index_reversal_bin);
+	assert( number_new_bins <= number_original_bins);
 
-	if ( number_new_bins == number_original_bins )
+	if (number_new_bins == number_original_bins)
 		return true;
 
-	_index_reversal_bin   = static_cast<int>(index_reversal_bin);
-	_index_reset_bin      = static_cast<int>(index_reset_bin);
+	_index_reversal_bin = static_cast<int>(index_reversal_bin);
+	_index_reset_bin = static_cast<int>(index_reset_bin);
 	_number_original_bins = number_original_bins;
-	_number_new_bins      = number_new_bins;
+	_number_new_bins = number_new_bins;
 
-	_p_array              = &array;
+	_p_array = &array;
 
 	if (_p_spline)
-		gsl_spline_free (_p_spline);
+		gsl_spline_free(_p_spline);
 
-	_p_spline = 
-		gsl_spline_alloc 
-		(
-			gsl_interp_cspline, 
-			_number_original_bins
-		);
+	_p_spline = gsl_spline_alloc(gsl_interp_cspline, _number_original_bins);
 
 	return true;
 }
 
-void InterpolationRebinner::PrepareLocalCopies
-(
-)
-{
+void InterpolationRebinner::PrepareLocalCopies() {
 	std::valarray<double>& array = *_p_array;
 
-	if ( _number_original_bins > _x_array.size() ){
+	if (_number_original_bins > _x_array.size()) {
 		_x_array.resize(_number_original_bins);
 		_y_array.resize(_number_original_bins);
 	}
 
-	std::copy
-	(
-		&array[0], 
-		&array[0] + _number_original_bins,
-		_y_array.begin()
-	);
+	std::copy(&array[0], &array[0] + _number_original_bins, _y_array.begin());
 
 	// The -1 is necessary! _number_bins - 1 = index_theta 
-	_dv_before = 1.0/static_cast<double>(_number_original_bins - 1 - _index_reversal_bin);
-	_dv_after  = 1.0/ static_cast<double>(_number_new_bins     - 1 - _index_reversal_bin);
+	_dv_before = 1.0
+			/ static_cast<double>(_number_original_bins - 1
+					- _index_reversal_bin);
+	_dv_after = 1.0
+			/ static_cast<double>(_number_new_bins - 1 - _index_reversal_bin);
 
-	for ( int i = 0; i < static_cast<int>(_number_original_bins); i++ )
-		_x_array[i] = (i - _index_reversal_bin)*_dv_before;
+	for (int i = 0; i < static_cast<int>(_number_original_bins); i++)
+		_x_array[i] = (i - _index_reversal_bin) * _dv_before;
 }
 
-int InterpolationRebinner::IndexNewResetBin()
-{
+int InterpolationRebinner::IndexNewResetBin() {
 	// Purpose: Locate new area of the new reset bin. If V_reset != V_reversal, they are
 	// different.
 	// Assumption: dv_before and dv_after have been calculated
 	// Author: Marc de Kamps
 	// Date: 08-01-2006
 
-	Potential v_reset = (_index_reset_bin - _index_reversal_bin)*_dv_before;
-	int new_reset_interval =  static_cast<int>(floor(v_reset/_dv_before+0.5));
+	Potential v_reset = (_index_reset_bin - _index_reversal_bin) * _dv_before;
+	int new_reset_interval = static_cast<int>(floor(v_reset / _dv_before + 0.5));
 	return _index_reversal_bin + new_reset_interval;
 }
 
-void InterpolationRebinner::ResetOvershoot()
-{
+void InterpolationRebinner::ResetOvershoot() {
 	std::valarray<double>& array = *_p_array;
-	for
-	( 
-		int index_rest_bins = static_cast<int>(_number_new_bins);
-		index_rest_bins < static_cast<int>(_number_original_bins);
-		index_rest_bins++
-	)
+	for (int index_rest_bins = static_cast<int>(_number_new_bins);
+			index_rest_bins < static_cast<int>(_number_original_bins);
+			index_rest_bins++)
 		array[index_rest_bins] = 0;
 }
 
-void InterpolationRebinner::Interpolate()
-{
+void InterpolationRebinner::Interpolate() {
 	std::valarray<double>& array = *_p_array;
-	gsl_spline_init 
-		(
-			_p_spline, 
-			&_x_array[0], 
-			&_y_array[0],
-			_number_original_bins
-		);
-	for 
-	(
-		int index_new_potential = 0;
-		index_new_potential < static_cast<int>(_number_new_bins);
-		index_new_potential++
-	)
-	{
+	gsl_spline_init(_p_spline, &_x_array[0], &_y_array[0],
+			_number_original_bins);
+	for (int index_new_potential = 0;
+			index_new_potential < static_cast<int>(_number_new_bins);
+			index_new_potential++) {
 
-		double x = ( index_new_potential - _index_reversal_bin )*_dv_after;   
+		double x = (index_new_potential - _index_reversal_bin) * _dv_after;
 
 		// take care, rebinning enlarges the negative region, for which there was no info available, therefore:
-		array[index_new_potential] = (x > _x_array[0]) ?  
-					gsl_spline_eval 
-					(
-						_p_spline, 
-						x, 
-						_p_accelerator
-					) : 0;
+		array[index_new_potential] =
+				(x > _x_array[0]) ?
+						gsl_spline_eval(_p_spline, x, _p_accelerator) : 0;
 	}
 }
 
-
-void InterpolationRebinner::ReplaceResetBin(AbstractZeroLeakEquations* p_zl)
-{
+void InterpolationRebinner::ReplaceResetBin(
+		zeroLeakEquations::AbstractZeroLeakEquations* p_zl) {
 	double refractive = p_zl ? p_zl->RefractiveProbability() : 0.0;
 	std::valarray<double>& array = *_p_array;
 	array[this->IndexNewResetBin()] += 1.0 - _p_array->sum() - refractive;
 }
 
-InterpolationRebinner* InterpolationRebinner::Clone() const
-{
+InterpolationRebinner* InterpolationRebinner::Clone() const {
 	// every useful bit of initialization must happen at Configure
 	// this is just type transfer
 
 	return new InterpolationRebinner;
 }
 
-void InterpolationRebinner::RescaleAllProbability(AbstractZeroLeakEquations* p_zl){
-	double scale = _dv_after/_dv_before; 
-	*_p_array *=  scale;
+void InterpolationRebinner::RescaleAllProbability(
+		zeroLeakEquations::AbstractZeroLeakEquations* p_zl) {
+	double scale = _dv_after / _dv_before;
+	*_p_array *= scale;
 	// do not scale refractive probability here
 }
 } /* namespace rebinner */
