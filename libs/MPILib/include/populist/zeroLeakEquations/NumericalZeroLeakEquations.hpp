@@ -126,7 +126,7 @@ private:
 	valarray<Potential>* _p_array_state;
 	Potential* _p_check_sum;
 	LIFConvertor _convertor;
-	std::unique_ptr<AbstractRateComputation> _p_rate_calc;
+	std::unique_ptr<rateComputation::AbstractRateComputation> _p_rate_calc;
 
 	std::shared_ptr<
 			ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_integrator;

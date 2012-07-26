@@ -30,7 +30,7 @@ namespace parameters {
 PopulistSpecificParameter::PopulistSpecificParameter() :
 		_p_rebinner(
 				std::shared_ptr<AbstractRebinner>(new InterpolationRebinner)), _p_rate(
-				std::shared_ptr<AbstractRateComputation>(new IntegralRateComputation)) {
+				std::shared_ptr<rateComputation::AbstractRateComputation>(new rateComputation::IntegralRateComputation)) {
 }
 
 PopulistSpecificParameter::PopulistSpecificParameter(Potential v_min,
@@ -39,7 +39,7 @@ PopulistSpecificParameter::PopulistSpecificParameter(Potential v_min,
 		const std::string& name_zeroleak, const std::string& name_circulant,
 		const std::string& name_noncirculant,
 		const AbstractRebinner* p_rebinner,
-		const AbstractRateComputation* p_rate) :
+		const rateComputation::AbstractRateComputation* p_rate) :
 		_v_min(v_min), _n_grid_initial(n_grid_initial), _n_add(n_add), _par_dens(
 				par_dens), _fact_expansion(fact_expansion), _name_zeroleak(
 				name_zeroleak), _name_circulant(name_circulant), _name_noncirculant(
@@ -49,10 +49,10 @@ PopulistSpecificParameter::PopulistSpecificParameter(Potential v_min,
 						std::shared_ptr<AbstractRebinner>(
 								new InterpolationRebinner)), _p_rate(
 				p_rate ?
-						std::shared_ptr<AbstractRateComputation>(
+						std::shared_ptr<rateComputation::AbstractRateComputation>(
 								p_rate->Clone()) :
-						std::shared_ptr<IntegralRateComputation>(
-								new IntegralRateComputation)) {
+						std::shared_ptr<rateComputation::IntegralRateComputation>(
+								new rateComputation::IntegralRateComputation)) {
 }
 
 PopulistSpecificParameter::PopulistSpecificParameter(
@@ -68,7 +68,7 @@ PopulistSpecificParameter::PopulistSpecificParameter(
 						rhs._p_rebinner->Clone())), _p_rate(
 						(rhs._p_rate.get() == nullptr) ?
 						rhs._p_rate :
-						std::shared_ptr<AbstractRateComputation>(
+						std::shared_ptr<rateComputation::AbstractRateComputation>(
 								rhs._p_rate->Clone())) {
 				}
 
@@ -90,7 +90,7 @@ PopulistSpecificParameter& PopulistSpecificParameter::operator=(
 	std::shared_ptr<AbstractRebinner>(rhs._p_rebinner->Clone());
 	_p_rate = (rhs._p_rate.get() == nullptr) ?
 	rhs._p_rate :
-	std::shared_ptr<AbstractRateComputation>(
+	std::shared_ptr<rateComputation::AbstractRateComputation>(
 			rhs._p_rate->Clone());
 	_name_zeroleak = rhs._name_zeroleak;
 	_name_circulant = rhs._name_circulant;
@@ -123,7 +123,7 @@ const AbstractRebinner& PopulistSpecificParameter::getRebin() const {
 	return *_p_rebinner;
 }
 
-const AbstractRateComputation& PopulistSpecificParameter::getRateComputation() const {
+const rateComputation::AbstractRateComputation& PopulistSpecificParameter::getRateComputation() const {
 	return *_p_rate;
 }
 

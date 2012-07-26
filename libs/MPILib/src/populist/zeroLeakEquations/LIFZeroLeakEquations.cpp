@@ -54,7 +54,7 @@ void LIFZeroLeakEquations::Configure(void* p_par// irrelevant for LIFZeroLeakequ
 
 	_p_solver_non_circulant->Configure(*_p_array_state, input_set);
 
-	_p_rate_calc = auto_ptr<AbstractRateComputation>(
+	_p_rate_calc = std::unique_ptr<rateComputation::AbstractRateComputation>(
 			this->ParSpec().getRateComputation().Clone());
 
 	_p_rate_calc->Configure(*_p_array_state, input_set, _convertor.getParPop(),

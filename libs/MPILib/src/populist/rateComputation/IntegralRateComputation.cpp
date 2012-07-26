@@ -27,6 +27,9 @@
 
 namespace MPILib {
 namespace populist {
+namespace rateComputation{
+
+
 namespace {
 
 gsl_spline* P_SPLINE;
@@ -128,5 +131,6 @@ Rate IntegralRateComputation::CalculateRate(Number nr_bins) {
 IntegralRateComputation* IntegralRateComputation::Clone() const {
 	return new IntegralRateComputation;
 }
+} /* namespace rateComputation*/
 } /* namespace populist */
 } /* namespace MPILib */

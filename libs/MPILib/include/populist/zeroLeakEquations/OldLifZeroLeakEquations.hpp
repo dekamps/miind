@@ -109,7 +109,7 @@ private:
 	LIFConvertor _convertor;
 	std::unique_ptr<circulantSolvers::AbstractCirculantSolver> _p_solver_circulant;
 	std::unique_ptr<nonCirculantSolvers::AbstractNonCirculantSolver> _p_solver_non_circulant;
-	std::unique_ptr<AbstractRateComputation> _p_rate_calc;
+	std::unique_ptr<rateComputation::AbstractRateComputation> _p_rate_calc;
 };
 } /* namespace populist */
 } /* namespace MPILib */

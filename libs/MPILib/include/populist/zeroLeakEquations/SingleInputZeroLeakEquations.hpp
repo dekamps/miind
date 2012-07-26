@@ -39,7 +39,7 @@ namespace populist {
 			parameters::PopulistSpecificParameter&	par_spec,	//!< reference to the PopulistSpecificParameter
 			Potential&					delta_v,	//!< reference to the current scale variable
 			const circulantSolvers::AbstractCirculantSolver&,
-			const  nonCirculantSolvers::AbstractNonCirculantSolver&
+			const nonCirculantSolvers::AbstractNonCirculantSolver&
 		);
 
 		virtual void Apply(Time);

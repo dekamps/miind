@@ -22,6 +22,7 @@
 #include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/LIFConvertor.hpp>
 #include <MPILib/include/populist/nonCirculantSolvers/AbstractNonCirculantSolver.hpp>
+#include <MPILib/include/populist/rateComputation/AbstractRateComputation.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 #include <memory>
@@ -120,9 +121,9 @@ protected:
 	std::valarray<Potential>* _p_array_state;
 	Potential* _p_check_sum;
 	LIFConvertor _convertor;
-	std::shared_ptr<circulantSolvers::AbstractCirculantSolver> _p_solver_circulant;
-	std::shared_ptr<nonCirculantSolvers::AbstractNonCirculantSolver> _p_solver_non_circulant;
-	std::shared_ptr<AbstractRateComputation> _p_rate_calc;
+	std::unique_ptr<circulantSolvers::AbstractCirculantSolver> _p_solver_circulant;
+	std::unique_ptr<nonCirculantSolvers::AbstractNonCirculantSolver> _p_solver_non_circulant;
+	std::unique_ptr<rateComputation::AbstractRateComputation> _p_rate_calc;
 };
 
 } /* namespace populist */

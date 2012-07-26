@@ -255,7 +255,7 @@ void NumericalZeroLeakEquations::Configure
 
 	parameters::InputParameterSet& input_set = _convertor.getSolverParameter();
 
-	_p_rate_calc = auto_ptr<AbstractRateComputation>(this->ParSpec().getRateComputation().Clone());
+	_p_rate_calc = std::unique_ptr<rateComputation::AbstractRateComputation>(this->ParSpec().getRateComputation().Clone());
 
 	_p_rate_calc->Configure
 	(

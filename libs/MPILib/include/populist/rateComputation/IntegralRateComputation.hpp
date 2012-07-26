@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_INTEGRALRATECOMPUTATION_HPP_
-#define MPILIB_POPULIST_INTEGRALRATECOMPUTATION_HPP_
+#ifndef MPILIB_POPULIST_RATECOMPUTATION_INTEGRALRATECOMPUTATION_HPP_
+#define MPILIB_POPULIST_RATECOMPUTATION_INTEGRALRATECOMPUTATION_HPP_
 
 #include <valarray>
 #include <gsl/gsl_spline.h>
@@ -27,6 +27,8 @@
 
 namespace MPILib {
 namespace populist {
+namespace rateComputation{
+
 
 //! IntegralRateComputation
 //! Computes the firing rate of a population from the density profile, using an integral method:
@@ -55,7 +57,8 @@ private:
 	gsl_integration_workspace* _p_workspace = nullptr;           // need to be initialized
 
 };
+} /* namespace rateComputation*/
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_INTEGRALRATECOMPUTATION_HPP_
+#endif // include guard MPILIB_POPULIST_RATECOMPUTATION_INTEGRALRATECOMPUTATION_HPP_

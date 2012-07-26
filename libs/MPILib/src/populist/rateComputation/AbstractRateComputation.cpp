@@ -22,6 +22,8 @@
 
 namespace MPILib {
 namespace populist {
+namespace rateComputation{
+
 
 AbstractRateComputation::AbstractRateComputation() {
 }
@@ -70,6 +72,6 @@ Potential AbstractRateComputation::BinToCurrentPotential(Index index) {
 	return (static_cast<int>(index) - static_cast<int>(_index_reversal))
 			* _delta_v_rel;
 }
-
+} /* namespace rateComputation*/
 } /* namespace populist */
 } /* namespace MPILib */

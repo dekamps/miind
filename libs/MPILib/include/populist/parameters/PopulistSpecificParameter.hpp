@@ -30,10 +30,10 @@
 namespace MPILib {
 namespace populist {
 class AbstractRebinner;
+namespace rateComputation {
 class AbstractRateComputation;
-namespace parameters{
-
-
+}
+namespace parameters {
 
 //! These are parameters necessary for the configuration of a PopulistAlgorithm and OneDMAlgorithm
 
@@ -72,113 +72,114 @@ public:
 	 */
 	PopulistSpecificParameter(Potential v_min, Number n_grid_initial,
 			Number n_add, const InitialDensityParameter& par_dens,
-			double fact_expansion, const std::string& name_zeroleak= "NumericalZeroLeakEquations",
-			const std::string& name_circulant  = "CirculantSolver" ,
+			double fact_expansion, const std::string& name_zeroleak =
+					"NumericalZeroLeakEquations",
+			const std::string& name_circulant = "CirculantSolver",
 			const std::string& name_noncirculant = "NonCirculantSolver",
 			const AbstractRebinner* p_rebinner = nullptr,
-			const AbstractRateComputation* p_rate = nullptr);
+			const rateComputation::AbstractRateComputation* p_rate = nullptr);
 
-	/**
-	 * destructor
-	 */
-	virtual ~PopulistSpecificParameter();
+			/**
+			 * destructor
+			 */
+			virtual ~PopulistSpecificParameter();
 
-	/**
-	 * copy operator
-	 * @param another PopulistSpecificParameter
-	 * @return a copy of this
-	 */
-	PopulistSpecificParameter&
-	operator=(const PopulistSpecificParameter&);
+			/**
+			 * copy operator
+			 * @param another PopulistSpecificParameter
+			 * @return a copy of this
+			 */
+			PopulistSpecificParameter&
+			operator=(const PopulistSpecificParameter&);
 
-	/**
-	 * clones this class
-	 * @return A clone of this class
-	 */
-	virtual PopulistSpecificParameter* Clone() const;
+			/**
+			 * clones this class
+			 * @return A clone of this class
+			 */
+			virtual PopulistSpecificParameter* Clone() const;
 
-	/**
-	 * Getter for minimum potential
-	 * @return Minimum Potential of Grid at initialization time
-	 */
-	Potential getVMin() const;
+			/**
+			 * Getter for minimum potential
+			 * @return Minimum Potential of Grid at initialization time
+			 */
+			Potential getVMin() const;
 
-	/**
-	 * Getter for number of bins
-	 * @return Number of bins at initialization time
-	 */
-	Number getNrGridInitial() const;
+			/**
+			 * Getter for number of bins
+			 * @return Number of bins at initialization time
+			 */
+			Number getNrGridInitial() const;
 
-	/**
-	 * Getter for number of bins to be added
-	 * @return Number of bins to be added, during evolution (almost always 1)
-	 */
-	Number getNrAdd() const;
+			/**
+			 * Getter for number of bins to be added
+			 * @return Number of bins to be added, during evolution (almost always 1)
+			 */
+			Number getNrAdd() const;
 
-	/**
-	 * Getter for maximum number of grid points
-	 * @return Maximum number of grid points that can result from the initial number of points and the expansion factor
-	 */
-	Number getMaxNumGridPoints() const;
+			/**
+			 * Getter for maximum number of grid points
+			 * @return Maximum number of grid points that can result from the initial number of points and the expansion factor
+			 */
+			Number getMaxNumGridPoints() const;
 
-	/**
-	 * Getter for initial probability density profile
-	 * @return Initial probability density profile
-	 */
-	InitialDensityParameter getInitialDensity() const;
+			/**
+			 * Getter for initial probability density profile
+			 * @return Initial probability density profile
+			 */
+			InitialDensityParameter getInitialDensity() const;
 
-	/**
-	 * Getter for the expansion factor
-	 * @return Expansion factor
-	 */
-	double getExpansionFactor() const;
+			/**
+			 * Getter for the expansion factor
+			 * @return Expansion factor
+			 */
+			double getExpansionFactor() const;
 
-	/**
-	 * Getter for the AbstractRebinner
-	 * @return The AbstractRebinner
-	 */
-	const AbstractRebinner& getRebin() const;
+			/**
+			 * Getter for the AbstractRebinner
+			 * @return The AbstractRebinner
+			 */
+			const AbstractRebinner& getRebin() const;
 
-	/**
-	 * Getter for the AbstractRateComputation
-	 * @return The AbstractRateComputation
-	 */
-	const AbstractRateComputation& getRateComputation() const;
+			/**
+			 * Getter for the AbstractRateComputation
+			 * @return The AbstractRateComputation
+			 */
+			const rateComputation::AbstractRateComputation& getRateComputation() const;
 
-	/**
-	 * Getter for the name of the algorithm for solving the zero leak equations
-	 * @return The name of the algorithm for solving the zero leak equations
-	 */
-	std::string getZeroLeakName() const;
-	/**
-	 * Getter for the name of the algorithm for solving the circulant equations
-	 * @return The name of the algorithm for solving the circulant equations
-	 */
-	std::string getCirculantName() const;
-	/**
-	 * Getter for the name of the algorithm for solving the non circulant equations
-	 * @return The name of the algorithm for solving the non circulant equations
-	 */
-	std::string getNonCirculantName() const;
+			/**
+			 * Getter for the name of the algorithm for solving the zero leak equations
+			 * @return The name of the algorithm for solving the zero leak equations
+			 */
+			std::string getZeroLeakName() const;
+			/**
+			 * Getter for the name of the algorithm for solving the circulant equations
+			 * @return The name of the algorithm for solving the circulant equations
+			 */
+			std::string getCirculantName() const;
+			/**
+			 * Getter for the name of the algorithm for solving the non circulant equations
+			 * @return The name of the algorithm for solving the non circulant equations
+			 */
+			std::string getNonCirculantName() const;
 
-private:
+		private:
 
-	/**
-	 * minimum potential of the grid
-	 */
-	Potential _v_min = 0.0;
-	/**
-	 * initial number of bins
-	 */
-	Number _n_grid_initial = 0;
-	/**
-	 * number of bins that is added after one zero-leak evaluation
-	 */
-	Number _n_add = 0;
-	/**
-	 * gaussian (or delta-peak) initial density profile
-	 */
-	InitialDensityParameter _par_dens = InitialDensityParameter(0.0, 0.0);
+			/**
+			 * minimum potential of the grid
+			 */
+			Potential _v_min = 0.0;
+			/**
+			 * initial number of bins
+			 */
+			Number _n_grid_initial = 0;
+			/**
+			 * number of bins that is added after one zero-leak evaluation
+			 */
+			Number _n_add = 0;
+			/**
+			 * gaussian (or delta-peak) initial density profile
+			 */
+			InitialDensityParameter _par_dens = InitialDensityParameter(0.0, 0.0);
 	/**
 	 * expansion factor
 	 */
@@ -203,10 +204,11 @@ private:
 	/**
 	 * Use when investigating alternatives to the standard rate computation
 	 */
-	std::shared_ptr<AbstractRateComputation> _p_rate;
-};
-} /* namespace parameters */
-} /* namespace populist */
+	std::shared_ptr<rateComputation::AbstractRateComputation> _p_rate;
+}
+			;
+		} /* namespace parameters */
+	} /* namespace populist */
 } /* namespace MPILib */
 
 #endif // include guard MPILIB_POPULIST_PARAMETERS_POPULISTSPECIFICPARAMETER_HPP_
