@@ -54,7 +54,7 @@ template<class Weight>
 PopulationAlgorithm_<Weight>::PopulationAlgorithm_(istream& s) :
 		algorithm::AlgorithmInterface<PopulationConnection>(), _parameter_population(
 				ParPopFromStream(s)), _parameter_specific(ParSpecFromStream(s)), _grid(
-				AlgorithmGrid(_parameter_specific.getMaxNumGridPoints())), _controller_grid(
+				algorithm::AlgorithmGrid(_parameter_specific.getMaxNumGridPoints())), _controller_grid(
 #ifdef _INVESTIGATE_ALGORITHM
 				_vec_value,
 #endif
