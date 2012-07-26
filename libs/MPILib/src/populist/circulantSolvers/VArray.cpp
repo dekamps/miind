@@ -28,6 +28,8 @@
 
 namespace MPILib {
 namespace populist {
+namespace circulantSolvers {
+
 
 VArray::VArray() :
 		_vector_array(MAX_V_ARRAY) {
@@ -123,5 +125,6 @@ bool VArray::CheckInNumbers(Number number_of_circulant_bins,
 
 	return true;
 }
+} /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */

@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_VARRAY_HPP_
-#define MPILIB_POPULIST_VARRAY_HPP_
+#ifndef MPILIB_POPULIST_CIRCULANTSOLVERS_VARRAY_HPP_
+#define MPILIB_POPULIST_CIRCULANTSOLVERS_VARRAY_HPP_
 
 #include <cassert>
 #include <MPILib/include/TypeDefinitions.hpp>
@@ -26,6 +26,8 @@
 
 namespace MPILib {
 namespace populist {
+namespace circulantSolvers {
+
 
 	//! VArray
 	//! This calculates the one row of the matrix elements V_{kj}, which determine the circulant solution.
@@ -80,7 +82,8 @@ inline double VArray::V
 	assert( index_non_circulant < _number_of_non_circulant_areas);
 	return _vector_array[index_circulant + index_non_circulant];
 }
+} /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard
+#endif // include guard MPILIB_POPULIST_CIRCULANTSOLVERS_VARRAY_HPP_

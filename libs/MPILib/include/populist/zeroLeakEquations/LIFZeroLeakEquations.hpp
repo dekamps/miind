@@ -51,7 +51,7 @@ public:
 			std::valarray<Potential>& array_state, Potential& check_sum,
 			SpecialBins& bins, parameters::PopulationParameter& par_pop,
 			parameters::PopulistSpecificParameter& par_spec, Potential& delta_v,
-			const AbstractCirculantSolver& circ,
+			const circulantSolvers::AbstractCirculantSolver& circ,
 			const AbstractNonCirculantSolver& noncirc);
 
 	virtual ~LIFZeroLeakEquations() {
@@ -120,7 +120,7 @@ protected:
 	std::valarray<Potential>* _p_array_state;
 	Potential* _p_check_sum;
 	LIFConvertor _convertor;
-	std::shared_ptr<AbstractCirculantSolver> _p_solver_circulant;
+	std::shared_ptr<circulantSolvers::AbstractCirculantSolver> _p_solver_circulant;
 	std::shared_ptr<AbstractNonCirculantSolver> _p_solver_non_circulant;
 	std::shared_ptr<AbstractRateComputation> _p_rate_calc;
 };

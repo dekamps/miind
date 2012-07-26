@@ -16,14 +16,16 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_REFRACTIVECIRCULANTSOLVER_HPP_
-#define MPILIB_POPULIST_REFRACTIVECIRCULANTSOLVER_HPP_
+#ifndef MPILIB_POPULIST_CIRCULANTSOLVERS_REFRACTIVECIRCULANTSOLVER_HPP_
+#define MPILIB_POPULIST_CIRCULANTSOLVERS_REFRACTIVECIRCULANTSOLVER_HPP_
 
 #include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
 #include <MPILib/include/populist/ProbabilityQueue.hpp>
 
 namespace MPILib {
 namespace populist {
+namespace circulantSolvers {
+
 	//! This AbstractCirculantSolver subclass stores proability density for, presumably LIF, neurons in a priority queue. Immediately
 	//! after the refractive period ends for those neurons, the corrsponding prability is reintroduced in the reset bin. 
 
@@ -84,8 +86,9 @@ namespace populist {
 		double				_precision;
 		double				_off_queue = 0.0;
 	};
+} /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_REFRACTIVECIRCULANTSOLVER_HPP_
+#endif // include guard MPILIB_POPULIST_CIRCULANTSOLVERS_REFRACTIVECIRCULANTSOLVER_HPP_
 

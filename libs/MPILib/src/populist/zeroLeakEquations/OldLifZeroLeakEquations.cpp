@@ -37,7 +37,7 @@ OldLIFZeroLeakEquations::OldLIFZeroLeakEquations(Number& n_bins,
 		parameters::PopulationParameter& par_pop,//!< reference to the PopulationParameter
 		parameters::PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
 		Potential& delta_v,		//!< reference to the current scale variable
-		const AbstractCirculantSolver& circ,
+		const circulantSolvers::AbstractCirculantSolver& circ,
 		const AbstractNonCirculantSolver& noncirc) :
 		LIFZeroLeakEquations(n_bins, array_state, check_sum, bins, par_pop,
 				par_spec, delta_v, circ, noncirc), _time_current(0), _p_n_bins(

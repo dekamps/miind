@@ -20,7 +20,7 @@
 #include  <MPILib/include/populist/circulantSolvers/RefractiveCirculantSolver.hpp>
 namespace MPILib {
 namespace populist {
-
+namespace circulantSolvers {
 
 
 double RefractiveCirculantSolver::AboveThreshold(Time tau) const 
@@ -54,6 +54,6 @@ void RefractiveCirculantSolver::AddCirculantToState(Index i_reset)
 	 _off_queue = 0;  // remember that this value would otherwise influence queries about the total probility in the queue.
 }
 
-
+} /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */

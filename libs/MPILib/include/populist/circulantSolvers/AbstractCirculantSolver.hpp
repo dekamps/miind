@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_ABSTRACTCIRCULANTSOLVER_HPP_
-#define MPILIB_POPULIST_ABSTRACTCIRCULANTSOLVER_HPP_
+#ifndef MPILIB_POPULIST_CIRCULANTSOLVERS_ABSTRACTCIRCULANTSOLVER_HPP_
+#define MPILIB_POPULIST_CIRCULANTSOLVERS_ABSTRACTCIRCULANTSOLVER_HPP_
 
 #include <valarray>
 #include <MPILib/include/populist/parameters/InputParameterSet.hpp>
@@ -28,6 +28,16 @@
 
 namespace MPILib {
 namespace populist {
+
+//! In the Configure method of AbstractCirculantSolver an InputSetParameter reference is passed in. This contains
+//! both an integer interpretation of the current potential jump in terms of number of bins (e.g. _H_exc) as well
+//! as a floating point. DiffusionZeroLeakEquations will work with an integer version, whilst now for example
+//! SingleInputZeroLeakEquations allow probability transport from one bin to a point between two bins, which requires
+//! a floating point interpretation of the step size. This choice must be taken by a ZeroLeak developer. This developer must also
+//! ensure that the CirculantMode and the NonCirculatMode are used consistently. Therefore also AbstractNonCirculantSolver uses this enum.
+enum CirculantMode {FLOATING_POINT, INTEGER};
+
+namespace circulantSolvers {
 
 	//! Both AbstractCirculantSolver and AbstractNonCirculantSolver instances sometimes can cut calculations short
 	//! by terminating the series \f$ e^{-t}\frac{t^k}{k!}$\f$, when it falls below a certain precision.
@@ -42,13 +52,7 @@ namespace populist {
 		return n_max;
 	}
 
-	//! In the Configure method of AbstractCirculantSolver an InputSetParameter reference is passed in. This contains
-	//! both an integer interpretation of the current potential jump in terms of number of bins (e.g. _H_exc) as well
-	//! as a floating point. DiffusionZeroLeakEquations will work with an integer version, whilst now for example
-	//! SingleInputZeroLeakEquations allow probability transport from one bin to a point between two bins, which requires 
-	//! a floating point interpretation of the step size. This choice must be taken by a ZeroLeak developer. This developer must also
-	//! ensure that the CirculantMode and the NonCirculatMode are used consistently. Therefore also AbstractNonCirculantSolver uses this enum.
-	enum CirculantMode {FLOATING_POINT, INTEGER};
+
 
 	//! AbstractCirculantSolver
 	//! 
@@ -124,6 +128,9 @@ namespace populist {
 		//! Some rebinners need to rescale the probability held in the queue after rebinning.
 		virtual void ScaleProbabilityQueue(double){}
 
+		void setMode(CirculantMode mode){
+			_mode=mode;
+		}
 	protected:
 
 		void FillNonCirculantBins();
@@ -197,7 +204,8 @@ namespace populist {
 		}
 		array_state[_n_bins-1]   += _array_circulant[n_circ-1];
 	}
+} /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_ABSTRACTCIRCULANTSOLVER_HPP_
+#endif // include guard MPILIB_POPULIST_CIRCULANTSOLVERS_ABSTRACTCIRCULANTSOLVER_HPP_

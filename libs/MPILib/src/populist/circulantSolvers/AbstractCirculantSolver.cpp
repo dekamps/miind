@@ -22,6 +22,8 @@
 
 namespace MPILib {
 namespace populist {
+namespace circulantSolvers {
+
 
 AbstractCirculantSolver::AbstractCirculantSolver
 (
@@ -148,6 +150,6 @@ Density AbstractCirculantSolver::IntegratedFlux() const
 
 		return sum;
 }
-
+} /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */

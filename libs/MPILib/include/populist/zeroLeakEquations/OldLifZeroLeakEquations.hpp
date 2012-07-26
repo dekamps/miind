@@ -52,7 +52,7 @@ public:
 			SpecialBins& bins, parameters::PopulationParameter& par_pop,
 			parameters::PopulistSpecificParameter& par_spec,
 			Potential& delta_v,
-			const AbstractCirculantSolver&, const AbstractNonCirculantSolver&);
+			const circulantSolvers::AbstractCirculantSolver&, const AbstractNonCirculantSolver&);
 
 	virtual ~OldLIFZeroLeakEquations() {
 	}
@@ -107,7 +107,7 @@ private:
 	std::valarray<Potential>* _p_array_state;
 	Potential* _p_check_sum;
 	LIFConvertor _convertor;
-	std::unique_ptr<AbstractCirculantSolver> _p_solver_circulant;
+	std::unique_ptr<circulantSolvers::AbstractCirculantSolver> _p_solver_circulant;
 	std::unique_ptr<AbstractNonCirculantSolver> _p_solver_non_circulant;
 	std::unique_ptr<AbstractRateComputation> _p_rate_calc;
 };

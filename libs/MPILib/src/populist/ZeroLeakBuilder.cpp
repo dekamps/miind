@@ -64,15 +64,15 @@ std::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEqua
 	const string&									noncirculant_solver_name
 )
 {
-	std::shared_ptr<AbstractCirculantSolver> p_circ;
+	std::shared_ptr<circulantSolvers::AbstractCirculantSolver> p_circ;
 	if ( circulant_solver_name == "CirculantSolver" )
-		p_circ = std::shared_ptr<AbstractCirculantSolver>(new CirculantSolver);
+		p_circ = std::shared_ptr<circulantSolvers::AbstractCirculantSolver>(new circulantSolvers::CirculantSolver);
 	else
 		if (circulant_solver_name  == "PolynomialCirculant" )
-			p_circ = std::shared_ptr<AbstractCirculantSolver>(new PolynomialCirculant );
+			p_circ = std::shared_ptr<circulantSolvers::AbstractCirculantSolver>(new circulantSolvers::PolynomialCirculant );
 		else 
 			if (circulant_solver_name == "RefractiveCirculantSolver")
-				p_circ = std::shared_ptr<AbstractCirculantSolver>(new RefractiveCirculantSolver(_par_pop._tau_refractive));
+				p_circ = std::shared_ptr<circulantSolvers::AbstractCirculantSolver>(new circulantSolvers::RefractiveCirculantSolver(_par_pop._tau_refractive));
 			else
 				throw utilities::Exception("Unknown Circulant");
 		

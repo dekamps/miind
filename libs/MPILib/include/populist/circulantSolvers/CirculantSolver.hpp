@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_CIRCULANTSOLVER_HPP_
-#define MPILIB_POPULIST_CIRCULANTSOLVER_HPP_
+#ifndef MPILIB_POPULIST_CIRCULANTSOLVERS_CIRCULANTSOLVER_HPP_
+#define MPILIB_POPULIST_CIRCULANTSOLVERS_CIRCULANTSOLVER_HPP_
 
 #include <valarray>
 #include <NumtoolsLib/NumtoolsLib.h>
@@ -31,6 +31,7 @@ using NumtoolsLib::D_Matrix;
 
 namespace MPILib {
 namespace populist {
+namespace circulantSolvers {
 
 	//! CirculantSolver
 	//! This is the literal implementation of the analytic solution from (de Kamps, 2006)
@@ -72,7 +73,8 @@ namespace populist {
 		Index				_index_reversal_bin;
 		VArray				_array_V;
 	};
+} /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_CIRCULANTSOLVER_HPP_
+#endif // include guard MPILIB_POPULIST_CIRCULANTSOLVERS_CIRCULANTSOLVER_HPP_

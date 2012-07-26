@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_POLYNOMIALCIRCULANT_HPP_
-#define MPILIB_POPULIST_POLYNOMIALCIRCULANT_HPP_
+#ifndef MPILIB_POPULIST_CIRCULANTSOLVERS_POLYNOMIALCIRCULANT_HPP_
+#define MPILIB_POPULIST_CIRCULANTSOLVERS_POLYNOMIALCIRCULANT_HPP_
 
 #include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
@@ -25,6 +25,7 @@
 
 namespace MPILib {
 namespace populist {
+namespace circulantSolvers {
 
 	//! This uses the short-time polynomial expansion of the analytic solution
 	//! The algorithm can only be used for small values of tau and will throw an
@@ -61,7 +62,8 @@ namespace populist {
 
 		std::vector<double>	_j_array;
 	};
+} /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard
+#endif // include guard MPILIB_POPULIST_CIRCULANTSOLVERS_POLYNOMIALCIRCULANT_HPP_

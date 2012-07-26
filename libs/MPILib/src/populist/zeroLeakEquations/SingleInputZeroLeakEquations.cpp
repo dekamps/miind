@@ -37,7 +37,7 @@ SingleInputZeroLeakEquations::SingleInputZeroLeakEquations
 	parameters::PopulationParameter&				par_pop,		//!< reference to the PopulationParameter
 	parameters::PopulistSpecificParameter&			par_spec,		//!< reference to the PopulistSpecificParameter
 	Potential&							delta_v,		//!< reference to the current scale variable
-	const AbstractCirculantSolver&		circ,
+	const circulantSolvers::AbstractCirculantSolver&		circ,
 	const AbstractNonCirculantSolver&	noncirc
 ):
 LIFZeroLeakEquations

@@ -20,6 +20,8 @@
 
 namespace MPILib {
 namespace populist {
+namespace circulantSolvers {
+
 PolynomialCirculant::PolynomialCirculant() :
 		_j_array(std::vector<double>(CIRCULANT_POLY_JMAX)) {
 }
@@ -108,5 +110,6 @@ void PolynomialCirculant::FillNonCirculantBins() {
 		_array_rho[index_non_circulant_area] += array_state[index_density];
 	}
 }
+} /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */

@@ -23,6 +23,8 @@
 
 namespace MPILib {
 namespace populist {
+namespace circulantSolvers {
+
 
 CirculantSolver::CirculantSolver(CirculantMode mode):
 AbstractCirculantSolver(mode)
@@ -137,6 +139,6 @@ CirculantSolver* CirculantSolver::Clone() const
 {
 	return new CirculantSolver;
 }
-
+} /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */
