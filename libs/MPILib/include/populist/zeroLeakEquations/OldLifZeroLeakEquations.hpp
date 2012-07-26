@@ -20,6 +20,7 @@
 #define MPILIB_POPULIST_OLDLIFZEROLEAKEQUATIONS_HPP_
 
 #include <MPILib/include/populist/zeroLeakEquations/LIFZeroLeakEquations.hpp>
+#include <MPILib/include/populist/rateComputation/AbstractRateComputation.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <memory>
 

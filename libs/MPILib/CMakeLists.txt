@@ -36,6 +36,9 @@ set(MPI_SRCS
     src/populist/parameters/AdaptationParameter.cpp
     src/populist/parameters/OneDMParameter.cpp
     
+    src/populist/rateComputation/AbstractRateComputation.cpp
+    src/populist/rateComputation/IntegralRateComputation.cpp
+
     src/populist/zeroLeakEquations/ABConvertor.cpp
     src/populist/zeroLeakEquations/LIFConvertor.cpp
     src/populist/zeroLeakEquations/LIFZeroLeakEquations.cpp
@@ -44,11 +47,9 @@ set(MPI_SRCS
     src/populist/zeroLeakEquations/OneDMZeroLeakEquations.cpp
     src/populist/zeroLeakEquations/SingleInputZeroLeakEquations.cpp
     
-    src/populist/AbstractRateComputation.cpp
     src/populist/AbstractRebinner.cpp
     src/populist/AdaptiveHazard.cpp
     src/populist/InitializeAlgorithmGrid.cpp
-    src/populist/IntegralRateComputation.cpp
     src/populist/InterpolationRebinner.cpp
     src/populist/MuSigmaScalarProduct.cpp
     src/populist/ProbabilityQueue.cpp
@@ -61,7 +62,9 @@ set(MPI_SRCS
     src/report/handler/RootHighThroughputHandler.cpp
     src/report/handler/RootReportHandler.cpp
     src/report/handler/ValueHandlerHandler.cpp
+    
     src/report/Report.cpp
+    
     src/utilities/CircularDistribution.cpp
     src/utilities/Exception.cpp
     src/utilities/FileNameGenerator.cpp
@@ -73,6 +76,7 @@ set(MPI_SRCS
     src/utilities/ProgressBar.cpp
     src/utilities/TimeException.cpp
     src/utilities/Timer.cpp
+    
     src/NetworkState.cpp
     src/SimulationRunParameter.cpp
 )

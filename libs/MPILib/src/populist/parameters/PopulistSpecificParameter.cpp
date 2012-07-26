@@ -18,7 +18,7 @@
 //
 #include <boost/lexical_cast.hpp>
 #include <MPILib/include/populist/InterpolationRebinner.hpp>
-#include <MPILib/include/populist/IntegralRateComputation.hpp>
+#include <MPILib/include/populist/rateComputation/IntegralRateComputation.hpp>
 
 
 #include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>

@@ -22,7 +22,6 @@
 #include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/LIFConvertor.hpp>
 #include <MPILib/include/populist/nonCirculantSolvers/AbstractNonCirculantSolver.hpp>
-#include <MPILib/include/populist/AbstractRateComputation.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 #include <memory>

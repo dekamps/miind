@@ -16,52 +16,46 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+#ifndef MPILIB_POPULIST_INTEGRALRATECOMPUTATION_HPP_
+#define MPILIB_POPULIST_INTEGRALRATECOMPUTATION_HPP_
 
-#ifndef MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
-#define MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
-
-#include <string>
-#include <boost/shared_ptr.hpp>
-#include <MPILib/include/populist/nonCirculantSolvers/AbstractNonCirculantSolver.hpp>
-#include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
+#include <valarray>
+#include <gsl/gsl_spline.h>
+#include <gsl/gsl_integration.h>
 #include <MPILib/include/populist/rateComputation/AbstractRateComputation.hpp>
+
 
 namespace MPILib {
 namespace populist {
 
-	class ZeroLeakBuilder {
-	public:
+//! IntegralRateComputation
+//! Computes the firing rate of a population from the density profile, using an integral method:
+//! \nu = \int^ \rho(v) dv
+class IntegralRateComputation: public AbstractRateComputation {
+public:
 
-		ZeroLeakBuilder(
-			Number&,					//!< reference to the current number of bins
-			std::valarray<Potential>&,		//!< reference to state array
-			Potential&,					//!< reference to the check sum variable
-			SpecialBins&,		
-			parameters::PopulationParameter&,		//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
-			Potential&					//!< reference to the current scale variable
-		);
+	//! constructor
+	IntegralRateComputation();
 
-	boost::shared_ptr<AbstractZeroLeakEquations> 
-		GenerateZeroLeakEquations
-		(
-			const std::string&,
-			const std::string&,
-			const std::string&
-		);
+	//! configuring gives access to density profile, the input parameters (effective efficacy and variance of eff. eff.)
+	//! and the neuron parameters
+	virtual void Configure(std::valarray<Density>&,	//! density valarray
+			const parameters::InputParameterSet&, const parameters::PopulationParameter&, Index);
 
-	private:
+	virtual ~IntegralRateComputation();
 
-		Number&						_n_bins;
-		std::valarray<Potential>&	_array_state;
-		Potential&					_checksum;
-		SpecialBins&				_bins;
-		parameters::PopulationParameter&		_par_pop;
-		parameters::PopulistSpecificParameter&	_par_spec;
-		Potential&					_delta_v;
+	virtual IntegralRateComputation* Clone() const;
 
-	};
+	virtual Rate CalculateRate(Number    // number current bins,
+			);
+
+private:
+
+	gsl_interp_accel* _p_accelerator = nullptr;                //
+	gsl_integration_workspace* _p_workspace = nullptr;           // need to be initialized
+
+};
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_ZEROLEAKBUILDER_HPP_
+#endif // include guard MPILIB_POPULIST_INTEGRALRATECOMPUTATION_HPP_

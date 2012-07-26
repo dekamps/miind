@@ -22,11 +22,11 @@
 #include <memory>
 #include <NumtoolsLib/NumtoolsLib.h>
 #include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
-#include <MPILib/include/populist/AbstractRateComputation.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/LIFConvertor.hpp>
 #include <MPILib/include/populist/parameters/NumericalZeroLeakParameter.hpp>
 #include <MPILib/include/populist/ProbabilityQueue.hpp>
+#include <MPILib/include/populist/rateComputation/AbstractRateComputation.hpp>
 
 using boost::shared_ptr;
 using NumtoolsLib::ExStateDVIntegrator;

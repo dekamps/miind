@@ -24,7 +24,7 @@
 #include <NumtoolsLib/NumtoolsLib.h>
 #include <UtilLib/UtilLib.h>
 #include <MPILib/include/populist/PopulationGridController.hpp>
-#include <MPILib/include/populist/IntegralRateComputation.hpp>
+#include <MPILib/include/populist/rateComputation/IntegralRateComputation.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/utilities/IterationNumberException.hpp>

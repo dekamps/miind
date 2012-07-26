@@ -16,46 +16,40 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_INTEGRALRATECOMPUTATION_HPP_
-#define MPILIB_POPULIST_INTEGRALRATECOMPUTATION_HPP_
 
-#include <valarray>
-#include <gsl/gsl_spline.h>
-#include <gsl/gsl_integration.h>
-#include <MPILib/include/populist/AbstractRateComputation.hpp>
+#include <vector>
+#include <MPILib/include/TypeDefinitions.hpp>
+#define private public
+#define protected public
+#include <MPILib/include/populist/rateComputation/IntegralRateComputation.hpp>
+#undef protected
+#undef private
 
 
-namespace MPILib {
-namespace populist {
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
 
-//! IntegralRateComputation
-//! Computes the firing rate of a population from the density profile, using an integral method:
-//! \nu = \int^ \rho(v) dv
-class IntegralRateComputation: public AbstractRateComputation {
-public:
+void test_Constructor() {
+	///@todo implement test for this class
 
-	//! constructor
-	IntegralRateComputation();
+}
 
-	//! configuring gives access to density profile, the input parameters (effective efficacy and variance of eff. eff.)
-	//! and the neuron parameters
-	virtual void Configure(std::valarray<Density>&,	//! density valarray
-			const parameters::InputParameterSet&, const parameters::PopulationParameter&, Index);
+int test_main(int argc, char* argv[]) // note the name!
+		{
 
-	virtual ~IntegralRateComputation();
+	test_Constructor();
 
-	virtual IntegralRateComputation* Clone() const;
-
-	virtual Rate CalculateRate(Number    // number current bins,
-			);
-
-private:
-
-	gsl_interp_accel* _p_accelerator = nullptr;                //
-	gsl_integration_workspace* _p_workspace = nullptr;           // need to be initialized
-
-};
-} /* namespace populist */
-} /* namespace MPILib */
-
-#endif // include guard MPILIB_POPULIST_INTEGRALRATECOMPUTATION_HPP_
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
+}

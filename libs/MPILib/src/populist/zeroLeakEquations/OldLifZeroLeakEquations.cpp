@@ -20,7 +20,7 @@
 #include <NumtoolsLib/NumtoolsLib.h>
 #include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
 #include <MPILib/include/populist/nonCirculantSolvers/AbstractNonCirculantSolver.hpp>
-#include <MPILib/include/populist/AbstractRateComputation.hpp>
+#include <MPILib/include/populist/rateComputation/AbstractRateComputation.hpp>
 #include <MPILib/include/populist/circulantSolvers/CirculantSolver.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/OldLifZeroLeakEquations.hpp>
 #include <MPILib/include/populist/nonCirculantSolvers/NonCirculantSolver.hpp>

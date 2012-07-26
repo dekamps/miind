@@ -1,0 +1,4 @@
+ADD_MIIND_TEST(AbstractRateComputation_test.cpp)
+ADD_MIIND_TEST(IntegralRateComputation_test.cpp)
+
+
