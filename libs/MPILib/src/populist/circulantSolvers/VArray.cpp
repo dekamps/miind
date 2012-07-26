@@ -20,10 +20,9 @@
 #pragma warning(disable: 4996)
 #endif
 
-#include <cassert>
 #include <functional>
 #include <gsl/gsl_math.h>
-#include <MPILib/include/populist/VArray.hpp>
+#include <MPILib/include/populist/circulantSolvers/VArray.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 
 

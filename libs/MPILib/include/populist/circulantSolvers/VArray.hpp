@@ -16,63 +16,71 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_CIRCULANTSOLVER_HPP_
-#define MPILIB_POPULIST_CIRCULANTSOLVER_HPP_
+#ifndef MPILIB_POPULIST_VARRAY_HPP_
+#define MPILIB_POPULIST_VARRAY_HPP_
 
-#include <valarray>
-#include <NumtoolsLib/NumtoolsLib.h>
-#include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
+#include <cassert>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/parameters/InputParameterSet.hpp>
-#include <MPILib/include/populist/circulantSolvers/VArray.hpp>
-
-using NumtoolsLib::C_Matrix;
-using NumtoolsLib::D_Matrix;
+#include <vector>
+#include <algorithm>
 
 namespace MPILib {
 namespace populist {
 
-	//! CirculantSolver
-	//! This is the literal implementation of the analytic solution from (de Kamps, 2006)
-	//! It is not efficient and should probably not be used in realistic applications, but
-	//! is important in the benchmarking of other circulant solvers
-	class CirculantSolver : public AbstractCirculantSolver
-	{
+	//! VArray
+	//! This calculates the one row of the matrix elements V_{kj}, which determine the circulant solution.
+	//! The full analytic expression from de Kamps (2006) is programmed, which is usefl benchmarking correctness
+	class VArray {
+
 	public:
 
-		CirculantSolver(CirculantMode = INTEGER);
+		//! Defualt constructor
+		VArray();
 
-		virtual void Execute
-		(
-			Number,
-			Time,
-			Time = 0 //!< Irrelevant for this solver
-		);
+		//! Compute the array elements, based on the number of circulant bins, the number of non-circulant areas
+		//! and for the time that is required
+		bool FillArray
+			(
+				Number, // number of circulant bins
+				Number, // number of non-circulant areas
+				Time    // time over which the solution is required (tau)
+			);
 
-
-		double Integrate(Number) const;
-
-		double Flux
-		(
-			Number, 
-			Time
-		) const;
-
-		//! Clone operation
-		CirculantSolver* Clone() const;
-
-		//! 
-		virtual bool BeforeNonCirculant() {return true;}
-
+		//! V_{kj}, where indices the circulant bin and j the non-circulant area 
+		double V
+			(
+				Index, // k
+				Index  // j
+			) const;
+					
 	private:
 
-		void CalculateInnerProduct();
+		bool FillArrayWithGarbage
+			 (
+			 );
 
+		bool CheckInNumbers
+			(
+				Number,
+				Number
+			);
 
-		Index				_index_reversal_bin;
-		VArray				_array_V;
+		std::vector<double> _vector_array;
+		Number         _number_of_circulant_bins;
+		Number         _number_of_non_circulant_areas;
 	};
+
+inline double VArray::V
+			(
+				Index index_circulant,
+				Index index_non_circulant
+			) const
+{
+	assert( index_circulant     < _number_of_circulant_bins);
+	assert( index_non_circulant < _number_of_non_circulant_areas);
+	return _vector_array[index_circulant + index_non_circulant];
+}
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_CIRCULANTSOLVER_HPP_
+#endif // include guard

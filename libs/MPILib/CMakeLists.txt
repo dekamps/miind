@@ -26,7 +26,8 @@ set(MPI_SRCS
     src/populist/circulantSolvers//CirculantSolver.cpp
     src/populist/circulantSolvers/PolynomialCirculant.cpp
     src/populist/circulantSolvers/RefractiveCirculantSolver.cpp
-    
+    src/populist/circulantSolvers/VArray.cpp
+     
     src/populist/nonCirculantSolvers/AbstractNonCirculantSolver.cpp
     src/populist/nonCirculantSolvers/LimitedNonCirculant.cpp
     src/populist/nonCirculantSolvers/MatrixNonCirculant.cpp
@@ -54,7 +55,6 @@ set(MPI_SRCS
     
     src/populist/InitializeAlgorithmGrid.cpp
     src/populist/ProbabilityQueue.cpp
-    src/populist/VArray.cpp
     src/populist/ZeroLeakBuilder.cpp
     
     src/report/handler/AbstractReportHandler.cpp

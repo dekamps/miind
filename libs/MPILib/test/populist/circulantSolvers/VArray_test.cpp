@@ -16,70 +16,40 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_VARRAY_HPP_
-#define MPILIB_POPULIST_VARRAY_HPP_
 
-#include <MPILib/include/TypeDefinitions.hpp>
 #include <vector>
-#include <algorithm>
+#include <MPILib/include/TypeDefinitions.hpp>
+#define private public
+#define protected public
+#include <MPILib/include/populist/circulantSolvers/VArray.hpp>
+#undef protected
+#undef private
 
-namespace MPILib {
-namespace populist {
 
-	//! VArray
-	//! This calculates the one row of the matrix elements V_{kj}, which determine the circulant solution.
-	//! The full analytic expression from de Kamps (2006) is programmed, which is usefl benchmarking correctness
-	class VArray {
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::populist;
+using namespace MPILib;
 
-	public:
+void test_Constructor() {
+	///@todo implement test for this class
 
-		//! Defualt constructor
-		VArray();
-
-		//! Compute the array elements, based on the number of circulant bins, the number of non-circulant areas
-		//! and for the time that is required
-		bool FillArray
-			(
-				Number, // number of circulant bins
-				Number, // number of non-circulant areas
-				Time    // time over which the solution is required (tau)
-			);
-
-		//! V_{kj}, where indices the circulant bin and j the non-circulant area 
-		double V
-			(
-				Index, // k
-				Index  // j
-			) const;
-					
-	private:
-
-		bool FillArrayWithGarbage
-			 (
-			 );
-
-		bool CheckInNumbers
-			(
-				Number,
-				Number
-			);
-
-		std::vector<double> _vector_array;
-		Number         _number_of_circulant_bins;
-		Number         _number_of_non_circulant_areas;
-	};
-
-inline double VArray::V
-			(
-				Index index_circulant,
-				Index index_non_circulant
-			) const
-{
-	assert( index_circulant     < _number_of_circulant_bins);
-	assert( index_non_circulant < _number_of_non_circulant_areas);
-	return _vector_array[index_circulant + index_non_circulant];
 }
-} /* namespace populist */
-} /* namespace MPILib */
 
-#endif // include guard
+int test_main(int argc, char* argv[]) // note the name!
+		{
+
+	test_Constructor();
+
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
+}

@@ -2,4 +2,5 @@ ADD_MIIND_TEST(AbstractCirculantSolver_test.cpp)
 ADD_MIIND_TEST(CirculantSolver_test.cpp)
 ADD_MIIND_TEST(PolynomialCirculant_test.cpp)
 ADD_MIIND_TEST(RefractiveCirculantSolver_test.cpp)
+ADD_MIIND_TEST(VArray_test.cpp)
 
