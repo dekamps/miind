@@ -20,10 +20,11 @@
 #define MPILIB_POPULIST_POPULATIONGRIDCONTROLER_HPP_
 
 #include <valarray>
+#include <memory>
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_integration.h>
 #include "../NumtoolsLib/NumtoolsLib.h"
-#include <MPILib/include/populist/AbstractRebinner.hpp>
+#include <MPILib/include/populist/rebinner/AbstractRebinner.hpp>
 #include <MPILib/include/populist/rateComputation/AbstractRateComputation.hpp>
 #include <MPILib/include/populist/circulantSolvers/CirculantSolver.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
@@ -182,20 +183,20 @@ private:
 
 	Rate* _p_current_rate;
 	// reference to the algorithm's grid state
-	valarray<Density>& _array_state_reference;
+	std::valarray<Density>& _array_state_reference;
 
 	// local copy of _array_state, which need not be normalized during
 	// evolution
-	valarray<Density> _array_state;
+	std::valarray<Density> _array_state;
 
 	// interpretation array is only used during reports, hence
 	// no local copy needed
-	valarray<Potential>& _array_interpretation;
-	boost::shared_ptr<AbstractRebinner> _p_rebinner;
+	std::valarray<Potential>& _array_interpretation;
+	std::shared_ptr<AbstractRebinner> _p_rebinner;
 	ostringstream* _p_stream;
 
 	ZeroLeakBuilder _builder;
-	boost::shared_ptr<AbstractZeroLeakEquations> _p_zl;
+	std::shared_ptr<AbstractZeroLeakEquations> _p_zl;
 
 };
 

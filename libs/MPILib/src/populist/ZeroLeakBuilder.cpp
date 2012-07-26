@@ -57,41 +57,41 @@ _delta_v(delta_v)
 }
 
 
-boost::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEquations
+std::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEquations
 ( 
 	const string&									zeroleakequations_name,
 	const string&									circulant_solver_name, 
 	const string&									noncirculant_solver_name
 )
 {
-	boost::shared_ptr<AbstractCirculantSolver> p_circ;
+	std::shared_ptr<AbstractCirculantSolver> p_circ;
 	if ( circulant_solver_name == "CirculantSolver" )
-		p_circ = boost::shared_ptr<AbstractCirculantSolver>(new CirculantSolver);
+		p_circ = std::shared_ptr<AbstractCirculantSolver>(new CirculantSolver);
 	else
 		if (circulant_solver_name  == "PolynomialCirculant" )
-			p_circ = boost::shared_ptr<AbstractCirculantSolver>(new PolynomialCirculant );
+			p_circ = std::shared_ptr<AbstractCirculantSolver>(new PolynomialCirculant );
 		else 
 			if (circulant_solver_name == "RefractiveCirculantSolver")
-				p_circ = boost::shared_ptr<AbstractCirculantSolver>(new RefractiveCirculantSolver(_par_pop._tau_refractive));
+				p_circ = std::shared_ptr<AbstractCirculantSolver>(new RefractiveCirculantSolver(_par_pop._tau_refractive));
 			else
 				throw utilities::Exception("Unknown Circulant");
 		
 
-	boost::shared_ptr<AbstractNonCirculantSolver> p_noncirc;
+	std::shared_ptr<AbstractNonCirculantSolver> p_noncirc;
 	if ( noncirculant_solver_name == "NonCirculantSolver" )
-		p_noncirc = boost::shared_ptr<AbstractNonCirculantSolver>(new NonCirculantSolver );
+		p_noncirc = std::shared_ptr<AbstractNonCirculantSolver>(new NonCirculantSolver );
 	else
 		if (noncirculant_solver_name == "LimitedNonCirculant" )
-			p_noncirc = boost::shared_ptr<AbstractNonCirculantSolver>(new LimitedNonCirculant);
+			p_noncirc = std::shared_ptr<AbstractNonCirculantSolver>(new LimitedNonCirculant);
 		else
 			if (noncirculant_solver_name == "MatrixNonCirculant" )
-				p_noncirc = boost::shared_ptr<AbstractNonCirculantSolver>(new MatrixNonCirculant);
+				p_noncirc = std::shared_ptr<AbstractNonCirculantSolver>(new MatrixNonCirculant);
 			else
 				throw utilities::Exception("Unknown NonCirculant solver");
 
-	boost::shared_ptr<AbstractZeroLeakEquations> p_ret;
+	std::shared_ptr<AbstractZeroLeakEquations> p_ret;
 	if (zeroleakequations_name == "NumericalZeroLeakEquations"){
-		p_ret = boost::shared_ptr<NumericalZeroLeakEquations>
+		p_ret = std::shared_ptr<NumericalZeroLeakEquations>
 				(
 					new NumericalZeroLeakEquations
 					(
@@ -108,7 +108,7 @@ boost::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEq
 	}
 
 	if (zeroleakequations_name == "LIFZeroLeakEquations"){
-		p_ret = boost::shared_ptr<LIFZeroLeakEquations>
+		p_ret = std::shared_ptr<LIFZeroLeakEquations>
 				(
 					new LIFZeroLeakEquations
 					(
@@ -129,9 +129,9 @@ boost::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEq
 	if (zeroleakequations_name == "OldLIFZeroLeakEquations"){
 
 		// This choice will overule the choice for the NonCirculantSolver
-		p_noncirc = boost::shared_ptr<AbstractNonCirculantSolver>(new NonCirculantSolver(INTEGER) );
+		p_noncirc = std::shared_ptr<AbstractNonCirculantSolver>(new NonCirculantSolver(INTEGER) );
 
-		p_ret = boost::shared_ptr<LIFZeroLeakEquations>
+		p_ret = std::shared_ptr<LIFZeroLeakEquations>
 				(
 					new OldLIFZeroLeakEquations
 					(
@@ -149,7 +149,7 @@ boost::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEq
 		return p_ret;
 	}
 	if (zeroleakequations_name == "OneDMZeroLeakEquations" ){
-		p_ret = boost::shared_ptr<OneDMZeroLeakEquations>
+		p_ret = std::shared_ptr<OneDMZeroLeakEquations>
 				(
 					new OneDMZeroLeakEquations
 					(
@@ -166,7 +166,7 @@ boost::shared_ptr<AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEq
 	}
 
 	if (zeroleakequations_name == "SingleInputZeroLeakEquations" ){
-		p_ret = boost::shared_ptr<SingleInputZeroLeakEquations>
+		p_ret = std::shared_ptr<SingleInputZeroLeakEquations>
 				(
 					new SingleInputZeroLeakEquations
 					(

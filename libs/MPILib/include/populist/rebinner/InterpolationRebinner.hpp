@@ -21,7 +21,7 @@
 #define MPILIB_POPULIST_INTERPOLATIONREBINNER_HPP_
 
 #include <gsl/gsl_spline.h>
-#include <MPILib/include/populist/AbstractRebinner.hpp>
+#include <MPILib/include/populist/rebinner/AbstractRebinner.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
 
 namespace MPILib {

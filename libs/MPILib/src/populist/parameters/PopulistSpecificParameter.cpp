@@ -17,7 +17,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 #include <boost/lexical_cast.hpp>
-#include <MPILib/include/populist/InterpolationRebinner.hpp>
+#include <MPILib/include/populist/rebinner/InterpolationRebinner.hpp>
 #include <MPILib/include/populist/rateComputation/IntegralRateComputation.hpp>
 
 
