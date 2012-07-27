@@ -77,7 +77,7 @@ public:
 	 * @param nodeVector Vector of the node States
 	 * @param weightVector Vector of the weights of the nodes
 	 * @param time Time point of the algorithm
-	 * @param weightVector Vector of the NodeTypes of the precursors
+	 * @param typeVector Vector of the NodeTypes of the precursors
 	 */
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
 			const std::vector<WeightValue>& weightVector, Time time,
