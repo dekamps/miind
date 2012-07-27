@@ -6,6 +6,7 @@ add_subdirectory(rateComputation)
 add_subdirectory(rebinner)
 add_subdirectory(zeroLeakEquations)
 
+ADD_MIIND_TEST(CirculantMode_test.cpp)
 ADD_MIIND_TEST(InitializeAlgorithmGrid_test.cpp)
 ADD_MIIND_TEST(OrnsteinUhlenbeckConnection_test.cpp)
 ADD_MIIND_TEST(PopulationAlgorithm_test.cpp)
