@@ -23,50 +23,43 @@
 #include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 
-
-
-
 namespace MPILib {
 namespace populist {
 namespace rebinner {
 
-	//! AbstractRebinner: Abstract base class for rebinning algorithms.
-	//! 
-	//! Rebinning algorithms serve to represent the density grid in the original grid, which is smaller
-	//! than the current grid, because grids are expanding over time. Various ways of rebinning are conceivable
-	//! and it may be necessary to compare different rebinning algorithms in the same program. The main simulation
-	//! step in PopulationGridController only needs to know that there is a rebinning algorithm.
-	class AbstractRebinner
-	{
-	public:
+//! AbstractRebinner: Abstract base class for rebinning algorithms.
+//!
+//! Rebinning algorithms serve to represent the density grid in the original grid, which is smaller
+//! than the current grid, because grids are expanding over time. Various ways of rebinning are conceivable
+//! and it may be necessary to compare different rebinning algorithms in the same program. The main simulation
+//! step in PopulationGridController only needs to know that there is a rebinning algorithm.
+class AbstractRebinner {
+public:
 
-		//!
-		virtual ~AbstractRebinner() = 0;
+	//!
+	virtual ~AbstractRebinner() = 0;
 
-		//! Configure 
-		//! Here the a reference to the bin contenets, as well as parameters necessary for the rebinning are set
-		virtual bool Configure
-			(	
-				std::valarray<double>&,
-				Index,               //!< reversal bin,
-				Index,               //!< reset bin
-				Number,              //!< number of  bins before rebinning
-				Number               //!< number of  bins after rebinning
+	//! Configure
+	//! Here the a reference to the bin contenets, as well as parameters necessary for the rebinning are set
+	virtual bool Configure(std::valarray<double>&, Index,     //!< reversal bin,
+			Index,               //!< reset bin
+			Number,              //!< number of  bins before rebinning
+			Number               //!< number of  bins after rebinning
 			) = 0;
 
-		//! every rebinner can do a rebin after it has been configured
-		//! some rebinners need to take refractive probability into account
-		virtual bool Rebin(zeroLeakEquations::AbstractZeroLeakEquations*) = 0;
+	//! every rebinner can do a rebin after it has been configured
+	//! some rebinners need to take refractive probability into account
+	virtual bool Rebin(zeroLeakEquations::AbstractZeroLeakEquations*) = 0;
 
-		virtual AbstractRebinner* Clone() const = 0;
+	virtual AbstractRebinner* Clone() const = 0;
 
-		//! every rebinner has a name
-		virtual std::string Name() const = 0;
+	//! every rebinner has a name
+	virtual std::string Name() const = 0;
 
-	protected:
+protected:
 
-		void ScaleRefractive(double, zeroLeakEquations::AbstractZeroLeakEquations*);
-	};
+	void ScaleRefractive(double, zeroLeakEquations::AbstractZeroLeakEquations*);
+};
 
 } /* namespace rebinner */
 } /* namespace populist */

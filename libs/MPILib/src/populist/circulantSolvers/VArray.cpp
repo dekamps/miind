@@ -25,11 +25,9 @@
 #include <MPILib/include/populist/circulantSolvers/VArray.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 
-
 namespace MPILib {
 namespace populist {
 namespace circulantSolvers {
-
 
 VArray::VArray() :
 		_vector_array(MAX_V_ARRAY) {

@@ -28,12 +28,11 @@
 #include <MPILib/include/populist/ProbabilityQueue.hpp>
 #include <MPILib/include/populist/rateComputation/AbstractRateComputation.hpp>
 
-using boost::shared_ptr;
 using NumtoolsLib::ExStateDVIntegrator;
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 /**
  * @brief Provides a numerical solution for the zero leak equations.
  */
@@ -128,10 +127,8 @@ private:
 	LIFConvertor _convertor;
 	std::unique_ptr<rateComputation::AbstractRateComputation> _p_rate_calc;
 
-	std::shared_ptr<
-			ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_integrator;
-	std::shared_ptr<
-			ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_reset;
+	std::unique_ptr<ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_integrator;
+	std::unique_ptr<ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_reset;
 	parameters::NumericalZeroLeakParameter _parameter;
 	ProbabilityQueue _queue;
 };

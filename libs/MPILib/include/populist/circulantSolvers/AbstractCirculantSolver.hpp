@@ -21,6 +21,7 @@
 
 #include <valarray>
 #include <MPILib/include/populist/parameters/InputParameterSet.hpp>
+#include <MPILib/include/populist/CirculantMode.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <cassert>
 
@@ -28,15 +29,6 @@
 
 namespace MPILib {
 namespace populist {
-
-//! In the Configure method of AbstractCirculantSolver an InputSetParameter reference is passed in. This contains
-//! both an integer interpretation of the current potential jump in terms of number of bins (e.g. _H_exc) as well
-//! as a floating point. DiffusionZeroLeakEquations will work with an integer version, whilst now for example
-//! SingleInputZeroLeakEquations allow probability transport from one bin to a point between two bins, which requires
-//! a floating point interpretation of the step size. This choice must be taken by a ZeroLeak developer. This developer must also
-//! ensure that the CirculantMode and the NonCirculatMode are used consistently. Therefore also AbstractNonCirculantSolver uses this enum.
-enum CirculantMode {FLOATING_POINT, INTEGER};
-
 namespace circulantSolvers {
 
 	//! Both AbstractCirculantSolver and AbstractNonCirculantSolver instances sometimes can cut calculations short

@@ -48,7 +48,8 @@ Potential InitializeAlgorithmGrid::DeltaV(Number number_of_initial_bins,
 }
 
 Index InitializeAlgorithmGrid::IndexReversal(Number number_of_initial_bins,
-		Potential v_min, const parameters::PopulationParameter& parameter_population
+		Potential v_min,
+		const parameters::PopulationParameter& parameter_population
 
 		) const {
 	return static_cast<Index>((parameter_population._V_reversal - v_min)
@@ -62,7 +63,8 @@ double InitializeAlgorithmGrid::ExpansionFactorDoubleRebinner(
 			v_min, parameter_population));
 	int number_growing_bins = number_initial_bins - index_reversal_bin;
 
-	unsigned int number_original_bins = number_growing_bins + index_reversal_bin;
+	unsigned int number_original_bins = number_growing_bins
+			+ index_reversal_bin;
 	assert( number_original_bins == number_initial_bins);
 
 	int number_new_bins = 2 * number_growing_bins + index_reversal_bin;

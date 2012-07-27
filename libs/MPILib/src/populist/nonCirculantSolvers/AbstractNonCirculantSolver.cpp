@@ -18,27 +18,17 @@
 //
 #include <MPILib/include/populist/nonCirculantSolvers/AbstractNonCirculantSolver.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
-#include <assert.h>
 
 namespace MPILib {
 namespace populist {
 namespace nonCirculantSolvers {
 
-AbstractNonCirculantSolver::AbstractNonCirculantSolver(CirculantMode mode):
-_array_factor  (0),
-_epsilon(EPS_J_CIRC_MAX),
-_mode(mode)
-{
+AbstractNonCirculantSolver::AbstractNonCirculantSolver(CirculantMode mode) :
+		_array_factor(0), _epsilon(EPS_J_CIRC_MAX), _mode(mode) {
 }
 
-
-bool AbstractNonCirculantSolver::Configure
-(
-	std::valarray<double>&			array_state,
-	const parameters::InputParameterSet&	input_set,
-	double						epsilon
-)
-{
+bool AbstractNonCirculantSolver::Configure(std::valarray<double>& array_state,
+		const parameters::InputParameterSet& input_set, double epsilon) {
 	if (epsilon == 0)
 		_epsilon = EPS_J_CIRC_MAX;
 	else
@@ -51,34 +41,27 @@ bool AbstractNonCirculantSolver::Configure
 	return true;
 }
 
-void AbstractNonCirculantSolver::InitializeArrayFactor
-(
-	Time   tau,
-	Number n_non_circulant
-)
-{
-	assert (_epsilon > 0 );
+void AbstractNonCirculantSolver::InitializeArrayFactor(Time tau,
+		Number n_non_circulant) {
+	assert(_epsilon > 0);
 	if (_epsilon < EPS_J_CIRC_MAX)
 		_epsilon = EPS_J_CIRC_MAX;
 
-	if ( n_non_circulant > _array_factor.size() )
+	if (n_non_circulant > _array_factor.size())
 		_array_factor.resize(n_non_circulant);
 
 	_array_factor = 0.0;
 	_array_factor[0] = exp(-tau);
-	for (int i = 1; i < static_cast<int>(n_non_circulant); i++)
-	{
+	for (int i = 1; i < static_cast<int>(n_non_circulant); i++) {
 		// Let some precision criterion determine where this breaks off
 		// and store the break off value
-		_array_factor[i] = tau*_array_factor[i - 1]/i;
-		if (_array_factor[i] < _epsilon )
-		{
+		_array_factor[i] = tau * _array_factor[i - 1] / i;
+		if (_array_factor[i] < _epsilon) {
 			_j_circ_max = i;
 			return;
 		}
 	}
 	_j_circ_max = n_non_circulant;
-	return;
 }
 } /* namespace nonCirculantSolvers */
 } /* namespace populist */

@@ -19,32 +19,22 @@
 #include <MPILib/include/populist/nonCirculantSolvers/MatrixNonCirculant.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 
-
 namespace MPILib {
 namespace populist {
 namespace nonCirculantSolvers {
 
-
-MatrixNonCirculant::MatrixNonCirculant():
-AbstractNonCirculantSolver(INTEGER)
-{
+MatrixNonCirculant::MatrixNonCirculant() :
+		AbstractNonCirculantSolver(INTEGER) {
 }
 
-MatrixNonCirculant::~MatrixNonCirculant()
-{
+MatrixNonCirculant::~MatrixNonCirculant() {
 }
 
-MatrixNonCirculant* MatrixNonCirculant::Clone() const
-{
+MatrixNonCirculant* MatrixNonCirculant::Clone() const {
 	return new MatrixNonCirculant;
 }
 
-void MatrixNonCirculant::ExecuteExcitatory
-(
-	Number n_bins,
-	Time   tau
-)
-{
+void MatrixNonCirculant::ExecuteExcitatory(Number n_bins, Time tau) {
 	// This is the most straightforward version of the algorithm: simply create a single
 	// row that contains exp Lt.
 	// Expectation is that this will be slower than the standard NonCirculantSolver,
@@ -52,45 +42,33 @@ void MatrixNonCirculant::ExecuteExcitatory
 	// because the time to set up the matrix row is shorter than the time to carry out the matrix 
 	// multiplication.
 
-	this->InitializeArrayFactor(tau,n_bins);
-
+	this->InitializeArrayFactor(tau, n_bins);
 
 	int H = static_cast<int>(_p_input_set->_H_exc);
 	_matrix_row = 0.0;
-	int i,j;
-	for (i = static_cast<int>(n_bins) - 1,  j = 0; i >=0; i-=H, j++)
+	int i, j;
+	for (i = static_cast<int>(n_bins) - 1, j = 0; i >= 0; i -= H, j++)
 		_matrix_row[i] = _array_factor[j];
 
 	std::valarray<Potential>& array_state = *_p_array_state;
 
-	for( int i = n_bins - 1; i >= 0; i-- )
-	{
+	for (int i = n_bins - 1; i >= 0; i--) {
 		// prevent the overwrite so that the matrix manipulation can be done in
 		// the case i == j first
-		array_state[i] = _matrix_row[n_bins - 1]*array_state[i];
+		array_state[i] = _matrix_row[n_bins - 1] * array_state[i];
 
-		for( int j = 0; j < i; j++ )
-			array_state[i] += _matrix_row[n_bins-i-1+j]*array_state[j];
+		for (int j = 0; j < i; j++)
+			array_state[i] += _matrix_row[n_bins - i - 1 + j] * array_state[j];
 	}
 
 }
 
-void MatrixNonCirculant::ExecuteInhibitory
-(
-	Number n_bins,
-	Time tau
-)
-{
+void MatrixNonCirculant::ExecuteInhibitory(Number n_bins, Time tau) {
 	throw utilities::Exception("Not yet implemented");
 }
 
-bool MatrixNonCirculant::Configure
-(
-	std::valarray<double>&		 array_state,
-	const parameters::InputParameterSet& input_set,
-	double
-)
-{
+bool MatrixNonCirculant::Configure(std::valarray<double>& array_state,
+		const parameters::InputParameterSet& input_set, double) {
 	// Normally this is done in the base class 
 	_p_array_state = &array_state;
 	_p_input_set = &input_set;

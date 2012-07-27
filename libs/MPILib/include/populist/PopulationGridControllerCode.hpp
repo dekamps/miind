@@ -30,7 +30,6 @@
 #include <MPILib/include/utilities/IterationNumberException.hpp>
 #include <MPILib/include/StringDefinitions.hpp>
 
-
 #ifdef WIN32
 #pragma warning(disable: 4267)
 #endif
@@ -42,24 +41,25 @@ namespace populist {
 
 template<class Weight>
 PopulationGridController<Weight>::PopulationGridController( VALUE_REF_INIT
-const parameters::PopulationParameter& par_pop, const parameters::PopulistSpecificParameter& par_spec,
+const parameters::PopulationParameter& par_pop,
+		const parameters::PopulistSpecificParameter& par_spec,
 		valarray<double>& array_state, valarray<double>& array_interpretation,
 		Number* p_grid_size, Rate* p_rate, ostringstream* p_stream) :
 		VALUE_MEMBER_INIT
 		_n_initial_bins(*p_grid_size), _n_bins_to_add(par_spec.getNrAdd()), _p_number_of_current_bins(
 				p_grid_size), _n_bins(*p_grid_size), _time_membrane_constant(
-				par_pop._tau), _time_report(0), _time_next_report(0), _time_network_step(
-				0), _par_pop(par_pop), _par_spec(par_spec), _f_current_scale(
-				1.0), _f_expansion_factor(par_spec.getExpansionFactor()), _delta_v(
-				0), _p_current_rate(p_rate), _array_state_reference(
+				par_pop._tau), _par_pop(par_pop), _par_spec(par_spec), _f_expansion_factor(
+				par_spec.getExpansionFactor()), _p_current_rate(p_rate), _array_state_reference(
 				array_state), _array_state(array_state), _array_interpretation(
 				array_interpretation), _p_rebinner(
-				std::unique_ptr<rebinner::AbstractRebinner>(par_spec.getRebin().Clone())), _p_stream(
-				p_stream), _builder( VALUE_MEMBER_ARG
-		_n_bins, _array_state, _check_sum, _bins, _par_pop, _par_spec,
+				std::unique_ptr<rebinner::AbstractRebinner>(
+						par_spec.getRebin().Clone())), _p_stream(p_stream), _builder(
+				VALUE_MEMBER_ARG
+				_n_bins, _array_state, _check_sum, _bins, _par_pop, _par_spec,
 				_delta_v), _p_zl(
 				_builder.GenerateZeroLeakEquations(par_spec.getZeroLeakName(),
-						par_spec.getCirculantName(), par_spec.getNonCirculantName())) {
+						par_spec.getCirculantName(),
+						par_spec.getNonCirculantName())) {
 }
 
 template<class Weight>
@@ -81,7 +81,8 @@ void PopulationGridController<Weight>::Configure(
 }
 
 template<class Weight>
-bool PopulationGridController<Weight>::CollectExternalInput(const std::vector<Rate>& nodeVector,
+bool PopulationGridController<Weight>::CollectExternalInput(
+		const std::vector<Rate>& nodeVector,
 		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
 		const std::vector<NodeType>& typeVector) {
 	_p_zl->SortConnectionvector(nodeVector, weightVector, typeVector);

@@ -27,41 +27,37 @@ namespace MPILib {
 namespace populist {
 namespace circulantSolvers {
 
-	//! This uses the short-time polynomial expansion of the analytic solution
-	//! The algorithm can only be used for small values of tau and will throw an
-	//! exception if it enters an unvalid regime.
-	class PolynomialCirculant : public AbstractCirculantSolver {
-	public:
+//! This uses the short-time polynomial expansion of the analytic solution
+//! The algorithm can only be used for small values of tau and will throw an
+//! exception if it enters an unvalid regime.
+class PolynomialCirculant: public AbstractCirculantSolver {
+public:
 
-		PolynomialCirculant();
+	PolynomialCirculant();
 
-		//! virtual destructor
-		virtual ~PolynomialCirculant();
+	//! virtual destructor
+	virtual ~PolynomialCirculant();
 
-		virtual void Execute
-		(
-			Number,
-			Time,
-			Time = 0 //!< Irrelevant for this solver
-		);
+	virtual void Execute(Number, Time, Time = 0 //!< Irrelevant for this solver
+			);
 
-		//! PolynomialCirculant computes how many circulant bins make sense
-		virtual Number NrCirculant() const;
+	//! PolynomialCirculant computes how many circulant bins make sense
+	virtual Number NrCirculant() const;
 
-		//! Virtual copy constructor
-		virtual PolynomialCirculant* Clone() const;
+	//! Virtual copy constructor
+	virtual PolynomialCirculant* Clone() const;
 
-		//! Some magical numbers are used in this CicrculantSolver
-		Index JMax() const;
+	//! Some magical numbers are used in this CicrculantSolver
+	Index JMax() const;
 
-	private:
+private:
 
-		virtual void FillNonCirculantBins();
+	virtual void FillNonCirculantBins();
 
-		void LoadJArray();
+	void LoadJArray();
 
-		std::vector<double>	_j_array;
-	};
+	std::vector<double> _j_array;
+};
 } /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */

@@ -28,57 +28,42 @@ namespace MPILib {
 namespace populist {
 namespace circulantSolvers {
 
+//! VArray
+//! This calculates the one row of the matrix elements V_{kj}, which determine the circulant solution.
+//! The full analytic expression from de Kamps (2006) is programmed, which is usefl benchmarking correctness
+class VArray {
 
-	//! VArray
-	//! This calculates the one row of the matrix elements V_{kj}, which determine the circulant solution.
-	//! The full analytic expression from de Kamps (2006) is programmed, which is usefl benchmarking correctness
-	class VArray {
+public:
 
-	public:
+	//! Defualt constructor
+	VArray();
 
-		//! Defualt constructor
-		VArray();
-
-		//! Compute the array elements, based on the number of circulant bins, the number of non-circulant areas
-		//! and for the time that is required
-		bool FillArray
-			(
-				Number, // number of circulant bins
-				Number, // number of non-circulant areas
-				Time    // time over which the solution is required (tau)
+	//! Compute the array elements, based on the number of circulant bins, the number of non-circulant areas
+	//! and for the time that is required
+	bool FillArray(Number, // number of circulant bins
+			Number, // number of non-circulant areas
+			Time    // time over which the solution is required (tau)
 			);
 
-		//! V_{kj}, where indices the circulant bin and j the non-circulant area 
-		double V
-			(
-				Index, // k
-				Index  // j
+	//! V_{kj}, where indices the circulant bin and j the non-circulant area
+	double V(Index, // k
+			Index  // j
 			) const;
-					
-	private:
 
-		bool FillArrayWithGarbage
-			 (
-			 );
+private:
 
-		bool CheckInNumbers
-			(
-				Number,
-				Number
-			);
+	bool FillArrayWithGarbage();
 
-		std::vector<double> _vector_array;
-		Number         _number_of_circulant_bins;
-		Number         _number_of_non_circulant_areas;
-	};
+	bool CheckInNumbers(Number, Number);
 
-inline double VArray::V
-			(
-				Index index_circulant,
-				Index index_non_circulant
-			) const
-{
-	assert( index_circulant     < _number_of_circulant_bins);
+	std::vector<double> _vector_array;
+	Number _number_of_circulant_bins;
+	Number _number_of_non_circulant_areas;
+};
+
+inline double VArray::V(Index index_circulant,
+		Index index_non_circulant) const {
+	assert( index_circulant < _number_of_circulant_bins);
 	assert( index_non_circulant < _number_of_non_circulant_areas);
 	return _vector_array[index_circulant + index_non_circulant];
 }

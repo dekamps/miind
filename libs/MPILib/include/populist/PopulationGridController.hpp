@@ -33,7 +33,7 @@
 #include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
 #include <MPILib/include/populist/ZeroLeakBuilder.hpp>
 
-using NumtoolsLib::D_Matrix;
+//using NumtoolsLib::D_Matrix;
 
 namespace MPILib {
 namespace populist {
@@ -167,19 +167,19 @@ private:
 	Number _n_bins;
 
 	Time _time_membrane_constant;
-	Time _time_report;
-	Time _time_next_report;
-	Time _time_network_step;
+	Time _time_report = 0.0;
+	Time _time_next_report = 0.0;
+	Time _time_network_step = 0.0;
 	Time _time_current;
 
 	zeroLeakEquations::SpecialBins _bins;
 	parameters::PopulationParameter _par_pop;
 	parameters::PopulistSpecificParameter _par_spec;
 
-	double _f_current_scale;
+	double _f_current_scale = 1.0;
 	double _f_expansion_factor;
 
-	Potential _delta_v;
+	Potential _delta_v = 0.0;
 	Potential _check_sum;
 
 	Rate* _p_current_rate;

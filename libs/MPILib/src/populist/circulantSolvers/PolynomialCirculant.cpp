@@ -80,8 +80,6 @@ void PolynomialCirculant::LoadJArray() {
 		fac_j *= _tau / static_cast<double>(j);
 		_j_array[j - 1] = fac_j * sum;
 	}
-
-	return;
 }
 
 void PolynomialCirculant::FillNonCirculantBins() {

@@ -17,20 +17,17 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 #include <MPILib/include/populist/rateComputation/AbstractRateComputation.hpp>
-#include <assert.h>
+#include <cassert>
 #include <MPILib/include/BasicDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {
-namespace rateComputation{
-
-
-AbstractRateComputation::AbstractRateComputation() {
-}
+namespace rateComputation {
 
 void AbstractRateComputation::Configure(std::valarray<Density>& array_state,
 		const parameters::InputParameterSet& input_set,
-		const parameters::PopulationParameter& par_population, Index index_reversal) {
+		const parameters::PopulationParameter& par_population,
+		Index index_reversal) {
 	_p_array_state = &array_state;
 	_p_input_set = &input_set;
 	_par_population = par_population;

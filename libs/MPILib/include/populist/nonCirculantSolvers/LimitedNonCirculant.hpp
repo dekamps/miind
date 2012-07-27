@@ -25,36 +25,27 @@ namespace MPILib {
 namespace populist {
 namespace nonCirculantSolvers {
 
-	class LimitedNonCirculant : public AbstractNonCirculantSolver {
-	public:
+class LimitedNonCirculant: public AbstractNonCirculantSolver {
+public:
 
-		LimitedNonCirculant();
+	LimitedNonCirculant();
 
-		virtual ~LimitedNonCirculant();
+	virtual ~LimitedNonCirculant();
 
-		virtual void ExecuteExcitatory
-			(
-				Number,	//!< Number of current bins in the state array
-				Time	//!< Time by which to evolve
+	virtual void ExecuteExcitatory(Number,//!< Number of current bins in the state array
+			Time	//!< Time by which to evolve
 			);
 
-		virtual void ExecuteInhibitory
-			 (
-				Number,	//!< Number of current bins in the state array
-				Time	//!< Time by which to evolve
-			 );
-
-
-		virtual LimitedNonCirculant* Clone() const;
-
-	protected:
-
-		virtual void InitializeArrayFactor
-			(
-				Time, 
-				Number
+	virtual void ExecuteInhibitory(Number,//!< Number of current bins in the state array
+			Time	//!< Time by which to evolve
 			);
-	};
+
+	virtual LimitedNonCirculant* Clone() const;
+
+protected:
+
+	virtual void InitializeArrayFactor(Time, Number);
+};
 } /* namespace nonCirculantSolvers */
 } /* namespace populist */
 } /* namespace MPILib */

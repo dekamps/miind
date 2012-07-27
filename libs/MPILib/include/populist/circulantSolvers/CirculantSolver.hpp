@@ -20,14 +20,11 @@
 #define MPILIB_POPULIST_CIRCULANTSOLVERS_CIRCULANTSOLVER_HPP_
 
 #include <valarray>
-#include <NumtoolsLib/NumtoolsLib.h>
 #include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/InputParameterSet.hpp>
 #include <MPILib/include/populist/circulantSolvers/VArray.hpp>
 
-using NumtoolsLib::C_Matrix;
-using NumtoolsLib::D_Matrix;
 
 namespace MPILib {
 namespace populist {
@@ -70,7 +67,7 @@ namespace circulantSolvers {
 		void CalculateInnerProduct();
 
 
-		Index				_index_reversal_bin;
+		Index				_index_reversal_bin = 0;
 		VArray				_array_V;
 	};
 } /* namespace circulantSolvers*/

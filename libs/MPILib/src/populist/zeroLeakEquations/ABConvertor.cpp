@@ -22,7 +22,7 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 ABConvertor::ABConvertor( VALUE_REF_INIT
 SpecialBins&, parameters::PopulationParameter& par_pop,
 		parameters::PopulistSpecificParameter& par_specific, Potential& delta_v,

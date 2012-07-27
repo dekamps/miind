@@ -45,8 +45,8 @@ public:
 	virtual MatrixNonCirculant* Clone() const;
 
 	//! Configure
-	virtual bool Configure(std::valarray<double>&, const parameters::InputParameterSet&,
-			double = 0);
+	virtual bool Configure(std::valarray<double>&,
+			const parameters::InputParameterSet&, double = 0);
 
 private:
 

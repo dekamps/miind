@@ -27,7 +27,7 @@ using NumtoolsLib::IsApproximatelyEqualTo;
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 SingleInputZeroLeakEquations::SingleInputZeroLeakEquations(Number& n_bins,
 		valarray<Potential>& array_state, Potential& check_sum,
 		SpecialBins& bins,

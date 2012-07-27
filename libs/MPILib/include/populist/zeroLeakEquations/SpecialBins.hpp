@@ -22,13 +22,13 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
-	struct SpecialBins {
+namespace zeroLeakEquations {
+struct SpecialBins {
 
-		Index	_index_reversal_bin;
-		Index	_index_original_reset_bin;
-		Index	_index_current_reset_bin;
-	};
+	Index _index_reversal_bin;
+	Index _index_original_reset_bin;
+	Index _index_current_reset_bin;
+};
 } /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */

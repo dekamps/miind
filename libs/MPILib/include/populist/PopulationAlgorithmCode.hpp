@@ -36,7 +36,8 @@ PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 		algorithm::AlgorithmInterface<PopulationConnection>(), _parameter_population(
 				par_populist._par_pop), _parameter_specific(
 				par_populist._par_spec), _grid(
-				algorithm::AlgorithmGrid(_parameter_specific.getMaxNumGridPoints())), _controller_grid(
+				algorithm::AlgorithmGrid(
+						_parameter_specific.getMaxNumGridPoints())), _controller_grid(
 #ifdef _INVESTIGATE_ALGORITHM
 				_vec_value,
 #endif
@@ -45,8 +46,7 @@ PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 				algorithm::AlgorithmInterface<Weight>::getArrayInterpretation(
 						_grid),
 				&algorithm::AlgorithmInterface<Weight>::getStateSize(_grid),
-				&_current_rate, &_stream_log), _current_time(0), _current_rate(
-				0) {
+				&_current_rate, &_stream_log) {
 	Embed();
 }
 
@@ -54,7 +54,8 @@ template<class Weight>
 PopulationAlgorithm_<Weight>::PopulationAlgorithm_(istream& s) :
 		algorithm::AlgorithmInterface<PopulationConnection>(), _parameter_population(
 				ParPopFromStream(s)), _parameter_specific(ParSpecFromStream(s)), _grid(
-				algorithm::AlgorithmGrid(_parameter_specific.getMaxNumGridPoints())), _controller_grid(
+				algorithm::AlgorithmGrid(
+						_parameter_specific.getMaxNumGridPoints())), _controller_grid(
 #ifdef _INVESTIGATE_ALGORITHM
 				_vec_value,
 #endif
@@ -81,15 +82,18 @@ PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 		algorithm::AlgorithmInterface<PopulationConnection>(algorithm), _parameter_population(
 				algorithm._parameter_population), _parameter_specific(
 				algorithm._parameter_specific), _grid(
-				algorithm::AlgorithmGrid(_parameter_specific.getMaxNumGridPoints())), _controller_grid(
+				algorithm::AlgorithmGrid(
+						_parameter_specific.getMaxNumGridPoints())), _controller_grid(
 #ifdef _INVESTIGATE_ALGORITHM
 				_vec_value,
 #endif
 				_parameter_population, _parameter_specific,
 				algorithm::AlgorithmInterface<Weight>::getArrayState(_grid),
-				algorithm::AlgorithmInterface<Weight>::getArrayInterpretation(_grid),
-				&algorithm::AlgorithmInterface<Weight>::getStateSize(_grid), &_current_rate,
-				&_stream_log), _current_time(0), _current_rate(0) {
+				algorithm::AlgorithmInterface<Weight>::getArrayInterpretation(
+						_grid),
+				&algorithm::AlgorithmInterface<Weight>::getStateSize(_grid),
+				&_current_rate, &_stream_log), _current_time(0), _current_rate(
+				0) {
 	Embed();
 }
 
@@ -102,8 +106,9 @@ void PopulationAlgorithm_<Weight>::Embed() {
 	// by the initial number of bins
 	InitializeAlgorithmGrid init;
 	algorithm::AlgorithmGrid grid_initial = init.InitializeGrid(
-			_parameter_specific.getNrGridInitial(), _parameter_specific.getVMin(),
-			_parameter_population, _parameter_specific.getInitialDensity());
+			_parameter_specific.getNrGridInitial(),
+			_parameter_specific.getVMin(), _parameter_population,
+			_parameter_specific.getInitialDensity());
 	// The initial grid now must be embedded in the local grid, which is generally larger.
 	// In general the local grid of the PopulationAlgorithm is out of sync with the
 	// valarrays maintained by the controller and it is only updated when a Report is due.
@@ -121,8 +126,8 @@ void PopulationAlgorithm_<Weight>::evolveNodeState(
 		const std::vector<Weight>& weightVector, Time time,
 		const std::vector<NodeType>& typeVector) {
 
-	 _controller_grid.Evolve(time, &_current_time,
-			&_current_rate, nodeVector, weightVector);
+	_controller_grid.Evolve(time, &_current_time, &_current_rate, nodeVector,
+			weightVector);
 
 }
 
@@ -151,9 +156,8 @@ void PopulationAlgorithm_<Weight>::configure(
 
 }
 
-template <class Weight>
-void PopulationAlgorithm_<Weight>::WriteConfigurationToLog()
-{
+template<class Weight>
+void PopulationAlgorithm_<Weight>::WriteConfigurationToLog() {
 }
 
 template<class Weight>

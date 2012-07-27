@@ -44,12 +44,12 @@ struct OrnsteinUhlenbeckConnection {
 	OrnsteinUhlenbeckConnection()=default;
 
 	//! construct, using effective number of connections and effectivie efficacy
-	OrnsteinUhlenbeckConnection(double number_of_connections, //!< effective number of connections
-			Efficacy efficacy,				//!< synaptic efficacy
-			Time delay = 0				//!< delay of connection
-			) :
-			_number_of_connections(number_of_connections), _efficacy(efficacy), _delay(
-					delay) {
+	OrnsteinUhlenbeckConnection(double number_of_connections,//!< effective number of connections
+			Efficacy efficacy,//!< synaptic efficacy
+			Time delay = 0//!< delay of connection
+	) :
+	_number_of_connections(number_of_connections), _efficacy(efficacy), _delay(
+			delay) {
 	}
 };
 
@@ -68,11 +68,8 @@ inline double toEfficacy(const OrnsteinUhlenbeckConnection& connection) {
 
 typedef OrnsteinUhlenbeckConnection OU_Connection;
 
-
 } /* namespace populist */
 } /* namespace MPILib */
-
-
 
 inline int IsNan(
 		const MPILib::populist::OrnsteinUhlenbeckConnection& connection) {
@@ -80,6 +77,5 @@ inline int IsNan(
 			+ IsNan(connection._number_of_connections)
 			+ IsNan(connection._delay);
 }
-
 
 #endif // include guard MPILIB_POPULIST_ORNSTEINUHLENBECKCONNECTION_HPP_

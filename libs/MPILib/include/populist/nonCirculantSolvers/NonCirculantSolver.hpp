@@ -25,61 +25,47 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/InputParameterSet.hpp>
 
-
-
 namespace MPILib {
 namespace populist {
 namespace nonCirculantSolvers {
 
+//! The algorithm that runs the Poisson master process for probability density corresponding to neurons that have not yet passed threshold.
+//! It should never be run in INTEGER mode, a mode which has been left in for the reproduction of old paper results.
+//! The algorithm can be created, but nothing will happen at that point. Once it has been configured, teling it which valarray to run on,
+//! and what the current input parameters are, it can be run by calling apply on a specified number of bins.
 
-	//! The algorithm that runs the Poisson master process for probability density corresponding to neurons that have not yet passed threshold.
-	//! It should never be run in INTEGER mode, a mode which has been left in for the reproduction of old paper results.
-	//! The algorithm can be created, but nothing will happen at that point. Once it has been configured, teling it which valarray to run on,
-	//! and what the current input parameters are, it can be run by calling apply on a specified number of bins.
+class NonCirculantSolver: public AbstractNonCirculantSolver {
+public:
 
-	class NonCirculantSolver : public AbstractNonCirculantSolver
-	{
-	public:
+	//! Only mode selection in the constructor, hard work is done in Configure function of the base class. If INTEGER mode is chosen,
+	//! the _H_exc and _H_inh are used as a parameter, for FLOATING_POINT _h_exc and _h_inh are used.
+	NonCirculantSolver(CirculantMode = FLOATING_POINT);
 
-		//! Only mode selection in the constructor, hard work is done in Configure function of the base class. If INTEGER mode is chosen,
-		//! the _H_exc and _H_inh are used as a parameter, for FLOATING_POINT _h_exc and _h_inh are used.
-		NonCirculantSolver
-		(
-			CirculantMode = FLOATING_POINT
-		);
-
-		//! Carry out one excitatory step for the number of bins given, using the input parameters that were set in the Configure method of the base class.
-		void ExecuteExcitatory
-		(
-			Number, //!< Number of bins in the current state array
+	//! Carry out one excitatory step for the number of bins given, using the input parameters that were set in the Configure method of the base class.
+	void ExecuteExcitatory(Number, //!< Number of bins in the current state array
 			Time	//!< Time by which to evolve
-		);
+			);
 
-		//! Carry out one inhibitory step for the number of bins given, using the input parameters that were set in the Configure method of the base class
-		void ExecuteInhibitory
-		(
-			Number,
-			Time
-		);
+	//! Carry out one inhibitory step for the number of bins given, using the input parameters that were set in the Configure method of the base class
+	void ExecuteInhibitory(Number, Time);
 
-		//! Simply add the total amount of probability present in the density array for the current number of bins
-		double 
-			Integrate
-			(
-				Number //!< current number of bins
+	//! Simply add the total amount of probability present in the density array for the current number of bins
+	double
+	Integrate(Number //!< current number of bins
 			) const;
 
-		//! Clone this object
-		virtual NonCirculantSolver* Clone() const;
+	//! Clone this object
+	virtual NonCirculantSolver* Clone() const;
 
-	private:
+private:
 
-		void ExecuteIntegerExcitatory(Number, Time);
-		void ExecuteIntegerInhibitory(Number, Time);
-		void ExecuteFractionExcitatory(Number, Time);
-		void ExecuteFractionInhibitory(Number, Time);
+	void ExecuteIntegerExcitatory(Number, Time);
+	void ExecuteIntegerInhibitory(Number, Time);
+	void ExecuteFractionExcitatory(Number, Time);
+	void ExecuteFractionInhibitory(Number, Time);
 
-	}; // end of NonCirculantSolver
+};
+// end of NonCirculantSolver
 
 } /* namespace nonCirculantSolvers */
 } /* namespace populist */

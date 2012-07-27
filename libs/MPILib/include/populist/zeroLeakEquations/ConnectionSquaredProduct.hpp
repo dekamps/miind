@@ -26,7 +26,7 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 class ConnectionSquaredProduct: public std::binary_function<Rate,
 		OrnsteinUhlenbeckConnection, double> {
 public:

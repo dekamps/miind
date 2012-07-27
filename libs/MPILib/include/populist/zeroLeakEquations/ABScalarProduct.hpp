@@ -27,7 +27,7 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 /**
  * @brief calculates the AB Scalar Product
  */

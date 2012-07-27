@@ -36,151 +36,94 @@
 namespace MPILib {
 namespace populist {
 
-ZeroLeakBuilder::ZeroLeakBuilder
-(
-	Number&						n_bins,		
-	valarray<Potential>&		array_state,
-	Potential&					checksum,	
-	zeroLeakEquations::SpecialBins&				bins,
-	parameters::PopulationParameter&		par_pop,
-	parameters::PopulistSpecificParameter&	par_spec,
-	Potential&					delta_v
-):
-_n_bins(n_bins),
-_array_state(array_state),
-_checksum(checksum),
-_bins(bins),
-_par_pop(par_pop),
-_par_spec(par_spec),
-_delta_v(delta_v)
-{
+ZeroLeakBuilder::ZeroLeakBuilder(Number& n_bins,
+		valarray<Potential>& array_state, Potential& checksum,
+		zeroLeakEquations::SpecialBins& bins,
+		parameters::PopulationParameter& par_pop,
+		parameters::PopulistSpecificParameter& par_spec, Potential& delta_v) :
+		_n_bins(n_bins), _array_state(array_state), _checksum(checksum), _bins(
+				bins), _par_pop(par_pop), _par_spec(par_spec), _delta_v(delta_v) {
 }
 
-
-std::shared_ptr<zeroLeakEquations::AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEquations
-( 
-	const string&									zeroleakequations_name,
-	const string&									circulant_solver_name, 
-	const string&									noncirculant_solver_name
-)
-{
+std::shared_ptr<zeroLeakEquations::AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEquations(
+		const string& zeroleakequations_name,
+		const string& circulant_solver_name,
+		const string& noncirculant_solver_name) {
 	std::shared_ptr<circulantSolvers::AbstractCirculantSolver> p_circ;
-	if ( circulant_solver_name == "CirculantSolver" )
-		p_circ = std::shared_ptr<circulantSolvers::AbstractCirculantSolver>(new circulantSolvers::CirculantSolver);
+	if (circulant_solver_name == "CirculantSolver")
+		p_circ = std::shared_ptr<circulantSolvers::AbstractCirculantSolver>(
+				new circulantSolvers::CirculantSolver);
+	else if (circulant_solver_name == "PolynomialCirculant")
+		p_circ = std::shared_ptr<circulantSolvers::AbstractCirculantSolver>(
+				new circulantSolvers::PolynomialCirculant);
+	else if (circulant_solver_name == "RefractiveCirculantSolver")
+		p_circ = std::shared_ptr<circulantSolvers::AbstractCirculantSolver>(
+				new circulantSolvers::RefractiveCirculantSolver(
+						_par_pop._tau_refractive));
 	else
-		if (circulant_solver_name  == "PolynomialCirculant" )
-			p_circ = std::shared_ptr<circulantSolvers::AbstractCirculantSolver>(new circulantSolvers::PolynomialCirculant );
-		else 
-			if (circulant_solver_name == "RefractiveCirculantSolver")
-				p_circ = std::shared_ptr<circulantSolvers::AbstractCirculantSolver>(new circulantSolvers::RefractiveCirculantSolver(_par_pop._tau_refractive));
-			else
-				throw utilities::Exception("Unknown Circulant");
-		
+		throw utilities::Exception("Unknown Circulant");
 
-	std::shared_ptr< nonCirculantSolvers::AbstractNonCirculantSolver> p_noncirc;
-	if ( noncirculant_solver_name == "NonCirculantSolver" )
-		p_noncirc = std::shared_ptr< nonCirculantSolvers::AbstractNonCirculantSolver>(new  nonCirculantSolvers::NonCirculantSolver );
+	std::shared_ptr<nonCirculantSolvers::AbstractNonCirculantSolver> p_noncirc;
+	if (noncirculant_solver_name == "NonCirculantSolver")
+		p_noncirc = std::shared_ptr<
+				nonCirculantSolvers::AbstractNonCirculantSolver>(
+				new nonCirculantSolvers::NonCirculantSolver);
+	else if (noncirculant_solver_name == "LimitedNonCirculant")
+		p_noncirc = std::shared_ptr<
+				nonCirculantSolvers::AbstractNonCirculantSolver>(
+				new nonCirculantSolvers::LimitedNonCirculant);
+	else if (noncirculant_solver_name == "MatrixNonCirculant")
+		p_noncirc = std::shared_ptr<
+				nonCirculantSolvers::AbstractNonCirculantSolver>(
+				new nonCirculantSolvers::MatrixNonCirculant);
 	else
-		if (noncirculant_solver_name == "LimitedNonCirculant" )
-			p_noncirc = std::shared_ptr< nonCirculantSolvers::AbstractNonCirculantSolver>(new  nonCirculantSolvers::LimitedNonCirculant);
-		else
-			if (noncirculant_solver_name == "MatrixNonCirculant" )
-				p_noncirc = std::shared_ptr< nonCirculantSolvers::AbstractNonCirculantSolver>(new  nonCirculantSolvers::MatrixNonCirculant);
-			else
-				throw utilities::Exception("Unknown NonCirculant solver");
+		throw utilities::Exception("Unknown NonCirculant solver");
 
 	std::shared_ptr<zeroLeakEquations::AbstractZeroLeakEquations> p_ret;
-	if (zeroleakequations_name == "NumericalZeroLeakEquations"){
-		p_ret = std::shared_ptr<zeroLeakEquations::NumericalZeroLeakEquations>
-				(
-					new zeroLeakEquations::NumericalZeroLeakEquations
-					(
-						_n_bins,
-						_array_state,
-						_checksum,
-						_bins,
-						_par_pop,	
-						_par_spec,	
-						_delta_v
-					)
-				);
+	if (zeroleakequations_name == "NumericalZeroLeakEquations") {
+		p_ret = std::shared_ptr<zeroLeakEquations::NumericalZeroLeakEquations>(
+				new zeroLeakEquations::NumericalZeroLeakEquations(_n_bins,
+						_array_state, _checksum, _bins, _par_pop, _par_spec,
+						_delta_v));
 		return p_ret;
 	}
 
-	if (zeroleakequations_name == "LIFZeroLeakEquations"){
-		p_ret = std::shared_ptr<zeroLeakEquations::LIFZeroLeakEquations>
-				(
-					new zeroLeakEquations::LIFZeroLeakEquations
-					(
-						_n_bins,
-						_array_state,
-						_checksum,
-						_bins,
-						_par_pop,	
-						_par_spec,	
-						_delta_v,
-						*p_circ,
-						*p_noncirc
-					)
-				);
+	if (zeroleakequations_name == "LIFZeroLeakEquations") {
+		p_ret = std::shared_ptr<zeroLeakEquations::LIFZeroLeakEquations>(
+				new zeroLeakEquations::LIFZeroLeakEquations(_n_bins,
+						_array_state, _checksum, _bins, _par_pop, _par_spec,
+						_delta_v, *p_circ, *p_noncirc));
 		return p_ret;
 	}
 
-	if (zeroleakequations_name == "OldLIFZeroLeakEquations"){
+	if (zeroleakequations_name == "OldLIFZeroLeakEquations") {
 
 		// This choice will overule the choice for the NonCirculantSolver
-		p_noncirc = std::shared_ptr< nonCirculantSolvers::AbstractNonCirculantSolver>(new  nonCirculantSolvers::NonCirculantSolver(INTEGER) );
+		p_noncirc = std::shared_ptr<
+				nonCirculantSolvers::AbstractNonCirculantSolver>(
+				new nonCirculantSolvers::NonCirculantSolver(INTEGER));
 
-		p_ret = std::shared_ptr<zeroLeakEquations::LIFZeroLeakEquations>
-				(
-					new zeroLeakEquations::OldLIFZeroLeakEquations
-					(
-						_n_bins,
-						_array_state,
-						_checksum,
-						_bins,
-						_par_pop,	
-						_par_spec,	
-						_delta_v,
-						*p_circ,
-						*p_noncirc
-					)
-				);
+		p_ret = std::shared_ptr<zeroLeakEquations::LIFZeroLeakEquations>(
+				new zeroLeakEquations::OldLIFZeroLeakEquations(_n_bins,
+						_array_state, _checksum, _bins, _par_pop, _par_spec,
+						_delta_v, *p_circ, *p_noncirc));
 		return p_ret;
 	}
-	if (zeroleakequations_name == "OneDMZeroLeakEquations" ){
-		p_ret = std::shared_ptr<zeroLeakEquations::OneDMZeroLeakEquations>
-				(
-					new zeroLeakEquations::OneDMZeroLeakEquations
-					(
-						_n_bins,
-						_array_state,
-						_checksum,
-						_bins,
-						_par_pop,	
-						_par_spec,	
-						_delta_v
-						)
-				);
+	if (zeroleakequations_name == "OneDMZeroLeakEquations") {
+		p_ret = std::shared_ptr<zeroLeakEquations::OneDMZeroLeakEquations>(
+				new zeroLeakEquations::OneDMZeroLeakEquations(_n_bins,
+						_array_state, _checksum, _bins, _par_pop, _par_spec,
+						_delta_v));
 		return p_ret;
 	}
 
-	if (zeroleakequations_name == "SingleInputZeroLeakEquations" ){
-		p_ret = std::shared_ptr<zeroLeakEquations::SingleInputZeroLeakEquations>
-				(
-					new zeroLeakEquations::SingleInputZeroLeakEquations
-					(
-						_n_bins,
-						_array_state,
-						_checksum,
-						_bins,
-						_par_pop,	
-						_par_spec,	
-						_delta_v,
-						*p_circ,
-						*p_noncirc
-					)
-				);
+	if (zeroleakequations_name == "SingleInputZeroLeakEquations") {
+		p_ret =
+				std::shared_ptr<zeroLeakEquations::SingleInputZeroLeakEquations>(
+						new zeroLeakEquations::SingleInputZeroLeakEquations(
+								_n_bins, _array_state, _checksum, _bins,
+								_par_pop, _par_spec, _delta_v, *p_circ,
+								*p_noncirc));
 
 		return p_ret;
 	}
@@ -190,4 +133,4 @@ std::shared_ptr<zeroLeakEquations::AbstractZeroLeakEquations> ZeroLeakBuilder::G
 
 } /* namespace populist */
 } /* namespace MPILib */
-	
+

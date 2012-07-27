@@ -32,7 +32,6 @@
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 #include <sstream>
 
-
 namespace MPILib {
 namespace populist {
 
@@ -142,28 +141,34 @@ public:
 	virtual ~PopulationAlgorithm_();
 
 	//!
-	virtual void configure(const SimulationRunParameter&) override;
+	virtual void configure(const SimulationRunParameter&)
+	override;
 
 	//! Evolve the node's state
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
 			const std::vector<Weight>& weightVector, Time time,
-			const std::vector<NodeType>& typeVector) override;
+			const std::vector<NodeType>& typeVector)
+	override;
 
 	//! This algorithm is dependent on synchronous updating, therefore the following function is overloaded
 	virtual void prepareEvolve(const std::vector<Rate>& nodeVector,
 			const std::vector<Weight>& weightVector,
-			const std::vector<NodeType>& typeVector) override;
+			const std::vector<NodeType>& typeVector)
+	override;
 	//! Current time as maintained by the algorithm
-	virtual Time getCurrentTime() const override;
+	virtual Time getCurrentTime() const
+	override;
 
 	//! Give the current output rate
-	virtual Rate getCurrentRate() const override;
+	virtual Rate getCurrentRate() const
+	override;
 
 	//! Provide a copy of the momentary grid
-	virtual algorithm::AlgorithmGrid getGrid() const override;
+	virtual algorithm::AlgorithmGrid getGrid() const
+	override;
 
 	//! Provide a clone of this algorithm
-	virtual PopulationAlgorithm_<Weight>* clone() const override{
+	virtual PopulationAlgorithm_<Weight>* clone() const override {
 		return new PopulationAlgorithm_<Weight>(*this);
 	}
 
@@ -189,8 +194,8 @@ private:
 	mutable ostringstream _stream_log; // before AlgorithmGrid, which receives a pointer to this stream
 	algorithm::AlgorithmGrid _grid;
 	PopulationGridController<Weight> _controller_grid;
-	Time _current_time;
-	Rate _current_rate;
+	Time _current_time = 0.0;
+	Rate _current_rate = 0.0;
 
 }
 ;

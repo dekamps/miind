@@ -27,66 +27,56 @@
 
 namespace MPILib {
 namespace populist {
-namespace rateComputation{
+namespace rateComputation {
 
+//! AbstractRateComputation
+//! There are several methods to calculate a Population's firing rate from the population density
+//! A virtual base class is provide, so that the methods can be exchanged in run time and the different
+//! methods can be compared within a single simulation
 
-	//! AbstractRateComputation
-	//! There are several methods to calculate a Population's firing rate from the population density
-	//! A virtual base class is provide, so that the methods can be exchanged in run time and the different
-	//! methods can be compared within a single simulation
+class AbstractRateComputation {
+public:
 
-	class AbstractRateComputation {
-	public:
+	//! constructor
+	AbstractRateComputation()=default;
 
-		//! constructor
-		AbstractRateComputation();
-
-		virtual void Configure
-		(
-			// not const since a pointer to an element is needed, it should have been const otherwise:
+	virtual void Configure(
+	// not const since a pointer to an element is needed, it should have been const otherwise:
 			std::valarray<Density>&,			// state array
-			const parameters::InputParameterSet&,	// current input to population
+			const parameters::InputParameterSet&,// current input to population
 			const parameters::PopulationParameter&,	// neuron parameters
 			Index						// index reversal bin
-		);
+			);
 
-		virtual ~AbstractRateComputation() = 0;
+	virtual ~AbstractRateComputation() = 0;
 
-		virtual AbstractRateComputation* Clone() const = 0;
+	virtual AbstractRateComputation* Clone() const = 0;
 
-		virtual Rate CalculateRate
-		(
-			Number    // number current bins
-		) = 0;
+	virtual Rate CalculateRate(Number    // number current bins
+			) = 0;
 
-	protected:
+protected:
 
-		bool DefineRateArea
-		(
-			Potential
-		);
+	bool DefineRateArea(Potential);
 
-		Potential BinToCurrentPotential(Index);
+	Potential BinToCurrentPotential(Index);
 
-		Index						_index_reversal = 0;
-		std::valarray<Density>*			_p_array_state = nullptr;
-		const parameters::InputParameterSet*	_p_input_set = nullptr;
-		parameters::PopulationParameter			_par_population;
-		std::valarray<Potential>			_array_interpretation;
+	Index _index_reversal = 0;
+	std::valarray<Density>* _p_array_state = nullptr;
+	const parameters::InputParameterSet* _p_input_set = nullptr;
+	parameters::PopulationParameter _par_population;
+	std::valarray<Potential> _array_interpretation;
 
-		Number		_n_bins;
-		Number		_number_integration_area;      
-		Index		_start_integration_area;       //
+	Number _n_bins;
+	Number _number_integration_area;
+	Index _start_integration_area;
 
-		Potential	_delta_v_rel;
-		Potential	_delta_v_abs;
+	Potential _delta_v_rel;
+	Potential _delta_v_abs;
 
+private:
 
-	private:
-
-
-	};
-} /* namespace rateComputation*/
+};} /* namespace rateComputation*/
 } /* namespace populist */
 } /* namespace MPILib */
 #endif // end of include guard MPILIB_POPULIST_RATECOMPUTATION_ABSTRACTRATECOMPUTATION_HPP_

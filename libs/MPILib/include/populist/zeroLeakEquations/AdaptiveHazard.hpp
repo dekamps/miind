@@ -21,7 +21,7 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 class AdaptiveHazard {
 public:
 

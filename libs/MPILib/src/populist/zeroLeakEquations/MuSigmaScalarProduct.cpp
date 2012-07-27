@@ -24,7 +24,7 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<Rate>& nodeVector,
 		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
 		Time tau) const {

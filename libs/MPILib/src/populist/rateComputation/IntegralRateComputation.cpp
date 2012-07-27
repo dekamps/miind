@@ -27,8 +27,7 @@
 
 namespace MPILib {
 namespace populist {
-namespace rateComputation{
-
+namespace rateComputation {
 
 namespace {
 
@@ -48,7 +47,8 @@ IntegralRateComputation::IntegralRateComputation() {
 
 void IntegralRateComputation::Configure(std::valarray<Density>& array_state,
 		const parameters::InputParameterSet& input_set,
-		const parameters::PopulationParameter& par_population, Index index_reversal) {
+		const parameters::PopulationParameter& par_population,
+		Index index_reversal) {
 	AbstractRateComputation::Configure(array_state, input_set, par_population,
 			index_reversal);
 

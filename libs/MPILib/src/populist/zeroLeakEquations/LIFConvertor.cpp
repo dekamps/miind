@@ -26,7 +26,7 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 void LIFConvertor::AdaptParameters() {
 	// Purpose: Adaption from stride size to current scale, to be called after every new AddBin, or rebinning
 	// Assumes correct values for _delta_v and _set_input, so DeltaV() must be called before this routine
@@ -124,7 +124,6 @@ void LIFConvertor::RecalculateSolverParameters() {
 	UpdateRestInputParameters();
 }
 
-
 const Index& LIFConvertor::getIndexReversalBin() const {
 	return _p_bins->_index_reversal_bin;
 }
@@ -139,12 +138,12 @@ void LIFConvertor::SortConnectionvector(const std::vector<Rate>& nodeVector,
 
 	// sorting depends on network structure and only should be done once
 	if (!_b_toggle_sort) {
-		auto iterWeight= weightVector.begin();
+		auto iterWeight = weightVector.begin();
 		auto iterType = typeVector.begin();
-		for (auto iter = nodeVector.begin(); iter != nodeVector.end(); iter++, iterType++) {
+		for (auto iter = nodeVector.begin(); iter != nodeVector.end();
+				iter++, iterType++) {
 
-			if (*iterType == EXCITATORY_BURST
-					|| *iterType == INHIBITORY_BURST)
+			if (*iterType == EXCITATORY_BURST || *iterType == INHIBITORY_BURST)
 				_vec_burst.push_back(*iter);
 			else
 				_vec_diffusion.push_back(*iter);
@@ -171,7 +170,8 @@ void LIFConvertor::SortConnectionvector(const std::vector<Rate>& nodeVector,
 
 	if (_vec_burst.size() == 0 && _vec_diffusion.size() > 0) {
 		MuSigmaScalarProduct scalar;
-		MuSigma par = scalar.Evaluate(nodeVector, weightVector, _p_par_pop->_tau);
+		MuSigma par = scalar.Evaluate(nodeVector, weightVector,
+				_p_par_pop->_tau);
 		SetDiffusionParameters(par);
 	}
 

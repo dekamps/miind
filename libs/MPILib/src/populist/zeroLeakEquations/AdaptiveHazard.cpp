@@ -19,31 +19,19 @@
 #include <cmath>
 #include <MPILib/include/populist/zeroLeakEquations/AdaptiveHazard.hpp>
 
-
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
-AdaptiveHazard::AdaptiveHazard
-(
-	double a,
-	double b
-):
-_a(a),
-_b(b)
-{
+namespace zeroLeakEquations {
+AdaptiveHazard::AdaptiveHazard(double a, double b) :
+		_a(a), _b(b) {
 }
 
-
-double AdaptiveHazard::operator () 
-(
-	double g
-) const
-{
+double AdaptiveHazard::operator ()(double g) const {
 	// negative g's are meaningless and there should not be hazard there
 	if (g < 0)
 		return 0.0F;
 
-	return _a*exp(-_b*g);
+	return _a * exp(-_b * g);
 }
 } /* namespace zeroLeakEquations */
 } /* namespace populist */

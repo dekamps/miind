@@ -39,17 +39,14 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 
 class ABConvertor {
 public:
 
-	typedef parameters::OneDMInputSetParameter SolverParameterType;
-	typedef ABQStruct ScalarProductParameterType;
-
 	ABConvertor( VALUE_REF
 	SpecialBins&, parameters::PopulationParameter&,	//!< serves now mainly to communicate t_s
-	parameters::PopulistSpecificParameter&, Potential&,	//!< current potential interval covered by one bin, delta_v
+			parameters::PopulistSpecificParameter&, Potential&,	//!< current potential interval covered by one bin, delta_v
 			Number&);
 
 	void Configure(std::valarray<Potential>&, std::valarray<Potential>&,

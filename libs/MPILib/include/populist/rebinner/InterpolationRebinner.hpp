@@ -28,7 +28,6 @@ namespace MPILib {
 namespace populist {
 namespace rebinner {
 
-
 //! Interprolation rebinner is an important rebinning object
 //!
 //! Rebinning is necessary because the normal evolution of the population density takes
@@ -100,8 +99,7 @@ private:
 	Number _number_original_bins = 0;
 	Number _number_new_bins = 0;
 	gsl_spline* _p_spline = nullptr;
-};
-} /* namespace rebinner */
+};} /* namespace rebinner */
 } /* namespace populist */
 } /* namespace MPILib */
 

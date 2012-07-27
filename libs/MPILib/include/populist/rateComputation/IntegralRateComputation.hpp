@@ -24,11 +24,9 @@
 #include <gsl/gsl_integration.h>
 #include <MPILib/include/populist/rateComputation/AbstractRateComputation.hpp>
 
-
 namespace MPILib {
 namespace populist {
-namespace rateComputation{
-
+namespace rateComputation {
 
 //! IntegralRateComputation
 //! Computes the firing rate of a population from the density profile, using an integral method:
@@ -41,8 +39,10 @@ public:
 
 	//! configuring gives access to density profile, the input parameters (effective efficacy and variance of eff. eff.)
 	//! and the neuron parameters
-	virtual void Configure(std::valarray<Density>&,	//! density valarray
-			const parameters::InputParameterSet&, const parameters::PopulationParameter&, Index);
+	virtual void Configure(
+			std::valarray<Density>&,	//! density valarray
+			const parameters::InputParameterSet&,
+			const parameters::PopulationParameter&, Index);
 
 	virtual ~IntegralRateComputation();
 
@@ -53,10 +53,11 @@ public:
 
 private:
 
-	gsl_interp_accel* _p_accelerator = nullptr;                //
-	gsl_integration_workspace* _p_workspace = nullptr;           // need to be initialized
+	gsl_interp_accel* _p_accelerator = nullptr;
+	gsl_integration_workspace* _p_workspace = nullptr;
 
 };
+
 } /* namespace rateComputation*/
 } /* namespace populist */
 } /* namespace MPILib */

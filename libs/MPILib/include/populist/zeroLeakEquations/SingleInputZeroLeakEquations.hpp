@@ -23,31 +23,29 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
-	class SingleInputZeroLeakEquations : public LIFZeroLeakEquations {
+namespace zeroLeakEquations {
+class SingleInputZeroLeakEquations: public LIFZeroLeakEquations {
 
-	public:
+public:
 
-		SingleInputZeroLeakEquations
-		(
+	SingleInputZeroLeakEquations(
 			VALUE_REF_INIT
-			Number&,								//!< reference to the current number of bins
-			std::valarray<Potential>&,					//!< reference to state array
-			Potential&,								//!< reference to the check sum variable
-			SpecialBins&				bins,		
-			parameters::PopulationParameter&		par_pop,	//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter&	par_spec,	//!< reference to the PopulistSpecificParameter
-			Potential&					delta_v,	//!< reference to the current scale variable
+			Number&,				//!< reference to the current number of bins
+			std::valarray<Potential>&,			//!< reference to state array
+			Potential&,					//!< reference to the check sum variable
+			SpecialBins& bins,
+			parameters::PopulationParameter& par_pop,//!< reference to the PopulationParameter
+			parameters::PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
+			Potential& delta_v,	//!< reference to the current scale variable
 			const circulantSolvers::AbstractCirculantSolver&,
-			const nonCirculantSolvers::AbstractNonCirculantSolver&
-		);
+			const nonCirculantSolvers::AbstractNonCirculantSolver&);
 
-		virtual void Apply(Time);
+	virtual void Apply(Time);
 
-	private:
+private:
 
-		Time _time_current = 0.0;
-	};
+	Time _time_current = 0.0;
+};
 } /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */

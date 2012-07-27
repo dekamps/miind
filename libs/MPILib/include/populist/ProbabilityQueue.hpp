@@ -24,7 +24,6 @@
 #include <MPILib/include/populist/StampedProbability.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 
-
 namespace MPILib {
 namespace populist {
 
@@ -48,7 +47,7 @@ class ProbabilityQueue {
 public:
 	//! Probability is grouped in batches
 	ProbabilityQueue(Time time_step = TIME_REFRACT_MIN) :
-			_queue(), _time_step(time_step), _total(0), _time_current(-10) {
+			_queue(), _time_step(time_step) {
 	}
 
 	//! push time stamped probability on the queue
@@ -78,13 +77,13 @@ public:
 
 private:
 
-	void Scale(double scale,  std::list<StampedProbability>);
+	void Scale(double scale, std::list<StampedProbability>);
 
 	std::list<StampedProbability> _queue;
 	Time _time_step;
-	Probability _total;
+	Probability _total = 0.0;
 	StampedProbability _current;
-	Time _time_current;
+	Time _time_current = -10.0;
 };
 } /* namespace populist */
 } /* namespace MPILib */

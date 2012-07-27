@@ -25,45 +25,25 @@
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 
-
 namespace MPILib {
 namespace populist {
 
-	class InitializeAlgorithmGrid
-	{
-	public:
-		algorithm::AlgorithmGrid
-			InitializeGrid
-			(
-				Number,
-				Potential,
-				const parameters::PopulationParameter&,
-				const parameters::InitialDensityParameter&
-			) const;
+class InitializeAlgorithmGrid {
+public:
+	algorithm::AlgorithmGrid
+	InitializeGrid(Number, Potential, const parameters::PopulationParameter&,
+			const parameters::InitialDensityParameter&) const;
 
-		double ExpansionFactorDoubleRebinner
-			(
-				Number,
-				Potential,
-				const parameters::PopulationParameter&
-			) const;
+	double ExpansionFactorDoubleRebinner(Number, Potential,
+			const parameters::PopulationParameter&) const;
 
-		Potential 
-			DeltaV
-			(
-				Number,
-				Potential,
-				const parameters::PopulationParameter&
-			) const;
-		Index 
-			IndexReversal
-			(
-				Number,
-				Potential,
-				const parameters::PopulationParameter&
-			) const;
-	
-	};
+	Potential
+	DeltaV(Number, Potential, const parameters::PopulationParameter&) const;
+	Index
+	IndexReversal(Number, Potential,
+			const parameters::PopulationParameter&) const;
+
+};
 } /* namespace populist */
 } /* namespace MPILib */
 

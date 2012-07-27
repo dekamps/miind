@@ -18,14 +18,13 @@
 //
 #include <MPILib/include/populist/rebinner/AbstractRebinner.hpp>
 
-namespace MPILib{
-namespace populist{
+namespace MPILib {
+namespace populist {
 namespace rebinner {
-AbstractRebinner::~AbstractRebinner()
-{
+AbstractRebinner::~AbstractRebinner() {
 }
-void AbstractRebinner::ScaleRefractive(double scale, zeroLeakEquations::AbstractZeroLeakEquations* p_zl)
-{
+void AbstractRebinner::ScaleRefractive(double scale,
+		zeroLeakEquations::AbstractZeroLeakEquations* p_zl) {
 	if (p_zl)
 		p_zl->ScaleRefractiveProbability(scale);
 }
