@@ -40,14 +40,13 @@ template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::MPINetwork() {
 //set the Debug level to Info if Debug is not enabled.
 #ifndef DEBUG
-	utilities::Log::setReportingLevel(utilities::logInfo);
+	utilities::Log::setReportingLevel(utilities::logINFO);
 #endif
 }
 
 
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::~MPINetwork() {
-//	_pLocalNodes->clear();
 }
 
 template<class WeightValue, class NodeDistribution>

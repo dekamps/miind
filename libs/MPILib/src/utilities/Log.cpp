@@ -20,6 +20,7 @@
 #include <MPILib/include/utilities/MPIProxy.hpp>
 #include <MPILib/include/utilities/Log.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
+#include <iomanip>
 
 namespace MPILib {
 namespace utilities {
@@ -105,10 +106,10 @@ std::ostringstream& Log::writeReport(LogLevel level) {
 	char outstr[200];
 	strftime(outstr, sizeof(outstr), "%x% %H:%M:%S", tempTm2);
 
-	_buffer << "- " << outstr;
+	_buffer  << "- " << outstr;
 	MPIProxy mpiProxy;
-	_buffer << " Proc " << mpiProxy.getRank() << " of " << mpiProxy.getSize();
-	_buffer << " " << logLevelToString(level) << ":\t";
+	_buffer <<" Proc " << mpiProxy.getRank() << " of " << mpiProxy.getSize();
+	_buffer <<std::setw(10) << logLevelToString(level) << ":\t";
 	return _buffer;
 }
 
