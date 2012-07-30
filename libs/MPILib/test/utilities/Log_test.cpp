@@ -103,11 +103,11 @@ void test_writeOutput() {
 }
 
 void test_getReportingLevel() {
-	BOOST_CHECK(Log::getReportingLevel()==logDEBUG4);
+	BOOST_CHECK(Log::getReportingLevel()==logINFO);
 }
 
 void test_setReportingLevel() {
-	BOOST_CHECK(Log::getReportingLevel()==logDEBUG4);
+	BOOST_CHECK(Log::getReportingLevel()==logINFO);
 	std::shared_ptr<std::ostringstream> pStream(new std::ostringstream());
 
 	Log::setStream(std::dynamic_pointer_cast<std::ostream>(pStream));
