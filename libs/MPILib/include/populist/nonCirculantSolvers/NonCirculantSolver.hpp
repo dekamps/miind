@@ -29,40 +29,80 @@ namespace MPILib {
 namespace populist {
 namespace nonCirculantSolvers {
 
-//! The algorithm that runs the Poisson master process for probability density corresponding to neurons that have not yet passed threshold.
-//! It should never be run in INTEGER mode, a mode which has been left in for the reproduction of old paper results.
-//! The algorithm can be created, but nothing will happen at that point. Once it has been configured, teling it which valarray to run on,
-//! and what the current input parameters are, it can be run by calling apply on a specified number of bins.
-
+/**
+ * The algorithm that runs the Poisson master process for probability density corresponding to neurons
+ * that have not yet passed threshold. It should never be run in INTEGER mode, a mode which has been
+ * left in for the reproduction of old paper results. The algorithm can be created, but nothing will
+ * happen at that point. Once it has been configured, telling it which valarray to run on, and what the
+ * current input parameters are, it can be run by calling apply on a specified number of bins.
+ *
+ */
 class NonCirculantSolver: public AbstractNonCirculantSolver {
 public:
 
-	//! Only mode selection in the constructor, hard work is done in Configure function of the base class. If INTEGER mode is chosen,
-	//! the _H_exc and _H_inh are used as a parameter, for FLOATING_POINT _h_exc and _h_inh are used.
-	NonCirculantSolver(CirculantMode = FLOATING_POINT);
+	/**
+	 * 	Only mode selection in the constructor, hard work is done in Configure function of the
+	 * 	base class. If INTEGER mode is chosen, the _H_exc and _H_inh are used as a parameter,
+	 * 	for FLOATING_POINT _h_exc and _h_inh are used.
+	 * @param mode The CirculantMode of this Solver
+	 */
+	NonCirculantSolver(CirculantMode mode = FLOATING_POINT);
 
-	//! Carry out one excitatory step for the number of bins given, using the input parameters that were set in the Configure method of the base class.
-	void ExecuteExcitatory(Number, //!< Number of bins in the current state array
-			Time	//!< Time by which to evolve
-			);
+	/**
+	 * Carry out one excitatory step for the number of bins given, using the input parameters that
+	 * were set in the Configure method of the base class.
+	 * @param n_bins Number of bins for which the solver must operate, i.e. the current number of bins. May not exceed number of elements in state array.
+	 * @param tau Time by which to evolve
+	 */
+	virtual void ExecuteExcitatory(Number n_bins, Time tau);
 
-	//! Carry out one inhibitory step for the number of bins given, using the input parameters that were set in the Configure method of the base class
-	void ExecuteInhibitory(Number, Time);
+	/**
+	 * Carry out one inhibitory step for the number of bins given, using the input parameters that
+	 * were set in the Configure method of the base class
+	 * @param n_bins Number of bins for which the solver must operate, i.e. the current number of bins. May not exceed number of elements in state array.
+	 * @param tau Time by which to evolve
+	 */
+	virtual void ExecuteInhibitory(Number n_bins, Time tau);
 
-	//! Simply add the total amount of probability present in the density array for the current number of bins
-	double
-	Integrate(Number //!< current number of bins
-			) const;
+	/**
+	 * Simply add the total amount of probability present in the density array for the current number of bins
+	 * @param number_of_bins current number of bins
+	 * @return The total amount of probability present in the density array
+	 */
+	double Integrate(Number number_of_bins) const;
 
-	//! Clone this object
+	/**
+	 * Clone method
+	 * @return A clone of NonCirculantSolver
+	 */
 	virtual NonCirculantSolver* Clone() const;
 
 private:
 
-	void ExecuteIntegerExcitatory(Number, Time);
-	void ExecuteIntegerInhibitory(Number, Time);
-	void ExecuteFractionExcitatory(Number, Time);
-	void ExecuteFractionInhibitory(Number, Time);
+	/**
+	 * Helper Function for ExecuteExcitatory for INTEGER mode
+	 * @param n_bins Number of bins for which the solver must operate, i.e. the current number of bins. May not exceed number of elements in state array.
+	 * @param tau Time by which to evolve
+	 */
+	void ExecuteIntegerExcitatory(Number n_bins, Time tau);
+	/**
+	 * Helper Function for ExecuteInhibitory for INTEGER mode
+	 * @param n_bins Number of bins for which the solver must operate, i.e. the current number of bins. May not exceed number of elements in state array.
+	 * @param tau Time by which to evolve
+	 */
+	void ExecuteIntegerInhibitory(Number n_bins, Time tau);
+	/**
+	 * Helper Function for ExecuteInhibitory for FLOATING_POINT mode
+	 * @param n_bins Number of bins for which the solver must operate, i.e. the current number of bins. May not exceed number of elements in state array.
+	 * @param tau Time by which to evolve
+	 */
+	void ExecuteFractionExcitatory(Number n_bins, Time tau);
+	/**
+	 * Helper Function for ExecuteInhibitory for FLOATING_POINT mode
+	 * @param n_bins Number of bins for which the solver must operate, i.e. the current number of bins. May not exceed number of elements in state array.
+	 * @param tau Time by which to evolve
+	 */
+	void ExecuteFractionInhibitory(Number n_bins, Time tau);
 
 };
 // end of NonCirculantSolver

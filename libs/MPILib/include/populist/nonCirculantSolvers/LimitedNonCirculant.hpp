@@ -25,26 +25,57 @@ namespace MPILib {
 namespace populist {
 namespace nonCirculantSolvers {
 
+/**
+ *  @brief A class for the LimitedNonCirculant solver
+ */
 class LimitedNonCirculant: public AbstractNonCirculantSolver {
 public:
 
+	/**
+	 * Default constructor
+	 */
 	LimitedNonCirculant();
 
-	virtual ~LimitedNonCirculant();
+	/**
+	 * virtual destructor
+	 */
+	virtual ~LimitedNonCirculant(){};
 
-	virtual void ExecuteExcitatory(Number,//!< Number of current bins in the state array
-			Time	//!< Time by which to evolve
-			);
+	/**
+	 * Execute the algorithm over a given time step,
+	 * for the currently valid number of bins, for the excitatory parameters
+	 * @param n_bins Number of bins for which the solver must operate, i.e. the current number of bins. May not exceed number of elements in state array.
+	 * @param tau Time by which to evolve
+	 */
+	virtual void ExecuteExcitatory(Number n_bins, Time tau);
 
-	virtual void ExecuteInhibitory(Number,//!< Number of current bins in the state array
-			Time	//!< Time by which to evolve
-			);
+	/**
+	 * Execute the algorithm over a given time step,
+	 * for the currently valid number of bins, for the inhibitory parameters
+	 * @param n_bins Number of bins for which the solver must operate, i.e. the current number of bins. May not exceed number of elements in state array.
+	 * @param tau Time by which to evolve
+	 */
+	virtual void ExecuteInhibitory(Number n_bins, Time tau);
 
+	/**
+	 * Clone method
+	 * @return A clone of LimitedNonCirculant
+	 */
 	virtual LimitedNonCirculant* Clone() const;
 
 protected:
-
-	virtual void InitializeArrayFactor(Time, Number);
+	/**
+	 *  Initializes an array with values \f$ e^{-tau}, \tau e^{-\tau}, \cdots \frac{\tau^k}{k!}e^{-\tau} \f$,
+	 *  but breaks the series if the terms become smaller than epsilon, which is set at Configure.
+	 *  There are then less terms than requested, the number of terms actually calculated is returned.
+	 *  The results are stored in _array_factor. Attempts to access _array_factor beyond position NumberFactor() - 1
+	 *  see below result in undefined behaviour. This number of elements in the factor array is usually
+	 *  calculated in one of the Execute* functions so would be known there. In general clients are advised
+	 *   not to use this function.
+	 * @param tau Time by which to evolve
+	 * @param n_non_circulant maximum number of terms of the factor array
+	 */
+	virtual void InitializeArrayFactor(Time tau, Number n_non_circulant);
 };
 } /* namespace nonCirculantSolvers */
 } /* namespace populist */

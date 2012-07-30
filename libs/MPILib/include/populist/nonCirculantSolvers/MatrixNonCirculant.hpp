@@ -36,20 +36,49 @@ public:
 	//! destructor
 	virtual ~MatrixNonCirculant();
 
-	//! calculate the non-circulant solution for the excitatory part of the matrix
-	virtual void ExecuteExcitatory(Number, Time);
+	/**
+	 * Execute the algorithm over a given time step,
+	 * for the currently valid number of bins, for the excitatory parameters.
+	 *
+	 * This is the most straightforward version of the algorithm: simply create a single
+	 * row that contains exp Lt.
+	 * Expectation is that this will be slower than the standard NonCirculantSolver,
+	 * but that it is independent of the number of input populations to a first approximation,
+	 * because the time to set up the matrix row is shorter than the time to carry out the matrix
+	 * multiplication.
+	 * @param n_bins Number of bins for which the solver must operate, i.e. the current number of bins. May not exceed number of elements in state array.
+	 * @param tau Time by which to evolve
+	 */
+	virtual void ExecuteExcitatory(Number n_bins, Time tau);
 
-	virtual void ExecuteInhibitory(Number, Time);
+	/**
+	 * Execute the algorithm over a given time step,
+	 * for the currently valid number of bins, for the inhibitory parameters
+	 * @param n_bins Number of bins for which the solver must operate, i.e. the current number of bins. May not exceed number of elements in state array.
+	 * @param tau Time by which to evolve
+	 */
+	virtual void ExecuteInhibitory(Number n_bins, Time tau);
 
-	//! Virtual copy constructor
+	/**
+	 * Clone method
+	 * @return A clone of MatrixNonCirculant
+	 */
 	virtual MatrixNonCirculant* Clone() const;
 
-	//! Configure
-	virtual bool Configure(std::valarray<double>&,
-			const parameters::InputParameterSet&, double = 0);
+	/**
+	 * Before every solution step the input parameters may have changed, and need to be adapted
+	 * @param array_state State array containing the population density
+	 * @param input_set Current input parameters, see InputParameterSet for documentation,
+	 * @param epsilon epsilon precision value overruling EPS_J_CIRC_MAX, when set to zero, EPS_J_CIRC_MAX is used
+	 */
+	virtual void Configure(std::valarray<double>& array_state,
+			const parameters::InputParameterSet& input_set, double epsilon = 0);
 
 private:
 
+	/**
+	 * Store the array state
+	 */
 	std::valarray<Potential> _matrix_row;
 };
 } /* namespace nonCirculantSolvers */

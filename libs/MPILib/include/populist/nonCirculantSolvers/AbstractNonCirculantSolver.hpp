@@ -29,75 +29,122 @@ namespace MPILib {
 namespace populist {
 namespace nonCirculantSolvers {
 
-//! A base class for all non-circulant solvers.
-//!
-//! The idea was that they can be exchanged during run time to investigate changes in the algorithm
-//! on the network level. This seems less important now. The base class stores an array of the
-//! form \f$ (e^{-\tau}, e^{-\tau}tau, e^{-\tau}\frac{\tau}{2}, \cdots e^{-\tau}\frac{\tau^k}{k!}, \cdots ) \f$.
-//! The sequence is broken off when the last term is smaller than  EPS_J_CIRC_MAX.
-//! The number of bins is efficacy in terms of number of bins.
+/**
+ * @brief A base class for all non-circulant solvers.
+ *
+ * The idea was that they can be exchanged during run time to investigate changes in the algorithm
+ * on the network level. This seems less important now. The base class stores an array of the
+ * form \f$ (e^{-\tau}, e^{-\tau}tau, e^{-\tau}\frac{\tau}{2}, \cdots e^{-\tau}\frac{\tau^k}{k!}, \cdots ) \f$ .
+ * The sequence is broken off when the last term is smaller than  EPS_J_CIRC_MAX.
+ * The number of bins is efficacy in terms of number of bins.
+ */
 class AbstractNonCirculantSolver {
 public:
 
-	//! The mode can be set on upon construction, but when used in AbstractZeroLeakEquations instances the mode can and generally will be overruled
-	AbstractNonCirculantSolver(CirculantMode);
+	/**
+	 * The mode can be set on upon construction, but when used in AbstractZeroLeakEquations
+	 * instances the mode can and generally will be overruled
+	 * @param mode The CirculantMode the solver is set to
+	 */
+	AbstractNonCirculantSolver(CirculantMode mode);
 
-	//! Before every solution step the input parameters may have changed, and need to be adapted
-	virtual bool Configure(std::valarray<double>&,//!< State array containing the population density
-			const parameters::InputParameterSet&,//!< Current input parameters, see InputParameterSet for documentation,
-			double = 0//!< epsilon precision value overruling EPS_J_CIRC_MAX, when set to zero, EPS_J_CIRC_MAX is used
-			);
+	/**
+	 * Before every solution step the input parameters may have changed, and need to be adapted
+	 * @param array_state State array containing the population density
+	 * @param input_set Current input parameters, see InputParameterSet for documentation,
+	 * @param epsilon epsilon precision value overruling EPS_J_CIRC_MAX, when set to zero, EPS_J_CIRC_MAX is used
+	 */
+	virtual void Configure(std::valarray<double>& array_state,
+			const parameters::InputParameterSet& input_set, double epsilon = 0);
 
-	//! Execute the algorithm over a given time step,
-	//! for the currently valid number of bins, for the excitatory parameters
-	virtual void ExecuteExcitatory(Number,//!< Number of bins for which the solver must operate, i.e. the current number of bins. May noy exceed number of elements in state array.
-			Time		//!< Time by which to evolve
-			)= 0;
+	/**
+	 * Execute the algorithm over a given time step,
+	 * for the currently valid number of bins, for the excitatory parameters
+	 * @param n_bins Number of bins for which the solver must operate, i.e. the current number of bins. May not exceed number of elements in state array.
+	 * @param tau Time by which to evolve
+	 */
+	virtual void ExecuteExcitatory(Number n_bins, Time tau)=0;
 
-	//! Execute the algorithm over a given time step,
-	//! for the currently valid number of bins, for the inhibitory parameters
-	virtual void ExecuteInhibitory(Number, Time)= 0;
+	/**
+	 * Execute the algorithm over a given time step,
+	 * for the currently valid number of bins, for the inhibitory parameters
+	 * @param n_bins Number of bins for which the solver must operate, i.e. the current number of bins. May not exceed number of elements in state array.
+	 * @param tau Time by which to evolve
+	 */
+	virtual void ExecuteInhibitory(Number n_bins, Time tau)= 0;
 
-	//! virtual destructor for correct removal of allocated resources
-	virtual ~AbstractNonCirculantSolver() = 0;
+	/**
+	 * virtual destructor for correct removal of allocated resources
+	 */
+	virtual ~AbstractNonCirculantSolver() {
+	}
+	;
 
-	//! virtual copying mechanism
+	/**
+	 * Clone method
+	 * @return A clone of AbstractNonCirculantSolver
+	 */
 	virtual AbstractNonCirculantSolver* Clone() const = 0;
 
-	//! Return the maximum number of terms available in array _array_factor, after the most recent run of InitializeArrayFactor
-	//! Only valid after InitializeArrayFactor was run
+	/**
+	 * Return the maximum number of terms available in array _array_factor, after the most recent
+	 * run of InitializeArrayFactor. Only valid after InitializeArrayFactor was run.
+	 * @return The maximum number of terms available in array _array_factor
+	 */
 	Number NumberFactor() const {
 		assert(_j_circ_max > 0);
 		return _j_circ_max;
 	}
 
+	/**
+	 * Setter for the mode
+	 * @param mode The new circulant mode
+	 */
 	void setMode(CirculantMode mode) {
 		_mode = mode;
 	}
 
 protected:
-	//! Initialises an array with values \f$ e^{-tau}, \tau e^{-\tau}, \cdots \frac{\tau^k}{k!}e^{-\tau} \f$, but breaks the series
-	//! if the terms become smaller than epsilon, which is set at Configure. There are then less terms than requested, the number of terms actually calculated
-	//! is returned. The rsults are stored in _array_factor. Attempts to access _array_factor beyond position NumberFactor() - 1
-	//! see below result in undefined behaviour. This number of elements in the factor array is usually calculated in one of the
-	//! Execute* functions so would be known there. In general clients are advised not to use this function.
+	/**
+	 *  Initializes an array with values \f$ e^{-tau}, \tau e^{-\tau}, \cdots \frac{\tau^k}{k!}e^{-\tau} \f$,
+	 *  but breaks the series if the terms become smaller than epsilon, which is set at Configure.
+	 *  There are then less terms than requested, the number of terms actually calculated is returned.
+	 *  The results are stored in _array_factor. Attempts to access _array_factor beyond position NumberFactor() - 1
+	 *  see below result in undefined behaviour. This number of elements in the factor array is usually
+	 *  calculated in one of the Execute* functions so would be known there. In general clients are advised
+	 *   not to use this function.
+	 * @param tau Time by which to evolve
+	 * @param n_non_circulant maximum number of terms of the factor array
+	 */
+	virtual void InitializeArrayFactor(Time tau, Number n_non_circulant);
 
-	void InitializeArrayFactor(Time,						//!< tau
-			Number				//!< maximum number of terms of the factor array
-			);
-
+	/**
+	 * The array with the factors
+	 */
 	std::valarray<double> _array_factor;
+	/**
+	 * Pointer to the state array containing the population density
+	 */
 	std::valarray<double>* _p_array_state = nullptr;
+	/**
+	 * Pointer to the input set
+	 */
 	const parameters::InputParameterSet* _p_input_set;
+	/**
+	 * Precision value overruling EPS_J_CIRC_MAX
+	 */
 	double _epsilon;
-	int _j_circ_max = -1;// maximum j for which exp(-tau) tau^k/k! is relevant
-			// helps to cut computation short
-			CirculantMode _mode;
+	/**
+	 *  maximum j for which \f$ exp(-tau) tau^k/k! \f$ is relevant. Helps to cut computation short.
+	 */
+	int _j_circ_max = -1;
+	/**
+	 * The circulant mode of the solver
+	 */
+	CirculantMode _mode;
 
-		};
+};
 
-inline AbstractNonCirculantSolver::~AbstractNonCirculantSolver() {
-}
 } /* namespace nonCirculantSolvers */
 } /* namespace populist */
 } /* namespace MPILib */

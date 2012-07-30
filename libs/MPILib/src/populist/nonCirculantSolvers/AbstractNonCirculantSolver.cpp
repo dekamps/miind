@@ -27,7 +27,7 @@ AbstractNonCirculantSolver::AbstractNonCirculantSolver(CirculantMode mode) :
 		_array_factor(0), _epsilon(EPS_J_CIRC_MAX), _mode(mode) {
 }
 
-bool AbstractNonCirculantSolver::Configure(std::valarray<double>& array_state,
+void AbstractNonCirculantSolver::Configure(std::valarray<double>& array_state,
 		const parameters::InputParameterSet& input_set, double epsilon) {
 	if (epsilon == 0)
 		_epsilon = EPS_J_CIRC_MAX;
@@ -38,7 +38,6 @@ bool AbstractNonCirculantSolver::Configure(std::valarray<double>& array_state,
 
 	_p_input_set = &input_set;
 
-	return true;
 }
 
 void AbstractNonCirculantSolver::InitializeArrayFactor(Time tau,

@@ -35,13 +35,6 @@ MatrixNonCirculant* MatrixNonCirculant::Clone() const {
 }
 
 void MatrixNonCirculant::ExecuteExcitatory(Number n_bins, Time tau) {
-	// This is the most straightforward version of the algorithm: simply create a single
-	// row that contains exp Lt.
-	// Expectation is that this will be slower than the standard NonCirculantSolver,
-	// but that it is independent of the number of input populations to a first approximation,
-	// because the time to set up the matrix row is shorter than the time to carry out the matrix 
-	// multiplication.
-
 	this->InitializeArrayFactor(tau, n_bins);
 
 	int H = static_cast<int>(_p_input_set->_H_exc);
@@ -67,15 +60,14 @@ void MatrixNonCirculant::ExecuteInhibitory(Number n_bins, Time tau) {
 	throw utilities::Exception("Not yet implemented");
 }
 
-bool MatrixNonCirculant::Configure(std::valarray<double>& array_state,
-		const parameters::InputParameterSet& input_set, double) {
+void MatrixNonCirculant::Configure(std::valarray<double>& array_state,
+		const parameters::InputParameterSet& input_set, double epsilon) {
 	// Normally this is done in the base class 
 	_p_array_state = &array_state;
 	_p_input_set = &input_set;
 
 	// however we need an overloaded Configure for this reason:
 	_matrix_row = array_state;
-	return true;
 }
 } /* namespace nonCirculantSolvers */
 } /* namespace populist */

@@ -27,9 +27,6 @@ LimitedNonCirculant::LimitedNonCirculant() :
 		AbstractNonCirculantSolver(INTEGER) {
 }
 
-LimitedNonCirculant::~LimitedNonCirculant() {
-}
-
 LimitedNonCirculant* LimitedNonCirculant::Clone() const {
 	return new LimitedNonCirculant(*this);
 }

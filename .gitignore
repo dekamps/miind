@@ -5,3 +5,7 @@ build/
 .pydevproject
 .settings
 org.eclipse.cdt.core.prefs
+runBrowser
+twopoptest_0.root
+twopoptest_1.root
+twopoptest_2.root
