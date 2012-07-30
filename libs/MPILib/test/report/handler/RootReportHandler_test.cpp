@@ -64,7 +64,7 @@ void test_writeReport() {
 	BOOST_CHECK(rH1._nrReports==0);
 	BOOST_CHECK(rH1._spCurrentRateGraph==nullptr);
 	rH1.initializeHandler(1);
-	rH1.writeReport(MPILib::report::Report (1.0, 2.0, 1, "blub" ));
+	rH1.writeReport(MPILib::report::Report (1.0, 2.0, 1));
 	BOOST_CHECK(rH1._spCurrentRateGraph!=nullptr);
 	BOOST_CHECK(std::string(rH1._spCurrentRateGraph->GetName())=="rate_1");
 	double x, y;
@@ -112,7 +112,7 @@ void test_initializeHandler() {
 void test_detachHandler() {
 	RootReportHandler rH1("RootTestFile", true);
 	rH1.initializeHandler(3);
-	rH1.writeReport(MPILib::report::Report ( 1.0, 2.0, 1, "blub" ));
+	rH1.writeReport(MPILib::report::Report ( 1.0, 2.0, 1));
 	BOOST_CHECK(rH1._spCurrentRateGraph!=nullptr);
 	rH1.detachHandler(3);
 	BOOST_CHECK(rH1._spCurrentRateGraph==nullptr);
@@ -148,7 +148,7 @@ void test_removeFromNodeList() {
 void test_finalize() {
 	RootReportHandler rH1("RootTestFile", true);
 	rH1.initializeHandler(3);
-	rH1.writeReport(MPILib::report::Report ( 1.0, 2.0, 1, "blub" ));
+	rH1.writeReport(MPILib::report::Report ( 1.0, 2.0, 1));
 	BOOST_CHECK(rH1._pFile!=nullptr);
 	rH1.finalize();
 	BOOST_CHECK(rH1._nodes.empty()==true);
@@ -163,7 +163,7 @@ void test_convertAlgorithmGridToGraph() {
 void test_isConnectedToAlgorithm() {
 	RootReportHandler rH1("blab", true);
 	BOOST_CHECK(rH1.isConnectedToAlgorithm()==false);
-	rH1.writeReport(MPILib::report::Report ( 1.0, 2.0, 1, "blub" ));
+	rH1.writeReport(MPILib::report::Report ( 1.0, 2.0, 1));
 	BOOST_CHECK(rH1.isConnectedToAlgorithm()==true);
 
 }

@@ -33,19 +33,17 @@ using namespace MPILib::report;
 
 
 void test_Constructor() {
-	Report r(1.0, 2.0, 1, "blub");
+	Report r(1.0, 2.0, 1);
 
 	BOOST_CHECK(r._id ==1);
-	BOOST_CHECK(r._log_message=="blub");
 	BOOST_CHECK(r._rate==2.0);
 	BOOST_CHECK(r._time==1.0);
 	ReportValue tempV {"blab", 1.0, 2.0};
 	std::vector<ReportValue> rv;
 	rv.push_back(tempV);
-	Report r1(1.0, 2.0, 1,  MPILib::algorithm::AlgorithmGrid(2), "blub", RATE, rv);
+	Report r1(1.0, 2.0, 1,  MPILib::algorithm::AlgorithmGrid(2), RATE, rv);
 
 	BOOST_CHECK(r1._id==1);
-	BOOST_CHECK(r1._log_message=="blub");
 	BOOST_CHECK(r1._grid.getStateSize()==2);
 	BOOST_CHECK(r1._rate==2.0);
 	BOOST_CHECK(r1._time==1.0);
@@ -53,10 +51,9 @@ void test_Constructor() {
 	BOOST_CHECK(r1._values[0]._name_quantity=="blab");
 	BOOST_CHECK(r1._nrNodes == 0);
 
-	Report r2(1.0, 2.0, 1,  MPILib::algorithm::AlgorithmGrid(2), "blub", RATE, rv, 10);
+	Report r2(1.0, 2.0, 1,  MPILib::algorithm::AlgorithmGrid(2), RATE, rv, 10);
 
 	BOOST_CHECK(r2._id==1);
-	BOOST_CHECK(r2._log_message=="blub");
 	BOOST_CHECK(r2._grid.getStateSize()==2);
 	BOOST_CHECK(r2._rate==2.0);
 	BOOST_CHECK(r2._time==1.0);
@@ -66,7 +63,7 @@ void test_Constructor() {
 }
 
 void test_addValue(){
-	Report r(1.0, 2.0, 1, "blub");
+	Report r(1.0, 2.0, 1);
 	ReportValue tempV {"blab", 1.0, 2.0};
 
 	r.addValue(tempV);

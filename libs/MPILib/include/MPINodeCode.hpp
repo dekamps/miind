@@ -190,23 +190,19 @@ void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 }
 
 template<class Weight, class NodeDistribution>
-std::string MPINode<Weight, NodeDistribution>::reportAll(
+void MPINode<Weight, NodeDistribution>::reportAll(
 		report::ReportType type) const {
-
-	std::string string_return("");
 
 	std::vector<report::ReportValue> vec_values;
 
 	if (type == report::RATE || type == report::STATE) {
 		report::Report report(_pAlgorithm->getCurrentTime(),
 				Rate(this->getActivity()), this->_nodeId,
-				_pAlgorithm->getGrid(), string_return, type, vec_values,
+				_pAlgorithm->getGrid(),  type, vec_values,
 				_rLocalNodes.size());
 
 		_pHandler->writeReport(report);
 	}
-
-	return string_return;
 }
 
 template<class Weight, class NodeDistribution>

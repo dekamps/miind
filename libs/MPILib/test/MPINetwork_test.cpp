@@ -62,7 +62,6 @@ void test_Constructor() {
 	//indirect test
 	BOOST_CHECK(network._stateNetwork._currentTime==0.0);
 	BOOST_CHECK(network._parameterSimulationRun._tBegin==0);
-	BOOST_CHECK(network._streamLog._isTimeAvailable==true);
 }
 
 void test_AddNode() {

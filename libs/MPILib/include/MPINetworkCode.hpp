@@ -32,6 +32,7 @@
 #include <MPILib/include/MPINodeCode.hpp>
 #include <MPILib/include/utilities/ProgressBar.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
+#include <MPILib/include/utilities/Log.hpp>
 
 namespace MPILib {
 
@@ -128,25 +129,18 @@ void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 		}
 
 	} catch (...) {
-		_streamLog << "error during configuration/n";
-		_streamLog.flush();
+		LOG(utilities::logERROR)<<"error during configuration";
 	}
-
 	_stateNetwork.toggleConfigured();
-
-	_streamLog.flush();
-
 }
 
 //! Envolve the network
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
-	std::string report;
 	if (_stateNetwork.isConfigured()) {
 		_stateNetwork.toggleConfigured();
-		_streamLog << "Starting simulation\n";
-		_streamLog.flush();
+		LOG(utilities::logINFO)<<"Starting simulation";
 		//init the nodes
 		for (auto& it : _localNodes) {
 			it.second.initNode();
@@ -183,8 +177,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					// there is something to report
 					//CheckPercentageAndLog(CurrentSimulationTime());
 					updateReportTime();
-					report = collectReport(report::RATE);
-					_streamLog << report;
+					collectReport(report::RATE);
 				}
 				// just a rate or also a state?
 				if (getCurrentSimulationTime() >= getCurrentStateTime()) {
@@ -200,16 +193,13 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 		}
 
 		catch (utilities::IterationNumberException &e) {
-			_streamLog << "NUMBER OF ITERATIONS EXCEEDED\n";
+			LOG(utilities::logWARNING) << "NUMBER OF ITERATIONS EXCEEDED\n";
 			_stateNetwork.setResult(NUMBER_ITERATIONS_ERROR);
-			_streamLog.flush();
-			_streamLog.close();
 		}
 
 		clearSimulation();
-		_streamLog << "Simulation ended, no problems noticed\n";
-		_streamLog << "End time: " << getCurrentSimulationTime() << "\n";
-		_streamLog.close();
+		LOG(utilities::logINFO)<<"Simulation ended, no problems noticed";
+		LOG(utilities::logINFO)<<"End time: " << getCurrentSimulationTime() << "\n";
 	}
 
 }
@@ -229,16 +219,13 @@ void MPINetwork<WeightValue, NodeDistribution>::incrementMaxNodeId() {
 }
 
 template<class WeightValue, class NodeDistribution>
-std::string MPINetwork<WeightValue, NodeDistribution>::collectReport(
+void MPINetwork<WeightValue, NodeDistribution>::collectReport(
 		report::ReportType type) {
 
-	std::string string_return;
-
 	for (auto& it : _localNodes) {
-		string_return += it.second.reportAll(type);
+		 it.second.reportAll(type);
 	}
 
-	return string_return;
 }
 
 template<class WeightValue, class NodeDistribution>
@@ -248,8 +235,8 @@ void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
 	std::shared_ptr<std::ostream> p_stream(new std::ofstream(filename.c_str()));
 	if (!p_stream)
 		throw utilities::Exception("MPINetwork cannot open log file.");
-	if (!_streamLog.openStream(p_stream))
-		_streamLog << "WARNING YOU ARE TRYING TO REOPEN THIS LOG FILE\n";
+	utilities::Log::setStream(p_stream);
+
 }
 
 template<class WeightValue, class NodeDistribution>

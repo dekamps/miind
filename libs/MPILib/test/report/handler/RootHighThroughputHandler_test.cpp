@@ -82,7 +82,7 @@ void test_writeReport() {
 
 	std::vector<ReportValue> rv;
 	rv.push_back(tempV);
-	Report r1(1.0, 1.0, 1, MPILib::algorithm::AlgorithmGrid(2), "blub", RATE,
+	Report r1(1.0, 1.0, 1, MPILib::algorithm::AlgorithmGrid(2),RATE,
 			rv, 3);
 
 	BOOST_CHECK(rH._pTree == nullptr);
@@ -110,13 +110,13 @@ void test_writeReport() {
 		BOOST_CHECK((*nodeIds)[2]==2);
 	}
 
-	Report r2(1.0, 2.0, 2, MPILib::algorithm::AlgorithmGrid(2), "blub", RATE,
+	Report r2(1.0, 2.0, 2, MPILib::algorithm::AlgorithmGrid(2), RATE,
 			rv, 3);
 	rH.writeReport(r2);
 	BOOST_CHECK(rH._mData.size()==2);
 	BOOST_CHECK(rH._mData[2]==2.0);
 
-	Report r3(1.0, 0.0, 0, MPILib::algorithm::AlgorithmGrid(2), "blub", RATE,
+	Report r3(1.0, 0.0, 0, MPILib::algorithm::AlgorithmGrid(2),  RATE,
 			rv, 3);
 	rH.writeReport(r3);
 	BOOST_CHECK(rH._mData.size()==0);
