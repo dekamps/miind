@@ -24,6 +24,7 @@
 #include <iostream>
 #include <MPILib/include/BasicDefinitions.hpp>
 #include <MPILib/include/StringDefinitions.hpp>
+#include <MPILib/include/utilities/Log.hpp>
 
 namespace MPILib {
 namespace populist {
@@ -91,7 +92,7 @@ Rate IntegralRateComputation::CalculateRate(Number nr_bins) {
 	if (!P_SPLINE && _number_integration_area >= 4) {
 		P_SPLINE = gsl_spline_alloc(gsl_interp_linear,
 				_number_integration_area);
-		std::cout << "Akima couldn't handle" << std::endl;
+		LOG(utilities::logWARNING)<<"Akima couldn't handle";
 	}
 
 	if (P_SPLINE == 0)
