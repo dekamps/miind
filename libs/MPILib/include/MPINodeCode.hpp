@@ -24,6 +24,7 @@
 #include <MPILib/include/MPINode.hpp>
 #include <iostream>
 #include <MPILib/include/utilities/Exception.hpp>
+#include <MPILib/include/utilities/Log.hpp>
 namespace MPILib {
 
 template<class Weight, class NodeDistribution>
@@ -121,11 +122,9 @@ void MPINode<Weight, NodeDistribution>::initNode() {
 	if (!_isInitialised) {
 		this->exchangeNodeTypes();
 		_isInitialised = true;
-#ifdef DEBUG
-		std::cout << "init finished. Node Types lenght: "
-		<< _precursorTypes.size() << " number of precursors: "
-		<< _precursors.size() << std::endl;
-#endif
+		LOG(utilities::logDEBUG1) << "init finished. Node Types lenght: "
+				<< _precursorTypes.size() << " number of precursors: "
+				<< _precursors.size();
 	} else {
 		throw utilities::Exception("init called more than once.");
 	}
@@ -139,8 +138,7 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 	for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
 		//do not send the data if the node is local!
 		if (_rNodeDistribution.isLocalNode(*it)) {
-			_precursorTypes[i] =
-					_rLocalNodes.find(*it)->second.getNodeType();
+			_precursorTypes[i] = _rLocalNodes.find(*it)->second.getNodeType();
 
 		} else {
 			utilities::MPIProxy mpiProxy;
@@ -198,8 +196,7 @@ void MPINode<Weight, NodeDistribution>::reportAll(
 	if (type == report::RATE || type == report::STATE) {
 		report::Report report(_pAlgorithm->getCurrentTime(),
 				Rate(this->getActivity()), this->_nodeId,
-				_pAlgorithm->getGrid(),  type, vec_values,
-				_rLocalNodes.size());
+				_pAlgorithm->getGrid(), type, vec_values, _rLocalNodes.size());
 
 		_pHandler->writeReport(report);
 	}

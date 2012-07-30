@@ -38,10 +38,12 @@ namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::MPINetwork() {
+//set the Debug level to Info if Debug is not enabled.
+#ifndef DEBUG
+	utilities::Log::setReportingLevel(utilities::logInfo);
+#endif
 }
-//		_pLocalNodes(
-//				new std::map<NodeId, MPINode<WeightValue, NodeDistribution>>) {
-//}
+
 
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::~MPINetwork() {
@@ -129,7 +131,7 @@ void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 		}
 
 	} catch (...) {
-		LOG(utilities::logERROR)<<"error during configuration";
+		LOG(utilities::logERROR) << "error during configuration";
 	}
 	_stateNetwork.toggleConfigured();
 }
@@ -140,7 +142,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 	if (_stateNetwork.isConfigured()) {
 		_stateNetwork.toggleConfigured();
-		LOG(utilities::logINFO)<<"Starting simulation";
+		LOG(utilities::logINFO) << "Starting simulation";
 		//init the nodes
 		for (auto& it : _localNodes) {
 			it.second.initNode();
@@ -198,8 +200,9 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 		}
 
 		clearSimulation();
-		LOG(utilities::logINFO)<<"Simulation ended, no problems noticed";
-		LOG(utilities::logINFO)<<"End time: " << getCurrentSimulationTime() << "\n";
+		LOG(utilities::logINFO) << "Simulation ended, no problems noticed";
+		LOG(utilities::logINFO) << "End time: "
+				<< getCurrentSimulationTime() << "\n";
 	}
 
 }
@@ -223,7 +226,7 @@ void MPINetwork<WeightValue, NodeDistribution>::collectReport(
 		report::ReportType type) {
 
 	for (auto& it : _localNodes) {
-		 it.second.reportAll(type);
+		it.second.reportAll(type);
 	}
 
 }
@@ -236,7 +239,6 @@ void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
 	if (!p_stream)
 		throw utilities::Exception("MPINetwork cannot open log file.");
 	utilities::Log::setStream(p_stream);
-
 }
 
 template<class WeightValue, class NodeDistribution>
