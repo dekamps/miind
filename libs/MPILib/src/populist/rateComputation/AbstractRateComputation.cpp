@@ -34,10 +34,8 @@ void AbstractRateComputation::Configure(std::valarray<Density>& array_state,
 	_index_reversal = index_reversal;
 }
 
-AbstractRateComputation::~AbstractRateComputation() {
-}
 
-bool AbstractRateComputation::DefineRateArea(Potential v_lower) {
+void AbstractRateComputation::DefineRateArea(Potential v_lower) {
 
 	_delta_v_rel = 1.0 / (_n_bins - 1 - static_cast<double>(_index_reversal));
 	_delta_v_abs = (_par_population._theta - _par_population._V_reset)
@@ -61,7 +59,6 @@ bool AbstractRateComputation::DefineRateArea(Potential v_lower) {
 			index++)
 		_array_interpretation[index] = BinToCurrentPotential(index);
 
-	return true;
 }
 
 Potential AbstractRateComputation::BinToCurrentPotential(Index index) {

@@ -29,37 +29,62 @@ namespace MPILib {
 namespace populist {
 namespace rateComputation {
 
-//! AbstractRateComputation
-//! There are several methods to calculate a Population's firing rate from the population density
-//! A virtual base class is provide, so that the methods can be exchanged in run time and the different
-//! methods can be compared within a single simulation
-
+/**
+ * There are several methods to calculate a Population's firing rate from the population density
+ * A virtual base class is provide, so that the methods can be exchanged in run time and the different
+ * methods can be compared within a single simulation
+ */
 class AbstractRateComputation {
 public:
 
-	//! constructor
+	/**
+	 * default constructor
+	 */
 	AbstractRateComputation()=default;
 
-	virtual void Configure(
-	// not const since a pointer to an element is needed, it should have been const otherwise:
-			std::valarray<Density>&,			// state array
-			const parameters::InputParameterSet&,// current input to population
-			const parameters::PopulationParameter&,	// neuron parameters
-			Index						// index reversal bin
-			);
+	/**
+	 * Configuration of the RateComputation
+	 * @param array_state state array (not const since a pointer to an element is needed, it should have been const otherwise)
+	 * @param input_set current input to population
+	 * @param par_population neuron parameters
+	 * @param index_reversal index reversal bin
+	 */
+	virtual void Configure(std::valarray<Density>& array_state,
+			const parameters::InputParameterSet& input_set,
+			const parameters::PopulationParameter& par_population,
+			Index index_reversal);
 
-	virtual ~AbstractRateComputation() = 0;
+	/**
+	 * virtual destructor
+	 */
+	virtual ~AbstractRateComputation() {};
 
+	/**
+	 * Clone method
+	 * @return A clone of AbstractRateComputation
+	 */
 	virtual AbstractRateComputation* Clone() const = 0;
-
-	virtual Rate CalculateRate(Number    // number current bins
-			) = 0;
+	/**
+	 * Calculates the current rate
+	 * @param nr_bins number current bins
+	 * @return The current rate
+	 */
+	virtual Rate CalculateRate(Number) = 0;
 
 protected:
 
-	bool DefineRateArea(Potential);
+	/**
+	 * Defines the Rate Area
+	 * @param v_lower The lower potential
+	 */
+	void DefineRateArea(Potential v_lower);
 
-	Potential BinToCurrentPotential(Index);
+	/**
+	 * Gets the Potential for the given bin
+	 * @param index The index of the bin
+	 * @return The current potential of the bin
+	 */
+	Potential BinToCurrentPotential(Index index);
 
 	Index _index_reversal = 0;
 	std::valarray<Density>* _p_array_state = nullptr;

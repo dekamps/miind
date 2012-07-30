@@ -23,33 +23,51 @@
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_integration.h>
 #include <MPILib/include/populist/rateComputation/AbstractRateComputation.hpp>
-
 namespace MPILib {
 namespace populist {
 namespace rateComputation {
 
-//! IntegralRateComputation
-//! Computes the firing rate of a population from the density profile, using an integral method:
-//! \nu = \int^ \rho(v) dv
+/**
+ * Computes the firing rate of a population from the density profile, using an integral method:
+ * \f$ \nu = \int^ \rho(v) dv \f$
+ */
 class IntegralRateComputation: public AbstractRateComputation {
 public:
 
-	//! constructor
+	/**
+	 * default constructor
+	 */
 	IntegralRateComputation();
 
-	//! configuring gives access to density profile, the input parameters (effective efficacy and variance of eff. eff.)
-	//! and the neuron parameters
-	virtual void Configure(
-			std::valarray<Density>&,	//! density valarray
-			const parameters::InputParameterSet&,
-			const parameters::PopulationParameter&, Index);
+	/**
+	 * Configuration gives access to density profile, the input parameters
+	 *  (effective efficacy and variance of eff. eff.) and the neuron parameters
+	 * @param array_state state array (not const since a pointer to an element is needed, it should have been const otherwise)
+	 * @param input_set current input to population
+	 * @param par_population neuron parameters
+	 * @param index_reversal index reversal bin
+	 */
+	virtual void Configure(std::valarray<Density>& array_state,
+			const parameters::InputParameterSet& input_set,
+			const parameters::PopulationParameter& par_population,
+			Index index_reversal);
 
+	/**
+	 * virtual destructor
+	 */
 	virtual ~IntegralRateComputation();
-
+	/**
+	 * Clone method
+	 * @return A clone of IntegralRateComputation
+	 */
 	virtual IntegralRateComputation* Clone() const;
 
-	virtual Rate CalculateRate(Number    // number current bins,
-			);
+	/**
+	 * Calculates the current rate
+	 * @param nr_bins number current bins
+	 * @return The current rate
+	 */
+	virtual Rate CalculateRate(Number nr_bins);
 
 private:
 
