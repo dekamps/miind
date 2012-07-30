@@ -30,14 +30,13 @@ AbstractCirculantSolver::AbstractCirculantSolver(CirculantMode mode,
 				MAXIMUM_NUMBER_CIRCULANT_BINS + 1), _mode(mode) {
 }
 
-bool AbstractCirculantSolver::Configure(std::valarray<Potential>* p_array_state,
+void AbstractCirculantSolver::Configure(std::valarray<Potential>* p_array_state,
 		const parameters::InputParameterSet& set) {
 	_p_array_state = p_array_state;
 	_p_set = &set;
 	_n_bins = p_array_state->size();
 
 	_initial_integral = p_array_state->sum();
-	return true;
 }
 
 Number AbstractCirculantSolver::NrCirculant() const {
@@ -45,11 +44,6 @@ Number AbstractCirculantSolver::NrCirculant() const {
 }
 
 void AbstractCirculantSolver::FillLinear() {
-	// Purpose: Integrate the density in the non-circulant areas. This produces the vector f^0.
-	// Assumptions: _p_set->_n_noncirc_exc and _p_set->H_exc are defined and consistent
-	// Author: Marc de Kamps
-	// Date:   01-09-2005
-
 	assert(_p_set->_n_noncirc_exc < MAXIMUM_NUMBER_CIRCULANT_BINS);
 
 #ifndef NDEBUG
@@ -108,8 +102,6 @@ void AbstractCirculantSolver::FillFP() {
 }
 
 void AbstractCirculantSolver::FillNonCirculantBins() {
-	// The fill algorithms store the probability density integrated per non circulant areas in area_rho. The index runs
-	// from the threshold backwards, i.e. the non circulant area bordering the threshold is area 0, conform Equation 20 in (de Kamps, 2006)
 	if (_mode == INTEGER)
 		this->FillLinear();
 	else
@@ -117,14 +109,50 @@ void AbstractCirculantSolver::FillNonCirculantBins() {
 }
 
 Density AbstractCirculantSolver::IntegratedFlux() const {
-	// Compute the total amount of density which has ended up in circulant bins
-	// This must much the amount of density that has left the non-circulant bins
 	Density sum = 0;
 	for (Index index_circulant = 0; index_circulant < _p_set->_n_circ_exc;
 			index_circulant++)
 		sum += _array_circulant[index_circulant];
 
 	return sum;
+}
+
+
+double AbstractCirculantSolver::operator [](Index index) const {
+	return _array_circulant[index];
+}
+
+void AbstractCirculantSolver::AddCirculantToState(Index i_reversal) {
+	if (_mode == INTEGER)
+		this->AddCirculantInteger(i_reversal);
+	else {
+		assert(
+				_p_set->_n_circ_exc == static_cast<Number>((_n_bins - i_reversal)/(_p_set->_H_exc + _p_set->_alpha_exc))+1);
+		this->AddCirculantFP(i_reversal);
+	}
+}
+
+void AbstractCirculantSolver::AddCirculantInteger(Index i_reversal) {
+	std::valarray<double>& array_state = *_p_array_state;
+	Index i = i_reversal;
+	int n_circ = static_cast<int>(_p_set->_n_circ_exc);
+	for (int j = 0; j < n_circ; j++) {
+		array_state[i] += _array_circulant[j];
+		i += _p_set->_H_exc;
+	}
+}
+
+void AbstractCirculantSolver::AddCirculantFP(Index i_reversal) {
+	std::valarray<double>& array_state = *_p_array_state;
+	int n_circ = static_cast<int>(_p_set->_n_circ_exc);
+	for (int j = 0; j < n_circ - 1; j++) {
+		double h = (_p_set->_H_exc + _p_set->_alpha_exc) * j;
+		int H = static_cast<int>(floor(h)) + i_reversal;
+		double frac = h - floor(h);
+		array_state[H] += (1 - frac) * _array_circulant[j];
+		array_state[H + 1] += frac * _array_circulant[j];
+	}
+	array_state[_n_bins - 1] += _array_circulant[n_circ - 1];
 }
 } /* namespace circulantSolvers*/
 } /* namespace populist */

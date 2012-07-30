@@ -28,45 +28,71 @@ namespace MPILib {
 namespace populist {
 namespace circulantSolvers {
 
-//! VArray
-//! This calculates the one row of the matrix elements V_{kj}, which determine the circulant solution.
-//! The full analytic expression from de Kamps (2006) is programmed, which is usefl benchmarking correctness
+/**
+ * This calculates the one row of the matrix elements \f$ V_{kj}\f$, which determine the circulant solution.
+ * The full analytic expression from de Kamps (2006) is programmed, which is useful benchmarking correctness
+ */
 class VArray {
 
 public:
 
-	//! Defualt constructor
+	/**
+	 * Default constructor
+	 */
 	VArray();
 
-	//! Compute the array elements, based on the number of circulant bins, the number of non-circulant areas
-	//! and for the time that is required
-	bool FillArray(Number, // number of circulant bins
-			Number, // number of non-circulant areas
-			Time    // time over which the solution is required (tau)
-			);
+	//!
+	//!
 
-	//! V_{kj}, where indices the circulant bin and j the non-circulant area
-	double V(Index, // k
-			Index  // j
-			) const;
+	/**
+	 * Compute the array elements, based on the number of circulant bins, the number of non-circulant areas
+	 * and for the time that is required.
+	 * @param number_circulant_bins number of circulant bins
+	 * @param number_non_circulant_areas number of non-circulant areas
+	 * @param tau  time over which the solution is required (tau)
+	 */
+	void FillArray(Number number_circulant_bins,
+			Number number_non_circulant_areas, Time tau);
+
+	//!
+	/**
+	 * \f$ V_{kj} \f$, where indices the circulant bin and j the non-circulant area
+	 * @param index_circulant
+	 * @param index_non_circulan
+	 * @return
+	 */
+	double V(Index index_circulant, Index index_non_circulant) const;
 
 private:
 
-	bool FillArrayWithGarbage();
+	/**
+	 * Fill the VArray with garbage
+	 */
+	void FillArrayWithGarbage();
 
-	bool CheckInNumbers(Number, Number);
+	/**
+	 * Setter for number_of_circulant_bins and number_of_non_circulant_areas
+	 * @param number_of_circulant_bins _number_of_circulant_bins is set to this
+	 * @param number_of_non_circulant_areas _number_of_non_circulant_areas is set to this
+	 */
+	void CheckInNumbers(Number number_of_circulant_bins,
+			Number number_of_non_circulant_areas);
 
+	/**
+	 * The vector array
+	 */
 	std::vector<double> _vector_array;
+	/**
+	 * The number of circulant bins
+	 */
 	Number _number_of_circulant_bins;
+	/**
+	 * the number of non circulant bins
+	 */
 	Number _number_of_non_circulant_areas;
 };
 
-inline double VArray::V(Index index_circulant,
-		Index index_non_circulant) const {
-	assert( index_circulant < _number_of_circulant_bins);
-	assert( index_non_circulant < _number_of_non_circulant_areas);
-	return _vector_array[index_circulant + index_non_circulant];
-}
+
 } /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */

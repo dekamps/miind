@@ -21,6 +21,10 @@ ENABLE_COVERAGE [Default: FALSE]
 </dt>
 <dd>allows to generate a coverage report</dd>
 <dt>
+DEBUG [Default: FALSE]
+</dt>
+<dd>print debug statements</dd>
+<dt>
 ENABLE_MPI [Default: FALSE]
 </dt>
 <dd>enable mpi for the miind mpi lib</dd>

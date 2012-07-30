@@ -33,10 +33,10 @@ VArray::VArray() :
 		_vector_array(MAX_V_ARRAY) {
 }
 
-bool VArray::FillArray(Number number_circulant_bins,
+void VArray::FillArray(Number number_circulant_bins,
 		Number number_non_circulant_areas, Time tau) {
-	assert(FillArrayWithGarbage());
-	assert(CheckInNumbers(number_circulant_bins, number_non_circulant_areas));
+	FillArrayWithGarbage();
+	CheckInNumbers(number_circulant_bins, number_non_circulant_areas);
 	assert(
 			number_circulant_bins + number_non_circulant_areas + 1 < _vector_array.size());
 
@@ -96,32 +96,23 @@ bool VArray::FillArray(Number number_circulant_bins,
 			_vector_array.begin(),
 			std::bind2nd(std::divides<double>(), number_circulant_bins));
 
-	return true;
 }
 
-bool VArray::FillArrayWithGarbage() {
+void VArray::FillArrayWithGarbage() {
 	std::fill(_vector_array.begin(), _vector_array.end(), -999);
-
-	return true;
 }
-/*
- double VArray::V
- (
- Index index_circulant,
- Index index_non_circulant
- ) const
- {
- assert( index_circulant     < _number_of_circulant_bins);
- assert( index_non_circulant < _number_of_non_circulant_areas);
- return _vector_array[index_circulant + index_non_circulant];
- }
- */
-bool VArray::CheckInNumbers(Number number_of_circulant_bins,
+
+void VArray::CheckInNumbers(Number number_of_circulant_bins,
 		Number number_of_non_circulant_areas) {
 	_number_of_circulant_bins = number_of_circulant_bins;
 	_number_of_non_circulant_areas = number_of_non_circulant_areas;
 
-	return true;
+}
+
+double VArray::V(Index index_circulant, Index index_non_circulant) const {
+	assert( index_circulant < _number_of_circulant_bins);
+	assert( index_non_circulant < _number_of_non_circulant_areas);
+	return _vector_array[index_circulant + index_non_circulant];
 }
 } /* namespace circulantSolvers*/
 } /* namespace populist */

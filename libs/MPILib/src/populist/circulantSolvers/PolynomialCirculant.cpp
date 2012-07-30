@@ -26,10 +26,8 @@ PolynomialCirculant::PolynomialCirculant() :
 		_j_array(std::vector<double>(CIRCULANT_POLY_JMAX)) {
 }
 
-PolynomialCirculant::~PolynomialCirculant() {
-}
 
-PolynomialCirculant* PolynomialCirculant::Clone() const {
+PolynomialCirculant* PolynomialCirculant::clone() const {
 	return new PolynomialCirculant;
 }
 

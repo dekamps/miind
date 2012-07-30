@@ -26,73 +26,121 @@ namespace MPILib {
 namespace populist {
 namespace circulantSolvers {
 
-//! This AbstractCirculantSolver subclass stores proability density for, presumably LIF, neurons in a priority queue. Immediately
-//! after the refractive period ends for those neurons, the corrsponding prability is reintroduced in the reset bin.
-
-//! RefractiveCirculantSolver is designed to run before any NonCirculantSolver. The perecision argument of the
-//! RefractiveCirculantSolver and the NonCirculantSolver should match, otherwise the probability sum between them may differ
-//! from one.
-
+/**
+ * @brief This AbstractCirculantSolver subclass stores proability density for, presumably LIF, neurons in a priority queue.
+ * Immediately after the refractive period ends for those neurons, the corrsponding prability is reintroduced in the reset bin.
+ *
+ * RefractiveCirculantSolver is designed to run before any NonCirculantSolver. The perecision argument of the
+ * RefractiveCirculantSolver and the NonCirculantSolver should match, otherwise the probability sum between
+ * them may differ frome one.
+ */
 class RefractiveCirculantSolver: public AbstractCirculantSolver {
 public:
 
-	//! standard constructor
-	RefractiveCirculantSolver(Time t_ref,	//! Refractive period of the neuron
-			Time t_batch = 1e-4,//! Batch size for storing the probability density in the queue, i.e. the precision by which proability density is maintained.
-			double precision = 0,//! Specifying a probability implies the assumption that in the NonCirculantSolver all calculations are broken off after terms such as $\f  \frac{\tau^k}{\tau !}e^{-tau}
-			CirculantMode mode = INTEGER//! Integer only transports probability between bins that are an integer step away
-			) :
+	/**
+	 *  standard constructor
+	 * @param t_ref Refractive period of the neuron
+	 * @param t_batch Batch size for storing the probability density in the queue, i.e. the precision by which proability density is maintained.
+	 * @param precision Specifying a probability implies the assumption that in the NonCirculantSolver all calculations are broken off after terms such as \f$ \frac{\tau^k}{\tau !}e^{-tau}\f$
+	 * @param mode Integer only transports probability between bins that are an integer step away
+	 */
+	RefractiveCirculantSolver(Time t_ref, Time t_batch = 1e-4,
+			double precision = 0, CirculantMode mode = INTEGER) :
 			AbstractCirculantSolver(mode), _t_ref(t_ref), _t_batch(t_batch), _precision(
 					precision) {
 	}
 
-	//! Carry out solver operation
+	/**
+	 * Only concrete CirculantSolvers know how to compute their contribution. At this stage it is assumed that
+	 * during configure the InputParameterSet is defined. The number of circulant bins, the number of
+	 * non_circulant_areas. H_exc and alpha_exc must all be defined.
+	 * @param n_bins Current number of bins that needs to be solved, cannot be larger than number of elements in state array
+	 * @param tau Time through which evolution needs to be carried out, this may not be related to the absolute time of the simulation
+	 * @param t_sim The current simulation time
+	 */
 	virtual void
-	Execute(Number, //!< current number of bins
-			Time,	//!< time to solve for
-			Time	//!< current simulation time
-			);
+	Execute(Number n_bins, Time tau, Time t_sim);
 
-	//! destructor
+	/**
+	 * virtual destructor
+	 */
 	virtual ~RefractiveCirculantSolver() {
 	}
 
-	//! cloning
-	virtual RefractiveCirculantSolver* Clone() const {
+	/**
+	 * Clone operation
+	 * @return A clone of the RefractiveCirculantSolver
+	 */
+	virtual RefractiveCirculantSolver* clone() const override {
 		return new RefractiveCirculantSolver(*this);
 	}
 
-	//! return the current refractive time
+	/**
+	 * Getter for refractive time
+	 * @return The current refractive time
+	 */
 	Time TimeRefractive() const {
 		return _t_ref;
 	}
 
-	//! return the total probability in the refractive queue
+	/**
+	 * Getter for the total probability in the refractive queue
+	 * @return The total probability
+	 */
 	virtual double RefractiveProbability() const {
 		return _off_queue + _queue.TotalProbability();
 	}
 
-	//! probability from the refractive queue is retintroduced in the reset bin.
-	virtual void AddCirculantToState(Index);
+	/**
+	 * probability from the refractive queue is retintroduced in the reset bin.
+	 * @param i_reset The index
+	 */
+	virtual void AddCirculantToState(Index i_reset);
 
-	//! In this solver the NonCirculant must be executed first
+	/**
+	 * In this solver the NonCirculant must be executed first
+	 * @return false if the NonCirculant must be executed first
+	 */
 	virtual bool BeforeNonCirculant() {
 		return false;
 	}
 
-	//! This circulant need to rescale the probability held in the queue after rebinning.
+	/**
+	 * This circulant need to rescale the probability held in the queue after rebinning.
+	 * @param scale The scale factor
+	 */
 	virtual void ScaleProbabilityQueue(double scale) {
 		_queue.Scale(scale);
 	}
 
 private:
 
-	double AboveThreshold(Time) const;
+	/**
+	 * The sum of the integral above the threshold
+	 * @param tau The time step
+	 * @return The sum of the integral above the threshold
+	 */
+	double AboveThreshold(Time tau) const;
 
+	/**
+	 * Refractive period of the neuron
+	 */
 	Time _t_ref;
+	/**
+	 * Batch size for storing the probability density in the queue, i.e. the precision by which proability density is maintained.
+	 */
 	Time _t_batch;
+	/**
+	 * The Probability Queue
+	 */
 	ProbabilityQueue _queue;
+	/**
+	 * The precision
+	 */
 	double _precision;
+	/**
+	 * No idea
+	 */
 	double _off_queue = 0.0;
 };
 } /* namespace circulantSolvers*/

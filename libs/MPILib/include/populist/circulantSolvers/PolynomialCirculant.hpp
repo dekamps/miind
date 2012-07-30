@@ -27,36 +27,69 @@ namespace MPILib {
 namespace populist {
 namespace circulantSolvers {
 
-//! This uses the short-time polynomial expansion of the analytic solution
-//! The algorithm can only be used for small values of tau and will throw an
-//! exception if it enters an unvalid regime.
+/**
+ * This uses the short-time polynomial expansion of the analytic solution
+ * The algorithm can only be used for small values of tau and will throw an
+ * exception if it enters an unvalid regime.
+ */
 class PolynomialCirculant: public AbstractCirculantSolver {
 public:
 
+	/**
+	 * default constructor
+	 */
 	PolynomialCirculant();
 
-	//! virtual destructor
-	virtual ~PolynomialCirculant();
+	/**
+	 * virtual destructor
+	 */
+	virtual ~PolynomialCirculant(){};
 
+	/**
+	 * Only concrete CirculantSolvers know how to compute their contribution. At this stage it is assumed that
+	 * during configure the InputParameterSet is defined. The number of circulant bins, the number of
+	 * non_circulant_areas. H_exc and alpha_exc must all be defined.
+	 * @param n_bins Current number of bins that needs to be solved, cannot be larger than number of elements in state array
+	 * @param tau Time through which evolution needs to be carried out, this may not be related to the absolute time of the simulation
+	 * @param t_sim Irrelevant for this solver
+	 */
 	virtual void Execute(Number, Time, Time = 0 //!< Irrelevant for this solver
-			);
+	);
 
-	//! PolynomialCirculant computes how many circulant bins make sense
+	/**
+	 * PolynomialCirculant computes how many circulant bins make sense
+	 * @return The number of circulant bins that make sense
+	 */
 	virtual Number NrCirculant() const;
 
-	//! Virtual copy constructor
-	virtual PolynomialCirculant* Clone() const;
+	/**
+	 * Clone operator
+	 * @return A clone of PolynomialCirculant
+	 */
+	virtual PolynomialCirculant* clone() const override;
 
-	//! Some magical numbers are used in this CicrculantSolver
+	/**
+	 * Some magical numbers are used in this CicrculantSolver
+	 * @return Some magical numbers
+	 */
 	Index JMax() const;
 
 private:
-
+	/**
+	 * Purpose: Integrate the density in the non-circulant areas. This produces the vector f^0.
+	 */
 	virtual void FillNonCirculantBins();
 
+	/**
+	 * Initialises the j_array
+	 */
 	void LoadJArray();
 
+	/**
+	 * The j array
+	 */
 	std::vector<double> _j_array;
+
 };
 } /* namespace circulantSolvers*/
 } /* namespace populist */

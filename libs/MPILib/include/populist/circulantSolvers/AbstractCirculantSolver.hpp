@@ -25,175 +25,220 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <cassert>
 
-
-
 namespace MPILib {
 namespace populist {
 namespace circulantSolvers {
 
-	//! Both AbstractCirculantSolver and AbstractNonCirculantSolver instances sometimes can cut calculations short
-	//! by terminating the series \f$ e^{-t}\frac{t^k}{k!}$\f$, when it falls below a certain precision.
-	inline Number NumberOfSolverTerms(Time t, double precision, Number n_max){
-		double fact = 1.0;
-		double et = exp(-t);
-		for (Index i = 0; i < n_max; i++){
-			fact *= t/i;
-			if (et*fact < precision)
-				return i;
-		}
-		return n_max;
+/**
+ * Both AbstractCirculantSolver and AbstractNonCirculantSolver instances sometimes can cut calculations short
+ * by terminating the series \f$ e^{-t}\frac{t^k}{k!}$\f$, when it falls below a certain precision.
+ * @param t The parameter t
+ * @param precision The precision
+ * @param n_max The max number of terms
+ * @return The max number of terms considered
+ */
+inline Number NumberOfSolverTerms(Time t, double precision, Number n_max) {
+	double fact = 1.0;
+	double et = exp(-t);
+	for (Index i = 0; i < n_max; i++) {
+		fact *= t / i;
+		if (et * fact < precision)
+			return i;
+	}
+	return n_max;
+}
+
+/**
+ * @brief This class stores the integrated non-circulant density areas (the f^0) and the computed
+ * circulant solution.
+ *
+ *  This class stores the integrated non-circulant density areas (the f^0) and the computed
+ *  also references to the current input parameters and the density profile, so that a circulant
+ *  algorithm always has access to the variables. The Index method allows the PopulationgridControlller
+ *  to access the calculated circulant solution.
+ */
+class AbstractCirculantSolver {
+
+public:
+
+	/**
+	 * default constructor, the mode can be set here, but when used in AbstractZeroLeakEquations they
+	 * can and generally will overrule the choice made in the constructor.
+	 * @param mode the circulant mode
+	 * @param precision The precicion
+	 */
+	AbstractCirculantSolver(CirculantMode mode = INTEGER, double precision = 0);
+
+	/**
+	 * virtual destructor
+	 */
+	virtual ~AbstractCirculantSolver(){};
+
+	/**
+	 * Configure the calculation with the current InputParameterSet
+	 * For running the AbstractCirculantSolver in INTEGER mode, _n_circ_exc, _n_noncirc_exc
+	 * and _H_exc must be properly defined, or the result will be undefined.
+	 * See the doucmentation of LIFConvertor and InputParameterSet for information.
+	 * @param p_array_state A pointer to the state of the array
+	 * @param set The input parameter set
+	 */
+	virtual void Configure(std::valarray<double>* p_array_state,
+			const parameters::InputParameterSet&);
+
+	/**
+	 * Only concrete CirculantSolvers know how to compute their contribution. At this stage it is assumed that
+	 * during configure the InputParameterSet is defined. The number of circulant bins, the number of
+	 * non_circulant_areas. H_exc and alpha_exc must all be defined.
+	 * @param n_bins Current number of bins that needs to be solved, cannot be larger than number of elements in state array
+	 * @param tau Time through which evolution needs to be carried out, this may not be related to the absolute time of the simulation
+	 * @param t_sim Where the absolute time is necessary, it can be passed here
+	 */
+	virtual void Execute(Number n_bins, Time tau, Time t_sim = 0) = 0;
+
+	/**
+	 * A CirculantSolver knows that sometimes not all circulant bins need to be taken into account
+	 * @return the number of circulant bins
+	 */
+	virtual Number NrCirculant() const;
+
+	/**
+	 * Clone operation
+	 * @return A clone of the AbstractCirculantSolver
+	 */
+	virtual AbstractCirculantSolver* clone() const = 0;
+
+	/**
+	 * Access to the circulant contribution. Tryimg to access beyond NrCirculant() - 1 is undefined
+	 * @param index The index of the accessed element
+	 * @return The value of the accesssed element
+	 */
+	double operator[](Index index) const;
+
+	/**
+	 * Compute the total amount of density which has ended up in circulant bins
+	 * This must much the amount of density that has left the non-circulant bins
+	 * @return The total amount of density
+	 */
+	Density IntegratedFlux() const;
+
+	/**
+	 * It will transfer the contributions calculated in the AbstractCirculantSolver, which knows nothing about
+	 * the neuronal parameters to the state array. Therefore it needs to receive the index of the current reset bin.
+	 * @param i_reversal the reversal index
+	 */
+	virtual void AddCirculantToState(Index i_reversal);
+
+	/**
+	 * This is a hint for AbstractZeroLeakEquations developers, whether in their implementation the
+	 * Circulantsolver should be called before of after the NonCirculantSolver. As an example,
+	 * CirculantSolver should be called before NonCirculantSolver, but RefractiveCirculantSolver
+	 * should be called after NonCirculantSolver. In LIFZeroEquations this hint allows generic code
+	 * which delegates the decision which to call first to the CirculantSolver in question.
+	 * The RefractiveCirculant strategy is made default.
+	 * @return false if the NonCirculant must be executed first
+	 */
+	virtual bool BeforeNonCirculant() {
+		return true;
 	}
 
-
-
-	//! AbstractCirculantSolver
-	//! 
-	//! This class stores the integrated non-circulant density areas (the f^0) and the computed
-	//! circulant solution. How they are computed is a matter for the derived classes. There are
-	//! also references to the current input parameters and the density profile, so that a circulant
-	//! algorithm always has access to the variables. The Index method allows the PopulationgridControlller
-	//! to access the calculated circulant solution.
-	class AbstractCirculantSolver {
-
-	public:
-
-		//! default constructor, the mode can be set here, but when used in AbstractZeroLeakEquations they can and generally will overrule
-		//! the choice made in the constructor. 
-		AbstractCirculantSolver
-		(
-			CirculantMode = INTEGER,
-			double precision = 0
-		);
-
-		//! virtual destructor, required for pure virtual base class
-		virtual ~AbstractCirculantSolver() = 0;
-
-		//! Configure the calculation with the current InputParameterSet
-		//! For running the AbstractCirculantSolver in INTEGER mode, _n_circ_exc, _n_noncirc_exc and _H_exc must be properly
-		//! defined, or the result will be undefined. See the doucmentation of LIFConvertor and InputParameterSet for information.
-		virtual bool Configure
-		(
-			std::valarray<double>*,
-			const parameters::InputParameterSet&
-		);
-
-		//! Only concrete CirculantSolvers know how to compute their contribution. At this stage it is assumed that
-		//! during configure the InputParameterSet is defined. The number of circulant bins, the number of non_circulant_areas.
-		//! H_exc and alpha_exc must all be defined.
-		virtual void Execute
-		(
-			Number,			//!< Current number of bins that needs to be solved, cannot be larger than number of elements in state array
-			Time,			//!< Time through which evolution needs to be carried out, this may not be related to the absolute time of the simulation
-			Time = 0        //!< Where the absolute time is necessary, it can be passed here
-		) = 0;
-
-		//! A CirculantSolver knows that sometimes not all circulant bins need to be taken into account
-		virtual Number NrCirculant() const;
-
-		//! Clone function
-		virtual AbstractCirculantSolver* Clone() const = 0;
-
-		//! Access to the circulant contribution. Tryimg to access beyond NrCirculant() - 1 is undefined
-		double operator[](Index) const;
-
-		//! The total amount of density which has ended up in the circulant bins
-		Density IntegratedFlux() const;
-
-
-		//! It wil transfer the contributions calculated in the AbstractCirculantSolver, which knows nothing about the neuronal
-		//! parameters to the state array. Therefor it needs to receive the index of the current reset bin.
-		virtual void AddCirculantToState(Index);
-
-		//! This is a hint for AbstractZeroLeakEquations developers, whether in their implementation the Circulantsolver
-		//! should be called before of after the NonCirculantSolver. As an example, CirculantSolver should be called
-		//! before NonCirculantSolver, but RefractiveCirculantSolver should be called after NonCirculantSolver. In LIFZeroEquations
-		//! this hint allows generic code which delegates the decision which to call first to the CirculantSolver in question.
-		//! The RefractiveCirculant strategy is made default.
-		virtual bool BeforeNonCirculant() {return true;}
-
-		//! Some CirculantSolvers hold refractive probability, i.e. probability that is not represented in the current state.
-		//! If so, this method needs to be overloaded
-		virtual Probability RefractiveProbability() const {return 0.0;}
-
-		//! Some rebinners need to rescale the probability held in the queue after rebinning.
-		virtual void ScaleProbabilityQueue(double){}
-
-		void setMode(CirculantMode mode){
-			_mode=mode;
-		}
-	protected:
-
-		void FillNonCirculantBins();
-
-		Number	_n_bins;				
-		Time	_tau;
-
-		//! The fill algorithms store the probability density integrated per non circulant areas in array_rho. The index runs
-		//! from the threshold backwards, i.e. the non circulant area bordering the threshold is area 0, conform Equation 20 in (de Kamps, 2006)
-
-		std::valarray<double>			_array_rho;			// integrated density in the non-circulant areas (f^0)
-		std::valarray<double>			_array_circulant;	// storage array for the calculated circulant solution
-		std::valarray<double>*			_p_array_state = nullptr;		// pointer to the probability density array
-
-		const parameters::InputParameterSet*	_p_set = nullptr;      // instantaneous value of the input parameters
-		double						_initial_integral = 0.0;
-
-	private:
-
-		void FillLinear	();
-		void FillFP		();
-
-		void AddCirculantInteger(Index);
-		void AddCirculantFP(Index);
-
-		CirculantMode	_mode;
-
-	};
-
-	inline AbstractCirculantSolver::~AbstractCirculantSolver()
-	{
+	/**
+	 * Some CirculantSolvers hold refractive probability, i.e. probability that is not represented in the current state.
+	 * If so, this method needs to be overloaded
+	 * @return In the default case 0
+	 */
+	virtual Probability RefractiveProbability() const {
+		return 0.0;
 	}
 
-	inline double AbstractCirculantSolver::operator [](Index index) const
-	{
-		return _array_circulant[index];
+	/**
+	 *  Some rebinners need to rescale the probability held in the queue after rebinning.
+	 * @param scale The scale factor
+	 */
+	virtual void ScaleProbabilityQueue(double scale) {
 	}
 
-	inline void AbstractCirculantSolver::AddCirculantToState(Index i_reversal)
-	{
-		if (_mode == INTEGER)
-			this->AddCirculantInteger(i_reversal);
-		else
-		{
-			assert( _p_set->_n_circ_exc == static_cast<Number>((_n_bins - i_reversal)/(_p_set->_H_exc + _p_set->_alpha_exc))+1);
-			this->AddCirculantFP(i_reversal);
-		}
+	/**
+	 * Setter for the CirculantMode
+	 * @param mode The new Circulant Mode the solver is set to.
+	 */
+	void setMode(CirculantMode mode) {
+		_mode = mode;
 	}
+protected:
 
-	inline void AbstractCirculantSolver::AddCirculantInteger(Index i_reversal)
-	{
-		std::valarray<double>& array_state = *_p_array_state;
-		Index i = i_reversal;
-		int n_circ = static_cast<int>(_p_set->_n_circ_exc);
-		for (int j = 0; j < n_circ; j++ ){
-			array_state[i] += _array_circulant[j];
-			i += _p_set->_H_exc;
-		}
-	}
+	/**
+	 * The fill algorithms store the probability density integrated per non circulant areas in area_rho.
+	 * The index runs from the threshold backwards, i.e. the non circulant area bordering the threshold is area 0,
+	 * conform Equation 20 in (de Kamps, 2006)
+	 */
+	void FillNonCirculantBins();
 
-	inline void AbstractCirculantSolver::AddCirculantFP(Index i_reversal)
-	{
-		std::valarray<double>& array_state = *_p_array_state;
-		int n_circ = static_cast<int>(_p_set->_n_circ_exc);
-		for (int j = 0; j < n_circ-1; j++){
-			double h = (_p_set->_H_exc + _p_set->_alpha_exc)*j;
-			int H = static_cast<int>(floor(h)) + i_reversal;
-			double frac = h - floor(h);
-			array_state[H]   += (1-frac)*_array_circulant[j];
-			array_state[H+1] += frac*_array_circulant[j];
-		}
-		array_state[_n_bins-1]   += _array_circulant[n_circ-1];
-	}
+	/**
+	 * The number of bins
+	 */
+	Number _n_bins;
+	/**
+	 * The parameter tau
+	 */
+	Time _tau;
+
+	/**
+	 * The fill algorithms store the probability density integrated per non circulant areas in array_rho.
+	 * The index runs from the threshold backwards, i.e. the non circulant area bordering the threshold
+	 * is area 0, conform Equation 20 in (de Kamps, 2006)
+	 * integrated density in the non-circulant areas (f^0)
+	 */
+	std::valarray<double> _array_rho;
+	/**
+	 *  storage array for the calculated circulant solution
+	 */
+	std::valarray<double> _array_circulant;
+	/**
+	 * pointer to the probability density array
+	 */
+	std::valarray<double>* _p_array_state = nullptr;
+	/**
+	 * instantaneous value of the input parameters
+	 */
+	const parameters::InputParameterSet* _p_set = nullptr;
+	/**
+	 * The value of the initial Integral
+	 */
+	double _initial_integral = 0.0;
+
+private:
+	/**
+	 * Purpose: Integrate the density in the non-circulant areas. This produces the vector f^0.
+	 * Assumptions: _p_set->_n_noncirc_exc and _p_set->H_exc are defined and consistent
+	 */
+	void FillLinear ();
+	/**
+	 * Alternative to FillLinear if the mode is double
+	 */
+	void FillFP ();
+
+	/**
+	 * It will transfer the contributions calculated in the AbstractCirculantSolver, which knows nothing about
+	 * the neuronal parameters to the state array. Therefore it needs to receive the index of the current reset bin.
+	 * This is the method for integer mode
+	 * @param i_reversal the reversal index
+	 */
+	void AddCirculantInteger(Index i_reversal);
+	/**
+	 * It will transfer the contributions calculated in the AbstractCirculantSolver, which knows nothing about
+	 * the neuronal parameters to the state array. Therefore it needs to receive the index of the current reset bin.
+	 * This is the method for double mode
+	 * @param i_reversal the reversal index
+	 */
+	void AddCirculantFP(Index i_reversal);
+
+	/**
+	 * The circulant mode
+	 */
+	CirculantMode _mode;
+
+};
+
 } /* namespace circulantSolvers*/
 } /* namespace populist */
 } /* namespace MPILib */
