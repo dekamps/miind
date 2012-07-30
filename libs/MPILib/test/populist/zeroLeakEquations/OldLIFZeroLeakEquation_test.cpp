@@ -21,7 +21,7 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 #define private public
 #define protected public
-#include <MPILib/include/populist/zeroLeakEquations/OldLIFZeroLeakEquations.hpp>
+#include <MPILib/include/populist/zeroLeakEquations/OldLifZeroLeakEquations.hpp>
 #undef protected
 #undef private
 #include <MPILib/include/populist/zeroLeakEquations/SpecialBins.hpp>
