@@ -47,14 +47,14 @@ namespace utilities {
  * done at compile time you pay only for log messages if they are actually printed.
  *
  * \section advanced_use Advanced use of logging
- * The default logging level is \c logDEBUG4 then everything is printed to the log.
+ * The default logging level is \c utilities::logINFO then everything is printed to the log.
  * To change the reporting level of the log class the following code is needed:
  *
  * @code{.cpp}
  * 	utilities::Log::setReportingLevel(utilities::logWARNING);
  * @endcode
  *
- * This code would set the reporting level to logWARNING
+ * This code would set the reporting level to \c logWARNING
  *
  * In the default version log messages are printed to std::cerr. To print the log messages
  * into a log file the following code is needed:
@@ -125,7 +125,7 @@ namespace utilities {
  */
 enum LogLevel {
 	logERROR,  //!< logERROR
-	logWARNING,  //!< logWARNING
+	logWARNING,//!< logWARNING
 	logINFO,   //!< logINFO
 	logDEBUG,  //!< logDEBUG
 	logDEBUG1, //!< logDEBUG1

@@ -38,9 +38,9 @@ namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::MPINetwork() {
-//set the Debug level to Info if Debug is not enabled.
-#ifndef DEBUG
-	utilities::Log::setReportingLevel(utilities::logINFO);
+//set the log level to logDEBUG4 to print all log messages if debug is enabled
+#ifdef DEBUG
+	utilities::Log::setReportingLevel(utilities::logDEBUG4);
 #endif
 }
 
