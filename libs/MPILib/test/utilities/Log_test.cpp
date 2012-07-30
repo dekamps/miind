@@ -79,7 +79,7 @@ void test_writeReport() {
 	BOOST_CHECK(
 			lg._buffer.str().find("blub")==space || lg._buffer.str().find("blub")==space+1);
 	BOOST_CHECK(
-			lg._buffer.str().find("42")==space+3 || lg._buffer.str().find("42")==space+4);
+			lg._buffer.str().find("42")==space+4 || lg._buffer.str().find("42")==space+5);
 
 }
 
@@ -127,7 +127,7 @@ void test_Macro() {
 
 	BOOST_CHECK(
 			pStream->str().find("blub")==space || pStream->str().find("blub")==space+1);
-	BOOST_CHECK(pStream->str().find("42")==space+3 || pStream->str().find("42")==space+4);
+	BOOST_CHECK(pStream->str().find("42")==space+4 || pStream->str().find("42")==space+5);
 	Log::setReportingLevel(logERROR);
 	std::shared_ptr<std::ostringstream> pStream1(new std::ostringstream());
 
@@ -145,7 +145,7 @@ void test_Macro() {
 	BOOST_CHECK(
 			pStream2->str().find("blub")==space || pStream2->str().find("blub")==space+1);
 	BOOST_CHECK(
-			pStream2->str().find("42")==space+3 || pStream2->str().find("42")==space+4);
+			pStream2->str().find("42")==space+4 || pStream2->str().find("42")==space+5);
 }
 
 }
