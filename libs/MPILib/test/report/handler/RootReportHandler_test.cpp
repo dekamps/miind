@@ -60,7 +60,7 @@ void test_Constructor() {
 }
 
 void test_writeReport() {
-	RootReportHandler rH1("RootTestWrite", true);
+	RootReportHandler rH1("RootTestWriteReport", true);
 	BOOST_CHECK(rH1._nrReports==0);
 	BOOST_CHECK(rH1._spCurrentRateGraph==nullptr);
 	rH1.initializeHandler(1);
@@ -95,7 +95,7 @@ void test_clone() {
 void test_initializeHandler() {
 	//it is not possible anymore to have a empty file
 
-	RootReportHandler rH1("RootTestFile", true);
+	RootReportHandler rH1("RootTestFileInit", true);
 	bool thrown = false;
 
 	try {
@@ -110,7 +110,7 @@ void test_initializeHandler() {
 }
 
 void test_detachHandler() {
-	RootReportHandler rH1("RootTestFile", true);
+	RootReportHandler rH1("RootTestFileDetach", true);
 	rH1.initializeHandler(3);
 	rH1.writeReport(MPILib::report::Report ( 1.0, 2.0, 1));
 	BOOST_CHECK(rH1._spCurrentRateGraph!=nullptr);
@@ -120,7 +120,7 @@ void test_detachHandler() {
 
 void test_removeFromNodeList() {
 
-	RootReportHandler rH1("RootTestFile", true);
+	RootReportHandler rH1("RootTestFileRemove", true);
 	bool thrown = false;
 	try {
 		rH1.removeFromNodeList(2);
@@ -146,7 +146,7 @@ void test_removeFromNodeList() {
 }
 
 void test_finalize() {
-	RootReportHandler rH1("RootTestFile", true);
+	RootReportHandler rH1("RootTestFileFinalize", true);
 	rH1.initializeHandler(3);
 	rH1.writeReport(MPILib::report::Report ( 1.0, 2.0, 1));
 	BOOST_CHECK(rH1._pFile!=nullptr);
