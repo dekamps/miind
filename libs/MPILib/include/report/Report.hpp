@@ -56,10 +56,6 @@ struct Report {
 	 */
 	algorithm::AlgorithmGrid _grid = (0);
 	/**
-	 * Whatever message should appear in the log file
-	 */
-	std::string _log_message;
-	/**
 	 * Information for the handler on how to treat the Report
 	 */
 	ReportType _type;
@@ -77,9 +73,8 @@ struct Report {
 	 * @param time Current time at this node.
 	 * @param rate Current firing rate of this node.
 	 * @param id NodeId of this node.
-	 * @param log_message Whatever message should appear in the log file
 	 */
-	Report(Time time, Rate rate, NodeId id, std::string log_message);
+	Report(Time time, Rate rate, NodeId id);
 
 	/**
 	 *
@@ -87,14 +82,13 @@ struct Report {
 	 * @param rate Current firing rate of this node.
 	 * @param id NodeId of this node.
 	 * @param grid The state space of the Algorithm
-	 * @param log_message Whatever message should appear in the log file
 	 * @param type Information for the handler on how to treat the Report
 	 * @param vec_values Ad hoc values that need to be logged in the simulation file
 	 * @param nrNodes The number of nodes on this processor
 	 */
 	Report(Time time, Rate rate, NodeId id, algorithm::AlgorithmGrid grid,
-			std::string log_message, ReportType type,
-			std::vector<ReportValue> vec_values, int nrNodes = 0);
+			ReportType type, std::vector<ReportValue> vec_values, int nrNodes =
+					0);
 
 	/**
 	 * Add a ReportValue to the report

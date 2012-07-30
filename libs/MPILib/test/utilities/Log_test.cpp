@@ -38,22 +38,26 @@ using namespace boost::unit_test;
 namespace MPILib {
 namespace utilities {
 
+unsigned int space = 43;
+
 void test_Constructor() {
 	Log lg;
 }
 
 void test_Destructor() {
 	Log* lg = new Log();
-	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
+	std::shared_ptr<std::ostringstream> pStream(new std::ostringstream());
 
 	Log::setStream(std::dynamic_pointer_cast<std::ostream>(pStream));
 
 	lg->writeReport() << "blub";
 	BOOST_CHECK(pStream->str().find("blub")!=38);
 	delete lg;
-	std::cout<<pStream->str()<<"\t"<<pStream->str().find("blub")<<std::endl;
+	std::cout << pStream->str() << "\t" << pStream->str().find("blub")
+			<< std::endl;
 	//depending on the os an additional % sign is added.
-	BOOST_CHECK(pStream->str().find("blub")==38 || pStream->str().find("blub")==39);
+	BOOST_CHECK(
+			pStream->str().find("blub")==space || pStream->str().find("blub")==space+1);
 
 }
 
@@ -72,14 +76,16 @@ void test_writeReport() {
 	Log lg;
 
 	lg.writeReport() << "blub" << 42;
-	BOOST_CHECK(lg._buffer.str().find("blub")==38 || lg._buffer.str().find("blub")==39);
-	BOOST_CHECK(lg._buffer.str().find("42")==42 || lg._buffer.str().find("42")==43);
+	BOOST_CHECK(
+			lg._buffer.str().find("blub")==space || lg._buffer.str().find("blub")==space+1);
+	BOOST_CHECK(
+			lg._buffer.str().find("42")==space+3 || lg._buffer.str().find("42")==space+4);
 
 }
 
 void test_setGetStream() {
 	Log* lg = new Log();
-	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
+	std::shared_ptr<std::ostringstream> pStream(new std::ostringstream());
 
 	Log::setStream(std::dynamic_pointer_cast<std::ostream>(pStream));
 
@@ -87,12 +93,10 @@ void test_setGetStream() {
 	delete lg;
 }
 
-
-
 void test_writeOutput() {
-	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
+	std::shared_ptr<std::ostringstream> pStream(new std::ostringstream());
 
-	Log::setStream( std::dynamic_pointer_cast<std::ostream>(pStream));
+	Log::setStream(std::dynamic_pointer_cast<std::ostream>(pStream));
 	Log::writeOutput(std::string("blub"));
 	BOOST_CHECK(pStream->str().find("blub")==0);
 
@@ -104,38 +108,44 @@ void test_getReportingLevel() {
 
 void test_setReportingLevel() {
 	BOOST_CHECK(Log::getReportingLevel()==logDEBUG4);
-	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
+	std::shared_ptr<std::ostringstream> pStream(new std::ostringstream());
 
-	Log::setStream( std::dynamic_pointer_cast<std::ostream>(pStream));
+	Log::setStream(std::dynamic_pointer_cast<std::ostream>(pStream));
 	Log::setReportingLevel(logERROR);
-	BOOST_CHECK(pStream->str().find("Report")==38 || pStream->str().find("Report")==39);
+	BOOST_CHECK(
+			pStream->str().find("Report")==space || pStream->str().find("Report")==space+1);
 	BOOST_CHECK(Log::getReportingLevel()==logERROR);
 
 }
 
 void test_Macro() {
-	std::shared_ptr<std::ostringstream> pStream ( new std::ostringstream());
+	std::shared_ptr<std::ostringstream> pStream(new std::ostringstream());
 
-	Log::setStream( std::dynamic_pointer_cast<std::ostream>(pStream));
+	Log::setStream(std::dynamic_pointer_cast<std::ostream>(pStream));
 
 	LOG(logERROR) << "blub" << 42;
 
-	BOOST_CHECK(pStream->str().find("blub")==39 || pStream->str().find("blub")==40);
-	BOOST_CHECK(pStream->str().find("42")==43 || pStream->str().find("42")==44);
+	BOOST_CHECK(
+			pStream->str().find("blub")==space || pStream->str().find("blub")==space+1);
+	BOOST_CHECK(pStream->str().find("42")==space+3 || pStream->str().find("42")==space+4);
 	Log::setReportingLevel(logERROR);
-	std::shared_ptr<std::ostringstream> pStream1 ( new std::ostringstream());
+	std::shared_ptr<std::ostringstream> pStream1(new std::ostringstream());
 
-	Log::setStream( std::dynamic_pointer_cast<std::ostream>(pStream1));
+	Log::setStream(std::dynamic_pointer_cast<std::ostream>(pStream1));
 	LOG(logDEBUG) << "blub" << 42;
-	BOOST_CHECK(pStream1->str().find("blub")!=39 || pStream1->str().find("blub")!=40);
-	BOOST_CHECK(pStream1->str().find("42")!=43 || pStream1->str().find("42")!=44);
-	std::shared_ptr<std::ostringstream> pStream2 ( new std::ostringstream());
+	BOOST_CHECK(
+			pStream1->str().find("blub")!=39 || pStream1->str().find("blub")!=40);
+	BOOST_CHECK(
+			pStream1->str().find("42")!=43 || pStream1->str().find("42")!=44);
+	std::shared_ptr<std::ostringstream> pStream2(new std::ostringstream());
 
-	Log::setStream( std::dynamic_pointer_cast<std::ostream>(pStream2));
+	Log::setStream(std::dynamic_pointer_cast<std::ostream>(pStream2));
 	LOG(logERROR) << "blub" << 42;
 
-	BOOST_CHECK(pStream2->str().find("blub")==39 || pStream2->str().find("blub")==40);
-	BOOST_CHECK(pStream2->str().find("42")==43 || pStream2->str().find("42")==44);
+	BOOST_CHECK(
+			pStream2->str().find("blub")==space || pStream2->str().find("blub")==space+1);
+	BOOST_CHECK(
+			pStream2->str().find("42")==space+3 || pStream2->str().find("42")==space+4);
 }
 
 }

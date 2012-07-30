@@ -40,7 +40,7 @@ void test_Constructor() {
 void test_addReport() {
 	ValueHandlerHandler vh;
 
-	MPILib::report::Report r(1.0, 2.0, 1, "blub");
+	MPILib::report::Report r(1.0, 2.0, 1);
 	MPILib::report::ReportValue rv {"blab", 3.0, 4.0};
 	r.addValue(rv);
 	vh.addReport(r);
@@ -57,7 +57,7 @@ void test_addReport() {
 void test_write() {
 	ValueHandlerHandler vh;
 
-	MPILib::report::Report r(1.0, 2.0, 1, "blub");
+	MPILib::report::Report r(1.0, 2.0, 1);
 	MPILib::report::ReportValue rv {"blab", 3.0, 4.0};
 	r.addValue(rv);
 	vh.addReport(r);

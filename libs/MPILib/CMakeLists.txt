@@ -71,12 +71,9 @@ set(MPI_SRCS
     src/utilities/FileNameGenerator.cpp
     src/utilities/IterationNumberException.cpp
     src/utilities/Log.cpp
-    src/utilities/LogStream.cpp
     src/utilities/MPIProxy.cpp
     src/utilities/ParallelException.cpp
     src/utilities/ProgressBar.cpp
-    src/utilities/TimeException.cpp
-    src/utilities/Timer.cpp
     
     src/NetworkState.cpp
     src/SimulationRunParameter.cpp

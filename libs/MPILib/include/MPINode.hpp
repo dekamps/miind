@@ -116,9 +116,8 @@ public:
 	/**
 	 * Report the node state
 	 * @param type The type of Report
-	 * @return The report
 	 */
-	std::string reportAll(report::ReportType type) const;
+	void reportAll(report::ReportType type) const;
 
 	/**
 	 * finishes the simulation.
