@@ -23,15 +23,27 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
-	struct ABQStruct {
-		double _a;
-		double _b;
-		double _q; // added later, may one day be variable and part of input
-	};
+namespace zeroLeakEquations {
+/**
+ * @brief storage for a b and q
+ */
+struct ABQStruct {
+	/**
+	 * storage of a
+	 */
+	double _a;
+	/**
+	 * Storage of b
+	 */
+	double _b;
+	/**
+	 *  added later, may one day be variable and part of input
+	 */
+	double _q;
+};
 
-	std::istream& operator>>(std::istream&, ABQStruct& );
-	std::ostream& operator<<(std::ostream&, const ABQStruct& );
+std::istream& operator>>(std::istream&, ABQStruct&);
+std::ostream& operator<<(std::ostream&, const ABQStruct&);
 } /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
