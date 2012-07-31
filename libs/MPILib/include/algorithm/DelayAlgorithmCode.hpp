@@ -20,6 +20,8 @@
 #ifndef MPILIB_ALGORITHMS_DELAYALGORITHM_CODE_HPP_
 #define MPILIB_ALGORITHMS_DELAYALGORITHM_CODE_HPP_
 
+#include <MPILib/config.hpp>
+#include <cassert>
 #include <MPILib/include/algorithm/DelayAlgorithm.hpp>
 
 namespace MPILib {
@@ -42,15 +44,14 @@ DelayAlgorithm<Weight>* DelayAlgorithm<Weight>::clone() const {
 template<class Weight>
 void DelayAlgorithm<Weight>::configure(const SimulationRunParameter& par) {
 	_t_current = par.getTBegin();
-	return true;
 }
 
 template<class Weight>
 void DelayAlgorithm<Weight>::evolveNodeState(
 		const std::vector<Rate>& nodeVector,
-		const std::vector<WeightValue>& weightVector, Time time) {
+		const std::vector<Weight>& weightVector, Time time) {
 
-	Rate rate = nodeVector.begin();
+	Rate rate = (*nodeVector.begin());
 
 	rate_time_pair p;
 	p.first = rate;
@@ -60,7 +61,7 @@ void DelayAlgorithm<Weight>::evolveNodeState(
 		_queue.push_back(p);
 	}
 
-	_t_current = t;
+	_t_current = time;
 	p.second = _t_current + _t_delay;
 	_queue.push_back(p);
 	_rate_current = CalculateDelayedRate();

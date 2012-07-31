@@ -73,7 +73,7 @@ public:
 	 * @param time Time point of the algorithm
 	 */
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
-			const std::vector<WeightValue>& weightVector, Time time);
+			const std::vector<Weight>& weightVector, Time time);
 
 	/**
 	 * The current timepoint
