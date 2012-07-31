@@ -5,6 +5,11 @@
 #cmakedefine ENABLE_MPI
 #cmakedefine DEBUG
 
+#ifdef DEBUG
+    #undef NDEBUG
+#elseif
+    #define NDEBUG
+#endif
 
 
 #endif //MPILIB_CONFIG_HPP_
