@@ -37,7 +37,7 @@ namespace populist {
 namespace parameters {
 class PopulistSpecificParameter;
 }
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 struct SpecialBins;
 
 /**
@@ -72,9 +72,11 @@ public:
 
 	/**
 	 * A signaller for when the PopulationGridController starts to configure
-	 * @param @todo describe this parameter
+	 * @param pot The array of the potentials
 	 */
-	void Configure(std::valarray<Potential>&){};
+	void Configure(std::valarray<Potential>& pot) {
+	}
+	;
 
 	/**
 	 * This function collects the external input, and lays it out internally for use in AdaptParameters.
@@ -137,8 +139,8 @@ public:
 	 */
 	const Index& getIndexCurrentResetBin() const;
 	/**
-	 * @todo describe this function
-	 * @return
+	 * Purpose: after someone has changed _p_input_set->_H_exc, ..inh, the number
+	 * of non_circulant bins must be adapted
 	 */
 	void UpdateRestInputParameters();
 
@@ -147,34 +149,63 @@ public:
 #endif
 private:
 	/**
-	 * @todo describe this function
-	 * @return
+	 * If it is a single diffusion process
+	 * @param h the Potential
+	 * @return true if it is a single diffusion process
 	 */
 	bool IsSingleDiffusionProcess(Potential h) const;
 	/**
-	 * @todo describe this function
-	 * @return
+	 * Calculates the diffusion parameters
+	 * @param par the MuSigma
 	 */
-	void SetDiffusionParameters(const MuSigma&);
+	void SetDiffusionParameters(const MuSigma& par);
 
 	VALUE_MEMBER_REF
 	/**
-	 * @todo describe the members
+	 * pointer to special bins
 	 */
 	SpecialBins* _p_bins = nullptr;
+	/**
+	 * the input Parameter set
+	 */
 	parameters::InputParameterSet _input_set;
+	/**
+	 * pointer to Population Parameters
+	 */
 	parameters::PopulationParameter* _p_par_pop = nullptr;
+	/**
+	 * pointer to Populist Specific Parameter
+	 */
 	parameters::PopulistSpecificParameter* _p_par_spec = nullptr;
+	/**
+	 * pointer to the potential
+	 */
 	Potential* _p_delta_v = nullptr;
+	/**
+	 * pointer to the number of bins
+	 */
 	Number* _p_n_bins = nullptr;
+	/**
+	 * pointer to the index of the reversal bin
+	 */
 	Index* _p_index_reversal_bin = nullptr;
+	/**
+	 * boolean if toggle sort is active
+	 */
 	bool _b_toggle_sort = false;
+	/**
+	 * boolean if toggle diffusion is active
+	 */
 	bool _b_toggle_diffusion = false;
-
+	/**
+	 *vector of burst rates
+	 */
 	std::vector<Rate> _vec_burst;
+	/**
+	 * vector of diffucion rates
+	 */
 	std::vector<Rate> _vec_diffusion;
-};
-} /* namespace zeroLeakEquations */
+};} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
 

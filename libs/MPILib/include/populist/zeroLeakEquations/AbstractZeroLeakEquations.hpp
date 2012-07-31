@@ -68,6 +68,9 @@ public:
 					bins) {
 	}
 
+	/**
+	 * virtual destructor
+	 */
 	virtual ~AbstractZeroLeakEquations() {
 	}
 	;

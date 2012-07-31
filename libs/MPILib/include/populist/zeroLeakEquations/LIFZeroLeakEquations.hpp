@@ -29,7 +29,7 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 /**
  * @brief This is the base class for population density methods based on leaky-integrate-and-fire neurons
  */
@@ -83,11 +83,14 @@ public:
 	 */
 	virtual void AdaptParameters();
 	/**
-	 * @todo write description
+	 * This function assumes that the current input is known and stored in the input parameter set,
+	 * but that the parameters for the circulant and non-circulant solver is wrong. One case where
+	 * this happens is after rebinning: the input firing rates and efficacies have changed, but the
+	 * solver parameters are invalid. This function recalculates them.
 	 */
 	virtual void RecalculateSolverParameters();
 	/**
-	 * @todo write description
+	 * Calculates the current rate
 	 */
 	virtual Rate CalculateRate() const;
 
@@ -101,28 +104,39 @@ public:
 
 protected:
 	/**
-	 * @todo write description
+	 *  Some rebinners need to rescale the probability held in the queue after rebinning.
+	 * @param scale The scale factor
 	 */
 	virtual void ScaleRefractiveProbability(double scale) {
 		_p_solver_circulant->ScaleProbabilityQueue(scale);
 	}
 	/**
-	 * @todo write description
-	 */
-	void ApplyZeroLeakEquationsAlphaExcitatory(Time);
-	/**
-	 * @todo write description
-	 */
-	void ApplyZeroLeakEquationsAlphaInhibitory(Time);
-	/**
-	 * @todo write member doc
+	 * pointer to the number of bins
 	 */
 	Number* _p_n_bins;
+	/**
+	 * pointer to the state array
+	 */
 	std::valarray<Potential>* _p_array_state;
+	/**
+	 * pointer to the potential
+	 */
 	Potential* _p_check_sum;
+	/**
+	 * The convertor
+	 */
 	LIFConvertor _convertor;
+	/**
+	 * unique ptr to the circulant Solver
+	 */
 	std::unique_ptr<circulantSolvers::AbstractCirculantSolver> _p_solver_circulant;
+	/**
+	 *  unique ptr to the non circulant Solver
+	 */
 	std::unique_ptr<nonCirculantSolvers::AbstractNonCirculantSolver> _p_solver_non_circulant;
+	/**
+	 *  unique ptr to the Abstract Rate Computation
+	 */
 	std::unique_ptr<rateComputation::AbstractRateComputation> _p_rate_calc;
 };
 } /* namespace zeroLeakEquations */
