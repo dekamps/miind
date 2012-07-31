@@ -29,7 +29,7 @@ namespace MPILib {
 namespace populist {
 namespace zeroLeakEquations {
 SingleInputZeroLeakEquations::SingleInputZeroLeakEquations(Number& n_bins,
-		valarray<Potential>& array_state, Potential& check_sum,
+		std::valarray<Potential>& array_state, Potential& check_sum,
 		SpecialBins& bins,
 		parameters::PopulationParameter& par_pop,//!< reference to the PopulationParameter
 		parameters::PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter

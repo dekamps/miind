@@ -80,7 +80,7 @@ public:
 	 */
 	virtual void AdaptParameters();
 	/**
-	 * @todo write description
+	 * Recalculates the solver parameters
 	 */
 	virtual void RecalculateSolverParameters();
 	/**
@@ -89,7 +89,7 @@ public:
 	 */
 	virtual void Apply(Time);
 	/**
-	 * @todo write description
+	 * Calculate the rate of the node
 	 */
 	Rate CalculateRate() const;
 
@@ -104,32 +104,64 @@ public:
 
 private:
 	/**
-	 * @todo write description
+	 * Initialize the integrators
 	 */
 	void InitializeIntegrators();
 	/**
-	 * @todo write description
+	 * Push the stamped measure of probability on the queue
+	 * @param t the time of the stamped measure of probability
+	 * @param before The before parameter
 	 */
-	void PushOnQueue(Time, double);
+	void PushOnQueue(Time t, double before);
 	/**
-	 * @todo write description
+	 * Pop the stamped measure of probability from the queue
+	 * @param t the time of the stamped measure of probability
 	 */
-	void PopFromQueue(Time);
+	void PopFromQueue(Time t);
 
 	/**
-	 * @todo write member doc
+	 * the current time
 	 */
 	Time _time_current = 0;
+	/**
+	 * A pointer to the number of bins
+	 */
 	Number* _p_n_bins;
+	/**
+	 * a pointer to the PopulationParameter
+	 */
 	parameters::PopulationParameter* _p_par_pop;
+	/**
+	 * a pointer to the Array state
+	 */
 	valarray<Potential>* _p_array_state;
+	/**
+	 * a pointer to check sum
+	 */
 	Potential* _p_check_sum;
+	/**
+	 * The LIFConvertor
+	 */
 	LIFConvertor _convertor;
+	/**
+	 * unique ptr to the AbstractRateComputation
+	 */
 	std::unique_ptr<rateComputation::AbstractRateComputation> _p_rate_calc;
-
+	/**
+	 * unique ptr to the ExStateDVIntegrator
+	 */
 	std::unique_ptr<ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_integrator;
+	/**
+	 * unique ptr to the ExStateDVIntegrator
+	 */
 	std::unique_ptr<ExStateDVIntegrator<parameters::NumericalZeroLeakParameter> > _p_reset;
+	/**
+	 * The NumericalZeroLeakParameter parameters
+	 */
 	parameters::NumericalZeroLeakParameter _parameter;
+	/**
+	 * The ProbabilityQueue
+	 */
 	ProbabilityQueue _queue;
 };
 } /* namespace zeroLeakEquations */

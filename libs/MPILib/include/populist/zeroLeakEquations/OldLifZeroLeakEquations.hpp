@@ -26,7 +26,7 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 /**
  * \deprecated DEPRECATED! In response to the discivery in (deKamps, 2006) that probability density
  * sometimes must be transported from one bin to a point between two bins a quick hack was devised,
@@ -47,12 +47,11 @@ public:
 	 * @param delta_v reference to the current scale variable
 	 */
 	OldLIFZeroLeakEquations( VALUE_REF_INIT
-			Number& n_bins,
-			std::valarray<Potential>& array_state, Potential& check_sum,
+	Number& n_bins, std::valarray<Potential>& array_state, Potential& check_sum,
 			SpecialBins& bins, parameters::PopulationParameter& par_pop,
-			parameters::PopulistSpecificParameter& par_spec,
-			Potential& delta_v,
-			const circulantSolvers::AbstractCirculantSolver&, const  nonCirculantSolvers::AbstractNonCirculantSolver&);
+			parameters::PopulistSpecificParameter& par_spec, Potential& delta_v,
+			const circulantSolvers::AbstractCirculantSolver&,
+			const nonCirculantSolvers::AbstractNonCirculantSolver&);
 
 	virtual ~OldLIFZeroLeakEquations() {
 	}
@@ -82,34 +81,30 @@ public:
 	 */
 	virtual void AdaptParameters();
 	/**
-	 * @todo write description
+	 * Recalculates the solver parameters
 	 */
 	virtual void RecalculateSolverParameters();
 	/**
-	 * @todo write description
+	 * Calculate the rate of the node
 	 */
 	virtual Rate CalculateRate() const;
 
 private:
 	/**
-	 * @todo write description
+	 * Apply the excitatory zero leak equation
+	 * @param time The time point
 	 */
-	void ApplyZeroLeakEquationsAlphaExcitatory(Time);
+	void ApplyZeroLeakEquationsAlphaExcitatory(Time time);
 	/**
-	 * @todo write description
+	 * Apply the inhibitory zero leak equation
+	 * @param time The time point
 	 */
-	void ApplyZeroLeakEquationsAlphaInhibitory(Time);
+	void ApplyZeroLeakEquationsAlphaInhibitory(Time time);
 	/**
-	 * @todo write member description
+	 * the current time
 	 */
-	Time _time_current;
-	Number* _p_n_bins;
-	std::valarray<Potential>* _p_array_state;
-	Potential* _p_check_sum;
-	LIFConvertor _convertor;
-	std::unique_ptr<circulantSolvers::AbstractCirculantSolver> _p_solver_circulant;
-	std::unique_ptr<nonCirculantSolvers::AbstractNonCirculantSolver> _p_solver_non_circulant;
-	std::unique_ptr<rateComputation::AbstractRateComputation> _p_rate_calc;
+	Time _time_current = 0.0;
+
 };
 } /* namespace zeroLeakEquations */
 } /* namespace populist */

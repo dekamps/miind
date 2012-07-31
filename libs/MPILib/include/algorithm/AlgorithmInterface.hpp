@@ -89,7 +89,7 @@ public:
 	 * prepare the Evolve method
 	 * @param nodeVector Vector of the node States
 	 * @param weightVector Vector of the weights of the nodes
-	 * @param weightVector Vector of the NodeTypes of the precursors
+	 * @param typeVector Vector of the NodeTypes of the precursors
 	 */
 	virtual void prepareEvolve(const std::vector<Rate>& nodeVector,
 			const std::vector<WeightValue>& weightVector,

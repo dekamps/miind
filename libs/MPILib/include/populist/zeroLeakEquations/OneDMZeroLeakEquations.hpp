@@ -28,63 +28,122 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 class AbConvertor;
 
 class OneDMZeroLeakEquations: public AbstractZeroLeakEquations {
 public:
 
-	OneDMZeroLeakEquations(Number&,	//<! reference to the variable keeping track of the current number of bins
-			std::valarray<Potential>&,		//<! reference to the state array
-			Potential&, SpecialBins&, parameters::PopulationParameter&,	//!< serves now mainly to communicate t_s
-			parameters::PopulistSpecificParameter&, Potential&//!< current potential interval covered by one bin, delta_v
+	/**
+	 * default destructor
+	 * @param n_bins reference to the variable keeping track of the current number of bins
+	 * @param state reference to the state array
+	 * @param check_sum reference to the check_sum
+	 * @param bins reference to the special bins
+	 * @param par_pop  serves now mainly to communicate t_s
+	 * @param par_spec reference to PopulistSpecificParameter
+	 * @param delta_v current potential interval covered by one bin
+	 */
+	OneDMZeroLeakEquations(Number& n_bins, std::valarray<Potential>& state,
+			Potential& check_sum, SpecialBins& bins,
+			parameters::PopulationParameter& par_pop,
+			parameters::PopulistSpecificParameter& par_spec,
+			Potential& delta_v);
 
-			);
-
+	/**
+	 * virtual destructor
+	 */
 	virtual ~OneDMZeroLeakEquations();
-
+	/**
+	 * Pass in whatever other parameters are needed. This is explicitly necessary for OneDMZeroLeakEquations
+	 * @param any pointer to a parameter
+	 */
 	virtual void Configure(void*);
-
+	/**
+	 * Given input parameters, derived classes are free to implement their own solution for ZeroLeakEquations
+	 * @param The time
+	 */
 	virtual void Apply(Time);
-
+	/**
+	 * Every Evolve step (but not every time step, see below), the input parameters must be updated
+	 * @param nodeVector The vector which stores the Rates of the precursor nodes
+	 * @param weightVector The vector which stores the Weights of the precursor nodes
+	 * @param typeVector The vector which stores the NodeTypes of the precursor nodes
+	 */
 	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
 			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
 			const std::vector<NodeType>& typeVector) {
 		_convertor.SortConnectionvector(nodeVector, weightVector, typeVector);
 	}
+	/**
+	 * Every time step the input parameters must be adapted, even if the input doesn't
+	 * change, because the are affected by LIF dynamics (see \ref population_algorithm).
+	 */
 	virtual void AdaptParameters() {
 		_convertor.AdaptParameters();
 	}
-
+	/**
+	 * Recalculates the solver parameters
+	 */
 	virtual void RecalculateSolverParameters() {
 		_convertor.RecalculateSolverParameters();
 	}
-
+	/**
+	 * Calculate the rate of the node
+	 */
 	virtual Time CalculateRate() const;
 
 private:
 
+	/**
+	 * Initialise the gsl system
+	 * @return the gsl system
+	 */
 	gsl_odeiv_system InitializeSystem() const;
 
-	//! OneDMZeroLeakEquations does not need this, but the base class requires this
-	parameters::InputParameterSet Set() {
-		parameters::InputParameterSet set;
-		return set;
-	}
-
+	/**
+	 * Reference to the number of bins
+	 */
 	Number& _n_bins;
+	/**
+	 * Pointer to the array state
+	 */
 	std::valarray<Potential>* _p_state;
-	gsl_odeiv_system _system;		// moving frame prevents use of DVIntegrator
+	/**
+	 * The gsl_odeiv_system
+	 * moving frame prevents use of DVIntegrator
+	 */
+	gsl_odeiv_system _system;
 
+	/**
+	 * The ABConvertor
+	 */
 	ABConvertor _convertor;
+	/**
+	 * The max number
+	 */
 	Number _n_max;
 
+	/**
+	 * Pointer to gsl step
+	 */
 	gsl_odeiv_step* _p_step;
+	/**
+	 * Pointer to gsl control
+	 */
 	gsl_odeiv_control* _p_control;
+	/**
+	 * Pointer to gsl evolve
+	 */
 	gsl_odeiv_evolve* _p_evolve;
-
+	/**
+	 * The gsl_odeiv_system
+	 */
 	gsl_odeiv_system _sys;
 
+	/**
+	 * The OneDMInputSetParameter
+	 */
 	parameters::OneDMInputSetParameter _params;
 
 };

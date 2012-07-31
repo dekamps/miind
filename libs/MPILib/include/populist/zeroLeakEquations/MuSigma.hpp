@@ -23,13 +23,20 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
-	//! Scalar product of OrnsteinUhlenbeckConnection has a dyadic output: mu and sigma
-	struct MuSigma
-	{
-		Potential _mu;
-		Potential _sigma;
-	};
+namespace zeroLeakEquations {
+/**
+ * Scalar product of OrnsteinUhlenbeckConnection has a dyadic output: mu and sigma
+ */
+struct MuSigma {
+	/**
+	 * Output mu of the scalar product
+	 */
+	Potential _mu;
+	/**
+	 * Output sigma of the scalar product
+	 */
+	Potential _sigma;
+};
 } /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */

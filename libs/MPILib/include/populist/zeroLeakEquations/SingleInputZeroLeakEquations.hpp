@@ -27,23 +27,35 @@ namespace zeroLeakEquations {
 class SingleInputZeroLeakEquations: public LIFZeroLeakEquations {
 
 public:
-
-	SingleInputZeroLeakEquations(
-			VALUE_REF_INIT
-			Number&,				//!< reference to the current number of bins
-			std::valarray<Potential>&,			//!< reference to state array
-			Potential&,					//!< reference to the check sum variable
-			SpecialBins& bins,
-			parameters::PopulationParameter& par_pop,//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter& par_spec,//!< reference to the PopulistSpecificParameter
-			Potential& delta_v,	//!< reference to the current scale variable
-			const circulantSolvers::AbstractCirculantSolver&,
-			const nonCirculantSolvers::AbstractNonCirculantSolver&);
-
+	/**
+	 * default constuctor
+	 * @param n_bins reference to the current number of bins
+	 * @param array_state reference to state array
+	 * @param check_sum reference to the check sum variable
+	 * @param bins reference to bins variable: reversal bin, reset bin, etc
+	 * @param par_pop reference to the PopulationParameter
+	 * @param par_spec reference to the PopulistSpecificParameter
+	 * @param delta_v reference to the current scale variable
+	 * @param circ reference to the AbstractCirculantSolver
+	 * @param noncirc reference to the AbstractNonCirculantSolver
+	 */
+	SingleInputZeroLeakEquations(VALUE_REF_INIT Number& n_bins,
+			std::valarray<Potential>& array_state, Potential& check_sum,
+			SpecialBins& bins, parameters::PopulationParameter& par_pop,
+			parameters::PopulistSpecificParameter& par_spec, Potential& delta_v,
+			const circulantSolvers::AbstractCirculantSolver& circ,
+			const nonCirculantSolvers::AbstractNonCirculantSolver& noncirc);
+	/**
+	 * Given input parameters, derived classes are free to implement their own solution for ZeroLeakEquations
+	 * @param The time
+	 */
 	virtual void Apply(Time);
 
 private:
 
+	/**
+	 * the current time
+	 */
 	Time _time_current = 0.0;
 };
 } /* namespace zeroLeakEquations */

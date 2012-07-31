@@ -40,11 +40,7 @@ OldLIFZeroLeakEquations::OldLIFZeroLeakEquations(Number& n_bins,
 		const circulantSolvers::AbstractCirculantSolver& circ,
 		const nonCirculantSolvers::AbstractNonCirculantSolver& noncirc) :
 		LIFZeroLeakEquations(n_bins, array_state, check_sum, bins, par_pop,
-				par_spec, delta_v, circ, noncirc), _time_current(0), _p_n_bins(
-				&n_bins), _p_array_state(&array_state), _p_check_sum(
-				&check_sum), _convertor( VALUE_REF_INIT
-		bins, par_pop, par_spec, delta_v, n_bins), _p_solver_circulant(
-				circ.clone()), _p_solver_non_circulant(noncirc.Clone()) {
+				par_spec, delta_v, circ, noncirc) {
 	this->SetInputParameter(_convertor.getSolverParameter());
 }
 

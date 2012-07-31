@@ -27,32 +27,51 @@ namespace MPILib {
 namespace populist {
 // forward declaration
 struct OrnsteinUhlenbeckConnection;
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 
-
-//! Evaluates the scalar product of an input which arrives over OU_Connections.
-//! The formulae are:
-//! \f[
-//! \mu = N \tau \sum_i \nu_i J_i
-//! \f]
-//! and
-//! \f[
-//! \sigma^2 = N \tau \sum_i \nu_i J^2_i
-//! \f]
+/**
+ * @brief Evaluates the scalar product of an input which arrives over OU_Connections.
+ *
+ * Evaluates the scalar product of an input which arrives over OU_Connections.
+ * The formulae are:
+ * \f[
+ * \mu = N \tau \sum_i \nu_i J_i
+ * \f]
+ * and
+ * \f[
+ * \sigma^2 = N \tau \sum_i \nu_i J^2_i
+ * \f]
+ */
 class MuSigmaScalarProduct {
 public:
-
-
-	//! Evaluate the inner product over connections which are indicated by the iterators
+	/**
+	 * Evaluate the inner product over connections which are indicated by the vectors
+	 * @param nodeVector The vector of the node rates
+	 * @param weightVector The vector of the weights
+	 * @param tau The membrane time constant
+	 * @return The MuSigma scalar product
+	 */
 	MuSigma Evaluate(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector, Time //!< membrane time constant
-			) const;
+			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			Time tau) const;
 
 private:
 
+	/**
+	 * Evaluate the inner product over connections which are indicated by the vectors
+	 * @param nodeVector The vector of the node rates
+	 * @param weightVector The vector of the weights
+	 * @return The inner product
+	 */
 	Potential InnerProduct(const std::vector<Rate>& nodeVector,
 			const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const;
 
+	/**
+	 * Evaluate the inner squared product over connections which are indicated by the vectors
+	 * @param nodeVector The vector of the node rates
+	 * @param weightVector The vector of the weights
+	 * @return The squared inner product
+	 */
 	Potential InnerSquaredProduct(const std::vector<Rate>& nodeVector,
 			const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const;
 

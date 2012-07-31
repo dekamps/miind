@@ -44,52 +44,102 @@ namespace zeroLeakEquations {
 class ABConvertor {
 public:
 
-	ABConvertor( VALUE_REF
-	SpecialBins&, parameters::PopulationParameter&,	//!< serves now mainly to communicate t_s
-			parameters::PopulistSpecificParameter&, Potential&,	//!< current potential interval covered by one bin, delta_v
-			Number&);
+	/**
+	 * default constructor
+	 * @param spec_bins The SpecialBins
+	 * @param par_pop serves now mainly to communicate t_s
+	 * @param par_specific current potential interval covered by one bin
+	 * @param delta_v  delta_v
+	 * @param n_current_bins The number of current bins
+	 */
+	ABConvertor(VALUE_REF SpecialBins& spec_bins,
+			parameters::PopulationParameter& par_pop,
+			parameters::PopulistSpecificParameter& par_specific,
+			Potential& delta_v, Number& n_current_bins);
 
-	void Configure(std::valarray<Potential>&, std::valarray<Potential>&,
-			const parameters::OneDMParameter& par_onedm) {
+	ABConvertor(const ABConvertor&)=delete;
+	/**
+	 * Configure the ABCOnvertor
+	 * @param par_onedm The OneDMParameters
+	 */
+	void Configure(const parameters::OneDMParameter& par_onedm) {
 		_param_onedm = par_onedm;
 	}
-
+	/**
+	 * Sort the Connection Vector
+	 * @param nodeVector Vector of the node States
+	 * @param weightVector Vector of the weights of the nodes
+	 * @param typeVector Vector of the NodeTypes of the precursors
+	 */
 	void SortConnectionvector(const std::vector<Rate>& nodeVector,
 			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
 			const std::vector<NodeType>& typeVector);
 
+	/**
+	 * Forwards the call to RecalculateSolverParameters
+	 */
 	void AdaptParameters();
 
+	/**
+	 * Recalculates the Solver Parameters
+	 */
 	void RecalculateSolverParameters();
 
-	void Rebin() {
-	}
-
+	/**
+	 * Getter for the PopulistSpecificParameter
+	 * @return The PopulistSpecificParameter
+	 */
 	const parameters::PopulistSpecificParameter&
 	PopSpecific() const;
 
+	/**
+	 * Getter for the OneDMInputSetParameter
+	 * @return The OneDMInputSetParameter
+	 */
 	const parameters::OneDMInputSetParameter&
 	InputSet() const;
 
+	/**
+	 * Getter for the PopulationParameter
+	 * @return The PopulationParameter
+	 */
 	const parameters::PopulationParameter& ParPop() const {
 		return *_p_pop;
 	}
 
 private:
 
-	ABConvertor(const ABConvertor&);
-
 	VALUE_MEMBER_REF
 
+	/**
+	 * The OneDMInputSetParameter
+	 */
 	parameters::OneDMInputSetParameter _param_input;
+	/**
+	 * The OneDMParameter
+	 */
 	parameters::OneDMParameter _param_onedm;
+	/**
+	 * The scalarProduct calculation
+	 */
 	ABScalarProduct _scalar_product;
+	/**
+	 * The pointer to PopulistSpecificParameter
+	 */
 	const parameters::PopulistSpecificParameter* _p_specific;
+	/**
+	 * The pointer to PopulationParameter
+	 */
 	const parameters::PopulationParameter* _p_pop;
+	/**
+	 * The pointer to the number of bins
+	 */
 	const Number* _p_n_bins;
+	/**
+	 * The pointer to the delta_v
+	 */
 	const Potential* _p_delta_v;
-};
-} /* namespace zeroLeakEquations */
+};} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
 

@@ -133,10 +133,7 @@ void OneDMZeroLeakEquations::Configure(void* p_par //OneDMParameter
 	_sys.dimension = _n_max;
 	_sys.params = static_cast<void*>(&_params);
 
-	// the valarrays don't play a role but are required by the base class
-	std::valarray<Potential> val;
-	_convertor.Configure(val, val,
-			*(static_cast<parameters::OneDMParameter*>(p_par)));
+	_convertor.Configure(*(static_cast<parameters::OneDMParameter*>(p_par)));
 
 }
 

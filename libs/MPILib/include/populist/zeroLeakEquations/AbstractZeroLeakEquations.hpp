@@ -104,11 +104,11 @@ public:
 	virtual void AdaptParameters() = 0;
 
 	/**
-	 * @todo write description
+	 * Recalculates the solver parameters
 	 */
 	virtual void RecalculateSolverParameters() = 0;
 	/**
-	 * @todo write description
+	 * Calculate the rate of the node
 	 */
 	virtual Rate CalculateRate() const = 0;
 
@@ -122,7 +122,8 @@ public:
 
 protected:
 	/**
-	 * @todo write description
+	 * Set the input parameters
+	 * @param set The new input parameter set
 	 */
 	void SetInputParameter(const parameters::InputParameterSet& set) {
 		_p_set = &set;

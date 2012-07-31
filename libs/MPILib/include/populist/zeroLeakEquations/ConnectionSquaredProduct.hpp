@@ -27,11 +27,20 @@
 namespace MPILib {
 namespace populist {
 namespace zeroLeakEquations {
+/**
+ * Function object
+ */
 class ConnectionSquaredProduct: public std::binary_function<Rate,
 		OrnsteinUhlenbeckConnection, double> {
 public:
 
-	inline double operator()(Rate connection_first,
+	/**
+	 * Calculates the connection squared product for the OrnsteinUhlenbeckConnection
+	 * @param connection_first The vector of the rates
+	 * @param connection_second The vetor of the weights
+	 * @return The squared product
+	 */
+	double operator()(Rate connection_first,
 			OrnsteinUhlenbeckConnection connection_second) const {
 
 		double f_node_rate = connection_first;

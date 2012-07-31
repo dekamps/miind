@@ -24,9 +24,17 @@ namespace MPILib {
 namespace populist {
 namespace zeroLeakEquations {
 struct SpecialBins {
-
+	/**
+	 * the reversal bin index
+	 */
 	Index _index_reversal_bin;
+	/**
+	 * the original reset bin
+	 */
 	Index _index_original_reset_bin;
+	/**
+	 * the current reset bin
+	 */
 	Index _index_current_reset_bin;
 };
 } /* namespace zeroLeakEquations */
