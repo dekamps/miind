@@ -29,7 +29,7 @@ namespace algorithm{
 
 template<class Weight>
 RateAlgorithm<Weight>::RateAlgorithm(Rate rate) :
-		AlgorithmInterface<double>(), _time_current(
+		AlgorithmInterface<Weight>(), _time_current(
 				std::numeric_limits<double>::max()), _rate(rate) {
 }
 

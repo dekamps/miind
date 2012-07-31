@@ -17,45 +17,53 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#ifndef MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
-#define MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
+#ifndef MPILIB_ALGORITHMS_DELAYALGORITHM_HPP_
+#define MPILIB_ALGORITHMS_DELAYALGORITHM_HPP_
 
-#include <MPILib/config.hpp>
+#include <deque>
 #include <MPILib/include/TypeDefinitions.hpp>
+
+#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
-#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
-#include <MPILib/include/NodeType.hpp>
-#include <MPILib/include/utilities/Exception.hpp>
-#include <vector>
 
 namespace MPILib {
 namespace algorithm {
 
 /**
- * @brief The interface for all algorithm classes.
+ * @brief This algorithm is effectively a pipeline with a preselected delay.
  *
- * This class provides the interface to which all developed algorithms need to implement.
+ * In some simulations connections must be implemented with time delays. If that needs to be done with
+ * high precision, create a node, configure it with a DelayAlgorithm, connected the output to be delayed
+ * to this node and connect the output of this node to the node specified by the original connection. At the
+ * moment this is the only way to implement delays. A less precise effect can be achieved with Wilson-Cowan algorithms.
+ * For large-scale simulations this solution may not be sustainable. Please provide feedback if this is the case.
+ *
  */
-template<class WeightValue>
-class AlgorithmInterface {
+template<class Weight>
+class DelayAlgorithm: public AlgorithmInterface<Weight> {
 public:
-	AlgorithmInterface()=default
-	;
-	virtual ~AlgorithmInterface() {
-	}
-	;
+
+	/**
+	 * Create algorithm with a delay time
+	 * @param t_delay The delay time
+	 */
+	DelayAlgorithm(Time t_delay);
+
+	/**
+	 * virtual destructor
+	 */
+	virtual ~DelayAlgorithm();
 
 	/**
 	 * Cloning operation, to provide each DynamicNode with its own
 	 * Algorithm instance. Clients use the naked pointer at their own risk.
 	 */
-	virtual AlgorithmInterface* clone() const = 0;
-
+	virtual DelayAlgorithm<Weight>* clone() const;
 	/**
 	 * Configure the Algorithm
 	 * @param simParam The simulation parameter
 	 */
-	virtual void configure(const SimulationRunParameter& simParam) = 0;
+	virtual void configure(const SimulationRunParameter& simParam);
 
 	/**
 	 * Evolve the node state. Overwrite this method if your algorithm does not
@@ -65,77 +73,43 @@ public:
 	 * @param time Time point of the algorithm
 	 */
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
-			const std::vector<WeightValue>& weightVector, Time time){
-		throw utilities::Exception("You need to overwrite this method in your algorithm"
-				" if you want to use it");
-	}
-
-	/**
-	 * Evolve the node state. In the default case it simply calls envolveNodeState
-	 * without the NodeTypes. However if an algorithm needs the nodeTypes
-	 * of the precursors overwrite this function.
-	 * @param nodeVector Vector of the node States
-	 * @param weightVector Vector of the weights of the nodes
-	 * @param time Time point of the algorithm
-	 * @param typeVector Vector of the NodeTypes of the precursors
-	 */
-	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
-			const std::vector<WeightValue>& weightVector, Time time,
-			const std::vector<NodeType>& typeVector) {
-		this->evolveNodeState(nodeVector, weightVector, time);
-	}
-
-	/**
-	 * prepare the Evolve method
-	 * @param nodeVector Vector of the node States
-	 * @param weightVector Vector of the weights of the nodes
-	 * @param typeVector Vector of the NodeTypes of the precursors
-	 */
-	virtual void prepareEvolve(const std::vector<Rate>& nodeVector,
-			const std::vector<WeightValue>& weightVector,
-			const std::vector<NodeType>& typeVector){};
+			const std::vector<WeightValue>& weightVector, Time time);
 
 	/**
 	 * The current timepoint
 	 * @return The current time point
 	 */
-	virtual Time getCurrentTime() const = 0;
+	virtual Time getCurrentTime() const;
 
 	/**
 	 * The calculated rate of the node
 	 * @return The rate of the node
 	 */
-	virtual Rate getCurrentRate() const = 0;
+	virtual Rate getCurrentRate() const;
 
 	/**
 	 * Stores the algorithm state in a Algorithm Grid
 	 * @return The state of the algorithm
 	 */
-	virtual AlgorithmGrid getGrid() const = 0;
+	virtual AlgorithmGrid getGrid() const;
 
+private:
 
-	std::valarray<double>& getArrayState(AlgorithmGrid& grid) const
-	{
-		return grid.getArrayState();
-	}
+	Rate CalculateDelayedRate();
 
-	std::valarray<double>& getArrayInterpretation(AlgorithmGrid& grid) const
-	{
-		return grid.getArrayInterpretation();
-	}
+	Rate Interpolate() const;
 
-	Number& getStateSize(AlgorithmGrid& grid) const
-	{
-		return grid.getStateSize();
-	}
+	typedef std::pair<Rate, Time> rate_time_pair;
 
-	Number getStateSize(const AlgorithmGrid & grid) const
-	{
-		return grid.getStateSize();
-	}
+	Time _t_current;
+	Time _t_delay;
+	Rate _rate_current;
+
+	std::deque<rate_time_pair> _queue;
 
 };
 
-} /* namespace algorithm */
-} /* namespace MPILib */
-#endif /* MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_ */
+} /* end namespace algorithm */
+} /* end namespace MPILib */
+
+#endif  //include guard MPILIB_ALGORITHMS_DELAYALGORITHM_HPP_
