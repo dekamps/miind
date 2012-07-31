@@ -126,20 +126,26 @@ class PopulistSpecificParameter;
 template<class Weight>
 class PopulationAlgorithm_: public algorithm::AlgorithmInterface<Weight> {
 public:
-
-	/// An algorithm should export its parameter type
+	/**
+	 * An algorithm should export its parameter type
+	 */
 	typedef parameters::PopulistParameter Parameter;
 
-	/// Construct an Algorithm from a stream
-	PopulationAlgorithm_(istream& s);
+	/**
+	 * Create a PopulistAlgorithm with settings defined in a PopulistParameter
+	 * @param par_populist the settings of the algorithm
+	 */
+	PopulationAlgorithm_(const parameters::PopulistParameter& par_populist);
 
-	/// Create a PopulistAlgorithm with settings defined in a PopulistParameter
-	PopulationAlgorithm_(const parameters::PopulistParameter&);
+	/**
+	 * copy constructor
+	 * @param algorithm the rhs algorithm
+	 */
+	PopulationAlgorithm_(const PopulationAlgorithm_<Weight>& algorithm);
 
-	/// copy constructor
-	PopulationAlgorithm_(const PopulationAlgorithm_<Weight>&);
-
-	/// virtual destructor
+	/**
+	 * virtual destructor
+	 */
 	virtual ~PopulationAlgorithm_();
 
 	/**
@@ -201,29 +207,50 @@ public:
 		return new PopulationAlgorithm_<Weight>(*this);
 	}
 
-	/// Give the potential that corresponds to a bin number at a specific moment
-	Potential BinToCurrentPotential(Index) const;
+	/**
+	 * Give the potential that corresponds to a bin number at a specific moment
+	 * @param index The index of the bin
+	 * @return The Potential of the index bin
+	 */
+	Potential BinToCurrentPotential(Index index) const;
 
-	/// Give the bin number that momentarily corresponds to a potential
-	Index CurrentPotentialToBin(Potential) const;
+	/**
+	 * Give the bin number that momentarily corresponds to a potential
+	 * @param v The Potential
+	 * @return The index which correspond to the potential
+	 */
+	Index CurrentPotentialToBin(Potential v) const;
 
 private:
 
-	void StripHeader(istream&);
-	void StripFooter(istream&);
-
-	parameters::PopulationParameter ParPopFromStream(istream&);
-	parameters::PopulistSpecificParameter ParSpecFromStream(istream&);
-
-	void WriteConfigurationToLog();
+	/**
+	 * Embed the initial grid in the local grid
+	 */
 	void Embed();
 
+	/**
+	 * the PopulationParameter
+	 */
 	parameters::PopulationParameter _parameter_population;
+	/**
+	 * The PopulistSpecificParameter
+	 */
 	parameters::PopulistSpecificParameter _parameter_specific;
-	mutable ostringstream _stream_log; // before AlgorithmGrid, which receives a pointer to this stream
+	/**
+	 * The Algorithm grid
+	 */
 	algorithm::AlgorithmGrid _grid;
+	/**
+	 * The PopulationGridController
+	 */
 	PopulationGridController<Weight> _controller_grid;
+	/**
+	 * The current time
+	 */
 	Time _current_time = 0.0;
+	/**
+	 * The current rate
+	 */
 	Rate _current_rate = 0.0;
 
 }
@@ -233,10 +260,10 @@ private:
 // default algorithm is with PopulistConnection
 typedef PopulationAlgorithm_<OrnsteinUhlenbeckConnection> PopulationAlgorithm;
 
-typedef algorithm::RateAlgorithm<PopulationConnection> Pop_RateAlgorithm;
-typedef RateFunctor<PopulationConnection> Pop_RateFunctor;
-typedef MPINode<PopulationConnection, utilities::CircularDistribution> Pop_DynamicNode;
-typedef MPINetwork<PopulationConnection, utilities::CircularDistribution> Pop_Network;
+typedef algorithm::RateAlgorithm<OrnsteinUhlenbeckConnection> Pop_RateAlgorithm;
+typedef RateFunctor<OrnsteinUhlenbeckConnection> Pop_RateFunctor;
+typedef MPINode<OrnsteinUhlenbeckConnection, utilities::CircularDistribution> Pop_DynamicNode;
+typedef MPINetwork<OrnsteinUhlenbeckConnection, utilities::CircularDistribution> Pop_Network;
 
 } /* namespace populist */
 } /* namespace MPILib */

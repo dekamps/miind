@@ -26,51 +26,75 @@
 namespace MPILib {
 namespace populist {
 
-//! Connection parameters for a network of OrnsteinUhlenbeck populations
-//! need two parameters: a number parameter, which is not squared in the
-//! calculation of sigma, and an efficacy, which is squared.
+/**
+ * Connection parameters for a network of OrnsteinUhlenbeck populations
+ * need two parameters: a number parameter, which is not squared in the
+ * calculation of sigma, and an efficacy, which is squared.
+ */
 struct OrnsteinUhlenbeckConnection {
 
-	//! effective number, may be fractional
+	/**
+	 * effective number, may be fractional
+	 */
 	double _number_of_connections = 0.0;
 
-	//! effective synaptic efficacy from one population on another
+	/**
+	 * effective synaptic efficacy from one population on another
+	 */
 	Efficacy _efficacy = 0.0;
 
-	//! delay of a connection
+	/**
+	 * delay of a connection
+	 */
 	Time _delay = 0.0;
 
-	//! default constructor
+	/**
+	 * default constructor
+	 */
 	OrnsteinUhlenbeckConnection()=default;
 
-	//! construct, using effective number of connections and effectivie efficacy
-	OrnsteinUhlenbeckConnection(double number_of_connections,//!< effective number of connections
-			Efficacy efficacy,//!< synaptic efficacy
-			Time delay = 0//!< delay of connection
+	/**
+	 * construct, using effective number of connections and effective efficacy
+	 * @param number_of_connections effective number of connections
+	 * @param efficacy synaptic efficacy
+	 * @param delay  delay of connection
+	 */
+	OrnsteinUhlenbeckConnection(double number_of_connections,
+			Efficacy efficacy,
+			Time delay = 0
 	) :
 	_number_of_connections(number_of_connections), _efficacy(efficacy), _delay(
 			delay) {
 	}
 };
 
-typedef OrnsteinUhlenbeckConnection PopulationConnection;
-
-//! Necessary for a sensible definition of InnerProduct
+/**
+ * Necessary for a sensible definition of InnerProduct
+ * @param f the factor for the inner product
+ * @param connection The connection
+ * @return Theproduct of the factor with the efficacy and the number of connections
+ */
 inline double operator*(double f,
 		const OrnsteinUhlenbeckConnection& connection) {
 	return f * connection._efficacy * connection._number_of_connections;
 }
 
-//! Necessary for tests on Dale's law
+/**
+ * Necessary for tests on Dale's law
+ * @param connection The connection
+ * @return The efficacy of the connection
+ */
 inline double toEfficacy(const OrnsteinUhlenbeckConnection& connection) {
 	return connection._efficacy;
 }
 
-typedef OrnsteinUhlenbeckConnection OU_Connection;
-
 } /* namespace populist */
 } /* namespace MPILib */
-
+/**
+ * if the connection is NAN
+ * @param connection The connection
+ * @return true if the connection is NAN
+ */
 inline int IsNan(
 		const MPILib::populist::OrnsteinUhlenbeckConnection& connection) {
 	return IsNan(connection._efficacy)

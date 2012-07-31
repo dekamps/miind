@@ -53,7 +53,7 @@ public:
 
 	/**
 	 * Configure the Algorithm
-	 * @param simParam
+	 * @param simParam The simulation parameter
 	 */
 	virtual void configure(const SimulationRunParameter& simParam) = 0;
 

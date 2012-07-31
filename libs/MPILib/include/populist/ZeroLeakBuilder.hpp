@@ -29,38 +29,69 @@
 namespace MPILib {
 namespace populist {
 
-	class ZeroLeakBuilder {
-	public:
+class ZeroLeakBuilder {
+public:
 
-		ZeroLeakBuilder(
-			Number&,					//!< reference to the current number of bins
-			std::valarray<Potential>&,		//!< reference to state array
-			Potential&,					//!< reference to the check sum variable
-			zeroLeakEquations::SpecialBins&,
-			parameters::PopulationParameter&,		//!< reference to the PopulationParameter
-			parameters::PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
-			Potential&					//!< reference to the current scale variable
-		);
+	/**
+	 * default constructor
+	 * @param n_bins reference to the current number of bins
+	 * @param array_state reference to state array
+	 * @param checksum reference to the check sum variable
+	 * @param bins reference to the Special Bins
+	 * @param par_pop reference to the PopulationParameter
+	 * @param par_spec reference to the PopulistSpecificParameter
+	 * @param delta_v reference to the current scale variable
+	 */
+	ZeroLeakBuilder(Number& n_bins, std::valarray<Potential>& array_state,
+			Potential& checksum, zeroLeakEquations::SpecialBins& bins,
+			parameters::PopulationParameter& par_pop,
+			parameters::PopulistSpecificParameter& par_spec,
+			Potential& delta_v);
 
-	std::shared_ptr<zeroLeakEquations::AbstractZeroLeakEquations>
-		GenerateZeroLeakEquations
-		(
-			const std::string&,
-			const std::string&,
-			const std::string&
-		);
+	/**
+	 * Constructs the zero Leak Equations
+	 * @param zeroleakequations_name The name of the zeroleak equation
+	 * @param circulant_solver_name The name of the circulant solver
+	 * @param noncirculant_solver_name The name of the non circulant solver
+	 * @return
+	 */
+	std::shared_ptr<zeroLeakEquations::AbstractZeroLeakEquations> GenerateZeroLeakEquations(
+			const std::string& zeroleakequations_name,
+			const std::string& circulant_solver_name,
+			const std::string& noncirculant_solver_name);
 
-	private:
+private:
 
-		Number&						_n_bins;
-		std::valarray<Potential>&	_array_state;
-		Potential&					_checksum;
-		zeroLeakEquations::SpecialBins&				_bins;
-		parameters::PopulationParameter&		_par_pop;
-		parameters::PopulistSpecificParameter&	_par_spec;
-		Potential&					_delta_v;
+	/**
+	 * reference to the current number of bins
+	 */
+	Number& _n_bins;
+	/**
+	 * reference to state array
+	 */
+	std::valarray<Potential>& _array_state;
+	/**
+	 * reference to the check sum variable
+	 */
+	Potential& _checksum;
+	/**
+	 * reference to the Special Bins
+	 */
+	zeroLeakEquations::SpecialBins& _bins;
+	/**
+	 * reference to the PopulationParameter
+	 */
+	parameters::PopulationParameter& _par_pop;
+	/**
+	 *  reference to the PopulistSpecificParameter
+	 */
+	parameters::PopulistSpecificParameter& _par_spec;
+	/**
+	 * reference to the current scale variable
+	 */
+	Potential& _delta_v;
 
-	};
+};
 } /* namespace populist */
 } /* namespace MPILib */
 

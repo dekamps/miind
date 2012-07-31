@@ -61,17 +61,14 @@ bool ProbabilityQueue::HasProbability(Time time) const {
 	else
 		return false;
 }
-void ProbabilityQueue::Scale(double scale,
-		std::list<StampedProbability> queue) {
-	for (auto& it : queue) {
-		it._prob *= scale;
-	}
-}
 
 void ProbabilityQueue::Scale(double scale) {
 	_current._prob *= scale;
 	_total *= scale;
-	this->Scale(scale, _queue);
+
+	for (auto& it : _queue) {
+		it._prob *= scale;
+	}
 }
 
 } /* namespace populist */

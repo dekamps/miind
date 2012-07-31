@@ -27,54 +27,85 @@ namespace populist {
 
 typedef Rate (*RateFunction)(Time);
 
-inline Rate Nul(Time) {
-	return 0;
-}
-
-//! An Algorithm that encapsulates a rate as a function of time
-//!
-//! It is sometime necessary to provide a network with external inputs. These inputs are created as
-//! DynamicNode themselves. Their state is trivial and their output firing rate, given by the
-//! CurrentRate method follows a given function of time.
+/**
+ * @brief  An Algorithm that encapsulates a rate as a function of time
+ *
+ * It is sometime necessary to provide a network with external inputs. These inputs are created as
+ * DynamicNode themselves. Their state is trivial and their output firing rate, given by the
+ * CurrentRate method follows a given function of time.
+ */
 template<class WeightValue>
 class RateFunctor: public algorithm::AlgorithmInterface<WeightValue> {
 public:
 
-	//! Constructor must be initialized with pointer a rate function of time.
-	RateFunctor(RateFunction);
+	/**
+	 * default constructor must be initialized with pointer a rate function of time.
+	 * @param function A pointer a rate function of time
+	 */
+	RateFunctor(RateFunction function);
 
-	//! mandatory virtual destructor
+	/**
+	 * mandatory virtual destructor
+	 */
 	virtual ~RateFunctor() {
 	}
+	;
 
-	//! Essentially just calling the encapsulated rate function. The connection iterators are
-	//! ignored and essentially just the current simulation time is set.
+	/**
+	 * Essentially just calling the encapsulated rate function.
+	 * The vectors are ignored and essentially just the current simulation time is set.
+	 * @param nodeVector Vector of the node States
+	 * @param weightVector Vector of the weights of the nodes
+	 * @param time Time point of the algorithm
+	 */
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
 			const std::vector<WeightValue>& weightVector, Time time)
 	override;
 
-	//! Gives the current rate according to the original rate function
+	/**
+	 * Gives the current rate according to the original rate function
+	 * @return The rate of the node
+	 */
 	virtual Rate getCurrentRate() const override {
 		return _function(_current_time);
 	}
 
-	//! Mandatory Grid  function, not of practical use.
+	/**
+	 * Stores the algorithm state in a Algorithm Grid not used here
+	 * @return The state of the algorithm
+	 */
 	virtual algorithm::AlgorithmGrid getGrid() const
 	override;
-
+	/**
+	 * Cloning operation, to provide each DynamicNode with its own
+	 * Algorithm instance. Clients use the naked pointer at their own risk.
+	 */
 	virtual RateFunctor* clone() const
 	override;
 
-	virtual void configure(const SimulationRunParameter&)
+	/**
+	 * Configure the Algorithm
+	 * @param simParam The simulation parameter
+	 */
+	virtual void configure(const SimulationRunParameter& simParam)
 	override;
 
-	//! Gives the current time that the Algorithm keeps.
+	/**
+	 * The current timepoint
+	 * @return The current time point
+	 */
 	virtual Time getCurrentTime() const
 	override;
 
 private:
 
+	/**
+	 * The rate function
+	 */
 	RateFunction _function;
+	/**
+	 * the current time point
+	 */
 	Time _current_time = 0.0;
 
 };

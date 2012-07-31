@@ -24,16 +24,32 @@
 namespace MPILib {
 namespace populist {
 
-//! A time stamped measure of probability
+/**
+ * @brief A time stamped measure of probability
+ */
 struct StampedProbability {
 
+	/**
+	 * default constructor
+	 */
 	StampedProbability()=default;
 
+	/**
+	 * default constructor
+	 * @param prob The Probability
+	 * @param time The time
+	 */
 	StampedProbability(Probability prob, Time time) :
 	_prob(prob), _time(time) {
 	}
 
+	/**
+	 * The Probability
+	 */
 	Probability _prob = 0.0;
+	/**
+	 * The time
+	 */
 	Time _time = 0.0;
 };} /* namespace populist */
 } /* namespace MPILib */

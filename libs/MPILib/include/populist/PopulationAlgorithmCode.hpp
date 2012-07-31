@@ -33,7 +33,7 @@ namespace populist {
 template<class Weight>
 PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 		const parameters::PopulistParameter& par_populist) :
-		algorithm::AlgorithmInterface<PopulationConnection>(), _parameter_population(
+		algorithm::AlgorithmInterface<OrnsteinUhlenbeckConnection>(), _parameter_population(
 				par_populist._par_pop), _parameter_specific(
 				par_populist._par_spec), _grid(
 				algorithm::AlgorithmGrid(
@@ -46,40 +46,15 @@ PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 				algorithm::AlgorithmInterface<Weight>::getArrayInterpretation(
 						_grid),
 				&algorithm::AlgorithmInterface<Weight>::getStateSize(_grid),
-				&_current_rate, &_stream_log) {
+				&_current_rate) {
 	Embed();
 }
 
-template<class Weight>
-PopulationAlgorithm_<Weight>::PopulationAlgorithm_(istream& s) :
-		algorithm::AlgorithmInterface<PopulationConnection>(), _parameter_population(
-				ParPopFromStream(s)), _parameter_specific(ParSpecFromStream(s)), _grid(
-				algorithm::AlgorithmGrid(
-						_parameter_specific.getMaxNumGridPoints())), _controller_grid(
-#ifdef _INVESTIGATE_ALGORITHM
-				_vec_value,
-#endif
-				_parameter_population, _parameter_specific,
-				algorithm::AlgorithmInterface<Weight>::ArrayState(_grid),
-				algorithm::AlgorithmInterface<Weight>::ArrayInterpretation(
-						_grid),
-				&algorithm::AlgorithmInterface<Weight>::StateSize(_grid),
-				&_current_rate, &_stream_log), _current_time(0), _current_rate(
-				0) {
-	_stream_log << "Running with ZeroLeakEquations: "
-			<< _parameter_specific.getZeroLeakName() << "\n";
-	_stream_log << "Running with Circulant: "
-			<< _parameter_specific.getCirculantName() << "\n";
-	_stream_log << "Running with NonCirculant"
-			<< _parameter_specific.getNonCirculantName() << "\n";
-	Embed();
-	StripFooter(s);
-}
 
 template<class Weight>
 PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 		const PopulationAlgorithm_<Weight>& algorithm) :
-		algorithm::AlgorithmInterface<PopulationConnection>(algorithm), _parameter_population(
+		algorithm::AlgorithmInterface<OrnsteinUhlenbeckConnection>(algorithm), _parameter_population(
 				algorithm._parameter_population), _parameter_specific(
 				algorithm._parameter_specific), _grid(
 				algorithm::AlgorithmGrid(
@@ -92,7 +67,7 @@ PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 				algorithm::AlgorithmInterface<Weight>::getArrayInterpretation(
 						_grid),
 				&algorithm::AlgorithmInterface<Weight>::getStateSize(_grid),
-				&_current_rate, &_stream_log), _current_time(0), _current_rate(
+				&_current_rate), _current_time(0), _current_rate(
 				0) {
 	Embed();
 }
@@ -151,14 +126,9 @@ void PopulationAlgorithm_<Weight>::configure(
 	// The grid controller is configured with each new configuration of the network.
 	_controller_grid.Configure(par_run);
 
-	// write information in the log file with regard to algorithm settings
-	WriteConfigurationToLog();
-
 }
 
-template<class Weight>
-void PopulationAlgorithm_<Weight>::WriteConfigurationToLog() {
-}
+
 
 template<class Weight>
 algorithm::AlgorithmGrid PopulationAlgorithm_<Weight>::getGrid() const {

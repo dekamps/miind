@@ -37,7 +37,7 @@ namespace MPILib {
 namespace populist {
 
 ZeroLeakBuilder::ZeroLeakBuilder(Number& n_bins,
-		valarray<Potential>& array_state, Potential& checksum,
+		std::valarray<Potential>& array_state, Potential& checksum,
 		zeroLeakEquations::SpecialBins& bins,
 		parameters::PopulationParameter& par_pop,
 		parameters::PopulistSpecificParameter& par_spec, Potential& delta_v) :
@@ -46,9 +46,9 @@ ZeroLeakBuilder::ZeroLeakBuilder(Number& n_bins,
 }
 
 std::shared_ptr<zeroLeakEquations::AbstractZeroLeakEquations> ZeroLeakBuilder::GenerateZeroLeakEquations(
-		const string& zeroleakequations_name,
-		const string& circulant_solver_name,
-		const string& noncirculant_solver_name) {
+		const std::string& zeroleakequations_name,
+		const std::string& circulant_solver_name,
+		const std::string& noncirculant_solver_name) {
 	std::shared_ptr<circulantSolvers::AbstractCirculantSolver> p_circ;
 	if (circulant_solver_name == "CirculantSolver")
 		p_circ = std::shared_ptr<circulantSolvers::AbstractCirculantSolver>(

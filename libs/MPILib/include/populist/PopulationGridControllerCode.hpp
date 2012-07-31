@@ -44,7 +44,7 @@ PopulationGridController<Weight>::PopulationGridController( VALUE_REF_INIT
 const parameters::PopulationParameter& par_pop,
 		const parameters::PopulistSpecificParameter& par_spec,
 		valarray<double>& array_state, valarray<double>& array_interpretation,
-		Number* p_grid_size, Rate* p_rate, ostringstream* p_stream) :
+		Number* p_grid_size, Rate* p_rate) :
 		VALUE_MEMBER_INIT
 		_n_initial_bins(*p_grid_size), _n_bins_to_add(par_spec.getNrAdd()), _p_number_of_current_bins(
 				p_grid_size), _n_bins(*p_grid_size), _time_membrane_constant(
@@ -53,7 +53,7 @@ const parameters::PopulationParameter& par_pop,
 				array_state), _array_state(array_state), _array_interpretation(
 				array_interpretation), _p_rebinner(
 				std::unique_ptr<rebinner::AbstractRebinner>(
-						par_spec.getRebin().Clone())), _p_stream(p_stream), _builder(
+						par_spec.getRebin().Clone())), _builder(
 				VALUE_MEMBER_ARG
 				_n_bins, _array_state, _check_sum, _bins, _par_pop, _par_spec,
 				_delta_v), _p_zl(
@@ -62,9 +62,6 @@ const parameters::PopulationParameter& par_pop,
 						par_spec.getNonCirculantName())) {
 }
 
-template<class Weight>
-PopulationGridController<Weight>::~PopulationGridController() {
-}
 
 template<class Weight>
 void PopulationGridController<Weight>::Configure(
@@ -91,7 +88,7 @@ bool PopulationGridController<Weight>::CollectExternalInput(
 }
 
 template<class Weight>
-bool PopulationGridController<Weight>::Evolve(Time time, Time* p_time_current,
+void PopulationGridController<Weight>::Evolve(Time time, Time* p_time_current,
 		Rate* p_rate_output, const std::vector<Rate>& nodeVector,
 		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) {
 
@@ -150,8 +147,6 @@ bool PopulationGridController<Weight>::Evolve(Time time, Time* p_time_current,
 //		else
 //			nothing
 	}
-
-	return true;
 }
 
 template<class Weight>
@@ -251,9 +246,8 @@ Potential PopulationGridController<Weight>::BinToCurrentPotential(
 }
 
 template<class Weight>
-bool PopulationGridController<Weight>::UpdateCheckSum() {
+void PopulationGridController<Weight>::UpdateCheckSum() {
 	_check_sum = _array_state.sum();
-	return true;
 }
 
 template<class Weight>

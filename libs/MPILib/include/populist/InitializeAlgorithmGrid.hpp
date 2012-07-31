@@ -30,18 +30,47 @@ namespace populist {
 
 class InitializeAlgorithmGrid {
 public:
-	algorithm::AlgorithmGrid
-	InitializeGrid(Number, Potential, const parameters::PopulationParameter&,
-			const parameters::InitialDensityParameter&) const;
+	/**
+	 * Initialise the algoritm grid
+	 * @param number_of_initial_bins The number of initial bins
+	 * @param v_min The min
+	 * @param parameter_population The PopulationParameter
+	 * @param parameter_density The InitialDensityParameter
+	 * @return The generated algorithm grid
+	 */
+	algorithm::AlgorithmGrid InitializeGrid(Number number_of_initial_bins,
+			Potential v_min,
+			const parameters::PopulationParameter& parameter_population,
+			const parameters::InitialDensityParameter& parameter_density) const;
 
-	double ExpansionFactorDoubleRebinner(Number, Potential,
-			const parameters::PopulationParameter&) const;
-
-	Potential
-	DeltaV(Number, Potential, const parameters::PopulationParameter&) const;
-	Index
-	IndexReversal(Number, Potential,
-			const parameters::PopulationParameter&) const;
+	/**
+	 * Rebin the expansion factor
+	 * @param number_of_initial_bins The number of initial bins
+	 * @param v_min The min
+	 * @param parameter_population The PopulationParameter
+	 * @return the expansion factor
+	 */
+	double ExpansionFactorDoubleRebinner(Number number_initial_bins,
+			Potential v_min,
+			const parameters::PopulationParameter& parameter_population) const;
+	/**
+	 * Calculates the delta V
+	 * @param number_of_initial_bins The number of initial bins
+	 * @param v_min The min
+	 * @param parameter_population The PopulationParameter
+	 * @return the delta v
+	 */
+	Potential DeltaV(Number number_of_initial_bins, Potential v_min,
+			const parameters::PopulationParameter& parameter_population) const;
+	/**
+	 * Calculates the reversal index
+	 * @param number_of_initial_bins The number of initial bins
+	 * @param v_min The min
+	 * @param parameter_population The PopulationParameter
+	 * @return the reversal index
+	 */
+	Index IndexReversal(Number number_of_initial_bins, Potential v_min,
+			const parameters::PopulationParameter& parameter_population) const;
 
 };
 } /* namespace populist */
