@@ -27,66 +27,38 @@ namespace MPILib {
 namespace populist {
 namespace rebinner {
 
-/**
- * @brief Abstract base class for rebinning algorithms.
- *
- * Rebinning algorithms serve to represent the density grid in the original grid, which is smaller
- * than the current grid, because grids are expanding over time. Various ways of rebinning are conceivable
- * and it may be necessary to compare different rebinning algorithms in the same program. The main simulation
- * step in PopulationGridController only needs to know that there is a rebinning algorithm.
- */
+//! AbstractRebinner: Abstract base class for rebinning algorithms.
+//!
+//! Rebinning algorithms serve to represent the density grid in the original grid, which is smaller
+//! than the current grid, because grids are expanding over time. Various ways of rebinning are conceivable
+//! and it may be necessary to compare different rebinning algorithms in the same program. The main simulation
+//! step in PopulationGridController only needs to know that there is a rebinning algorithm.
 class AbstractRebinner {
 public:
 
-	/**
-	 * default constructor
-	 */
-	AbstractRebinner()=default;
-	/**
-	 * virtual Destructor
-	 */
-	virtual ~AbstractRebinner() {};
+	//!
+	virtual ~AbstractRebinner() = 0;
 
-	/**
-	 * Configure: Here the a reference to the bin contenets, as well as parameters necessary for the rebinning are set
-	 * @param array array with density profile that needs rebinning
-	 * @param index_reversal_bin reversal bin
-	 * @param index_reset_bin reset bin
-	 * @param number_original_bins number of  bins before rebinning
-	 * @param number_new_bins number of  bins after rebinning
-	 */
-	virtual void Configure(std::valarray<double>& array,
-			Index index_reversal_bin, Index index_reset_bin,
-			Number number_original_bins, Number number_new_bins)=0;
+	//! Configure
+	//! Here the a reference to the bin contenets, as well as parameters necessary for the rebinning are set
+	virtual bool Configure(std::valarray<double>&, Index,     //!< reversal bin,
+			Index,               //!< reset bin
+			Number,              //!< number of  bins before rebinning
+			Number               //!< number of  bins after rebinning
+			) = 0;
 
-	/**
-	 * every rebinner can do a rebin after it has been configured some rebinners need to
-	 * take refractive probability into account
-	 * @param p_zl
-	 */
-	virtual void Rebin(zeroLeakEquations::AbstractZeroLeakEquations* p_zl) = 0;
+	//! every rebinner can do a rebin after it has been configured
+	//! some rebinners need to take refractive probability into account
+	virtual bool Rebin(zeroLeakEquations::AbstractZeroLeakEquations*) = 0;
 
-	/**
-	 * Clone method
-	 * @return A clone of AbstractRebinner
-	 */
 	virtual AbstractRebinner* Clone() const = 0;
 
-	/**
-	 * every rebinner has a name
-	 * @return The name
-	 */
+	//! every rebinner has a name
 	virtual std::string Name() const = 0;
 
 protected:
 
-	/**
-	 * Scale the refractive
-	 * @param scale The scale
-	 * @param p_zl The equation
-	 */
-	void ScaleRefractive(double scale,
-			zeroLeakEquations::AbstractZeroLeakEquations* p_zl);
+	void ScaleRefractive(double, zeroLeakEquations::AbstractZeroLeakEquations*);
 };
 
 } /* namespace rebinner */

@@ -21,7 +21,8 @@
 namespace MPILib {
 namespace populist {
 namespace rebinner {
-
+AbstractRebinner::~AbstractRebinner() {
+}
 void AbstractRebinner::ScaleRefractive(double scale,
 		zeroLeakEquations::AbstractZeroLeakEquations* p_zl) {
 	if (p_zl)
