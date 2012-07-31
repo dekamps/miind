@@ -49,8 +49,8 @@ namespace algorithm{
  * studied with statistical techniques. We refer to the appropriate literature; the algorithm described here can only be used for
  * modelling purposes.
  *
- * In the application of this algorithm it is assumed that a population can be adequately described by itspopulation  firing rate. This
- * is not always true. In section \ref pop_introduction reasons are given for why more sophisticated techniques are sometimes required.
+ * In the application of this algorithm it is assumed that a population can be adequately described by its population  firing rate. This
+ * is not always true. In section \ref sec_intro reasons are given for why more sophisticated techniques are sometimes required.
  * A full discussion of when these assumptions are appropriate and when not is outside the scope of this document, but a few rules
  * of the thumb are:
  * <ul>

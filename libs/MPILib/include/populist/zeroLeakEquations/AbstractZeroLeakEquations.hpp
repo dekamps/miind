@@ -33,7 +33,7 @@
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations{
+namespace zeroLeakEquations {
 /**
  * @brief A solver for the zero leak master equations in the PopulationAlgorithm.
  *
@@ -58,12 +58,10 @@ public:
 	 * @param par_spec reference to the PopulistSpecificParameter
 	 * @param delta_v reference to the current scale variable
 	 */
-	AbstractZeroLeakEquations(VALUE_REF_INIT
-	Number& n_bins, std::valarray<Potential>& array_state, Potential& check_sum,
+	AbstractZeroLeakEquations(Number& n_bins,
+			std::valarray<Potential>& array_state, Potential& check_sum,
 			SpecialBins& bins, parameters::PopulationParameter& par_pop,
-			parameters::PopulistSpecificParameter& par_spec,
-			Potential& delta_v
-			) :
+			parameters::PopulistSpecificParameter& par_spec, Potential& delta_v) :
 			_array_state(array_state), _par_pop(par_pop), _par_spec(par_spec), _bins(
 					bins) {
 	}
@@ -77,15 +75,15 @@ public:
 
 	/**
 	 * Pass in whatever other parameters are needed. This is explicitly necessary for OneDMZeroLeakEquations
-	 * @param any pointer to a parameter
+	 * @param p_void any pointer to a parameter
 	 */
-	virtual void Configure(void*) = 0;
+	virtual void Configure(void* p_void) = 0;
 
 	/**
 	 * Given input parameters, derived classes are free to implement their own solution for ZeroLeakEquations
-	 * @param The time
+	 * @param time The time
 	 */
-	virtual void Apply(Time) = 0;
+	virtual void Apply(Time time) = 0;
 
 	/**
 	 * Every Evolve step (but not every time step, see below), the input parameters must be updated
@@ -113,9 +111,9 @@ public:
 	virtual Rate CalculateRate() const = 0;
 
 	/** Some  AbstractZeroLeakEquations have derived classes which keep track of refractive probability.
-	* These derived classes can overload this method, and make this amount available. For example,
-	* when rebinning this probability must be taken into account. See, e.g. RefractiveCirculantSolver.
-	*/
+	 * These derived classes can overload this method, and make this amount available. For example,
+	 * when rebinning this probability must be taken into account. See, e.g. RefractiveCirculantSolver.
+	 */
 	virtual Probability RefractiveProbability() const {
 		return 0.0;
 	}
@@ -134,14 +132,17 @@ protected:
 	 * @param mode
 	 * @param solver
 	 */
-	void SetMode(CirculantMode mode, circulantSolvers::AbstractCirculantSolver& solver) {
+	void SetMode(CirculantMode mode,
+			circulantSolvers::AbstractCirculantSolver& solver) {
 		solver.setMode(mode);
 	}
 	/**
 	 * concrete instances of ZeroLeakEquations need to be able to manipulate mode
 	 * @param mode
 	 * @param solver
-	 */	void SetMode(CirculantMode mode, nonCirculantSolvers::AbstractNonCirculantSolver& solver) {
+	 */
+	void SetMode(CirculantMode mode,
+			nonCirculantSolvers::AbstractNonCirculantSolver& solver) {
 		solver.setMode(mode);
 	}
 
@@ -174,8 +175,7 @@ private:
 	const parameters::PopulistSpecificParameter& _par_spec;
 	const SpecialBins& _bins;
 	const parameters::InputParameterSet* _p_set = nullptr;
-};
-} /* namespace zeroLeakEquations */
+};} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
 

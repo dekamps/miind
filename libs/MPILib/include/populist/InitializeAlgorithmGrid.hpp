@@ -45,7 +45,7 @@ public:
 
 	/**
 	 * Rebin the expansion factor
-	 * @param number_of_initial_bins The number of initial bins
+	 * @param number_initial_bins The number of initial bins
 	 * @param v_min The min
 	 * @param parameter_population The PopulationParameter
 	 * @return the expansion factor

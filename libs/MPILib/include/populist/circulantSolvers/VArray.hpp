@@ -41,9 +41,6 @@ public:
 	 */
 	VArray();
 
-	//!
-	//!
-
 	/**
 	 * Compute the array elements, based on the number of circulant bins, the number of non-circulant areas
 	 * and for the time that is required.
@@ -54,12 +51,11 @@ public:
 	void FillArray(Number number_circulant_bins,
 			Number number_non_circulant_areas, Time tau);
 
-	//!
 	/**
 	 * \f$ V_{kj} \f$, where indices the circulant bin and j the non-circulant area
-	 * @param index_circulant
-	 * @param index_non_circulan
-	 * @return
+	 * @param index_circulant index of the circulant bin
+	 * @param index_non_circulant index of the non circulant bin
+	 * @return The \f$ V_{kj} \f$
 	 */
 	double V(Index index_circulant, Index index_non_circulant) const;
 

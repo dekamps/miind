@@ -120,9 +120,8 @@ NumericalZeroLeakEquations::NumericalZeroLeakEquations(Number& n_bins,
 		parameters::PopulistSpecificParameter& par_spec, Potential& delta_v) :
 		AbstractZeroLeakEquations(n_bins, array_state, check_sum, bins, par_pop,
 				par_spec, delta_v), _p_n_bins(&n_bins), _p_par_pop(&par_pop), _p_array_state(
-				&array_state), _p_check_sum(&check_sum), _convertor(
-				VALUE_REF_INIT
-				bins, par_pop, par_spec, delta_v, n_bins) {
+				&array_state), _p_check_sum(&check_sum), _convertor(bins,
+				par_pop, par_spec, delta_v, n_bins) {
 	this->SetInputParameter(_convertor.getSolverParameter());
 }
 

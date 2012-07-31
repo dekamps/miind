@@ -69,7 +69,7 @@ public:
 	 * @param nr_bins number current bins
 	 * @return The current rate
 	 */
-	virtual Rate CalculateRate(Number) = 0;
+	virtual Rate CalculateRate(Number nr_bins) = 0;
 
 protected:
 

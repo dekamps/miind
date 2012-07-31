@@ -38,24 +38,26 @@
 namespace MPILib {
 namespace populist {
 
-//! PopulationGridController. Maintains the density profile.
-//!
-//! This class maintains the population density profile. Its main functions are
-//! - to miantain the density profile
-//! - to keep track of the instantaneous relation between bin number and membrane potential
-//! - to maintain references to the circulant and the non-circulant solver
-//! - to delegate the computation of the circulant and the non-circulant solution to respective solvers
-//!
-//! but not:
-//!
-//! - to compute the (non-)circulant solutions itelf, which is a task of the (Non)CirculantSolver classess
-//! - to interpret input from other nodes, this is done by the PopulistAlgorithm, which makes input rates and
-//!   efficacies available to the PopulistGridController
-
-// Modification: 20-03-2009; Introduce template argument for decoding input parameters, this has become necessary
-// by the introduction of the OneDMAlgorithm and some assumptions on how to convert input into parameters for the zero
-// leak equation that were hardwired, have to be resolved by  the template argument.
-
+/**
+ * @brief  PopulationGridController. Maintains the density profile.
+ *
+ *
+ *  This class maintains the population density profile. Its main functions are
+ *  - to maintain the density profile
+ *  - to keep track of the instantaneous relation between bin number and membrane potential
+ *  - to maintain references to the circulant and the non-circulant solver
+ *  - to delegate the computation of the circulant and the non-circulant solution to respective solvers
+ *
+ *  but not:
+ *
+ *  - to compute the (non-)circulant solutions itself, which is a task of the (Non)CirculantSolver classes
+ *  - to interpret input from other nodes, this is done by the PopulistAlgorithm, which makes input rates and
+ *    efficacies available to the PopulistGridController
+ *
+ * Modification: 20-03-2009; Introduce template argument for decoding input parameters, this has become necessary
+ * by the introduction of the OneDMAlgorithm and some assumptions on how to convert input into parameters for the zero
+ * leak equation that were hard wired, have to be resolved by  the template argument.
+ */
 template<class Weight>
 class PopulationGridController {
 public:
@@ -70,8 +72,7 @@ public:
 	 * @param p_grid_size The size of the grid
 	 * @param p_rate The rate
 	 */
-	PopulationGridController(VALUE_REF
-	const parameters::PopulationParameter& par_pop,
+	PopulationGridController(const parameters::PopulationParameter& par_pop,
 			const parameters::PopulistSpecificParameter& par_spec,
 			valarray<double>& array_state,
 			valarray<double>& array_interpretation, Number* p_grid_size,
@@ -85,13 +86,10 @@ public:
 	;
 	/**
 	 * delete copy constructor
-	 * @param
 	 */
 	PopulationGridController(const PopulationGridController&)=delete;
 	/**
 	 * delete copy operator
-	 * @param
-	 * @return
 	 */
 	PopulationGridController& operator=(const PopulationGridController&)=delete;
 	/**
@@ -119,7 +117,7 @@ public:
 	 * the network as a whole is updated synchronously
 	 * @param nodeVector Vector of the node States
 	 * @param weightVector Vector of the weights of the nodes
-	 * @param weightVector Vector of the NodeTypes of the precursors
+	 * @param typeVector Vector of the NodeTypes of the precursors
 	 */
 	bool CollectExternalInput(const std::vector<Rate>& nodeVector,
 			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
@@ -229,8 +227,6 @@ private:
 	 * @return The original reset bin
 	 */
 	Index IndexOriginalResetBin() const;
-
-	VALUE_MEMBER_REF
 
 	/**
 	 * The maximum number of evolution steps

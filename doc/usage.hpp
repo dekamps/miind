@@ -1,5 +1,0 @@
-/**
-\page usage Usage
-
-
-*/

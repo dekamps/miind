@@ -43,7 +43,9 @@ public:
 	/**
 	 * virtual destructor
 	 */
-	virtual ~PolynomialCirculant(){};
+	virtual ~PolynomialCirculant() {
+	}
+	;
 
 	/**
 	 * Only concrete CirculantSolvers know how to compute their contribution. At this stage it is assumed that
@@ -53,8 +55,7 @@ public:
 	 * @param tau Time through which evolution needs to be carried out, this may not be related to the absolute time of the simulation
 	 * @param t_sim Irrelevant for this solver
 	 */
-	virtual void Execute(Number, Time, Time = 0 //!< Irrelevant for this solver
-	);
+	virtual void Execute(Number n_bins, Time tau, Time t_sim = 0);
 
 	/**
 	 * PolynomialCirculant computes how many circulant bins make sense
@@ -66,7 +67,8 @@ public:
 	 * Clone operator
 	 * @return A clone of PolynomialCirculant
 	 */
-	virtual PolynomialCirculant* clone() const override;
+	virtual PolynomialCirculant* clone() const
+	override;
 
 	/**
 	 * Some magical numbers are used in this CicrculantSolver

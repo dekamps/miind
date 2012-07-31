@@ -28,8 +28,6 @@ namespace parameters{
 
 /**
  * @brief To be used internally by NumericalZeroLeakEquations
- *
- * @todo add documentation for members
  */
 struct NumericalZeroLeakParameter {
 	Number _nr_current_bins = 0;

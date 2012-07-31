@@ -48,9 +48,9 @@ public:
 	 * @param circ reference to the AbstractCirculantSolver
 	 * @param noncirc reference to the AbstractNonCirculantSolver
 	 */
-	LIFZeroLeakEquations(VALUE_REF_INIT Number& n_bins,
-			std::valarray<Potential>& array_state, Potential& check_sum,
-			SpecialBins& bins, parameters::PopulationParameter& par_pop,
+	LIFZeroLeakEquations(Number& n_bins, std::valarray<Potential>& array_state,
+			Potential& check_sum, SpecialBins& bins,
+			parameters::PopulationParameter& par_pop,
 			parameters::PopulistSpecificParameter& par_spec, Potential& delta_v,
 			const circulantSolvers::AbstractCirculantSolver& circ,
 			const nonCirculantSolvers::AbstractNonCirculantSolver& noncirc);
@@ -59,14 +59,14 @@ public:
 	}
 	/**
 	 * Pass in whatever other parameters are needed. This is explicitly necessary for OneDMZeroLeakEquations
-	 * @param any pointer to a parameter
+	 * @param p_void any pointer to a parameter
 	 */
 	virtual void Configure(void* p_void = 0);
 	/**
 	 * Given input parameters, derived classes are free to implement their own solution for ZeroLeakEquations
-	 * @param The time
+	 * @param time The time
 	 */
-	virtual void Apply(Time) {
+	virtual void Apply(Time time) {
 	}
 	/**
 	 * Every Evolve step (but not every time step, see below), the input parameters must be updated

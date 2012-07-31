@@ -28,7 +28,7 @@
 
 namespace MPILib {
 namespace populist {
-namespace rebinner{
+namespace rebinner {
 class AbstractRebinner;
 }
 namespace rateComputation {
@@ -54,9 +54,9 @@ public:
 
 	/**
 	 * copy constructor
-	 * @param Another PopulistSpecificParameter
+	 * @param rhs Another PopulistSpecificParameter
 	 */
-	PopulistSpecificParameter(const PopulistSpecificParameter&);
+	PopulistSpecificParameter(const PopulistSpecificParameter& rhs);
 
 	/**
 	 * constructor
@@ -65,9 +65,9 @@ public:
 	 * @param n_add number of bins that is added after one zero-leak evaluation
 	 * @param par_dens gaussian (or delta-peak) initial density profile
 	 * @param fact_expansion expansion factor
-	 * @param name_zeroleak The algorithm for solving the zero leak equations (see documentation at \ref AbstractZeroLeakequations if you want to modify the default choice)
-	 * @param name_circulant The algorithm for solving the circulant equations (see documentation at \ref AbstractCirculant if you want to use a modified version of this algorithm)
-	 * @param name_noncirculant The algorithm for solving the non circulant equations (see documentation at \ref AbstractNonCirculant if you want to use a modified version of this algorithm)
+	 * @param name_zeroleak The algorithm for solving the zero leak equations (see documentation at \c zeroLeakEquations::AbstractZeroLeakEquations if you want to modify the default choice)
+	 * @param name_circulant The algorithm for solving the circulant equations (see documentation at \c circulantSolvers::AbstractCirculant if you want to use a modified version of this algorithm)
+	 * @param name_noncirculant The algorithm for solving the non circulant equations (see documentation at \c nonCirculantSolvers::AbstractNonCirculant if you want to use a modified version of this algorithm)
 	 * @param p_rebinner Use when investigating alternatives to the standard rebinner, which InterpolationRebinner
 	 * @param p_rate Use when investigating alternatives to the standard rate computation, which is IntegralRateComputation
 	 */
@@ -78,7 +78,8 @@ public:
 			const std::string& name_circulant = "CirculantSolver",
 			const std::string& name_noncirculant = "NonCirculantSolver",
 			const rebinner::AbstractRebinner* p_rebinner = nullptr,
-			const rateComputation::AbstractRateComputation* p_rate = nullptr);
+			const rateComputation::AbstractRateComputation* p_rate = nullptr
+			);
 
 			/**
 			 * destructor
@@ -87,11 +88,11 @@ public:
 
 			/**
 			 * copy operator
-			 * @param another PopulistSpecificParameter
+			 * @param rhs another PopulistSpecificParameter
 			 * @return a copy of this
 			 */
 			PopulistSpecificParameter&
-			operator=(const PopulistSpecificParameter&);
+			operator=(const PopulistSpecificParameter& rhs);
 
 			/**
 			 * clones this class
@@ -145,7 +146,7 @@ public:
 			 * Getter for the AbstractRateComputation
 			 * @return The AbstractRateComputation
 			 */
-			const rateComputation::AbstractRateComputation& getRateComputation() const;
+			const rateComputation::AbstractRateComputation& getRateComputation()const;
 
 			/**
 			 * Getter for the name of the algorithm for solving the zero leak equations

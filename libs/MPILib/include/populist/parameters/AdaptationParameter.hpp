@@ -48,7 +48,7 @@ struct AdaptationParameter {
 	 * Constructor, adaptation parameters only
 	 * @param t_adaptation The adaptation time
 	 * @param q The adaptation jump value
-	 * @param g_max The maximum value @todo better description
+	 * @param g_max The maximum value
 	 */
 	AdaptationParameter(Time t_adaptation, State q,
 			State g_max);
@@ -62,7 +62,7 @@ struct AdaptationParameter {
 	 */
 	State _q = 0.0;
 	/**
-	 * The maximum value @todo better description
+	 * The maximum value
 	 */
 	State _g_max = 0.0;
 

@@ -1,0 +1,564 @@
+%
+%
+%
+%               AAAA            PPPPPPPPPPPP          AAAA
+%              AAAAAA           PPPPPPPPPPPPPPP      AAAAAA
+%             AAAAAAAA          PPPP       PPPPP    AAAAAAAA
+%            AAAA  AAAA         PPPP        PPPPP  AAAA  AAAA
+%           AAAA    AAAA        PPPP       PPPPP  AAAA    AAAA
+%          AAAA      AAAA       PPPPPPPPPPPPPPP  AAAA      AAAA
+%         AAAAAAAAAAAAAAAA      PPPPPPPPPPPP    AAAAAAAAAAAAAAAA
+%        AAAAAAAAAAAAAAAAAA     PPPP           AAAAAAAAAAAAAAAAAA
+%       AAAA            AAAA    PPPP          AAAA            AAAA
+%      AAAA              AAAA   PPPP         AAAA              AAAA
+%     AAAA                AAAA  PPPP        AAAA                AAAA
+%
+%            CCCC  IIII TTTTTT EEEEEE    SSSS  TTTTTT YY    YY
+%           CC  CC  II    TT   EE       SS       TT    YY  YY
+%           CC      II    TT   EEEE      SSSS    TT      YY
+%           CC  CC  II    TT   EE           SS   TT      YY
+%            CCCC  IIII   TT   EEEEEE :: SSSS    TT      YY
+%
+%
+%
+%
+% apacite.sty : citation according to APA manual
+%
+% author: Erik Meijer (Meijer@rulfsw.LeidenUniv.nl)
+%
+% based on theapa.sty by Young U. Ryu
+%
+% documentation: see apacite.tex; see also readme.apa
+%
+% NO GUARANTEES!
+%
+% If you change anything to this file, you must rename it. 
+%
+
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{myapacite}[1994/11/30 APA citation]
+
+%%%%%%%%%%%%%%%%%%%%%
+% cite punctuations %
+%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\BBOP}{(}   % open parenthesis
+\newcommand{\BBAA}{\&}  % between authors in parentheses and ref. sec.
+\newcommand{\BBAB}{and} % between authors in text
+\newcommand{\BBAY}{, }  % between author(s) and year
+\newcommand{\BBC}{; }   % between cites
+\newcommand{\BBN}{, }   % before note
+\newcommand{\BBCP}{)}   % closing parenthesis
+\newcommand{\BBOQ}{}    % open quote for article title
+\newcommand{\BBCQ}{}    % closing quote for article title
+%
+\newcommand{\BBA}{\BBAA}
+%
+%
+\newcommand{\BCBT}{,}   % comma between authors in ref. sec
+                        % when no. of authors = 2
+\newcommand{\BCBL}{,}   % comma before last author 
+
+%
+\let\Bem\emph
+
+%%%%%%%%%%%%%%%
+% cite labels %
+%%%%%%%%%%%%%%%
+
+\newcommand{\BOthers}{et~al.}         % ``others''
+\newcommand{\BIP}{in press}           % used as year for in-press citations
+\newcommand{\BAnd}{and}               % for ``Ed. and Trans.''
+\newcommand{\BED}{Ed.}                % editor
+\newcommand{\BEDS}{Eds.}              % editors
+\newcommand{\BTRANS}{Trans.}          % translator
+\newcommand{\BTRANSS}{Trans.}         % translators
+\newcommand{\BCHAIR}{Chair}           % chair of symposium
+\newcommand{\BCHAIRS}{Chairs}         % chairs
+\newcommand{\BVOL}{Vol.}              % volume
+\newcommand{\BVOLS}{Vols.}            % volumes
+\newcommand{\BNUM}{No.}               % number
+\newcommand{\BNUMS}{Nos.}             % numbers
+\newcommand{\BEd}{ed.}                % edition
+\newcommand{\BPG}{p.}                 % page
+\newcommand{\BPGS}{pp.}               % pages
+\newcommand{\BTR}{Tech.\ Rep.}        % (default) technical report type name
+\newcommand{\BPhD}{Doctoral dissertation}
+                                      % (default) PhD thesis type name
+\newcommand{\BUPhD}{Unpublished doctoral dissertation}
+                                      % (default) unpublished PhD thesis 
+                                      % type name
+\newcommand{\BMTh}{Master's thesis}   % (default) master's thesis type name
+\newcommand{\BUMTh}%
+    {Unpublished master's thesis}     % (default) unpublished 
+                                      % master's thesis type name
+\newcommand{\BOWP}{Original work published }
+\newcommand{\BREPR}{Reprinted from }
+
+
+%
+% for multiple citations with same author-year 
+% (Kruskal, 1964a, 1964b)
+%
+\newcounter{BibCnt}
+\newcommand{\BCnt}[1]{\setcounter{BibCnt}{#1}\alph{BibCnt}}
+%
+% in press
+%
+\newcommand{\BCntIP}[1]{\setcounter{BibCnt}{#1}{}-\alph{BibCnt}}
+
+
+%%%%%%%%%%%%%
+% citations %
+%%%%%%%%%%%%%
+
+\def\@lbibitem[#1]#2{%
+    \def\BBA{\BBAA}%
+    \item[\@biblabel{#1}]%
+    \if@filesw{%
+        \def\BBA{\string\BBA}%
+        \def\protect##1{\string ##1\space}%
+        \immediate\write\@auxout{\string\bibcite{#2}{#1}}%
+        \def\BBA{\BBAA}%
+    }%
+    \fi%
+    \ignorespaces%
+}
+
+% Year is separately handled by \Y<citation key>
+\def\bibcite#1#2{%
+    \global\expandafter\def\csname b@#1\endcsname{#2}%        names
+    \global\expandafter\def\csname Y@#1\endcsname{\@year@#2}% year
+}
+\def\@year@\BCAY#1#2#3{#3}
+
+% first author of a multi-author reference?
+\newif\if@F@cite\@F@citetrue
+
+%
+% \cite<prefix>[postfix]{keys}
+% \fullcite<prefix>[postfix]{keys}
+% \shortcite<prefix>[postfix]{keys}
+%       writes \citation{keys} on .aux
+%       produces (prefix Authors1, Year1; Authors2, Year2; ..., postfix)
+%
+
+\def\cite{%
+    \def\BCAY##1##2##3{\BCA{##1}{##2}}%
+    \@ifnextchar<%          %>
+        {\@cite}%
+        {\@cite<>}%
+}
+
+\def\fullcite{%
+    \def\BCAY##1##2##3{\BCA{##1}{##1}}%
+    \@ifnextchar<%          %>
+        {\@cite}%
+        {\@cite<>}%
+}
+
+\def\shortcite{%
+    \def\BCAY##1##2##3{\BCA{##2}{##2}}%
+    \@ifnextchar<%          %>
+        {\@cite}%
+        {\@cite<>}%
+}
+
+\def\@cite<#1>{%
+    \@ifnextchar[%                                %]
+        {\def\@BBN{\BBN}%
+         \@@cite<#1>}%
+        {\def\@BBN{\ignorespaces}%
+         \@@cite<#1>[]}%
+}
+
+\def\@@cite<#1>[#2]#3{%
+    \if@filesw{%
+        \immediate\write\@auxout{\string\citation{#3}}%
+    }%
+    \fi%
+    \edef\@citeP{}%
+    \BBOP{\ignorespaces#1\space}%
+    \@for\@citeb:=#3\do{%
+        \@ifundefined{b@\@citeb}%
+          {\expandafter\def\csname b@\@citeb\endcsname{?}%
+           \expandafter\def\csname Y@\@citeb\endcsname{?}%
+           \@warning{Citation `\@citeb' on page \thepage\space undefined}%
+          }%
+          {\@ifundefined{flag@\@citeb}%
+             {\global\expandafter\def\csname flag@\@citeb\endcsname{DUMMY}%
+              \def\BCA##1##2{##1}%
+             }%
+             {\def\BCA##1##2{##2}}%
+          }%
+        \edef\B@my@dummy{\csname b@\@citeb\endcsname}%
+        \ifx\@citeP\B@my@dummy%
+            \if@F@cite\@F@citefalse\else{,\ }\fi%
+            \csname Y@\@citeb\endcsname%
+        \else%
+            \if@F@cite\@F@citefalse\else{\BBC}\fi%
+            \edef\@cite@undefined{?}%
+            \ifx\@cite@undefined\B@my@dummy%
+                \csname Y@\@citeb\endcsname%
+            \else%
+                \def\BBA{\BBAA}%
+                \csname b@\@citeb\endcsname\BBAY\csname Y@\@citeb\endcsname%
+            \fi%
+        \fi%
+        \edef\@citeP{\csname b@\@citeb\endcsname}%
+    }%
+    {\@BBN #2}\BBCP%
+    \@F@citetrue%
+}
+
+%
+% \citeA[postfix]{keys}
+% \fullciteA[postfix]{keys}
+% \shortciteA[postfix]{keys}
+%       writes \citation{keys} on .aux
+%       produces Authors1 (Year1), ..., AuthorN (YearN, postfix)
+%
+
+\def\citeA{%
+    \def\BCAY##1##2##3{\BCA{##1}{##2}}%
+    \@ifnextchar[%                          %]
+        {\def\@BBN{\BBN}%
+         \@citeA%
+        }%
+        {\def\@BBN{\ignorespaces}%
+         \@citeA[]%
+        }%
+}
+
+\def\fullciteA{%
+    \def\BCAY##1##2##3{\BCA{##1}{##1}}%
+    \@ifnextchar[%                                %]
+        {\def\@BBN{\BBN}%
+         \@citeA%
+        }%
+        {\def\@BBN{\ignorespaces}%
+         \@citeA[]%
+        }%
+}
+
+\def\shortciteA{%
+    \def\BCAY##1##2##3{\BCA{##2}{##2}}%
+    \@ifnextchar[%                              %]
+        {\def\@BBN{\BBN}%
+         \@citeA%
+        }%
+        {\def\@BBN{\ignorespaces}%
+         \@citeA[]%
+        }%
+}
+
+\def\@citeA[#1]#2{%
+    \if@filesw{%
+        \immediate\write\@auxout{\string\citation{#2}}%
+        }%
+    \fi%
+    \edef\@citeP{}%
+    \@for\@citeb:=#2\do{%
+        \@ifundefined{b@\@citeb}%
+           {\expandafter\def\csname b@\@citeb\endcsname{?}%
+            \expandafter\def\csname Y@\@citeb\endcsname{?}%
+            \@warning{Citation `\@citeb' on page \thepage\space undefined}%
+           }%
+           {\@ifundefined{flag@\@citeb}%
+              {\global\expandafter\def\csname flag@\@citeb\endcsname{DUMMY}%
+               \def\BCA##1##2{##1}%
+              }%
+              {\def\BCA##1##2{##2}}%
+           }%
+        \edef\B@my@dummy{\csname b@\@citeb\endcsname}%
+        \ifx\@citeP\B@my@dummy%
+          \if@F@cite\@F@citefalse\else{,\ }\fi%
+          \csname Y@\@citeb\endcsname%
+        \else%
+          \if@F@cite\@F@citefalse\else{\BBCP,\ }\fi%
+          \def\BBA{\BBAB}%
+          \csname b@\@citeb\endcsname\ \BBOP\csname Y@\@citeb\endcsname%
+        \fi%
+        \edef\@citeP{\csname b@\@citeb\endcsname}%
+    }%
+    {\@BBN #1}\BBCP%
+    \@F@citetrue%
+}
+
+%
+%
+% \citeauthor{keys}
+% \fullciteauthor{keys}
+% \shortciteauthor{keys}
+%       writes \citation{keys} on .aux
+%       produces Authors1, ..., AuthorN
+%
+
+\def\citeauthor{%
+    \def\BCAY##1##2##3{\BCA{##1}{##2}}%
+    \@citeauthor%
+}
+
+\def\fullciteauthor{%
+    \def\BCAY##1##2##3{\BCA{##1}{##1}}%
+    \@citeauthor%
+}
+
+\def\shortciteauthor{%
+    \def\BCAY##1##2##3{\BCA{##2}{##2}}%
+    \@citeauthor%
+}
+
+\def\@citeauthor#1{%
+    \if@filesw{%
+      \immediate\write\@auxout{\string\citation{#1}}}%
+    \fi%
+    \edef\@citeP{}%
+    \@for\@citeb:=#1\do{%
+        \@ifundefined{b@\@citeb}%
+          {\expandafter\def\csname b@\@citeb\endcsname{?}%
+           \expandafter\def\csname Y@\@citeb\endcsname{?}%
+           \@warning{Citation `\@citeb' on page \thepage\space undefined}%
+          }%
+          {\@ifundefined{flag@\@citeb}%
+             {\global\expandafter\def\csname flag@\@citeb\endcsname{DUMMY}%
+              \def\BCA##1##2{##1}%
+             }%
+             {\def\BCA##1##2{##2}}%
+          }%
+        \edef\B@my@dummy{\csname b@\@citeb\endcsname}%
+        \ifx\@citeP\B@my@dummy%
+        \else%
+            \if@F@cite\@F@citefalse\else{,\ }\fi%
+            \def\BBA{\BBAB}%
+            \csname b@\@citeb\endcsname%
+        \fi%
+        \edef\@citeP{\csname b@\@citeb\endcsname}%
+    }%
+    \@F@citetrue%
+}
+
+%
+% \citeyear[postfix]{keys}
+%       writes \citation{keys} on .aux
+%       produces (Year1, ..., YearN, postfix)
+%
+
+\def\citeyear{%
+    \def\BCAY##1##2##3{}%
+    \@ifnextchar[%                   %]
+        {\def\@BBN{\BBN}%
+         \@citeyear%
+        }%
+        {\def\@BBN{\ignorespaces}%
+         \@citeyear[]%
+        }%
+}
+
+\def\@citeyear[#1]#2{%
+    \if@filesw{%
+        \immediate\write\@auxout{\string\citation{#2}}}%
+    \fi%
+    \edef\@citeP{}%
+    \BBOP{}%
+    \@for\@citeb:=#2\do{%
+        \@ifundefined{b@\@citeb}%
+          {\expandafter\def\csname b@\@citeb\endcsname{?}%
+           \expandafter\def\csname Y@\@citeb\endcsname{?}%
+           \@warning{Citation `\@citeb' on page \thepage\space undefined}%
+          }%
+          {\@ifundefined{flag@\@citeb}%
+             {\global\expandafter\def\csname flag@\@citeb\endcsname{DUMMY}}%
+             {}%
+          }%
+        \edef\B@my@dummy{\csname b@\@citeb\endcsname}%
+        \if@F@cite\@F@citefalse\else{,\ }\fi%
+        \csname Y@\@citeb\endcsname%
+        \edef\@citeP{\csname b@\@citeb\endcsname}%
+    }%
+    {\@BBN #1}%
+    \BBCP{}%
+    \@F@citetrue%
+}
+
+%
+%
+% \citeyearNP[postfix]{keys}
+%       writes \citation{keys} on .aux
+%       produces Year1, ..., YearN, postfix
+%
+
+\def\citeyearNP{%
+    \def\BCAY##1##2##3{}%
+    \@ifnextchar[%                      %]
+        {\def\@BBN{\BBN}%
+         \@citeyearNP%
+        }%
+        {\def\@BBN{\ignorespaces}%
+         \@citeyearNP[]%
+        }%
+}
+
+\def\@citeyearNP[#1]#2{%
+    \if@filesw{%
+        \immediate\write\@auxout{\string\citation{#2}}}%
+    \fi%
+    \edef\@citeP{}%
+    \@for\@citeb:=#2\do{%
+        \@ifundefined{b@\@citeb}%
+          {\expandafter\def\csname Y@\@citeb\endcsname{?}%
+           \@warning{Citation `\@citeb' on page \thepage\space undefined}%
+          }%
+          {\@ifundefined{flag@\@citeb}%
+             {\global\expandafter\def\csname flag@\@citeb\endcsname{DUMMY}}%
+             {}%
+          }%
+        \edef\B@my@dummy{\csname b@\@citeb\endcsname}%
+        \if@F@cite\@F@citefalse\else{,\ }\fi%
+        \csname Y@\@citeb\endcsname%
+        \edef\@citeP{\csname b@\@citeb\endcsname}%
+    }%
+    {\@BBN #1}%
+    \@F@citetrue%
+}
+
+%
+% \citeNP<prefix>[postfix]{keys}
+% \fullciteNP<prefix>[postfix]{keys}
+% \shortciteNP<prefix>[postfix]{keys}
+%       writes \citation{keys} on .aux
+%       produces prefix Authors1, Year1; Authors2, Year2; ..., postfix
+%
+
+\def\citeNP{%
+    \def\BCAY##1##2##3{\BCA{##1}{##2}}%
+    \@ifnextchar<%                %>
+        {\@citeNP}%
+        {\@citeNP<>}%
+}
+
+\def\fullciteNP{%
+    \def\BCAY##1##2##3{\BCA{##1}{##1}}%
+    \@ifnextchar<%                   %>
+        {\@citeNP}%
+        {\@citeNP<>}%
+}
+
+\def\shortciteNP{%
+    \def\BCAY##1##2##3{\BCA{##2}{##2}}%
+    \@ifnextchar<%               %>
+        {\@citeNP}%
+        {\@citeNP<>}%
+}
+
+\def\@citeNP<#1>{%
+    \@ifnextchar[%             %]
+        {\def\@BBN{\BBN}%
+         \@@citeNP<#1>%
+        }%
+        {\def\@BBN{\ignorespaces}%
+         \@@citeNP<#1>[]%
+        }%
+}
+
+\def\@@citeNP<#1>[#2]#3{%
+    \if@filesw{%
+        \immediate\write\@auxout{\string\citation{#3}}}%
+    \fi%
+    \edef\@citeP{}%
+    {\ignorespaces#1\space}%
+    \@for\@citeb:=#3\do{%
+        \@ifundefined{b@\@citeb}%
+          {\expandafter\def\csname b@\@citeb\endcsname{?}%
+           \expandafter\def\csname Y@\@citeb\endcsname{?}%
+           \@warning{Citation `\@citeb' on page \thepage\space undefined}%
+          }%
+          {\@ifundefined{flag@\@citeb}%
+             {\global\expandafter\def\csname flag@\@citeb\endcsname{DUMMY}%
+              \def\BCA##1##2{##1}%
+             }%
+             {\def\BCA##1##2{##2}}%
+          }%
+        \edef\B@my@dummy{\csname b@\@citeb\endcsname}%
+        \ifx\@citeP\B@my@dummy%
+          \if@F@cite\@F@citefalse\else{,\ }\fi%
+          \csname Y@\@citeb\endcsname%
+        \else%
+          \if@F@cite\@F@citefalse\else{\BBC}\fi%
+          \edef\@cite@undefined{?}%
+          \ifx\@cite@undefined\B@my@dummy%
+            \csname Y@\@citeb\endcsname%
+          \else%
+            \def\BBA{\BBAA}%
+            \csname b@\@citeb\endcsname\BBAY\csname Y@\@citeb\endcsname%
+          \fi%
+       \fi%
+       \edef\@citeP{\csname b@\@citeb\endcsname}%
+    }%
+    {\@BBN #2}%
+    \@F@citetrue%
+}
+
+%
+% \nocite{key} : entry in reference list, not in text
+%
+
+
+\def\nocite#1{%
+    \@bsphack%
+    \if@filesw{%
+        \immediate\write\@auxout{\string\citation{#1}}}%
+    \fi%
+    \@for\@citeb:=#1\do{%
+        \@ifundefined{b@\@citeb}%
+          {\edef\B@my@dummy{*}%
+           \ifx\@citeb\B@my@dummy%
+           \else%
+             \@warning{Citation `\@citeb' on page \thepage\space undefined}%
+           \fi%
+          }%
+          {\global\expandafter\def\csname flag@\@citeb\endcsname{DUMMY}}%
+    }%
+    \@esphack%
+}
+
+%
+%  bibliography style parameters
+%
+
+%
+%
+% No labels in the bibliography.
+%
+
+\def\@biblabel#1{}
+\newskip{\bibleftmargin}
+\bibleftmargin=2.5em
+%
+\def\refname{References}
+\def\bibname{References}
+%
+\def\thebibliography#1{%
+     \@ifundefined{chapter}%
+       {\section*{\refname}%
+        \@mkboth{\uppercase{\refname}}{\uppercase{\refname}}%
+        \addcontentsline{toc}{section}{\refname}}%
+       {\chapter*{\bibname}%
+        \@mkboth{\uppercase{\bibname}}{\uppercase{\bibname}}%
+        \addcontentsline{toc}{chapter}{\bibname}}%
+     \list{\relax}{\labelsep=0em%
+                   \leftmargin=\bibleftmargin%
+                   \itemindent=-\bibleftmargin}
+     \def\newblock{\hskip .11em plus .33em minus .07em}
+     \sloppy\clubpenalty4000\widowpenalty4000
+     \sfcode`\.=1000\relax
+}
+\let\endthebibliography=\endlist
+
+
+
+
+
+%
+% EOF apacite.sty
+%

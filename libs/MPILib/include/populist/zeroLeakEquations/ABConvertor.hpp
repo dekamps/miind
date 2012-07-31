@@ -52,7 +52,7 @@ public:
 	 * @param delta_v  delta_v
 	 * @param n_current_bins The number of current bins
 	 */
-	ABConvertor(VALUE_REF SpecialBins& spec_bins,
+	ABConvertor(SpecialBins& spec_bins,
 			parameters::PopulationParameter& par_pop,
 			parameters::PopulistSpecificParameter& par_specific,
 			Potential& delta_v, Number& n_current_bins);
@@ -108,8 +108,6 @@ public:
 	}
 
 private:
-
-	VALUE_MEMBER_REF
 
 	/**
 	 * The OneDMInputSetParameter

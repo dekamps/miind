@@ -40,12 +40,11 @@ namespace MPILib {
 namespace populist {
 
 template<class Weight>
-PopulationGridController<Weight>::PopulationGridController( VALUE_REF_INIT
+PopulationGridController<Weight>::PopulationGridController(
 const parameters::PopulationParameter& par_pop,
 		const parameters::PopulistSpecificParameter& par_spec,
 		valarray<double>& array_state, valarray<double>& array_interpretation,
 		Number* p_grid_size, Rate* p_rate) :
-		VALUE_MEMBER_INIT
 		_n_initial_bins(*p_grid_size), _n_bins_to_add(par_spec.getNrAdd()), _p_number_of_current_bins(
 				p_grid_size), _n_bins(*p_grid_size), _time_membrane_constant(
 				par_pop._tau), _par_pop(par_pop), _par_spec(par_spec), _f_expansion_factor(
@@ -54,7 +53,6 @@ const parameters::PopulationParameter& par_pop,
 				array_interpretation), _p_rebinner(
 				std::unique_ptr<rebinner::AbstractRebinner>(
 						par_spec.getRebin().Clone())), _builder(
-				VALUE_MEMBER_ARG
 				_n_bins, _array_state, _check_sum, _bins, _par_pop, _par_spec,
 				_delta_v), _p_zl(
 				_builder.GenerateZeroLeakEquations(par_spec.getZeroLeakName(),
@@ -104,16 +102,7 @@ void PopulationGridController<Weight>::Evolve(Time time, Time* p_time_current,
 
 		_p_zl->AdaptParameters();
 
-#ifdef _INVESTIGATE_ALGORITHM
-		ReportValue val;
-		val._name_quantity = "scale";
-		val._value = _f_current_scale;
-		val._time = _time_current;
-		_vec_value.push_back(val);
-		val._name_quantity = "sum";
-		val._value = _array_state.sum();
-		_vec_value.push_back(val);
-#endif 
+
 		_p_zl->Apply(t_next_bin);
 
 		assert( this->IsFinite());

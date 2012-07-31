@@ -25,25 +25,6 @@
 
 namespace MPILib {
 
-#ifdef _INVESTIGATE_ALGORITHM
-#define VALUE_ARG vec_value,
-#define VALUE_MEMBER_ARG _vec_value,
-#define VALUE_REF vector<ReportValue>&,
-#define VALUE_REF_INIT vector<ReportValue>& vec_value,
-#define VALUE_MEMBER vector<ReportValue> _vec_value;
-#define VALUE_MEMBER_REF vector<ReportValue>& _vec_value;
-#define VALUE_MEMBER_INIT _vec_value(vec_value),
-#define VALUE_RETURN		virtual vector<ReportValue> GetValues() const { return _vec_value; }
-#else
-#define VALUE_ARG
-#define VALUE_MEMBER_ARG
-#define VALUE_REF
-#define VALUE_REF_INIT
-#define VALUE_MEMBER
-#define VALUE_MEMBER_REF
-#define VALUE_MEMBER_INIT
-#define VALUE_RETURN
-#endif
 
 //from basicdefinitions
 const int HAVE_ROOT = 1;

@@ -25,9 +25,7 @@
 namespace MPILib {
 namespace populist {
 namespace parameters{
-	/**
-	 * @todo documentation about members
-	 */
+
 	struct OneDMInputSetParameter {
 
 		zeroLeakEquations::ABQStruct	_par_input;

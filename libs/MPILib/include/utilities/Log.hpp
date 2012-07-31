@@ -117,6 +117,7 @@ namespace utilities {
  * <dd>Use this for not important debug messages</dd>
  * <dt>logDEBUG4</dt>
  * <dd>Use this for for every debug detail messages</dd>
+ * </dl>
  *
  */
 

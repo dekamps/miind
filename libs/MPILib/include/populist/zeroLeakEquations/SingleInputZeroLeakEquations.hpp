@@ -39,17 +39,18 @@ public:
 	 * @param circ reference to the AbstractCirculantSolver
 	 * @param noncirc reference to the AbstractNonCirculantSolver
 	 */
-	SingleInputZeroLeakEquations(VALUE_REF_INIT Number& n_bins,
+	SingleInputZeroLeakEquations(Number& n_bins,
 			std::valarray<Potential>& array_state, Potential& check_sum,
 			SpecialBins& bins, parameters::PopulationParameter& par_pop,
 			parameters::PopulistSpecificParameter& par_spec, Potential& delta_v,
 			const circulantSolvers::AbstractCirculantSolver& circ,
 			const nonCirculantSolvers::AbstractNonCirculantSolver& noncirc);
+
 	/**
 	 * Given input parameters, derived classes are free to implement their own solution for ZeroLeakEquations
-	 * @param The time
+	 * @param time The time
 	 */
-	virtual void Apply(Time);
+	virtual void Apply(Time time);
 
 private:
 

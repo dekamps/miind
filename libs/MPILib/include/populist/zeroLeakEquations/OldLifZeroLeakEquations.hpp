@@ -46,8 +46,8 @@ public:
 	 * @param par_spec reference to the PopulistSpecificParameter
 	 * @param delta_v reference to the current scale variable
 	 */
-	OldLIFZeroLeakEquations( VALUE_REF_INIT
-	Number& n_bins, std::valarray<Potential>& array_state, Potential& check_sum,
+	OldLIFZeroLeakEquations(Number& n_bins,
+			std::valarray<Potential>& array_state, Potential& check_sum,
 			SpecialBins& bins, parameters::PopulationParameter& par_pop,
 			parameters::PopulistSpecificParameter& par_spec, Potential& delta_v,
 			const circulantSolvers::AbstractCirculantSolver&,
@@ -58,14 +58,14 @@ public:
 
 	/**
 	 * No-op for OldLIFZeroLeakEquations
-	 * @param p_void
+	 * @param p_void pointer to needed data
 	 */
 	virtual void Configure(void* p_void = 0);
 	/**
 	 * Given input parameters, derived classes are free to implement their own solution for ZeroLeakEquations
-	 * @param The time
+	 * @param time The time
 	 */
-	virtual void Apply(Time);
+	virtual void Apply(Time time);
 	/**
 	 * Every Evolve step (but not every time step, see below), the input parameters must be updated
 	 * @param nodeVector The vector which stores the Rates of the precursor nodes

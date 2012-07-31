@@ -59,13 +59,11 @@ public:
 	 * Constructor registers where the output results must be written,
 	 * which can happen at construction of PopulationGridController
 	 */
-	LIFConvertor( VALUE_REF_INIT
-	SpecialBins& bins, parameters::PopulationParameter& par_pop,
+	LIFConvertor(SpecialBins& bins, parameters::PopulationParameter& par_pop,
 			parameters::PopulistSpecificParameter& par_spec, Potential& delta_v,
 			Number& n_bins
 
 			) :
-			VALUE_MEMBER_INIT
 			_p_bins(&bins), _p_par_pop(&par_pop), _p_par_spec(&par_spec), _p_delta_v(
 					&delta_v), _p_n_bins(&n_bins) {
 	}
@@ -144,9 +142,6 @@ public:
 	 */
 	void UpdateRestInputParameters();
 
-#ifdef _INVESTIGATE_ALGORITHM
-	vector<ReportValue>& Values() {return _vec_value;}
-#endif
 private:
 	/**
 	 * If it is a single diffusion process
@@ -160,7 +155,6 @@ private:
 	 */
 	void SetDiffusionParameters(const MuSigma& par);
 
-	VALUE_MEMBER_REF
 	/**
 	 * pointer to special bins
 	 */

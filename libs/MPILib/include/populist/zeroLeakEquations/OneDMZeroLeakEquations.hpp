@@ -56,14 +56,14 @@ public:
 	virtual ~OneDMZeroLeakEquations();
 	/**
 	 * Pass in whatever other parameters are needed. This is explicitly necessary for OneDMZeroLeakEquations
-	 * @param any pointer to a parameter
+	 * @param p_void any pointer to a parameter
 	 */
-	virtual void Configure(void*);
+	virtual void Configure(void* p_void);
 	/**
 	 * Given input parameters, derived classes are free to implement their own solution for ZeroLeakEquations
-	 * @param The time
+	 * @param time The time
 	 */
-	virtual void Apply(Time);
+	virtual void Apply(Time time);
 	/**
 	 * Every Evolve step (but not every time step, see below), the input parameters must be updated
 	 * @param nodeVector The vector which stores the Rates of the precursor nodes
