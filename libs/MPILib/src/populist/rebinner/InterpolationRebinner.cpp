@@ -32,7 +32,7 @@ InterpolationRebinner::~InterpolationRebinner() {
 	gsl_interp_accel_free(_p_accelerator);
 }
 
-void InterpolationRebinner::Rebin(
+bool InterpolationRebinner::Rebin(
 		zeroLeakEquations::AbstractZeroLeakEquations* p_zl) {
 
 	_sum_before = _p_array->sum();
@@ -41,8 +41,9 @@ void InterpolationRebinner::Rebin(
 	PrepareLocalCopies();
 	Interpolate();
 	ResetOvershoot();	// set the shrunk negative part of probability to zero
-	RescaleAllProbability(); // because the scale factor in PopulationGridController will be reset to 1
+	RescaleAllProbability(p_zl); // because the scale factor in PopulationGridController will be reset to 1
 	ReplaceResetBin(p_zl); // take reafactive probability into account
+	return true;
 }
 
 void InterpolationRebinner::SmoothResetBin() {
@@ -64,14 +65,14 @@ void InterpolationRebinner::SmoothResetBin() {
 				+ array[_index_reset_bin + 1]) / 2;
 }
 
-void InterpolationRebinner::Configure(std::valarray<double>& array,
+bool InterpolationRebinner::Configure(std::valarray<double>& array,
 		Index index_reversal_bin, Index index_reset_bin,
 		Number number_original_bins, Number number_new_bins) {
 	assert( number_new_bins - 1 > index_reversal_bin);
 	assert( number_new_bins <= number_original_bins);
 
 	if (number_new_bins == number_original_bins)
-		return;
+		return true;
 
 	_index_reversal_bin = static_cast<int>(index_reversal_bin);
 	_index_reset_bin = static_cast<int>(index_reset_bin);
@@ -85,6 +86,7 @@ void InterpolationRebinner::Configure(std::valarray<double>& array,
 
 	_p_spline = gsl_spline_alloc(gsl_interp_cspline, _number_original_bins);
 
+	return true;
 }
 
 void InterpolationRebinner::PrepareLocalCopies() {
@@ -159,7 +161,8 @@ InterpolationRebinner* InterpolationRebinner::Clone() const {
 	return new InterpolationRebinner;
 }
 
-void InterpolationRebinner::RescaleAllProbability() {
+void InterpolationRebinner::RescaleAllProbability(
+		zeroLeakEquations::AbstractZeroLeakEquations* p_zl) {
 	double scale = _dv_after / _dv_before;
 	*_p_array *= scale;
 	// do not scale refractive probability here
