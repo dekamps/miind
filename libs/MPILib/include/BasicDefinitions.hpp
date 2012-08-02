@@ -29,10 +29,6 @@ namespace MPILib {
 //from basicdefinitions
 const int HAVE_ROOT = 1;
 
-
-// RootRortHandler will start with initial display of the first TIME_ROOT_INITIAL_DISPLAY_SECONDS , by default
-const Time TIME_ROOT_INITIAL_DISPLAY = 0.05;
-
 const double EPSILON_INTEGRALRATE = 1e-4;
 
 //! Rate Algorithm nodes have a single state
@@ -87,10 +83,6 @@ const int KEY_PRECISION = 8;
 
 const int MAX_V_ARRAY = 100000; // should be more than sufficient
 
-
-
-const int CANVAS_X_DIMENSION = 800;
-const int CANVAS_Y_DIMENSION = 800;
 
 } //end namespace
 
