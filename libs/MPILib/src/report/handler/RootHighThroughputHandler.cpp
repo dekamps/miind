@@ -104,8 +104,8 @@ void RootHighThroughputHandler::writeReport(const Report& report) {
 		// Store the global node ids in the array
 		TArrayI nodeIds(report._nrNodes);
 		for (Index i = 0; i < report._nrNodes; i++) {
-			nodeIds[i] = utilities::MPIProxySingleton::instance().getSize() * i
-					+ utilities::MPIProxySingleton::instance().getRank();
+			nodeIds[i] = utilities::MPIProxy().getSize() * i
+					+ utilities::MPIProxy().getRank();
 		}
 		_pFile->WriteObject(&nodeIds, "GlobalNodeIds");
 

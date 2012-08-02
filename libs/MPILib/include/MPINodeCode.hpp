@@ -114,7 +114,7 @@ void MPINode<Weight, NodeDistribution>::setActivity(ActivityType activity) {
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::waitAll() {
-	utilities::MPIProxySingleton::instance().waitAll();
+	utilities::MPIProxy().waitAll();
 }
 
 template<class Weight, class NodeDistribution>
@@ -141,14 +141,14 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 			_precursorTypes[i] = _rLocalNodes.find(*it)->second.getNodeType();
 
 		} else {
-			utilities::MPIProxySingleton::instance().irecv(_rNodeDistribution.getResponsibleProcessor(*it), *it,
+			utilities::MPIProxy().irecv(_rNodeDistribution.getResponsibleProcessor(*it), *it,
 					_precursorTypes[i]);
 		}
 	}
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
 		if (!_rNodeDistribution.isLocalNode(it)) {
-			utilities::MPIProxySingleton::instance().isend(_rNodeDistribution.getResponsibleProcessor(it),
+			utilities::MPIProxy().isend(_rNodeDistribution.getResponsibleProcessor(it),
 					_nodeId, _nodeType);
 		}
 	}
@@ -165,7 +165,7 @@ void MPINode<Weight, NodeDistribution>::receiveData() {
 					_rLocalNodes.find(*it)->second.getActivity();
 
 		} else {
-			utilities::MPIProxySingleton::instance().irecv(_rNodeDistribution.getResponsibleProcessor(*it), *it,
+			utilities::MPIProxy().irecv(_rNodeDistribution.getResponsibleProcessor(*it), *it,
 					_precursorActivity[i]);
 		}
 	}
@@ -177,7 +177,7 @@ void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
 		if (!_rNodeDistribution.isLocalNode(it)) {
-			utilities::MPIProxySingleton::instance().isend(_rNodeDistribution.getResponsibleProcessor(it),
+			utilities::MPIProxy().isend(_rNodeDistribution.getResponsibleProcessor(it),
 					_nodeId, _activity);
 		}
 	}

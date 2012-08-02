@@ -87,9 +87,9 @@ int main(int argc, char* argv[]) {
 		te.start();
 
 		network.evolve();
-		MPILib::utilities::MPIProxySingleton::instance().barrier();
+		MPILib::utilities::MPIProxy().barrier();
 		te.stop();
-		if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
+		if (MPILib::utilities::MPIProxy().getRank() == 0) {
 			std::cout << "Time of Envolve methode of processor 0: \n";
 			te.report();
 		}

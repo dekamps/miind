@@ -116,7 +116,7 @@ void test_sendRecvWait() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	SleepAlgorithm<double> alg;
 
-	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
+	if (MPILib::utilities::MPIProxy().getRank() == 0) {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
 				EXCITATORY, 0, network._nodeDistribution, network._localNodes);
@@ -132,12 +132,12 @@ void test_sendRecvWait() {
 		node->addPrecursor(0, 1.2);
 	}
 
-	node->setActivity(MPILib::utilities::MPIProxySingleton::instance().getRank());
+	node->setActivity(MPILib::utilities::MPIProxy().getRank());
 	node->sendOwnActivity();
 	node->receiveData();
 	MPINode<double, utilities::CircularDistribution>::waitAll();
-	if (MPILib::utilities::MPIProxySingleton::instance().getSize() == 2) {
-		if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
+	if (MPILib::utilities::MPIProxy().getSize() == 2) {
+		if (MPILib::utilities::MPIProxy().getRank() == 0) {
 			BOOST_CHECK(node->_precursorActivity[0]==1);
 		} else {
 			BOOST_CHECK(node->_precursorActivity[0]==0);
@@ -153,7 +153,7 @@ void test_exchangeNodeTypes() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	SleepAlgorithm<double> alg;
 
-	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
+	if (MPILib::utilities::MPIProxy().getRank() == 0) {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
 				EXCITATORY, 0, network._nodeDistribution, network._localNodes);
@@ -172,8 +172,8 @@ void test_exchangeNodeTypes() {
 
 	node->exchangeNodeTypes();
 	MPINode<double, utilities::CircularDistribution>::waitAll();
-	if (MPILib::utilities::MPIProxySingleton::instance().getSize() == 2) {
-		if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
+	if (MPILib::utilities::MPIProxy().getSize() == 2) {
+		if (MPILib::utilities::MPIProxy().getRank() == 0) {
 			BOOST_CHECK(node->_precursorTypes[0]==INHIBITORY_BURST);
 		} else {
 			BOOST_CHECK(node->_precursorTypes[0]==EXCITATORY);
@@ -190,7 +190,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	boost::mpi::environment env(argc, argv);
 
 	// we use only two processors for this testing
-	if (MPILib::utilities::MPIProxySingleton::instance().getSize() != 2) {
+	if (MPILib::utilities::MPIProxy().getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
 #endif

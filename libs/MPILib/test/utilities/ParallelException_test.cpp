@@ -37,8 +37,8 @@ void test_Constructor() {
 	ParallelException e("message");
 
 	std::stringstream sstream;
-	sstream << std::endl << "Parallel Exception on processor: " << MPIProxySingleton::instance().getRank()
-			<< " from: " << MPIProxySingleton::instance().getSize() << " with error message: message"
+	sstream << std::endl << "Parallel Exception on processor: " << MPIProxy().getRank()
+			<< " from: " << MPIProxy().getSize() << " with error message: message"
 			<< std::endl;
 
 	BOOST_CHECK(
@@ -55,8 +55,8 @@ void test_Macros() {
 	bool thrown = false;
 
 	std::stringstream sstream;
-	sstream << std::endl << "Parallel Exception on processor: " << MPIProxySingleton::instance().getRank()
-			<< " from: " << MPIProxySingleton::instance().getSize() << " with error message: abc"
+	sstream << std::endl << "Parallel Exception on processor: " << MPIProxy().getRank()
+			<< " from: " << MPIProxy().getSize() << " with error message: abc"
 			<< std::endl;
 
 	try {
@@ -133,7 +133,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	boost::mpi::environment env(argc, argv);
 
 	// we use only two processors for this testing
-	if (MPIProxySingleton::instance().getSize() != 2) {
+	if (MPIProxy().getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
 #endif

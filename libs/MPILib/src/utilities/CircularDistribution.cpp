@@ -31,15 +31,15 @@ CircularDistribution::~CircularDistribution() throw(){
 }
 
 bool CircularDistribution::isLocalNode(NodeId nodeId) const {
-	return getResponsibleProcessor(nodeId) == utilities::MPIProxySingleton::instance().getRank();
+	return getResponsibleProcessor(nodeId) == utilities::MPIProxy().getRank();
 }
 
 int CircularDistribution::getResponsibleProcessor(NodeId nodeId) const {
-	return nodeId % utilities::MPIProxySingleton::instance().getSize();
+	return nodeId % utilities::MPIProxy().getSize();
 }
 
 bool CircularDistribution::isMaster() const {
-	return utilities::MPIProxySingleton::instance().getRank() == 0;
+	return utilities::MPIProxy().getRank() == 0;
 }
 
 

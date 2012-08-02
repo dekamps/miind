@@ -41,7 +41,7 @@ void test_Constructor() {
 void test_Getters() {
 	InactiveReportHandler iH;
 	BOOST_CHECK(iH.getFileName()=="");
-	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
+	if (MPILib::utilities::MPIProxy().getRank() == 0) {
 		BOOST_CHECK(iH.getRootOutputFileName()=="_0.root");
 	} else {
 		BOOST_CHECK(iH.getRootOutputFileName()=="_1.root");
@@ -56,7 +56,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	boost::mpi::environment env(argc, argv);
 
 	// we use only two processors for this testing
-	if (MPILib::utilities::MPIProxySingleton::instance().getSize() != 2) {
+	if (MPILib::utilities::MPIProxy().getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
 #endif

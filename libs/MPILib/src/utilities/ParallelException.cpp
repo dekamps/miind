@@ -28,8 +28,8 @@ ParallelException::ParallelException(const char* message) :
 		Exception(message) {
 	std::stringstream sstream;
 	sstream << std::endl << "Parallel Exception on processor: "
-			<< MPIProxySingleton::instance().getRank() << " from: "
-			<< MPIProxySingleton::instance().getSize()
+			<< MPIProxy().getRank() << " from: "
+			<< MPIProxy().getSize()
 			<< " with error message: " << msg_ << std::endl;
 	msg_ = sstream.str();
 }
@@ -38,8 +38,8 @@ ParallelException::ParallelException(const std::string& message) :
 		Exception(message) {
 	std::stringstream sstream;
 	sstream << std::endl << "Parallel Exception on processor: "
-			<< MPIProxySingleton::instance().getRank() << " from: "
-			<< MPIProxySingleton::instance().getSize()
+			<< MPIProxy().getRank() << " from: "
+			<< MPIProxy().getSize()
 			<< " with error message: " << msg_ << std::endl;
 	msg_ = sstream.str();
 }

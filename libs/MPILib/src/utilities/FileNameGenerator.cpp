@@ -30,10 +30,10 @@ FileNameGenerator::FileNameGenerator(const std::string& fileName, FileType fileT
 	std::stringstream tempFileName;
 
 	if (fileType == LOGFILE) {
-		tempFileName << fileName << "_" << MPIProxySingleton::instance().getRank() << ".log";
+		tempFileName << fileName << "_" << MPIProxy().getRank() << ".log";
 	}
 	if (fileType == ROOTFILE) {
-		tempFileName << fileName << "_" << MPIProxySingleton::instance().getRank() << ".root";
+		tempFileName << fileName << "_" << MPIProxy().getRank() << ".root";
 	}
 	_fileName = tempFileName.str();
 

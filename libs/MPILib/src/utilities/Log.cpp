@@ -107,8 +107,8 @@ std::ostringstream& Log::writeReport(LogLevel level) {
 	strftime(outstr, sizeof(outstr), "%x% %H:%M:%S", tempTm2);
 
 	_buffer << "- " << outstr;
-	_buffer << " Proc " << MPIProxySingleton::instance().getRank() << " of "
-			<< MPIProxySingleton::instance().getSize();
+	_buffer << " Proc " << MPIProxy().getRank() << " of "
+			<< MPIProxy().getSize();
 	_buffer << std::setw(10) << logLevelToString(level) << ":\t";
 	return _buffer;
 }

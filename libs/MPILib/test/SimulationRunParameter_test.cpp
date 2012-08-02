@@ -97,7 +97,7 @@ void test_Getters() {
 	BOOST_CHECK(simParam2.getTReport()==1.0);
 	BOOST_CHECK(simParam2.getTStep()==1.0);
 
-	if (MPILib::utilities::MPIProxySingleton::instance().getRank()==0){
+	if (MPILib::utilities::MPIProxy().getRank()==0){
 		BOOST_CHECK(simParam2.getLogName()=="a_0.log");
 	}else{
 		BOOST_CHECK(simParam2.getLogName()=="a_1.log");
@@ -111,7 +111,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	boost::mpi::environment env(argc, argv);
 
 	// we use only two processors for this testing
-	if (MPILib::utilities::MPIProxySingleton::instance().getSize() != 2) {
+	if (MPILib::utilities::MPIProxy().getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
 #endif

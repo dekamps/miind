@@ -233,9 +233,9 @@ int main(int argc, char* argv[]) {
 		}
 
 		//timed calculation
-		MPILib::utilities::MPIProxySingleton::instance().barrier();
+		MPILib::utilities::MPIProxy().barrier();
 		te.stop();
-		if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
+		if (MPILib::utilities::MPIProxy().getRank() == 0) {
 
 			std::cout << "Time of configuration and envolve: \n";
 			te.report();
@@ -248,9 +248,9 @@ int main(int argc, char* argv[]) {
 #endif
 		return 1;
 	}
-	MPILib::utilities::MPIProxySingleton::instance().barrier();
+	MPILib::utilities::MPIProxy().barrier();
 	t.stop();
-	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
+	if (MPILib::utilities::MPIProxy().getRank() == 0) {
 
 		std::cout << "Overall time spend\n";
 		t.report();

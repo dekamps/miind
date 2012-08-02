@@ -43,12 +43,12 @@ void test_Constructor() {
 void test_isLocalNode() {
 	CircularDistribution circularD;
 
-	if (MPIProxySingleton::instance().getSize() == 2) {
-		if (MPIProxySingleton::instance().getRank() == 0) {
+	if (MPIProxy().getSize() == 2) {
+		if (MPIProxy().getRank() == 0) {
 			BOOST_CHECK(circularD.isLocalNode(0)==true);
 			BOOST_CHECK(circularD.isLocalNode(1)==false);
 
-		} else if (MPIProxySingleton::instance().getRank() == 1) {
+		} else if (MPIProxy().getRank() == 1) {
 			BOOST_CHECK(circularD.isLocalNode(0)==false);
 			BOOST_CHECK(circularD.isLocalNode(1)==true);
 		}
@@ -62,7 +62,7 @@ void test_isLocalNode() {
 void test_getResponsibleProcessor() {
 	CircularDistribution circularD;
 
-	if (MPIProxySingleton::instance().getSize() == 2) {
+	if (MPIProxy().getSize() == 2) {
 		BOOST_CHECK(circularD.getResponsibleProcessor(1)==1);
 		BOOST_CHECK(circularD.getResponsibleProcessor(0)==0);
 	} else {
@@ -74,7 +74,7 @@ void test_getResponsibleProcessor() {
 void test_isMaster() {
 	CircularDistribution circularD;
 
-	if (MPIProxySingleton::instance().getRank() == 0) {
+	if (MPIProxy().getRank() == 0) {
 		BOOST_CHECK(circularD.isMaster()==true);
 	} else {
 		BOOST_CHECK(circularD.isMaster()==false);
@@ -88,7 +88,7 @@ int test_main(int argc, char* argv[]) // note the name!
 	boost::mpi::environment env(argc, argv);
 
 	// we use only two processors for this testing
-	if (MPIProxySingleton::instance().getSize() != 2) {
+	if (MPIProxy().getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
 #endif

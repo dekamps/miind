@@ -45,11 +45,6 @@ namespace utilities {
 class MPIProxy_ {
 public:
 	/**
-	 * constructor sets the MPI rank and size
-	 */
-	MPIProxy_();
-
-	/**
 	 * destructor
 	 */
 	virtual ~MPIProxy_();
@@ -102,7 +97,16 @@ public:
 	template<typename T>
 	void isend(int dest, int tag, const T& value) const;
 
+
 private:
+	/**
+	 * Declare the Singleton class a friend to allow construction of the MPIProxy_ class
+	 */
+	friend class Singleton<MPIProxy_>;
+	/**
+	 * constructor sets the MPI rank and size
+	 */
+	MPIProxy_();
 
 #ifdef ENABLE_MPI
 	/**
@@ -150,9 +154,22 @@ void MPIProxy_::isend(int dest, int tag, const T& value) const {
 #endif
 }
 
+/**
+ * Generate an singleton instance of the MPIProxy_ class.
+ */
 typedef Singleton<MPIProxy_> MPIProxySingleton;
+
+/**
+ * Wrapper function to reduce the writing needed to access the MPIProxy_.
+ * inline this function to allow to definition in multiple translation units.
+ * @return The reference to the single instance of MPIProxy
+ */
+inline MPIProxy_& MPIProxy() {
+	return MPIProxySingleton::instance();
+}
+
 
 
 } /* namespace utilities */
 } /* namespace MPILib */
-#endif /* MPIPROXY_HPP_ */
+#endif /* MPILIB_UTILITIES_MPIPROXY_HPP_ */
