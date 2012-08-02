@@ -27,10 +27,10 @@
 namespace MPILib {
 namespace utilities {
 
-int MPIProxy::_rank = 0;
-int MPIProxy::_size = 1;
+int MPIProxy_::_rank = 0;
+int MPIProxy_::_size = 1;
 
-MPIProxy::MPIProxy() {
+MPIProxy_::MPIProxy_() {
 #ifdef ENABLE_MPI
 	mpi::communicator world;
 	_rank = world.rank();
@@ -38,25 +38,25 @@ MPIProxy::MPIProxy() {
 #endif
 }
 
-MPIProxy::~MPIProxy() {
+MPIProxy_::~MPIProxy_() {
 }
 
-int MPIProxy::getRank() const{
+int MPIProxy_::getRank() const{
 	return  _rank;
 }
 
-int MPIProxy::getSize() const{
+int MPIProxy_::getSize() const{
 	return _size;
 }
 
-void MPIProxy::barrier(){
+void MPIProxy_::barrier(){
 #ifdef ENABLE_MPI
 	mpi::communicator world;
 	world.barrier();
 #endif
 }
 
-void MPIProxy::waitAll(){
+void MPIProxy_::waitAll(){
 #ifdef ENABLE_MPI
 	mpi::wait_all(_mpiStatus.begin(), _mpiStatus.end());
 	_mpiStatus.clear();
@@ -64,7 +64,7 @@ void MPIProxy::waitAll(){
 }
 
 #ifdef ENABLE_MPI
-std::vector<boost::mpi::request> MPIProxy::_mpiStatus;
+std::vector<boost::mpi::request> MPIProxy_::_mpiStatus;
 #endif
 
 

@@ -38,16 +38,15 @@ using namespace MPILib::utilities;
 void test_Constructor() {
 	std::string tempStr ( "blub" );
 	FileNameGenerator fg(tempStr);
-	MPILib::utilities::MPIProxy mpiProxy;
 
-	if (mpiProxy.getRank() == 0) {
+	if (MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(fg._fileName == "blub_0.log");
 	} else {
 		BOOST_CHECK(fg._fileName == "blub_1.log");
 	}
 
 	FileNameGenerator fg1(tempStr, ROOTFILE);
-	if (mpiProxy.getRank() == 0) {
+	if (MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(fg1._fileName == "blub_0.root");
 	} else {
 		BOOST_CHECK(fg1._fileName == "blub_1.root");
@@ -56,17 +55,16 @@ void test_Constructor() {
 
 void test_getFileName() {
 	std::string tempStr ( "blub" );
-	MPILib::utilities::MPIProxy mpiProxy;
 
 	FileNameGenerator fg(tempStr);
-	if (mpiProxy.getRank() == 0) {
+	if (MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(fg.getFileName() == "blub_0.log");
 	} else {
 		BOOST_CHECK(fg.getFileName() == "blub_1.log");
 	}
 
 	FileNameGenerator fg1(tempStr, ROOTFILE);
-	if (mpiProxy.getRank() == 0) {
+	if (MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(fg1.getFileName() == "blub_0.root");
 	} else {
 		BOOST_CHECK(fg1.getFileName() == "blub_1.root");
@@ -77,10 +75,9 @@ int test_main(int argc, char* argv[]) // note the name!
 		{
 #ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
-	MPILib::utilities::MPIProxy mpiProxy;
 
 	// we use only two processors for this testing
-	if (mpiProxy.getSize() != 2) {
+	if (MPIProxySingleton::instance().getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
 #endif

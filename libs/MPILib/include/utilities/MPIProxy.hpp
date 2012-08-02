@@ -21,6 +21,7 @@
 #define MPILIB_UTILITIES_MPIPROXY_HPP_
 #include <MPILib/config.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
+#include <MPILib/include/utilities/Singleton.hpp>
 #ifdef ENABLE_MPI
 #include <boost/mpi/request.hpp>
 #include <boost/mpi/communicator.hpp>
@@ -32,6 +33,7 @@ namespace mpi = boost::mpi;
 namespace MPILib {
 namespace utilities {
 
+
 /**
  * @brief A class to handle all MPI related code. It also provides works if MPI is disabled
  *
@@ -40,17 +42,17 @@ namespace utilities {
  * main method the MPI environment needs to be generated. All other MPI calls are handled
  * by this class
  */
-class MPIProxy {
+class MPIProxy_ {
 public:
 	/**
 	 * constructor sets the MPI rank and size
 	 */
-	MPIProxy();
+	MPIProxy_();
 
 	/**
 	 * destructor
 	 */
-	virtual ~MPIProxy();
+	virtual ~MPIProxy_();
 
 	/**
 	 * wrapper method to return the process id, if mpi is disabled it returns 0
@@ -121,7 +123,7 @@ private:
 };
 
 template<typename T>
-void MPIProxy::broadcast(T& value, int root) {
+void MPIProxy_::broadcast(T& value, int root) {
 #ifdef ENABLE_MPI
 	mpi::communicator world;
 	boost::mpi::broadcast(world, value, root);
@@ -129,7 +131,7 @@ void MPIProxy::broadcast(T& value, int root) {
 }
 
 template<typename T>
-void MPIProxy::irecv(int source, int tag, T& value) const {
+void MPIProxy_::irecv(int source, int tag, T& value) const {
 #ifdef ENABLE_MPI
 	mpi::communicator world;
 	_mpiStatus.push_back(world.irecv(source, tag, value));
@@ -139,7 +141,7 @@ void MPIProxy::irecv(int source, int tag, T& value) const {
 }
 
 template<typename T>
-void MPIProxy::isend(int dest, int tag, const T& value) const {
+void MPIProxy_::isend(int dest, int tag, const T& value) const {
 #ifdef ENABLE_MPI
 	mpi::communicator world;
 	_mpiStatus.push_back(world.isend(dest, tag, value));
@@ -147,6 +149,9 @@ void MPIProxy::isend(int dest, int tag, const T& value) const {
 	MPILib::utilities::Exception("MPI Code called from serial code in isend");
 #endif
 }
+
+typedef Singleton<MPIProxy_> MPIProxySingleton;
+
 
 } /* namespace utilities */
 } /* namespace MPILib */

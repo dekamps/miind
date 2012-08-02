@@ -19,6 +19,7 @@
 
 #include <MPILib/config.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
+#include <MPILib/include/utilities/MPIProxy.hpp>
 
 
 using namespace MPILib::utilities;
@@ -30,21 +31,15 @@ CircularDistribution::~CircularDistribution() throw(){
 }
 
 bool CircularDistribution::isLocalNode(NodeId nodeId) const {
-	MPIProxy mpiProxy;
-	return getResponsibleProcessor(nodeId) == mpiProxy.getRank();
+	return getResponsibleProcessor(nodeId) == utilities::MPIProxySingleton::instance().getRank();
 }
 
 int CircularDistribution::getResponsibleProcessor(NodeId nodeId) const {
-	MPIProxy mpiProxy;
-
-	return nodeId % mpiProxy.getSize();
-
+	return nodeId % utilities::MPIProxySingleton::instance().getSize();
 }
 
 bool CircularDistribution::isMaster() const {
-	MPIProxy mpiProxy;
-
-	return mpiProxy.getRank() == 0;
+	return utilities::MPIProxySingleton::instance().getRank() == 0;
 }
 
 

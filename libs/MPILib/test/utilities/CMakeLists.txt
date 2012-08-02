@@ -6,4 +6,4 @@ ADD_MIIND_MPI_TEST( Log_test.cpp)
 ADD_MIIND_MPI_TEST( MPIProxy_test.cpp)
 ADD_MIIND_MPI_TEST( ParallelException_test.cpp)
 ADD_MIIND_MPI_TEST( ProgressBar_test.cpp)
-
+ADD_MIIND_TEST(Singleton_test.cpp)

@@ -157,9 +157,8 @@ int test_main(int argc, char* argv[]) // note the name!
 #ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
 	// we use only two processors for this testing
-	MPILib::utilities::MPIProxy mpiProxy;
 
-	if (mpiProxy.getSize() != 2) {
+	if (MPILib::utilities::MPIProxySingleton::instance().getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
 #endif

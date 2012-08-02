@@ -26,15 +26,14 @@ namespace MPILib {
 namespace utilities {
 
 FileNameGenerator::FileNameGenerator(const std::string& fileName, FileType fileType) {
-	MPIProxy mpiProxy;
 
 	std::stringstream tempFileName;
 
 	if (fileType == LOGFILE) {
-		tempFileName << fileName << "_" << mpiProxy.getRank() << ".log";
+		tempFileName << fileName << "_" << MPIProxySingleton::instance().getRank() << ".log";
 	}
 	if (fileType == ROOTFILE) {
-		tempFileName << fileName << "_" << mpiProxy.getRank() << ".root";
+		tempFileName << fileName << "_" << MPIProxySingleton::instance().getRank() << ".root";
 	}
 	_fileName = tempFileName.str();
 

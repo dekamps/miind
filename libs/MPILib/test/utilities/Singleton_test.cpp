@@ -16,43 +16,44 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+#include <MPILib/config.hpp>
 
-#ifndef MPILIB_UTILITIES_CIRCULARDISTRIBUTION_HPP_
-#define MPILIB_UTILITIES_CIRCULARDISTRIBUTION_HPP_
+#include <MPILib/include/utilities/Singleton.hpp>
 
-#include <MPILib/include/utilities/NodeDistributionInterface.hpp>
-#include <memory>
+#include <boost/test/minimal.hpp>
+using namespace boost::unit_test;
+using namespace MPILib::utilities;
 
-namespace MPILib {
-namespace utilities {
-
-class CircularDistribution: public NodeDistributionInterface {
+class SingletonTest {
 public:
-	CircularDistribution();
-	virtual ~CircularDistribution() throw();
-
-
-	/**
-	 * check is a node is local to the processor
-	 * @param nodeId The Id of the Node
-	 * @return true if the Node is local
-	 */
-	virtual bool isLocalNode(NodeId nodeId) const;
-	/** get the processor number which is responsible for the node
-	 * @param nodeId The Id of the Node
-	 * @return the processor responsible
-	 */
-	virtual int getResponsibleProcessor(NodeId nodeId) const;
-
-	/**
-	 * If the processor is master (We assume the processor with _processorId=0 is the master)
-	 * @return true if the node is the master.
-	 */
-	virtual bool isMaster() const;
+	SingletonTest() :
+			dummy_(0.0) {
+	}
 private:
-
+	double dummy_;
 };
 
-} /* namespace MPILib */
-} /* namespace utilities */
-#endif /* MPILIB_UTILITIES_CIRCULARDISTRIBUTION_HPP_ */
+void test() {
+	typedef Singleton<SingletonTest> ST;
+	SingletonTest& u = ST::instance();
+	SingletonTest& v = ST::instance();
+	BOOST_CHECK(&u == &v);
+}
+
+int test_main(int argc, char* argv[]) // note the name!
+		{
+	test();
+
+	return 0;
+//    // six ways to detect and report the same error:
+//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
+//    if( add( 2,2 ) != 4 )
+//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
+//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
+//
+//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
+}
+

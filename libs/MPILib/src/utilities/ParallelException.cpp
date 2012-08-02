@@ -24,22 +24,23 @@
 
 using namespace MPILib::utilities;
 
-
 ParallelException::ParallelException(const char* message) :
 		Exception(message) {
-	MPIProxy mpiProxy;
 	std::stringstream sstream;
-	sstream <<std::endl<< "Parallel Exception on processor: " << mpiProxy.getRank() << " from: "
-			<< mpiProxy.getSize() << " with error message: " << msg_<<std::endl;
+	sstream << std::endl << "Parallel Exception on processor: "
+			<< MPIProxySingleton::instance().getRank() << " from: "
+			<< MPIProxySingleton::instance().getSize()
+			<< " with error message: " << msg_ << std::endl;
 	msg_ = sstream.str();
 }
 
 ParallelException::ParallelException(const std::string& message) :
 		Exception(message) {
-	MPIProxy mpiProxy;
 	std::stringstream sstream;
-	sstream <<std::endl<< "Parallel Exception on processor: " << mpiProxy.getRank() << " from: "
-			<< mpiProxy.getSize() << " with error message: " << msg_<<std::endl;
+	sstream << std::endl << "Parallel Exception on processor: "
+			<< MPIProxySingleton::instance().getRank() << " from: "
+			<< MPIProxySingleton::instance().getSize()
+			<< " with error message: " << msg_ << std::endl;
 	msg_ = sstream.str();
 }
 

@@ -43,14 +43,13 @@ void test_Constructor() {
 	std::stringstream os;
 
 	ProgressBar pb(100, "blub", os);
-	MPILib::utilities::MPIProxy mpiProxy;
 
-	if (mpiProxy.getRank() == 0) {
+	if (MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(pb._expectedCount==100);
 	}
 	BOOST_CHECK(pb._description=="blub");
 
-	if (mpiProxy.getRank() == 0) {
+	if (MPIProxySingleton::instance().getRank() == 0) {
 
 		std::stringstream tempStream;
 		tempStream << "blub" << "\n"
@@ -81,10 +80,9 @@ int test_main(int argc, char* argv[]) // note the name!
 
 #ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
-	MPILib::utilities::MPIProxy mpiProxy;
 
 	// we use only two processors for this testing
-	if (mpiProxy.getSize() != 2) {
+	if (MPIProxySingleton::instance().getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
 #endif

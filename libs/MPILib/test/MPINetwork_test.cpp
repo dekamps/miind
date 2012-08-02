@@ -45,12 +45,11 @@ using namespace MPILib;
 void test_Constructor() {
 
 	MPINetwork<double, utilities::CircularDistribution> network;
-	MPILib::utilities::MPIProxy mpiProxy;
 
-	if (mpiProxy.getRank() == 0) {
+	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(network._nodeDistribution.isMaster()==true);
 		BOOST_CHECK(network._localNodes.size()==0);
-	} else if (mpiProxy.getRank() == 1) {
+	} else if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 1) {
 		BOOST_CHECK(network._localNodes.size()==0);
 	}
 
@@ -67,12 +66,11 @@ void test_Constructor() {
 void test_AddNode() {
 
 	MPINetwork<double, utilities::CircularDistribution> network;
-	MPILib::utilities::MPIProxy mpiProxy;
 
-	if (mpiProxy.getRank() == 0) {
+	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==0);
 		BOOST_CHECK(network._localNodes.size()==0);
-	} else if (mpiProxy.getRank() == 1) {
+	} else if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 1) {
 		BOOST_CHECK(network._localNodes.size()==0);
 	}
 
@@ -80,23 +78,23 @@ void test_AddNode() {
 
 	network.addNode(alg, EXCITATORY);
 
-	if (mpiProxy.getRank() == 0) {
+	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==1);
 		BOOST_CHECK(network._localNodes.size()==1);
-	} else if (mpiProxy.getRank() == 1) {
+	} else if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 1) {
 		BOOST_CHECK(network._localNodes.size()==0);
 	}
 
 	network.addNode(alg, EXCITATORY);
 
-	if (mpiProxy.getRank() == 0) {
+	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==2);
-		if (mpiProxy.getSize() == 1) {
+		if (MPILib::utilities::MPIProxySingleton::instance().getSize() == 1) {
 			BOOST_CHECK(network._localNodes.size()==2);
 		} else {
 			BOOST_CHECK(network._localNodes.size()==1);
 		}
-	} else if (mpiProxy.getRank() == 1) {
+	} else if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 1) {
 		BOOST_CHECK(network._localNodes.size()==1);
 	}
 }
@@ -105,7 +103,6 @@ void test_MakeFirstInputOfSecond() {
 
 	MPINetwork<double, utilities::CircularDistribution> network;
 	SleepAlgorithm<double> alg;
-	MPILib::utilities::MPIProxy mpiProxy;
 
 	int node0 = network.addNode(alg, EXCITATORY);
 	int node1 = network.addNode(alg, EXCITATORY);
@@ -118,7 +115,7 @@ void test_MakeFirstInputOfSecond() {
 		exceptionThrown = true;
 	}
 	BOOST_CHECK(exceptionThrown==false);
-	if (mpiProxy.getRank() == 1) {
+	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 1) {
 
 		BOOST_CHECK(
 				network._localNodes.find(node1)->second._precursors.size()==1);
@@ -161,18 +158,17 @@ void test_getMaxNodeId() {
 
 void test_incrementMaxNodeId() {
 	MPINetwork<double, utilities::CircularDistribution> network;
-	MPILib::utilities::MPIProxy mpiProxy;
 
-	if (mpiProxy.getRank() == 0) {
+	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==0);
 	}
 	network.incrementMaxNodeId();
-	if (mpiProxy.getRank() == 0) {
+	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==1);
 	}
 	network.incrementMaxNodeId();
 	network.incrementMaxNodeId();
-	if (mpiProxy.getRank() == 0) {
+	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==3);
 	}
 }
@@ -182,10 +178,9 @@ int test_main(int argc, char* argv[]) // note the name!
 
 #ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
-	MPILib::utilities::MPIProxy mpiProxy;
 
 	// we use only two processors for this testing
-	if (mpiProxy.getSize() != 2) {
+	if (MPILib::utilities::MPIProxySingleton::instance().getSize() != 2) {
 		BOOST_FAIL( "Run the test with two processes!");
 	}
 #endif

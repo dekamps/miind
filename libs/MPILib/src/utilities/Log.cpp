@@ -79,7 +79,7 @@ LogLevel Log::_reportingLevel = logINFO;
  */
 std::shared_ptr<std::ostream> Log::_pStream(&std::cerr, null_deleter());
 
-std::shared_ptr<std::ostream> Log::getStream(){
+std::shared_ptr<std::ostream> Log::getStream() {
 	return _pStream;
 }
 
@@ -106,10 +106,10 @@ std::ostringstream& Log::writeReport(LogLevel level) {
 	char outstr[200];
 	strftime(outstr, sizeof(outstr), "%x% %H:%M:%S", tempTm2);
 
-	_buffer  << "- " << outstr;
-	MPIProxy mpiProxy;
-	_buffer <<" Proc " << mpiProxy.getRank() << " of " << mpiProxy.getSize();
-	_buffer <<std::setw(10) << logLevelToString(level) << ":\t";
+	_buffer << "- " << outstr;
+	_buffer << " Proc " << MPIProxySingleton::instance().getRank() << " of "
+			<< MPIProxySingleton::instance().getSize();
+	_buffer << std::setw(10) << logLevelToString(level) << ":\t";
 	return _buffer;
 }
 

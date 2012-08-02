@@ -27,8 +27,7 @@ namespace utilities {
 ProgressBar::ProgressBar(unsigned long expectedCount,
 		const std::string & description, std::ostream& os) :
 		_description(description), _outputStream(os) {
-	MPIProxy mpiProxy;
-	if (mpiProxy.getRank() == 0) {
+	if (MPIProxySingleton::instance().getRank() == 0) {
 		restart(expectedCount);
 	}
 }
@@ -44,8 +43,7 @@ void ProgressBar::restart(unsigned long expected_count) {
 }
 
 unsigned long ProgressBar::operator+=(unsigned long increment) {
-	MPIProxy mpiProxy;
-	if (mpiProxy.getRank() == 0) {
+	if (MPIProxySingleton::instance().getRank() == 0) {
 		if ((_count += increment) >= _nextTicCount) {
 			display_tic();
 		}

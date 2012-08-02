@@ -25,6 +25,7 @@
 #include <iostream>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/utilities/Log.hpp>
+#include <MPILib/include/utilities/MPIProxy.hpp>
 namespace MPILib {
 
 template<class Weight, class NodeDistribution>
@@ -113,8 +114,7 @@ void MPINode<Weight, NodeDistribution>::setActivity(ActivityType activity) {
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::waitAll() {
-	utilities::MPIProxy mpiProxy;
-	mpiProxy.waitAll();
+	utilities::MPIProxySingleton::instance().waitAll();
 }
 
 template<class Weight, class NodeDistribution>
@@ -141,16 +141,14 @@ void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
 			_precursorTypes[i] = _rLocalNodes.find(*it)->second.getNodeType();
 
 		} else {
-			utilities::MPIProxy mpiProxy;
-			mpiProxy.irecv(_rNodeDistribution.getResponsibleProcessor(*it), *it,
+			utilities::MPIProxySingleton::instance().irecv(_rNodeDistribution.getResponsibleProcessor(*it), *it,
 					_precursorTypes[i]);
 		}
 	}
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
 		if (!_rNodeDistribution.isLocalNode(it)) {
-			utilities::MPIProxy mpiProxy;
-			mpiProxy.isend(_rNodeDistribution.getResponsibleProcessor(it),
+			utilities::MPIProxySingleton::instance().isend(_rNodeDistribution.getResponsibleProcessor(it),
 					_nodeId, _nodeType);
 		}
 	}
@@ -167,8 +165,7 @@ void MPINode<Weight, NodeDistribution>::receiveData() {
 					_rLocalNodes.find(*it)->second.getActivity();
 
 		} else {
-			utilities::MPIProxy mpiProxy;
-			mpiProxy.irecv(_rNodeDistribution.getResponsibleProcessor(*it), *it,
+			utilities::MPIProxySingleton::instance().irecv(_rNodeDistribution.getResponsibleProcessor(*it), *it,
 					_precursorActivity[i]);
 		}
 	}
@@ -177,11 +174,10 @@ void MPINode<Weight, NodeDistribution>::receiveData() {
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 
-	utilities::MPIProxy mpiProxy;
 	for (auto& it : _successors) {
 		//do not send the data if the node is local!
 		if (!_rNodeDistribution.isLocalNode(it)) {
-			mpiProxy.isend(_rNodeDistribution.getResponsibleProcessor(it),
+			utilities::MPIProxySingleton::instance().isend(_rNodeDistribution.getResponsibleProcessor(it),
 					_nodeId, _activity);
 		}
 	}

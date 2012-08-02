@@ -44,7 +44,7 @@ TFile* RootHighThroughputHandler::_pFile = nullptr;
 TVectorD* RootHighThroughputHandler::_pArray = nullptr;
 
 RootHighThroughputHandler::RootHighThroughputHandler(
-		const std::string& fileName,  bool generateGraphs) :
+		const std::string& fileName, bool generateGraphs) :
 		AbstractReportHandler(fileName) {
 
 	this->_generateNodeGraphs = generateGraphs;
@@ -100,12 +100,12 @@ void RootHighThroughputHandler::initializeHandler(const NodeId&) {
 void RootHighThroughputHandler::writeReport(const Report& report) {
 
 	if (!_isRecording) {
-		utilities::MPIProxy mpiProxy;
 
 		// Store the global node ids in the array
 		TArrayI nodeIds(report._nrNodes);
 		for (Index i = 0; i < report._nrNodes; i++) {
-			nodeIds[i] = mpiProxy.getSize() * i + mpiProxy.getRank();
+			nodeIds[i] = utilities::MPIProxySingleton::instance().getSize() * i
+					+ utilities::MPIProxySingleton::instance().getRank();
 		}
 		_pFile->WriteObject(&nodeIds, "GlobalNodeIds");
 
@@ -118,8 +118,9 @@ void RootHighThroughputHandler::writeReport(const Report& report) {
 
 	if (_isRecording) {
 		//store the node in a map one below the max number of nodes
-		if(_mData.count(report._id)){
-			throw utilities::Exception("The report for this node is already stored");
+		if (_mData.count(report._id)) {
+			throw utilities::Exception(
+					"The report for this node is already stored");
 		}
 
 		if (_mData.size() < (report._nrNodes - 1)) {
@@ -178,7 +179,8 @@ void RootHighThroughputHandler::generateNodeGraphs(const char* fileName) {
 void RootHighThroughputHandler::storeRateGraphs(
 		const std::vector<double>& vecTime, Number nrNodes, Number nrSlices) {
 
-	auto nodeIds = std::unique_ptr<TArrayI>((TArrayI*)_pFile->Get("GlobalNodeIds"));
+	auto nodeIds = std::unique_ptr<TArrayI>(
+			(TArrayI*) _pFile->Get("GlobalNodeIds"));
 	if (!nodeIds) {
 		throw utilities::Exception("No nodeIds found in the root file");
 	}

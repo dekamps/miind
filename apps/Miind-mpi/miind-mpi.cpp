@@ -55,7 +55,6 @@ int main(int argc, char* argv[]) {
 	// initialise the mpi environment this cannot be forwarded to a class
 	boost::mpi::environment env(argc, argv);
 #endif
-	utilities::MPIProxy mpiProxy;
 	try {
 		MPINetwork<double, utilities::CircularDistribution> network;
 
@@ -88,9 +87,9 @@ int main(int argc, char* argv[]) {
 		te.start();
 
 		network.evolve();
-		mpiProxy.barrier();
+		MPILib::utilities::MPIProxySingleton::instance().barrier();
 		te.stop();
-		if (mpiProxy.getRank() == 0) {
+		if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
 			std::cout << "Time of Envolve methode of processor 0: \n";
 			te.report();
 		}

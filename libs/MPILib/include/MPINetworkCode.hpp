@@ -208,8 +208,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 template<class WeightValue, class NodeDistribution>
 int MPINetwork<WeightValue, NodeDistribution>::getMaxNodeId() {
-	utilities::MPIProxy mpiProxy;
-	mpiProxy.broadcast(_maxNodeId, 0);
+	utilities::MPIProxySingleton::instance().broadcast(_maxNodeId, 0);
 	return _maxNodeId;
 }
 

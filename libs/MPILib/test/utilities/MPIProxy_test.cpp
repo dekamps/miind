@@ -42,7 +42,7 @@ using namespace MPILib::utilities;
 
 void test_Constructor() {
 
-	MPIProxy mpiProxy;
+	MPIProxy_ mpiProxy;
 #ifdef ENABLE_MPI
 
 	BOOST_CHECK(mpiProxy._rank == world.rank());
@@ -52,7 +52,7 @@ void test_Constructor() {
 }
 
 void test_Getter() {
-	MPIProxy mpiProxy;
+	MPIProxy_ mpiProxy;
 #ifdef ENABLE_MPI
 
 	BOOST_CHECK(mpiProxy.getRank() == world.rank());
@@ -72,7 +72,7 @@ void test_Broadcast(){
 		blub = 9;
 		BOOST_CHECK(blub == 9);
 	}
-	MPIProxy mpiProxy;
+	MPIProxy_ mpiProxy;
 	mpiProxy.broadcast(blub, 0);
 
 	BOOST_CHECK(blub == 9);

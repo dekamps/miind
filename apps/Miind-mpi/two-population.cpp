@@ -203,7 +203,6 @@ int main(int argc, char* argv[]) {
 #ifdef ENABLE_MPI
 	boost::mpi::environment env(argc, argv);
 #endif
-	utilities::MPIProxy mpiProxy;
 	try {
 
 		NodeId id_cortical_background;
@@ -234,9 +233,9 @@ int main(int argc, char* argv[]) {
 		}
 
 		//timed calculation
-		mpiProxy.barrier();
+		MPILib::utilities::MPIProxySingleton::instance().barrier();
 		te.stop();
-		if (mpiProxy.getRank() == 0) {
+		if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
 
 			std::cout << "Time of configuration and envolve: \n";
 			te.report();
@@ -249,9 +248,9 @@ int main(int argc, char* argv[]) {
 #endif
 		return 1;
 	}
-	mpiProxy.barrier();
+	MPILib::utilities::MPIProxySingleton::instance().barrier();
 	t.stop();
-	if (mpiProxy.getRank() == 0) {
+	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
 
 		std::cout << "Overall time spend\n";
 		t.report();
