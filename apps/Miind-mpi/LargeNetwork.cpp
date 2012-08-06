@@ -18,11 +18,11 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
+#include <MPILib/include/MPINetwork.hpp>
 
 #include <MPILib/include/largeNetwork/GenerateHexagonalNetwork.hpp>
 #include <MPILib/include/largeNetwork/Hexagon.hpp>
 #include <MPILib/include/largeNetwork/LargeNetwork.hpp>
-
 
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/PopulationAlgorithm.hpp>
