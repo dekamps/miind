@@ -22,6 +22,9 @@ set(MPI_SRCS
     src/algorithm/AlgorithmGrid.cpp
     src/algorithm/WilsonCowanAlgorithm.cpp
     
+    src/largeNetwork/GenerateHexagonalNetwork.cpp
+    src/largeNetwork/Hexagon.cpp
+    
     src/populist/circulantSolvers/AbstractCirculantSolver.cpp
     src/populist/circulantSolvers//CirculantSolver.cpp
     src/populist/circulantSolvers/PolynomialCirculant.cpp

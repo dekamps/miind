@@ -39,6 +39,9 @@ namespace algorithm {
 template<class WeightValue>
 class AlgorithmInterface {
 public:
+
+	typedef WeightValue WeightType;
+
 	AlgorithmInterface()=default
 	;
 	virtual ~AlgorithmInterface() {

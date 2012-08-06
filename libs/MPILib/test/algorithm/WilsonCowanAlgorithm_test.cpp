@@ -147,15 +147,11 @@ void test_innerProduct() {
 
 	WilsonCowanAlgorithm algorithm_exc(par_sigmoid);
 
-	std::vector<double> weightVector;
-	weightVector.push_back(4.5);
-	weightVector.push_back(5.2);
-	weightVector.push_back(7.2);
+	std::vector<double> weightVector {4.5,5.2,7.2};
 
-	std::vector<double> nodeVector;
-	nodeVector.push_back(2.3);
-	nodeVector.push_back(5.3);
-	nodeVector.push_back(9.3);
+
+	std::vector<double> nodeVector {2.3,5.3,9.3};
+
 
 	//need to calculate this
 	double res = algorithm_exc.innerProduct(weightVector, nodeVector);

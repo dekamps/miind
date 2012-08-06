@@ -55,3 +55,7 @@ add_executable( two-population
     two-population.cpp )
 
 target_link_libraries( two-population ${LIBLIST} )
+
+
+add_executable(largeNetwork LargeNetwork.cpp )
+target_link_libraries(largeNetwork ${LIBLIST})
