@@ -46,7 +46,7 @@ void Add_J_II(MPILib::populist::Pop_Network* p_net,
 
 	for (Index i = 0; i < vec.size(); i++) {
 
-		p_net->makeFirstInputOfSecond(vec[i], vec[i], connection_J_II);
+		p_net->makeFirstInputOfSecond(vec[i], vec[i], connection_J_II, INHIBITORY);
 	}
 }
 
@@ -61,7 +61,7 @@ void Add_J_EI(MPILib::populist::Pop_Network* p_net,
 
 	for (Index i = 0; i < vec_grid.size(); i++) {
 		p_net->makeFirstInputOfSecond(vec_link[i], vec_grid[i]._id,
-				connection_J_EI);
+				connection_J_EI, INHIBITORY);
 	}
 }
 
@@ -74,7 +74,7 @@ void Add_J_IE(MPILib::populist::Pop_Network* p_net,
 
 	for (Index i = 0; i < vec_grid.size(); i++)
 		p_net->makeFirstInputOfSecond(vec_grid[i]._id, vec_link[i],
-				connection_J_IE);
+				connection_J_IE, EXCITATORY);
 
 }
 
@@ -85,7 +85,7 @@ void Add_J_IE_bg(MPILib::populist::Pop_Network* p_net, NodeId id_bg,
 			static_cast<Number>(TWOPOPULATION_C_E * 0.5), TWOPOPULATION_J_IE);
 
 	for (Index i = 0; i < vec_link.size(); i++)
-		p_net->makeFirstInputOfSecond(id_bg, vec_link[i], connection_J_IE_BG);
+		p_net->makeFirstInputOfSecond(id_bg, vec_link[i], connection_J_IE_BG, EXCITATORY);
 
 }
 
@@ -96,7 +96,7 @@ void Add_J_EE_bg(MPILib::populist::Pop_Network* p_net, NodeId id_bg,
 
 	for (Index i = 0; i < vec_grid.size(); i++)
 		p_net->makeFirstInputOfSecond(id_bg, vec_grid[i]._id,
-				connection_J_EE_BG);
+				connection_J_EE_BG, EXCITATORY);
 }
 
 void Add_J_EE(MPILib::populist::Pop_Network* p_net,
@@ -113,7 +113,7 @@ void Add_J_EE(MPILib::populist::Pop_Network* p_net,
 				TWOPOPULATION_J_EE);
 
 		p_net->makeFirstInputOfSecond(vec_grid[i]._id, vec_grid[i]._id,
-				connection_J_EE);
+				connection_J_EE, EXCITATORY);
 	}
 }
 
@@ -130,7 +130,7 @@ void Add_Lateral(MPILib::populist::Pop_Network* p_net,
 					TWOPOPULATION_C_E * 0.5 / (n_neighbours + 1),
 					TWOPOPULATION_J_EE);
 			p_net->makeFirstInputOfSecond(vec_neighbour[j_in], vec_grid[i]._id,
-					connection_J_EE);
+					connection_J_EE, EXCITATORY);
 		}
 	}
 }
@@ -182,5 +182,5 @@ void GenerateHexagonalNetwork(Number n_rings,				//! number of rings
 	populist::Pop_Network::WeightType connection_J_EE_Burst(
 			BURST_FACTOR * TWOPOPULATION_C_E, TWOPOPULATION_J_EE);
 
-	p_net->makeFirstInputOfSecond(id_burst, *p_id_cent, connection_J_EE_Burst);
+	p_net->makeFirstInputOfSecond(id_burst, *p_id_cent, connection_J_EE_Burst, EXCITATORY);
 }

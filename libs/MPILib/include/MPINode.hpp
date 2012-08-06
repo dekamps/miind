@@ -82,8 +82,9 @@ public:
 	 * Add a precursor to the current node
 	 * @param nodeId NodeId the id of the precursor
 	 * @param weight the weight of the connection
+	 * @param nodeType the nodeType of the precursor
 	 */
-	void addPrecursor(NodeId nodeId, const Weight& weight);
+	void addPrecursor(NodeId nodeId, const Weight& weight, NodeType& nodeType);
 
 	/**
 	 * Add a successor to the current node
@@ -137,14 +138,6 @@ public:
 	void initNode();
 
 private:
-
-	/**
-	 * exchange the Node Types
-	 *
-	 * It send the own NodeType to remote nodes and collects the NodeTypes of
-	 * the precursor nodes and store them in the vector _precursorTypes
-	 */
-	void exchangeNodeTypes();
 
 	/**
 	 * Store the nodeIds of the Precursors
@@ -202,11 +195,6 @@ private:
 
 	Number _number_iterations = 0;
 	Number _maximum_iterations = 0;
-
-	/**
-	 * True if the node Types are exchanged
-	 */
-	bool _isInitialised = false;
 
 	/**
 	 * Pointer to the Report Handler

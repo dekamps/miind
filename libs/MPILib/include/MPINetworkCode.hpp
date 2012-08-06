@@ -71,7 +71,7 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
-		NodeId first, NodeId second, const WeightValue& weight) {
+		NodeId first, NodeId second, const WeightValue& weight, NodeType secondNodeType) {
 
 	//Make sure that the node exists and then add the successor
 	if (_nodeDistribution.isLocalNode(first)) {
@@ -104,7 +104,7 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 	// Make sure that the second node exist and then set the precursor
 	if (_nodeDistribution.isLocalNode(second)) {
 		if (_localNodes.count(second) > 0) {
-			_localNodes.find(second)->second.addPrecursor(first, weight);
+			_localNodes.find(second)->second.addPrecursor(first, weight, secondNodeType);
 		} else {
 			std::stringstream tempStream;
 			tempStream << "the node " << second
@@ -122,7 +122,7 @@ void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 	_currentSimulationTime = simParam.getTBegin();
 	_parameterSimulationRun = simParam;
 
-	initializeLogStream(simParam.getLogName());
+	this->initializeLogStream(simParam.getLogName());
 
 	try {
 		//loop over all local nodes!
@@ -143,11 +143,6 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 	if (_stateNetwork.isConfigured()) {
 		_stateNetwork.toggleConfigured();
 		LOG(utilities::logINFO) << "Starting simulation";
-		//init the nodes
-		for (auto& it : _localNodes) {
-			it.second.initNode();
-		}
-
 		try {
 			utilities::ProgressBar pb(
 					getEndTime() / _parameterSimulationRun.getTReport()
@@ -237,6 +232,7 @@ template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
 		const std::string & filename) {
 	// resource will be passed on to _stream_log
+
 	std::shared_ptr<std::ostream> p_stream(new std::ofstream(filename.c_str()));
 	if (!p_stream)
 		throw utilities::Exception("MPINetwork cannot open log file.");

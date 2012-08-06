@@ -90,8 +90,9 @@ void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::addPrecursor(NodeId nodeId,
-		const Weight& weight) {
+		const Weight& weight, NodeType& nodeType) {
 	_precursors.push_back(nodeId);
+	_precursorTypes.push_back(nodeType);
 	_weights.push_back(weight);
 	//make sure that _precursorStates is big enough to store the data
 	_precursorActivity.resize(_precursors.size());
@@ -117,42 +118,6 @@ void MPINode<Weight, NodeDistribution>::waitAll() {
 	utilities::MPIProxy().waitAll();
 }
 
-template<class Weight, class NodeDistribution>
-void MPINode<Weight, NodeDistribution>::initNode() {
-	if (!_isInitialised) {
-		this->exchangeNodeTypes();
-		_isInitialised = true;
-		LOG(utilities::logDEBUG1) << "init finished. Node Types lenght: "
-				<< _precursorTypes.size() << " number of precursors: "
-				<< _precursors.size();
-	} else {
-		throw utilities::Exception("init called more than once.");
-	}
-}
-
-template<class Weight, class NodeDistribution>
-void MPINode<Weight, NodeDistribution>::exchangeNodeTypes() {
-	_precursorTypes.resize(_precursors.size());
-	//get the Types from the precursors
-	int i = 0;
-	for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
-		//do not send the data if the node is local!
-		if (_rNodeDistribution.isLocalNode(*it)) {
-			_precursorTypes[i] = _rLocalNodes.find(*it)->second.getNodeType();
-
-		} else {
-			utilities::MPIProxy().irecv(_rNodeDistribution.getResponsibleProcessor(*it), *it,
-					_precursorTypes[i]);
-		}
-	}
-	for (auto& it : _successors) {
-		//do not send the data if the node is local!
-		if (!_rNodeDistribution.isLocalNode(it)) {
-			utilities::MPIProxy().isend(_rNodeDistribution.getResponsibleProcessor(it),
-					_nodeId, _nodeType);
-		}
-	}
-}
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::receiveData() {

@@ -21,6 +21,9 @@
 #include <MPILib/config.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
+#include <MPILib/include/utilities/Exception.hpp>
+#include <MPILib/include/utilities/FilenameGenerator.hpp>
+#include <fstream>
 
 #ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
@@ -45,6 +48,13 @@ int main(int argc, char* argv[]) {
 	boost::mpi::environment env(argc, argv);
 #endif
 	try {
+
+
+		std::shared_ptr<std::ostream> p_stream(new std::ofstream(MPILib::utilities::FileNameGenerator("log").getFileName()));
+		if (!p_stream)
+			throw MPILib::utilities::Exception("MPINetwork cannot open log file.");
+		MPILib::utilities::Log::setStream(p_stream);
+
 		MPILib::populist::Pop_Network net;
 		MPILib::NodeId id_centrum;
 		MPILib::NodeId id_bg;
@@ -56,7 +66,7 @@ int main(int argc, char* argv[]) {
 
 		// generates a network of hexgonal rings
 		GenerateHexagonalNetwork(
-				0,	// number of rings, increase if you want a larger network
+				1,	// number of rings, increase if you want a larger network
 				&net, &id_centrum, &id_bg, &vec_grid, &vec_link, &vec_inh,
 				&i_offset);
 
