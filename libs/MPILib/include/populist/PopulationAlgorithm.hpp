@@ -20,6 +20,7 @@
 #define MPILIB_POPULIST_POPOULATIONALGORITHM_HPP_
 #include <MPILib/include/MPINode.hpp>
 #include <MPILib/include/MPINetwork.hpp>
+#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 
 #include <MPILib/include/populist/PopulationGridControllerCode.hpp>
 #include <MPILib/include/populist/parameters/PopulistParameter.hpp>
@@ -152,8 +153,7 @@ public:
 	 * Configure the Algorithm
 	 * @param simParam the Simulation Parameters
 	 */
-	virtual void configure(const SimulationRunParameter& simParam)
-	override;
+	virtual void configure(const SimulationRunParameter& simParam);
 
 	/**
 	 * Evolve the node state.
@@ -164,8 +164,7 @@ public:
 	 */
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
 			const std::vector<Weight>& weightVector, Time time,
-			const std::vector<NodeType>& typeVector)
-	override;
+			const std::vector<NodeType>& typeVector);
 
 	/**
 	 * prepare the Evolve method
@@ -175,35 +174,31 @@ public:
 	 */
 	virtual void prepareEvolve(const std::vector<Rate>& nodeVector,
 			const std::vector<Weight>& weightVector,
-			const std::vector<NodeType>& typeVector)
-	override;
+			const std::vector<NodeType>& typeVector);
 
 	/**
 	 * The current timepoint
 	 * @return The current time point
 	 */
-	virtual Time getCurrentTime() const
-	override;
+	virtual Time getCurrentTime() const;
 
 	/**
 	 * The calculated rate of the node
 	 * @return The rate of the node
 	 */
-	virtual Rate getCurrentRate() const
-	override;
+	virtual Rate getCurrentRate() const;
 
 	/**
 	 * Stores the algorithm state in a Algorithm Grid
 	 * @return The state of the algorithm
 	 */
-	virtual algorithm::AlgorithmGrid getGrid() const
-	override;
+	virtual algorithm::AlgorithmGrid getGrid() const;
 
 	/**
 	 * Cloning operation, to provide each DynamicNode with its own
 	 * Algorithm instance. Clients use the naked pointer at their own risk.
 	 */
-	virtual PopulationAlgorithm_<Weight>* clone() const override {
+	virtual PopulationAlgorithm_<Weight>* clone() const {
 		return new PopulationAlgorithm_<Weight>(*this);
 	}
 

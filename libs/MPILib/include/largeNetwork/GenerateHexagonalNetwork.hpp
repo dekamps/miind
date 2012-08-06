@@ -21,7 +21,7 @@
 #define _CODE_LIBS_LARGENETWORK_GENERATEHEXAGONALNETWORK_INCLUDE_GUARD
 
 #include <MPILib/include/MPINetwork.hpp>
-#include <MPILib/include/populist/PopulationAlgorithm.hpp>
+#include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>

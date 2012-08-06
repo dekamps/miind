@@ -23,8 +23,8 @@
 #include <MPILib/include/largeNetwork/GenerateHexagonalNetwork.hpp>
 
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/PopulationAlgorithm.hpp>
-#include <MPILib/include/populist/RateFunctor.hpp>
+#include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
+#include <MPILib/include/populist/RateFunctorCode.hpp>
 using namespace MPILib;
 using namespace largeNetwork;
 namespace {

@@ -25,7 +25,7 @@
 #include <MPILib/include/largeNetwork/LargeNetwork.hpp>
 
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/PopulationAlgorithm.hpp>
+#include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
