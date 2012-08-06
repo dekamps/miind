@@ -36,8 +36,9 @@ OPTION(ENABLE_MEMORY_TEST "Generate memory test" OFF)
 OPTION(INCLUDE_MPI_LIB "Compile the MPILib" TRUE)
 OPTION(ENABLE_MPI "Enable mpi" FALSE)
 OPTION(ENABLE_COVERAGE "Enable GCov coverage analysis (defines a 'coverage' target and enforces static build of miind)" OFF)
-OPTION(DEBUG "Enable debug information" FALSE)
 
+set(DEBUGLEVEL "logINFO" CACHE STRING "Define the Debug Level")
+add_definitions( -DDEBUGLEVEL=${DEBUGLEVEL})
 
 ##############################################################################
 # enable MPI dependent build

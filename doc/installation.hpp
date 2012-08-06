@@ -21,9 +21,9 @@ ENABLE_COVERAGE [Default: FALSE]
 </dt>
 <dd>allows to generate a coverage report</dd>
 <dt>
-DEBUG [Default: FALSE]
+DEBUGLEVEL [Default: logINFO]
 </dt>
-<dd>print debug statements</dd>
+<dd>set the debug level see the avilable levels at \ref provided_debug_levels</dd>
 <dt>
 ENABLE_MPI [Default: FALSE]
 </dt>

@@ -3,7 +3,8 @@
 #define MPILIB_CONFIG_HPP_
 
 #cmakedefine ENABLE_MPI
-#cmakedefine DEBUG
+
+#define DEBUGLEVEL @DEBUGLEVEL@
 
 
 #endif //MPILIB_CONFIG_HPP_
