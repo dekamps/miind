@@ -18,10 +18,15 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
+#include <MPILib/config.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
+#include <MPILib/include/utilities/MPIProxy.hpp>
+
 #ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
 #endif
+#include <boost/timer/timer.hpp>
+
 #include "largeNetwork/GenerateHexagonalNetwork.hpp"
 #include "largeNetwork/Hexagon.hpp"
 #include "largeNetwork/LargeNetwork.hpp"
@@ -33,6 +38,8 @@
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 int main(int argc, char* argv[]) {
+	boost::timer::auto_cpu_timer t;
+
 #ifdef ENABLE_MPI
 	// initialise the mpi environment this cannot be forwarded to a class
 	boost::mpi::environment env(argc, argv);
@@ -65,14 +72,33 @@ int main(int argc, char* argv[]) {
 				t_end, t_report, t_step, "hex");
 
 		net.configureSimulation(par_run);
-
+		boost::timer::auto_cpu_timer te;
+		te.start();
 		net.evolve();
-	} catch (MPILib::utilities::Exception& exc) {
+
+		//timed calculation
+		MPILib::utilities::MPIProxy().barrier();
+		te.stop();
+		if (MPILib::utilities::MPIProxy().getRank() == 0) {
+
+			std::cout << "Time of configuration and envolve: \n";
+			te.report();
+		}
+	} catch (std::exception& exc) {
 		std::cout << exc.what() << std::endl;
 #ifdef ENABLE_MPI
 		//Abort the MPI environment in the correct way :)
 		env.abort(1);
 #endif
+	}
+
+
+	MPILib::utilities::MPIProxy().barrier();
+	t.stop();
+	if (MPILib::utilities::MPIProxy().getRank() == 0) {
+
+		std::cout << "Overall time spend\n";
+		t.report();
 	}
 	return 0;
 }
