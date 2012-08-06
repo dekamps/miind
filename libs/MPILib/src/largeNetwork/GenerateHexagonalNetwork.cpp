@@ -38,12 +38,10 @@ Rate Burst(Time t) {
 	return (t > 0.08 && t < 0.090) ? 5.0 : 0.0;
 }
 
-void Add_J_II(
-		MPINetwork<MPILib::populist::OrnsteinUhlenbeckConnection,
-				utilities::CircularDistribution>* p_net,
+void Add_J_II(MPILib::populist::Pop_Network* p_net,
 		const std::vector<NodeId>& vec) {
 
-	populist::PopulationAlgorithm::WeightType connection_J_II(TWOPOPULATION_C_I,
+	populist::Pop_Network::WeightType connection_J_II(TWOPOPULATION_C_I,
 			-TWOPOPULATION_J_II);
 
 	for (Index i = 0; i < vec.size(); i++) {
@@ -52,15 +50,13 @@ void Add_J_II(
 	}
 }
 
-void Add_J_EI(
-		MPINetwork<MPILib::populist::OrnsteinUhlenbeckConnection,
-				utilities::CircularDistribution>* p_net,
+void Add_J_EI(MPILib::populist::Pop_Network* p_net,
 		const std::vector<IdGrid>& vec_grid,
 		const std::vector<NodeId>& vec_link) {
 	assert(vec_grid.size() == vec_link.size());
 
 	// I to E
-	populist::PopulationAlgorithm::WeightType connection_J_EI(TWOPOPULATION_C_I,
+	populist::Pop_Network::WeightType connection_J_EI(TWOPOPULATION_C_I,
 			-TWOPOPULATION_J_EI);
 
 	for (Index i = 0; i < vec_grid.size(); i++) {
@@ -70,11 +66,10 @@ void Add_J_EI(
 }
 
 void Add_J_IE(
-		MPINetwork<populist::OrnsteinUhlenbeckConnection,
-				utilities::CircularDistribution>* p_net,
+		MPILib::populist::Pop_Network* p_net,
 		const std::vector<IdGrid>& vec_grid,
 		const std::vector<NodeId>& vec_link) {
-	populist::PopulationAlgorithm::WeightType connection_J_IE(
+	populist::Pop_Network::WeightType connection_J_IE(
 			static_cast<Number>(TWOPOPULATION_C_E * 0.5), // other half should come from cortical background
 			TWOPOPULATION_J_IE);
 
@@ -84,11 +79,10 @@ void Add_J_IE(
 
 }
 
-void Add_J_IE_bg(MPINetwork<populist::OrnsteinUhlenbeckConnection,
-		utilities::CircularDistribution>* p_net, NodeId id_bg,
+void Add_J_IE_bg(MPILib::populist::Pop_Network* p_net, NodeId id_bg,
 		const std::vector<NodeId>& vec_link) {
 
-	populist::PopulationAlgorithm::WeightType connection_J_IE_BG(
+	populist::Pop_Network::WeightType connection_J_IE_BG(
 			static_cast<Number>(TWOPOPULATION_C_E * 0.5), TWOPOPULATION_J_IE);
 
 	for (Index i = 0; i < vec_link.size(); i++)
@@ -96,10 +90,9 @@ void Add_J_IE_bg(MPINetwork<populist::OrnsteinUhlenbeckConnection,
 
 }
 
-void Add_J_EE_bg(MPINetwork<populist::OrnsteinUhlenbeckConnection,
-		utilities::CircularDistribution>* p_net, NodeId id_bg,
+void Add_J_EE_bg(MPILib::populist::Pop_Network* p_net, NodeId id_bg,
 		const std::vector<IdGrid>& vec_grid) {
-	populist::PopulationAlgorithm::WeightType connection_J_EE_BG(
+	populist::Pop_Network::WeightType connection_J_EE_BG(
 			TWOPOPULATION_C_E * (0.5), TWOPOPULATION_J_EE);
 
 	for (Index i = 0; i < vec_grid.size(); i++)
@@ -107,8 +100,7 @@ void Add_J_EE_bg(MPINetwork<populist::OrnsteinUhlenbeckConnection,
 				connection_J_EE_BG);
 }
 
-void Add_J_EE(MPINetwork<populist::OrnsteinUhlenbeckConnection,
-		utilities::CircularDistribution>* p_net, const std::vector<IdGrid>& vec_grid,
+void Add_J_EE(MPILib::populist::Pop_Network* p_net, const std::vector<IdGrid>& vec_grid,
 		const std::vector<nodepair>& vec_link) {
 	// Excitatory connection to itself
 
@@ -116,7 +108,7 @@ void Add_J_EE(MPINetwork<populist::OrnsteinUhlenbeckConnection,
 		Number n_neighbours =
 				NodesOntoThisNode(vec_link, vec_grid[i]._id).size();
 
-		populist::PopulationAlgorithm::WeightType connection_J_EE(
+		populist::Pop_Network::WeightType connection_J_EE(
 				TWOPOPULATION_C_E * 0.5 / (n_neighbours + 1),
 				TWOPOPULATION_J_EE);
 
@@ -125,8 +117,7 @@ void Add_J_EE(MPINetwork<populist::OrnsteinUhlenbeckConnection,
 	}
 }
 
-void Add_Lateral(MPINetwork<populist::OrnsteinUhlenbeckConnection,
-		utilities::CircularDistribution>* p_net, const std::vector<IdGrid>& vec_grid,
+void Add_Lateral(MPILib::populist::Pop_Network* p_net, const std::vector<IdGrid>& vec_grid,
 		const std::vector<nodepair>& vec_link) {
 	for (Index i = 0; i < vec_grid.size(); i++) {
 		std::vector<NodeId> vec_neighbour = NodesOntoThisNode(vec_link,
@@ -134,7 +125,7 @@ void Add_Lateral(MPINetwork<populist::OrnsteinUhlenbeckConnection,
 		Number n_neighbours = vec_neighbour.size();
 
 		for (Index j_in = 0; j_in < n_neighbours; j_in++) {
-			populist::PopulationAlgorithm::WeightType connection_J_EE(
+			populist::Pop_Network::WeightType connection_J_EE(
 					TWOPOPULATION_C_E * 0.5 / (n_neighbours + 1),
 					TWOPOPULATION_J_EE);
 			p_net->makeFirstInputOfSecond(vec_neighbour[j_in], vec_grid[i]._id,
@@ -145,8 +136,7 @@ void Add_Lateral(MPINetwork<populist::OrnsteinUhlenbeckConnection,
 }
 
 void GenerateHexagonalNetwork(Number n_rings,				//! number of rings
-		MPINetwork<populist::OrnsteinUhlenbeckConnection,
-						utilities::CircularDistribution>* p_net,		//! network to which populations should be added
+		MPILib::populist::Pop_Network* p_net,		//! network to which populations should be added
 		NodeId* p_id_cent,				//! id of the central node id
 		NodeId* p_id_bg,				//! id of the background node
 		std::vector<IdGrid>* p_vec_grid,//! list of Ids and positions for the excitatory nodes in the hexagon
@@ -172,7 +162,7 @@ void GenerateHexagonalNetwork(Number n_rings,				//! number of rings
 	*p_offset = (*p_vec_inh)[0] - (*p_id_cent); // one being the id value of the central id node
 
 	// Create cortical background, and add to network
-	populist::RateFunctor < populist::PopulationAlgorithm::WeightType
+	populist::RateFunctor < populist::Pop_Network::WeightType
 			> cortical_background(CorticalBackground);
 	*p_id_bg = p_net->addNode(cortical_background, EXCITATORY);
 
@@ -184,9 +174,9 @@ void GenerateHexagonalNetwork(Number n_rings,				//! number of rings
 	Add_J_EE(p_net, *p_vec_grid, *p_vec_link);
 	Add_Lateral(p_net, *p_vec_grid, *p_vec_link);
 
-	populist::RateFunctor < populist::PopulationAlgorithm::WeightType > burst(Burst);
+	populist::RateFunctor < populist::Pop_Network::WeightType > burst(Burst);
 	NodeId id_burst = p_net->addNode(burst, EXCITATORY);
-	populist::PopulationAlgorithm::WeightType connection_J_EE_Burst(
+	populist::Pop_Network::WeightType connection_J_EE_Burst(
 			BURST_FACTOR * TWOPOPULATION_C_E, TWOPOPULATION_J_EE);
 
 	p_net->makeFirstInputOfSecond(id_burst, *p_id_cent, connection_J_EE_Burst);

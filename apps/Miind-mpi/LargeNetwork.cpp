@@ -32,8 +32,7 @@
 #include <MPILib/include/SimulationRunParameter.hpp>
 int main(int argc, char* argv[]) {
 
-	MPILib::MPINetwork<MPILib::populist::OrnsteinUhlenbeckConnection,
-	MPILib::utilities::CircularDistribution> net;
+	MPILib::populist::Pop_Network net;
 	MPILib::NodeId id_centrum;
 	MPILib::NodeId id_bg;
 

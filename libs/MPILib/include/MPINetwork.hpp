@@ -38,6 +38,8 @@ class MPINetwork{
 
 public:
 
+	typedef WeightValue WeightType;
+
 	explicit MPINetwork();
 
 	~MPINetwork();

@@ -21,6 +21,7 @@
 #define _CODE_LIBS_LARGENETWORK_GENERATEHEXAGONALNETWORK_INCLUDE_GUARD
 
 #include <MPILib/include/MPINetwork.hpp>
+#include <MPILib/include/populist/PopulationAlgorithm.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
@@ -28,8 +29,7 @@
 
 void GenerateHexagonalNetwork(
 		MPILib::Number,							//! number of rings
-		MPILib::MPINetwork<MPILib::populist::OrnsteinUhlenbeckConnection,
-		MPILib::utilities::CircularDistribution>*,//! network to which populations should be added
+		MPILib::populist::Pop_Network*,//! network to which populations should be added
 		MPILib::NodeId*,						//! id of the central node id
 		MPILib::NodeId*,						//! id of the background rate node
 		std::vector<IdGrid>*,//! list of Ids and positions for the excitatory nodes in the hexagon
