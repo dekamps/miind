@@ -56,7 +56,7 @@ public:
 	 * @param t_end End time of Simulation
 	 * @param t_report Report time
 	 * @param t_step Network step time
-	 * @param name_log Log file path name @attention without extension
+	 * @param name_log Log file path name @attention without extension If you do not provide a string the log is printed to \c std::cerr
 	 * @param t_state_report Report State time
 	 */
 	SimulationRunParameter(
