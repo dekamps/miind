@@ -65,8 +65,7 @@ void Add_J_EI(MPILib::populist::Pop_Network* p_net,
 	}
 }
 
-void Add_J_IE(
-		MPILib::populist::Pop_Network* p_net,
+void Add_J_IE(MPILib::populist::Pop_Network* p_net,
 		const std::vector<IdGrid>& vec_grid,
 		const std::vector<NodeId>& vec_link) {
 	populist::Pop_Network::WeightType connection_J_IE(
@@ -100,7 +99,8 @@ void Add_J_EE_bg(MPILib::populist::Pop_Network* p_net, NodeId id_bg,
 				connection_J_EE_BG);
 }
 
-void Add_J_EE(MPILib::populist::Pop_Network* p_net, const std::vector<IdGrid>& vec_grid,
+void Add_J_EE(MPILib::populist::Pop_Network* p_net,
+		const std::vector<IdGrid>& vec_grid,
 		const std::vector<nodepair>& vec_link) {
 	// Excitatory connection to itself
 
@@ -117,7 +117,8 @@ void Add_J_EE(MPILib::populist::Pop_Network* p_net, const std::vector<IdGrid>& v
 	}
 }
 
-void Add_Lateral(MPILib::populist::Pop_Network* p_net, const std::vector<IdGrid>& vec_grid,
+void Add_Lateral(MPILib::populist::Pop_Network* p_net,
+		const std::vector<IdGrid>& vec_grid,
 		const std::vector<nodepair>& vec_link) {
 	for (Index i = 0; i < vec_grid.size(); i++) {
 		std::vector<NodeId> vec_neighbour = NodesOntoThisNode(vec_link,
@@ -136,7 +137,7 @@ void Add_Lateral(MPILib::populist::Pop_Network* p_net, const std::vector<IdGrid>
 }
 
 void GenerateHexagonalNetwork(Number n_rings,				//! number of rings
-		MPILib::populist::Pop_Network* p_net,		//! network to which populations should be added
+		MPILib::populist::Pop_Network* p_net,//! network to which populations should be added
 		NodeId* p_id_cent,				//! id of the central node id
 		NodeId* p_id_bg,				//! id of the background node
 		std::vector<IdGrid>* p_vec_grid,//! list of Ids and positions for the excitatory nodes in the hexagon
@@ -146,7 +147,8 @@ void GenerateHexagonalNetwork(Number n_rings,				//! number of rings
 		) {
 	BuildHexagonalGrid(p_vec_grid, p_vec_link, n_rings);
 
-	populist::PopulationAlgorithm alg_e(TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP);
+	populist::PopulationAlgorithm alg_e(
+			TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP);
 
 	*p_id_cent = NodeId(0);
 
@@ -155,15 +157,16 @@ void GenerateHexagonalNetwork(Number n_rings,				//! number of rings
 		assert(id_e == (*p_vec_grid)[i]._id);
 	}
 
-	populist::PopulationAlgorithm alg_i(TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP);
+	populist::PopulationAlgorithm alg_i(
+			TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP);
 	for (Index i = 0; i < p_vec_grid->size(); i++)
 		p_vec_inh->push_back(p_net->addNode(alg_i, INHIBITORY));
 
 	*p_offset = (*p_vec_inh)[0] - (*p_id_cent); // one being the id value of the central id node
 
 	// Create cortical background, and add to network
-	populist::RateFunctor < populist::Pop_Network::WeightType
-			> cortical_background(CorticalBackground);
+	populist::RateFunctor<populist::Pop_Network::WeightType> cortical_background(
+			CorticalBackground);
 	*p_id_bg = p_net->addNode(cortical_background, EXCITATORY);
 
 	Add_J_II(p_net, *p_vec_inh);
@@ -174,7 +177,7 @@ void GenerateHexagonalNetwork(Number n_rings,				//! number of rings
 	Add_J_EE(p_net, *p_vec_grid, *p_vec_link);
 	Add_Lateral(p_net, *p_vec_grid, *p_vec_link);
 
-	populist::RateFunctor < populist::Pop_Network::WeightType > burst(Burst);
+	populist::RateFunctor<populist::Pop_Network::WeightType> burst(Burst);
 	NodeId id_burst = p_net->addNode(burst, EXCITATORY);
 	populist::Pop_Network::WeightType connection_J_EE_Burst(
 			BURST_FACTOR * TWOPOPULATION_C_E, TWOPOPULATION_J_EE);
