@@ -22,7 +22,7 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
-#include <MPILib/include/utilities/FilenameGenerator.hpp>
+#include <MPILib/include/utilities/FileNameGenerator.hpp>
 #include <fstream>
 
 #ifdef ENABLE_MPI
