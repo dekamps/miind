@@ -19,8 +19,8 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
 #include <cassert>
-#include <MPILib/include/largeNetwork/LargeNetwork.hpp>
-#include <MPILib/include/largeNetwork/GenerateHexagonalNetwork.hpp>
+#include "LargeNetwork.hpp"
+#include "GenerateHexagonalNetwork.hpp"
 
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
@@ -148,7 +148,7 @@ void GenerateHexagonalNetwork(Number n_rings,				//! number of rings
 
 	populist::PopulationAlgorithm alg_e(TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP);
 
-	*p_id_cent = NodeId(1);
+	*p_id_cent = NodeId(0);
 
 	for (Index i = 0; i < p_vec_grid->size(); i++) {
 		NodeId id_e = p_net->addNode(alg_e, EXCITATORY);

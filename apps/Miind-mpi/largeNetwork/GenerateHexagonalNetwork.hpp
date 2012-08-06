@@ -20,12 +20,12 @@
 #ifndef _CODE_LIBS_LARGENETWORK_GENERATEHEXAGONALNETWORK_INCLUDE_GUARD
 #define _CODE_LIBS_LARGENETWORK_GENERATEHEXAGONALNETWORK_INCLUDE_GUARD
 
-#include <MPILib/include/MPINetwork.hpp>
+#include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/largeNetwork/Hexagon.hpp>
+#include "Hexagon.hpp"
 
 void GenerateHexagonalNetwork(
 		MPILib::Number,							//! number of rings

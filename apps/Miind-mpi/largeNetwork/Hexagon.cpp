@@ -18,7 +18,7 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
-#include <MPILib/include/largeNetwork/Hexagon.hpp>
+#include "Hexagon.hpp"
 #include <math.h>
 #include <iostream>
 namespace {
@@ -41,7 +41,8 @@ bool IsPointInGrid(const std::vector<IdGrid>& vec_grid, const IdGrid& point) {
 
 void BuildHexagonalGrid(std::vector<IdGrid>* pvec_grid,
 		std::vector<std::pair<MPILib::NodeId, MPILib::NodeId> >* pvec_link, MPILib::Number n_rings) {
-	int id_count = 1;
+	//The MPINetworks starts at 0!!!
+	int id_count = 0;
 	std::vector<IdGrid> vec_seed;
 
 	IdGrid seed = { MPILib::NodeId(id_count++), 0.0, 0.0 };

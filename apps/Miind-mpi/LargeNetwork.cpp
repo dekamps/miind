@@ -18,11 +18,13 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
-#include <MPILib/include/MPINetwork.hpp>
-
-#include <MPILib/include/largeNetwork/GenerateHexagonalNetwork.hpp>
-#include <MPILib/include/largeNetwork/Hexagon.hpp>
-#include <MPILib/include/largeNetwork/LargeNetwork.hpp>
+#include <MPILib/include/MPINetworkCode.hpp>
+#ifdef ENABLE_MPI
+#include <boost/mpi/communicator.hpp>
+#endif
+#include "largeNetwork/GenerateHexagonalNetwork.hpp"
+#include "largeNetwork/Hexagon.hpp"
+#include "largeNetwork/LargeNetwork.hpp"
 
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
@@ -31,37 +33,46 @@
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 int main(int argc, char* argv[]) {
-
-	MPILib::populist::Pop_Network net;
-	MPILib::NodeId id_centrum;
-	MPILib::NodeId id_bg;
-
-	std::vector<IdGrid> vec_grid;
-	std::vector<std::pair<MPILib::NodeId, MPILib::NodeId> > vec_link;
-	std::vector<MPILib::NodeId> vec_inh;
-	int i_offset;
-
-	// generates a network of hexgonal rings
-	GenerateHexagonalNetwork(
-			0,		// number of rings, increase if you want a larger network
-			&net, &id_centrum, &id_bg, &vec_grid, &vec_link, &vec_inh,
-			&i_offset);
-
-	MPILib::Time t_begin = 0.0;
-	MPILib::Time t_end = 0.13;
-	MPILib::Time t_report = 1e-4;
-	MPILib::Time t_step = 1e-5;
-
-	MPILib::report::handler::RootReportHandler hex_handler("hexagon", false);
-
-	MPILib::SimulationRunParameter par_run(hex_handler, 1000000, t_begin, t_end,
-			t_report, t_step, "hex");
-
-	net.configureSimulation(par_run);
+#ifdef ENABLE_MPI
+	// initialise the mpi environment this cannot be forwarded to a class
+	boost::mpi::environment env(argc, argv);
+#endif
 	try {
+		MPILib::populist::Pop_Network net;
+		MPILib::NodeId id_centrum;
+		MPILib::NodeId id_bg;
+
+		std::vector<IdGrid> vec_grid;
+		std::vector<std::pair<MPILib::NodeId, MPILib::NodeId> > vec_link;
+		std::vector<MPILib::NodeId> vec_inh;
+		int i_offset;
+
+		// generates a network of hexgonal rings
+		GenerateHexagonalNetwork(
+				0,	// number of rings, increase if you want a larger network
+				&net, &id_centrum, &id_bg, &vec_grid, &vec_link, &vec_inh,
+				&i_offset);
+
+		MPILib::Time t_begin = 0.0;
+		MPILib::Time t_end = 0.13;
+		MPILib::Time t_report = 1e-4;
+		MPILib::Time t_step = 1e-5;
+
+		MPILib::report::handler::RootReportHandler hex_handler("hexagon",
+				false);
+
+		MPILib::SimulationRunParameter par_run(hex_handler, 1000000, t_begin,
+				t_end, t_report, t_step, "hex");
+
+		net.configureSimulation(par_run);
+
 		net.evolve();
 	} catch (MPILib::utilities::Exception& exc) {
 		std::cout << exc.what() << std::endl;
+#ifdef ENABLE_MPI
+		//Abort the MPI environment in the correct way :)
+		env.abort(1);
+#endif
 	}
 	return 0;
 }
