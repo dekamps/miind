@@ -25,6 +25,7 @@
 #include <iostream>
 #include <cassert>
 #include <fstream>
+#include <MPILib/include/utilities/Log.hpp>
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/utilities/IterationNumberException.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
@@ -39,9 +40,7 @@ namespace MPILib {
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::MPINetwork() {
 //set the log level to logDEBUG4 to print all log messages if debug is enabled
-#ifdef DEBUG
-	utilities::Log::setReportingLevel(utilities::logDEBUG4);
-#endif
+
 }
 
 
@@ -63,6 +62,7 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 				NodeDistribution>(alg, nodeType, tempNodeId, _nodeDistribution,
 				_localNodes);
 		_localNodes.insert(std::make_pair(tempNodeId, node));
+		LOG(utilities::logDEBUG)<<"new node generated with id: "<<tempNodeId;
 	}
 	//increment the max NodeId to make sure that it is not assigned twice.
 	incrementMaxNodeId();
@@ -77,6 +77,7 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 	if (_nodeDistribution.isLocalNode(first)) {
 		if (_localNodes.count(first) > 0) {
 			_localNodes.find(first)->second.addSuccessor(second);
+			LOG(utilities::logDEBUG)<<"make first input of second called first: "<<first<<"; second: "<<second;
 		} else {
 			std::stringstream tempStream;
 			tempStream << "the node " << first << "does not exist on this node";

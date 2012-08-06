@@ -7,7 +7,7 @@
 
 #ifdef DEBUG
     #undef NDEBUG
-#elseif
+#else
     #define NDEBUG
 #endif
 
