@@ -18,16 +18,17 @@
 //
 
 #include <MPILib/config.hpp>
-#ifdef ENABLE_MPI
-#include <boost/mpi/communicator.hpp>
-#endif
-#include <MPILib/include/utilities/MPIProxy.hpp>
-
 #define private public
 #define protected public
 #include <MPILib/include/utilities/Log.hpp>
 #undef protected
 #undef private
+#ifdef ENABLE_MPI
+#include <boost/mpi/communicator.hpp>
+#endif
+#include <MPILib/include/utilities/MPIProxy.hpp>
+
+
 #include <cstring>
 #include <string>
 #include <iostream>
@@ -103,11 +104,20 @@ void test_writeOutput() {
 }
 
 void test_getReportingLevel() {
+#ifdef DEBUG
+	BOOST_CHECK(Log::getReportingLevel()==logDEBUG4);
+#else
 	BOOST_CHECK(Log::getReportingLevel()==logINFO);
+#endif
+
 }
 
 void test_setReportingLevel() {
+#ifdef DEBUG
+	BOOST_CHECK(Log::getReportingLevel()==logDEBUG4);
+#else
 	BOOST_CHECK(Log::getReportingLevel()==logINFO);
+#endif
 	std::shared_ptr<std::ostringstream> pStream(new std::ostringstream());
 
 	Log::setStream(std::dynamic_pointer_cast<std::ostream>(pStream));

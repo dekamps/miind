@@ -43,7 +43,6 @@ MPINetwork<WeightValue, NodeDistribution>::MPINetwork() {
 
 }
 
-
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::~MPINetwork() {
 }
@@ -62,7 +61,8 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 				NodeDistribution>(alg, nodeType, tempNodeId, _nodeDistribution,
 				_localNodes);
 		_localNodes.insert(std::make_pair(tempNodeId, node));
-		LOG(utilities::logDEBUG)<<"new node generated with id: "<<tempNodeId;
+		LOG(utilities::logDEBUG) << "new node generated with id: "
+				<< tempNodeId;
 	}
 	//increment the max NodeId to make sure that it is not assigned twice.
 	incrementMaxNodeId();
@@ -71,13 +71,16 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
-		NodeId first, NodeId second, const WeightValue& weight, NodeType secondNodeType) {
+		NodeId first, NodeId second, const WeightValue& weight,
+		NodeType secondNodeType) {
 
 	//Make sure that the node exists and then add the successor
 	if (_nodeDistribution.isLocalNode(first)) {
 		if (_localNodes.count(first) > 0) {
 			_localNodes.find(first)->second.addSuccessor(second);
-			LOG(utilities::logDEBUG)<<"make first input of second called first: "<<first<<"; second: "<<second;
+			LOG(utilities::logDEBUG)
+					<< "make first input of second called first: " << first
+					<< "; second: " << second;
 		} else {
 			std::stringstream tempStream;
 			tempStream << "the node " << first << "does not exist on this node";
@@ -104,7 +107,8 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 	// Make sure that the second node exist and then set the precursor
 	if (_nodeDistribution.isLocalNode(second)) {
 		if (_localNodes.count(second) > 0) {
-			_localNodes.find(second)->second.addPrecursor(first, weight, secondNodeType);
+			_localNodes.find(second)->second.addPrecursor(first, weight,
+					secondNodeType);
 		} else {
 			std::stringstream tempStream;
 			tempStream << "the node " << second
@@ -152,7 +156,8 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 			do {
 				do {
 
-					LOG(utilities::logDEBUG)<<"****** one evolve step finished ******";
+					LOG(utilities::logDEBUG)
+							<< "****** one evolve step finished ******";
 
 					// business as usual: keep evolving, as long as there is nothing to report
 					// or to update
@@ -232,11 +237,14 @@ template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::initializeLogStream(
 		const std::string & filename) {
 	// resource will be passed on to _stream_log
-
-	std::shared_ptr<std::ostream> p_stream(new std::ofstream(filename.c_str()));
-	if (!p_stream)
-		throw utilities::Exception("MPINetwork cannot open log file.");
-	utilities::Log::setStream(p_stream);
+	//only if filename is provided
+	if (!filename.empty()) {
+		std::shared_ptr<std::ostream> p_stream(
+				new std::ofstream(filename.c_str()));
+		if (!p_stream)
+			throw utilities::Exception("MPINetwork cannot open log file.");
+		utilities::Log::setStream(p_stream);
+	}
 }
 
 template<class WeightValue, class NodeDistribution>

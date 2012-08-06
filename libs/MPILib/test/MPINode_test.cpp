@@ -71,7 +71,7 @@ void test_addPrecursor() {
 	MPILib::NodeId nodeId = 4;
 	double weight = 2.1;
 
-	node.addPrecursor(nodeId, weight);
+	node.addPrecursor(nodeId, weight, EXCITATORY);
 	BOOST_CHECK(node._precursors.size()==1);
 	BOOST_CHECK(node._precursors[0]==4);
 	BOOST_CHECK(node._weights.size()==1);
@@ -122,14 +122,14 @@ void test_sendRecvWait() {
 				EXCITATORY, 0, network._nodeDistribution, network._localNodes);
 
 		node->addSuccessor(1);
-		node->addPrecursor(1, 2.1);
+		node->addPrecursor(1, 2.1, EXCITATORY);
 	} else {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
 				EXCITATORY, 1, network._nodeDistribution, network._localNodes);
 
 		node->addSuccessor(0);
-		node->addPrecursor(0, 1.2);
+		node->addPrecursor(0, 1.2, EXCITATORY);
 	}
 
 	node->setActivity(MPILib::utilities::MPIProxy().getRank());
@@ -159,7 +159,7 @@ void test_exchangeNodeTypes() {
 				EXCITATORY, 0, network._nodeDistribution, network._localNodes);
 
 		node->addSuccessor(1);
-		node->addPrecursor(1, 2.1);
+		node->addPrecursor(1, 2.1, INHIBITORY_BURST);
 	} else {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
@@ -167,10 +167,9 @@ void test_exchangeNodeTypes() {
 				network._localNodes);
 
 		node->addSuccessor(0);
-		node->addPrecursor(0, 1.2);
+		node->addPrecursor(0, 1.2, EXCITATORY);
 	}
 
-	node->exchangeNodeTypes();
 	MPINode<double, utilities::CircularDistribution>::waitAll();
 	if (MPILib::utilities::MPIProxy().getSize() == 2) {
 		if (MPILib::utilities::MPIProxy().getRank() == 0) {

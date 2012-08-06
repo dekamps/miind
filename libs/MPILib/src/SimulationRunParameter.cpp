@@ -86,8 +86,12 @@ Time SimulationRunParameter::getTState() const {
 }
 
 std::string SimulationRunParameter::getLogName() const {
-	utilities::FileNameGenerator fg (_logFileName);
-	return fg.getFileName();
+	if (_logFileName.empty()) {
+		return "";
+	} else {
+		utilities::FileNameGenerator fg(_logFileName);
+		return fg.getFileName();
+	}
 }
 
 const report::handler::AbstractReportHandler& SimulationRunParameter::getHandler() const {

@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 	try {
 
 
-		std::shared_ptr<std::ostream> p_stream(new std::ofstream(MPILib::utilities::FileNameGenerator("log").getFileName()));
+		std::shared_ptr<std::ostream> p_stream(new std::ofstream(MPILib::utilities::FileNameGenerator("hex").getFileName()));
 		if (!p_stream)
 			throw MPILib::utilities::Exception("MPINetwork cannot open log file.");
 		MPILib::utilities::Log::setStream(p_stream);
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 				false);
 
 		MPILib::SimulationRunParameter par_run(hex_handler, 1000000, t_begin,
-				t_end, t_report, t_step, "hex");
+				t_end, t_report, t_step);
 
 		net.configureSimulation(par_run);
 		boost::timer::auto_cpu_timer te;

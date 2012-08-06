@@ -84,7 +84,7 @@ public:
 	 * @param weight the weight of the connection
 	 * @param nodeType the nodeType of the precursor
 	 */
-	void addPrecursor(NodeId nodeId, const Weight& weight, NodeType& nodeType);
+	void addPrecursor(NodeId nodeId, const Weight& weight, NodeType nodeType);
 
 	/**
 	 * Add a successor to the current node

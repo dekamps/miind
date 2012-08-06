@@ -90,7 +90,7 @@ void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::addPrecursor(NodeId nodeId,
-		const Weight& weight, NodeType& nodeType) {
+		const Weight& weight, NodeType nodeType) {
 	_precursors.push_back(nodeId);
 	_precursorTypes.push_back(nodeType);
 	_weights.push_back(weight);
