@@ -72,7 +72,7 @@ struct null_deleter {
 /**
  * The default log level is set to the finest possible, everything is logged.
  */
-LogLevel Log::_reportingLevel = logINFO;
+LogLevel Log::_reportingLevel = logDEBUG4;
 /**
  * Default the log is printed to std::cerr. To avoid the deletion of std::cerr
  * a null_deleter is provided.

@@ -155,6 +155,9 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 			do {
 				do {
+
+					LOG(utilities::logDEBUG)<<"****** one evolve step finished ******";
+
 					// business as usual: keep evolving, as long as there is nothing to report
 					// or to update
 					updateSimulationTime();

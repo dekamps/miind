@@ -41,25 +41,28 @@ MPIProxy_::MPIProxy_() {
 MPIProxy_::~MPIProxy_() {
 }
 
-int MPIProxy_::getRank() const{
-	return  _rank;
+int MPIProxy_::getRank() const {
+	return _rank;
 }
 
-int MPIProxy_::getSize() const{
+int MPIProxy_::getSize() const {
 	return _size;
 }
 
-void MPIProxy_::barrier(){
+void MPIProxy_::barrier() {
 #ifdef ENABLE_MPI
 	mpi::communicator world;
 	world.barrier();
 #endif
 }
 
-void MPIProxy_::waitAll(){
+void MPIProxy_::waitAll() {
 #ifdef ENABLE_MPI
+	LOG(utilities::logDEBUG)<<"wait all called with: "<<_mpiStatus.size()<<" mpi statues";
 	mpi::wait_all(_mpiStatus.begin(), _mpiStatus.end());
+
 	_mpiStatus.clear();
+
 #endif
 }
 

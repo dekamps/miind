@@ -22,6 +22,7 @@
 #include <MPILib/config.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/utilities/Singleton.hpp>
+#include <MPILib/include/utilities/Log.hpp>
 #ifdef ENABLE_MPI
 #include <boost/mpi/request.hpp>
 #include <boost/mpi/communicator.hpp>
@@ -139,6 +140,7 @@ void MPIProxy_::irecv(int source, int tag, T& value) const {
 #ifdef ENABLE_MPI
 	mpi::communicator world;
 	_mpiStatus.push_back(world.irecv(source, tag, value));
+	LOG(utilities::logDEBUG)<<"recv source: "<<source<<"; tag: "<<tag<<"; value: "<<value;
 #else
 	MPILib::utilities::Exception("MPI Code called from serial code in irecv");
 #endif
@@ -149,6 +151,7 @@ void MPIProxy_::isend(int dest, int tag, const T& value) const {
 #ifdef ENABLE_MPI
 	mpi::communicator world;
 	_mpiStatus.push_back(world.isend(dest, tag, value));
+	LOG(utilities::logDEBUG)<<"send destination: "<<dest<<"; tag: "<<tag<<"; value: "<<value;
 #else
 	MPILib::utilities::Exception("MPI Code called from serial code in isend");
 #endif
