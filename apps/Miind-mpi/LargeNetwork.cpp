@@ -23,7 +23,7 @@
 #include <MPILib/include/utilities/MPIProxy.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/utilities/FileNameGenerator.hpp>
-#include <fstream>
+#include <iostream>
 
 #ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
