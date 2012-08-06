@@ -61,7 +61,7 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 				NodeDistribution>(alg, nodeType, tempNodeId, _nodeDistribution,
 				_localNodes);
 		_localNodes.insert(std::make_pair(tempNodeId, node));
-		LOG(utilities::logDEBUG) << "new node generated with id: "
+		LOG(utilities::logDEBUG2) << "new node generated with id: "
 				<< tempNodeId;
 	}
 	//increment the max NodeId to make sure that it is not assigned twice.
@@ -78,7 +78,7 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 	if (_nodeDistribution.isLocalNode(first)) {
 		if (_localNodes.count(first) > 0) {
 			_localNodes.find(first)->second.addSuccessor(second);
-			LOG(utilities::logDEBUG)
+			LOG(utilities::logDEBUG2)
 					<< "make first input of second called first: " << first
 					<< "; second: " << second;
 		} else {

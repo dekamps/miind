@@ -140,7 +140,7 @@ void MPIProxy_::irecv(int source, int tag, T& value) const {
 #ifdef ENABLE_MPI
 	mpi::communicator world;
 	_mpiStatus.push_back(world.irecv(source, tag, value));
-	LOG(utilities::logDEBUG)<<"recv source: "<<source<<"; tag: "<<tag<<"; value: "<<value;
+	LOG(utilities::logDEBUG4)<<"recv source: "<<source<<"; tag: "<<tag<<"; value: "<<value;
 #else
 	MPILib::utilities::Exception("MPI Code called from serial code in irecv");
 #endif
@@ -151,7 +151,7 @@ void MPIProxy_::isend(int dest, int tag, const T& value) const {
 #ifdef ENABLE_MPI
 	mpi::communicator world;
 	_mpiStatus.push_back(world.isend(dest, tag, value));
-	LOG(utilities::logDEBUG)<<"send destination: "<<dest<<"; tag: "<<tag<<"; value: "<<value;
+	LOG(utilities::logDEBUG4)<<"send destination: "<<dest<<"; tag: "<<tag<<"; value: "<<value;
 #else
 	MPILib::utilities::Exception("MPI Code called from serial code in isend");
 #endif

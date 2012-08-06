@@ -58,7 +58,7 @@ void MPIProxy_::barrier() {
 
 void MPIProxy_::waitAll() {
 #ifdef ENABLE_MPI
-	LOG(utilities::logDEBUG)<<"wait all called with: "<<_mpiStatus.size()<<" mpi statues";
+	LOG(utilities::logDEBUG4)<<"wait all called with: "<<_mpiStatus.size()<<" mpi statues";
 	mpi::wait_all(_mpiStatus.begin(), _mpiStatus.end());
 
 	_mpiStatus.clear();

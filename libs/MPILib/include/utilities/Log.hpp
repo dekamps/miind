@@ -35,7 +35,7 @@ namespace utilities {
  * <li>\ref logging_introduction</li>
  * <li>\ref advanced_use</li>
  * <li>\ref details_macro</li>
- * <li>\ref provided_error_levels</li>
+ * <li>\ref provided_debug_levels</li>
  * </ol>
  * \section logging_introduction Introduction
  * To log a message in miind use the following macro:
@@ -47,7 +47,7 @@ namespace utilities {
  * done at compile time you pay only for log messages if they are actually printed.
  *
  * \section advanced_use Advanced use of logging
- * The default logging level is \c utilities::logINFO then everything is printed to the log.
+ * The default logging level is defined by the flag DEBUGLEVEL then everything is printed to the log.
  * To change the reporting level of the log class the following code is needed:
  *
  * @code{.cpp}
@@ -98,7 +98,7 @@ namespace utilities {
  * @endcode
  * However try to use the macro with temporary variables.
  *
- * \section provided_error_levels Provided Error levels
+ * \section provided_debug_levels Provided Debug levels
  *
  * <dl>
  * <dt>logERROR</dt>
