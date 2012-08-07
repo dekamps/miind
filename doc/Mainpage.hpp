@@ -17,6 +17,9 @@ MIIND is free and Open Source. It is distributed under a modified BSD license (s
 \section sec_install Installation
 Use cmake and make. For more details see \ref installation.
 
+\section sec_dependencies Dependencies
+For more details see \ref dependencies
+
 \section MPILib
 see \ref MPILibDoc.
 
