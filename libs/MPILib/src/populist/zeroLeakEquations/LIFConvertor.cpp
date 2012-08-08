@@ -138,7 +138,6 @@ void LIFConvertor::SortConnectionvector(const std::vector<Rate>& nodeVector,
 
 	// sorting depends on network structure and only should be done once
 	if (!_b_toggle_sort) {
-		auto iterWeight = weightVector.begin();
 		auto iterType = typeVector.begin();
 		for (auto iter = nodeVector.begin(); iter != nodeVector.end();
 				iter++, iterType++) {

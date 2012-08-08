@@ -37,6 +37,7 @@ _b_time_available(true)
 	{
 		// just check if there is timing
 		float time_first = _timer.SecondsSinceLastCall();
+		time_first++;
 
 	}
 	catch (TimeException)
