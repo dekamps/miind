@@ -101,7 +101,6 @@ MPILib::Number NumberOfNeighbours(const std::vector<IdGrid>& vec_grid, MPILib::N
 			break;
 		}
 
-	float rad = sqrt(pow(vec_grid[j]._x, 2) + pow(vec_grid[j]._y, 2));
 	bool b_outer_ring = fabs(vec_grid[j]._y - max_rad * sqrt(3.0) * 0.5) < EPS
 			|| fabs(-vec_grid[j]._y - max_rad * sqrt(3.0) * 0.5) < EPS
 			|| fabs(sqrt(3.0) / 3.0 * vec_grid[j]._y - vec_grid[j]._x - max_rad)
