@@ -203,7 +203,7 @@ private:
 	double innerProduct(const std::vector<Rate>& nodeVector,
 			const std::vector<double>& weightVector);
 
-	vector<double> getInitialState() const;
+	std::vector<double> getInitialState() const;
 
 	WilsonCowanParameter _parameter;
 

@@ -88,7 +88,7 @@ void WilsonCowanAlgorithm::configure(const SimulationRunParameter& simParam) {
 
 	NumtoolsLib::DVIntegratorStateParameter<WilsonCowanParameter> parameter_dv;
 
-	parameter_dv._vector_state = vector<double>(1, 0);
+	parameter_dv._vector_state = std::vector<double>(1, 0);
 	parameter_dv._time_begin = simParam.getTBegin();
 	parameter_dv._time_end = simParam.getTEnd();
 	parameter_dv._time_step = simParam.getTStep();
@@ -143,8 +143,8 @@ double WilsonCowanAlgorithm::innerProduct(const std::vector<Rate>& nodeVector,
 
 }
 
-vector<double> WilsonCowanAlgorithm::getInitialState() const {
-	vector<double> array_return(WILSON_COWAN_STATE_DIMENSION);
+std::vector<double> WilsonCowanAlgorithm::getInitialState() const {
+	std::vector<double> array_return(WILSON_COWAN_STATE_DIMENSION);
 	array_return[0] = 0;
 	return array_return;
 }
