@@ -27,7 +27,8 @@
 namespace MPILib{
 namespace utilities{
 
-/** libpipe expection base class.
+/**
+ * miind exception base class.
  */
 class Exception : public std::exception
 {
