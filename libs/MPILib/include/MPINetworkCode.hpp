@@ -39,8 +39,6 @@ namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::MPINetwork() {
-//set the log level to logDEBUG4 to print all log messages if debug is enabled
-
 }
 
 template<class WeightValue, class NodeDistribution>

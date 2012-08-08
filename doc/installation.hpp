@@ -19,7 +19,7 @@ ENABLE_MEMORY_TEST [Default: FALSE]
 <dt>
 ENABLE_COVERAGE [Default: FALSE]
 </dt>
-<dd>allows to generate a coverage report</dd>
+<dd>allows to generate a coverage report. Does not work at the moment</dd>
 <dt>
 DEBUGLEVEL [Default: logINFO]
 </dt>
@@ -28,10 +28,6 @@ DEBUGLEVEL [Default: logINFO]
 ENABLE_MPI [Default: FALSE]
 </dt>
 <dd>enable mpi for the miind mpi lib</dd>
-<dt>
-INCLUDE_MPI_LIB [Default: TRUE]
-</dt>
-<dd>build the miind mpi lib</dd>
 <dt>
 MPIEXEC
 </dt>
