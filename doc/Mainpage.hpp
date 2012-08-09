@@ -22,7 +22,8 @@ For more details see \ref dependencies
 
 \section MPILib
 see \ref MPILibDoc.
-
+\section adaption Adaption of old Code to the new MPILib
+see \ref changes
 \section sec_appendix Appendix
 
 \subsection sec_issues Known Issues
