@@ -31,7 +31,7 @@ using namespace MPILib::populist;
 using namespace MPILib;
 
 void test_Enum() {
-	BOOST_CHECK(FLOATING_POINT < INTEGER == true);
+	BOOST_CHECK((FLOATING_POINT < INTEGER) == true);
 	BOOST_CHECK(FLOATING_POINT==0);
 	BOOST_CHECK(INTEGER ==1);
 

@@ -23,7 +23,7 @@
 #include <iostream>
 namespace {
 
-const int N_Hexagon = 6;
+const unsigned int N_Hexagon = 6;
 const float Phi_hexagon = 2 * 3.1415926535F / 6;
 const float TOLERANCE = 0.01F;
 const float EPS = 1e-4F;

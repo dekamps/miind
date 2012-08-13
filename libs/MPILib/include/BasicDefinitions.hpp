@@ -50,7 +50,7 @@ const double RELATIVE_LEAKAGE_PRECISION = 1e-4; //1e-10;
 const double ALPHA_LIMIT = 1e-6;
 
 const unsigned int MAXIMUM_NUMBER_CIRCULANT_BINS = 100000;
-const int MAXIMUM_NUMBER_NON_CIRCULANT_BINS = 100000;
+const unsigned int MAXIMUM_NUMBER_NON_CIRCULANT_BINS = 100000;
 
 //! The parameter vector for Wilson Cowan integration has four elements
 const int WILSON_COWAN_PARAMETER_DIMENSION = 4;
@@ -66,7 +66,7 @@ const Number CIRCULANT_POLY_DEGREE = 4;
 
 const Index CIRCULANT_POLY_JMAX = 7;
 
-const int MAXIMUM_NUMBER_GAMMAZ_VALUES = 500;
+const unsigned int MAXIMUM_NUMBER_GAMMAZ_VALUES = 500;
 
 const Number NUMBER_INTEGRATION_WORKSPACE = 10000;
 

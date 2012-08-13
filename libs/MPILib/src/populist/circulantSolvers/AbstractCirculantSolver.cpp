@@ -64,8 +64,7 @@ void AbstractCirculantSolver::FillLinear() {
 		Index index_non_circulant_area = (_n_bins - 1 - index_density)
 				/ (_p_set->_H_exc);
 
-		assert(
-				index_non_circulant_area >= 0 && index_non_circulant_area < static_cast<unsigned int>( _array_rho.size() ));
+		assert(index_non_circulant_area < static_cast<unsigned int>( _array_rho.size() ));
 
 		_array_rho[index_non_circulant_area] += array_state[index_density];
 	}
