@@ -49,10 +49,12 @@ int main(int argc, char* argv[]) {
 #endif
 	try {
 
-
-		std::shared_ptr<std::ostream> p_stream(new std::ofstream(MPILib::utilities::FileNameGenerator("hex").getFileName()));
+		std::shared_ptr<std::ostream> p_stream(
+				new std::ofstream(
+						MPILib::utilities::FileNameGenerator("hex").getFileName()));
 		if (!p_stream)
-			throw MPILib::utilities::Exception("MPINetwork cannot open log file.");
+			throw MPILib::utilities::Exception(
+					"MPINetwork cannot open log file.");
 		MPILib::utilities::Log::setStream(p_stream);
 
 		MPILib::populist::Pop_Network net;
@@ -62,13 +64,14 @@ int main(int argc, char* argv[]) {
 		std::vector<IdGrid> vec_grid;
 		std::vector<std::pair<MPILib::NodeId, MPILib::NodeId> > vec_link;
 		std::vector<MPILib::NodeId> vec_inh;
+		std::vector<MPILib::NodeId> vec_delay;
 		int i_offset;
 
 		// generates a network of hexgonal rings
 		GenerateHexagonalNetwork(
 				1,	// number of rings, increase if you want a larger network
 				&net, &id_centrum, &id_bg, &vec_grid, &vec_link, &vec_inh,
-				&i_offset);
+				&vec_delay, & i_offset);
 
 		MPILib::Time t_begin = 0.0;
 		MPILib::Time t_end = 0.13;
@@ -101,7 +104,6 @@ int main(int argc, char* argv[]) {
 		env.abort(1);
 #endif
 	}
-
 
 	MPILib::utilities::MPIProxy().barrier();
 	t.stop();

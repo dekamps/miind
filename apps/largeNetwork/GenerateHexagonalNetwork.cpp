@@ -23,6 +23,7 @@
 #include "GenerateHexagonalNetwork.hpp"
 
 #include <MPILib/include/TypeDefinitions.hpp>
+#include <MPILib/include/algorithm/DelayAlgorithmCode.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
 #include <MPILib/include/populist/RateFunctorCode.hpp>
 using namespace MPILib;
@@ -46,7 +47,8 @@ void Add_J_II(MPILib::populist::Pop_Network* p_net,
 
 	for (Index i = 0; i < vec.size(); i++) {
 
-		p_net->makeFirstInputOfSecond(vec[i], vec[i], connection_J_II, INHIBITORY);
+		p_net->makeFirstInputOfSecond(vec[i], vec[i], connection_J_II,
+				INHIBITORY);
 	}
 }
 
@@ -85,7 +87,8 @@ void Add_J_IE_bg(MPILib::populist::Pop_Network* p_net, NodeId id_bg,
 			static_cast<Number>(TWOPOPULATION_C_E * 0.5), TWOPOPULATION_J_IE);
 
 	for (Index i = 0; i < vec_link.size(); i++)
-		p_net->makeFirstInputOfSecond(id_bg, vec_link[i], connection_J_IE_BG, EXCITATORY);
+		p_net->makeFirstInputOfSecond(id_bg, vec_link[i], connection_J_IE_BG,
+				EXCITATORY);
 
 }
 
@@ -118,8 +121,11 @@ void Add_J_EE(MPILib::populist::Pop_Network* p_net,
 }
 
 void Add_Lateral(MPILib::populist::Pop_Network* p_net,
-		const std::vector<IdGrid>& vec_grid,
+		std::vector<NodeId>* pvec_delay, const std::vector<IdGrid>& vec_grid,
 		const std::vector<nodepair>& vec_link) {
+
+	MPILib::populist::Pop_Network::WeightType connection_unit(1, 1);
+
 	for (Index i = 0; i < vec_grid.size(); i++) {
 		std::vector<NodeId> vec_neighbour = NodesOntoThisNode(vec_link,
 				vec_grid[i]._id);
@@ -129,6 +135,13 @@ void Add_Lateral(MPILib::populist::Pop_Network* p_net,
 			populist::Pop_Network::WeightType connection_J_EE(
 					TWOPOPULATION_C_E * 0.5 / (n_neighbours + 1),
 					TWOPOPULATION_J_EE);
+			MPILib::algorithm::DelayAlgorithm <MPILib::populist::Pop_Network::WeightType
+					> alg_delay(largeNetwork::T_DELAY); //TODO fix this
+			NodeId id_delay = p_net->addNode(alg_delay, EXCITATORY);
+			p_net->makeFirstInputOfSecond(vec_neighbour[j_in], id_delay,
+					connection_unit, EXCITATORY);//TODO make sur that this is correct
+			p_net->makeFirstInputOfSecond(id_delay, vec_grid[i]._id,
+					connection_J_EE, EXCITATORY);//TODO make sur that this is correct
 			p_net->makeFirstInputOfSecond(vec_neighbour[j_in], vec_grid[i]._id,
 					connection_J_EE, EXCITATORY);
 		}
@@ -143,6 +156,7 @@ void GenerateHexagonalNetwork(Number n_rings,				//! number of rings
 		std::vector<IdGrid>* p_vec_grid,//! list of Ids and positions for the excitatory nodes in the hexagon
 		std::vector<std::pair<NodeId, NodeId> >* p_vec_link,//! list of neighbours for the excitatory nodes
 		std::vector<NodeId>* p_vec_inh,				//! list of inhibitory nodes
+		std::vector<NodeId>* p_vec_delay, //! list of delay nodes
 		int* p_offset		//! offset between excitatory and inhibitory nodes
 		) {
 	BuildHexagonalGrid(p_vec_grid, p_vec_link, n_rings);
@@ -175,12 +189,13 @@ void GenerateHexagonalNetwork(Number n_rings,				//! number of rings
 	Add_J_IE_bg(p_net, *p_id_bg, *p_vec_inh);
 	Add_J_EE_bg(p_net, *p_id_bg, *p_vec_grid);
 	Add_J_EE(p_net, *p_vec_grid, *p_vec_link);
-	Add_Lateral(p_net, *p_vec_grid, *p_vec_link);
+	Add_Lateral(p_net, p_vec_delay, *p_vec_grid, *p_vec_link);
 
 	populist::RateFunctor<populist::Pop_Network::WeightType> burst(Burst);
 	NodeId id_burst = p_net->addNode(burst, EXCITATORY);
 	populist::Pop_Network::WeightType connection_J_EE_Burst(
 			BURST_FACTOR * TWOPOPULATION_C_E, TWOPOPULATION_J_EE);
 
-	p_net->makeFirstInputOfSecond(id_burst, *p_id_cent, connection_J_EE_Burst, EXCITATORY);
+	p_net->makeFirstInputOfSecond(id_burst, *p_id_cent, connection_J_EE_Burst,
+			EXCITATORY);
 }

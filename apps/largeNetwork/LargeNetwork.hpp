@@ -60,6 +60,8 @@ namespace largeNetwork {
 
 	const double g = 3.0;
 
+	const double T_DELAY = 0.0;
+
 	const MPILib::Efficacy TWOPOPULATION_J_EI = g*TWOPOPULATION_J_EE;
 	const MPILib::Efficacy TWOPOPULATION_J_II = g*TWOPOPULATION_J_IE;
 

@@ -35,6 +35,7 @@ void GenerateHexagonalNetwork(
 		std::vector<IdGrid>*,//! list of Ids and positions for the excitatory nodes in the hexagon
 		std::vector<std::pair<MPILib::NodeId, MPILib::NodeId> >*, //! list of neighbours for the excitatory nodes
 		std::vector<MPILib::NodeId>*,				//! list of inhibitory nodes
+		std::vector<MPILib::NodeId>*,				//! list of delay nodes
 		int*				//! offset between excitatory and inhibitory nodes
 		);
 
