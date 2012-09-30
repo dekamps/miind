@@ -101,15 +101,21 @@ Rate DelayAlgorithm<Weight>::CalculateDelayedRate() {
 template<class Weight>
 Rate DelayAlgorithm<Weight>::Interpolate() const {
 
-	double t_early = _queue[0].second;
-	double t_late = _queue[1].second;
+	if (_queue.size() == 1){
+		// this happens if the delay is 0
+		assert(_t_current == _queue[0].second);
+		return _queue[0].first;
+	}
+	double t_early  = _queue[0].second;
+	double t_late   = _queue[1].second;
 	assert(t_late >= _t_current && t_early <= _t_current);
-	double t_dif = t_late - t_early;
-	double t_rat = _t_current - t_early;
+	double t_dif   = t_late - t_early;
+	double t_rat   = _t_current - t_early;
 	double alpha = t_rat / t_dif;
-	Rate rate = alpha * _queue[0].first + (1 - alpha) * _queue[1].first;
+	Rate rate = alpha*_queue[0].first + (1-alpha)*_queue[1].first;
 
 	return rate;
+
 }
 
 } /* end namespace algorithm */
