@@ -136,14 +136,13 @@ void Add_Lateral(MPILib::populist::Pop_Network* p_net,
 					TWOPOPULATION_C_E * 0.5 / (n_neighbours + 1),
 					TWOPOPULATION_J_EE);
 			MPILib::algorithm::DelayAlgorithm <MPILib::populist::Pop_Network::WeightType
-					> alg_delay(largeNetwork::T_DELAY); //TODO fix this
+					> alg_delay(largeNetwork::T_DELAY);
 			NodeId id_delay = p_net->addNode(alg_delay, EXCITATORY);
 			p_net->makeFirstInputOfSecond(vec_neighbour[j_in], id_delay,
-					connection_unit, EXCITATORY);//TODO make sur that this is correct
+					connection_unit, INHIBITORY);
 			p_net->makeFirstInputOfSecond(id_delay, vec_grid[i]._id,
-					connection_J_EE, EXCITATORY);//TODO make sur that this is correct
-			p_net->makeFirstInputOfSecond(vec_neighbour[j_in], vec_grid[i]._id,
-					connection_J_EE, EXCITATORY);
+					connection_J_EE, INHIBITORY);
+
 		}
 	}
 }
