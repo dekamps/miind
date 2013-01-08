@@ -69,12 +69,12 @@ int main(int argc, char* argv[]) {
 
 		// generates a network of hexgonal rings
 		GenerateHexagonalNetwork(
-				1,	// number of rings, increase if you want a larger network
+				3,	// number of rings, increase if you want a larger network
 				&net, &id_centrum, &id_bg, &vec_grid, &vec_link, &vec_inh,
 				&vec_delay, & i_offset);
 
 		MPILib::Time t_begin = 0.0;
-		MPILib::Time t_end = 0.13;
+		MPILib::Time t_end = 0.2;
 		MPILib::Time t_report = 1e-4;
 		MPILib::Time t_step = 1e-5;
 

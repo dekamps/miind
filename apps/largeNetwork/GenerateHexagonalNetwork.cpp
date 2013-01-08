@@ -19,182 +19,236 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
 #include <cassert>
-#include "LargeNetwork.hpp"
-#include "GenerateHexagonalNetwork.hpp"
+#include "LargeNetwork.h"
+#include "GenerateHexagonalNetwork.h"
 
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/algorithm/DelayAlgorithmCode.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
 #include <MPILib/include/populist/RateFunctorCode.hpp>
+
+using namespace LargeNetwork;
 using namespace MPILib;
-using namespace largeNetwork;
-namespace {
+using namespace MPILib::populist;
+namespace { 
 
-Rate CorticalBackground(Time t) {
-	return RATE_TWOPOPULATION_EXCITATORY_BACKGROUND;
-}
-// Provide a sharp burst to centre
-
-Rate Burst(Time t) {
-	return (t > 0.08 && t < 0.090) ? 5.0 : 0.0;
-}
-
-void Add_J_II(MPILib::populist::Pop_Network* p_net,
-		const std::vector<NodeId>& vec) {
-
-	populist::Pop_Network::WeightType connection_J_II(TWOPOPULATION_C_I,
-			-TWOPOPULATION_J_II);
-
-	for (Index i = 0; i < vec.size(); i++) {
-
-		p_net->makeFirstInputOfSecond(vec[i], vec[i], connection_J_II,
-				INHIBITORY);
+	Rate CorticalBackground(Time t)
+	{
+		return RATE_TWOPOPULATION_EXCITATORY_BACKGROUND;
 	}
-}
+	// Provide a sharp burst to centre
 
-void Add_J_EI(MPILib::populist::Pop_Network* p_net,
-		const std::vector<IdGrid>& vec_grid,
-		const std::vector<NodeId>& vec_link) {
-	assert(vec_grid.size() == vec_link.size());
-
-	// I to E
-	populist::Pop_Network::WeightType connection_J_EI(TWOPOPULATION_C_I,
-			-TWOPOPULATION_J_EI);
-
-	for (Index i = 0; i < vec_grid.size(); i++) {
-		p_net->makeFirstInputOfSecond(vec_link[i], vec_grid[i]._id,
-				connection_J_EI, INHIBITORY);
+	Rate Burst(Time t)
+	{
+		return (t > 0.08 && t < 0.090) ? 6.0 : 0.0;
 	}
-}
 
-void Add_J_IE(MPILib::populist::Pop_Network* p_net,
-		const std::vector<IdGrid>& vec_grid,
-		const std::vector<NodeId>& vec_link) {
-	populist::Pop_Network::WeightType connection_J_IE(
-			static_cast<Number>(TWOPOPULATION_C_E * 0.5), // other half should come from cortical background
-			TWOPOPULATION_J_IE);
 
-	for (Index i = 0; i < vec_grid.size(); i++)
-		p_net->makeFirstInputOfSecond(vec_grid[i]._id, vec_link[i],
-				connection_J_IE, EXCITATORY);
 
-}
+        void Add_J_II(Pop_Network* p_net,const vector<NodeId>& vec)
+	{
 
-void Add_J_IE_bg(MPILib::populist::Pop_Network* p_net, NodeId id_bg,
-		const std::vector<NodeId>& vec_link) {
+		PopulationAlgorithm::WeightType 
+			connection_J_II
+			(
+				TWOPOPULATION_C_I,
+				-TWOPOPULATION_J_II
+			);
 
-	populist::Pop_Network::WeightType connection_J_IE_BG(
-			static_cast<Number>(TWOPOPULATION_C_E * 0.5), TWOPOPULATION_J_IE);
+		for(Index i = 0; i < vec.size(); i++){
 
-	for (Index i = 0; i < vec_link.size(); i++)
-		p_net->makeFirstInputOfSecond(id_bg, vec_link[i], connection_J_IE_BG,
-				EXCITATORY);
-
-}
-
-void Add_J_EE_bg(MPILib::populist::Pop_Network* p_net, NodeId id_bg,
-		const std::vector<IdGrid>& vec_grid) {
-	populist::Pop_Network::WeightType connection_J_EE_BG(
-			TWOPOPULATION_C_E * (0.5), TWOPOPULATION_J_EE);
-
-	for (Index i = 0; i < vec_grid.size(); i++)
-		p_net->makeFirstInputOfSecond(id_bg, vec_grid[i]._id,
-				connection_J_EE_BG, EXCITATORY);
-}
-
-void Add_J_EE(MPILib::populist::Pop_Network* p_net,
-		const std::vector<IdGrid>& vec_grid,
-		const std::vector<nodepair>& vec_link) {
-	// Excitatory connection to itself
-
-	for (Index i = 0; i < vec_grid.size(); i++) {
-		Number n_neighbours =
-				NodesOntoThisNode(vec_link, vec_grid[i]._id).size();
-
-		populist::Pop_Network::WeightType connection_J_EE(
-				TWOPOPULATION_C_E * 0.5 / (n_neighbours + 1),
-				TWOPOPULATION_J_EE);
-
-		p_net->makeFirstInputOfSecond(vec_grid[i]._id, vec_grid[i]._id,
-				connection_J_EE, EXCITATORY);
+		  p_net->makeFirstInputOfSecond(vec[i], vec[i],connection_J_II, INHIBITORY);
+		}
 	}
-}
 
-void Add_Lateral(MPILib::populist::Pop_Network* p_net,
-		std::vector<NodeId>* pvec_delay, const std::vector<IdGrid>& vec_grid,
-		const std::vector<nodepair>& vec_link) {
+	void Add_J_EI
+	(
+		Pop_Network*			p_net, 
+		const vector<IdGrid>&	vec_grid, 
+		const vector<NodeId>&	vec_link
+	)
+	{
+		assert(vec_grid.size() == vec_link.size() );
 
-	MPILib::populist::Pop_Network::WeightType connection_unit(1, 1);
+		// I to E
+		Pop_Network::WeightType 
+			connection_J_EI
+			(
+				TWOPOPULATION_C_I,
+				-TWOPOPULATION_J_EI
+			);
 
-	for (Index i = 0; i < vec_grid.size(); i++) {
-		std::vector<NodeId> vec_neighbour = NodesOntoThisNode(vec_link,
-				vec_grid[i]._id);
-		Number n_neighbours = vec_neighbour.size();
+		for(Index i = 0; i < vec_grid.size(); i++){
+		  p_net->makeFirstInputOfSecond(vec_link[i],vec_grid[i]._id,connection_J_EI, INHIBITORY);
+		}
+	}
 
-		for (Index j_in = 0; j_in < n_neighbours; j_in++) {
-			populist::Pop_Network::WeightType connection_J_EE(
-					TWOPOPULATION_C_E * 0.5 / (n_neighbours + 1),
-					TWOPOPULATION_J_EE);
-			MPILib::algorithm::DelayAlgorithm <MPILib::populist::Pop_Network::WeightType
-					> alg_delay(largeNetwork::T_DELAY);
-			NodeId id_delay = p_net->addNode(alg_delay, EXCITATORY);
-			p_net->makeFirstInputOfSecond(vec_neighbour[j_in], id_delay,
-					connection_unit, INHIBITORY);
-			p_net->makeFirstInputOfSecond(id_delay, vec_grid[i]._id,
-					connection_J_EE, INHIBITORY);
+	void Add_J_IE
+	(
+		Pop_Network*			p_net,
+		const vector<IdGrid>&	vec_grid,
+		const vector<NodeId>&	vec_link
+	)
+	{
+		PopulationAlgorithm::WeightType 
+			connection_J_IE
+			(
+				static_cast<Number>(TWOPOPULATION_C_E*0.5), // other half should come from cortical background
+				TWOPOPULATION_J_IE
+			);
 
+		for(Index i = 0; i < vec_grid.size(); i++ )
+		  p_net->makeFirstInputOfSecond(vec_grid[i]._id,vec_link[i],connection_J_IE,EXCITATORY);
+
+	}
+
+	void Add_J_IE_bg
+	(
+		Pop_Network*			p_net,
+		NodeId					id_bg,
+		const vector<NodeId>&	vec_link
+	)
+	{
+		
+		PopulationAlgorithm::WeightType 
+			connection_J_IE_BG
+			(
+				static_cast<Number>(TWOPOPULATION_C_E*0.5),
+				TWOPOPULATION_J_IE
+			);
+
+		for (Index i = 0; i < vec_link.size(); i++)
+		  p_net->makeFirstInputOfSecond(id_bg,vec_link[i],connection_J_IE_BG,EXCITATORY);
+
+	}
+
+	void Add_J_EE_bg
+	(
+		Pop_Network*			p_net,
+		NodeId					id_bg,
+		const vector<IdGrid>&	vec_grid
+	)
+	{
+		PopulationAlgorithm::WeightType 
+			connection_J_EE_BG
+			(
+				TWOPOPULATION_C_E*(0.5), 
+				TWOPOPULATION_J_EE
+			);
+
+		for(Index i = 0; i < vec_grid.size(); i++)
+		  p_net->makeFirstInputOfSecond(id_bg,vec_grid[i]._id,connection_J_EE_BG,EXCITATORY);
+	}
+
+	void Add_J_EE
+	(
+		Pop_Network*			p_net,
+		const vector<IdGrid>&	vec_grid,
+		const vector<nodepair>&  vec_link
+	)
+	{
+		// Excitatory connection to itself
+
+		for (Index i = 0; i < vec_grid.size(); i++){
+			Number n_neighbours = NodesOntoThisNode(vec_link,vec_grid[i]._id).size();
+			
+			Pop_Network::WeightType 
+				connection_J_EE
+				(
+					TWOPOPULATION_C_E*0.5/(n_neighbours + 1),
+					TWOPOPULATION_J_EE
+				);
+
+			p_net->makeFirstInputOfSecond(vec_grid[i]._id, vec_grid[i]._id, connection_J_EE,EXCITATORY);
+		}
+	}
+
+	void Add_Lateral
+	(
+		Pop_Network*			p_net,
+		vector<NodeId>*			pvec_delay,	
+		const vector<IdGrid>&	vec_grid,
+		const vector<nodepair>&	vec_link
+	)
+	{
+		Pop_Network::WeightType 
+					connection_unit
+					(
+						1,
+						1
+					);
+	
+		for (Index i = 0; i < vec_grid.size(); i++){
+			vector<NodeId> vec_neighbour = NodesOntoThisNode(vec_link,vec_grid[i]._id);
+			Number n_neighbours = vec_neighbour.size();
+
+			for (Index j_in = 0; j_in < n_neighbours; j_in++){
+				Pop_Network::WeightType 
+					connection_J_EE
+					(
+						TWOPOPULATION_C_E*0.5/(n_neighbours + 1),
+						TWOPOPULATION_J_EE
+					);
+				algorithm::DelayAlgorithm<Pop_Network::WeightType> alg_delay(LargeNetwork::T_DELAY);
+				NodeId id_delay = p_net->addNode(alg_delay,EXCITATORY);
+				p_net->makeFirstInputOfSecond(vec_neighbour[j_in],id_delay,connection_unit,EXCITATORY);
+				p_net->makeFirstInputOfSecond(id_delay,vec_grid[i]._id,connection_J_EE,EXCITATORY);
+			}
 		}
 	}
 }
-}
 
-void GenerateHexagonalNetwork(Number n_rings,				//! number of rings
-		MPILib::populist::Pop_Network* p_net,//! network to which populations should be added
-		NodeId* p_id_cent,				//! id of the central node id
-		NodeId* p_id_bg,				//! id of the background node
-		std::vector<IdGrid>* p_vec_grid,//! list of Ids and positions for the excitatory nodes in the hexagon
-		std::vector<std::pair<NodeId, NodeId> >* p_vec_link,//! list of neighbours for the excitatory nodes
-		std::vector<NodeId>* p_vec_inh,				//! list of inhibitory nodes
-		std::vector<NodeId>* p_vec_delay, //! list of delay nodes
-		int* p_offset		//! offset between excitatory and inhibitory nodes
-		) {
-	BuildHexagonalGrid(p_vec_grid, p_vec_link, n_rings);
+void GenerateHexagonalNetwork
+(
+	Number								n_rings,				//! number of rings
+	Pop_Network*						p_net,					//! network to which populations should be added
+	NodeId*								p_id_cent,				//! id of the central node id
+	NodeId*								p_id_bg,				//! id of the background node
+	vector<IdGrid>*						p_vec_grid,				//! list of Ids and positions for the excitatory nodes in the hexagon
+	vector<pair<NodeId,NodeId> >*		p_vec_link,				//! list of neighbours for the excitatory nodes
+	vector<NodeId>*						p_vec_inh,				//! list of inhibitory nodes
+	vector<NodeId>*						p_vec_delay,			//! list of delay nodes
+	int*								p_offset				//! offset between excitatory and inhibitory nodes
+)
+{
+	BuildHexagonalGrid(p_vec_grid,p_vec_link,n_rings);
 
-	populist::PopulationAlgorithm alg_e(
-			TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP);
+	PopulationAlgorithm alg_e(TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP);
 
 	*p_id_cent = NodeId(0);
 
-	for (Index i = 0; i < p_vec_grid->size(); i++) {
-		NodeId id_e = p_net->addNode(alg_e, EXCITATORY);
-		assert(id_e == (*p_vec_grid)[i]._id);
+	for (Index i = 0; i < p_vec_grid->size(); i++){
+	        NodeId id_e = p_net->addNode(alg_e,EXCITATORY);
+		cout << "DDDT" << id_e << endl;
+       		assert(id_e == (*p_vec_grid)[i]._id);
 	}
 
-	populist::PopulationAlgorithm alg_i(
-			TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP);
+	PopulationAlgorithm alg_i(TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP);
 	for (Index i = 0; i < p_vec_grid->size(); i++)
-		p_vec_inh->push_back(p_net->addNode(alg_i, INHIBITORY));
+		p_vec_inh->push_back(p_net->addNode(alg_i,INHIBITORY));
 
 	*p_offset = (*p_vec_inh)[0] - (*p_id_cent); // one being the id value of the central id node
 
 	// Create cortical background, and add to network
-	populist::RateFunctor<populist::Pop_Network::WeightType> cortical_background(
-			CorticalBackground);
-	*p_id_bg = p_net->addNode(cortical_background, EXCITATORY);
+	RateFunctor<PopulationAlgorithm::WeightType> cortical_background(CorticalBackground);
+		*p_id_bg = p_net->addNode(cortical_background,EXCITATORY);
 
-	Add_J_II(p_net, *p_vec_inh);
-	Add_J_EI(p_net, *p_vec_grid, *p_vec_inh);
-	Add_J_IE(p_net, *p_vec_grid, *p_vec_inh);
-	Add_J_IE_bg(p_net, *p_id_bg, *p_vec_inh);
-	Add_J_EE_bg(p_net, *p_id_bg, *p_vec_grid);
-	Add_J_EE(p_net, *p_vec_grid, *p_vec_link);
-	Add_Lateral(p_net, p_vec_delay, *p_vec_grid, *p_vec_link);
+	Add_J_II	(p_net,*p_vec_inh);
+	Add_J_EI	(p_net,*p_vec_grid,*p_vec_inh);
+	Add_J_IE	(p_net,*p_vec_grid,*p_vec_inh);
+	Add_J_IE_bg	(p_net,*p_id_bg,   *p_vec_inh);
+	Add_J_EE_bg	(p_net,*p_id_bg,   *p_vec_grid);
+	Add_J_EE	(p_net,*p_vec_grid,*p_vec_link);
+	Add_Lateral (p_net,p_vec_delay,*p_vec_grid,*p_vec_link);
 
-	populist::RateFunctor<populist::Pop_Network::WeightType> burst(Burst);
-	NodeId id_burst = p_net->addNode(burst, EXCITATORY);
-	populist::Pop_Network::WeightType connection_J_EE_Burst(
-			BURST_FACTOR * TWOPOPULATION_C_E, TWOPOPULATION_J_EE);
+	RateFunctor<PopulationAlgorithm::WeightType> burst(Burst);
+	NodeId id_burst = p_net->addNode(burst,EXCITATORY);
+	PopulationAlgorithm::WeightType 
+			connection_J_EE_Burst
+			(
+				BURST_FACTOR*TWOPOPULATION_C_E, 
+				TWOPOPULATION_J_EE
+			);
 
-	p_net->makeFirstInputOfSecond(id_burst, *p_id_cent, connection_J_EE_Burst,
-			EXCITATORY);
+	p_net->makeFirstInputOfSecond(id_burst,*p_id_cent,connection_J_EE_Burst,EXCITATORY);
 }

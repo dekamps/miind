@@ -1,23 +1,26 @@
-// Copyright (c) 2005 - 2012 Marc de Kamps
-//						2012 David-Matthias Sichau
+// Copyright (c) 2005 - 2010 Marc de Kamps
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 //
 //    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation
+//    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation 
 //      and/or other materials provided with the distribution.
-//    * Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software
+//    * Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software 
 //      without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
-// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY 
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF 
+// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_RATECOMPUTATION_INTEGRALRATECOMPUTATION_HPP_
-#define MPILIB_POPULIST_RATECOMPUTATION_INTEGRALRATECOMPUTATION_HPP_
+//      If you use this software in work leading to a scientific publication, you should include a reference there to
+//      the 'currently valid reference', which can be found at http://miind.sourceforge.net
+//
+#ifndef MPILIB_POPULIST_RATECOMPUTATION_NEWINTEGRALRATECOMPUTATION_HPP_
+#define MPILIB_POPULIST_RATECOMPUTATION_NEWINTEGRALRATECOMPUTATION_HPP_
+
 
 #include <valarray>
 #include <gsl/gsl_spline.h>
@@ -27,57 +30,46 @@ namespace MPILib {
 namespace populist {
 namespace rateComputation {
 
-/**
- * Computes the firing rate of a population from the density profile, using an integral method:
- * \f$ \nu = \int^ \rho(v) dv \f$
- */
-class IntegralRateComputation: public AbstractRateComputation {
-public:
+using std::valarray;
 
-	/**
-	 * default constructor
-	 */
-	IntegralRateComputation();
 
-	/**
-	 * Configuration gives access to density profile, the input parameters
-	 *  (effective efficacy and variance of eff. eff.) and the neuron parameters
-	 * @param array_state state array (not const since a pointer to an element is needed, it should have been const otherwise)
-	 * @param input_set current input to population
-	 * @param par_population neuron parameters
-	 * @param index_reversal index reversal bin
-	 */
-	virtual void Configure(std::valarray<Density>& array_state,
-			const parameters::InputParameterSet& input_set,
-			const parameters::PopulationParameter& par_population,
-			Index index_reversal);
+	//! IntegralRateComputation
+	//! Computes the firing rate of a population from the density profile, using an integral method:
+	//! \nu = \int^ \rho(v) dv
+	class IntegralRateComputation : public AbstractRateComputation {
+	public:
 
-	/**
-	 * virtual destructor
-	 */
-	virtual ~IntegralRateComputation();
-	/**
-	 * Clone method
-	 * @return A clone of IntegralRateComputation
-	 */
-	virtual IntegralRateComputation* Clone() const;
+		//! constructor
+		IntegralRateComputation();
 
-	/**
-	 * Calculates the current rate
-	 * @param nr_bins number current bins
-	 * @return The current rate
-	 */
-	virtual Rate CalculateRate(Number nr_bins);
+		//! configuring gives access to density profile, the input parameters (effective efficacy and variance of eff. eff.)
+		//! and the neuron parameters
+		virtual void Configure
+		(
+			      valarray<Density>&,	//! density valarray
+			      const std::vector<parameters::InputParameterSet>&,
+			      const parameters::PopulationParameter&,
+			      Index
+		);
 
-private:
+		virtual ~IntegralRateComputation();
 
-	gsl_interp_accel* _p_accelerator = nullptr;
-	gsl_integration_workspace* _p_workspace = nullptr;
+		virtual IntegralRateComputation* Clone() const;
 
-};
+		virtual Rate CalculateRate
+		(
+			Number    // number current bins,
+		);
 
-} /* namespace rateComputation*/
-} /* namespace populist */
-} /* namespace MPILib */
+	private:
 
-#endif // include guard MPILIB_POPULIST_RATECOMPUTATION_INTEGRALRATECOMPUTATION_HPP_
+
+		gsl_interp_accel*			_p_accelerator;                //
+		gsl_integration_workspace*	_p_workspace;                  // need to be initialized
+
+	};
+}
+}
+}
+
+#endif // include guard

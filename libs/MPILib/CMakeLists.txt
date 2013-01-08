@@ -34,8 +34,8 @@ set(MPI_SRCS
     src/populist/nonCirculantSolvers/NonCirculantSolver.cpp
     
     src/populist/parameters/PopulistSpecificParameter.cpp
-    src/populist/parameters/AdaptationParameter.cpp
-    src/populist/parameters/OneDMParameter.cpp
+#    src/populist/parameters/AdaptationParameter.cpp
+#    src/populist/parameters/OneDMParameter.cpp
     
     src/populist/rateComputation/AbstractRateComputation.cpp
     src/populist/rateComputation/IntegralRateComputation.cpp
@@ -43,14 +43,10 @@ set(MPI_SRCS
     src/populist/rebinner/AbstractRebinner.cpp
     src/populist/rebinner/InterpolationRebinner.cpp
 
-    src/populist/zeroLeakEquations/ABConvertor.cpp
-    src/populist/zeroLeakEquations/AdaptiveHazard.cpp
-    src/populist/zeroLeakEquations/LIFConvertor.cpp
+    src/populist/zeroLeakEquations/InputConvertor.cpp
     src/populist/zeroLeakEquations/LIFZeroLeakEquations.cpp
     src/populist/zeroLeakEquations/MuSigmaScalarProduct.cpp
     src/populist/zeroLeakEquations/NumericalZeroLeakEquations.cpp
-    src/populist/zeroLeakEquations/OldLifZeroLeakEquations.cpp
-    src/populist/zeroLeakEquations/OneDMZeroLeakEquations.cpp
     src/populist/zeroLeakEquations/SingleInputZeroLeakEquations.cpp
     
     src/populist/InitializeAlgorithmGrid.cpp

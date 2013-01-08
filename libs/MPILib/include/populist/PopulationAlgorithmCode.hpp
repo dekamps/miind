@@ -25,6 +25,7 @@
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/PopulistParameter.hpp>
+#include <cassert>
 #include <vector>
 
 namespace MPILib {
@@ -137,6 +138,7 @@ algorithm::AlgorithmGrid PopulationAlgorithm_<Weight>::getGrid() const {
 
 template<class Weight>
 Rate PopulationAlgorithm_<Weight>::getCurrentRate() const {
+  assert( _current_rate >= 0.0 );
 	return _current_rate;
 }
 

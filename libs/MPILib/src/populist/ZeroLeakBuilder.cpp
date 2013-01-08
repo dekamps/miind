@@ -96,26 +96,6 @@ std::shared_ptr<zeroLeakEquations::AbstractZeroLeakEquations> ZeroLeakBuilder::G
 		return p_ret;
 	}
 
-	if (zeroleakequations_name == "OldLIFZeroLeakEquations") {
-
-		// This choice will overule the choice for the NonCirculantSolver
-		p_noncirc = std::shared_ptr<
-				nonCirculantSolvers::AbstractNonCirculantSolver>(
-				new nonCirculantSolvers::NonCirculantSolver(INTEGER));
-
-		p_ret = std::shared_ptr<zeroLeakEquations::LIFZeroLeakEquations>(
-				new zeroLeakEquations::OldLIFZeroLeakEquations(_n_bins,
-						_array_state, _checksum, _bins, _par_pop, _par_spec,
-						_delta_v, *p_circ, *p_noncirc));
-		return p_ret;
-	}
-	if (zeroleakequations_name == "OneDMZeroLeakEquations") {
-		p_ret = std::shared_ptr<zeroLeakEquations::OneDMZeroLeakEquations>(
-				new zeroLeakEquations::OneDMZeroLeakEquations(_n_bins,
-						_array_state, _checksum, _bins, _par_pop, _par_spec,
-						_delta_v));
-		return p_ret;
-	}
 
 	if (zeroleakequations_name == "SingleInputZeroLeakEquations") {
 		p_ret =

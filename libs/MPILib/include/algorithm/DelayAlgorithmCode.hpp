@@ -75,6 +75,7 @@ Time DelayAlgorithm<Weight>::getCurrentTime() const {
 
 template<class Weight>
 Rate DelayAlgorithm<Weight>::getCurrentRate() const {
+        assert(_rate_current >= 0.0);
 	return _rate_current;
 }
 

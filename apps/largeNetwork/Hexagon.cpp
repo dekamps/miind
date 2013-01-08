@@ -17,49 +17,50 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-
-#include "Hexagon.hpp"
-#include <math.h>
-#include <iostream>
+#include <cmath>
+#include "Hexagon.h"
+using namespace std;
 namespace {
-
-const unsigned int N_Hexagon = 6;
-const float Phi_hexagon = 2 * 3.1415926535F / 6;
-const float TOLERANCE = 0.01F;
-const float EPS = 1e-4F;
+	
+        const MPILib::Number N_Hexagon   = 6;
+	const float  Phi_hexagon = 2*3.1415926535F/6;
+	const float  TOLERANCE   = 0.01F;
+	const float  EPS         = 1e-4F;
 
 }
-bool IsPointInGrid(const std::vector<IdGrid>& vec_grid, const IdGrid& point) {
-	for (MPILib::Index i = 0; i < vec_grid.size(); i++) {
-		float sqr = pow(vec_grid[i]._x - point._x, 2)
-				+ pow(vec_grid[i]._y - point._y, 2);
-		if (sqrt(sqr) < TOLERANCE)
+
+bool IsPointInGrid(const std::vector<IdGrid>& vec_grid, const IdGrid& point){
+        for (MPILib::Index i = 0; i < vec_grid.size(); i++){
+		float sqr = pow(vec_grid[i]._x - point._x,2) + pow(vec_grid[i]._y - point._y,2);
+		if ( sqrt(sqr) < TOLERANCE)
 			return true;
 	}
 	return false;
 }
 
-void BuildHexagonalGrid(std::vector<IdGrid>* pvec_grid,
-		std::vector<std::pair<MPILib::NodeId, MPILib::NodeId> >* pvec_link, MPILib::Number n_rings) {
-	//The MPINetworks starts at 0!!!
+void BuildHexagonalGrid
+(	vector<IdGrid>*					pvec_grid, 
+	vector<pair<MPILib::NodeId,MPILib::NodeId> >*	pvec_link, 
+	MPILib::Number n_rings
+)
+{
 	int id_count = 0;
-	std::vector<IdGrid> vec_seed;
-
-	IdGrid seed = { MPILib::NodeId(id_count++), 0.0, 0.0 };
+	vector<IdGrid> vec_seed;
+	
+	IdGrid seed = {MPILib::NodeId(id_count++), 0.0, 0.0};
 	vec_seed.push_back(seed);
 	pvec_grid->push_back(seed);
-	while (n_rings-- > 0) {
+	while(n_rings-- > 0){
 		// add a ring around all seeds, unless the corresponding point is already in the list, the nodes
 		// that are added in this pass are the seed for the enxt round
-		std::vector<IdGrid> vec_new_seed;
-		for (MPILib::Index i_seed = 0; i_seed < vec_seed.size(); i_seed++) {
-			for (MPILib::Index i_hex = 0; i_hex < N_Hexagon; i_hex++) {
+		vector<IdGrid> vec_new_seed;
+		for( MPILib::Index i_seed = 0; i_seed < vec_seed.size(); i_seed++){
+		  for (MPILib::Index i_hex = 0; i_hex < N_Hexagon; i_hex++){
 				IdGrid new_point;
-				new_point._x = vec_seed[i_seed]._x + cos(i_hex * Phi_hexagon);
-				new_point._y = vec_seed[i_seed]._y + sin(i_hex * Phi_hexagon);
-				if (!IsPointInGrid(vec_new_seed, new_point)
-						&& !IsPointInGrid(*pvec_grid, new_point)) {
-					new_point._id = MPILib::NodeId(id_count++);
+				new_point._x = vec_seed[i_seed]._x + cos(i_hex*Phi_hexagon);
+				new_point._y = vec_seed[i_seed]._y + sin(i_hex*Phi_hexagon);
+				if (! IsPointInGrid(vec_new_seed,new_point) && !IsPointInGrid(*pvec_grid,new_point)){
+				        new_point._id = MPILib::NodeId(id_count++);
 					vec_new_seed.push_back(new_point);
 				}
 			}
@@ -68,70 +69,63 @@ void BuildHexagonalGrid(std::vector<IdGrid>* pvec_grid,
 		for (MPILib::Index i = 0; i < vec_seed.size(); i++)
 			pvec_grid->push_back(vec_seed[i]);
 	}
-	std::vector<IdGrid>& vec_grid = *pvec_grid;
+	vector<IdGrid>& vec_grid = *pvec_grid;
 	// generate neighbourpairs
 	for (MPILib::Index i = 0; i < vec_grid.size(); i++)
-		for (MPILib::Index j = 0; j < i; j++)
-			if (fabs(
-					pow(vec_grid[i]._x - vec_grid[j]._x, 2)
-							+ pow(vec_grid[i]._y - vec_grid[j]._y, 2) - 1.0)
-					< EPS) {
-				std::pair < MPILib::NodeId, MPILib::NodeId > p;
-				p.first = vec_grid[i]._id;
+	      for (MPILib::Index j = 0; j < i; j++)
+			if ( fabs(pow(vec_grid[i]._x -vec_grid[j]._x,2) + pow(vec_grid[i]._y - vec_grid[j]._y,2) - 1.0) < EPS){
+			        pair<MPILib::NodeId,MPILib::NodeId> p;
+				p.first  = vec_grid[i]._id;
 				p.second = vec_grid[j]._id;
 				pvec_link->push_back(p);
 			}
-
+				
 }
 
-MPILib::Number NumberOfNeighbours(const std::vector<IdGrid>& vec_grid, MPILib::NodeId id) {
+MPILib::Number NumberOfNeighbours(const vector<IdGrid>& vec_grid, MPILib::NodeId id){
 	// first walk through the grid to establish the maximal radius
 	// all points not in the outer ring have 6 neighbours.
 	// all other points four neighbours, unless phi is i*2pi/6, which have three neighbours
 	float max_rad = 0;
-	for (MPILib::Index i = 0; i < vec_grid.size(); i++) {
-		float rad = sqrt(pow(vec_grid[i]._x, 2) + pow(vec_grid[i]._y, 2));
+	for (MPILib::Index i = 0; i < vec_grid.size(); i++){
+		float rad = sqrt(pow(vec_grid[i]._x,2) + pow(vec_grid[i]._y,2));
 		if (rad > max_rad)
 			max_rad = rad;
 	}
 	MPILib::Index j = 0;
-	for (MPILib::Index i = 0; i < vec_grid.size(); i++)
-		if (id == vec_grid[i]._id) {
+	for(MPILib::Index i = 0; i < vec_grid.size(); i++ )
+		if (id == vec_grid[i]._id){
 			j = i;
 			break;
 		}
 
-	bool b_outer_ring = fabs(vec_grid[j]._y - max_rad * sqrt(3.0) * 0.5) < EPS
-			|| fabs(-vec_grid[j]._y - max_rad * sqrt(3.0) * 0.5) < EPS
-			|| fabs(sqrt(3.0) / 3.0 * vec_grid[j]._y - vec_grid[j]._x - max_rad)
-					< EPS
-			|| fabs(sqrt(3.0) / 3.0 * vec_grid[j]._y - vec_grid[j]._x + max_rad)
-					< EPS
-			|| fabs(
-					-sqrt(3.0) / 3.0 * vec_grid[j]._y - vec_grid[j]._x
-							- max_rad) < EPS
-			|| fabs(
-					-sqrt(3.0) / 3.0 * vec_grid[j]._y - vec_grid[j]._x
-							+ max_rad) < EPS;
+	bool b_outer_ring =
+		fabs(  vec_grid[j]._y - max_rad*sqrt(3.0)*0.5 )    < EPS ||
+		fabs( -vec_grid[j]._y - max_rad*sqrt(3.0)*0.5 )    < EPS ||
+		fabs(  sqrt(3.0)/3.0*vec_grid[j]._y - vec_grid[j]._x - max_rad) < EPS ||
+		fabs(  sqrt(3.0)/3.0*vec_grid[j]._y - vec_grid[j]._x + max_rad) < EPS ||
+		fabs( -sqrt(3.0)/3.0*vec_grid[j]._y - vec_grid[j]._x - max_rad) < EPS ||
+		fabs( -sqrt(3.0)/3.0*vec_grid[j]._y - vec_grid[j]._x + max_rad) < EPS;
 
-	if (!b_outer_ring)
+	if ( ! b_outer_ring)
 		return N_Hexagon;
 	else {
 		// outer ring
-		float phi = atan(vec_grid[j]._y / vec_grid[j]._x);
+		float phi = atan(vec_grid[j]._y/vec_grid[j]._x);
 		// should be close to a multiple of (-) Phi_hexagon
-		float f = phi / Phi_hexagon;
+		float f = phi/Phi_hexagon;
 		// so either the floor or the ceil of f should be close to f
-		if (fabs(floor(f) - f) < EPS || fabs(ceil(f) - f) < EPS)
+		if (fabs(floor(f) -f) < EPS || fabs(ceil(f) -f) < EPS)
 			return 3;
 		else
 			return 4;
 	}
 }
 
-std::vector<MPILib::NodeId> NodesOntoThisNode(const std::vector<nodepair>& vec_pair, MPILib::NodeId id) {
-	std::vector < MPILib::NodeId > vec_ret;
-	for (MPILib::Index i = 0; i < vec_pair.size(); i++) {
+vector<MPILib::NodeId> NodesOntoThisNode(const vector<nodepair>& vec_pair, MPILib::NodeId id)
+{
+        vector<MPILib::NodeId> vec_ret;
+	for (MPILib::Index i = 0; i < vec_pair.size(); i++){
 		if (vec_pair[i].first == id)
 			vec_ret.push_back(vec_pair[i].second);
 		if (vec_pair[i].second == id)
@@ -140,23 +134,32 @@ std::vector<MPILib::NodeId> NodesOntoThisNode(const std::vector<nodepair>& vec_p
 	return vec_ret;
 }
 
-void WriteGridToStream(const std::vector<IdGrid>& vec_grid,
-		const std::vector<std::pair<MPILib::NodeId, MPILib::NodeId> >& vec_link, std::ostream& s) {
-	for (MPILib::Index i = 0; i < vec_grid.size(); i++)
-		s << vec_grid[i]._id << "\t" << vec_grid[i]._x << "\t" << vec_grid[i]._y
-				<< "\t" << NumberOfNeighbours(vec_grid, vec_grid[i]._id)
-				<< "\n";
+
+void WriteGridToStream
+(
+	const vector<IdGrid>& vec_grid, 
+	const vector<pair<MPILib::NodeId, MPILib::NodeId> >& 
+	vec_link, ostream& s
+){
+        for (MPILib::Index i = 0; i < vec_grid.size(); i++)
+		s << vec_grid[i]._id << "\t" 
+		  << vec_grid[i]._x  << "\t" 
+		  << vec_grid[i]._y  << "\t" 
+		  << NumberOfNeighbours(vec_grid,vec_grid[i]._id) << "\n";
 
 	s << "-\n";
 	for (MPILib::Index j = 0; j < vec_link.size(); j++)
 		s << vec_link[j].first << " " << vec_link[j].second << "\n";
 }
 
-void PrintGrid(const std::vector<IdGrid>& vec_grid) {
-	for (MPILib::Index i = 0; i < vec_grid.size(); i++) {
-		std::cout << "---" << std::endl;
-		std::cout << vec_grid[i]._id << std::endl;
-		std::cout << vec_grid[i]._x << std::endl;
-		std::cout << vec_grid[i]._y << std::endl;
+
+/*
+void PrintGrid(const vector<IdGrid>& vec_grid){
+        for(MPILib::Index i = 0; i < vec_grid.size(); i++){
+		cout << "---" << endl;
+		cout << vec_grid[i]._id << endl;
+		cout << vec_grid[i]._x  << endl;
+		cout << vec_grid[i]._y  << endl;
 	}
 }
+*/
