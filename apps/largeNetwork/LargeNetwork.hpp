@@ -26,25 +26,26 @@
 #include <MPILib/include/populist/parameters/PopulistParameter.hpp>
 #include <MPILib/include/populist/parameters/InitialDensityParameter.hpp>
 
-namespace largeNetwork {
+
+namespace LargeNetwork {
 	
-	const MPILib::populist::parameters::OrnsteinUhlenbeckParameter
+	const MPILib::populist::parameters::OrnsteinUhlenbeckParameter 
 		TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER 
 		(
 			20e-3, // V_threshold: 20 mV
 			0,     // V_reset: 0 mV
 			0,     // V_reversal
-			2e-3,  // tau refractive
+			5e-3,  // tau refractive
 			10e-3  // tau membrane; 10 ms
 		);
 
-	const MPILib::populist::parameters::OrnsteinUhlenbeckParameter
+	const MPILib::populist::parameters::OrnsteinUhlenbeckParameter 
 		TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER
 		(
 			20e-3,  // V_threshold; 20 mV
 			0,      // V_reset: 0 mV
 			0,      // V_reversal
-			2e-3,   // tau refractive
+			5e-3,   // tau refractive
 			3e-3    // tau membrane 3 ms
 		);
 
@@ -60,10 +61,9 @@ namespace largeNetwork {
 
 	const double g = 3.0;
 
-	const double T_DELAY = 10e-3;
-
 	const MPILib::Efficacy TWOPOPULATION_J_EI = g*TWOPOPULATION_J_EE;
 	const MPILib::Efficacy TWOPOPULATION_J_II = g*TWOPOPULATION_J_IE;
+
 
 	const MPILib::populist::parameters::InitialDensityParameter
 		TWOPOP_INITIAL_DENSITY
@@ -72,7 +72,7 @@ namespace largeNetwork {
 			0.0
 		);
 
-	const MPILib::Number TWOPOP_NUMBER_OF_INITIAL_BINS		= 1100; //crank this up if you want to have higher CPU load
+	const MPILib::Number TWOPOP_NUMBER_OF_INITIAL_BINS		= 2200; //crank this up if you want to have higher CPU load
 	const MPILib::Number TWOPOP_NUMBER_OF_BINS_TO_ADD		= 1;
 	const MPILib::Number TWOPOP_MAXIMUM_NUMBER_OF_ITERATIONS	= 1000000;
 
@@ -105,7 +105,9 @@ namespace largeNetwork {
 			TWOPOP_SPECIFIC
 		);
 
-	const double BURST_FACTOR = 0.01;
+	const double BURST_FACTOR = 1.0;
+
+	const MPILib::Time T_DELAY = 10e-3;
 }
 
 #endif // include guard

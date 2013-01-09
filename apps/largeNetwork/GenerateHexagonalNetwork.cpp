@@ -4,23 +4,23 @@
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 //
 //    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation 
+//    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation
 //      and/or other materials provided with the distribution.
-//    * Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software 
+//    * Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software
 //      without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY 
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF 
-// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
 #include <cassert>
-#include "LargeNetwork.h"
-#include "GenerateHexagonalNetwork.h"
+#include "LargeNetwork.hpp"
+#include "GenerateHexagonalNetwork.hpp"
 
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/algorithm/DelayAlgorithmCode.hpp>
@@ -30,7 +30,7 @@
 using namespace LargeNetwork;
 using namespace MPILib;
 using namespace MPILib::populist;
-namespace { 
+namespace {
 
 	Rate CorticalBackground(Time t)
 	{
@@ -48,7 +48,7 @@ namespace {
         void Add_J_II(Pop_Network* p_net,const vector<NodeId>& vec)
 	{
 
-		PopulationAlgorithm::WeightType 
+		PopulationAlgorithm::WeightType
 			connection_J_II
 			(
 				TWOPOPULATION_C_I,
@@ -63,15 +63,15 @@ namespace {
 
 	void Add_J_EI
 	(
-		Pop_Network*			p_net, 
-		const vector<IdGrid>&	vec_grid, 
+		Pop_Network*			p_net,
+		const vector<IdGrid>&	vec_grid,
 		const vector<NodeId>&	vec_link
 	)
 	{
 		assert(vec_grid.size() == vec_link.size() );
 
 		// I to E
-		Pop_Network::WeightType 
+		Pop_Network::WeightType
 			connection_J_EI
 			(
 				TWOPOPULATION_C_I,
@@ -90,7 +90,7 @@ namespace {
 		const vector<NodeId>&	vec_link
 	)
 	{
-		PopulationAlgorithm::WeightType 
+		PopulationAlgorithm::WeightType
 			connection_J_IE
 			(
 				static_cast<Number>(TWOPOPULATION_C_E*0.5), // other half should come from cortical background
@@ -109,8 +109,8 @@ namespace {
 		const vector<NodeId>&	vec_link
 	)
 	{
-		
-		PopulationAlgorithm::WeightType 
+
+		PopulationAlgorithm::WeightType
 			connection_J_IE_BG
 			(
 				static_cast<Number>(TWOPOPULATION_C_E*0.5),
@@ -129,10 +129,10 @@ namespace {
 		const vector<IdGrid>&	vec_grid
 	)
 	{
-		PopulationAlgorithm::WeightType 
+		PopulationAlgorithm::WeightType
 			connection_J_EE_BG
 			(
-				TWOPOPULATION_C_E*(0.5), 
+				TWOPOPULATION_C_E*(0.5),
 				TWOPOPULATION_J_EE
 			);
 
@@ -151,8 +151,8 @@ namespace {
 
 		for (Index i = 0; i < vec_grid.size(); i++){
 			Number n_neighbours = NodesOntoThisNode(vec_link,vec_grid[i]._id).size();
-			
-			Pop_Network::WeightType 
+
+			Pop_Network::WeightType
 				connection_J_EE
 				(
 					TWOPOPULATION_C_E*0.5/(n_neighbours + 1),
@@ -166,24 +166,24 @@ namespace {
 	void Add_Lateral
 	(
 		Pop_Network*			p_net,
-		vector<NodeId>*			pvec_delay,	
+		vector<NodeId>*			pvec_delay,
 		const vector<IdGrid>&	vec_grid,
 		const vector<nodepair>&	vec_link
 	)
 	{
-		Pop_Network::WeightType 
+		Pop_Network::WeightType
 					connection_unit
 					(
 						1,
 						1
 					);
-	
+
 		for (Index i = 0; i < vec_grid.size(); i++){
 			vector<NodeId> vec_neighbour = NodesOntoThisNode(vec_link,vec_grid[i]._id);
 			Number n_neighbours = vec_neighbour.size();
 
 			for (Index j_in = 0; j_in < n_neighbours; j_in++){
-				Pop_Network::WeightType 
+				Pop_Network::WeightType
 					connection_J_EE
 					(
 						TWOPOPULATION_C_E*0.5/(n_neighbours + 1),
@@ -243,10 +243,10 @@ void GenerateHexagonalNetwork
 
 	RateFunctor<PopulationAlgorithm::WeightType> burst(Burst);
 	NodeId id_burst = p_net->addNode(burst,EXCITATORY);
-	PopulationAlgorithm::WeightType 
+	PopulationAlgorithm::WeightType
 			connection_J_EE_Burst
 			(
-				BURST_FACTOR*TWOPOPULATION_C_E, 
+				BURST_FACTOR*TWOPOPULATION_C_E,
 				TWOPOPULATION_J_EE
 			);
 

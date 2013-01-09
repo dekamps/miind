@@ -4,24 +4,24 @@
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 //
 //    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation 
+//    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation
 //      and/or other materials provided with the distribution.
-//    * Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software 
+//    * Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software
 //      without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY 
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF 
-// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <cmath>
-#include "Hexagon.h"
+#include "Hexagon.hpp"
 using namespace std;
 namespace {
-	
+
         const MPILib::Number N_Hexagon   = 6;
 	const float  Phi_hexagon = 2*3.1415926535F/6;
 	const float  TOLERANCE   = 0.01F;
@@ -39,14 +39,14 @@ bool IsPointInGrid(const std::vector<IdGrid>& vec_grid, const IdGrid& point){
 }
 
 void BuildHexagonalGrid
-(	vector<IdGrid>*					pvec_grid, 
-	vector<pair<MPILib::NodeId,MPILib::NodeId> >*	pvec_link, 
+(	vector<IdGrid>*					pvec_grid,
+	vector<pair<MPILib::NodeId,MPILib::NodeId> >*	pvec_link,
 	MPILib::Number n_rings
 )
 {
 	int id_count = 0;
 	vector<IdGrid> vec_seed;
-	
+
 	IdGrid seed = {MPILib::NodeId(id_count++), 0.0, 0.0};
 	vec_seed.push_back(seed);
 	pvec_grid->push_back(seed);
@@ -79,7 +79,7 @@ void BuildHexagonalGrid
 				p.second = vec_grid[j]._id;
 				pvec_link->push_back(p);
 			}
-				
+
 }
 
 MPILib::Number NumberOfNeighbours(const vector<IdGrid>& vec_grid, MPILib::NodeId id){
@@ -137,14 +137,14 @@ vector<MPILib::NodeId> NodesOntoThisNode(const vector<nodepair>& vec_pair, MPILi
 
 void WriteGridToStream
 (
-	const vector<IdGrid>& vec_grid, 
-	const vector<pair<MPILib::NodeId, MPILib::NodeId> >& 
+	const vector<IdGrid>& vec_grid,
+	const vector<pair<MPILib::NodeId, MPILib::NodeId> >&
 	vec_link, ostream& s
 ){
         for (MPILib::Index i = 0; i < vec_grid.size(); i++)
-		s << vec_grid[i]._id << "\t" 
-		  << vec_grid[i]._x  << "\t" 
-		  << vec_grid[i]._y  << "\t" 
+		s << vec_grid[i]._id << "\t"
+		  << vec_grid[i]._x  << "\t"
+		  << vec_grid[i]._y  << "\t"
 		  << NumberOfNeighbours(vec_grid,vec_grid[i]._id) << "\n";
 
 	s << "-\n";
