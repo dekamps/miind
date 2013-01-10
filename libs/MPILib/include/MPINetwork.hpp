@@ -62,7 +62,7 @@ public:
 	 * @exception Can throw a ParallelException
 	 */
 	void makeFirstInputOfSecond(NodeId first, NodeId second,
-			const WeightValue& weight, NodeType secondNodeType);
+			const WeightValue& weight);
 
 	/**
 	 * Configure the next simulation
@@ -143,6 +143,8 @@ private:
 	Time _currentSimulationTime = 0;
 	NetworkState _stateNetwork = 0.0;
 	bool _isDalesLaw = true;
+
+	std::map<NodeId, NodeType> nodeIdsType_;
 
 	SimulationRunParameter _parameterSimulationRun = SimulationRunParameter(report::handler::InactiveReportHandler(), 0, 0.0,
 		0.0, 0.0, 0.0, "");

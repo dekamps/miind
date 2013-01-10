@@ -57,7 +57,7 @@ namespace {
 
 		for(Index i = 0; i < vec.size(); i++){
 
-		  p_net->makeFirstInputOfSecond(vec[i], vec[i],connection_J_II, INHIBITORY);
+		  p_net->makeFirstInputOfSecond(vec[i], vec[i],connection_J_II);
 		}
 	}
 
@@ -79,7 +79,7 @@ namespace {
 			);
 
 		for(Index i = 0; i < vec_grid.size(); i++){
-		  p_net->makeFirstInputOfSecond(vec_link[i],vec_grid[i]._id,connection_J_EI, INHIBITORY);
+		  p_net->makeFirstInputOfSecond(vec_link[i],vec_grid[i]._id,connection_J_EI);
 		}
 	}
 
@@ -98,7 +98,7 @@ namespace {
 			);
 
 		for(Index i = 0; i < vec_grid.size(); i++ )
-		  p_net->makeFirstInputOfSecond(vec_grid[i]._id,vec_link[i],connection_J_IE,EXCITATORY);
+		  p_net->makeFirstInputOfSecond(vec_grid[i]._id,vec_link[i],connection_J_IE);
 
 	}
 
@@ -118,7 +118,7 @@ namespace {
 			);
 
 		for (Index i = 0; i < vec_link.size(); i++)
-		  p_net->makeFirstInputOfSecond(id_bg,vec_link[i],connection_J_IE_BG,EXCITATORY);
+		  p_net->makeFirstInputOfSecond(id_bg,vec_link[i],connection_J_IE_BG);
 
 	}
 
@@ -137,7 +137,7 @@ namespace {
 			);
 
 		for(Index i = 0; i < vec_grid.size(); i++)
-		  p_net->makeFirstInputOfSecond(id_bg,vec_grid[i]._id,connection_J_EE_BG,EXCITATORY);
+		  p_net->makeFirstInputOfSecond(id_bg,vec_grid[i]._id,connection_J_EE_BG);
 	}
 
 	void Add_J_EE
@@ -159,7 +159,7 @@ namespace {
 					TWOPOPULATION_J_EE
 				);
 
-			p_net->makeFirstInputOfSecond(vec_grid[i]._id, vec_grid[i]._id, connection_J_EE,EXCITATORY);
+			p_net->makeFirstInputOfSecond(vec_grid[i]._id, vec_grid[i]._id, connection_J_EE);
 		}
 	}
 
@@ -191,8 +191,8 @@ namespace {
 					);
 				algorithm::DelayAlgorithm<Pop_Network::WeightType> alg_delay(LargeNetwork::T_DELAY);
 				NodeId id_delay = p_net->addNode(alg_delay,EXCITATORY);
-				p_net->makeFirstInputOfSecond(vec_neighbour[j_in],id_delay,connection_unit,EXCITATORY);
-				p_net->makeFirstInputOfSecond(id_delay,vec_grid[i]._id,connection_J_EE,EXCITATORY);
+				p_net->makeFirstInputOfSecond(vec_neighbour[j_in],id_delay,connection_unit);
+				p_net->makeFirstInputOfSecond(id_delay,vec_grid[i]._id,connection_J_EE);
 			}
 		}
 	}
@@ -250,5 +250,5 @@ void GenerateHexagonalNetwork
 				TWOPOPULATION_J_EE
 			);
 
-	p_net->makeFirstInputOfSecond(id_burst,*p_id_cent,connection_J_EE_Burst,EXCITATORY);
+	p_net->makeFirstInputOfSecond(id_burst,*p_id_cent,connection_J_EE_Burst);
 }

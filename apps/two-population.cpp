@@ -142,7 +142,7 @@ MPINetwork<WeightValue, NodeDistribution> CreateTwoPopulationNetwork //Edited by
 			TWOPOPULATION_J_EE);
 
 	network.makeFirstInputOfSecond(*p_id_cortical_background,
-			*p_id_excitatory_main, connection_J_EE_BG,EXCITATORY);
+			*p_id_excitatory_main, connection_J_EE_BG);
 
 	// Excitatory connection to itself
 
@@ -150,7 +150,7 @@ MPINetwork<WeightValue, NodeDistribution> CreateTwoPopulationNetwork //Edited by
 			TWOPOPULATION_J_EE);
 
 	network.makeFirstInputOfSecond(*p_id_excitatory_main, *p_id_excitatory_main,
-			connection_J_EE, EXCITATORY);
+			connection_J_EE);
 
 	// Background connection to I
 
@@ -159,7 +159,7 @@ MPINetwork<WeightValue, NodeDistribution> CreateTwoPopulationNetwork //Edited by
 			TWOPOPULATION_J_IE);
 
 	network.makeFirstInputOfSecond(*p_id_cortical_background,
-			*p_id_inhibitory_main, connection_J_IE_BG, INHIBITORY);
+			*p_id_inhibitory_main, connection_J_IE_BG);
 
 	// E to I
 	WeightValue connection_J_IE(
@@ -167,19 +167,19 @@ MPINetwork<WeightValue, NodeDistribution> CreateTwoPopulationNetwork //Edited by
 			TWOPOPULATION_J_IE);
 
 	network.makeFirstInputOfSecond(*p_id_excitatory_main, *p_id_inhibitory_main,
-			connection_J_IE, INHIBITORY);
+			connection_J_IE);
 
 	// I to E
 	WeightValue connection_J_EI(TWOPOPULATION_C_I, -TWOPOPULATION_J_EI);
 
 	network.makeFirstInputOfSecond(*p_id_inhibitory_main, *p_id_excitatory_main,
-			connection_J_EI, EXCITATORY);
+			connection_J_EI);
 
 	// I to I
 	WeightValue connection_J_II(TWOPOPULATION_C_I, -TWOPOPULATION_J_II);
 
 	network.makeFirstInputOfSecond(*p_id_inhibitory_main, *p_id_inhibitory_main,
-			connection_J_II, INHIBITORY);
+			connection_J_II);
 
 	return network;
 

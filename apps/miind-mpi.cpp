@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 		int id = network.addNode(algorithm_exc, EXCITATORY);
 
 		// connect the two nodes
-		network.makeFirstInputOfSecond(id_rate, id, epsilon, EXCITATORY);
+		network.makeFirstInputOfSecond(id_rate, id, epsilon);
 
 		network.configureSimulation(PAR_WILSONCOWAN);
 

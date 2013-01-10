@@ -53,7 +53,7 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 	assert(
 			nodeType == EXCITATORY || nodeType == INHIBITORY || nodeType == NEUTRAL || nodeType == EXCITATORY_BURST || nodeType == INHIBITORY_BURST);
 
-	int tempNodeId = getMaxNodeId();
+	NodeId tempNodeId = getMaxNodeId();
 	if (_nodeDistribution.isLocalNode(tempNodeId)) {
 		MPINode<WeightValue, NodeDistribution> node = MPINode<WeightValue,
 				NodeDistribution>(alg, nodeType, tempNodeId, _nodeDistribution,
@@ -62,15 +62,19 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 		LOG(utilities::logDEBUG2) << "new node generated with id: "
 				<< tempNodeId;
 	}
+
+	nodeIdsType_[tempNodeId] = nodeType;
+
 	//increment the max NodeId to make sure that it is not assigned twice.
 	incrementMaxNodeId();
+	// wait for all threads to finish
+	utilities::MPIProxy().barrier();
 	return tempNodeId;
 }
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
-		NodeId first, NodeId second, const WeightValue& weight,
-		NodeType secondNodeType) {
+		NodeId first, NodeId second, const WeightValue& weight) {
 
 	//Make sure that the node exists and then add the successor
 	if (_nodeDistribution.isLocalNode(first)) {
@@ -106,7 +110,7 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 	if (_nodeDistribution.isLocalNode(second)) {
 		if (_localNodes.count(second) > 0) {
 			_localNodes.find(second)->second.addPrecursor(first, weight,
-					secondNodeType);
+					nodeIdsType_[second]);
 		} else {
 			std::stringstream tempStream;
 			tempStream << "the node " << second
