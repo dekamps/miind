@@ -11,3 +11,7 @@ twopoptest_1.root
 twopoptest_2.root
 README_Google
 build_test
+*.docx
+*.log
+*.aux
+pmiind.pdf
