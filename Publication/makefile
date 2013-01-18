@@ -3,8 +3,11 @@
 all: pmiind.pdf
 
 pmiind.pdf: *.tex 
-	pdflatex pmiind.tex
-	pdflatex pmiind.tex 
+	latex pmiind
+	bibtex pmiind
+	latex pmiind 
+	latex pmiind 
+	dvipdf pmiind
 
 clean: 
 	rm -f *.toc *.log *.aux *~
