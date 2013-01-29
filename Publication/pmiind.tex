@@ -94,7 +94,7 @@ $\ast$ E-mail: m.dekamps@leeds.ac.uk
 
 \section{Introduction}
 Multiple Interacting Instantiations of Neural Dynamics \citep{dekamps2008} (MIIND) is a simulation framework designed for modeling large networks of 
-neuronal populations. It is written in C++ and employs MPI \citep{grop} for parallelisation. Python extensions can be provided on request. 
+neuronal populations. It is written in C++ and employs MPI \citep{gropp1998} for parallelisation. Python extensions can be provided on request. 
 Due to its design philosophy it can be easily applied to modeling 
 biological processes outside computational neuroscience. MIIND abstracts the interaction between neuronal populations into an interaction 
 between nodes on a directed graph. The neuronal processes describing the activity of the population live on these nodes as objects and evolve 
@@ -105,8 +105,8 @@ parallelizable. Unfortunately, the word trivial does not apply to the actual imp
 were too many obstacles to parallelisation and we decided to start from a fresh code based. 
 
 As with any framework, MIIND comes with a number of predefined algorithms, some allowing sophisticated simulations of neuronal 
-dynamics. The simplest algorithms implement Wilson-Cowan dynamics \citep{wilsonwan1972}, but, uniquely, 
-MIIND provides an implementation of population density techniques (e.g.) \citep{stein1996,knight1972,knight1996}. They provide efficient simulations 
+dynamics. The simplest algorithms implement Wilson-Cowan dynamics \citep{wilson1972}, but, uniquely, 
+MIIND provides an implementation of population density techniques (e.g.) \citep{stein1965,knight1972,knight1996}. They provide efficient simulations 
 of large populations of neurons by means of a density function over the state variables of a given neuron. Such techniques have undergone rapid 
 development over the last decade \citep{omurtag2000}. In practice these technques have been mainly used for leaky-integrate-and-fire (LIF) neurons,
 in the so-called diffusion limit: small synaptic efficacies and high firing rate. In  this limit the distribution of membrane potentials of the
@@ -185,12 +185,167 @@ also be discerned (see Figure \ref{fig-sim}).
 
 \section*{Methods}
 \label{sec-methods}
+\subsection{Network Model}
+\subsubsection{Finding Steady State Firing Rate}
+\label{sec-steady}
+The architecture of the network has been described in Figure \ref{fig-bb}. It consists of a local circuit comprised of an excitatory and an inhibitory
+population that are fully connected. We will first describe how this local circuit the local circuit is simulated. 
+In section \ref{sec-hexagon} we will then describe how this circuit is embedded in an overall hexagonal structure.
+Each population
+is assumed to be comprised of a large number of spiking LIF neurons. It is assumed that both the populations input and output spike trains
+are Poisson distributed and that populations are connected sparsely but by a large number of connections. Under these assumptions an expression
+can be found that expresses the population's output firing rate as a function of the input contributions: the so-called gain functions.
+Assume a population of LIF neurons with time constant $\tau$, threshold $V_{th}$, reset potential $V_{reset}$ and reversal potential $V_{rev}$
+receives Poisson distributed spike trains from another external population, which has a population firing rate of $\nu_{ext}$. 
+Furthermore, assume that each such input spike raises the membrane potential
+instantaneously by a magnitude $h$ (delta peak synapses), that $N_{input}\epsilon$ external neurons connect to a neuron in the population on average, 
+where $N_{input}$ is the average number of input neurons and $\epsilon$ is a sparseness parameter. The average contribution to the
+membrane potential per time unit $\tau$ is then given by:
+\begin{equation}
+  \mu = \tau \epsilon \nu_{ext} J, 
+\end{equation}
+the variability by:
+\begin{equation}
+  \sigma^2 = \tau \epsilon \nu_{ext} J^2,
+\end{equation}
+
+The population's own firing rate is then given by:
+\begin{equation}
+\nu = \phi( \mu, \sigma)
+\label{eq-transduc}
+\end{equation}
+with $\phi$ given by:
+\begin{equation}
+\phi(\mu, \sigma) = \int^{bla}_{ble}du \exp(u^2)(1 + )
+\end{equation}
+If the population is large, Equation \ref{eq-transduc} is a very good approximation of the firing rate that would be found in a simulation
+of LIF neurons indeed. In a network of LIF neuron populations this leads to self-consistency relationships in term of gain functions, that describe
+the steady state firing rates that eventually may emerge \footnote{This is not necessarily the case. See section \ref{sec-Fokker-Planck}.} if external contributions to the network are kept constant. For each population $i$ one has:
+\begin{equation}
+  \nu_i = \phi_i( \mu_i, \sigma_i), i = 0 \cdots N-1
+  \label{eq-steady}
+\end{equation}
+with:
+\begin{equation}
+  \mu_i = \tau_i (\sum^{N-1}_{j=0} J_{ij}\epsilon_{ij} N_j\nu_j + \sum^{N_{ext}-1}_{k=0} J_{ik} \epsilon_{ik}N_k \nu_k)
+  \label{eq-mui}
+\end{equation}
+\begin{equation}
+  \sigma^2_i = \tau (\sum^{N-1}_{j=0} J^2_{ij}\epsilon_{ij} N_j\nu_j + \sum^{N_{ext}-1}_{k=0} J_{ik} \epsilon_{ik}N_k \nu_k)
+  \label{eq-sigi}
+\end{equation}
+The $J_{ij}$ are now the (average) efficacy of population $j$ onto $i$, which can be positive (excitatory) or negative (inhibitory)
+with the understanding that  ... Dale's law.
+
+Here $N$ is the number of populations in the network, and the existence of a number of $N_{k}$ external sources is assumed
+whose activation drive the dynamics of the network. If a steady state exists where the external populations fire at a constant rate,
+then also the network will settle into a steady state where each population $i$ fires with a constant rate. These rates can be found
+with Equations \ref{eq-mui} and \ref{eq-sigi}. Although this is an elaborate process, computationally it is much faster than
+simulating a network of large populations, waiting until the network relaxates and then finally collating population statistics.
+
+One can find solutions to this set of equations by postulating a state $E_i$ for each node $i$, which evolves according to:
+\begin{equation}
+  \frac{dE_i}{dt} = -E_i + \phi_i (\mu_i, \sigma_i) 
+  \label{eq-wc}
+\end{equation}
+One can pick 'sensible' values  $E_i(0)$ and numerically solve Equation \ref{eq-wc}. After some time, the values $E_i$ will start to approximate
+those of the $\nu_i$, given by Equation \ref{eq-steady}. 
+
+Although this seems a roundabout way of doing things, in practice it is convenient since the solution of sets of Equations such
+as \ref{eq-wc} are precisely what MIIND is designed to do. There is an algorithm provided with MIIND that evolves a node's state
+$E_i$ according to Equation \ref{eq-wc}. This allows one to play with the values of connectivities, synaptic efficacies, etc.
+and observe their effect on the steady state firing rates of the network.
+
+\subsubsection{Modeling the Network Dynamics}
+\label{sec-Fokker-Planck}
+The methods described in the last section are well established techniques to find the steady state firing rates
+of networks of LIF neuron populations, but there are sitautions where Equation \ref{eq-wc} provides a poor 
+model for the transient dynamics of the network, or indeed the stability of the steady state solution. It may well be possible
+that the network never settles into a steady state. A much better description of the firing rate of neurons is given
+by population density methods. Population density methods do not resort to the simulation of large groups of neuronal models,
+but instead they define a density function over the neuronal population. Assume the existence of some minimum potential, that
+any neuron in the population is likely to cross with vanishing probaility.
+One can then define a density function $\rho(V,t)$, defined as the fraction of neurons in the population that have
+their membrane potential in interval $[V, v+ dv)$. Clearly:
+\begin{equation}
+  \int^{V_{th}}_{V_{min}} \rho(V,t) dv = 1
+\end{equation}
+It can be demonstrated that all relevant quantities that exist at the population level, such as its firing rate, can be calculated
+from thsi function. Although mathematically more complex, this method is an order of magnitude more efficient than large
+scale neuronal simulations. 
+
+Assume the same situation as in the previous section where we defined the gain function of a population, and consider another
+population connecting onto this population with all parameters defined in the same way as before.
+
+It can be demonstrated (see \citet{omurtag2000} for a lucid demonstration) that:
+\begin{equation}
+  \frac{\partial}{\partial t} \rho(V,t) + \frac{1}{\tau}\frac{\partial \rho(V,t)}{\partial V} = \nu_{ext}( \rho(V-h,t) - \rho(V,t)) +\nu(t) \delta(V -V_{reset})
+  \label{eq-balance}
+\end{equation}
+where $\nu(t)$ is given by:
+\begin{equation}
+  \nu(t) = \int^{V_{th}}_{V_{th} - h} rho(v,t) dv)
+\end{equation}
+Moreover, one must impose:
+\begin{equation}
+  \rho(V_{th},t) = 0
+\end{equation}
+as a boundary condition. Note that in the limit where $h \rightarrow 0$, but $\nu_{ext} h $ is constant, one can Taylor expand the right hand side of
+Equation \ref{eq-balance} to obtain the form:
+\begin{equation}
+\frac{\partial \rho(V,t)}{\partial t} + \frac{1}{\tau}\frac{\partial}{\partial}\left\{(V - \mu)\rho)\right\}  + \frac{sigma^2}{2 \tau}\frac{\partial^2}{\partial v^2} \rho(V,t) = \nu_{ext} \delta (V - V_{reset}),
+\label{eq-fp}
+\end{equation}
+which is a Fokker-Planck equation.
+Introducing $\mathcal{L}_{FP}(\mu, \sigma)$ as a shorthand for the second order differential operator defined by Equation \ref{eq-fp}.
+The network can now be described by the following set of coupled Fokker-Planck equations:
+\begin{equation}
+  \mathcal{L}_{FP,i}(\mu_{i},\sigma_{i})\rho_i(V,t) = nu_{i} \delta(V - V_{reset}),
+\end{equation}
+with:
+\begin{equation}
+  \nu_i = \int^{V_{th}}_{V_{th}-h} \rho_i(V,t)
+\end{equation}
+and $\mu_i$, $\sigma_i$ given by Equations \ref{eq-mui} and \ref{eq-sigi}. 
+
+Although the state of each individual node is much more complex than for the simulation described in the previous section. The network structure
+of the simulation is identical. Again, MIIND provides algorithms that can evolve the state $\rho_i$ of node $i$ numerically, and in this way
+an accurate simulation of transient network dynamics and stability can be simulated without having to model thousands of nodes individually, and then
+collating their population statistics. The gain in overall efficiency is still large enough to warrant the added complexity of the poulation
+density approach.
+
+\subsubsection{A Hexagonal Network of Populations}
+\label{sec-hexagon}
+Using parameters described as biologically plausible elsewhere \citet{amit1997}, and tinkering with them to obtain
+steady state firing rates of 2 Hz for the excitatory population and 5 Hz for the inhibitory population, we arrive at the
+connectivity parameters described in Table \ref{tab-con}
+\begin{table}[h]
+\label{tab-con}
+For these parameters the network is stable, although not far away from instability: a mere change of $x$ in $J_{EE}$ brings the network
+in a permanent oscillatory state. The convergence of the firing rates and the steady state density distributions are given in Fig \ref{fig-bingo}.
+The network can maintain its low level firing rates due a balance of excitation and inhibition and individual neurons in this regime
+would fire irregularly.
+
+
+We now reduce take one such local circuit at the centre of a hexagon, and place six others at the cornes of the hexagon. We
+reduce all intra-circuit parameters $J_{EE}$ by a factor half. We connect all excitatory populations laterally by with an efficacy
+$\frac{1}{2N_{neigh}}$ where $N_{neigh}$ is the number of neighbours. For the centre node $N_{neigh}= 6$ for the outside nodes $N_{neigh} = 3$.
+This ensures that when all excitatory nodes fire with a firing rate of 2 Hz, the neighbour nodes make up for the lost connectivity,
+the previous self-stable. Clearly, hexagonal networks with more rings can be created by taking following this procedure, always taking
+the correct number of neighbours of a node into account. In general the number of populations in the network $N_{pop}$ is given
+by:
+\begin{equation}
+N_{pop} = 2 ...,
+\end{equation}
+where the factor of two accounts for there being two populations in the circuit. Finally, it is possible to provide a delay
+\caption{Connectivity parameters for the local cortical circuit.}
+\end{table}
 \section*{Acknowledgments}
-This parallelization of MIIND was carried out as a Google Summer of Code 2012 project. We gratefully ackowledge Google's support. 
-\section*{References}
+This parallelization of MIIND was carried out as a Google Summer of Code 2012 project. We gratefully acknowledge Google's support. 
+
 % The bibtex filename
 \bibliographystyle{front}
-\bibliography{bib}
+\bibliography{pmiind}
 
 \section*{Figure Legends}
 
