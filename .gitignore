@@ -15,3 +15,6 @@ build_test
 *.log
 *.aux
 pmiind.pdf
+*.dvi
+*.bbl
+*.blg
