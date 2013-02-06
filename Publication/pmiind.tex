@@ -62,6 +62,18 @@
 \DeclareCaptionSubType*{figure}
 \captionsetup[subfigure]{format=subfig,labelsep=colon,labelformat=simple}
 
+% the listings package
+\usepackage{listings}
+\lstset{
+language=C++,
+basicstyle=\footnotesize,
+numbers=right,
+numberstyle=\tiny,
+frame=tb,
+columns=fullflexible,
+showstringspaces=false
+}
+
 
 %% ** EDIT HERE **
 %% PLEASE INCLUDE ALL MACROS BELOW
@@ -145,37 +157,146 @@ By repeating this process for all nodes in the network for a desired period of t
 The central idea is represented in Figure 1. In the next section we will illustrate how network creation and configuring a simulation is done 
 from the user's perspective.
 \subsection{Simulating Networks as a Use Case}
-Here we present a small program that performs a simulation of two neuronal populations: one excitatory and one inhibitory, driven by a common external
-input.
-Creating a network is done by instantiating a network object.
-From then on only two methods are required to control the generation of the network.
-The first method \texttt{addNode} adds a new nodes to the network.
+Here we present a small program that performs a simulation of two neuronal populations: one excitatory and one inhibitory, driven by a common external input.
+In listing \ref{code:twopopnet} the shortened code of this simulation is provided.
+To increase the readability parameters are not provided. 
+As a placeholder for the parameters the word PARAM is used.
+Additional namespaces are ignored. 
+For the whole program the reader is refered to the source code where this example is provided as \texttt{two-population.cpp}.
+In the next section the setup of an simulation is explained step by step with the two population network.
+\begin{lstlisting}[caption=Simulation of a two neuronal population network.,label=code:twopopnet]
+int main(int argc, char* argv[]) {
+#ifdef ENABLE_MPI
+	boost::mpi::environment env(argc, argv);
+#endif
+	try {
+		NodeId id_cortical_background;
+		NodeId id_excitatory_main;
+		NodeId id_inhibitory_main;
+		MPINetwork<OrnsteinUhlenbeckConnection, CircularDistribution> network;
+
+		// Create cortical background, and add to network
+		populist::RateFunctor<WeightValue> cortical_background(PARAM);
+		id_cortical_background = network.addNode(cortical_background, EXCITATORY);
+		// Create excitatory main population
+		PopulationAlgorithm_<OrnsteinUhlenbeckConnection> algorithm_excitatory(PARAM);
+		id_excitatory_main = network.addNode(algorithm_excitatory, EXCITATORY);
+		// Create inhibitory main population
+		PopulationAlgorithm_<OrnsteinUhlenbeckConnection>  algorithm_inhibitory(PARAM);
+		id_inhibitory_main = network.addNode(algorithm_inhibitory, INHIBITORY);
+
+		// Background and excitatory connection only differ in x, 1- x
+		network.makeFirstInputOfSecond(id_cortical_background, id_excitatory_main, PARAM);
+		// Excitatory connection to itself
+		network.makeFirstInputOfSecond(id_excitatory_main, id_excitatory_main, PARAM);
+		// Background connection to I
+		network.makeFirstInputOfSecond(id_cortical_background, id_inhibitory_main, PARAM);
+		// E to I
+		network.makeFirstInputOfSecond(id_excitatory_main, id_inhibitory_main, PARAM);
+		// I to E
+		network.makeFirstInputOfSecond(id_inhibitory_main, id_excitatory_main, PARAM);
+		// I to I
+		network.makeFirstInputOfSecond(id_inhibitory_main, id_inhibitory_main, PARAM);
+		
+		network.configureSimulation(PARAM);
+		network.evolve();
+	} catch (std::exception&e) {
+		std::cout << e.what() << std::endl;
+		return 1;
+	}
+	return 0;
+}
+\end{lstlisting}
+
+For parallel MIIND it is important to initialise the mpi environment (see line 3 in listing \ref{code:twopopnet}).
+To allow that the code is compilable without an mpi compiler the preprocessor is used to remove the code if mpi is not enabled.
+These 3 lines are the only one where actually the user is forced to handle the mpi environment direct.
+All other mpi related code is hidden from the user.
+
+After the mpi environment is initialised one can start with setting up an simulation.
+The network is created by instantiating a network object (line 9).
+The network gets two template parameters.
+The first parameter defines the connection type of the network.
+In the example above this is a Ornstein Uhlenbeck type of connection.
+The second parameter is the distribution of the nodes.
+These parameter controls the distribution of the nodes in an mpi environment.
+More details will be provided in the next section.
+
+So far only the type of the network is defined.
+To define the structure of the network two methods are needed.
+
+
+The first method \texttt{addNode} adds a new nodes to the network (see line 13, 16 and 19).
 This method expects the algorithm executed on this node and the type of the node.
-The method \texttt{addNode} returns the node if of the generated node.
+In the example above 3 nodes are generated.
+The cortical background driving the simulation with a constant firing rate (line 13).
+And an excitatory and inhibitory node where leaky-integrate-and-fire neurons are simulated (line 16 and 19). %what reference for that
+
+The method \texttt{addNode} returns the node id of the generated node.
 The node ids start from 0 and are incremented by one for each additional nodes.
 The order of the node ids correspond to the chronological order of the calls to \texttt{addNode}.
-In the case of the two neural population simulation there are three nodes.
-One node represents the external input, the other two nodes represent the excitatory and the inhibitory node.
+These ids are needed to identify the individual nodes and are needed for the second method to generate the network structure.
 
 After the creation of the nodes the interactions of the network needs to be created.
 Therefore directed connections between two nodes are generated.
 Directed Connections between two nodes are generated by calling the method \texttt{makeFirstInputOfSecond}.
-The method expects as parameters the node id of the first and the second node in the connection and the parameters of the connection.
-During the generation of a connection the two nodes store the id of their successor respective precursors.
+The method expects as parameters the node id of the first and the second node in the connection and the parameters of the connection (see line 22 - 32).
 In the case of the two population network six connections are generated.
 The background node is connected to the exhibitory and the inhibitory node.
 The exhibitory and inhibitory nodes are connected to itself and to each other.
 With these two methods the structure of the network is constructed.
-Now the simulation can be configured and executed.
-The configuration is done by providing the simulation parameters to the method \texttt{configureSimulation}.
-The simulation loop is executed by the method \texttt{evolve}.
-As one can see the interface of Parallel MIIND has not changed compared to the old MIIND version.
-Until now the user has not seen any code related to the parallelisation.
+The structure of the generated network can be seen in figure \ref{fig:twoPopNetwork}.
 
+With these two methods all kind of networks can be generated.
+To execute a simulation on that network the simulation needs to be configured.
+The configuration is done by providing the simulation parameters to the method \texttt{configureSimulation} (see line 34 in listing \ref{code:twopopnet}).
+When the simulation is configured the main simulation loop can be executed with the method \texttt{evolve}.
+
+With the example provided above one can see that the generation of a simulation is straightforward.
+It does not need any knowledge about the underlying parallelisation. More details about the parallelisation is provided in the next section.
 
 \subsection{The Simulation Engine: An MPI-enabled Simulation Loop}%TODO(MdK) it is not only the simulation loop which is parallised. Maybe another title would be more suitable
-In this section we will describe the MPI-based infrastructure that forms the heart of the framework.
+In this section we will describe the mpi-based infrastructure that forms the heart of the framework.
 
+To start with an illustration will be used.
+A person wants to solve a large equation consiting of lot of different smaller equations.
+In the beginning the person solved the equation on its own.
+However it took a large amount of time for one person to solve the equations.
+Therefore the management decided to hire additonal people to speed up the process.
+To solve the equations faster each person needs to know what equation it should solve and sometimes the extension of another person equation is needed.
+To share results and work they need to communicate with each other.
+When people communicate with each other they cannot solve equations on the same time.
+Additional the they might need lot of extensions of other people so they need to wait until the other people are finished with their calculation.
+These two problems show some of the largest issues with parallelisation.
+One is the overhead for communication.
+And the other the latency.
+The illustration above allegorize the message passing interface.
+
+The Message passing interface mpi is a standard to develop applications aimed at large scale parallel applications.
+An mpi program resembles an ordinary program written for a serial processor.
+This similarity is deceptive, however.
+In reallity the code is executed in parallel on different mpi processes.
+A mpi process can be either executed on a single core of a multi core processor or on a different CPU.
+These execution in different processes results that each process has its own memory space and not a shared memory space like a serial program.
+That increases the amount of work to share data between the mpi processes.
+For sharing data messages are sent between the individual mpi processes.
+To send messages conncetions between the individual processes are needed.
+The connections between the individual processes can be either a internal bus or a simple network connection.
+However mpi is normally executed on super clusters with a very fast network connection (e.g. InfiniBand).
+
+To speed-up a serial program with mpi the serial program is decomposed in parts that can be executed in parallel.
+Often a serial program is not embarrasing parallel resulting in data that needs to be shared between the mpi processes.
+Therefore the individual mpi processes needs to communicate with each other to share the data.
+To share the data between the mpi processes messages are sent from one mpi process to another with the data.
+Compared to computation a message is very slow.
+To reduce the overhead of parallelisation it is very important to reduce the number of messages to the minimum.
+
+
+For the parallelisation of MIIND the idea was to distribute the nodes to MPI processes.
+Each node can locally envole one time step without any communication.
+The evolve step is responsible for most of the run time of an simulation the run time should be reduced by parallising these method.
+
+% continue from here
 The biggest change compared to the old MIIND is that the nodes are distributed to the MPI processes.
 In figure \ref{fig-realNewtork} one can see an example representation of a network consisting of 8 nodes.
 These nodes are distributed with the default circular distribution to their corresponding MPI nodes.
@@ -419,7 +540,11 @@ This parallelization of MIIND was carried out as a Google Summer of Code 2012 pr
 \bibliography{pmiind}
 
 \section*{Figure Legends}
-
+\begin{figure}[tbp]
+	\includegraphics[width=0.99\textwidth]{twoPopNetwork.eps}
+    \label{fig:twoPopNetwork}
+    \caption{The network of the two population network simulation.}
+\end{figure}
 
 \begin{figure}[tbp]
 	\begin{subfigure}[b]{0.48\linewidth}
