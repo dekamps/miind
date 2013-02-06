@@ -197,7 +197,7 @@ int main(int argc, char* argv[]) {
 		network.makeFirstInputOfSecond(id_inhibitory_main, id_excitatory_main, PARAM);
 		// I to I
 		network.makeFirstInputOfSecond(id_inhibitory_main, id_inhibitory_main, PARAM);
-		
+
 		network.configureSimulation(PARAM);
 		network.evolve();
 	} catch (std::exception&e) {
@@ -285,7 +285,7 @@ The connections between the individual processes can be either a internal bus or
 However mpi is normally executed on super clusters with a very fast network connection (e.g. InfiniBand).
 
 To speed-up a serial program with mpi the serial program is decomposed in parts that can be executed in parallel.
-Often a serial program is not embarrasing parallel resulting in data that needs to be shared between the mpi processes.
+A serial program that is not embarrasing parallel results in data that needs to be shared between the mpi processes.
 Therefore the individual mpi processes needs to communicate with each other to share the data.
 To share the data between the mpi processes messages are sent from one mpi process to another with the data.
 Compared to computation a message is very slow.
@@ -295,27 +295,73 @@ To reduce the overhead of parallelisation it is very important to reduce the num
 For the parallelisation of MIIND the idea was to distribute the nodes to MPI processes.
 Each node can locally envole one time step without any communication.
 The evolve step is responsible for most of the run time of an simulation the run time should be reduced by parallising these method.
-
-% continue from here
-The biggest change compared to the old MIIND is that the nodes are distributed to the MPI processes.
-In figure \ref{fig-realNewtork} one can see an example representation of a network consisting of 8 nodes.
-These nodes are distributed with the default circular distribution to their corresponding MPI nodes.
-From figure \ref{fig-internalNetwork} one can see the assignment of the nodes to the 4 MPI processes.
-
-To allow the distribution of the nodes to distinct MPI processes several major changes inside the library where needed.
-As a default distribution a circular distribution (\texttt{CircularDistribution}) is provided.
-However the distribution can be easily exchanged by the user by changing a template argument of the MPI Network class.
+To distribute the nodes to the mpi processes a distibution function is used.
+As a default distribution function the circular distribution (\texttt{CircularDistribution}) is provided.
+The circular distribution assignes the nodes in a circular manar to the mpi processes by using the modulor operator.
+For example the network \ref{fig-realNetwork} would be represented internaly like \ref{fig-internalNetwork} when 4 mpi processes are available.
+As the default distribution is not always the best choice it can be easily exchanged.
 A new distribution can be implemented by implementing the virtual methods of the base class \texttt{NodeDistributionInterface}.
 The implementation of a new distribution might be useful if another distribution would decrease the number of messages across the MPI processes (the dotted arrows in figure \ref{fig-internalNetwork}).
-To implement a new distribution one might use of additional knowledge of the network to decrease the messages over MPI process boarders.
+To implement a new distribution one might make use of additional knowledge of the network to decrease the messages over MPI process boarders.
 
-The parallelisation starts during the creation of the network. When a node is added to the network the node is only generated on its responsible MPI process.
-During the generation of the nodes unique ids are assigned to each node.
+With the distribution function the nodes are assigned to distinct mpi processes.
+As the nodes are distributed over several mpi processes major changes inside the library where needed.
+
+The parallelisation starts during the creation of the network.
+When a node is added to the network the node is only generated on its responsible mpi process.
+The method \texttt{addNode} is responsible for creating nodes.
+
+\begin{lstlisting}[caption=The \texttt{addNode} method of the network.,label=code:addNode]
+addNode(const AlgorithmInterface<WeightValue>& alg, NodeType nodeType) {
+	NodeId tempNodeId = getMaxNodeId();
+	if (nodeDistribution.isLocalNode(tempNodeId)) {
+		MPINode node = MPINode(...);
+		localNodes.insert(std::make_pair(tempNodeId, node));
+	}
+	incrementMaxNodeId();
+	utilities::MPIProxy().barrier();
+	return tempNodeId;
+}
+\end{lstlisting}
+
+In listing \ref{code:addNode} the simplified method is provided.
+The method starts with getting the next node id (see line 2 in listing \ref{code:addNode}.
+The node id needs to be synchonised between the mpi processes to make sure that each nodes gets an unique id.
 The ids of the nodes starts with 0 and increasing numbers are assigned to each node depending on the time of their initialization.
-To avoid side effects the creation of nodes the creation is synchronous and guarded with barriers. As the generation of nodes happen only during the initialization this synchronous code has no impact on the performance.
-As the nodes are distributed to MPI processes a connection cannot be stored anymore by connecting the nodes direct (via pointers or references). Instead nodes are connected by storing the node ids of their precursors respective their successor.
-As the distribution of the nodes depends on the node id of the node with a given node id the responsible processor for a node can be identified on each MPI process. This allows a MPI process to identify the MPI processes where a certain node is stored.
-The nodes are stored locally in \texttt{MPINetwork} on each MPI process in a map with their id as the key. The node ids of their precursors and successors are stored internally in each \texttt{MPINode}.
+At this moment all mpi processes have the same node id.
+To generate a node only on the responsibel mpi process the check on line 3 is carried out.
+The \texttt{nodeDistribution} is the choosen distribution class, which checks if the node should be assigned to this mpi process.
+If the node should generate on this node the node is generated and stored in the map \texttt{localNodes}, where the nodes on this mpi process are stored with their id as an key.
+After the node is generated, or not the node id needs to be increased by calling the method \texttt{incrementMaxNodeId()}.
+To avoid side effects the \texttt{addNode} method is synchronised.
+For synchronous code mpi barriers are used which make sure that the function is only finished if all processes have executed all code.
+As the generation of nodes happen only during the initialization this synchronous code has no impact on the performance.
+
+
+
+
+As the mpi processes have different memory spaces the connections between the nodes cannot be stored anymore by connecting the nodes direct (via pointers or references).
+The connections are generated by calls to the \texttt{makeFirstInputOfSecond} method.
+
+
+\begin{lstlisting}[caption=The simplified \texttt{makeFirstInputOfSecond} method of the network.,label=code:makeFirstInputOfSecond]
+makeFirstInputOfSecond(NodeId first, NodeId second, const WeightValue& weight) {
+	//Make sure that the node exists and then add the successor
+	if (nodeDistribution.isLocalNode(first)) {
+		localNodes.find(first)->second.addSuccessor(second);
+	}
+	// Make sure that the second node exist and then set the precursor
+	if (nodeDistribution.isLocalNode(second)) {
+		localNodes.find(second)->second.addPrecursor(first, weight, nodeIdsType_[second]);
+	}
+}
+\end{lstlisting}
+
+In listing \ref{code:makeFirstInputOfSecond} the simplified method is provided.
+As the connections cannot be stored with pointers or references it is stored by saving the node ids of the precursors respective the successor of a node.
+During the \texttt{makeFirstInputOfSecond} method on the local nodes either the successor (line 4) or precursor (line 8) of a node is stored.
+
+UNTIL HERE REWRITTEN
 
 After the nodes have been generated and the network has been generated the simulation is initialized. During the initialization each MPI process generates its corresponding output file, where the activities of the local nodes are stored. The decision to not collect all inputs on one node and then write the output file was made due to performance considerations. Otherwise all node activities had to be collected to one MPI process, which would require lot of communication.
 
