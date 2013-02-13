@@ -361,38 +361,118 @@ In listing \ref{code:makeFirstInputOfSecond} the simplified method is provided.
 As the connections cannot be stored with pointers or references it is stored by saving the node ids of the precursors respective the successor of a node.
 During the \texttt{makeFirstInputOfSecond} method on the local nodes either the successor (line 4) or precursor (line 8) of a node is stored.
 
-UNTIL HERE REWRITTEN
 
-After the nodes have been generated and the network has been generated the simulation is initialized. During the initialization each MPI process generates its corresponding output file, where the activities of the local nodes are stored. The decision to not collect all inputs on one node and then write the output file was made due to performance considerations. Otherwise all node activities had to be collected to one MPI process, which would require lot of communication.
+After the network has been generated the simulation is initialized.
+To avoid to much communication between the nodes each mpi process has its own log and output file.
+In the output file the activities of the local nodes are stored.
+The advantage of several output files is that the node activities had not to be collected on one mpi process, which would require lot of communication.
+This performance gain is paid for by a more difficult post processing. 
+As the activites of the nodes are distributed into several files and are not stored all in one file.
 
-When the network is initialized the main simulation loop iterates on each MPI processor over the local nodes and evolves them.
-To evolve the local nodes they need the activity of their precursors.
-The activity of the precursors are stored temporarily on each node and updated before a node evolves.
-The update is carried out by each node sending its new activity after an evolve step to all its successors and on the same time receiving the new activities from all precursors.
-To increase the performance MPI messages are sent asynchronously and the activity of local nodes is updated local on the MPI process without MPI messages.
-The asynchronous messages allows to hide the latency by continue with local calculations.
-However before executing the next step of the simulation the library makes sure that all messages are received successfully to avoid inconsistent behavior.
-The algorithms of Parallel MIIND have not changed significantly compared to MIIND. For an algorithm developer only the way the data is provided has changed.
+When the simulation is configured the main simulation loop is started.
+The main simulation loop iterates over the local nodes and envoles them one step.
+To make sure that all node have recieved and sended their activity at the beginning of each \texttt{evolve} step an barrier is introduced.
+At this barrier all nodes waits until all mpi messages are successfully finished.
+This barrier increased the performance as the latency of the mpi messages was hidded.
+The mpi messages where sent ascynchronus such that the mpi process could continue with other computation and does not need to wait for each to be finished.
+
+The evolve of a node does require that all nodes have the activity of their precursors.
+Each node has a temporary storage (\texttt{\_precursorActivity}) of the activity of their precursors.
+During the \texttt{evolve} method each node calls his corresponding algorithm and passes the activity of the precursors the weights of the connection and the type of the precursor (see line 3 in listing \ref{code:evolve}).
+
+
+\begin{lstlisting}[caption=The simplified \texttt{evolve} method of the nodes.,label=code:evolve]
+evolve(Time time) {
+	while (_pAlgorithm->getCurrentTime() < time) {
+		_pAlgorithm->evolveNodeState(_precursorActivity, _weights, time,_precursorTypes);
+	}
+	this->setActivity(_pAlgorithm->getCurrentRate());
+	sendOwnActivity();
+	receiveData();
+}
+\end{lstlisting}
+
+After the algorithm had evolved the state of the node the new rate of the node is stored (line 5).
+When the new activity of the node is available the node sends its new activity to all its successors (line 6).
+The details of the \texttt{sendOwnActivity} method is explained below.
+Additonal the node prepares itself to receive data from his precursors (line 7).
+The details of the method \texttt{receiveData} is explained below.
+As the  \texttt{sendOwnActivity} and  \texttt{receiveData} are asynchronous they return immediately such that the next node can be envolved without waiting for the data transmission.
+
+
+The activity of a node is sent to the successors with the help of the  \texttt{sendOwnActivity} method.
+In listing \ref{code:sending} the simplified method is provided.
+\begin{lstlisting}[caption=The simplified \texttt{sendOwnActivity} method of the nodes.,label=code:sending]
+sendOwnActivity() {
+  for (auto& it : _successors) {
+	if (!_rNodeDistribution.isLocalNode(it)) {
+	  MPIProxy().isend(_rNodeDistribution.getResponsibleProcessor(it), _nodeId, _activity);
+	}
+  }
+}
+\end{lstlisting}
+The method  \texttt{sendOwnActivity}  iterates ofter the ids of the successors of a node (see line 2 in listing \ref{code:sending}.
+For each successor it is checked if the successor is on the same mpi process or not (line 3).
+If not the activity of the code needs to be send with mpi to the corresponding processor (line 4).
+The \texttt{MPIProxy} class is a simple wrapper over the mpi environment to avoid any bare mpi code in library.
+\texttt{MPIPoroxy} is explained later into more detail.
+The method \texttt{isend} sends an asynchronous mpi message to a processor with some data.
+The first parameter \texttt{isend} is the identifier of the mpi process which is responsible for the successor.
+The second parameter is a message identifer.
+Together with the mpi process these need to be unique.
+The last parameter is the actual data that is send to the other node.
+
+After the own data sending was started each node prepares itself to recieve the activities of the other nodes.
+Therefore the \texttt{receiveData} method is used.
+
+\begin{lstlisting}[caption=The simplified \texttt{receiveData} method of the nodes.,label=code:receive]
+receiveData() {
+  int i = 0;
+  for (auto it = _precursors.begin(); it != _precursors.end(); it++, i++) {
+	if (_rNodeDistribution.isLocalNode(*it)) {
+  	  _precursorActivity[i] = _rLocalNodes.find(*it)->second.getActivity();
+	} else {
+	  MPIProxy().irecv(_rNodeDistribution.getResponsibleProcessor(*it), *it, _precursorActivity[i]);
+	}
+  }
+}
+\end{lstlisting}
+
+The \texttt{receiveData} method iterates over all precursors of a node (see line 3 in listing \ref{code:receive}).
+For each precursor it is checked if it is local to this mpi process (line 4).
+If a node is local the activity is received without any communication with a lookup in the map of the local nodes (line 5).
+When a node is not local to this mpi process the method opens an asynchronous receive (line 7).
+The first parameter the method \texttt{irecv} is the identifier of the mpi process which is responsible for the precursor.
+The second parmeter is the identfier of the message. 
+Each \texttt{isend} and \texttt{irecv} method must pair depending on responsible processors and the message identifier.
+The last parameter is the storage location where the location where the received activity should be stored.
+It is the temporary storage of the activities of the precursors which are used during the next \texttt{evolve} step.
+
+
+These are where all the magic of the parallelisation of MIIND is done. 
+The algorithms of Parallel MIIND have not changed significantly compared to MIIND. 
+For an algorithm developer only the way the data is provided has changed.
 Additional he does not need to care about concurrency issues as the parallelisation is encapsuled from the algorithm.
 This simplifies the development of new algorithms significantly as developers does not need to gain internal knowledge of pmiind.
-The most visible change of Parallel MIIND for a application developer is the output.
-To do not decrease the efficiency of Parallel MIIND the simulation reports are written parallel to the file system.
+
+The most visible change of Parallel MIIND for an application developer is the output.
+As explained above each mpi process writes to its own output file.
 Instead of one root file with all results for each MPI process a root file with the corresponding local nodes is generated.
 Therefore the activity of the nodes are distributed to several files and need to be collected from different files for postprocessing.
 
-To reduce the impact of pmiind all MPI related code is encapsulated and can be turned off.
-To improve the readability of the code the MPI related code is encapsulated in the class \texttt{MPIProxy}.
+To reduce the impact of pmiind all mpi related code is encapsulated in the class \texttt{MPIProxy} and can be turned off.
+To improve the readability of the code the mpi related code is wrapped by the class \texttt{MPIProxy}.
 Therefore when MPI methods are used boost mpi is not called direct instead the class \texttt{MPIProxy} forwards the calls to boost mpi.
 Additional this class stores all open mpi requests of the asynchronous calls.
-Allowing to handle all open communications in one place and not scattered around the code of the library.
+Reducing the code to handle all open communications as all mpi request are stored in one place and not scattered around the code of the library.
 As all mpi related code is encapsulated in one class it can be easily turned off.
-When MPI is turned off parallel MIIND can be builded and executed without MPI available on the computer.
+When MPI is turned off parallel MIIND can be builded and executed without mpi available on the computer.
 This reduces the impact of the development of new algorithms further as the development computer does not need to have mpi installed.
 After the testing the parallelisation can be turned on and one can benefit of the speed ups achieved by parallel execution on clusters.
 
 As a parallel environment is very hard to debug a new logging class had been developed.
 The class \texttt{Log} provides methods to print logging and debugging messages.
-Additional it provides additional information about the MPI environment allowing to identify the MPI process which might have an error.
+Additional it provides additional information about the mpi environment allowing to identify the mpi process which might have an error.
 The generation of a huge number of debug logs is very time consuming. Therefore the logging can be turned off completely for release builds.
 Instead off a simple on or off the class provides several log levels allowing a fine granularity of log messages.
 This allows the usage of this class not only for debugging purposed but additional for error messages or important information during a simulation run.
