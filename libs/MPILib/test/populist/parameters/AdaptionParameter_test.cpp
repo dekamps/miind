@@ -36,11 +36,11 @@ void test_Constructor() {
 	BOOST_CHECK(test._q==0.0);
 	BOOST_CHECK(test._t_adaptation==0.0);
 
-	AdaptationParameter test1(1.0, 2.0, 3.0);
+//	AdaptationParameter test1(1.0, 2.0, 3.0);
 
-	BOOST_CHECK(test1._t_adaptation==1.0);
-	BOOST_CHECK(test1._q==2.0);
-	BOOST_CHECK(test1._g_max == 3.0);
+//	BOOST_CHECK(test1._t_adaptation==1.0);
+//	BOOST_CHECK(test1._q==2.0);
+//	BOOST_CHECK(test1._g_max == 3.0);
 
 }
 

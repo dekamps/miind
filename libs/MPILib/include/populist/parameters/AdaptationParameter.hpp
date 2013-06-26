@@ -43,7 +43,7 @@ struct AdaptationParameter {
 	/**
 	 * Default constructor
 	 */
-	AdaptationParameter() = default;
+	AdaptationParameter() {};
 	/**
 	 * Constructor, adaptation parameters only
 	 * @param t_adaptation The adaptation time

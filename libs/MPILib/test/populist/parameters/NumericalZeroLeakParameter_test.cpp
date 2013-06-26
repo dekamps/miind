@@ -33,11 +33,6 @@ void test_Constructor() {
 
 	NumericalZeroLeakParameter test;
 
-	BOOST_CHECK(test._H==0);
-	BOOST_CHECK(test._alpha_e==0.0);
-	BOOST_CHECK(test._alpha_i==0.0);
-	BOOST_CHECK(test._eff_rate_exc==0.0);
-	BOOST_CHECK(test._eff_rate_inh==0.0);
 	BOOST_CHECK(test._i_reset==0);
 	BOOST_CHECK(test._i_reset_orig==0);
 	BOOST_CHECK(test._i_reversal==0);

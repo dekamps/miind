@@ -110,7 +110,7 @@ void test_MakeFirstInputOfSecond() {
 
 	bool exceptionThrown = false;
 	try {
-		network.makeFirstInputOfSecond(node0, node1, weight,EXCITATORY);
+		network.makeFirstInputOfSecond(node0, node1, weight);
 	} catch (...) {
 		exceptionThrown = true;
 	}
@@ -135,7 +135,7 @@ void test_MakeFirstInputOfSecond() {
 	exceptionThrown = false;
 	try {
 		//use bad input to test exception
-		network.makeFirstInputOfSecond(100, 101, weight,EXCITATORY);
+		network.makeFirstInputOfSecond(100, 101, weight);
 	} catch (utilities::ParallelException &e) {
 		exceptionThrown = true;
 	}

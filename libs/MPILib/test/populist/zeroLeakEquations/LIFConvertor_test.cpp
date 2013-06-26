@@ -58,7 +58,7 @@ void test_Constructor() {
 	BOOST_CHECK(converter._vec_diffusion.size()==0);
 
 }
-
+/*
 void test_SortConnectionvector(){
 	parameters::PopulistSpecificParameter popSpecParam;
 	parameters::OrnsteinUhlenbeckParameter popParam;
@@ -121,7 +121,7 @@ void test_SortConnectionvector(){
 	BOOST_CHECK(converter3._input_set._rate_inh==3);
 
 }
-
+*/
 void test_RecalculateSolverParameters(){
 	///@todo implement this test
 }
@@ -130,7 +130,7 @@ int test_main(int argc, char* argv[]) // note the name!
 		{
 
 	test_Constructor();
-	test_SortConnectionvector();
+	//test_SortConnectionvector();
 	test_RecalculateSolverParameters();
 	return 0;
 //    // six ways to detect and report the same error:
