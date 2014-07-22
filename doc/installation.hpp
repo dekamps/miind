@@ -1,8 +1,41 @@
 /**
 \page installation Installation
+\section sec_prelim Preliminaries. 
+At the moment, it is necessary to install 
+<a href="http://root.cern.ch">ROOT</a>. Under Unix systems, this is 
+straightforward. ROOT is a powerful analysis platform that has similar
+capablities as MATLAB, but is optimized for high performance.
+
+From October 2014, we will provide an option to install MIIND without ROOT.
+Simulation results can then be analyzed using MATLAB or SciPy. In general,
+we recommend that you install ROOT.
+
+You will also need:
+<ul>
+ <li> The Gnu Scientific Library, <a href="http://www.gnu.org/software/gsl/">GSL</a> for short</li>
+ <li>  A recent (> 1.48) version of <a href="http://www.boost.org">BOOST</a>.
+</ul>
+
+\section Basic Installation
+Whether you down load the tar file or checkout the code from the
+repository, you will have a top directory called 'code'. Where you place
+this is immaterial. Preform the following steps:
+<ol>
+<li> Directly below 'code', create a directory called 'build'. This 'build' directory will be at the same level as 'apps' and 'libs'.</li>
+<li> cd build </li>
+<li> ccmake ..</li>
+<li> Indicate whether you want a Release or a Debug version.</li>
+<li> You may have to indicate where ROOT is. CMake is intelligent enough
+to work out where, once you have provided the location of the root excutable.</li>
+<li> Generate the Make file ('g')</li> 
+<li> Quit ('q') </li>
+<li> Type 'make'</li>
+</ol>
+The libraries will built in build/libs, the excetuables in buid/apps.
 
 \section Release
-
+Once you have done this and want to make changes, it may be easier
+to run cmake, although the description below applies to ccmake as well.
 <ol>
 <li> Run cmake:
 

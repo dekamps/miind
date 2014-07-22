@@ -1,5 +1,5 @@
 /*!
-\mainpage Miind-mpi Documentation
+\mainpage Miind Documentation
 \section sec_intro Introduction
 MIIND provides a simulation framework for neural simulations. It focusses on population level
 descriptions of neural dynamics, i.e. it does not provide a siumulator for individual neurons,
@@ -16,7 +16,13 @@ Currently, part of the developent is funded by the <a href="http://www.humanbrai
 A new official release date will be 1 October 2014. The new release will contain many new algorithms, including
 other populations than leaky-integrate-and-fire ones. The documentation will be revamped.
 
-
+\section sec_download Download
+The latest tar bal can be found <a href="http://sourceforge.net/projects/miind">here</a>. Install on Unix platforms
+is straightforward, using cmake. The procedure is explained
+in \ref installation. You can checkout a snapshot of the latest
+code with:
+cvs -d :pserver:anonymous@miind.cvs.sf.net:/cvsroot/miind co -P code
+This will change soon, though.
 
 The components are Open Source software under a BSD licence.
 \section licence Licence
@@ -29,13 +35,9 @@ Use cmake and make. For more details see \ref installation.
 \section sec_dependencies Dependencies
 For more details see \ref dependencies
 
-\section MPILib
-see \ref MPILibDoc.
-\section adaption Adaption of old Code to the new MPILib
-see \ref changes
-\section sec_appendix Appendix
 
-\subsection sec_issues Known Issues
-
+\section sec_wiki WIKI
+The MIIND <a href="http://sourceforge.net/p/miind/wiki/Home">wiki</a>.
+The WIKI contains more details about the extra work that needs to be done to install MIIND under windows.
 */
 
