@@ -96,8 +96,8 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 
 			auto tempNode = _localNodes.find(first)->second;
 
-			if ((tempNode.getNodeType() == EXCITATORY && toEfficacy(weight) < 0)
-					|| (tempNode.getNodeType() == INHIBITORY
+			if ((IsExcitatory(tempNode.getNodeType())  && toEfficacy(weight) < 0)
+					|| (IsInhibitory(tempNode.getNodeType()) 
 							&& toEfficacy(weight) > 0)) {
 				throw utilities::Exception("Dale's law violated");
 

@@ -173,7 +173,7 @@ void InputConvertor::SortConnectionvector
 	if (! _b_toggle_sort ) {
 	  for ( Index i = 0; i < n_inputs; i++){
 
-	    if ( typeVector[i] == EXCITATORY_BURST || typeVector[i] == INHIBITORY_BURST ){
+	    if ( typeVector[i] == EXCITATORY_DIRECT || typeVector[i] == INHIBITORY_DIRECT ){
 	      _vec_burst.push_back(i);
 	    }
 	    else {
