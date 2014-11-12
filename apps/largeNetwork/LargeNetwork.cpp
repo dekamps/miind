@@ -30,9 +30,9 @@
 #endif
 #include <boost/timer/timer.hpp>
 
-#include "largeNetwork/GenerateHexagonalNetwork.hpp"
-#include "largeNetwork/Hexagon.hpp"
-#include "largeNetwork/LargeNetwork.hpp"
+#include "GenerateHexagonalNetwork.hpp"
+#include "Hexagon.hpp"
+#include "LargeNetwork.hpp"
 
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>

@@ -190,7 +190,7 @@ namespace {
 						TWOPOPULATION_J_EE
 					);
 				algorithm::DelayAlgorithm<Pop_Network::WeightType> alg_delay(LargeNetwork::T_DELAY);
-				NodeId id_delay = p_net->addNode(alg_delay,EXCITATORY);
+				NodeId id_delay = p_net->addNode(alg_delay,EXCITATORY_GAUSSIAN);
 				p_net->makeFirstInputOfSecond(vec_neighbour[j_in],id_delay,connection_unit);
 				p_net->makeFirstInputOfSecond(id_delay,vec_grid[i]._id,connection_J_EE);
 			}
@@ -218,20 +218,20 @@ void GenerateHexagonalNetwork
 	*p_id_cent = NodeId(0);
 
 	for (Index i = 0; i < p_vec_grid->size(); i++){
-	        NodeId id_e = p_net->addNode(alg_e,EXCITATORY);
+	        NodeId id_e = p_net->addNode(alg_e,EXCITATORY_GAUSSIAN);
 		cout << "DDDT" << id_e << endl;
        		assert(id_e == (*p_vec_grid)[i]._id);
 	}
 
 	PopulationAlgorithm alg_i(TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP);
 	for (Index i = 0; i < p_vec_grid->size(); i++)
-		p_vec_inh->push_back(p_net->addNode(alg_i,INHIBITORY));
+		p_vec_inh->push_back(p_net->addNode(alg_i,INHIBITORY_GAUSSIAN));
 
 	*p_offset = (*p_vec_inh)[0] - (*p_id_cent); // one being the id value of the central id node
 
 	// Create cortical background, and add to network
 	RateFunctor<PopulationAlgorithm::WeightType> cortical_background(CorticalBackground);
-		*p_id_bg = p_net->addNode(cortical_background,EXCITATORY);
+		*p_id_bg = p_net->addNode(cortical_background,EXCITATORY_GAUSSIAN);
 
 	Add_J_II	(p_net,*p_vec_inh);
 	Add_J_EI	(p_net,*p_vec_grid,*p_vec_inh);
@@ -242,7 +242,7 @@ void GenerateHexagonalNetwork
 	Add_Lateral (p_net,p_vec_delay,*p_vec_grid,*p_vec_link);
 
 	RateFunctor<PopulationAlgorithm::WeightType> burst(Burst);
-	NodeId id_burst = p_net->addNode(burst,EXCITATORY);
+	NodeId id_burst = p_net->addNode(burst,EXCITATORY_GAUSSIAN);
 	PopulationAlgorithm::WeightType
 			connection_J_EE_Burst
 			(
