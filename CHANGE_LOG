@@ -1,0 +1,13 @@
+10-11-2014: Added warning for intel compiler support, some required C++11 features are not yet supported.
+
+12-11-2014: Moved all applications to subdirectories: BasicDemos, largeNetwork
+
+12-11-2014: Added UnitGeomLib test suite in the apps directory
+
+12-11-2014: Added UnitGeomLib to libs
+
+12-11-2014: Replaced EXCITATORY (INHIBITORY) by EXCITATORY_GAUSSIAN (INHIBITORY_GAUSSIAN)
+
+12_11_2014: Replaced EXCITATORY_BURST (INHIBITORY_BURST) by EXCITATORY_DIRECT  (INHIBITORY_DIRECT)
+
+12_11_2014: Replaced test on EXCITATORY (INHIBITORY) in Dale's law test in MPINetworkCode.hpp by a test on IsExcitatory (IsInhibitory)
