@@ -142,7 +142,7 @@ void LIFConvertor::SortConnectionvector(const std::vector<Rate>& nodeVector,
 		for (auto iter = nodeVector.begin(); iter != nodeVector.end();
 				iter++, iterType++) {
 
-			if (*iterType == EXCITATORY_BURST || *iterType == INHIBITORY_BURST)
+			if (*iterType == EXCITATORY_DIRECT || *iterType == INHIBITORY_DIRECT)
 				_vec_burst.push_back(*iter);
 			else
 				_vec_diffusion.push_back(*iter);

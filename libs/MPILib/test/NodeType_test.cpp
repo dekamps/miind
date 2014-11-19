@@ -31,10 +31,10 @@ using namespace MPILib;
 
 void test_enum(){
 	BOOST_CHECK(static_cast<int>(NodeType::NEUTRAL) == 0);
-	BOOST_CHECK(static_cast<int>(NodeType::EXCITATORY) == 1);
-	BOOST_CHECK(static_cast<int>(NodeType::INHIBITORY) == 2);
-	BOOST_CHECK(static_cast<int>(NodeType::EXCITATORY_BURST) == 3);
-	BOOST_CHECK(static_cast<int>(NodeType::INHIBITORY_BURST) == 4);
+	BOOST_CHECK(static_cast<int>(NodeType::EXCITATORY_GAUSSIAN) == 1);
+	BOOST_CHECK(static_cast<int>(NodeType::INHIBITORY_GAUSSIAN) == 2);
+	BOOST_CHECK(static_cast<int>(NodeType::EXCITATORY_DIRECT) == 3);
+	BOOST_CHECK(static_cast<int>(NodeType::INHIBITORY_DIRECT) == 4);
 
 }
 

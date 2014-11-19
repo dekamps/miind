@@ -1,4 +1,4 @@
-// Copyright (c) 2005 - 2009 Marc de Kamps
+// Copyright (c) 2005 - 2014 Marc de Kamps
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,7 +18,7 @@
 //      If you use this software in work leading to a scientific publication, you should cite
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #ifndef _CODE_LIBS_NUMTOOLSLIB_GAUSSIANDISTRIBUTION_INCLUDE_GUARD
-#define _CODE_LIBS_NUMTOOLS_GAUSSIANDISTRIBUTION_INCLUDE_GUARD
+#define _CODE_LIBS_NUMTOOLSLIB_GAUSSIANDISTRIBUTION_INCLUDE_GUARD
 
 // Date:   12-04-1999
 // Author: Marc de Kamps

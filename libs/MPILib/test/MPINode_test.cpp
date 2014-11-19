@@ -43,7 +43,7 @@ void test_Constructor() {
 	// make node global
 	MPINetwork<double, utilities::CircularDistribution> network;
 	SleepAlgorithm<double> alg;
-	NodeType nodeType = EXCITATORY;
+	NodeType nodeType = EXCITATORY_GAUSSIAN;
 	MPILib::NodeId nodeId = 1;
 	MPINode<double, utilities::CircularDistribution> node(alg, nodeType, nodeId,
 			network._nodeDistribution, network._localNodes);
@@ -65,13 +65,13 @@ void test_addPrecursor() {
 
 	SleepAlgorithm<double> alg;
 
-	MPINode<double, utilities::CircularDistribution> node(alg, EXCITATORY, 1,
+	MPINode<double, utilities::CircularDistribution> node(alg, EXCITATORY_GAUSSIAN, 1,
 			network._nodeDistribution, network._localNodes);
 
 	MPILib::NodeId nodeId = 4;
 	double weight = 2.1;
 
-	node.addPrecursor(nodeId, weight, EXCITATORY);
+	node.addPrecursor(nodeId, weight, EXCITATORY_GAUSSIAN);
 	BOOST_CHECK(node._precursors.size()==1);
 	BOOST_CHECK(node._precursors[0]==4);
 	BOOST_CHECK(node._weights.size()==1);
@@ -84,7 +84,7 @@ void test_addSuccessor() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	SleepAlgorithm<double> alg;
 
-	MPINode<double, utilities::CircularDistribution> node(alg, EXCITATORY, 1,
+	MPINode<double, utilities::CircularDistribution> node(alg, EXCITATORY_GAUSSIAN, 1,
 			network._nodeDistribution, network._localNodes);
 
 	MPILib::NodeId nodeId = 4;
@@ -102,7 +102,7 @@ void test_setGetState() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	SleepAlgorithm<double> alg;
 
-	MPINode<double, utilities::CircularDistribution> node(alg, EXCITATORY, 1,
+	MPINode<double, utilities::CircularDistribution> node(alg, EXCITATORY_GAUSSIAN, 1,
 			network._nodeDistribution, network._localNodes);
 
 	node.setActivity(3);
@@ -119,17 +119,17 @@ void test_sendRecvWait() {
 	if (MPILib::utilities::MPIProxy().getRank() == 0) {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
-				EXCITATORY, 0, network._nodeDistribution, network._localNodes);
+				EXCITATORY_GAUSSIAN, 0, network._nodeDistribution, network._localNodes);
 
 		node->addSuccessor(1);
-		node->addPrecursor(1, 2.1, EXCITATORY);
+		node->addPrecursor(1, 2.1, EXCITATORY_GAUSSIAN);
 	} else {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
-				EXCITATORY, 1, network._nodeDistribution, network._localNodes);
+				EXCITATORY_GAUSSIAN, 1, network._nodeDistribution, network._localNodes);
 
 		node->addSuccessor(0);
-		node->addPrecursor(0, 1.2, EXCITATORY);
+		node->addPrecursor(0, 1.2, EXCITATORY_GAUSSIAN);
 	}
 
 	node->setActivity(MPILib::utilities::MPIProxy().getRank());
@@ -156,26 +156,26 @@ void test_exchangeNodeTypes() {
 	if (MPILib::utilities::MPIProxy().getRank() == 0) {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
-				EXCITATORY, 0, network._nodeDistribution, network._localNodes);
+				EXCITATORY_GAUSSIAN, 0, network._nodeDistribution, network._localNodes);
 
 		node->addSuccessor(1);
-		node->addPrecursor(1, 2.1, INHIBITORY_BURST);
+		node->addPrecursor(1, 2.1, INHIBITORY_DIRECT);
 	} else {
 
 		node = new MPINode<double, utilities::CircularDistribution>(alg,
-				INHIBITORY_BURST, 1, network._nodeDistribution,
+				INHIBITORY_DIRECT, 1, network._nodeDistribution,
 				network._localNodes);
 
 		node->addSuccessor(0);
-		node->addPrecursor(0, 1.2, EXCITATORY);
+		node->addPrecursor(0, 1.2, EXCITATORY_GAUSSIAN);
 	}
 
 	MPINode<double, utilities::CircularDistribution>::waitAll();
 	if (MPILib::utilities::MPIProxy().getSize() == 2) {
 		if (MPILib::utilities::MPIProxy().getRank() == 0) {
-			BOOST_CHECK(node->_precursorTypes[0]==INHIBITORY_BURST);
+			BOOST_CHECK(node->_precursorTypes[0]==INHIBITORY_DIRECT);
 		} else {
-			BOOST_CHECK(node->_precursorTypes[0]==EXCITATORY);
+			BOOST_CHECK(node->_precursorTypes[0]==EXCITATORY_GAUSSIAN);
 		}
 	}
 	delete node;

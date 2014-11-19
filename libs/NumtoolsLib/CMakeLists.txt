@@ -28,8 +28,8 @@ set( numtools_SRC
     UniformDistribution.cpp )
 
 set( numtools_HEADERS
-	AbstractDVIntegrator.h
-	AbstractDVIntegratorCode.h
+    AbstractDVIntegrator.h
+    AbstractDVIntegratorCode.h
     BasicDefinitions.h
     ChangeSeedException.h
     Distribution.h

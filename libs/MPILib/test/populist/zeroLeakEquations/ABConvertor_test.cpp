@@ -69,13 +69,13 @@ void test_SortConnectionvector(){
 
 	rates.push_back(6.0);
 	weights.push_back(OrnsteinUhlenbeckConnection(2.0,3.0));
-	types.push_back(EXCITATORY_BURST);
+	types.push_back(EXCITATORY_DIRECT);
 	rates.push_back(2.0);
 	weights.push_back(OrnsteinUhlenbeckConnection(4.0,5.0));
-	types.push_back(INHIBITORY_BURST);
+	types.push_back(INHIBITORY_DIRECT);
 	rates.push_back(3.0);
 	weights.push_back(OrnsteinUhlenbeckConnection(6.0,7.0));
-	types.push_back(INHIBITORY);
+	types.push_back(INHIBITORY_GAUSSIAN);
 
 	converter.SortConnectionvector(rates, weights, types);
 	BOOST_CHECK(converter._param_input._par_input._a==6.91423056);

@@ -22,6 +22,7 @@
 #define MPILIB_POPULIST_RATECOMPUTATION_NEWABSTRACTRATECOMPUTATION_HPP_
 
 #include <valarray>
+#include <vector>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/InputParameterSet.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
@@ -47,8 +48,8 @@ namespace populist {
 		(
 			// not const since a pointer to an element is needed, it should have been const otherwise:
 		        std::valarray<Density>&,					// state array
-			const std::vector<parameters::InputParameterSet>&,	// current input to population
-			const parameters::PopulationParameter&,			// neuron parameters
+			const std::vector<parameters::InputParameterSet>&,	        // current input to population
+			const parameters::PopulationParameter&,			        // neuron parameters
 			Index								// index reversal bin
 		);
 

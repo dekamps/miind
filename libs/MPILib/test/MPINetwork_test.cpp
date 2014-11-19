@@ -76,7 +76,7 @@ void test_AddNode() {
 
 	SleepAlgorithm<double> alg;
 
-	network.addNode(alg, EXCITATORY);
+	network.addNode(alg, EXCITATORY_GAUSSIAN);
 
 	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==1);
@@ -85,7 +85,7 @@ void test_AddNode() {
 		BOOST_CHECK(network._localNodes.size()==0);
 	}
 
-	network.addNode(alg, EXCITATORY);
+	network.addNode(alg, EXCITATORY_GAUSSIAN);
 
 	if (MPILib::utilities::MPIProxySingleton::instance().getRank() == 0) {
 		BOOST_CHECK(network._maxNodeId==2);
@@ -104,8 +104,8 @@ void test_MakeFirstInputOfSecond() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	SleepAlgorithm<double> alg;
 
-	int node0 = network.addNode(alg, EXCITATORY);
-	int node1 = network.addNode(alg, EXCITATORY);
+	int node0 = network.addNode(alg, EXCITATORY_GAUSSIAN);
+	int node1 = network.addNode(alg, EXCITATORY_GAUSSIAN);
 	double weight = 2.0;
 
 	bool exceptionThrown = false;
@@ -147,11 +147,11 @@ void test_getMaxNodeId() {
 	MPINetwork<double, utilities::CircularDistribution> network;
 	SleepAlgorithm<double> alg;
 	BOOST_CHECK(network.getMaxNodeId()==0);
-	network.addNode(alg, EXCITATORY);
+	network.addNode(alg, EXCITATORY_GAUSSIAN);
 	BOOST_CHECK(network.getMaxNodeId()==1);
-	network.addNode(alg, EXCITATORY);
-	network.addNode(alg, EXCITATORY);
-	network.addNode(alg, EXCITATORY);
+	network.addNode(alg, EXCITATORY_GAUSSIAN);
+	network.addNode(alg, EXCITATORY_GAUSSIAN);
+	network.addNode(alg, EXCITATORY_GAUSSIAN);
 	BOOST_CHECK(network.getMaxNodeId()==4);
 
 }

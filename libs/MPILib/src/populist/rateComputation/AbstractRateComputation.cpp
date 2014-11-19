@@ -35,10 +35,10 @@ _p_vec_set(0)
 
 void AbstractRateComputation::Configure
 (
-              std::valarray<Density>&			array_state,
+              std::valarray<Density>&  array_state,
 	      const std::vector<parameters::InputParameterSet>&	vec_set,
-	      const parameters::PopulationParameter&			par_population,
-	      Index							index_reversal
+	      const parameters::PopulationParameter&  par_population,
+	      Index index_reversal
 )
 {
 	_p_array_state  = &array_state;
