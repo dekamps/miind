@@ -23,6 +23,7 @@
 #include <GeomLib.hpp>
 
 using namespace GeomLib;
+using namespace MPILib;
 
 BOOST_AUTO_TEST_CASE(LeakingOdeSystemCreationTest){
 

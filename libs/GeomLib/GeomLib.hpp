@@ -18,6 +18,7 @@
 #ifndef _CODE_LIBS_GEOMLIB_GEOMLIB_INCLUDE_GUARD
 #define _CODE_LIBS_GEOMLIB_GEOMLIB_INCLUDE_GUARD
 
+#include "GeomLibException.hpp"
 #include "OdeParameter.hpp"
 #include "LeakingOdeSystem.hpp"
 #include "MuSigmaScalarProduct.hpp"

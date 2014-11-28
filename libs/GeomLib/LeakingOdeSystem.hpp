@@ -20,8 +20,8 @@
 #ifndef _CODE_LIBS_GEOMLIB_LEAKINGODESYSTEM_INCLUDE_GUARD
 #define _CODE_LIBS_GEOMLIB_LEAKINGODESYSTEM_INCLUDE_GUARD
 
+#include <GeomLib/AbstractOdeSystem.hpp>
 #include <vector>
-#include "AbstractOdeSystem.h"
 #include "LifNeuralDynamics.hpp"
 using std::vector;
 
@@ -33,7 +33,7 @@ namespace GeomLib {
   //! this controller if all you ever want is model populations of LIF neurons. It is then to be preferred over
   //! SpikingOdeSystem as it does not rely on the current compensation trick and does not introduce a diffusive
   //! background. The number of bins that is specified in the OdeParameter refers to the interval [V_r, V_th).
-  //! If the user specifies a V_min < V_th, the system will compute the number of extra bins to required to accomodate this
+  //! If the user specifies a V_min < V_th, the system will compute the number of extra bins to required to accommodate this
   //! part of state space, and bin arrays will be larger than the number of bins specified by the user. 
   class LeakingOdeSystem  : public AbstractOdeSystem{
   public:

@@ -62,8 +62,8 @@ BOOST_AUTO_TEST_CASE(LifNeuralDynamicsBinLimitsTest){
 	//Test whether LifNeuralDynamics generates the expected bin limits
 
 
-	Potential theta = 20e-3;
-	Time      tau   = 10e-3;
+	Potential theta    = 20e-3;
+	MPILib::Time tau   = 10e-3;
 	OrnsteinUhlenbeckParameter par_neuron(theta, 0., 0., 0., tau);
 
 	Number n_bins = 5;
@@ -83,8 +83,8 @@ BOOST_AUTO_TEST_CASE(LifNeuralDynamicsBinLimitsTest){
 	BOOST_CHECK(vec_inter[0] == 0.0);
 	BOOST_CHECK(vec_inter[1] == frac*theta);
 
-	Time t_period  = tau*log(1./frac);
-	Time t_step    = t_period/(n_bins - 1);
+	MPILib::Time t_period  = tau*log(1./frac);
+	MPILib::Time t_step    = t_period/(n_bins - 1);
 
 
 	Potential decay_1 = theta*exp(-t_step/tau);

@@ -20,7 +20,17 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 # UnitGeom source and header files
 #############################################################################
 
-set (UNIT_GEOM_SRC UnitGeomLib.cpp OdeParameterTest.cpp)
+set (UNIT_GEOM_SRC 
+    UnitGeomLib.cpp 
+    CurrentCompensationParameterTest.cpp									
+    InitialDensityParameterTest.cpp	
+    LeakingOdeSystemTest.cpp  
+    LifNeuralDynamicsTest.cpp  															
+    MuSigmaScalarProductTest.cpp  
+    NeuronParameterTest.cpp	
+    OdeParameterTest.cpp
+    UnitGeomLib.cpp
+)
 
 #############################################################################
 # Libraries
@@ -31,6 +41,7 @@ if (UNIX)
 endif (UNIX)
 set ( LIBLIST       
     ${MIIND_LIBRARY_PREFIX}mpi      
+    ${MIIND_LIBRARY_PREFIX}geom
     ${MPI_LIBRARIES} 
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}

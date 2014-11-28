@@ -23,7 +23,7 @@
 
 //#include "../DynamicLib/DynamicLib.h"
 #include "InputParameterSet.hpp"
-#include <include/populist/OrnsteinUhlenbeckConnection.hpp>
+#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include "MuSigmaScalarProduct.hpp"
 #include "OrnsteinUhlenbeckParameter.hpp"
 

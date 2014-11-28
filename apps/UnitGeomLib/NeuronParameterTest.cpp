@@ -24,6 +24,7 @@
 #include <GeomLib.hpp>
 
 using namespace GeomLib;
+using MPILib::Time;
 
 //TODO: Should be renamed NeuronParameter test once OrnsteinUhlenbeckParameter has been renamed
 

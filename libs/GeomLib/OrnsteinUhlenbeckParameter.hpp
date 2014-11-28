@@ -22,6 +22,7 @@
 
 
 #include <MPILib/include/BasicDefinitions.hpp>
+#include "GeomLibException.hpp"
 
 namespace GeomLib {
 
@@ -61,6 +62,10 @@ namespace GeomLib {
 		_V_reversal(V_reversal),
 		_tau_refractive(tau_refractive),
 		_tau(tau){
+			if (_V_reset > theta || _V_reversal > theta)
+				throw GeomLibException("Threshold should be largest potential");
+			if (_tau_refractive > _tau)
+				throw GeomLibException("tau_ref > tau");
 		}
 
 	};

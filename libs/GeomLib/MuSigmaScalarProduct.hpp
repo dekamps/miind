@@ -21,7 +21,7 @@
 #include <vector>
 #include <utility>
 #include <MPILib/include/BasicDefinitions.hpp>
-#include <include/populist/OrnsteinUhlenbeckConnection.hpp>
+#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include "MuSigmaScalarProduct.hpp"
 #include "MuSigma.hpp"
 
