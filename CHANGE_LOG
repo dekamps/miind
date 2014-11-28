@@ -11,3 +11,5 @@
 12_11_2014: Replaced EXCITATORY_BURST (INHIBITORY_BURST) by EXCITATORY_DIRECT  (INHIBITORY_DIRECT)
 
 12_11_2014: Replaced test on EXCITATORY (INHIBITORY) in Dale's law test in MPINetworkCode.hpp by a test on IsExcitatory (IsInhibitory)
+
+19-11-2014: Added ENABLE_MPI to libs/MPILib/test/utilities/MPIProxy_test.cpp in order to compile when MPI_ENABLE is OFF

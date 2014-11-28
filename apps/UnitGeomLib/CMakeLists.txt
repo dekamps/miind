@@ -1,5 +1,5 @@
 ##############################################################################
-# include the header files
+# include external header files
 ##############################################################################
 
 #include the MPILib build dir for the config file
@@ -9,11 +9,18 @@ INCLUDE_DIRECTORIES(
 
 
 include_directories( ../../libs/MPILib )
+include_directories( ../../libs/GeomLib )
 
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
 include_directories( ${ROOT_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
+
+#############################################################################
+# UnitGeom source and header files
+#############################################################################
+
+set (UNIT_GEOM_SRC UnitGeomLib.cpp OdeParameterTest.cpp)
 
 #############################################################################
 # Libraries
@@ -36,6 +43,6 @@ set ( LIBLIST
 #############################################################################
 # executables
 #############################################################################
-add_executable(UnitGeomLib UnitGeomLib.cpp)
+add_executable(UnitGeomLib ${UNIT_GEOM_SRC})
 target_link_libraries(UnitGeomLib ${LIBLIST})
 

@@ -1,5 +1,5 @@
-// Copyright (c) 2005 - 2012 Marc de Kamps
-//						2012 David-Matthias Sichau
+// Copyright (c) 2005 - 2014 Marc de Kamps, David-Matthias Sichau
+//						 
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,8 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_PARAMETERS_ORNSTEINUHLENBECKPARAMETER_HPP_
-#define MPILIB_POPULIST_PARAMETERS_ORNSTEINUHLENBECKPARAMETER_HPP_
+#ifndef MPILIB_POPULIST_PARAMETERS_NEURONPARAMETER_HPP_
+#define MPILIB_POPULIST_PARAMETERS_NEURONPARAMETER_HPP_
 
 #include <MPILib/include/TypeDefinitions.hpp>
 
@@ -74,9 +74,10 @@ struct OrnsteinUhlenbeckParameter {
 };
 
 typedef OrnsteinUhlenbeckParameter PopulationParameter;
+
 } /* namespace parameters */
 
 } /* namespace populist */
 } /* namespace MPILib */
 
-#endif // include guard MPILIB_POPULIST_PARAMETERS_ORNSTEINUHLENBECKPARAMETER_HPP_
+#endif // include guard MPILIB_POPULIST_PARAMETERS_NEURON_HPP_

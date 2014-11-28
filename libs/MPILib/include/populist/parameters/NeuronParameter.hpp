@@ -1,4 +1,5 @@
 // Copyright (c) 2005 - 2014 Marc de Kamps, David-Matthias Sichau
+//						 
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,43 +16,66 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#include <MPILib/include/populist/zeroLeakEquations/MuSigmaScalarProduct.hpp>
-#include <MPILib/include/populist/zeroLeakEquations/ConnectionSquaredProduct.hpp>
-#include <math.h>
-#include <functional>
-#include <numeric>
+#ifndef MPILIB_POPULIST_PARAMETERS_NEURONPARAMETER_HPP_
+#define MPILIB_POPULIST_PARAMETERS_NEURONPARAMETER_HPP_
+
+#include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
 namespace populist {
-namespace zeroLeakEquations {
-MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
-		Time tau) const {
-	MuSigma ret;
+namespace parameters{
 
-	ret._mu = tau * this->InnerProduct(nodeVector, weightVector);
-	ret._sigma = sqrt(
-			tau * this->InnerSquaredProduct(nodeVector, weightVector));
+/**
+ * @brief Parameters necessary for the configuration of an OUAlgorithm
+ *
+ * These are the parameters that define a leaky-integrate-and-fire neuron.
+ */
+struct NeuronParameter {
 
-	return ret;
-}
+	/**
+	 * threshold potential in V
+	 */
+	Potential _theta = 0.0;
+	/**
+	 * reset potential in V
+	 */
+	Potential _V_reset = 0.0;
+	/**
+	 * reversal potential in V
+	 */
+	Potential _V_reversal = 0.0;
+	/**
+	 * (absolute) refractive time in s
+	 */
+	Time _tau_refractive = 0.0;
+	/**
+	 * membrane time constant in s
+	 */
+	Time _tau = 0.0;
 
-Potential MuSigmaScalarProduct::InnerProduct(
-		const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const {
+	/**
+	 * default constructor
+	 */
+	NeuronParameter()=default;
 
-	return std::inner_product(nodeVector.begin(), nodeVector.end(),
-			weightVector.begin(), 0.0);
-}
+	/**
+	 * standard constructor
+	 * @param theta threshold potential in V
+	 * @param V_reset reset potential in V
+	 * @param V_reversal reversal potential in V
+	 * @param tau_refractive (absolute) refractive time in s
+	 * @param tau membrane time constant in s
+	 */
+	NeuronParameter(Potential theta, Potential V_reset,
+			Potential V_reversal, Time tau_refractive, Time tau) :
+	_theta(theta), _V_reset(V_reset), _V_reversal(V_reversal), _tau_refractive(
+			tau_refractive), _tau(tau) {
+	}
+};
 
-Potential MuSigmaScalarProduct::InnerSquaredProduct(
-		const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const {
+} /* namespace parameters */
 
-	return inner_product(nodeVector.begin(), nodeVector.end(),
-			weightVector.begin(), 0.0, std::plus<double>(),
-			ConnectionSquaredProduct());
-}
-} /* namespace zeroLeakEquations */
 } /* namespace populist */
 } /* namespace MPILib */
+
+#endif // include guard MPILIB_POPULIST_PARAMETERS_NEURON_HPP_

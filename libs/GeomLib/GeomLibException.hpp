@@ -1,4 +1,4 @@
-// Copyright (c) 2005 - 2014 Marc de Kamps, David-Matthias Sichau
+// Copyright (c) 2005 - 2014 Marc de Kamps
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,43 +15,27 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#include <MPILib/include/populist/zeroLeakEquations/MuSigmaScalarProduct.hpp>
-#include <MPILib/include/populist/zeroLeakEquations/ConnectionSquaredProduct.hpp>
-#include <math.h>
-#include <functional>
-#include <numeric>
 
-namespace MPILib {
-namespace populist {
-namespace zeroLeakEquations {
-MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
-		Time tau) const {
-	MuSigma ret;
+#ifndef _CODE_LIBS_GEOMLIB_GEOMLIBEXCEPTION
+#define _CODE_LIBS_GEOMLIB_GEOMLIBEXCEPTION
 
-	ret._mu = tau * this->InnerProduct(nodeVector, weightVector);
-	ret._sigma = sqrt(
-			tau * this->InnerSquaredProduct(nodeVector, weightVector));
+#include <string>
 
-	return ret;
+using std::string;
+
+namespace GeomLib {
+
+	class GeomLibException {
+	public:
+
+		GeomLibException(const string& description):_description(description){}
+
+	private:
+
+		string _description;
+	};
 }
 
-Potential MuSigmaScalarProduct::InnerProduct(
-		const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const {
 
-	return std::inner_product(nodeVector.begin(), nodeVector.end(),
-			weightVector.begin(), 0.0);
-}
 
-Potential MuSigmaScalarProduct::InnerSquaredProduct(
-		const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const {
-
-	return inner_product(nodeVector.begin(), nodeVector.end(),
-			weightVector.begin(), 0.0, std::plus<double>(),
-			ConnectionSquaredProduct());
-}
-} /* namespace zeroLeakEquations */
-} /* namespace populist */
-} /* namespace MPILib */
+#endif

@@ -1,4 +1,5 @@
-// Copyright (c) 2005 - 2014 Marc de Kamps, David-Matthias Sichau
+// Copyright (c) 2005 - 2012 Marc de Kamps
+//						2012 David-Matthias Sichau
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,18 +16,17 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#include <MPILib/include/populist/zeroLeakEquations/MuSigmaScalarProduct.hpp>
+#include "MuSigmaScalarProduct.hpp"
 #include <MPILib/include/populist/zeroLeakEquations/ConnectionSquaredProduct.hpp>
 #include <math.h>
 #include <functional>
 #include <numeric>
 
-namespace MPILib {
-namespace populist {
-namespace zeroLeakEquations {
-MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
-		Time tau) const {
+using namespace GeomLib;
+
+MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<MPILib::Rate>& nodeVector,
+		const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& weightVector,
+		MPILib::Time tau) const {
 	MuSigma ret;
 
 	ret._mu = tau * this->InnerProduct(nodeVector, weightVector);
@@ -36,22 +36,19 @@ MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<Rate>& nodeVector,
 	return ret;
 }
 
-Potential MuSigmaScalarProduct::InnerProduct(
-		const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const {
+MPILib::Potential MuSigmaScalarProduct::InnerProduct(
+		const std::vector<MPILib::Rate>& nodeVector,
+		const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& weightVector) const {
 
 	return std::inner_product(nodeVector.begin(), nodeVector.end(),
 			weightVector.begin(), 0.0);
 }
 
-Potential MuSigmaScalarProduct::InnerSquaredProduct(
-		const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const {
+MPILib::Potential MuSigmaScalarProduct::InnerSquaredProduct(
+		const std::vector<MPILib::Rate>& nodeVector,
+		const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& weightVector) const {
 
 	return inner_product(nodeVector.begin(), nodeVector.end(),
 			weightVector.begin(), 0.0, std::plus<double>(),
-			ConnectionSquaredProduct());
+			MPILib::populist::zeroLeakEquations::ConnectionSquaredProduct());
 }
-} /* namespace zeroLeakEquations */
-} /* namespace populist */
-} /* namespace MPILib */

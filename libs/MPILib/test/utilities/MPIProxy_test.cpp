@@ -16,14 +16,14 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-
 #include <MPILib/config.hpp>
+
 #ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
 namespace mpi = boost::mpi;
 
 mpi::communicator world;
-#endif
+#endif // ENABLE_MPI
 
 #define private public
 #define protected public
@@ -31,8 +31,10 @@ mpi::communicator world;
 #undef protected
 #undef private
 
+#ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
+#endif // ENABLE_MPI
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;

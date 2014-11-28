@@ -20,7 +20,7 @@
 #ifndef MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
 #define MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
 
-#include <MPILib/config.hpp>
+#include <MPILib/config.hpp> //TODO: this file is actually created in the build directory ... why? leave for now
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>

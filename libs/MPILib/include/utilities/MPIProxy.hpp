@@ -29,7 +29,7 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/nonblocking.hpp>
 namespace mpi = boost::mpi;
-#endif
+#endif // ENABLE_MPI
 
 namespace MPILib {
 namespace utilities {

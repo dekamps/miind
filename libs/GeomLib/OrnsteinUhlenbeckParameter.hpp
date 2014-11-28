@@ -1,4 +1,4 @@
-// Copyright (c) 2005 - 2009 Marc de Kamps
+// Copyright (c) 2005 - 2011 Marc de Kamps
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,41 +15,58 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-//      If you use this software in work leading to a scientific publication, you should cite
+//      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef _CODE_LIBS_NUMTOOLSLIB_INCLUDE_GUARD
-#define _CODE_LIBS_NUMTOOLSLIB_INCLUDE_GUARD
-
-#include <cmath>
-#include <cassert>
-#include <string>
-#include <vector>
-
-#include "UniformDistribution.h"
-#include "GaussianDistribution.h"
-#include "PoissonDistribution.h"
-#include "NumtoolsLibException.h"
-#include "exponentialdistribution.h"
-#include "Modulo.h"
-#include "DVIntegratorCode.h"
-#include "ExStateDVIntegratorCode.h"
-#include "RandomGenerator.h"
-#include "Interpolation.h"
-#include "IsApproximatelyEqualTo.h"
-#include "QaDirtyImplementation.h"
-#include "MinMaxTrackerCode.h"
-#include "Precision.h"
-#include "Rational.h"
+#ifndef _GEOM_LIBS_POPULISTLIB_ORNSTEINUHLENBECKPARAMETER_INCLUDE_GUARD
+#define _GEOM_LIBS_POPULISTLIB_ORNSTEINUHLENBECKPARAMETER_INCLUDE_GUARD
 
 
-///////////////////////////////////////////////////////////////////////////////////////////
-// NUMTOOLS: Numerical Tools for ATTENT project.
-// Version:  0.00
-// Created:  12-04-1999
-// Author:   M. de Kamps (KAMPS@FSW.LEIDENUNIV.NL)
-// Documented in   numtools.ps (contact author)
-///////////////////////////////////////////////////////////////////////////////////////////
+#include <MPILib/include/BasicDefinitions.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////
+namespace GeomLib {
 
-#endif
+
+	//! Parameters necessary for the configuration of an OUAlgorithm
+	//!
+	//! These are the parameters that define a leaky-integrate-and-fire neuron.
+
+	struct OrnsteinUhlenbeckParameter  {
+
+		MPILib::Potential _theta;				//!< threshold potential in V
+		MPILib::Potential _V_reset;				//!< reset potential in V
+		MPILib::Potential _V_reversal;			//!< reversal potential in V
+		MPILib::Time      _tau_refractive;		//!< (absolute) refractive time in s
+		MPILib::Time      _tau;					//!< membrane time constant in s
+
+		//! default constructor
+		OrnsteinUhlenbeckParameter():
+		_theta(0),
+		_V_reset(0),
+		_V_reversal(0),
+		_tau_refractive(0),
+		_tau(0){
+			}
+
+		//! standard constructor
+		OrnsteinUhlenbeckParameter
+			(
+				MPILib::Potential theta,
+				MPILib::Potential V_reset,
+				MPILib::Potential V_reversal,
+				MPILib::Time      tau_refractive,
+				MPILib::Time      tau
+			):
+		_theta(theta),
+		_V_reset(V_reset),
+		_V_reversal(V_reversal),
+		_tau_refractive(tau_refractive),
+		_tau(tau){
+		}
+
+	};
+
+	typedef OrnsteinUhlenbeckParameter PopulationParameter;
+
+} // end of GeomLib
+
+#endif // include guard
