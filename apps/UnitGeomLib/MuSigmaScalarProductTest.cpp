@@ -1,3 +1,4 @@
+
 // Copyright (c) 2005 - 2014 Marc de Kamps
 // All rights reserved.
 //
@@ -20,7 +21,7 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include <boost/test/execution_monitor.hpp>
-#include <GeomLib.h>
+#include <GeomLib.hpp>
 #include <include/algorithm/AlgorithmInterface.hpp>
 #include <include/populist/OrnsteinUhlenbeckConnection.hpp>
 

@@ -1,4 +1,3 @@
-
 // Copyright (c) 2005 - 2014 Marc de Kamps
 // All rights reserved.
 //
@@ -16,20 +15,11 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-//      If you use this software in work leading to a scientific publication, you should include a reference there to
-//      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#define BOOST_TEST_DYN_LINK
-#include <boost/test/unit_test.hpp>
-#include <boost/test/execution_monitor.hpp>
-#include <GeomLib.hpp>
+#ifndef _CODE_LIBS_GEOMLIB_GEOMLIB_INCLUDE_GUARD
+#define _CODE_LIBS_GEOMLIB_GEOMLIB_INCLUDE_GUARD
 
-using namespace GeomLib;
+#include "OdeParameter.hpp"
+#include "LeakingOdeSystem.hpp"
+#include "MuSigmaScalarProduct.hpp"
 
-
-BOOST_AUTO_TEST_CASE(OdeParameterTest ) 
-{
-  InitialDensityParameter par_dense(0.0,0.0);
-
-
-}
-
+#endif // include guard

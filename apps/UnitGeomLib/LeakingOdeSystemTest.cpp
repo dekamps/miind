@@ -1,3 +1,4 @@
+
 // Copyright (c) 2005 - 2014 Marc de Kamps
 // All rights reserved.
 //
@@ -19,7 +20,7 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
-#include <GeomLib.h>
+#include <GeomLib.hpp>
 
 using namespace GeomLib;
 
