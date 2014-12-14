@@ -25,7 +25,7 @@
 #include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/NodeType.hpp>
 #include "CurrentCompensationParameter.hpp"
-#include "DiffusionParameter.h"
+#include "DiffusionParameter.hpp"
 #include "InputParameterSet.hpp"
 #include "MuSigmaScalarProduct.hpp"
 #include "OrnsteinUhlenbeckParameter.hpp"

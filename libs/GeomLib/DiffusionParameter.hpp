@@ -28,44 +28,37 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef _CODE_LIBS_GEOMLIB_GEOMPARAMETER_INCLUDE_GUARD
-#define _CODE_LIBS_GEOMLIB_GEOMPARAMETER_INCLUDE_GUARD
+#ifndef _CODE_LIBS_GEOMLIB_DIFFUSIONPARAMETER_INCLUDE_GUARD
+#define _CODE_LIBS_GEOMLIB_DIFFUSIONPARAMETER_INCLUDE_GUARD
 
-#include <string>
-#include <boost/shared_ptr.hpp>
-#include "AbstractOdeSystem.hpp"
-#include "CurrentCompensationParameter.hpp"
-#include "DiffusionParameter.hpp"
-#include "OdeParameter.hpp"
 
-using std::string;
 
 namespace GeomLib {
 
-	struct GeomParameter {
-	public:
+	//! When to switch to a two Poisson input approximation, and what input jump to use then.
 
-		GeomParameter
+	//! It is often useful to emulate Gaussian white noise with a Poisson input. For
+	//! low variability white noise, a single Poisson input is sufficient. When the variability
+	//! is high, two inputs must be used. This parameter determines when the switch is made (diffusion_limit)
+	//! and what efficacy is being used for the two Poisson inputs (diffusion jump). The
+	//! the values are typically interpreted as percentages of a scale, which is set by the neural model.
+
+	struct DiffusionParameter {
+
+		double _diffusion_jump;
+		double _diffusion_limit;
+
+		DiffusionParameter
 		(
-			const AbstractOdeSystem&,															//! Any OdeSystem object, this defines the neural model. This object will be cloned.
-			Potential scale								= 1.0,  								//! In a diffusion interpretation of the input, it must be made clear what scale is considered to be small
-			const DiffusionParameter& par_diff          = DiffusionParameter(0.03,0.03),		//! Typical values are 3% of the scale
-			const CurrentCompensationParameter& par_cur = CurrentCompensationParameter(0.,0.),	//! By default, no current compensation
-			const string& name_master					= "NumericalMasterEquation",			//! By default, a numerical scheme for the solution of the Master equation
-			bool  no_master_equations               	= false									//! Do not run master equation when true
-		);
+			double diffusion_jump  = 0.03,
+			double diffusion_limit = 0.03
+		):
+		_diffusion_jump(diffusion_jump),
+		_diffusion_limit(diffusion_limit)
+		{
+		}
 
-
-		boost::shared_ptr<AbstractOdeSystem>	_p_sys_ode;
-		Potential								_scale;
-		const DiffusionParameter&				_par_diff;
-		const CurrentCompensationParameter		_par_cur;
-		const string							_name_master;
-		bool									_no_master_equation;
 	};
-}
+} // namespace
 
-
-
-
-#endif /* GEOMPARAMETER_H_ */
+#endif // include guard
