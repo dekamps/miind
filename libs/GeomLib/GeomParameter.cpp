@@ -27,40 +27,26 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
-#ifndef _CODE_LIBS_GEOMLIB_CURRENTCOMPENSATION_PARAMETER_INCLUDE_GUARD
-#define _CODE_LIBS_GEOMLIB_CURRENTCOMPENSATION_PARAMETER_INCLUDE_GUARD
 
-#include<cassert>
-#include <MPILib/include/BasicDefinitions.hpp>
+#include "GeomParameter.hpp"
 
-namespace GeomLib {
+using namespace GeomLib;
 
-	//! Parameter for setting current compensation values for the neural models that use it
-	struct CurrentCompensationParameter {
-
-		MPILib::Potential _I;			//! DC contribution
-		MPILib::Potential _sigma;		//! variability of the Poisson emulation
-
-
-		//! Standard constructor
-		CurrentCompensationParameter
-		(
-			MPILib::Potential I = 0,    //! current
-			MPILib::Potential sigma = 0 //! variability
-		):
-		_I(I),
-		_sigma(sigma)
-		{
-			assert( ! (I != 0 && sigma == 0.0 ));
-		}
-
-		//! Many models will not use CurrentCompensation; the convention is that as long as sigma is positive
-		//! compensation will be applied, so if you do not want current compensation is applied keep both I and sigma
-		//! equal to 0
-		bool NoCurrentCompensation() const { return (_I == 0.0 && _sigma == 0.0) ? true : false; }
-
-	};
+GeomParameter::GeomParameter
+(
+	const AbstractOdeSystem& 			sys,
+	Potential 							scale,
+	const DiffusionParameter& 			par_diff,
+	const CurrentCompensationParameter&	par_cur,
+	const string& 						name_master,
+	bool								no_master_equation
+):
+_p_sys_ode			(sys.Clone()),
+_scale				(scale),
+_par_diff			(par_diff),
+_par_cur			(par_cur),
+_name_master		(name_master),
+_no_master_equation	(no_master_equation)
+{
 }
-
-#endif
 

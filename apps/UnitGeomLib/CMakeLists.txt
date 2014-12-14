@@ -23,6 +23,7 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 set (UNIT_GEOM_SRC 
     UnitGeomLib.cpp 
     CurrentCompensationParameterTest.cpp									
+    GeomParameterTest.cpp
     InitialDensityParameterTest.cpp	
     LeakingOdeSystemTest.cpp  
     LifNeuralDynamicsTest.cpp  															
@@ -41,13 +42,14 @@ if (UNIX)
 endif (UNIX)
 set ( LIBLIST       
     ${MIIND_LIBRARY_PREFIX}mpi      
-    ${MIIND_LIBRARY_PREFIX}geom
     ${MPI_LIBRARIES} 
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
     ${MIIND_LIBRARY_PREFIX}numtools
     ${gsl_LINK_FLAGS} 
     gsl
+    ${MIIND_LIBRARY_PREFIX}geom
+
 )
 
 

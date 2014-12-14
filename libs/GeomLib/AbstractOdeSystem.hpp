@@ -22,28 +22,19 @@
 
 #include <vector>
 #include "AbstractNeuralDynamics.hpp"
-//#include "BasicDefinitions.hpp"
 #include "OdeParameter.hpp"
 
 using std::vector;
 
 namespace GeomLib {
 
-	//! Base class for Ode solvers for use in QIFAlgorithm
-
-	//! QIFAlgorithm relies on externally provided solver classes for the system of ordinary differential equations.
-	//! AbstractOdeSystem is the base class for such solvers. These solvers evolve the phase space in which probability densities
-	//! are represented. The decision to pass a naked reference to the interpretation array, rather than a well defined
-	//! C++ object reflects the vast difference between different algorithms in the use of containers. TO DO: consider wrapper
-	//! class for this.
-
-	class NumericalMasterEquations;
 	class AbstractOdeSystem {
 	public:
 
+		//! Constructor using neural dynamics object (see AbstractNeuralDynamics and derived classes)
 		AbstractOdeSystem
 		(
-			const AbstractNeuralDynamics& 						//! NeuralDynamics object
+			const AbstractNeuralDynamics& 		//! NeuralDynamics object
 		);
 
 		//! copy constructor
@@ -66,30 +57,46 @@ namespace GeomLib {
 		//! Access to the  OdeParameter of the system. It is often time-critical, therefore implemented as reference return.
 		const OdeParameter& Par() const { return _par; }
 
-
 		MPILib::Time CurrentTime() const { return _t_current; }
 
+		//! Rate due to neural dynamics driving
 		virtual MPILib::Rate CurrentRate() const = 0;
 
 		virtual Potential DCContribution() const { return 0;}
 
+		//! Number of bins used in the grid representation
 		Number NumberOfBins() const {return _number_of_bins; }
 
+		//! Access to the array of bin limits; be aware of the convention that the upper limit of the highest bin is
+		//! not present in this array, and is equal to VMax, which can be obtained by Par()._nr_bins
 		vector<MPILib::Potential>& InterpretationBuffer()             { return _buffer_interpretation; }
 
+		//! Const access to the array of bin limits; be aware of the convention that the upper limit of the highest bin is
+		//! not present in this array, and is equal to VMax, which can be obtained by Par()._nr_bins
 		const vector<MPILib::Potential>& InterpretationBuffer() const { return _buffer_interpretation; }
 
+		//! Direct access to the array that represents the density mass. Note that this may be confusing, and in general
+		//! you do not want to use this information directly. For a density profile, use PrepareReport, which performs the appropriate preprocessing.
+		//! a density profile use PrepareReport
 		vector<MPILib::Potential>& MassBuffer()                       { return _buffer_mass; }
+
+		//! Const direct access to the array that represents the density mass. Note that this may be confusing, and in general
+		//! you do not want to use this information directly. For a density profile, use PrepareReport, which performs the appropriate preprocessing.
+		//! a density profile use PrepareReport
 
 		const vector<MPILib::Potential>& MassBuffer() const           { return _buffer_mass; }
 
+		//! Index of the reset bin relative to the interpretation array, i.e. constant during simulation
 		Index IndexResetBin() const {return _i_reset;}
 
+		//! Find which bin in the interpretation array contains this potential.
 		Index FindBin(Potential) const;
 
+		//! Maintains the current mapping from a probability mass bin to its current poetntial bin in the interpretation array
 		Index MapPotentialToProbabilityBin(Index i) const { assert(i < _map_cache.size()); return _map_cache[i]; }
 
-		//! make sure that the interpretation array is up-to-date
+		//! Represents the current density profile. Both double pointers must point to contiguous memory at least NumberOfBins() large.
+		//! After calling the first array will contain
 		void PrepareReport
 		(
 			double*,
@@ -100,8 +107,8 @@ namespace GeomLib {
 
 		boost::shared_ptr<AbstractNeuralDynamics> _p_dyn;
 		const string		_name_namerical;
-		MPILib::Time				_t_period;
-		MPILib::Time 				_t_step;
+		MPILib::Time		_t_period;
+		MPILib::Time 		_t_step;
 
 		const OdeParameter& _par;
 		vector<MPILib::Potential>	_buffer_interpretation;
@@ -109,7 +116,7 @@ namespace GeomLib {
 
 		Index		       	_i_reset;
 		Index				_i_reversal;
-		MPILib::Time		       	_t_current;
+		MPILib::Time       	_t_current;
 
 		vector<Index>		_map_cache;
 

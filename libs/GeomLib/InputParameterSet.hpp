@@ -24,14 +24,11 @@
 #include <MPILib/include/BasicDefinitions.hpp>
 namespace GeomLib
 {
-
-	//! This class stores input rate and efficacies in terms of the number of circulant bins and the number of non-circulant
-	//! areas.
 	class InputParameterSet {
 	public:
 
-		int			_H_exc;				//! Excitatory efficacy in terms of bins. The real number of bins is rounded to the next integer, for historical reasons. To obtain the floating point value, add _alpha_exc. Do not use _h_exc instead because this is the efficacy in whatever units are given, usually mV or V and does not correspond to a number of bins.
-		int			_H_inh;             //! Inhibitory efficacy in terms of bins. The real number of bins is rounded to the next integer, for historical reasons. To obtain the floating point value, add _alpha_exc. Do not use _h_inh instead because this is the efficacy in whatever units are given, usually mV or V and does not correspond to a number of bins.
+		int					_H_exc;				//! Excitatory efficacy in terms of bins. The real number of bins is rounded to the next integer, for historical reasons. To obtain the floating point value, add _alpha_exc. Do not use _h_exc instead because this is the efficacy in whatever units are given, usually mV or V and does not correspond to a number of bins.
+		int					_H_inh;             //! Inhibitory efficacy in terms of bins. The real number of bins is rounded to the next integer, for historical reasons. To obtain the floating point value, add _alpha_exc. Do not use _h_inh instead because this is the efficacy in whatever units are given, usually mV or V and does not correspond to a number of bins.
 		MPILib::Potential	_h_exc;				//! Synaptic efficacy in mV or V, do not interpret as a number of bins
 		MPILib::Potential	_h_inh;				//! Synaptic efficacy in mV or V, do not interpret as a number of bins
 		MPILib::Potential	_alpha_exc;			//! When the efficacy needs to be expressed as a number of bins, add this number to _H_exc for an accurate floating point value

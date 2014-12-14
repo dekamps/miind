@@ -27,40 +27,45 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
-#ifndef _CODE_LIBS_GEOMLIB_CURRENTCOMPENSATION_PARAMETER_INCLUDE_GUARD
-#define _CODE_LIBS_GEOMLIB_CURRENTCOMPENSATION_PARAMETER_INCLUDE_GUARD
 
-#include<cassert>
-#include <MPILib/include/BasicDefinitions.hpp>
+#ifndef _CODE_LIBS_GEOMLIB_GEOMPARAMETER_INCLUDE_GUARD
+#define _CODE_LIBS_GEOMLIB_GEOMPARAMETER_INCLUDE_GUARD
+
+#include <string>
+#include <boost/shared_ptr.hpp>
+#include "AbstractOdeSystem.hpp"
+#include "CurrentCompensationParameter.hpp"
+#include "DiffusionParameter.h"
+#include "OdeParameter.hpp"
+
+using std::string;
 
 namespace GeomLib {
 
-	//! Parameter for setting current compensation values for the neural models that use it
-	struct CurrentCompensationParameter {
+	struct GeomParameter {
+	public:
 
-		MPILib::Potential _I;			//! DC contribution
-		MPILib::Potential _sigma;		//! variability of the Poisson emulation
-
-
-		//! Standard constructor
-		CurrentCompensationParameter
+		GeomParameter
 		(
-			MPILib::Potential I = 0,    //! current
-			MPILib::Potential sigma = 0 //! variability
-		):
-		_I(I),
-		_sigma(sigma)
-		{
-			assert( ! (I != 0 && sigma == 0.0 ));
-		}
+			const AbstractOdeSystem&,															//! Any OdeSystem object, this defines the neural model. This object will be cloned.
+			Potential scale								= 1.0,  								//! In a diffusion interpretation of the input, it must be made clear what scale is considered to be small
+			const DiffusionParameter& par_diff          = DiffusionParameter(0.03,0.03),		//! Typical values are 3% of the scale
+			const CurrentCompensationParameter& par_cur = CurrentCompensationParameter(0.,0.),	//! By default, no current compensation
+			const string& name_master					= "NumericalMasterEquation",			//! By default, a numerical scheme for the solution of the Master equation
+			bool  no_master_equations               	= false									//! Do not run master equation when true
+		);
 
-		//! Many models will not use CurrentCompensation; the convention is that as long as sigma is positive
-		//! compensation will be applied, so if you do not want current compensation is applied keep both I and sigma
-		//! equal to 0
-		bool NoCurrentCompensation() const { return (_I == 0.0 && _sigma == 0.0) ? true : false; }
 
+		boost::shared_ptr<AbstractOdeSystem>	_p_sys_ode;
+		Potential								_scale;
+		const DiffusionParameter&				_par_diff;
+		const CurrentCompensationParameter		_par_cur;
+		const string							_name_master;
+		bool									_no_master_equation;
 	};
 }
 
-#endif
 
+
+
+#endif /* GEOMPARAMETER_H_ */

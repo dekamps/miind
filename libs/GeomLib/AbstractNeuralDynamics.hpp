@@ -22,7 +22,6 @@
 #define _CODE_LIBS_GEOMLIB_ABSTRACTNEURALDYNAMICS_H_
 
 #include <MPILib/include/BasicDefinitions.hpp>
-//#include "BasicDefinitions.hpp"
 #include "CurrentCompensationParameter.hpp"
 #include "OdeParameter.hpp"
 
@@ -33,7 +32,8 @@ namespace GeomLib {
 	//  There are predefined derived classes for leaky-integrate-and-fire and quadratic-integrate-and-fire
 	//  dynamics. Anyone who wants to use their own model of neural dynamics needs to overload this class. Unit tests in:
 	//! LifNeuralDynamics
-	class AbstractNeuralDynamics {
+
+class AbstractNeuralDynamics {
 	public:
 
 		//! Constructor

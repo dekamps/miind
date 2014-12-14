@@ -18,6 +18,7 @@ AbstractOdeSystem.cpp
 AbstractNeuralDynamics.cpp
 CurrentCompensationParameter.hpp
 GeomInputConvertor.cpp
+GeomParameter.cpp
 LeakingOdeSystem.cpp
 LifNeuralDynamics.cpp
 MuSigmaScalarProduct.cpp
@@ -29,6 +30,7 @@ AbstractNeuralDynamics.hpp
 AbstractOdeSystem.hpp
 GeomInputConvertor.hpp
 GeomLib.hpp
+GeomParameter.hpp
 InitialDensityParameter.hpp  
 InputParameterSet.hpp
 LeakingOdeSystem.hpp

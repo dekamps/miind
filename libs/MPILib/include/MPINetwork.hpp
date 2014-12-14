@@ -151,6 +151,7 @@ private:
 
 };
 
+
 //! Standard conversion for operations that depend on efficacy online
 inline double toEfficacy(double efficacy) {
 	return efficacy;

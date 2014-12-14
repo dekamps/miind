@@ -22,69 +22,34 @@
 #include "MuSigmaScalarProduct.hpp"
 #include "OrnsteinUhlenbeckParameter.hpp"
 #include "GeomLibException.hpp"
-//#include "SpecialBins.h"
-/*
+
+
 using namespace GeomLib;
 
-		CharacteristicInputConvertor::CharacteristicInputConvertor
-		(
-			Time						tau,
-			const vector<Potential>&	vec_interpretation,
-			const vector<Density>&		vec_density,
-			Potential					dc_component,
-			double						diffusion_limit,
-			double						diffusion_step,
-			double						sigma_fraction,
-			bool						no_sigma_smooth,
-			bool						force_small_bins
-		):
-		_vec_interpretation(vec_interpretation),
-		_vec_set(1),		// many older algorithms, OldLIFZeroLeakEquations, SingleInputZeroLeakEquations simply assume there is one InputSetParameter
-		_gamma_estimated(EstimateGamma(vec_interpretation)),
-		_minval(MinVal(vec_interpretation)),
-		_V_min(V_min_from_gamma(_gamma_estimated)),
-		_V_max(V_max_from_gamma(_gamma_estimated)),
-		_tau(tau),
-		_n_bins(vec_interpretation.size()),
-		_b_toggle_sort(false),
-		_b_toggle_diffusion(false),
-		_diffusion_limit(diffusion_limit),
-		_diffusion_step(diffusion_step),
-		_dc_component(dc_component),
-		_sigma_fraction(sigma_fraction),
-		_no_sigma_smooth(no_sigma_smooth),
-		_force_small_bins(force_small_bins),
-		_vec_burst(0),
-		_vec_diffusion(0)
-		{
-			// warn against possible negative firing rates
-			if (_diffusion_step > _diffusion_limit)
-				throw PopulistException("Keep diffusion_step smaller than diffusion limit");
-			predecessor_iterator iter = DCComponent(_dc_component); 
-			_vec_diffusion.push_back(iter);
-		}
-
-void CharacteristicInputConvertor::AdaptParameters
+GeomInputConvertor::GeomInputConvertor
 (
-)
+	const OrnsteinUhlenbeckParameter&		par_neuron,
+	const DiffusionParameter&				par_diff,
+	const CurrentCompensationParameter&		par_curr,
+	const std::vector<MPILib::Potential>&	vec_int,
+	bool									b_force_small
+):
+_par_neuron			(par_neuron),
+_par_diff			(par_diff),
+_par_curr			(par_curr),
+_vec_interpretation	(vec_int),
+_vec_direct			(0),
+_vec_diffusion		(0),
+_force_small_bins	(b_force_small)
 {
-	RecalculateSolverParameters();
-	UpdateRestInputParameters();
 }
 
-void CharacteristicInputConvertor::AdaptSigma(Potential mu, Potential* p_h, Potential* p_sigma) const
+MPILib::Number GeomInputConvertor::NumberDirect() const
 {
-	assert (*p_sigma > 0.0);
-	//sigma is so small that it leads to an h value that doesn't even cover a single bin
-	// just increase sigma a little bit, but throw an exception if it crosses
-	// _sigma_fraction. //TODO: provide a warning in the log file that this has happened
-	*p_sigma *= 1.1;
-	*p_h = (mu != 0.0) ? (*p_sigma)*(*p_sigma)/mu : numeric_limits<double>::max();
-	if (*p_sigma > fabs(mu)*_sigma_fraction )
-		throw PopulistException("Can't adapt sigma. Increase number of bins");
+	return _vec_direct.size();
 }
 
-void CharacteristicInputConvertor::SetDiffusionParameters
+void GeomInputConvertor::SetDiffusionParameters
 (
 	const MuSigma& par,
 	InputParameterSet& set
@@ -100,13 +65,14 @@ void CharacteristicInputConvertor::SetDiffusionParameters
 		set._rate_inh = 0.0;
 		return;
 	}
-	Potential h = (mu != 0.0) ? sigma*sigma/mu : numeric_limits<double>::max();
+
+	MPILib::Potential h = (mu != 0.0) ? sigma*sigma/mu : std::numeric_limits<double>::max();
 
 	if (mu != 0 && IsSingleDiffusionProcess(h) ){
-		if (fabs(h) < 2*_minval && _force_small_bins)
-			throw PopulistException("Increase the number of bins.");
+		if (fabs(h) < 2*_min_step && _force_small_bins)
+			throw GeomLibException("Increase the number of bins.");
 
-		Rate rate = mu*mu/(sigma*sigma*_tau);
+		MPILib::Rate rate = mu*mu/(sigma*sigma*_par_neuron._tau);
 
 		if ( h > 0 ){
 			set._h_exc    = h;
@@ -123,12 +89,12 @@ void CharacteristicInputConvertor::SetDiffusionParameters
 	}
 	else {
 
-		double h = this->DiffusionJump();
+		double h = _par_diff._diffusion_jump;
 
-		if (fabs(h) < 2*_minval && _force_small_bins)
-			throw PopulistException("Increase the number of bins.");
+		if (fabs(h) < 2*_min_step && _force_small_bins)
+			throw GeomLibException("Increase the number of bins.");
 
-		double tau = _tau;
+		double tau =  _par_neuron._tau;
 		set._h_exc =  h;
 		set._h_inh = -h;
 
@@ -140,115 +106,52 @@ void CharacteristicInputConvertor::SetDiffusionParameters
 	}
 }
 
-bool CharacteristicInputConvertor::IsSingleDiffusionProcess(Potential h) const
+bool GeomInputConvertor::IsSingleDiffusionProcess(MPILib::Potential h) const
 {
-	return (fabs(h) < _diffusion_limit*(_V_max - _V_min));
+	return (fabs(h) < _par_diff._diffusion_limit*(_par_neuron._theta - _par_neuron._V_reversal));
 }
 
-void CharacteristicInputConvertor::UpdateRestInputParameters
+void GeomInputConvertor::SortConnectionvector
 (
+	const std::vector<MPILib::Rate>& 									vec_rates,
+	const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& 	vec_con,
+	const std::vector<MPILib::NodeType>& 								vec_type
 )
 {
-	BOOST_FOREACH(InputParameterSet& set, _vec_set){
-		set._n_noncirc_exc  = 0;
-		set._n_noncirc_inh  = 0;
-		set._n_circ_exc     = 0;
-	}
+	assert(vec_rates.size() == vec_con.size());
+	assert(vec_type.size()  == vec_rates.size());
+
+	// it is guaranteed that there is exist a parameter vector that is large enough
+	if (_vec_set.size() == 0)
+		// If all inputs are direct, still one extra input is needed for diffusion
+		_vec_set = std::vector<InputParameterSet>(vec_type.size() + 1);
+
+	_vec_direct.clear();
+	_vec_diffusion.clear();
+
+	for (MPILib::Index i = 0; i < vec_type.size(); i++)
+		if (vec_type[i] == MPILib::EXCITATORY_GAUSSIAN ||
+		    vec_type[i] == MPILib::INHIBITORY_GAUSSIAN)
+			_vec_diffusion.push_back(i);
+		else
+			_vec_direct.push_back(i);
+
+	this->AddDiffusionParameter (vec_con, vec_rates);
+	this->AddBurstParameters    (vec_con, vec_rates);
 }
 
-double CharacteristicInputConvertor::EstimateGamma(const vector<double>& vec_interpretation) const
-{
-	double f = numeric_limits<double>::max();
-	Index ind_min = 0;
-	for (Index i = 0; i < vec_interpretation.size(); i++)
-		if (fabs(vec_interpretation[i]) < f ){
-			ind_min = i;
-			f = fabs(vec_interpretation[i]);
-		}
-
-	Potential V1 = vec_interpretation[ind_min + 1];
-	Potential V2 = vec_interpretation[ind_min + 2];
-	return V1*V1*V2/(V2 - 2*V1);
-}
-
-void CharacteristicInputConvertor::RecalculateSolverParameters
-( 
-)
-{
-	// We will not use an expression in an integer number of steps unlike LIFConvertor
-
-	BOOST_FOREACH(InputParameterSet& set, _vec_set){
-		set._H_exc = 0;
-		set._H_inh = 0;
-
-		assert(set._H_exc >= 0);
-		assert(set._H_inh >= 0);
-
-		set._alpha_exc = 0.0;
-		set._alpha_inh = 0.0;
-
-		assert(set._alpha_exc <= 1.0 && set._alpha_exc >= 0.0);
-		assert(set._alpha_inh <= 1.0 && set._alpha_inh >= 0.0);
-	}
-}
-
-void CharacteristicInputConvertor::Configure
+void GeomInputConvertor::AddBurstParameters
 (
-	valarray<Potential>& array_state
+	const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& vec_con,
+	const std::vector<MPILib::Rate>& vec_rates
 )
 {
-}
-
-void CharacteristicInputConvertor::SortConnectionvector
-(
-//	predecessor_iterator iter_begin,
-//	predecessor_iterator iter_end
-		const vector<Rate>&,
-		const vector<OrnsteinUhlenbeckConnection>&,
-		const vector<MPILib::NodeType>&
-)
-{
-	assert(iter_begin != iter_end);
-
-	// sorting depends on network structure and only should be done once
-	typedef DynamicLib::DynamicNode<PopulationConnection>& Node;
-	if (! _b_toggle_sort){
-		for (predecessor_iterator iter = iter_begin; iter != iter_end; iter++)
-		{	
-			AbstractSparseNode<double,PopulationConnection>& sparse_node = *iter;
-			Node node = dynamic_cast<Node>(sparse_node);
-
-			if ( node.Type() == DynamicLib::EXCITATORY_BURST || node.Type() == DynamicLib::INHIBITORY_BURST )
-				_vec_burst.push_back(iter);
-			else
-				_vec_diffusion.push_back(iter);
-		}
-		_b_toggle_sort = true;
-	}
-
-	this->AddDiffusionParameter();
-	this->AddBurstParameters();
-}
-
-void CharacteristicInputConvertor::AddBurstParameters()
-{
-	// This is necessary for older ZeroLeakEquations. They rely on the relevant input 
-	// being in _vec-set[0]. So if there is no diffusion input, the first element has
-	// to be taken up by bursting input.
-
-	if (_vec_diffusion.size() == 0 )
-		_vec_set.clear();
-
-	InputParameterSet set;
-	while( _vec_set.size() < 1 + _vec_burst.size() )
-		_vec_set.push_back(set);
-
-	Index start = _vec_diffusion.size() == 1 ? 1 : 0;
-	BOOST_FOREACH(predecessor_iterator iter, _vec_burst){
+	MPILib::Index start = 1;
+	for(auto i: _vec_direct){
 		
-		double h = iter.GetWeight()._efficacy;
-		double N = iter.GetWeight()._number_of_connections;
-		double rate = iter->GetValue();
+		double h = vec_con[i]._efficacy;
+		double N = vec_con[i]._number_of_connections;
+		double rate = vec_rates[i];
 
 		if (h >= 0 ){
 			_vec_set[start]._h_exc    = h;
@@ -266,53 +169,55 @@ void CharacteristicInputConvertor::AddBurstParameters()
 	}
 }
 
-void CharacteristicInputConvertor::AddDiffusionParameter()
+void GeomInputConvertor::SortDiffusionInput
+(
+	const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& vec_con,
+	const std::vector<MPILib::Rate>& vec_rates,
+	std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>* p_vec_con_diff,
+	std::vector<MPILib::Rate>* p_vec_rates_diff
+)
+{
+	for (auto i: _vec_diffusion){
+		p_vec_con_diff->push_back(vec_con[i]);
+		p_vec_rates_diff->push_back(vec_rates[i]);
+	}
+}
+
+
+void GeomInputConvertor::AddDiffusionParameter
+(
+	const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& vec_con,
+	const std::vector<MPILib::Rate>& vec_rates
+)
 {	
+	std::vector<MPILib::populist::OrnsteinUhlenbeckConnection> vec_diff_con;
+	std::vector<MPILib::Rate> vec_diff_rates;
+
+	SortDiffusionInput(vec_con,vec_rates, &vec_diff_con,&vec_diff_rates);
+
 	MuSigmaScalarProduct scalar;
 	MuSigma par = 
 		scalar.Evaluate
 		(
-			_vec_diffusion,
-			_tau,
-			_no_sigma_smooth
+			vec_diff_rates,
+			vec_diff_con,
+			_par_neuron._tau
 		);
+
+	par._mu    += _par_curr._I;
+	par._sigma += _par_curr._sigma;
+
 	SetDiffusionParameters(par,_vec_set[0]);
 }
 
-AbstractSparseNode<double,OrnsteinUhlenbeckConnection>::predecessor_iterator
-	CharacteristicInputConvertor::DCComponent(Potential I)
-{
-	_connection.first  = &_node;
-	OU_Connection conou;
-	conou._delay = 0.0;
-
-	if (I == 0){
-		_node.SetValue(0);
-		conou._efficacy = 0.0;
-		conou._number_of_connections = 0;
-		_connection.second = conou;
-	} else {
-		Potential mu = -I;
-		Potential sigma = this->_sigma_fraction;
-
-		Rate rate = mu*mu/(_tau*sigma*sigma);
-		Potential h = sigma*sigma/mu;
-		_node.SetValue(rate);
-		conou._efficacy = h;
-		conou._number_of_connections = 1;
-		_connection.second = conou;
-	}
-		
-	predecessor_iterator iter(&_connection);
-
-	return iter;
-}
-
-double CharacteristicInputConvertor::MinVal(const vector<Potential>& vec_interpretation) const
+MPILib::Potential GeomInputConvertor::MinVal
+(
+	const std::vector<MPILib::Potential>& vec_interpretation
+) const
 {
 	assert (vec_interpretation.size() > 0);
-	double min = numeric_limits<double>::max();
-	for (Index i = 0; i < vec_interpretation.size() - 1; i++){
+	double min = std::numeric_limits<double>::max();
+	for (MPILib::Index i = 0; i < vec_interpretation.size() - 1; i++){
 		double dif = fabs(vec_interpretation[i+1] - vec_interpretation[i]);
 		if (min > dif)
 			min = dif;
@@ -320,21 +225,3 @@ double CharacteristicInputConvertor::MinVal(const vector<Potential>& vec_interpr
 	return min;
 }
 
-Potential CharacteristicInputConvertor::V_min_from_gamma(Potential gamma) const
-{
-	// for some neuron models V_min is a huge underestimate of the relevant potential domain
-	// if gamma can be estimated, use -sqrt(gamma) as minimum potential
-	if (gamma > 0)
-		return -sqrt(gamma);
-	else
-		return _vec_interpretation[0];
-}
-
-Potential CharacteristicInputConvertor::V_max_from_gamma(Potential gamma) const
-{
-	if (gamma > 0)
-		return sqrt(gamma);
-	else
-		return _vec_interpretation.back();
-}
-*/

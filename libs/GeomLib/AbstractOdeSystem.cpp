@@ -17,7 +17,7 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#include <GeomLib/AbstractOdeSystem.hpp>
+#include "AbstractOdeSystem.hpp"
 #include "GeomLibException.hpp"
 
 using namespace GeomLib;
@@ -68,7 +68,6 @@ Index AbstractOdeSystem::InitializeResetBin() const
 	i_ret = this->FindBin(_par._par_pop._V_reset);
 	return i_ret;
 }
-
 
 Index AbstractOdeSystem::InitializeReversalBin() const
 {
@@ -175,5 +174,4 @@ void AbstractOdeSystem::NormaliseDensity
 	for (Index i = 0; i < n_bins; i++)
 		buffer_mass[i] /= sum;
 }
-
 
