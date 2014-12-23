@@ -23,7 +23,7 @@
 #include "GeomLibException.hpp"
 
 using namespace GeomLib;
-
+using namespace MPILib;
 
 namespace
 {
@@ -38,14 +38,13 @@ namespace
         Index                   i,
         const double            y[],
         const AbstractOdeSystem& system,
-        const BinEstimator&     estimator,
         Index                   j,
-        Potential               h,
         Rate                    rate,
         const CNZLCache&        cache,
         Type                    type
     )
     {
+
         BinEstimator::CoverPair pair_cover = (type == EXCITATORY) ? cache.List()[j].first[i] : cache.List()[j].second[i];
         Number n_bins = system.NumberOfBins();
 
@@ -77,7 +76,6 @@ namespace
         Index                       i,
         const double                y[],
         const AbstractOdeSystem&    system,
-        const BinEstimator&         estimator,
         Index                       j,
         const InputParameterSet&    set,
         const CNZLCache&            cache
@@ -85,10 +83,10 @@ namespace
     {
         // determine the boundaries of this bin; mind the minus sign: exc input comes from lower, inh from higher
         if (set._rate_exc != 0)
-            AddCachedToRow(dydt, i, y, system, estimator, j, -set._h_exc, set._rate_exc, cache, EXCITATORY);
+            AddCachedToRow(dydt, i, y, system, j, set._rate_exc, cache, EXCITATORY);
 
         if (set._rate_inh != 0)
-            AddCachedToRow(dydt, i, y, system, estimator, j, -set._h_inh, set._rate_inh, cache, INHIBITORY);
+            AddCachedToRow(dydt, i, y, system, j, set._rate_inh, cache, INHIBITORY);
     }
 
     void
@@ -98,7 +96,6 @@ namespace
         Index                               i,
         const double                        y[],
         const AbstractOdeSystem&            system,
-        const BinEstimator&                 estimator,
         const vector<InputParameterSet>&    vec_set,
         const CNZLCache&                    cache
     )
@@ -106,6 +103,7 @@ namespace
         dydt[system.MapPotentialToProbabilityBin(i)] = 0.0;
         Number n_bins  = system.NumberOfBins();
         Number n_input = vec_set.size();
+
         Index i_reset  = system.IndexResetBin();
 
         for (Index j = 0; j < n_input; j++) {
@@ -141,18 +139,18 @@ namespace
             }
 
             dydt[system.MapPotentialToProbabilityBin(i)] -= rate_e * y[system.MapPotentialToProbabilityBin(i)];
-            AddCachedInputContributionToRow(dydt, i, y, system, estimator, j, vec_set[j], cache);
-        }
+            AddCachedInputContributionToRow(dydt, i, y, system, j, vec_set[j], cache);
+
+       }
     }
 
     int CachedDeriv(double t, const double y[], double dydt[], void* params)
     {
-
         MasterParameter* p_par = static_cast<MasterParameter*>(params);
         Number n_bins = p_par->_p_system->NumberOfBins();
 
         for (Index i = 0; i < n_bins; i++)
-            AddCachedRowDeriv(dydt, i, y, *(p_par->_p_system), *(p_par->_p_estimator), *(p_par->_p_vec_set), *(p_par->_p_cache)/*, rate*/);
+            AddCachedRowDeriv(dydt, i, y, *(p_par->_p_system), *(p_par->_p_vec_set), *(p_par->_p_cache));
 
         return GSL_SUCCESS;
     }
@@ -200,7 +198,7 @@ NumericalMasterEquation::~NumericalMasterEquation()
 {
 }
 
-void NumericalMasterEquation::SortConnectionvector
+void NumericalMasterEquation::sortConnectionVector
 (
 	const std::vector<MPILib::Rate>&									vec_rates,
 	const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>&	vec_cons,
@@ -213,13 +211,12 @@ void NumericalMasterEquation::SortConnectionvector
 
 void NumericalMasterEquation::InitializeIntegrator()
 {
-	_integrator.Parameter()._nr_bins    = _system.NumberOfBins();
-    _integrator.Parameter()._p_system           = &_system;
-    _integrator.Parameter()._p_estimator        = &_estimator;
-    _integrator.Parameter()._i_reset            = _system.IndexResetBin();
-    _integrator.Parameter()._p_vec_set          = &_convertor.SolverParameter();
-    _integrator.Parameter()._p_cache            = &_cache;
-
+	_integrator.Parameter()._nr_bins    	= _system.NumberOfBins();
+    _integrator.Parameter()._p_system		= &_system;
+    _integrator.Parameter()._p_estimator	= &_estimator;
+    _integrator.Parameter()._i_reset        = _system.IndexResetBin();
+    _integrator.Parameter()._p_vec_set      = &_convertor.SolverParameter();
+    _integrator.Parameter()._p_cache        = &_cache;
 }
 
 double NumericalMasterEquation::RecaptureProbability()
@@ -231,7 +228,7 @@ double NumericalMasterEquation::RecaptureProbability()
 	return p;
 }
 
-void NumericalMasterEquation::Apply(Time t)
+void NumericalMasterEquation::apply(Time t)
 {
     InitializeIntegrator();
     // initialize caching values for the bin estimator
@@ -261,10 +258,9 @@ void NumericalMasterEquation::Apply(Time t)
 
     p = _queue.CollectAndRemove(t);
     _system.MassBuffer()[_system.MapPotentialToProbabilityBin(_system.IndexResetBin())] += p;
-
 }
 
-Rate NumericalMasterEquation::TransitionRate() const
+Rate NumericalMasterEquation::getTransitionRate() const
 {
     return  _rate;
 }
@@ -308,4 +304,9 @@ Rate NumericalMasterEquation::IntegralRate() const
 
 	return rate*integ;
 
+}
+
+Density NumericalMasterEquation::Checksum() const
+{
+	return std::accumulate(_system.MassBuffer().begin(),_system.MassBuffer().end(),0.0);
 }

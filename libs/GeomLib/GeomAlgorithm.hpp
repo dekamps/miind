@@ -22,21 +22,25 @@
 #define _CODE_LIBS_GEOMLIB_GEOMALGORITHM_INCLUDE_GUARD
 
 #include <boost/circular_buffer.hpp>
-#include "../DynamicLib/DynamicLib.h"
-#include "AbstractMasterEquation.h"
-#include "GeomParameter.h"
+#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include "GeomParameter.hpp"
+#include "NumericalMasterEquation.h"
 
-
+using MPILib::algorithm::AlgorithmGrid;
+using MPILib::algorithm::AlgorithmInterface;
+using MPILib::populist::OrnsteinUhlenbeckConnection;
+using MPILib::Rate;
+using MPILib::SimulationRunParameter;
+using MPILib::Time;
 
 namespace GeomLib {
 
-  template <class Weight>
-	class GeomAlgorithm : public AbstractAlgorithm<Weight> {
+  template <class WeightValue>
+	class GeomAlgorithm : public AlgorithmInterface<WeightValue>  {
 	public:
 
-		typedef typename AbstractAlgorithm<Weight>::predecessor_iterator predecessor_iterator;
-
 		typedef GeomParameter Parameter;
+		using AlgorithmInterface<WeightValue>::evolveNodeState;
 
 		//! Standard way for user to create algorithm
 		GeomAlgorithm
@@ -50,58 +54,54 @@ namespace GeomLib {
 		//! virtual destructor
 		virtual ~GeomAlgorithm();
 
-		//! An algorithm saves its log messages, and must be able to produce them for a Report
-		virtual string LogString() const;
+		/**
+		 * Cloning operation, to provide each DynamicNode with its own
+		 * Algorithm instance. Clients use the naked pointer at their own risk.
+		 */
+		virtual GeomAlgorithm* clone() const;
 
-		//! Cloning operation, to provide each DynamicNode with its own 
-		//! Algorithm instance
-		virtual GeomAlgorithm<Weight>* Clone() const;
+		/**
+		 * Configure the Algorithm
+		 * @param simParam The simulation parameter
+		 */
+		virtual void configure(const SimulationRunParameter& simParam);
 
-		//! A complete serialization of the state of an Algorithm, so that
-		//! it can be resumed from its disk representation. NOT IMPLEMENTED.
-		virtual bool Dump(ostream&) const ;
-		
-		//! Configure the algorithm with run time parameter
-		virtual bool Configure
-		(
-			const SimulationRunParameter&
-		);
 
-		//! Evolve density over the desired time step
-		virtual bool EvolveNodeState
-		(
-			predecessor_iterator,
-			predecessor_iterator,
-			Time
-		);
+		virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
+				const std::vector<WeightValue>& weightVector, Time time);
 
-		//! Current time as maintained by the algorithm
-		virtual Time CurrentTime() const;
+		virtual void prepareEvolve(const std::vector<Rate>& nodeVector,
+				const std::vector<WeightValue>& weightVector,
+				const std::vector<MPILib::NodeType>& typeVector);
 
-		//! Current rate of Algorithm
-		virtual Rate CurrentRate () const;
 
-		//! state of the algorithm
-		virtual NodeState State() const;
+		/**
+		 * The current time point
+		 * @return The current time point
+		 */
+		virtual MPILib::Time getCurrentTime() const;
 
-		//! Return current AlgorithmGrid
-		virtual AlgorithmGrid Grid() const;
 
-		//!
-		virtual bool CollectExternalInput
-		(
-			predecessor_iterator,
-			predecessor_iterator
-		);
+		/**
+		 * The calculated rate of the node
+		 * @return The rate of the node
+		 */
+		virtual Rate getCurrentRate() const;
+
+		/**
+		 * Stores the algorithm state in a Algorithm Grid
+		 * @return The state of the algorithm
+		 */
+		virtual AlgorithmGrid getGrid() const;
 
 	private:
 
 		bool  IsReportDue() const;
 
-		const	GeomParameter						_par_geom;
-		AlgorithmGrid		      					_grid;
-		boost::shared_ptr<AbstractOdeSystem>    	_p_system;
-	    boost::shared_ptr<AbstractMasterEquation>   _p_zl;
+		const GeomParameter					_par_geom;
+		AlgorithmGrid		      			_grid;
+		unique_ptr<AbstractOdeSystem>		_p_system;
+	    unique_ptr<AbstractMasterEquation>	_p_zl;
 
 	    bool    _b_zl;
 		Time	_t_cur;
@@ -109,7 +109,7 @@ namespace GeomLib {
 		Time	_t_report;
 
 		mutable Number	_n_report;
-		SpecialBins     _bins; //TODO : is this necessary?
+
 	};
 }
 

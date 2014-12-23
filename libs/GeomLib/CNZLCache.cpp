@@ -41,18 +41,16 @@ void CNZLCache::InitializeCoverPairs()
 
 	// vectors are there
 	for (Index i = 0; i < _p_vec_set->size(); i++){
-		Rate rate_e =  (*_p_vec_set)[i]._rate_exc;
-		if ( rate_e != 0){
-			Efficacy h_e = (*_p_vec_set)[i]._h_exc;
-			for(Index j = 0; j < _n_bins; j++)
-				_vec_coverpair[i].first[j] = _p_estimator->CalculateBinCover(j,-h_e);
-			}
-		Rate rate_i = (*_p_vec_set)[i]._rate_inh;
-		if (rate_i != 0 ){
-			Efficacy h_i = (*_p_vec_set)[i]._h_inh;
-			for (Index j = 0; j < _n_bins; j++)
-				_vec_coverpair[i].second[j] = _p_estimator->CalculateBinCover(j,-h_i);
-			}
+
+		// initially this was only done when rate_e != 0; this is an error, as input steps may change at point in time when the rate happens to 0 incidently
+		MPILib::Efficacy h_e = (*_p_vec_set)[i]._h_exc;
+		for(Index j = 0; j < _n_bins; j++)
+			_vec_coverpair[i].first[j] = _p_estimator->CalculateBinCover(j,-h_e);
+
+		MPILib::Efficacy h_i = (*_p_vec_set)[i]._h_inh;
+		for (Index j = 0; j < _n_bins; j++)
+			_vec_coverpair[i].second[j] = _p_estimator->CalculateBinCover(j,-h_i);
+
 	}
 }
 

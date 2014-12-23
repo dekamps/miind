@@ -80,7 +80,7 @@ namespace GeomLib {
 				Potential //! Difference in potential with respect to the boundaries of bin i. Careful! For an excitatory input this value must be negative
 			) const;
 
-		//! Read ony access to the interpretation array
+		//! Read only access to the interpretation array
 		const vector<double>& InterpretationArray() const { return _vec_interpretation; }
 
 	private:

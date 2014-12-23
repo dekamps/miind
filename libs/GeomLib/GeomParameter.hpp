@@ -55,6 +55,7 @@ namespace GeomLib {
 			bool  no_master_equations               	= false									//! Do not run master equation when true
 		);
 
+		GeomParameter(const GeomParameter&);
 
 		unique_ptr<AbstractOdeSystem>			_p_sys_ode;
 		Potential								_scale;

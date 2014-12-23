@@ -37,6 +37,7 @@ BOOST_AUTO_TEST_CASE(GeomParameterConstructorTest) {
 	OdeParameter par_ode(n_bins, V_min, par_neuron, par_density);
 
 	LifNeuralDynamics dyn(par_ode,0.01);
+	LeakingOdeSystem sys(dyn);
 
-	GeomParameter par_geom(dyn);
+	GeomParameter par_geom(sys);
 }

@@ -23,6 +23,7 @@
 
 #include <MPILib/include/populist/ProbabilityQueue.hpp>
 #include "../NumtoolsLib/NumtoolsLib.h"
+#include "AbstractMasterEquation.hpp"
 #include "AbstractOdeSystem.hpp"
 #include "BinEstimator.hpp"
 #include "CNZLCache.hpp"
@@ -40,8 +41,10 @@ using NumtoolsLib::ExStateDVIntegrator;
 namespace GeomLib {
 
 
-	class NumericalMasterEquation {
+	class NumericalMasterEquation : public AbstractMasterEquation {
 	public:
+
+		using AbstractMasterEquation::sortConnectionVector;
 
 		NumericalMasterEquation
 		(
@@ -53,17 +56,17 @@ namespace GeomLib {
 		virtual ~NumericalMasterEquation();
 
 		//! apply the master equations over a period of time
-		virtual void Apply(Time);
+		virtual void apply(MPILib::Time);
 
 
-		void SortConnectionvector
+		virtual void sortConnectionVector
 		(
 			const std::vector<MPILib::Rate>&,
 			const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>&,
 			const std::vector<MPILib::NodeType>&
 		);
 
-		virtual Rate TransitionRate() const;
+		virtual Rate getTransitionRate() const;
 
 		Rate IntegralRate() const;
 
@@ -73,8 +76,9 @@ namespace GeomLib {
 		NumericalMasterEquation& operator=(const NumericalMasterEquation&);
 
 		void InitializeIntegrator();
-		double RecaptureProbability();
+		Density RecaptureProbability();
 
+		Density Checksum() const;
 		AbstractOdeSystem&					_system;
 		const DiffusionParameter			_par_diffusion;
 		const CurrentCompensationParameter	_par_current;

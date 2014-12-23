@@ -21,6 +21,7 @@
 #include "BinEstimator.hpp"
 #include "GeomInputConvertor.hpp"
 #include "GeomLibException.hpp"
+#include "GeomAlgorithmCode.hpp"
 #include "GeomParameter.hpp"
 #include "OdeParameter.hpp"
 #include "LeakingOdeSystem.hpp"

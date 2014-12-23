@@ -20,21 +20,33 @@
 
 #include <GeomLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
+#include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
+#include <MPILib/include/SimulationRunParameter.hpp>
+#include <MPILib/include/report/handler/RootReportHandler.hpp>
 
+using GeomLib::GeomAlgorithm;
 using GeomLib::GeomParameter;
 using GeomLib::InitialDensityParameter;
+using GeomLib::LeakingOdeSystem;
 using GeomLib::LifNeuralDynamics;
 using GeomLib::OdeParameter;
 using GeomLib::PopulationParameter;
+
+using MPILib::EXCITATORY_DIRECT;
+using MPILib::NodeId;
+using MPILib::SimulationRunParameter;
+using MPILib::algorithm::RateAlgorithm;
+
 using std::cout;
 using std::endl;
 
 typedef MPILib::MPINetwork<MPILib::populist::OrnsteinUhlenbeckConnection, MPILib::utilities::CircularDistribution> Network;
+typedef GeomLib::GeomAlgorithm<MPILib::populist::OrnsteinUhlenbeckConnection> GeomDelayAlg;
 
 int main(){
 
 	cout << "Demonstrating Omurtag et al. (2000)" << endl;
-	Number    n_bins = 300;
+	Number    n_bins = 330;
 	Potential V_min  = 0.0;
 
 	PopulationParameter
@@ -58,8 +70,37 @@ int main(){
 
 	double min_bin = 0.01;
 	LifNeuralDynamics dyn(par_ode,min_bin);
-	GeomParameter par_geom(dyn);
+	LeakingOdeSystem sys(dyn);
+	GeomParameter par_geom(sys);
+	GeomDelayAlg alg(par_geom);
+
+	Rate rate_ext = 800.0;
+	RateAlgorithm<MPILib::populist::OrnsteinUhlenbeckConnection> alg_ext(rate_ext);
 
 	Network network;
+
+	NodeId id_rate = network.addNode(alg_ext,EXCITATORY_DIRECT);
+	NodeId id_alg  = network.addNode(alg,    EXCITATORY_DIRECT);
+
+	MPILib::populist::OrnsteinUhlenbeckConnection con(1,0.03,0.0);
+	network.makeFirstInputOfSecond(id_rate,id_alg,con);
+
+	const MPILib::report::handler::RootReportHandler handler("test/singlepoptest", true );
+
+	const SimulationRunParameter
+		par_run
+		(
+			handler,
+	        10000000,
+			0.0,
+			10.0,
+	        1e-4,
+			1e-4,
+			"test/singlepoptest.log"
+		);
+
+	network.configureSimulation(par_run);
+	network.evolve();
+
 	return 0;
 }

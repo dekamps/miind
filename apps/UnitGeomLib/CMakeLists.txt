@@ -21,8 +21,9 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 #############################################################################
 
 set (UNIT_GEOM_SRC 
-    UnitGeomLib.cpp 
-    CurrentCompensationParameterTest.cpp									
+    BinEstimatorTest.cpp
+    CurrentCompensationParameterTest.cpp							
+    GeomInputConvertorTest.cpp		
     GeomParameterTest.cpp
     InitialDensityParameterTest.cpp	
     LeakingOdeSystemTest.cpp  

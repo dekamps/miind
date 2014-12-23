@@ -162,9 +162,9 @@ public:
 	 * @param time Time point of the algorithm
 	 * @param typeVector Vector of the NodeTypes of the precursors
 	 */
-	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
+	virtual void evolveNodeState(const std::vector<MPILib::Rate>& nodeVector,
 			const std::vector<Weight>& weightVector, Time time,
-			const std::vector<NodeType>& typeVector);
+			const std::vector<MPILib::NodeType>& typeVector);
 
 	/**
 	 * prepare the Evolve method
@@ -257,8 +257,8 @@ typedef PopulationAlgorithm_<OrnsteinUhlenbeckConnection> PopulationAlgorithm;
 
 typedef algorithm::RateAlgorithm<OrnsteinUhlenbeckConnection> Pop_RateAlgorithm;
 typedef RateFunctor<OrnsteinUhlenbeckConnection> Pop_RateFunctor;
-typedef MPINode<OrnsteinUhlenbeckConnection, utilities::CircularDistribution> Pop_DynamicNode;
-typedef MPINetwork<OrnsteinUhlenbeckConnection, utilities::CircularDistribution> Pop_Network;
+typedef MPINode<MPILib::populist::OrnsteinUhlenbeckConnection, utilities::CircularDistribution> Pop_DynamicNode;
+typedef MPINetwork<MPILib::populist::OrnsteinUhlenbeckConnection, utilities::CircularDistribution> Pop_Network;
 
 } /* namespace populist */
 } /* namespace MPILib */

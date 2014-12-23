@@ -14,32 +14,51 @@ INCLUDE_DIRECTORIES(
 )
 				
 set( GEOM_SRC
-AbstractOdeSystem.cpp
 AbstractNeuralDynamics.cpp
-CurrentCompensationParameter.hpp
+AbstractOdeSystem.cpp
+BinEstimator.cpp
+CNZLCache.cpp
 GeomInputConvertor.cpp
 GeomParameter.cpp
 LeakingOdeSystem.cpp
 LifNeuralDynamics.cpp
+MasterFactory.cpp
 MuSigmaScalarProduct.cpp
+NumericalMasterEquation.cpp
 OdeParameter.cpp
+QifOdeSystem.cpp
+SpikingNeuralDynamics.cpp
+SpikingOdeSystem.cpp
+SpikingQifNeuralDynamics.cpp
  )
 
 set( GEOM_HEADERS
+AbstractMasterEquation.hpp
 AbstractNeuralDynamics.hpp
 AbstractOdeSystem.hpp
+BinEstimator.hpp
+CNZLCache.hpp
+CurrentCompensationParameter.hpp
 GeomInputConvertor.hpp
+GeomAlgorithm.hpp
+GeomAlgorithmCode.hpp
 GeomLib.hpp
 GeomParameter.hpp
 InitialDensityParameter.hpp  
 InputParameterSet.hpp
 LeakingOdeSystem.hpp
 LifNeuralDynamics.hpp
+MasterFactory.hpp
 MuSigma.hpp
 MuSigmaScalarProduct.hpp
+NumericalMasterEquation.h
 OdeParameter.hpp
 OrnsteinUhlenbeckParameter.hpp
- )
+QifOdeSystem.hpp
+SpikingNeuralDynamics.hpp
+SpikingOdeSystem.hpp
+SpikingQifNeuralDynamics.hpp
+)
 
 add_library( ${MIIND_LIBRARY_PREFIX}geom ${LIB_TYPE} ${GEOM_SRC} ${GEOM_HEADERS})
 

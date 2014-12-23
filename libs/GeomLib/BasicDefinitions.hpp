@@ -21,7 +21,6 @@
 #define _CODE_LIBS_GEOMLIB_BASICDEFINITIONS_INCLUDE_GUARD
 
 #include <MPILib/include/BasicDefinitions.hpp>
-//#include "../UtilLib/UtilLib.h"
 #include "../NumtoolsLib/NumtoolsLib.h"
 using UtilLib::Number;
 

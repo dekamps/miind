@@ -104,21 +104,7 @@ namespace GeomLib {
 		std::vector<MPILib::Index>				_vec_diffusion;
 
 		MPILib::Potential						_min_step;
-/*		double						_gamma_estimated;
-		double						_minval;
-		MPILib::Potential					_V_min;
-		MPILib::Potential					_V_max;
-		MPILib::Time						_tau;
-		MPILib::Number						_n_bins;
-		MPILib::Index*	 		_p_index_reversal_bin;
-		bool						_b_toggle_sort;
-		bool						_b_toggle_diffusion;
-		double						_diffusion_limit;
-		double						_diffusion_step;
-		double						_h_burst_min;
-		double						_dc_component;
-		double						_sigma_fraction;
-		bool						_no_sigma_smooth;*/
+
 		bool						_force_small_bins;
 
 

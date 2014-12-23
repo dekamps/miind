@@ -68,7 +68,7 @@ public:
 	 * @param time Time point of the algorithm
 	 */
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
-			const std::vector<WeightValue>& weightVector, Time time){
+			const std::vector<WeightValue>& weightVector, Time time) {
 		throw utilities::Exception("You need to overwrite this method in your algorithm"
 				" if you want to use it");
 	}

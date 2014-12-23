@@ -17,16 +17,16 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef _CODE_LIBS_POPULISTLIB_QIFALGORITHMCODE_INCLUDE_GUARD
-#define _CODE_LIBS_POPULISTLIB_QIFALGORITHMCODE_INCLUDE_GUARD
+#ifndef _CODE_LIBS_POPULISTLIB_GEOMALGORITHMCODE_INCLUDE_GUARD
+#define _CODE_LIBS_POPULISTLIB_GEOMALGORITHMCODE_INCLUDE_GUARD
 
-#include "QIFAlgorithm.h"
-#include "MasterFactory.h"
+#include "GeomAlgorithm.hpp"
+#include "MasterFactory.hpp"
 
-namespace PopulistLib {
+namespace GeomLib {
 
-    template <class Weight>
-	GeomAlgorithm<Weight>::GeomAlgorithm
+    template <class WeightValue>
+	GeomAlgorithm<WeightValue>::GeomAlgorithm
 	(
 		const GeomParameter& par_geom
 	):
@@ -40,7 +40,6 @@ namespace PopulistLib {
 	{
 		_grid = AlgorithmGrid(_p_system->NumberOfBins());
 		_t_step = _p_system->TStep();
-
 		MasterFactory fact;
 		_p_zl = fact.Create
 		  (
@@ -51,8 +50,8 @@ namespace PopulistLib {
 		   );
 	}
 
-	template <class Weight>
-	GeomAlgorithm<Weight>::GeomAlgorithm
+	template <class WeightValue>
+	GeomAlgorithm<WeightValue>::GeomAlgorithm
 	(
 		const GeomAlgorithm& alg
 	):
@@ -77,57 +76,44 @@ namespace PopulistLib {
 		  );
 	}
 
-	template <class Weight>
-	GeomAlgorithm<Weight>::~GeomAlgorithm()
+	template <class WeightValue>
+	GeomAlgorithm<WeightValue>::~GeomAlgorithm()
 	{
 	}
 
-	template <class Weight>
-	GeomAlgorithm<Weight>* GeomAlgorithm<Weight>::Clone() const
+	template <class WeightValue>
+	GeomAlgorithm<WeightValue>* GeomAlgorithm<WeightValue>::clone() const
 	{
-	  return new GeomAlgorithm<Weight>(*this);
+	  return new GeomAlgorithm<WeightValue>(*this);
 	}
 
-	template <class Weight>
-	string GeomAlgorithm<Weight>::LogString() const
+	template<class WeightValue>
+	void GeomAlgorithm<WeightValue>::configure(const SimulationRunParameter& par_run)
 	{
-		return "";
+		_t_cur		= par_run.getTBegin();
+		_t_report	= par_run.getTReport();
 	}
 
-	template <class Weight>
-	bool GeomAlgorithm<Weight>::Dump(ostream&) const
-	{
-		return true;
-	}
-
-	template<class Weight>
-	bool GeomAlgorithm<Weight>::Configure(const SimulationRunParameter& par_run)
-	{
-		_t_cur		= par_run.TBegin();
-		_t_report	= par_run.TReport();
-
-		return true;
-	}
-
-	template <class Weight>
-	bool GeomAlgorithm<Weight>::CollectExternalInput
+	template<class WeightValue>
+	void GeomAlgorithm<WeightValue>::prepareEvolve
 	(
-		predecessor_iterator iter_begin,
-		predecessor_iterator iter_end
+		const std::vector<Rate>& nodeVector,
+		const std::vector<WeightValue>& weightVector,
+		const std::vector<MPILib::NodeType>& typeVector
 	)
 	{
-		_p_zl->SortConnectionvector(iter_begin,iter_end);
-		return true;
+		_p_zl->sortConnectionVector(nodeVector,weightVector,typeVector);
 	}
 
-	template <class Weight>
-	bool GeomAlgorithm<Weight>::EvolveNodeState
+	template <class WeightValue>
+	void GeomAlgorithm<WeightValue>::evolveNodeState
 	(
-		predecessor_iterator iter_begin,
-		predecessor_iterator iter_end,
+		const std::vector<Rate>& nodeVector,
+		const std::vector<WeightValue>& weightVector,
 		Time t
-	)
+		)
 	{
+
 	    double n = (t - _t_cur)/_t_step;
 		Number n_steps = static_cast<Number>(ceil(n));
 		if (n_steps == 0)
@@ -135,27 +121,27 @@ namespace PopulistLib {
 
 		for (Index i = 0; i < n_steps; i++){
 		  _p_system->Evolve(_t_step);
+
 		  if (_b_zl)
-		    _p_zl->Apply(_t_step);
+		    _p_zl->apply(_t_step);
 
 		}
 		_t_cur = _p_system->CurrentTime();
 
+
 		// previously, a report was prepared here at report time. That is
 		// unnecessary. This can be handled in the Grid method.
 
-
-		return true;
 	}
 
-	template <class Weight>
-	Time GeomAlgorithm<Weight>::CurrentTime() const
+	template <class WeightValue>
+	Time GeomAlgorithm<WeightValue>::getCurrentTime() const
 	{
 		return _t_cur;
 	}
 
-	template <class Weight>
-	bool GeomAlgorithm<Weight>::IsReportDue() const
+	template <class WeightValue>
+	bool GeomAlgorithm<WeightValue>::IsReportDue() const
 	{
 		if (_n_report*_t_report < _t_cur){
 			++_n_report;
@@ -165,15 +151,15 @@ namespace PopulistLib {
 			return false;
 			
 	}
-
-	template <class Weight>
-	NodeState GeomAlgorithm<Weight>::State() const
+/*
+	template <class WeightValue>
+	NodeState GeomAlgorithm<WeightValue>::State() const
 	{
 		return NodeState(vector<double>(0));
 	}
-
-	template <class Weight>
-	AlgorithmGrid GeomAlgorithm<Weight>::Grid() const
+*/
+	template <class WeightValue>
+	AlgorithmGrid GeomAlgorithm<WeightValue>::getGrid() const
 	{
 		Number N = _p_system->NumberOfBins();
 		vector<double> array_interpretation(N);
@@ -186,10 +172,10 @@ namespace PopulistLib {
 		return AlgorithmGrid(array_state,array_interpretation);
 	}
 
-	template <class Weight>
-	Rate GeomAlgorithm<Weight>::CurrentRate() const
+	template <class WeightValue>
+	Rate GeomAlgorithm<WeightValue>::getCurrentRate() const
 	{
-		return _p_system->CurrentRate() + _p_zl->TransitionRate();
+		return _p_system->CurrentRate() + _p_zl->getTransitionRate();
 	}
 }
 
