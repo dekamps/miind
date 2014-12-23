@@ -18,7 +18,6 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <MPILib/include/populist/ProbabilityQueue.hpp>
-//#include "PopulistException.h"
 
 using namespace MPILib;
 using namespace MPILib::populist;
