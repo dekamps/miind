@@ -69,6 +69,7 @@ void GeomInputConvertor::SetDiffusionParameters
 	MPILib::Potential h = (mu != 0.0) ? sigma*sigma/mu : std::numeric_limits<double>::max();
 
 	if (mu != 0 && IsSingleDiffusionProcess(h) ){
+
 		if (fabs(h) < 2*_min_step && _force_small_bins)
 			throw GeomLibException("Increase the number of bins.");
 
@@ -88,8 +89,7 @@ void GeomInputConvertor::SetDiffusionParameters
 		}
 	}
 	else {
-
-		double h = _par_diff._diffusion_jump;
+		double h = _par_diff._diffusion_jump*(_par_neuron._theta - _vec_interpretation[0]);
 
 		if (fabs(h) < 2*_min_step && _force_small_bins)
 			throw GeomLibException("Increase the number of bins.");
@@ -108,7 +108,7 @@ void GeomInputConvertor::SetDiffusionParameters
 
 bool GeomInputConvertor::IsSingleDiffusionProcess(MPILib::Potential h) const
 {
-	return (fabs(h) < _par_diff._diffusion_limit*(_par_neuron._theta - _par_neuron._V_reversal));
+	return (fabs(h) < _par_diff._diffusion_limit*(_par_neuron._theta - _vec_interpretation[0]));
 }
 
 void GeomInputConvertor::SortConnectionvector
