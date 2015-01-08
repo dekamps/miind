@@ -121,11 +121,12 @@ namespace GeomLib {
 
 		for (Index i = 0; i < n_steps; i++){
 		  _p_system->Evolve(_t_step);
-
-		  if (_b_zl)
-		    _p_zl->apply(_t_step);
-
 		}
+
+		//MdK-08/01/2015: Decoupled zero leak time step from grid time step
+		if (_b_zl)
+			_p_zl->apply(n_steps*_t_step);
+
 		_t_cur = _p_system->CurrentTime();
 
 
