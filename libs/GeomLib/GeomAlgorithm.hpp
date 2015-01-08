@@ -28,7 +28,7 @@
 
 using MPILib::algorithm::AlgorithmGrid;
 using MPILib::algorithm::AlgorithmInterface;
-using MPILib::populist::OrnsteinUhlenbeckConnection;
+using MPILib::DelayedConnection;
 using MPILib::Rate;
 using MPILib::SimulationRunParameter;
 using MPILib::Time;

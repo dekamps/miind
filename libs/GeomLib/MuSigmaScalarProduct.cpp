@@ -25,7 +25,7 @@
 using namespace GeomLib;
 
 MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<MPILib::Rate>& nodeVector,
-		const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& weightVector,
+		const std::vector<MPILib::DelayedConnection>& weightVector,
 		MPILib::Time tau) const {
 	MuSigma ret;
 
@@ -38,7 +38,7 @@ MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<MPILib::Rate>& nodeVect
 
 MPILib::Potential MuSigmaScalarProduct::InnerProduct(
 		const std::vector<MPILib::Rate>& nodeVector,
-		const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& weightVector) const {
+		const std::vector<MPILib::DelayedConnection>& weightVector) const {
 
 	return std::inner_product(nodeVector.begin(), nodeVector.end(),
 			weightVector.begin(), 0.0);
@@ -46,7 +46,7 @@ MPILib::Potential MuSigmaScalarProduct::InnerProduct(
 
 MPILib::Potential MuSigmaScalarProduct::InnerSquaredProduct(
 		const std::vector<MPILib::Rate>& nodeVector,
-		const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& weightVector) const {
+		const std::vector<MPILib::DelayedConnection>& weightVector) const {
 
 	return inner_product(nodeVector.begin(), nodeVector.end(),
 			weightVector.begin(), 0.0, std::plus<double>(),

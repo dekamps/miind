@@ -78,7 +78,7 @@ void PopulationGridController<Weight>::Configure(
 template<class Weight>
 bool PopulationGridController<Weight>::CollectExternalInput(
 		const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+		const std::vector<DelayedConnection>& weightVector,
 		const std::vector<NodeType>& typeVector) {
 	_p_zl->SortConnectionvector(nodeVector, weightVector, typeVector);
 
@@ -88,7 +88,7 @@ bool PopulationGridController<Weight>::CollectExternalInput(
 template<class Weight>
 void PopulationGridController<Weight>::Evolve(Time time, Time* p_time_current,
 		Rate* p_rate_output, const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) {
+		const std::vector<DelayedConnection>& weightVector) {
 
 	// This is the main Evolve step from the PopulistGridController. It is driven by the PopulistAlgorithm Evolve method.
 

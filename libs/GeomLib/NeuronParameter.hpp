@@ -17,8 +17,8 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef _GEOM_LIBS_POPULISTLIB_ORNSTEINUHLENBECKPARAMETER_INCLUDE_GUARD
-#define _GEOM_LIBS_POPULISTLIB_ORNSTEINUHLENBECKPARAMETER_INCLUDE_GUARD
+#ifndef _GEOM_LIBS_GEOMLIB_NEURONPARAMETER_INCLUDE_GUARD
+#define _GEOM_LIBS_GEOMLIB_NEURONPARAMETER_INCLUDE_GUARD
 
 
 #include <MPILib/include/BasicDefinitions.hpp>
@@ -31,7 +31,7 @@ namespace GeomLib {
 	//!
 	//! These are the parameters that define a leaky-integrate-and-fire neuron.
 
-	struct OrnsteinUhlenbeckParameter  {
+	struct NeuronParameter  {
 
 		MPILib::Potential _theta;				//!< threshold potential in V
 		MPILib::Potential _V_reset;				//!< reset potential in V
@@ -40,7 +40,7 @@ namespace GeomLib {
 		MPILib::Time      _tau;					//!< membrane time constant in s
 
 		//! default constructor
-		OrnsteinUhlenbeckParameter():
+		NeuronParameter():
 		_theta(0),
 		_V_reset(0),
 		_V_reversal(0),
@@ -49,7 +49,7 @@ namespace GeomLib {
 			}
 
 		//! standard constructor
-		OrnsteinUhlenbeckParameter
+		NeuronParameter
 			(
 				MPILib::Potential theta,
 				MPILib::Potential V_reset,
@@ -70,7 +70,6 @@ namespace GeomLib {
 
 	};
 
-	typedef OrnsteinUhlenbeckParameter PopulationParameter;
 
 } // end of GeomLib
 

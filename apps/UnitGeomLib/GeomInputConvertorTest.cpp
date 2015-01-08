@@ -23,8 +23,8 @@
 #include <boost/test/execution_monitor.hpp>
 #include <GeomLib.hpp>
 #include <MPILib/include/NodeType.hpp>
+#include <MPILib/include/DelayedConnection.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 
 using namespace GeomLib;
 
@@ -37,11 +37,11 @@ struct ConvertorFixture {
 		GenerateSet
 		(
 			const std::vector<MPILib::Rate>&,
-			const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>&,
+			const std::vector<MPILib::DelayedConnection>&,
 			const std::vector<MPILib::NodeType>&
 		);
 
-	OrnsteinUhlenbeckParameter		_par_neuron;
+	NeuronParameter         		_par_neuron;
 	DiffusionParameter				_par_diff;
 	CurrentCompensationParameter	_par_curr;
 	OdeParameter					_par_ode;
@@ -53,7 +53,7 @@ struct ConvertorFixture {
 std::vector<InputParameterSet> ConvertorFixture::GenerateSet
 (
 	const std::vector<MPILib::Rate>&                                  vec_rate,
-	const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& vec_con,
+	const std::vector<MPILib::DelayedConnection>& vec_con,
 	const std::vector<MPILib::NodeType>&							  vec_type
 )
 {
@@ -75,9 +75,9 @@ BOOST_AUTO_TEST_CASE(SingleInputTest) {
 
 	vector<MPILib::NodeType> 	vec_type;
 	vector<MPILib::Rate>     	vec_rate;
-	vector<MPILib::populist::OrnsteinUhlenbeckConnection>	vec_con;
+	vector<MPILib::DelayedConnection>	vec_con;
 
-	OrnsteinUhlenbeckParameter par_neuron(20e-3,0.0,0.0,0.,10e-3);
+	NeuronParameter par_neuron(20e-3,0.0,0.0,0.,10e-3);
 	DiffusionParameter par_diff(0.03,0.05);
 
 	CurrentCompensationParameter par_curr;
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(SingleInputTest) {
 	vec_rate.push_back(rate);
 
 	MPILib::Efficacy eff = 0.03;
-	MPILib::populist::OrnsteinUhlenbeckConnection con(1,eff,0.0);
+	MPILib::DelayedConnection con(1,eff,0.0);
 	vec_con.push_back(con);
 
 	convertor.SortConnectionvector(vec_rate, vec_con, vec_type);
@@ -125,14 +125,14 @@ BOOST_FIXTURE_TEST_CASE(test_fixture, ConvertorFixture)
 
 	vector<MPILib::NodeType> 	vec_type;
 	vector<MPILib::Rate>     	vec_rate;
-	vector<MPILib::populist::OrnsteinUhlenbeckConnection>	vec_con;
+	vector<MPILib::DelayedConnection>	vec_con;
 
 	vec_type.push_back(MPILib::EXCITATORY_DIRECT);
 	MPILib::Rate rate = 800.0;
 	vec_rate.push_back(rate);
 
 	MPILib::Efficacy eff = 0.03;
-	MPILib::populist::OrnsteinUhlenbeckConnection con(1,eff,0.0);
+	MPILib::DelayedConnection con(1,eff,0.0);
 	vec_con.push_back(con);
 
 
@@ -156,14 +156,14 @@ BOOST_FIXTURE_TEST_CASE(test_current_compensation, ConvertorFixture)
 
 	vector<MPILib::NodeType> 	vec_type;
 	vector<MPILib::Rate>     	vec_rate;
-	vector<MPILib::populist::OrnsteinUhlenbeckConnection>	vec_con;
+	vector<MPILib::DelayedConnection>	vec_con;
 
 	vec_type.push_back(MPILib::EXCITATORY_DIRECT);
 	MPILib::Rate rate = 800.0;
 	vec_rate.push_back(rate);
 
 	MPILib::Efficacy eff = 0.03;
-	MPILib::populist::OrnsteinUhlenbeckConnection con(1,eff,0.0);
+	MPILib::DelayedConnection con(1,eff,0.0);
 	vec_con.push_back(con);
 
 	double mu    = 0.0;
@@ -199,7 +199,7 @@ BOOST_FIXTURE_TEST_CASE(test_double_diffusion, ConvertorFixture)
 
 	vector<MPILib::NodeType> 	vec_type;
 	vector<MPILib::Rate>     	vec_rate;
-	vector<MPILib::populist::OrnsteinUhlenbeckConnection>	vec_con;
+	vector<MPILib::DelayedConnection>	vec_con;
 
 	vec_type.push_back(MPILib::EXCITATORY_GAUSSIAN);
 	vec_type.push_back(MPILib::INHIBITORY_GAUSSIAN);
@@ -209,9 +209,9 @@ BOOST_FIXTURE_TEST_CASE(test_double_diffusion, ConvertorFixture)
 	vec_rate.push_back(rate);
 
 	MPILib::Efficacy eff = 0.01;
-	MPILib::populist::OrnsteinUhlenbeckConnection con_e(1,eff,0.0);
+	MPILib::DelayedConnection con_e(1,eff,0.0);
 	vec_con.push_back(con_e);
-	MPILib::populist::OrnsteinUhlenbeckConnection con_i(1,-eff,0.0);
+	MPILib::DelayedConnection con_i(1,-eff,0.0);
 	vec_con.push_back(con_i);
 
 	std::vector<InputParameterSet> vec_set = GenerateSet(vec_rate, vec_con, vec_type);

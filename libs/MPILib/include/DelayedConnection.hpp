@@ -1,4 +1,4 @@
-// Copyright (c) 2005 - 2012 Marc de Kamps
+// Copyright (c) 2005 - 2014 Marc de Kamps
 //						2012 David-Matthias Sichau
 // All rights reserved.
 //
@@ -16,22 +16,21 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef MPILIB_POPULIST_ORNSTEINUHLENBECKCONNECTION_HPP_
-#define MPILIB_POPULIST_ORNSTEINUHLENBECKCONNECTION_HPP_
+#ifndef MPILIB_POPULIST_DELAYEDCONNECTION_HPP_
+#define MPILIB_POPULIST_DELAYEDCONNECTION_HPP_
 
 #include <iostream>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <UtilLib/IsNan.h>
 
 namespace MPILib {
-namespace populist {
 
 /**
  * Connection parameters for a network of OrnsteinUhlenbeck populations
  * need two parameters: a number parameter, which is not squared in the
  * calculation of sigma, and an efficacy, which is squared.
  */
-struct OrnsteinUhlenbeckConnection {
+struct DelayedConnection {
 
 	/**
 	 * effective number, may be fractional
@@ -51,7 +50,7 @@ struct OrnsteinUhlenbeckConnection {
 	/**
 	 * default constructor
 	 */
-	OrnsteinUhlenbeckConnection()=default;
+	DelayedConnection()=default;
 
 	/**
 	 * construct, using effective number of connections and effective efficacy
@@ -59,7 +58,7 @@ struct OrnsteinUhlenbeckConnection {
 	 * @param efficacy synaptic efficacy
 	 * @param delay  delay of connection
 	 */
-	OrnsteinUhlenbeckConnection(double number_of_connections,
+	DelayedConnection(double number_of_connections,
 			Efficacy efficacy,
 			Time delay = 0
 	) :
@@ -72,10 +71,10 @@ struct OrnsteinUhlenbeckConnection {
  * Necessary for a sensible definition of InnerProduct
  * @param f the factor for the inner product
  * @param connection The connection
- * @return Theproduct of the factor with the efficacy and the number of connections
+ * @return The product of the factor with the efficacy and the number of connections
  */
 inline double operator*(double f,
-		const OrnsteinUhlenbeckConnection& connection) {
+		const DelayedConnection& connection) {
 	return f * connection._efficacy * connection._number_of_connections;
 }
 
@@ -84,11 +83,10 @@ inline double operator*(double f,
  * @param connection The connection
  * @return The efficacy of the connection
  */
-inline double toEfficacy(const OrnsteinUhlenbeckConnection& connection) {
+inline double toEfficacy(const DelayedConnection& connection) {
 	return connection._efficacy;
 }
 
-} /* namespace populist */
 } /* namespace MPILib */
 /**
  * if the connection is NAN
@@ -96,7 +94,7 @@ inline double toEfficacy(const OrnsteinUhlenbeckConnection& connection) {
  * @return true if the connection is NAN
  */
 inline int IsNan(
-		const MPILib::populist::OrnsteinUhlenbeckConnection& connection) {
+		const MPILib::DelayedConnection& connection) {
 	return IsNan(connection._efficacy)
 			+ IsNan(connection._number_of_connections)
 			+ IsNan(connection._delay);

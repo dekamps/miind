@@ -19,8 +19,8 @@
 #ifndef MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABSTRACTZEROLEAKEQUATIONS_HPP_
 #define MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABSTRACTZEROLEAKEQUATIONS_HPP_
 
+#include <MPILib/include/DelayedConnection.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/SpecialBins.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/populist/nonCirculantSolvers/AbstractNonCirculantSolver.hpp>
 #include <MPILib/include/populist/circulantSolvers/AbstractCirculantSolver.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
@@ -92,7 +92,7 @@ public:
 	 * @param typeVector The vector which stores the NodeTypes of the precursor nodes
 	 */
 	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<DelayedConnection>& weightVector,
 			const std::vector<NodeType>& typeVector) = 0;
 
 	/**

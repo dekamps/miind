@@ -29,7 +29,7 @@ using namespace GeomLib;
 BOOST_AUTO_TEST_CASE(LifNeuralDynamicsConstructorTest) {
 
 	// Test constructor of LifNeuralDynamics and indirectly of AbstractNeuralDynamics
-	OrnsteinUhlenbeckParameter par_neuron(20e-3, 0., 0., 0., 10e-3);
+	NeuronParameter par_neuron(20e-3, 0., 0., 0., 10e-3);
 
 	Number n_bins = 5;
 	Potential V_min = 0.0;
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(LifNeuralDynamicsCurrentComepnesationTest) {
 	// Test whether the AbstractNeuralDynamics object provides the correct current compensation object:
 	// no current compensation
 
-	OrnsteinUhlenbeckParameter par_neuron(20e-3, 0., 0., 0., 10e-3);
+	NeuronParameter par_neuron(20e-3, 0., 0., 0., 10e-3);
 
 	Number n_bins = 5;
 	Potential V_min = 0.0;
@@ -59,12 +59,13 @@ BOOST_AUTO_TEST_CASE(LifNeuralDynamicsCurrentComepnesationTest) {
 }
 
 BOOST_AUTO_TEST_CASE(LifNeuralDynamicsBinLimitsTest){
+
 	//Test whether LifNeuralDynamics generates the expected bin limits
 
 
 	Potential theta    = 20e-3;
 	MPILib::Time tau   = 10e-3;
-	OrnsteinUhlenbeckParameter par_neuron(theta, 0., 0., 0., tau);
+	NeuronParameter par_neuron(theta, 0., 0., 0., tau);
 
 	Number n_bins = 5;
 	Potential V_min = 0.0;
@@ -94,11 +95,12 @@ BOOST_AUTO_TEST_CASE(LifNeuralDynamicsBinLimitsTest){
 
 
 BOOST_AUTO_TEST_CASE(LifNeuralDynamicsCloneTest){
+
 	//Test whether LifNeuralDynamics generates the expected bin limits
 
 	Potential theta    = 20e-3;
 	MPILib::Time tau   = 10e-3;
-	OrnsteinUhlenbeckParameter par_neuron(theta, 0., 0., 0., tau);
+	NeuronParameter par_neuron(theta, 0., 0., 0., tau);
 
 	Number n_bins = 5;
 	Potential V_min = 0.0;

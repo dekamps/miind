@@ -51,9 +51,9 @@ LifNeuralDynamics.hpp
 MasterFactory.hpp
 MuSigma.hpp
 MuSigmaScalarProduct.hpp
+NeuronParameter.hpp
 NumericalMasterEquation.h
 OdeParameter.hpp
-OrnsteinUhlenbeckParameter.hpp
 QifOdeSystem.hpp
 SpikingNeuralDynamics.hpp
 SpikingOdeSystem.hpp

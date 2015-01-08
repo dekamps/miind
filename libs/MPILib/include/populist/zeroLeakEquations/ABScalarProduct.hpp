@@ -20,8 +20,9 @@
 #define MPILIB_POPULIST_ZEROLEAKEQUATIONS_ABSCALARPRODUCT_HPP_
 
 #include <MPILib/config.hpp>
+#include <MPILib/include/DelayedConnection.hpp>
+
 #include <MPILib/include/populist/zeroLeakEquations/ABQStruct.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <vector>
 
@@ -41,7 +42,7 @@ public:
 	 * @return A ABQ struct
 	 */
 	ABQStruct Evaluate(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<DelayedConnection>& weightVector,
 			Time time) const {
 		// for now a comes from the first population and b from the second. This will need to change.
 		ABQStruct par_ret;

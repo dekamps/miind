@@ -57,7 +57,7 @@ namespace PerformanceGeom {
 	 -1.0
       	);
 
-      	Network network;
+        Network network;
 
        	// Create cortical background, and add to network
 	MPILib::populist::RateFunctor<typename Algorithm::WeightType> cortical_background(CorticalBackground);

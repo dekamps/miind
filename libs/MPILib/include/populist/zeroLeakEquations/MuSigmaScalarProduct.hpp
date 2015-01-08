@@ -24,15 +24,15 @@
 #include <MPILib/include/populist/zeroLeakEquations/MuSigma.hpp>
 
 namespace MPILib {
-namespace populist {
 // forward declaration
-struct OrnsteinUhlenbeckConnection;
+struct DelayedConnection;
+namespace populist {
 namespace zeroLeakEquations {
 
 /**
- * @brief Evaluates the scalar product of an input which arrives over OU_Connections.
+ * @brief Evaluates the scalar product of an input which arrives over DelayedConnection instances.
  *
- * Evaluates the scalar product of an input which arrives over OU_Connections.
+ * Evaluates the scalar product of an input which arrives over DelayedConnection instances.
  * The formulae are:
  * \f[
  * \mu = N \tau \sum_i \nu_i J_i
@@ -52,7 +52,7 @@ public:
 	 * @return The MuSigma scalar product
 	 */
 	MuSigma Evaluate(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<DelayedConnection>& weightVector,
 			Time tau) const;
 
 private:
@@ -64,7 +64,7 @@ private:
 	 * @return The inner product
 	 */
 	Potential InnerProduct(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const;
+			const std::vector<DelayedConnection>& weightVector) const;
 
 	/**
 	 * Evaluate the inner squared product over connections which are indicated by the vectors
@@ -73,7 +73,7 @@ private:
 	 * @return The squared inner product
 	 */
 	Potential InnerSquaredProduct(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const;
+			const std::vector<DelayedConnection>& weightVector) const;
 
 };
 } /* namespace zeroLeakEquations */

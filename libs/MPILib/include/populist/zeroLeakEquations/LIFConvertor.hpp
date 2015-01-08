@@ -23,10 +23,10 @@
 #include <vector>
 
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/DelayedConnection.hpp>
 
 #include <MPILib/include/populist/parameters/InputParameterSet.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/MuSigma.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
@@ -87,7 +87,7 @@ public:
 	 * @param typeVector The vector which stores the NodeTypes of the precursor nodes
 	 */
 	void SortConnectionvector(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<DelayedConnection>& weightVector,
 			const std::vector<NodeType>& typeVector);
 
 	/** This function interprets the  input contribution from other populations and converts them

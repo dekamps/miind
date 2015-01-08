@@ -28,7 +28,7 @@ using namespace GeomLib;
 BOOST_AUTO_TEST_CASE(GeomParameterConstructorTest) {
 
 	// Test constructor of LifNeuralDynamics and indirectly of AbstractNeuralDynamics
-	OrnsteinUhlenbeckParameter par_neuron(20e-3, 0., 0., 0., 10e-3);
+	NeuronParameter par_neuron(20e-3, 0., 0., 0., 10e-3);
 
 	Number n_bins = 5;
 	Potential V_min = 0.0;

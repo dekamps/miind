@@ -21,14 +21,12 @@
 #include <vector>
 #include <utility>
 #include <MPILib/include/BasicDefinitions.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
+#include <MPILib/include/DelayedConnection.hpp>
 #include "MuSigmaScalarProduct.hpp"
 #include "MuSigma.hpp"
 
-namespace GeomLib {
-// forward declaration
-struct OrnsteinUhlenbeckConnection;
 
+namespace GeomLib {
 
 /**
  * @brief Evaluates the scalar product of an input which arrives over OU_Connections.
@@ -55,7 +53,7 @@ public:
 	MuSigma Evaluate
 			(
 				const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& weightVector,
+				const std::vector<MPILib::DelayedConnection>& weightVector,
 				MPILib::Time tau
 			) const;
 
@@ -70,7 +68,7 @@ private:
 	MPILib::Potential InnerProduct
 				(
 					const std::vector<MPILib::Rate>& nodeVector,
-					const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& weightVector
+					const std::vector<MPILib::DelayedConnection>& weightVector
 				) const;
 
 	/**
@@ -82,7 +80,7 @@ private:
 	MPILib::Potential InnerSquaredProduct
 				(
 					const std::vector<MPILib::Rate>& nodeVector,
-					const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& weightVector
+					const std::vector<MPILib::DelayedConnection>& weightVector
 				) const;
 
 };

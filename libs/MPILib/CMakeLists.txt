@@ -34,8 +34,6 @@ set(MPI_SRCS
     src/populist/nonCirculantSolvers/NonCirculantSolver.cpp
     
     src/populist/parameters/PopulistSpecificParameter.cpp
-#    src/populist/parameters/AdaptationParameter.cpp
-#    src/populist/parameters/OneDMParameter.cpp
     
     src/populist/rateComputation/AbstractRateComputation.cpp
     src/populist/rateComputation/IntegralRateComputation.cpp

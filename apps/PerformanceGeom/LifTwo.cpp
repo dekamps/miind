@@ -12,7 +12,7 @@ using GeomLib::InitialDensityParameter;
 using GeomLib::LeakingOdeSystem;
 using GeomLib::LifNeuralDynamics;
 using GeomLib::OdeParameter;
-using GeomLib::PopulationParameter;
+using GeomLib::NeuronParameter;
 
 using MPILib::EXCITATORY_DIRECT;
 using MPILib::NodeId;
@@ -22,8 +22,8 @@ using MPILib::algorithm::RateAlgorithm;
 using std::cout;
 using std::endl;
 
-typedef MPILib::MPINetwork<MPILib::populist::OrnsteinUhlenbeckConnection, MPILib::utilities::CircularDistribution> Network;
-typedef GeomLib::GeomAlgorithm<MPILib::populist::OrnsteinUhlenbeckConnection> GeomDelayAlg;
+typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
+typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 
 int main(){
   InitialDensityParameter dense(0.0,0.0);
@@ -42,7 +42,7 @@ int main(){
   NodeId id_inhibitory_main;
   NodeId id_rate;
   Network network =
-    PerformanceGeom::CreateTwoPopulationNetwork<GeomAlgorithm<MPILib::populist::OrnsteinUhlenbeckConnection>  >
+    PerformanceGeom::CreateTwoPopulationNetwork<GeomAlgorithm<MPILib::DelayedConnection>  >
     (
      &id_cortical_background,
      &id_excitatory_main,

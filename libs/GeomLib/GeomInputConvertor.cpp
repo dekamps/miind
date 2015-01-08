@@ -20,7 +20,7 @@
 #include "../MPILib/include/algorithm/AlgorithmInterface.hpp"
 #include "GeomInputConvertor.hpp"
 #include "MuSigmaScalarProduct.hpp"
-#include "OrnsteinUhlenbeckParameter.hpp"
+#include "NeuronParameter.hpp"
 #include "GeomLibException.hpp"
 
 
@@ -28,7 +28,7 @@ using namespace GeomLib;
 
 GeomInputConvertor::GeomInputConvertor
 (
-	const OrnsteinUhlenbeckParameter&		par_neuron,
+	const NeuronParameter&          		par_neuron,
 	const DiffusionParameter&				par_diff,
 	const CurrentCompensationParameter&		par_curr,
 	const std::vector<MPILib::Potential>&	vec_int,
@@ -113,9 +113,9 @@ bool GeomInputConvertor::IsSingleDiffusionProcess(MPILib::Potential h) const
 
 void GeomInputConvertor::SortConnectionvector
 (
-	const std::vector<MPILib::Rate>& 									vec_rates,
-	const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& 	vec_con,
-	const std::vector<MPILib::NodeType>& 								vec_type
+	const std::vector<MPILib::Rate>& 				vec_rates,
+	const std::vector<MPILib::DelayedConnection>& 	vec_con,
+	const std::vector<MPILib::NodeType>& 			vec_type
 )
 {
 	assert(vec_rates.size() == vec_con.size());
@@ -142,7 +142,7 @@ void GeomInputConvertor::SortConnectionvector
 
 void GeomInputConvertor::AddBurstParameters
 (
-	const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& vec_con,
+	const std::vector<MPILib::DelayedConnection>& vec_con,
 	const std::vector<MPILib::Rate>& vec_rates
 )
 {
@@ -171,9 +171,9 @@ void GeomInputConvertor::AddBurstParameters
 
 void GeomInputConvertor::SortDiffusionInput
 (
-	const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& vec_con,
+	const std::vector<MPILib::DelayedConnection>& vec_con,
 	const std::vector<MPILib::Rate>& vec_rates,
-	std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>* p_vec_con_diff,
+	std::vector<MPILib::DelayedConnection>* p_vec_con_diff,
 	std::vector<MPILib::Rate>* p_vec_rates_diff
 )
 {
@@ -186,11 +186,11 @@ void GeomInputConvertor::SortDiffusionInput
 
 void GeomInputConvertor::AddDiffusionParameter
 (
-	const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>& vec_con,
+	const std::vector<MPILib::DelayedConnection>& vec_con,
 	const std::vector<MPILib::Rate>& vec_rates
 )
 {	
-	std::vector<MPILib::populist::OrnsteinUhlenbeckConnection> vec_diff_con;
+	std::vector<MPILib::DelayedConnection> vec_diff_con;
 	std::vector<MPILib::Rate> vec_diff_rates;
 
 	SortDiffusionInput(vec_con,vec_rates, &vec_diff_con,&vec_diff_rates);

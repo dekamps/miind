@@ -37,6 +37,7 @@ if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
 set ( LIBLIST       
+    ${MIIND_LIBRARY_PREFIX}geom
     ${MIIND_LIBRARY_PREFIX}mpi      
     ${MPI_LIBRARIES} 
     ${ROOT_LIBRARIES}
@@ -44,7 +45,6 @@ set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}numtools
     ${gsl_LINK_FLAGS} 
     gsl
-    ${MIIND_LIBRARY_PREFIX}geom
 
 )
 

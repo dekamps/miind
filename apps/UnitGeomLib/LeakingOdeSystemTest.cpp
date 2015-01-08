@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(LeakingOdeSystemCreationTest){
 	Potential V_reset =  0.0;
 	Potential V_rev   =  0.0;
 
-	PopulationParameter par_neuron(V_peak, V_rev, V_reset, t_ref, t_mem);
+	NeuronParameter par_neuron(V_peak, V_rev, V_reset, t_ref, t_mem);
 
 	OdeParameter 
 		par_ode
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(DensityInitialization)
 	Potential V_reset =  0.0;
 	Potential V_rev   =  0.0;
 
-	PopulationParameter par_neuron(V_peak, V_rev, V_reset, t_ref, t_mem);
+	NeuronParameter par_neuron(V_peak, V_rev, V_reset, t_ref, t_mem);
 
 	OdeParameter
 		par_ode
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(BinMapTest)
 	Potential V_reset =  0.0;
 	Potential V_rev   =  0.0;
 
-	PopulationParameter par_neuron(V_peak, V_rev, V_reset, t_ref, t_mem);
+	NeuronParameter par_neuron(V_peak, V_rev, V_reset, t_ref, t_mem);
 
 	OdeParameter
 		par_ode
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(TestReversalScoop)
 	Potential V_reset =  0.0;
 	Potential V_rev   =  0.0;
 
-	PopulationParameter par_neuron(V_peak, V_rev, V_reset, t_ref, t_mem);
+	NeuronParameter par_neuron(V_peak, V_rev, V_reset, t_ref, t_mem);
 
 	OdeParameter
 		par_ode
@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE(DecayTest){
 	Potential V_reset =  0.0;
 	Potential V_rev   =  0.0;
 
-	PopulationParameter par_neuron(V_peak, V_rev, V_reset, t_ref, t_mem);
+	NeuronParameter par_neuron(V_peak, V_rev, V_reset, t_ref, t_mem);
 
 	OdeParameter
 		par_ode

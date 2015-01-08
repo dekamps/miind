@@ -28,10 +28,10 @@
 
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
+#include <MPILib/include/DelayedConnection.hpp>
 
 #include <MPILib/include/populist/zeroLeakEquations/ABQStruct.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/ABScalarProduct.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/populist/parameters/OneDMParameter.hpp>
 #include <MPILib/include/populist/parameters/OneDMInputSetParameter.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/SpecialBins.hpp>
@@ -72,7 +72,7 @@ public:
 	 * @param typeVector Vector of the NodeTypes of the precursors
 	 */
 	void SortConnectionvector(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<DelayedConnection>& weightVector,
 			const std::vector<NodeType>& typeVector);
 
 	/**

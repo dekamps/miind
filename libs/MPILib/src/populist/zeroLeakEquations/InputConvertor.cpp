@@ -158,7 +158,7 @@ const Index& InputConvertor::getIndexCurrentResetBin() const
 void InputConvertor::SortConnectionvector
 (
                         const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<DelayedConnection>& weightVector,
 			const std::vector<NodeType>& typeVector	
 )
 {
@@ -194,7 +194,7 @@ void InputConvertor::SortConnectionvector
 void InputConvertor::AddBurstParameters
 (
     const std::vector<Rate>& nodeVector,
-    const std::vector<OrnsteinUhlenbeckConnection>& weightVector
+    const std::vector<DelayedConnection>& weightVector
 )
 {
 	// This is necessary for older ZeroLeakEquations. They rely on the relevant input 
@@ -230,7 +230,7 @@ void InputConvertor::AddBurstParameters
 void InputConvertor::AddDiffusionParameter
 (
 	const std::vector<Rate>& nodeVector,
-	const std::vector<OrnsteinUhlenbeckConnection>& weightVector
+	const std::vector<DelayedConnection>& weightVector
 )
 {	
         std::vector<Rate> vec_diffusion_rate;

@@ -32,10 +32,7 @@ namespace rateComputation {
 
 using std::valarray;
 
-
-	//! IntegralRateComputation
-	//! Computes the firing rate of a population from the density profile, using an integral method:
-	//! \nu = \int^ \rho(v) dv
+//! \deprecated
 	class IntegralRateComputation : public AbstractRateComputation {
 	public:
 

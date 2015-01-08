@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(BinEstimatorTest)
     Potential V_reset =   0.0;
     Potential gamma   =  0.5;
 
-    PopulationParameter par_neuron(V_peak, V_reset, V_reset, t_ref, t_mem);
+    NeuronParameter par_neuron(V_peak, V_reset, V_reset, t_ref, t_mem);
     QifParameter
     par_qif
     (
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(ExcitatoryBinEstimatorCoverTest)
         gamma
     );
 
-    PopulationParameter par_neuron(V_peak, V_reset, V_reset, t_ref, t_mem);
+    NeuronParameter par_neuron(V_peak, V_reset, V_reset, t_ref, t_mem);
     OdeParameter par_ode
     (
     	n_bins,
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE(InhibitoryBinEstimatorCoverTest)
         gamma
     );
 
-    PopulationParameter par_neuron(V_peak, V_reset, V_reset, t_ref, t_mem);
+    NeuronParameter par_neuron(V_peak, V_reset, V_reset, t_ref, t_mem);
     OdeParameter
     par_ode
     (

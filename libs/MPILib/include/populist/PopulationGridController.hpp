@@ -33,7 +33,6 @@
 #include <MPILib/include/populist/parameters/PopulistSpecificParameter.hpp>
 #include <MPILib/include/populist/ZeroLeakBuilder.hpp>
 
-//using NumtoolsLib::D_Matrix;
 
 namespace MPILib {
 namespace populist {
@@ -110,7 +109,7 @@ public:
 	 */
 	void Evolve(Time time, Time* p_time_current, Rate* p_rate_output,
 			const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector);
+			const std::vector<DelayedConnection>& weightVector);
 
 	/**
 	 * Before the algorithm is carried out, the input parameters are calculated in all nodes so that
@@ -120,7 +119,7 @@ public:
 	 * @param typeVector Vector of the NodeTypes of the precursors
 	 */
 	bool CollectExternalInput(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<DelayedConnection>& weightVector,
 			const std::vector<NodeType>& typeVector);
 
 	/**

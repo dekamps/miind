@@ -22,7 +22,7 @@
 #include <utility>
 #include <functional>
 #include <vector>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
+#include <MPILib/include/DelayedConnection.hpp>
 
 namespace MPILib {
 namespace populist {
@@ -31,7 +31,7 @@ namespace zeroLeakEquations {
  * Function object
  */
 class ConnectionSquaredProduct: public std::binary_function<Rate,
-		OrnsteinUhlenbeckConnection, double> {
+		DelayedConnection, double> {
 public:
 
 	/**
@@ -41,7 +41,7 @@ public:
 	 * @return The squared product
 	 */
 	double operator()(Rate connection_first,
-			OrnsteinUhlenbeckConnection connection_second) const {
+			DelayedConnection connection_second) const {
 
 		double f_node_rate = connection_first;
 		double f_efficacy_squared = connection_second._efficacy

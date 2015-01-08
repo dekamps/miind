@@ -25,7 +25,7 @@ namespace MPILib {
 namespace populist {
 namespace zeroLeakEquations {
 MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+		const std::vector<DelayedConnection>& weightVector,
 		Time tau) const {
 	MuSigma ret;
 
@@ -38,7 +38,7 @@ MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<Rate>& nodeVector,
 
 Potential MuSigmaScalarProduct::InnerProduct(
 		const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const {
+		const std::vector<DelayedConnection>& weightVector) const {
 
 	return std::inner_product(nodeVector.begin(), nodeVector.end(),
 			weightVector.begin(), 0.0);
@@ -46,7 +46,7 @@ Potential MuSigmaScalarProduct::InnerProduct(
 
 Potential MuSigmaScalarProduct::InnerSquaredProduct(
 		const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector) const {
+		const std::vector<DelayedConnection>& weightVector) const {
 
 	return inner_product(nodeVector.begin(), nodeVector.end(),
 			weightVector.begin(), 0.0, std::plus<double>(),

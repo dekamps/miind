@@ -49,6 +49,13 @@ p, div, dl {
 	color:#3E3E3E;
 }
 
+ down vote accepted
+ 
+
+div.image img[src="hbp.png"]{ 
+    width:10px; 
+}
+
 /*
 div.contents p {
 	

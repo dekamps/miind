@@ -34,7 +34,7 @@ namespace populist {
 template<class Weight>
 PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 		const parameters::PopulistParameter& par_populist) :
-		algorithm::AlgorithmInterface<OrnsteinUhlenbeckConnection>(), _parameter_population(
+		algorithm::AlgorithmInterface<DelayedConnection>(), _parameter_population(
 				par_populist._par_pop), _parameter_specific(
 				par_populist._par_spec), _grid(
 				algorithm::AlgorithmGrid(
@@ -55,7 +55,7 @@ PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 template<class Weight>
 PopulationAlgorithm_<Weight>::PopulationAlgorithm_(
 		const PopulationAlgorithm_<Weight>& algorithm) :
-		algorithm::AlgorithmInterface<OrnsteinUhlenbeckConnection>(algorithm), _parameter_population(
+		algorithm::AlgorithmInterface<DelayedConnection>(algorithm), _parameter_population(
 				algorithm._parameter_population), _parameter_specific(
 				algorithm._parameter_specific), _grid(
 				algorithm::AlgorithmGrid(

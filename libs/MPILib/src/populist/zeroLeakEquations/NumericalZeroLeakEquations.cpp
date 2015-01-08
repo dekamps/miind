@@ -230,7 +230,7 @@ void NumericalZeroLeakEquations::AdaptParameters
 void NumericalZeroLeakEquations::SortConnectionvector
 (
 	const std::vector<Rate>& nodeVector,
-	const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+	const std::vector<DelayedConnection>& weightVector,
 	const std::vector<NodeType>& typeVector    
 )
 {

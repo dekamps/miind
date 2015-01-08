@@ -21,10 +21,11 @@
 
 #include <gsl/gsl_odeiv.h>
 #include <gsl/gsl_errno.h>
+#include <MPILib/include/DelayedConnection.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/ABConvertor.hpp>
 #include <MPILib/include/populist/parameters/OneDMInputSetParameter.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
+
 
 namespace MPILib {
 namespace populist {
@@ -71,7 +72,7 @@ public:
 	 * @param typeVector The vector which stores the NodeTypes of the precursor nodes
 	 */
 	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<DelayedConnection>& weightVector,
 			const std::vector<NodeType>& typeVector) {
 		_convertor.SortConnectionvector(nodeVector, weightVector, typeVector);
 	}

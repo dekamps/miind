@@ -20,11 +20,13 @@
 #ifndef _CODE_LIBS_LARGENETWORK_GENERATEHEXAGONALNETWORK_INCLUDE_GUARD
 #define _CODE_LIBS_LARGENETWORK_GENERATEHEXAGONALNETWORK_INCLUDE_GUARD
 
+#include <MPILib/include/DelayedConnection.hpp>
+#include <MPILib/include/TypeDefinitions.hpp>
+
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
-#include <MPILib/include/TypeDefinitions.hpp>
+
 #include "Hexagon.hpp"
 
 using MPILib::NodeId;

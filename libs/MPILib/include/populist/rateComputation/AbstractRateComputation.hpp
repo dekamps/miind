@@ -25,7 +25,7 @@
 #include <vector>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/InputParameterSet.hpp>
-#include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
+#include <MPILib/include/DelayedConnection.hpp>
 
 using std::valarray;
 

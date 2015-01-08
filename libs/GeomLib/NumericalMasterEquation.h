@@ -62,7 +62,7 @@ namespace GeomLib {
 		virtual void sortConnectionVector
 		(
 			const std::vector<MPILib::Rate>&,
-			const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>&,
+			const std::vector<MPILib::DelayedConnection>&,
 			const std::vector<MPILib::NodeType>&
 		);
 

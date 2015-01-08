@@ -23,8 +23,8 @@ if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
 set ( LIBLIST       
-    ${MIIND_LIBRARY_PREFIX}mpi           
     ${MIIND_LIBRARY_PREFIX}geom
+    ${MIIND_LIBRARY_PREFIX}mpi           
     ${MPI_LIBRARIES} 
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}

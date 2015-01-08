@@ -329,9 +329,9 @@ NumericalMasterEquation::~NumericalMasterEquation()
 
 void NumericalMasterEquation::sortConnectionVector
 (
-	const std::vector<MPILib::Rate>&									vec_rates,
-	const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>&	vec_cons,
-	const std::vector<MPILib::NodeType>&								vec_types
+	const std::vector<MPILib::Rate>&				vec_rates,
+	const std::vector<MPILib::DelayedConnection>&	vec_cons,
+	const std::vector<MPILib::NodeType>&			vec_types
 
 )
 {
@@ -373,14 +373,12 @@ void NumericalMasterEquation::apply(Time t)
 
     t_integrator = 0.0;
 
-//    cout << this->Checksum() << endl;
     double p = 0;
     while (t_integrator < t){
         t_integrator = _integrator.Evolve(t);
         p += RecaptureProbability();
     }
 
-//    cout << this->Checksum() + p << std::endl;
 
     MPILib::populist::StampedProbability prob;
     prob._prob = p;

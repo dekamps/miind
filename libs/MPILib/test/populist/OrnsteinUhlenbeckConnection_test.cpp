@@ -21,14 +21,13 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 #define private public
 #define protected public
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
+#include <MPILib/include/DelayedConnection.hpp>
 #undef protected
 #undef private
 
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;
-using namespace MPILib::populist;
 using namespace MPILib;
 
 void test_Constructor() {

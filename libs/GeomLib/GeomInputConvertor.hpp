@@ -22,13 +22,13 @@
 #define _CODE_LIBS_GEOMLIB_GEOMINPUTCONVERTOR_INCLUDE_GUARD
 
 #include <vector>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
+#include <MPILib/include/DelayedConnection.hpp>
 #include <MPILib/include/NodeType.hpp>
 #include "CurrentCompensationParameter.hpp"
 #include "DiffusionParameter.hpp"
 #include "InputParameterSet.hpp"
 #include "MuSigmaScalarProduct.hpp"
-#include "OrnsteinUhlenbeckParameter.hpp"
+#include "NeuronParameter.hpp"
 
 
 namespace GeomLib {
@@ -39,7 +39,7 @@ namespace GeomLib {
 
 		GeomInputConvertor
 		(
-			const OrnsteinUhlenbeckParameter&,
+			const NeuronParameter&,
 			const DiffusionParameter&,
 			const CurrentCompensationParameter&,
 			const std::vector<MPILib::Potential>&,
@@ -50,7 +50,7 @@ namespace GeomLib {
 		void SortConnectionvector
 		(
 			const std::vector<MPILib::Rate>&,
-			const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>&,
+			const std::vector<MPILib::DelayedConnection>&,
 			const std::vector<MPILib::NodeType>&
 		);
 
@@ -65,13 +65,13 @@ namespace GeomLib {
 
 		void AddDiffusionParameter
 		(
-			const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>&,
+			const std::vector<MPILib::DelayedConnection>&,
 			const std::vector<MPILib::Rate>&
 		);
 
 		void AddBurstParameters
 		(
-			const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>&,
+			const std::vector<MPILib::DelayedConnection>&,
 			const std::vector<MPILib::Rate>&
 		);
 
@@ -84,9 +84,9 @@ namespace GeomLib {
 
 		void SortDiffusionInput
 		(
-			const std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>&,
+			const std::vector<MPILib::DelayedConnection>&,
 			const std::vector<MPILib::Rate>& vec_rates,
-			std::vector<MPILib::populist::OrnsteinUhlenbeckConnection>*,
+			std::vector<MPILib::DelayedConnection>*,
 			std::vector<MPILib::Rate>*
 
 		);
@@ -94,7 +94,7 @@ namespace GeomLib {
 
 		MPILib::Potential MinVal(const std::vector<MPILib::Potential>&) const;
 
-		const OrnsteinUhlenbeckParameter		_par_neuron;
+		const NeuronParameter	            	_par_neuron;
 		const DiffusionParameter				_par_diff;
 		const CurrentCompensationParameter		_par_curr;
 		std::vector<MPILib::Potential>			_vec_interpretation;

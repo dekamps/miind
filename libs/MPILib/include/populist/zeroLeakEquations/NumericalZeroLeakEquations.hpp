@@ -77,7 +77,7 @@ namespace MPILib {
 	 * @param typeVector The vector which stores the NodeTypes of the precursor nodes
 	 */
 	virtual void SortConnectionvector(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<DelayedConnection>& weightVector,
 			const std::vector<NodeType>& typeVector);
 
 	/**

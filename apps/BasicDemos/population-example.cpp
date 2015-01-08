@@ -30,7 +30,7 @@ using GeomLib::InitialDensityParameter;
 using GeomLib::LeakingOdeSystem;
 using GeomLib::LifNeuralDynamics;
 using GeomLib::OdeParameter;
-using GeomLib::PopulationParameter;
+using GeomLib::NeuronParameter;
 
 using MPILib::EXCITATORY_DIRECT;
 using MPILib::NodeId;
@@ -40,8 +40,8 @@ using MPILib::algorithm::RateAlgorithm;
 using std::cout;
 using std::endl;
 
-typedef MPILib::MPINetwork<MPILib::populist::OrnsteinUhlenbeckConnection, MPILib::utilities::CircularDistribution> Network;
-typedef GeomLib::GeomAlgorithm<MPILib::populist::OrnsteinUhlenbeckConnection> GeomDelayAlg;
+typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
+typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 
 int main(){
 
@@ -49,7 +49,7 @@ int main(){
 	Number    n_bins = 330;
 	Potential V_min  = 0.0;
 
-	PopulationParameter
+	NeuronParameter
 		par_neuron
 		(
 			1.0,
@@ -75,14 +75,14 @@ int main(){
 	GeomDelayAlg alg(par_geom);
 
 	Rate rate_ext = 800.0;
-	RateAlgorithm<MPILib::populist::OrnsteinUhlenbeckConnection> alg_ext(rate_ext);
+	RateAlgorithm<MPILib::DelayedConnection> alg_ext(rate_ext);
 
 	Network network;
 
 	NodeId id_rate = network.addNode(alg_ext,EXCITATORY_DIRECT);
 	NodeId id_alg  = network.addNode(alg,    EXCITATORY_DIRECT);
 
-	MPILib::populist::OrnsteinUhlenbeckConnection con(1,0.03,0.0);
+	MPILib::DelayedConnection con(1,0.03,0.0);
 	network.makeFirstInputOfSecond(id_rate,id_alg,con);
 
 	const MPILib::report::handler::RootReportHandler handler("test/singlepoptest", true );

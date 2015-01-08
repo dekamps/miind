@@ -35,7 +35,7 @@ namespace PerformanceGeom {
 
 	// TwoPopulationTest
 
-  const GeomLib::PopulationParameter
+  const GeomLib::NeuronParameter
 		TWOPOP_NET_EXC_PAR
 		(
 			20e-3, // V_threshold: 20 mV
@@ -45,7 +45,7 @@ namespace PerformanceGeom {
 			10e-3  // tau membrane; 10 ms
 		);
 
-  const GeomLib::PopulationParameter
+  const GeomLib::NeuronParameter
 		TWOPOP_NET_INH_PAR
 		(
 			20e-3,  // V_threshold; 20 mV

@@ -34,7 +34,7 @@
 #include <string>
 #include "../UtilLib/UtilLib.h"
 #include "CurrentCompensationParameter.hpp"
-#include "OrnsteinUhlenbeckParameter.hpp"
+#include "NeuronParameter.hpp"
 #include "InitialDensityParameter.hpp"
 
 using MPILib::Potential;
@@ -50,13 +50,13 @@ namespace GeomLib
       Number                    _nr_bins;  //! The number of bins
       InitialDensityParameter   _par_dens; //! Specifies the initial density profile
       Potential                 _V_min;    //! The minimum of potential range (the maximum is given in the neuron parameter)
-      PopulationParameter       _par_pop;  //! The neuron parameter
+      NeuronParameter      	    _par_pop;  //! The neuron parameter
 
       OdeParameter
       (
        Number,                        //! Number of bins
        Potential,                     //! V_min, the minimum value of the Potential range
-       const PopulationParameter&,    //! Neuron parameter
+       const NeuronParameter&,    	  //! Neuron parameter
        const InitialDensityParameter& //! Initial density profile
       );
 

@@ -25,9 +25,9 @@
 
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 
+#include <MPILib/include/DelayedConnection.hpp>
 #include <MPILib/include/populist/parameters/InputParameterSet.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/MuSigma.hpp>
 #include <MPILib/include/populist/zeroLeakEquations/MuSigmaScalarProduct.hpp>
@@ -107,7 +107,7 @@ namespace populist {
 	 * @param typeVector The vector which stores the NodeTypes of the precursor nodes
 	 */
 	void SortConnectionvector(const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+			const std::vector<DelayedConnection>& weightVector,
 			const std::vector<NodeType>& typeVector);
 
 
@@ -175,13 +175,13 @@ namespace populist {
 		void AddDiffusionParameter
 		(
 		        const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector
+			const std::vector<DelayedConnection>& weightVector
 		);
 
 		void AddBurstParameters		
 		(
 		        const std::vector<Rate>& nodeVector,
-			const std::vector<OrnsteinUhlenbeckConnection>& weightVector
+			const std::vector<DelayedConnection>& weightVector
                 );
 
 		bool IsSingleDiffusionProcess(Potential h) const;
@@ -203,7 +203,7 @@ namespace populist {
 	
 	  std::vector<Index>			    _vec_burst;
 	  std::vector<Index>			    _vec_diffusion;
-	  std::vector<OrnsteinUhlenbeckConnection>  _vec_diffusion_weight;
+	  std::vector<DelayedConnection>  _vec_diffusion_weight;
 	};
 }
 }

@@ -35,8 +35,9 @@
 #include "LargeNetwork.hpp"
 
 #include <MPILib/include/TypeDefinitions.hpp>
+#include <MPILib/include/DelayedConnection.hpp>
+
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>

@@ -23,7 +23,7 @@
 #include "TwoPopulationDefinitions.hpp"
 #include <MPILib/include/MPINetworkCode.hpp>
 
-typedef MPILib::MPINetwork<MPILib::populist::OrnsteinUhlenbeckConnection, MPILib::utilities::CircularDistribution> Network;
+typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 
 namespace PerformanceGeom {
 

@@ -1,4 +1,3 @@
-
 // Copyright (c) 2005 - 2014 Marc de Kamps
 // All rights reserved.
 //
@@ -23,12 +22,12 @@
 #include <boost/test/execution_monitor.hpp>
 #include <GeomLib.hpp>
 
+
 using namespace GeomLib;
 using MPILib::Time;
 
-//TODO: Should be renamed NeuronParameter test once OrnsteinUhlenbeckParameter has been renamed
 
-BOOST_AUTO_TEST_CASE(OrnsteinUhlenbeckParameterTest ) {
+BOOST_AUTO_TEST_CASE(NeuronParameterTest ) {
 
 	Potential theta      = 20e-3;
 	Potential V_reset    = 0.0;
@@ -36,10 +35,10 @@ BOOST_AUTO_TEST_CASE(OrnsteinUhlenbeckParameterTest ) {
 	Time      t_ref      = 3e-3;
 	Time      tau        = 20e-3;
 
-	OrnsteinUhlenbeckParameter par_neuron(theta, V_reset, V_reversal, t_ref, tau);
+	NeuronParameter par_neuron(theta, V_reset, V_reversal, t_ref, tau);
 }
 
-BOOST_AUTO_TEST_CASE( OrnsteinUhlenbeckWrongOrderTest ){
+BOOST_AUTO_TEST_CASE( NeuronWrongOrderTest ){
 
 	Potential theta      = 20e-3;
 	Potential V_reset    = 0.0;
@@ -47,7 +46,7 @@ BOOST_AUTO_TEST_CASE( OrnsteinUhlenbeckWrongOrderTest ){
 	Time      t_ref      = 3e-3;
 	Time      tau        = 20e-3;
 
-	BOOST_CHECK_THROW(OrnsteinUhlenbeckParameter par_neuron_wrong(V_reset, theta, V_reversal, t_ref,tau), GeomLibException);
-	BOOST_CHECK_THROW(OrnsteinUhlenbeckParameter par_neuron_wrong_t(theta, V_reset, V_reversal, tau, t_ref),GeomLibException);
+	BOOST_CHECK_THROW(NeuronParameter par_neuron_wrong(V_reset, theta, V_reversal, t_ref,tau), GeomLibException);
+	BOOST_CHECK_THROW(NeuronParameter par_neuron_wrong_t(theta, V_reset, V_reversal, tau, t_ref),GeomLibException);
 }
 

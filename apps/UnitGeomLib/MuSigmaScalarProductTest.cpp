@@ -23,11 +23,11 @@
 #include <boost/test/execution_monitor.hpp>
 #include <GeomLib.hpp>
 #include <include/algorithm/AlgorithmInterface.hpp>
-#include <include/populist/OrnsteinUhlenbeckConnection.hpp>
+#include <include/DelayedConnection.hpp>
 
 using namespace GeomLib;
 using namespace MPILib;
-using MPILib::populist::OrnsteinUhlenbeckConnection;
+using MPILib::DelayedConnection;
 
 BOOST_AUTO_TEST_CASE(MuSigmaScalarTest)
 {
@@ -37,9 +37,9 @@ BOOST_AUTO_TEST_CASE(MuSigmaScalarTest)
 	vec_type.push_back(EXCITATORY_GAUSSIAN);
 	vec_type.push_back(INHIBITORY_GAUSSIAN);
 
-	vector<MPILib::populist::OrnsteinUhlenbeckConnection> vec_con;
-	MPILib::populist::OrnsteinUhlenbeckConnection con_1(1, 0.01,0.0);
-	MPILib::populist::OrnsteinUhlenbeckConnection con_2(1,-0.01,0.0);
+	vector<MPILib::DelayedConnection> vec_con;
+	MPILib::DelayedConnection con_1(1, 0.01,0.0);
+	MPILib::DelayedConnection con_2(1,-0.01,0.0);
 	vec_con.push_back(con_1);
 	vec_con.push_back(con_2);
 

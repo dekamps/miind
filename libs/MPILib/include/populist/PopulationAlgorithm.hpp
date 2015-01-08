@@ -20,6 +20,8 @@
 #define MPILIB_POPULIST_POPOULATIONALGORITHM_HPP_
 #include <MPILib/include/MPINode.hpp>
 #include <MPILib/include/MPINetwork.hpp>
+#include <MPILib/include/DelayedConnection.hpp>
+
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 
 #include <MPILib/include/populist/PopulationGridControllerCode.hpp>
@@ -28,7 +30,6 @@
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp>
 #include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
 #include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 #include <sstream>
@@ -253,12 +254,12 @@ private:
 // end of PopulationAlgorithm
 
 // default algorithm is with PopulistConnection
-typedef PopulationAlgorithm_<OrnsteinUhlenbeckConnection> PopulationAlgorithm;
+typedef PopulationAlgorithm_<DelayedConnection> PopulationAlgorithm;
 
-typedef algorithm::RateAlgorithm<OrnsteinUhlenbeckConnection> Pop_RateAlgorithm;
-typedef RateFunctor<OrnsteinUhlenbeckConnection> Pop_RateFunctor;
-typedef MPINode<MPILib::populist::OrnsteinUhlenbeckConnection, utilities::CircularDistribution> Pop_DynamicNode;
-typedef MPINetwork<MPILib::populist::OrnsteinUhlenbeckConnection, utilities::CircularDistribution> Pop_Network;
+typedef algorithm::RateAlgorithm<DelayedConnection> Pop_RateAlgorithm;
+typedef RateFunctor<DelayedConnection> Pop_RateFunctor;
+typedef MPINode<DelayedConnection, utilities::CircularDistribution> Pop_DynamicNode;
+typedef MPINetwork<DelayedConnection, utilities::CircularDistribution> Pop_Network;
 
 } /* namespace populist */
 } /* namespace MPILib */

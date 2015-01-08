@@ -36,7 +36,7 @@ OdeParameter::OdeParameter
 (
 	Number			      	nr_bins,
 	Potential	       		V_min,
-	const  PopulationParameter&    	par_pop,
+	const  NeuronParameter&    	par_pop,
 	const InitialDensityParameter&	par_dens 
 ):
 _nr_bins(nr_bins),
