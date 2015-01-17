@@ -37,8 +37,8 @@ set ( LIBLIST
 #############################################################################
 # executables
 #############################################################################
-#add_executable(twoPopulationDemo two-population.cpp)
-#target_link_libraries(twoPopulationDemo ${LIBLIST})
+add_executable(miind miind.cpp)
+target_link_libraries(miind ${LIBLIST})
 
 #add_executable(wilsoncowanDemo miind-mpi.cpp)
 #target_link_libraries(wilsoncowanDemo ${LIBLIST})

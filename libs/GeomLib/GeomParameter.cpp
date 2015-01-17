@@ -35,9 +35,9 @@ using namespace GeomLib;
 GeomParameter::GeomParameter
 (
 	const AbstractOdeSystem& 			sys,
-	Potential 							scale,
 	const DiffusionParameter& 			par_diff,
 	const CurrentCompensationParameter&	par_cur,
+	Potential 							scale,
 	const string& 						name_master,
 	bool								no_master_equation
 ):
