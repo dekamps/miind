@@ -3,6 +3,7 @@ import include
 import algorithms
 import nodes
 import connections
+import simulation
 import xml.etree.ElementTree as ET
 
 XML_EXTENSION = '.xml'
@@ -20,18 +21,18 @@ def generate_preamble(outfile):
     return
 
 def generate_closing(outfile):
+    outfile.write('\tnetwork.configureSimulation(par_run);\n')
+    outfile.write('\tnetwork.evolve();\n')
     outfile.write('\treturn 0;\n}\n')
     return
 
 def check_call(argv):   
-    if len(argv) != 2:
-        raise ValueError
-    if argv[1][-4:] != XML_EXTENSION:
+    if len(argv) != 1:
         raise ValueError
 
-    infile = open (argv[1],'r')
-    outname=argv[1][:len(argv[1])-len(XML_EXTENSION)]
-    outfile= open('../apps/BasicDemos/' + outname + '.cpp','w') 
+
+    infile = open ('miind.xml','r')
+    outfile= open('../apps/BasicDemos/miind.cpp','w') 
 
     return infile, outfile
 
@@ -67,4 +68,9 @@ if __name__ == "__main__":
     outfile.write('\t// generating connections\n')
     connection_list = tree.findall('Connections/Connection')
     connections.parse_connections(connection_list,weighttype,outfile)
+    outfile.write('\t// generation simulation parameter\n')
+    simhand = tree.find('SimulationIO')
+    simulation.parse_simulation(simhand,outfile)
+    simpar = tree.find('SimulationRunParameter')
+    simulation.parse_parameter(simpar,outfile)
     generate_closing(outfile)

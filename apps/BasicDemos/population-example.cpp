@@ -18,6 +18,10 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
+/** @file
+ *  This file replicates Omurtag A., Knight B. W., Sirovich L., On the simulation of large populations of neurons<i>J. of Comp. Neurosc.</i> (2000) ; 8(1)\
+:51-63                     
+ */ 
 #include <GeomLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/algorithm/RateAlgorithmCode.hpp>

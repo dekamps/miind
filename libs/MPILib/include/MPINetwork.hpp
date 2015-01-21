@@ -54,11 +54,10 @@ public:
 			NodeType nodeType);
 
 	/**
-	 * Connects two node
+	 * Connect two nodes
 	 * @param first NodeId of the first node
 	 * @param second NodeId of the second node
 	 * @param weight The WeightType of the connection
-	 * @param secondNodeType The NodeType of the second Node
 	 * @exception Can throw a ParallelException
 	 */
 	void makeFirstInputOfSecond(NodeId first, NodeId second,

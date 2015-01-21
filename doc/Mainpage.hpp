@@ -7,7 +7,9 @@ and neural mass models. Important new features include:
 can easily be provided or implemented.
 - Support for arbitrary large synaptic efficacies: Fokker-Planck equations are contained as a special case.
 - MPI support
+
 Many new features are in developement. These include:
+
 - Support for multi-dimensional models
 - Support for non Poisson statistics
 - Support for activity dependent efficacies
@@ -22,9 +24,7 @@ but models population activity directly. It provides support for simple neural m
 focusses strongly on so-called population density techniques.
 
 
-To get a feeling for the simulator and its capabilities,
-we encourage you to read the following <a href="http://www.sciencedirect.com/science/article/pii/S0893608008001457">paper</a> 
-(an open access <a href="http://eprints.whiterose.ac.uk/5235/">preprint</a> version is also available). 
+To get a feeling for the simulator and its capabilities, go to the \subpage page_examples page.
 
 \image html hbp.png
 Currently, part of the developent is funded by the <a href="http://www.humanbrainproject.eu/">Human Brain Project</a>.  

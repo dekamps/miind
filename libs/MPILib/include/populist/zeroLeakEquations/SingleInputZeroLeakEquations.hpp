@@ -44,15 +44,15 @@ namespace zeroLeakEquations {
 	 */
 		SingleInputZeroLeakEquations
 		(
-			Number&,								//!< reference to the current number of bins
+			Number&,							//!< reference to the current number of bins
 			std::valarray<Potential>&,					//!< reference to state array
-			Potential&,								//!< reference to the check sum variable
-			SpecialBins&				bins,		
-			parameters::PopulationParameter&		par_pop,	//!< reference to the PopulationParameter 
-			parameters::PopulistSpecificParameter&	par_spec,	//!< reference to the PopulistSpecificParameter
-			Potential&					delta_v,	//!< reference to the current scale variable
-			const circulantSolvers::AbstractCirculantSolver&,
-			const nonCirculantSolvers::AbstractNonCirculantSolver& 
+			Potential&,							//!< reference to the check sum variable
+			SpecialBins&,			                                //!< object for the storage of specific bins, such as the reset bin 
+			parameters::PopulationParameter&,	                  	//!< reference to the PopulationParameter 
+			parameters::PopulistSpecificParameter&,	                	//!< reference to the PopulistSpecificParameter
+			Potential&,	                                                //!< reference to the current scale variable
+			const circulantSolvers::AbstractCirculantSolver&,               //!< reference to the circulant solver
+			const nonCirculantSolvers::AbstractNonCirculantSolver&          //!< reference to the non circulant solver
 		);
 
 	/**

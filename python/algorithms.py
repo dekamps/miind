@@ -99,10 +99,10 @@ def wrap_up_geom_algorithm(alg, i):
     s += '\tGeomLib::LifNeuralDynamics dyn_ode_leak_' + str(i) + '('
     s += 'par_ode_'     + str(i) + ', '
     s += d['lambda']    + ');\n'
-    
+    # ode sytem must be determined from the file
     s += '\tGeomLib::LeakingOdeSystem sys_ode_' + str(i) +'('
     s += 'dyn_ode_leak_' + str(i)  + ');\n'
-
+    # default parameters must be handled by GeomParameter
     s += '\tGeomLib::GeomParameter par_geom_' + str(i) + '('
     s += 'sys_ode_'+ str(i) + ');\n'
     cpp_name = 'alg_geom_' + str(i)

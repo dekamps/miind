@@ -36,8 +36,11 @@ namespace zeroLeakEquations {
 
 
 	/**
+	 * \deprecated
 	 * @brief This is the base class for population density methods based on leaky-integrate-and-fire neurons
+	 *
 	 */
+
 	class LIFZeroLeakEquations : public AbstractZeroLeakEquations {
 	public:
 
@@ -56,14 +59,14 @@ namespace zeroLeakEquations {
 		LIFZeroLeakEquations
 		(
 			Number&,								//!< reference to the current number of bins
-			valarray<Potential>&,					//!< reference to state array
+			valarray<Potential>&,					                //!< reference to state array
 			Potential&,								//!< reference to the check sum variable
-			SpecialBins&,							//!< reference to bins variable: reversal bin, reset bin, etc	      
+			SpecialBins&,							        //!< reference to bins variable: reversal bin, reset bin, etc	      
 			parameters::PopulationParameter&,					//!< reference to the PopulationParameter 
-			parameters::PopulistSpecificParameter&,				//!< reference to the PopulistSpecificParameter
+			parameters::PopulistSpecificParameter&,				        //!< reference to the PopulistSpecificParameter
 			Potential&,								//!< reference to the current scale variable
-			const circulantSolvers::AbstractCirculantSolver&,
-			const nonCirculantSolvers::AbstractNonCirculantSolver& 
+			const circulantSolvers::AbstractCirculantSolver&,                       //!< reference to the circulant solver
+			const nonCirculantSolvers::AbstractNonCirculantSolver&                  //!< reference to the non cirulant solver
 		);
 
 		virtual ~LIFZeroLeakEquations(){}

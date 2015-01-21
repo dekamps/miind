@@ -46,7 +46,7 @@ typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 int main(){
 
 	cout << "Demonstrating Omurtag et al. (2000)" << endl;
-	Number    n_bins = 330;
+	Number    n_bins = 500;
 	Potential V_min  = 0.0;
 
 	NeuronParameter
@@ -91,10 +91,10 @@ int main(){
 		par_run
 		(
 			handler,
-	        10000000,
+			10000000,
 			0.0,
 			10.0,
-	        1e-4,
+			1e-4,
 			1e-4,
 			"test/singlepoptest.log"
 		);

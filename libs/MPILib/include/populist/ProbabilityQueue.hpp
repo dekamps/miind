@@ -29,22 +29,9 @@ using std::queue;
 namespace MPILib {
 namespace populist {
 
-	//! For a refractive neuron it may be necessary to store probability density. Probability density is held in a ProbabilityQueue
-	//! for the time that the neuron is refractive. To be able to do this all probability density corresponding to neurons pushed over
-	//! threshold is time stamped, held in a queue and released when external time has moved beyond a period longer than the refractive
-	//! period then reintroduced in the reset bin. This reintroduction is typically done by an AbstractCirculantSolver.
-
-	//! For convenience probability is grouped in batches, typically for a period of which TIME_REFRACT_MIN by default. 
-	//! Let this period be \f$\t_{batch}\f$. Probability is now time stamped by means of a StampedProbability, which lists the
-	//! amount of probability and the time of storage, the event time \f$t_{event}$\f. The queue will maintain an internal
-	//! time based on the CollectAndRemove method. Upon calling this method all probability up to \f$ t = n t_{batch}\f$ with
-	//! \f$n = \div(t, t_{batch})\f$ will be released and remove from the queue. For example, if \f$t_{batch} =0.1$\f and three
-	//! stamped events have been pushed on to the queue, with \f$t = 0.99, 1.0, 1.05$\f, then call CollectandRemove(1.0) will
-	//! remove the first two events, but not the last. The internal queue time will also be set to \f$t\f$, i.e. multiples of
-	//! \f$t_{batch}$\f. It is illegal to push and event on the queue with a time that is 
-	//! earlier than the current time of the queue and this will trigger a PopulistException. It is legal to push events
-	//! which are not time ordered on the queue.
-
+  //! @brief A queue to store probability density, effectively a pipeline.
+  //!
+  //! ProbabilityQueue stores StampedProbability instances.
 	class ProbabilityQueue {
 	public:
 		//! Probability is grouped in batches
