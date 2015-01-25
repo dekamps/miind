@@ -1,0 +1,63 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<AbstractAlgorithm  type="GeomAlgorithm">
+<GeomAlgorithm Name="LIF_excitatory Algorithm"  system="LeakingOdeSystem" lambda="0.01">
+<OdeParameter>
+<NeuronParameter>
+<t_membrane>50e-3</t_membrane>
+<t_refractive>0</t_refractive>
+<V_threshold>1.0</V_threshold>
+<V_reset>0</V_reset>
+<V_reversal>0</V_reversal>
+</NeuronParameter>
+<InitialDensityParameter> 
+<mu>0.0</mu>
+<sigma>0.0</sigma> 
+</InitialDensityParameter>
+<V_min>-0.02</V_min>
+<N_bins>500</N_bins>
+</OdeParameter>
+</GeomAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="RateAlgorithm">
+<RateAlgorithm Name="Cortical Background Algorithm">
+<rate>1.0</rate>
+</RateAlgorithm>
+</AbstractAlgorithm>
+</Algorithms>
+<Nodes>
+<Node name="LIF E" type="EXCITATORY_GAUSSIAN" algorithm="LIF_excitatory Algorithm"></Node>
+<Node name="Cortical Background" type="EXCITATORY_GAUSSIAN" algorithm="Cortical Background Algorithm"></Node>
+</Nodes>
+<Connections>
+<Connection In="Cortical Background" Out="LIF E">800 0.03 0</Connection>
+</Connections>
+<SimulationIO>
+<SimulationName>omurtag</SimulationName>
+<OnScreen>TRUE</OnScreen>
+<WithState>TRUE</WithState>
+<WriteNet>FALSE</WriteNet>
+<CanvasParameter>
+<T_min>0</T_min>
+<T_max>0.3</T_max>
+<F_max>0</F_max>
+<F_max>10</F_max>
+<State_min>0</State_min>
+<State_max>0.02</State_max>
+<Dense_max>0</Dense_max>
+<Dense_max>250</Dense_max>
+</CanvasParameter>
+<CanvasNodes>Name="LIF E" Name="LIF I"</CanvasNodes>
+</SimulationIO>
+<SimulationRunParameter>
+<max_iter>1000000</max_iter>
+<t_begin>0</t_begin>
+<t_end>0.3</t_end>
+<t_report>1e-05</t_report>
+<t_state_report>1e-03</t_state_report>
+<t_step>1e-05</t_step>
+<t_update>1e-05</t_update>
+<name_log>omurtag.log</name_log>
+</SimulationRunParameter>
+</Simulation>
