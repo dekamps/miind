@@ -10,7 +10,16 @@
  * are individually different</i>. Such a simulation can easily be set up in NEST or BRIAN and the results can be inspected in the spike
  * raster of section \ref page_examples. The set up in MIIND is not very different. The code for this example will be compiled upon installation
  * of MIIND. The code can be found in the apps/BasicDemos directory resides in file population-example.cpp; the resulting executable is called
- * populationDemo.
+ * populationDemo.  
  *
+ * \section sec_cpp_example_starting Starting
+ * It is simplest to start a new simulation from an existing file. In the apps/BasicDemos subdirectory is  a file called population-example.cpp.
+ * It can easily be modified to create more complex larger simulations. Your program should probably start somewhat like this:
+ *
+ * \snippet  population-example.cpp  preamble
+ * \section The Full Program
+ * For reference here is the full program:
  * \include population-example.cpp
+ *
+ * \example population-example.cpp
  */

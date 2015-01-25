@@ -27,39 +27,7 @@
 
 namespace GeomLib {
 
-	//! This OdeSystem models the probability  distribution function of a population of Quadratic Integrate and Fire (QIF)
-	//! neurons
 
-	//! This model is discussed extensively in Izhikevich's book 'Dynamical Systems in Neuroscience'. It can be 'derived' as an 
-	//! approximation of a conductance-based model dominated by a persistent sodium current,  \f$ I_{Na,p}\f$. This current is responsible
-	//! for the upstroke of the neuron membrane potential during a spike. As a neuronal model it is characterised by two different
-	//! regimes: one where it represents Class I neurons, and another one where it represents Class II neurons. Class I neurons show
-	//! a graded respons to input current, reflected in a firing rate that is commensurate to the input stimulation, whereas Class II
-	//! neurons respond to input with action potentials in a certain frequency band that is 'relatively insensitive to the strength
-	//! of the applied current.'
-
-	//! Assuming \f$ I_{Na,p} \f$ to be instantaneous, one can write the equation for the persistent sodium model
-	//! \f[
-	//! C \frac{d V}{d t} = I - g_L(V - E_L) - g_{Na}m_{\infty}(V)(V - E_{Na} )
-	//! \f]
-	//! with
-	//! \f[
-	//! m_{\infty} = \frac{1}{1 + \exp\{ (V_{1/2} - V)/k \}} )
-	//! \f]
-	//! The resulting steady state current has a maximum approximately at \f$ (V_{sn}, I_{sn})  = (-46.6 mV, 16 pA) \f$ and can be approximated
-	//! locally by:
-	//! \f[
-	//! I = I_{sn} - \gamma (V - V_{sn})^2
-	//! \f]
-	//! with \f$ \gamma \approx 0.45 \mbox{nS/mV} \f$.
-	//! By a suitable change of units the resulting equation can easily be cast into its 'topological normal form':
-	//! \f[
-	//! \frac{dV}{dt} = I + V^2
-	//! \f]
-	//! Under this equation V may reach infinity in finite time. It is assumed that the neuron's potential will be reset
-	//! to \f$ V_{reset} \f$ after this time. In simulations it is necessary to chose a finite value \f$ V_{peak} \f$ as the
-	//! maximum that a neuron's membrane potential can attain. In the QIF model an instantaneous reset to $\f V_{reset} \f$
-	//! will occur.
 
 	class QifOdeSystem : public SpikingOdeSystem {
 	public:

@@ -28,7 +28,7 @@
 namespace MPILib {
 namespace algorithm{
 /**
- * @brief A Algorithm with constant rate
+ * @brief An Algorithm with constant rate
  */
 template<class Weight>
 class RateAlgorithm: public AlgorithmInterface<Weight> {

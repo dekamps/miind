@@ -22,6 +22,7 @@
  *  This file replicates Omurtag A., Knight B. W., Sirovich L., On the simulation of large populations of neurons<i>J. of Comp. Neurosc.</i> (2000) ; 8(1)\
 :51-63                     
  */ 
+//! [preamble]
 #include <GeomLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
@@ -48,7 +49,7 @@ typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::Circula
 typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 
 int main(){
-
+  //! [preamble]
 	cout << "Demonstrating Omurtag et al. (2000)" << endl;
 	Number    n_bins = 330;
 	Potential V_min  = 0.0;

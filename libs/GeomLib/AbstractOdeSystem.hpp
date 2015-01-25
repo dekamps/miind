@@ -28,10 +28,21 @@ using std::vector;
 
 namespace GeomLib {
 
+	//! A geometric grid to represent population densities.
+
+	//! Internally, the system uses two arrays: one to represent probability mass and one one to represent
+	//! the bin boundaries in membrane potential. A one-to-one mapping identifies each mass bin with a
+	//! a potential bin, thus providing a basis for a density representation. The mapping is time dependent, and
+	//! depends on the topology of the neural system under consideration. Derived classes provide concrete
+	//! implementations of these different topologies. LeakingOdeSystem implements the topology of
+	//! leaky-integrate-and-fire neurons. SpikingOdeSystem implements spiking neural models, such as
+	//! quadratic-integrate-and-fire neurons (leaky-integrate-and-fire neurons can be modeled as well by SpikingOdeSystem,
+	//! using the current compensation device).
+
 	class AbstractOdeSystem {
 	public:
 
-		//! Constructor using neural dynamics object (see AbstractNeuralDynamics and derived classes)
+		//! Constructor using neural dynamics object (see AbstractNeuralDynamics and derived classes).
 		AbstractOdeSystem
 		(
 			const AbstractNeuralDynamics& 		//! NeuralDynamics object
@@ -43,7 +54,9 @@ namespace GeomLib {
 		//! pure virtual destructor for base class
 		virtual ~AbstractOdeSystem() = 0;
 		
-		//! Every sub class defines its own evolution. 
+		//! Every sub class defines its own evolution. This Evolve function does not relate to neural dynamics:
+		//! that is controlled by AbstractNeuralDynamics objects. This function is a hook to call update
+		//! the mapping between mass and potential bins.
 		virtual void 
 			Evolve
 			(

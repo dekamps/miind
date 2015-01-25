@@ -44,7 +44,13 @@ using std::string;
 namespace GeomLib
 {
 
-  //! Contains the parameter necessary to configure an OdeSystem instance. See AbstractOdeSystem and derived classes.
+  //! Contains the parameters necessary to configure a concrete OdeSystem instance. See AbstractOdeSystem and derived classes.
+
+  //! An AbstractOdeSystem is geometric grid: a grid defined by a system of ordinary differential equations.
+  //! The grid needs dimensions: a minimum potential specified by _V_min, a maximum defined in the NeuronParameter
+  //! as the threshold, and an initial density at the start of the simulation.
+
+
     struct OdeParameter {
 
       Number                    _nr_bins;  //! The number of bins

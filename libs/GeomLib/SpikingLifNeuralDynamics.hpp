@@ -28,6 +28,7 @@ using MPILib::Time;
 
 namespace GeomLib {
 
+
 	class SpikingLifNeuralDynamics : public SpikingNeuralDynamics {
 	public:
 

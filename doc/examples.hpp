@@ -44,8 +44,8 @@ The result demonstrates a fundamental property of population density techniques:
 the precise neuron from which they originated and the precise destination are irrelevant) and only population-level quantities are of interest,
 population density techniques are equivalent to simulation of populations of spiking neurons.
 
-There are two versions of this example:
+There are two versions of this example. You are strongly recommended to consider the XML example first, as it is nearly self documenting.
+-  \subpage sub_page_xml_example
 -  \subpage sub_page_cpp_example
-- An XML file (suitable for a Python workflow)
 
 */

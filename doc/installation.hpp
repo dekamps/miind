@@ -4,11 +4,14 @@
 At the moment, it is necessary to install 
 <a href="http://root.cern.ch">ROOT</a>. Under Unix systems, this is 
 straightforward. ROOT is a powerful analysis platform that has similar
-capablities as MATLAB, but is optimized for high performance.
+capablities as MATLAB, but is optimized for high performance. Use
+a pre-compiled version or compile yourself. Make sure that the
+version you use is configured with --enable-python. You can
+use  Python to inspect the simulation results, and convert
+them to numpy objects if you feel the need. 
 
-From October 2014, we will provide an option to install MIIND without ROOT.
-Simulation results can then be analyzed using MATLAB or SciPy. In general,
-we recommend that you install ROOT.
+
+
 
 You will also need:
 <ul>

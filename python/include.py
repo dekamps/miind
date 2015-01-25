@@ -1,2 +1,2 @@
-includes = ['#include <GeomLib.hpp>', '#include <MPILib/include/MPINetworkCode.hpp>','#include <MPILib/include/algorithm/RateAlgorithmCode.hpp>','#include <MPILib/include/SimulationRunParameter.hpp>', '#include <MPILib/include/report/handler/RootReportHandler.hpp>']
+includes = ['#include <GeomLib.hpp>', '#include <MPILib/include/MPINetworkCode.hpp>','#include <MPILib/include/algorithm/RateAlgorithmCode.hpp>','#include <MPILib/include/SimulationRunParameter.hpp>', '#include <MPILib/include/report/handler/RootReportHandler.hpp>','#include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>', '#include <MPILib/include/algorithm/DelayAlgorithmCode.hpp>','#include <MPILib/include/algorithm/RateFunctorCode.hpp>']
 

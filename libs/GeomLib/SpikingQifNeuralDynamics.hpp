@@ -27,12 +27,25 @@ using MPILib::Time;
 
 namespace GeomLib {
 
+//! This class models the dynamics of  of Quadratic Integrate and Fire (QIF)
+//! neurons
+
+//! This model is discussed extensively in Izhikevich's book 'Dynamical Systems in Neuroscience'.
+//! By a suitable choice of units a more complex equation can be simplified to a 'topological normal form':
+//! \f[
+//! \frac{dV}{dt} = I + V^2
+//! \f]
+//! Under this equation V may reach infinity in finite time. It is assumed that the neuron's potential will be reset
+//! to \f$ V_{reset} \f$ after this time. In simulations it is necessary to chose a finite value \f$ V_{peak} \f$ as the
+//! maximum that a neuron's membrane potential can attain. In the QIF model an instantaneous reset to \f$ V_{reset} \f$
+//! will occur.  Configuration requires a QIFParameter and an OdeParameter.
+
 	class SpikingQifNeuralDynamics : public SpikingNeuralDynamics{
 	public:
 		SpikingQifNeuralDynamics
 		(
 			const OdeParameter&,
-			const QifParameter&
+			const QifParameter&		//! parameter specific  to QIF dynamics
 		);
 
 		SpikingQifNeuralDynamics

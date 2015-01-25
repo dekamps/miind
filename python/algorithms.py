@@ -7,6 +7,7 @@ ALGORITHMS = { 'RateAlgorithm'   : {'Connection' : 'double', 'Parameter': '' },
 
 ALGORITHM_NAMES = {}
 
+RATEFUNCTIONS = []
 
 def Register(name, cpp_name):
     if name in ALGORITHM_NAMES.keys():
@@ -128,12 +129,115 @@ def parse_geom_algorithm(alg, i,weightype):
     
     return s
 
+def parse_wilsoncowan_parameter(alg, i, weighttype):
+    wcpar= alg.find('WilsonCowanAlgorithm/WilsonCowanParameter')
+    s = ''
+       
+    t_mem = alg.find('WilsonCowanAlgorithm/WilsonCowanParameter/t_membrane')
+    t_name = 't_mem_' + str(i)
+    s += '\tconst MPILib::Time ' + t_name
+    s += ' = ' + t_mem.text +';\n'
+    
+    f_noise = alg.find('WilsonCowanAlgorithm/WilsonCowanParameter/f_noise')
+    noise_name ='f_noise_' + str(i)
+    s += '\tconst double ' + noise_name 
+    s += ' = ' + f_noise.text +';\n'
+    
+    f_max = alg.find('WilsonCowanAlgorithm/WilsonCowanParameter/f_max')
+    f_name = 'f_max_' + str(i)
+    s += '\tMPILib::Rate ' + f_name
+    s += ' = ' + f_max.text + ';\n'
+
+    I_ext = alg.find('WilsonCowanAlgorithm/WilsonCowanParameter/I_ext')
+    I_name = 'I_ext_' + str(i)
+    s += '\tMPILib::Rate ' + I_name
+    s += ' = ' + I_ext.text + ';\n'
+
+    s += '\tMPILib::algorithm::WilsonCowanParameter  par_wil_' + str(i) +'('
+    s += t_name +','
+    s += f_name + ','
+    s += noise_name  + ','
+    s += I_name  +');\n'
+
+    return s
+    
+def wrapup_wilsoncowan_algorithm(alg,i,weighttype):
+    algorithm = alg.find('WilsonCowanAlgorithm')
+    d=algorithm.attrib
+    if not 'Name' in d.keys():
+        raise NameError('Name tag expected in WilsonCowanAlgorithm')    
+
+    s = '\tMPILib::algorithm::WilsonCowanAlgorithm '
+    s += 'alg_wc_' + str(i) + '('
+    s += 'par_wil_' + str(i)
+    s += ');\n'
+    cpp_name = 'alg_wc_' + str(i)
+    Register(d['Name'], cpp_name)    
+    return s
+    
+def parse_wilsoncowan_algorithm(alg, i, weighttype):
+    s = ''
+    s += parse_wilsoncowan_parameter(alg, i, weighttype)
+    s += wrapup_wilsoncowan_algorithm(alg, i, weighttype)
+    return s
+
+def parse_delay_algorithm(alg,i,weighttype):
+    s = ''
+    dg = alg.find('DelayAlgorithm')
+    
+    if not 'Name' in  dg.keys():
+        raise NameError('Name tag expected')
+
+    cpp_name = 'delay_alg_' + str(i)
+    Register(dg.attrib['Name'],cpp_name)
+
+    s += '\tMPILib::algorithm::DelayAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('
+    
+    dt = dg.find('delay')
+    s += dt.text
+    
+    s += ');\n'
+    
+    return s
+
+def parse_ratefunctor_algorithm(alg, i, weighttype):
+    s = ''
+    rf = alg.find('RateFunctor')
+    if not 'Name' in rf.keys():
+        raise NameError('Name tag expected')
+        
+    cpp_name = 'rate_functor_' + str(i)
+    Register(rf.attrib['Name'],cpp_name)
+    
+    s += '\tMPILib::Rate RateFunction_' + str(i) + '(MPILib::Time);\n'
+    
+    s += '\tMPILib::algorithm::RateFunctor<' + weighttype.text + '> ' + cpp_name + '(' 
+    s += 'RateFunction_' + str(i) + ');\n'
+    rb = rf.find('expression')
+    body=rb.text
+    
+    t = 'MPILib::Rate RateFunction_' + str(i) + '(MPILib::Time t){\n'
+    t += '\treturn ' + body + ';\n}\n'
+    
+    RATEFUNCTIONS.append(t)
+    
+    return s
+    
 def parse_algorithm(alg,i,weighttype):
     algname=alg.get('type')
-    
-    if algname=='RateAlgorithm':
+
+    if algname=='WilsonCowanAlgorithm':
+        if weighttype.text == 'double':
+            return parse_wilsoncowan_algorithm(alg,i,weighttype)
+        else:
+            raise NameError('Wrong type for WilsonCowanAlgorithm')
+    if algname == 'RateFunctor':
+        return parse_ratefunctor_algorithm(alg,i,weighttype)
+    if algname == 'DelayAlgorithm':
+        return parse_delay_algorithm(alg,i,weighttype)
+    if algname =='RateAlgorithm':
         return  parse_rate_algorithm(alg,i,weighttype)
-    if algname=='GeomAlgorithm':
+    if algname =='GeomAlgorithm':
         if weighttype.text == 'DelayedConnection':
             return parse_geom_algorithm(alg,i,weighttype)
         else:

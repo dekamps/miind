@@ -29,9 +29,11 @@ namespace GeomLib {
 
 	//! The configuration of a GeomAlgorithm requires that the neural dynamics is defined somewhere. The dynamics is used to define an OdeSystem.
 
-	//  There are predefined derived classes for leaky-integrate-and-fire and quadratic-integrate-and-fire
-	//  dynamics. Anyone who wants to use their own model of neural dynamics needs to overload this class. Unit tests in:
-	//! LifNeuralDynamics
+	//!  There are predefined derived classes for leaky-integrate-and-fire and quadratic-integrate-and-fire
+	//!  dynamics. The dynamics is usually defined on a grid, whose dimensions are specified in the OdeParameter. OdeParameter
+	//!  also contains a NeuronParameter that determines the dynamics.Anyone who wants to use their own model of neural dynamics.
+	//!  To define dynamics on this grid, the EvolvePotential must be overloaded. Derived classes exist for
+	//!  LIF and QIF neurons, and more generally for spiking neurons (SpikingNeuralDynamics).
 
 class AbstractNeuralDynamics {
 	public:

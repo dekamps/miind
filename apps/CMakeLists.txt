@@ -1,4 +1,5 @@
 ADD_SUBDIRECTORY( BasicDemos )
 ADD_SUBDIRECTORY( largeNetwork )
+ADD_SUBDIRECTORY( UnitMPILib )
 ADD_SUBDIRECTORY( UnitGeomLib )
 ADD_SUBDIRECTORY( PerformanceGeom )

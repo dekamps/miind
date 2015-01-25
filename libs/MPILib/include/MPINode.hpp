@@ -34,7 +34,7 @@
 namespace MPILib {
 
 /**
- * MPINode the class for the actual network nodes which are distributed with mpi.
+ * MPINode the class for the actual network nodes which are distributed with MPI.
  */
 template<class Weight, class NodeDistribution>
 class MPINode {

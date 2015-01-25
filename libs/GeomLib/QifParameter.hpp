@@ -26,13 +26,20 @@ namespace GeomLib {
 
 	//! This parameter configures the QIFAlgorithm
 
-	//! The default parameters are chosen such that the normal form of the QIFAlgorithm wil be configured. See the QIFAlgorithm documentation for this
-
+	//! The default parameters are chosen such that the normal form of the QIFAlgorithm will be configured.
+    //! See the QIFAlgorithm documentation for this
 	//! The default constructor will set values, so that the topological normal form will be simulated:
 	//! \f[
 	//! \tau\frac{dV}{dt} = \gamma + V^{2}
 	//! \f]
 	//! 
+	//! A subtlety arises when neurons with negative \f$ \gamma \f$ must be modeled. In the current implementation
+	//! this is achieved by defining implementing a model with positive \f$ \gamma \f$, whilst adding a negative
+	//! DC contribution to the external neurons, i.e. the resulting neural dynamics is made up of an
+	//! intrinsically spiking neuron with \f$ \gamma_{sys} > 0 \f$, and an extra negative DC contribution
+	//! to the neural input. This trick is called current compensation. Current compensation is done automatically,
+	//! and the user can ignore the \f$ \gamma_{sys} \f$ parameter, unless an influence on the performance is
+	//! suspected.
 	class QifParameter : public CurrentParameter {
 	public:
 		QifParameter
