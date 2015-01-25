@@ -38,15 +38,15 @@ namespace GeomLib {
 	//! Parameter for setting current compensation values for the neural models that use it
 	struct CurrentCompensationParameter {
 
-		MPILib::Potential _I;			//! DC contribution
-		MPILib::Potential _sigma;		//! variability of the Poisson emulation
+		MPILib::Potential _I;			//!< DC contribution
+		MPILib::Potential _sigma;		//!< variability of the Poisson emulation
 
 
 		//! Standard constructor
 		CurrentCompensationParameter
 		(
-			MPILib::Potential I = 0,    //! current
-			MPILib::Potential sigma = 0 //! variability
+			MPILib::Potential I = 0,    //!< current
+			MPILib::Potential sigma = 0 //!< variability
 		):
 		_I(I),
 		_sigma(sigma)

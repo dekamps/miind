@@ -2,8 +2,10 @@
  * \page sub_page_xml_example An XML Example
  *
  * \section Introduction
- * Make sure you have read the workflow section. It explains how a Python script van be used to turn MIIND XML files into executables.
- * The XML file discussed here, relates to \ref page_examples.
+ * Make sure you have read the \ref workflow section. It explains how a Python script van be used to turn MIIND XML files into executables.
+ * The XML file discussed here, relates to \ref page_examples. This particular XML file resides in the python directory, immediately
+ * below the top-level directory and is called omurtag.xml. It can be ran immediately as is, as described in \ref workflow.
+ *
  * We will replicate the experiment discussed in section \ref page_examples. The original paper considered a large population of leaky-integrate-and-fire    
  * (LIF) neurons. Membrane parameters are rescaled and dimensionless: reset and reversal potential are 0, threshold is one.                                  
  * Each neuron in this population receives a Poisson distributed spike train of 800 Hz. The synapses are delta-synapses with                                 

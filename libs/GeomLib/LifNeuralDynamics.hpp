@@ -38,8 +38,8 @@ namespace GeomLib {
 		//! in leaky dynamics. Consult the '1D document.' This type of dynamics does not allow current compensation.
 		LifNeuralDynamics
 		(
-			const OdeParameter&,	//! parameter specifying neural dynamics, bin size, etc.
-			double lambda			//! recommended to be of the order 0.01; consult '1D document' for information on trade off between speed and efficiency
+			const OdeParameter&,	//!< parameter specifying neural dynamics, bin size, etc.
+			double lambda			//!< recommended to be of the order 0.01; consult '1D document' for information on trade off between speed and efficiency
 		);
 
 		//! Destructor; required to be virtual

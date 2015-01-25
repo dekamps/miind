@@ -35,15 +35,8 @@ namespace MPILib {
 namespace populist {
 namespace zeroLeakEquations {
 /**
- * @brief A solver for the zero leak master equations in the PopulationAlgorithm.
+ * @brief A solver for the zero leak master equations in the PopulationAlgorithm. \deprecated
  *
- * PopulationAlgorithm models the combined effect from leaky-integrate-and-fire (LIF) dynamics
- * and Poisson input spike trains on individual neurons. The effects of LIF dynamics are
- * accounted for by maintaining the density in a PopulationGridController. The PopulationGridController
- * implements exponential shrinkage (LIF decay) by relabeling the potential density every
- * time step and by adding points. The principle is explained in \ref population_algorithm.
- * Every time step the M equation governing the Poisson statistics of input spike trains
- * must be executed. This is handled by ZeroLeakEquations.
  */
 class AbstractZeroLeakEquations {
 public:
@@ -97,7 +90,7 @@ public:
 
 	/**
 	 * Every time step the input parameters must be adapted, even if the input doesn't
-	 * change, because the are affected by LIF dynamics (see \ref population_algorithm).
+	 * change, because the are affected by LIF dynamics.
 	 */
 	virtual void AdaptParameters() = 0;
 

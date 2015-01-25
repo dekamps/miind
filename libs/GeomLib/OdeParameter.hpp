@@ -53,17 +53,17 @@ namespace GeomLib
 
     struct OdeParameter {
 
-      Number                    _nr_bins;  //! The number of bins
-      InitialDensityParameter   _par_dens; //! Specifies the initial density profile
-      Potential                 _V_min;    //! The minimum of potential range (the maximum is given in the neuron parameter)
-      NeuronParameter      	    _par_pop;  //! The neuron parameter
+      Number                    _nr_bins;  //!< The number of bins
+      InitialDensityParameter   _par_dens; //!< Specifies the initial density profile
+      Potential                 _V_min;    //!< The minimum of potential range (the maximum is given in the neuron parameter)
+      NeuronParameter      	    _par_pop;  //!< The neuron parameter
 
       OdeParameter
       (
-       Number,                        //! Number of bins
-       Potential,                     //! V_min, the minimum value of the Potential range
-       const NeuronParameter&,    	  //! Neuron parameter
-       const InitialDensityParameter& //! Initial density profile
+       Number,                        //!< Number of bins
+       Potential,                     //!< V_min, the minimum value of the Potential range
+       const NeuronParameter&,    	  //!< Neuron parameter
+       const InitialDensityParameter& //!< Initial density profile
       );
 
     };

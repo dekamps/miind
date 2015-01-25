@@ -44,8 +44,8 @@ namespace GeomLib {
 	public:
 		QifParameter
 		(
-			Potential gamma,			//! Although a current, it is best to see this as a shape parameter (see QIFAlgorithm)
-			Potential gamma_sys	= 0.5	//! The gamma for which OdeSystems will be run (if you don't know what that means, leave alone)
+			Potential gamma,			//!< Shape parameter (see QIFAlgorithm)
+			Potential gamma_sys	= 0.5	//!< The gamma for which SpikingOdeSystem will be run (if you don't know what that means, leave alone)
 		):
 		CurrentParameter(gamma_sys),
 		_gamma(gamma),
@@ -58,11 +58,11 @@ namespace GeomLib {
 
 		public:
 
-			Potential	_gamma;			
+			Potential	_gamma;			//! Although a current, it is best to see this as a shape parameter (see QIFAlgorithm)
 	
 		private:
 
-			Potential	_gamma_sys;		
+			Potential	_gamma_sys;		//! The gamma for which OdeSystems will be run (if you don't know what that means, leave alone)
 
 	};
 

@@ -26,6 +26,9 @@ focusses strongly on so-called population density techniques.
 
 To get a feeling for the simulator and its capabilities, go to the \subpage page_examples page.
 
+To run the simulator, go to the \ref workflow page, after installation is completed. Make sure
+you have had a glance at the \ref ugh page.
+
 \image html hbp.png
 Currently, part of the developent is funded by the <a href="http://www.humanbrainproject.eu/">Human Brain Project</a>.  
 

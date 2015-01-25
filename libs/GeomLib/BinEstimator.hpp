@@ -47,8 +47,8 @@ namespace GeomLib {
 
 	        //! Expresses the coverage of a given bin, _index< as a fraction, _alpha.
 		struct BinCover {
-			int	_index;
-			double	_alpha;
+			int	    _index; //!< Index of the bin under consideration
+			double	_alpha; //!< Fraction of the bin that is covered
 		};
 
 		//! Type representing begin an end bins of a translated bins and the respective covering fraction.

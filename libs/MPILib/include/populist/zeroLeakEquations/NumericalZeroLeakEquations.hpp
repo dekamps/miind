@@ -33,7 +33,7 @@ namespace MPILib {
     namespace zeroLeakEquations {
 
 
-	//! Provides a numerical solution for the zero leak equations.
+	//! Provides a numerical solution for the zero leak equations. \deprecated
 	class NumericalZeroLeakEquations : public AbstractZeroLeakEquations {
 	public:
 
@@ -53,7 +53,7 @@ namespace MPILib {
 			Number&,					//!< reference to the current number of bins
 			valarray<Potential>&,		//!< reference to state array
 			Potential&,					//!< reference to the check sum variable
-			SpecialBins&,		
+			SpecialBins&,		                        //!< reference to objject for reset, reversal bin
 			parameters::PopulationParameter&,		//!< reference to the PopulationParameter 
 			parameters::PopulistSpecificParameter&,	//!< reference to the PopulistSpecificParameter
 			Potential&					//!< reference to the current value of delta v
@@ -82,7 +82,7 @@ namespace MPILib {
 
 	/**
 	 * Every time step the input parameters must be adapted, even if the input doesn't
-	 * change, because the are affected by LIF dynamics (see \ref population_algorithm).
+	 * change, because the are affected by LIF dynamic).
 	 */
 	virtual void AdaptParameters();
          /**
@@ -116,18 +116,8 @@ namespace MPILib {
 	 */
 
 	void InitializeIntegrators();
-	/**
-	 * Push the stamped measure of probability on the queue
-	 * @param t the time of the stamped measure of probability
-	 * @param before The before parameter
-	 */
 	
 	void PushOnQueue(Time, double);
-	/**
-	 * Pop the stamped measure of probability from the queue
-	 * @param t the time of the stamped measure of probability
-	 */
-
        	void PopFromQueue(Time);
 
 
