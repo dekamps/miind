@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-import parameters
+
 
 ALGORITHMS = { 'RateAlgorithm'   : {'Connection' : 'double', 'Parameter': '' }, 
                'RateAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter' : ''}, 
