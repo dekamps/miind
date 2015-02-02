@@ -27,7 +27,10 @@
 
 namespace GeomLib {
 
+	//! A geometric grid based on Quadratic-Integrate-and Fire (QIF) dynamics
 
+	//! This is a geometric grid based on the topology of spiking neuron dynamics. The
+	// specific neural dynamics is QIF dynamics.
 
 	class QifOdeSystem : public SpikingOdeSystem {
 	public:
@@ -35,7 +38,7 @@ namespace GeomLib {
 		//! standard constructor
 		QifOdeSystem
 		(
-			const SpikingQifNeuralDynamics&
+			const SpikingQifNeuralDynamics& //!< Accepts an object implementing the dynamics
 		);
 
 		//! copy constructor
@@ -54,8 +57,10 @@ namespace GeomLib {
 		//! virtual copying mechanism
 		virtual QifOdeSystem* Clone() const;
 
+		//! return current firing rate
 		virtual MPILib::Rate CurrentRate() const;
 
+		//! return the DC contribution applied in current compensation
 		virtual Potential DCContribution() const { return _par_qif.Gammasys() - _par_qif._gamma; }
 
 		virtual Index CurrentIndex() const { return _index; }

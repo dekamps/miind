@@ -42,10 +42,11 @@ namespace GeomLib {
 
 	class SpikingQifNeuralDynamics : public SpikingNeuralDynamics{
 	public:
+		//! Standard constructor
 		SpikingQifNeuralDynamics
 		(
-			const OdeParameter&,
-			const QifParameter&		//! parameter specific  to QIF dynamics
+			const OdeParameter&,    //!< general parameters
+			const QifParameter&		//!< parameter specific  to QIF dynamics
 		);
 
 		SpikingQifNeuralDynamics
@@ -58,8 +59,10 @@ namespace GeomLib {
 		//! calculate time to reach threshold for the given potential
 		virtual Time TimeToInf(Potential) const;
 
+		//! time it takes to move density one grid forwards
 		virtual Time TStep() const;
 
+		//! time it takes for a neuron to traverse from V_min to threshold
 		virtual Time TPeriod() const;
 
 		virtual Potential

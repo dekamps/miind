@@ -42,7 +42,16 @@ using std::string;
 
 namespace GeomLib {
 
-	//! Parameter for the configuration of a GeomAlgorithm object
+	//! Parameter for the configuration of a GeomAlgorithm object. Users of SpikingOdeSystem should read the full description carefully.
+
+	//! This parameter packs the geometric binning system (AbstractOdeSystem) together with other paarmeters required
+	//! to configure a GeomAlgorithm instance. When some inputs are identified as Gaussian white noise, a DiffusionParameter
+	//! configures how the white noise is emulated internally, as described in http://arxiv.org/abs/1309.1654. The default
+	//! parameter is sensible and hence can often be omitted.
+    //! When a current compensation parameter is provided, internally an extra white noise contribution is emulated
+	//! with a mean equal to the size of the compensation current. Users of SpikingOdeSystem, must sepcify this, and
+	//! because the introduce a white noise contribution, they also must provide a DiffusionParameter object.
+	//!
 	struct GeomParameter {
 	public:
 

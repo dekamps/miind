@@ -27,7 +27,9 @@ set (ONELIF_GEOM_SRC
 set (TWOLIF_GEOM_SRC 
 	LifTwo.cpp
 )
-	
+
+set (ONEQIF_GEOM_SRC
+        QifJumpPoisson.cpp)	
 
 #############################################################################
 # Libraries
@@ -57,4 +59,8 @@ target_link_libraries(LifOne ${LIBLIST})
 
 add_executable(LifTwo ${TWOLIF_GEOM_SRC})
 target_link_libraries(LifTwo ${LIBLIST})
+
+add_executable(QifOnePoisson ${ONEQIF_GEOM_SRC})
+target_link_libraries(QifOnePoisson ${LIBLIST})
+
 

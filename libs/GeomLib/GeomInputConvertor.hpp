@@ -33,17 +33,24 @@
 
 namespace GeomLib {
 
+	//! Internally used by GeomLib, interprets input from white noise; calculates the current compensation contribution.
 
+	//! This object is handed a list of firing rates, node types and efficacies and converts this
+	//! to another list of firing rates that is used internally by GeomAlgorithm. Some inputs to a population
+	//! are to be interpreted as contributions to Gaussian white noise. Others should simply be passed
+	//! on to GeomAlgorithm. Internally, GeomAlgorithm uses a single input to emulate Gaussian white noise,
+	//! which means that GeomInputConvertor must collapse the external white noise contribution into a single
+	//! one that can be used internally.
 	class GeomInputConvertor {
 	public:
 
 		GeomInputConvertor
 		(
-			const NeuronParameter&,
-			const DiffusionParameter&,
-			const CurrentCompensationParameter&,
-			const std::vector<MPILib::Potential>&,
-			bool  force_small_bins = false
+			const NeuronParameter&,						//! Neuron parameter of the receiving population, required to be able to interpret the white noise contribution
+			const DiffusionParameter&,					//! Determines when white noise is emulated internally by one or two Poisson inputs
+			const CurrentCompensationParameter&,		//! Creates an extra internal white noise source thatimplements the crrent compensation
+			const std::vector<MPILib::Potential>&,		//! Interpretation array from the relevan tAbstractOdeSystem
+			bool  force_small_bins = false				//! Inactive at the moment
 		);
 
 

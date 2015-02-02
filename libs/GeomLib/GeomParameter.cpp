@@ -57,6 +57,7 @@ GeomParameter::GeomParameter
 _p_sys_ode			(par._p_sys_ode->Clone()),
 _scale				(par._scale),
 _par_diff			(par._par_diff),
+_par_cur			(par._par_cur),
 _name_master		(par._name_master),
 _no_master_equation	(par._no_master_equation)
 {

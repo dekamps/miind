@@ -1,5 +1,10 @@
 /**
 \page page_examples Example
+
+\section example_intro Introduction
+We will first show an example using leaky-integrate-and-fire neurons. Quadratic-integrate-and-fire neurons can be handled
+in a similar way.
+
 This example comes from Omurtag A., Knight B. W., Sirovich L,   On the simulation of large populations of neurons   <i>J. of Comp. Neurosc.</i> (2000) ; 8(1):51-63
 
 Neural circuits can be simulated in terms of models of individual neurons, but such simulations quickly become intractable. Usually

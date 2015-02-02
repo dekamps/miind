@@ -42,6 +42,7 @@ _vec_direct			(0),
 _vec_diffusion		(0),
 _force_small_bins	(b_force_small)
 {
+	std::cout << "zz" << par_curr._I << std::endl;
 }
 
 MPILib::Number GeomInputConvertor::NumberDirect() const
