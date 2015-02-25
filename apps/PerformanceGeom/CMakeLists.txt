@@ -24,6 +24,10 @@ set (ONELIF_GEOM_SRC
 	LifOne.cpp
 )
 
+set (ONELIF_CANVAS_GEOM_SRC 
+	LifOneCanvas.cpp
+)
+
 set (TWOLIF_GEOM_SRC 
 	LifTwo.cpp
 )
@@ -56,6 +60,9 @@ set ( LIBLIST
 #############################################################################
 add_executable(LifOne ${ONELIF_GEOM_SRC})
 target_link_libraries(LifOne ${LIBLIST})
+
+add_executable(LifOneCanvas ${ONELIF_CANVAS_GEOM_SRC})
+target_link_libraries(LifOneCanvas ${LIBLIST})
 
 add_executable(LifTwo ${TWOLIF_GEOM_SRC})
 target_link_libraries(LifTwo ${LIBLIST})

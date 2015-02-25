@@ -186,7 +186,7 @@ int test_main(int argc, char* argv[]) // note the name!
 		BOOST_FAIL( "Run the test with two processes!");
 	}
 #endif
-	// run only one one process as otherwise race conditions occure
+	// run only one one process as otherwise race conditions occur
 	test_Constructor();
 	test_writeReport();
 	test_clone();

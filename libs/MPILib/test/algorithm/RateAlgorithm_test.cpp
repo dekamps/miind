@@ -17,7 +17,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-//Hack to test privat members
+//Hack to test private members
 #define private public
 #define protected public
 #include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
@@ -124,8 +124,8 @@ void test_getGrid() {
 
 	BOOST_CHECK(grid._arrayState[0]==2.1);
 	BOOST_CHECK(grid._arrayInterpretation[0]==0.0);
-
 }
+
 
 int test_main(int argc, char* argv[]) // note the name!
 		{
@@ -150,3 +150,4 @@ int test_main(int argc, char* argv[]) // note the name!
 //
 //    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
 }
+

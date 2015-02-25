@@ -133,7 +133,7 @@ const Index& LIFConvertor::getIndexCurrentResetBin() const {
 }
 
 void LIFConvertor::SortConnectionvector(const std::vector<Rate>& nodeVector,
-		const std::vector<OrnsteinUhlenbeckConnection>& weightVector,
+		const std::vector<DelayedConnection>& weightVector,
 		const std::vector<NodeType>& typeVector) {
 
 	// sorting depends on network structure and only should be done once

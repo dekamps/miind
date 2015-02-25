@@ -52,9 +52,11 @@ set(MPI_SRCS
     src/populist/ZeroLeakBuilder.cpp
     
     src/report/handler/AbstractReportHandler.cpp
+    src/report/handler/CanvasParameter.cpp
     src/report/handler/GraphKey.cpp
     src/report/handler/InactiveReportHandler.cpp
     src/report/handler/RootHighThroughputHandler.cpp
+    src/report/handler/RootCanvasNoMPI.cpp
     src/report/handler/RootReportHandler.cpp
     src/report/handler/ValueHandlerHandler.cpp
     

@@ -23,7 +23,7 @@ namespace MPILib {
 SimulationRunParameter::SimulationRunParameter(
 		const report::handler::AbstractReportHandler& handler, Number max_iter,
 		Time t_begin, Time t_end, Time t_report, Time t_step,
-		const std::string& name_log, Time t_state_report) :
+		const std::string& name_log, Time t_state_report, bool bOnCanvas) :
 
 		_pHandler(&handler), //
 		_maxIter(max_iter), //
@@ -32,7 +32,8 @@ SimulationRunParameter::SimulationRunParameter(
 		_tReport(t_report), //
 		_tStep(t_step), //
 		_logFileName(name_log), //
-		_tStateReport((t_state_report == 0) ? t_end : t_state_report) {
+		_tStateReport((t_state_report == 0) ? t_end : t_state_report),
+		_bOnCanvas(bOnCanvas){
 }
 
 SimulationRunParameter::SimulationRunParameter(
@@ -44,7 +45,8 @@ SimulationRunParameter::SimulationRunParameter(
 		_tReport(parameter._tReport), //
 		_tStep(parameter._tStep), //
 		_logFileName(parameter._logFileName), //
-		_tStateReport(parameter._tStateReport) {
+		_tStateReport(parameter._tStateReport),
+		_bOnCanvas(parameter._bOnCanvas){
 }
 
 SimulationRunParameter& SimulationRunParameter::operator=(

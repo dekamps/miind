@@ -9,31 +9,72 @@
 #include <MPILib/include/algorithm/DelayAlgorithmCode.hpp>
 #include <MPILib/include/algorithm/RateFunctorCode.hpp>
 
-typedef MPILib::MPINetwork<double, MPILib::utilities::CircularDistribution> Network;
+typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 int main(){
 	Network network;
 	// generating algorithms
-	const MPILib::Time t_mem_0 = 50e-3;
-	const double f_noise_0 = 1.0;
-	MPILib::Rate f_max_0 = 10.0;
-	MPILib::Rate I_ext_0 = 0;
-	MPILib::algorithm::WilsonCowanParameter  par_wil_0(t_mem_0,f_max_0,f_noise_0,I_ext_0);
-	MPILib::algorithm::WilsonCowanAlgorithm alg_wc_0(par_wil_0);
-	MPILib::Rate RateFunction_1(MPILib::Time);
-	MPILib::algorithm::RateFunctor<double> rate_functor_1(RateFunction_1);
+	const MPILib::Potential v_min_0 = -0.02;
+	const MPILib::Number n_bins_0 = 2000;
+	GeomLib::NeuronParameter par_neur_0(20e-3,0,0,2e-3,6e-3);
+	const GeomLib::InitialDensityParameter par_dense_0(0.0, 0.0);
+	GeomLib::OdeParameter par_ode_0(n_bins_0,v_min_0,par_neur_0,par_dense_0);
+	GeomLib::LifNeuralDynamics dyn_ode_leak_0(par_ode_0, 0.01);
+	GeomLib::LeakingOdeSystem sys_ode_0(dyn_ode_leak_0);
+	GeomLib::GeomParameter par_geom_0(sys_ode_0);
+	GeomLib::GeomAlgorithm<DelayedConnection> alg_geom_0(par_geom_0);
+
+	const MPILib::Potential v_min_1 = -0.02;
+	const MPILib::Number n_bins_1 = 2000;
+	GeomLib::NeuronParameter par_neur_1(20e-3,0,0,2e-3,14e-3);
+	const GeomLib::InitialDensityParameter par_dense_1(0.0, 0.0);
+	GeomLib::OdeParameter par_ode_1(n_bins_1,v_min_1,par_neur_1,par_dense_1);
+	GeomLib::LifNeuralDynamics dyn_ode_leak_1(par_ode_1, 0.01);
+	GeomLib::LeakingOdeSystem sys_ode_1(dyn_ode_leak_1);
+	GeomLib::GeomParameter par_geom_1(sys_ode_1);
+	GeomLib::GeomAlgorithm<DelayedConnection> alg_geom_1(par_geom_1);
+
+	MPILib::algorithm::RateAlgorithm<DelayedConnection> rate_alg_2(1.8);
+	MPILib::algorithm::DelayAlgorithm<DelayedConnection> delay_alg_3(0.0);
+	MPILib::algorithm::DelayAlgorithm<DelayedConnection> delay_alg_4(0.1);
+	MPILib::algorithm::DelayAlgorithm<DelayedConnection> delay_alg_5(8e-3);
+	MPILib::algorithm::DelayAlgorithm<DelayedConnection> delay_alg_6(8e-3);
+	MPILib::algorithm::DelayAlgorithm<DelayedConnection> delay_alg_7(4e-3);
 	// generating nodes
-	MPILib::NodeId id_0 = network.addNode(alg_wc_0,MPILib::EXCITATORY_GAUSSIAN);
-	MPILib::NodeId id_1 = network.addNode(rate_functor_1,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_0 = network.addNode(alg_geom_0,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_1 = network.addNode(alg_geom_1,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_2 = network.addNode(rate_alg_2,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_3 = network.addNode(delay_alg_3,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_4 = network.addNode(delay_alg_4,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_5 = network.addNode(delay_alg_5,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_6 = network.addNode(delay_alg_6,MPILib::INHIBITORY_GAUSSIAN);
+	MPILib::NodeId id_7 = network.addNode(delay_alg_7,MPILib::EXCITATORY_GAUSSIAN);
 	// generating connections
-	double con_1_0(0.1);
-	network.makeFirstInputOfSecond(id_1,id_0,con_1_0);
+	DelayedConnection con_2_1(3000,0.0002,0.0);
+	network.makeFirstInputOfSecond(id_2,id_1,con_2_1);
+	DelayedConnection con_2_3(1,1,0.0);
+	network.makeFirstInputOfSecond(id_2,id_3,con_2_3);
+	DelayedConnection con_2_4(1,1,0.0);
+	network.makeFirstInputOfSecond(id_2,id_4,con_2_4);
+	DelayedConnection con_0_5(1,1,0.0);
+	network.makeFirstInputOfSecond(id_0,id_5,con_0_5);
+	DelayedConnection con_1_6(1,1,0.0);
+	network.makeFirstInputOfSecond(id_1,id_6,con_1_6);
+	DelayedConnection con_1_7(1,1,0.0);
+	network.makeFirstInputOfSecond(id_1,id_7,con_1_7);
+	DelayedConnection con_3_0(3000,0.0004,0.0);
+	network.makeFirstInputOfSecond(id_3,id_0,con_3_0);
+	DelayedConnection con_4_0(3000,0.0002,0.0);
+	network.makeFirstInputOfSecond(id_4,id_0,con_4_0);
+	DelayedConnection con_6_0(1250,-6e-6,0.0);
+	network.makeFirstInputOfSecond(id_6,id_0,con_6_0);
+	DelayedConnection con_5_0(1250,3e-5,0.0);
+	network.makeFirstInputOfSecond(id_5,id_0,con_5_0);
+	DelayedConnection con_7_1(10000,1e-10,0.0);
+	network.makeFirstInputOfSecond(id_7,id_1,con_7_1);
 	// generation simulation parameter
-	MPILib::report::handler::RootReportHandler handler("wilsoncowan",true);
-	SimulationRunParameter par_run( handler,1000000,0,0.3,1e-05,1e-05,"wilson.log",1e-03);
+	MPILib::report::handler::RootReportHandler handler("duffin",true);
+	SimulationRunParameter par_run( handler,1000000,0,5.0,1e-05,1e-05,"omurtag.log",1e-03);
 	network.configureSimulation(par_run);
 	network.evolve();
 	return 0;
-}
-MPILib::Rate RateFunction_1(MPILib::Time t){
-	return 100.0*sin(100e-3*t) + 100.0;
 }

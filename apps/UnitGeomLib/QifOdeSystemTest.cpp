@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(QIFOdeSystemTest)
         gamma
     );
 
-	PopulationParameter par_neuron(V_peak, V_reset, V_reset, t_ref, t_mem);
+	NeuronParameter par_neuron(V_peak, V_reset, V_reset, t_ref, t_mem);
     OdeParameter
     par_ode
     (
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(QIFEvolvePositive)
         gamma
     );
 
-	PopulationParameter par_neuron(V_peak, V_reset, V_reset, t_ref, t_mem);
+	NeuronParameter par_neuron(V_peak, V_reset, V_reset, t_ref, t_mem);
 
     OdeParameter
     par_ode
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(RateCalculationTest)
         gamma
     );
 
-	PopulationParameter par_neuron(V_peak, V_reset, V_reset, t_ref, t_mem);
+	NeuronParameter par_neuron(V_peak, V_reset, V_reset, t_ref, t_mem);
     // create a peak
     OdeParameter
     par_ode

@@ -37,7 +37,6 @@
 #include "IsFinite.h"
 #include "MToCm.h"
 #include "NumericException.h"
-#include "Page.h"
 #include "ParameterScan.h"
 #include "Persistant.h"
 #include "Point.h"

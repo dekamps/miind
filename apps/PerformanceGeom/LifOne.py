@@ -8,6 +8,7 @@ NEST_FILE = 'om_counts.dat'
 ROOT_FILE = 'singlepoptest_0.root'
 DENS_FILE = 'density_count.dat'
 
+
 def parse_sim_res_dense():
     f = open(DENS_FILE)
     lines = f.readlines()
@@ -58,7 +59,7 @@ def parse_sim_res_spike():
 def plot_rate_results():
     ROOT.gStyle.SetOptStat(0)
     type=111
-    ps = ROOT.TSVG('rate.svg',type)
+    ps = ROOT.TPostScript('rate.eps',type)
     ps.Range(12.0,5.0)
     k  = ROOT.TCanvas()
     f  = ROOT.TFile(TEST_PATH + 'singlepoptest_0.root')
@@ -81,7 +82,7 @@ def plot_rate_results():
 def plot_dens_results():
     ROOT.gStyle.SetOptStat(0)
     type=111
-    ps = ROOT.TSVG('dense.svg',type)
+    ps = ROOT.TPostScript('dense.eps',type)
     ps.Range(12.0,5.0)
     k  = ROOT.TCanvas()
     f  = ROOT.TFile(TEST_PATH + 'singlepoptest_0.root')
@@ -101,6 +102,7 @@ def plot_dens_results():
     return
 
 if __name__ == "__main__":
+    print 'Run the LifOne executable before running this script.'
     plot_rate_results()
     plot_dens_results()
 

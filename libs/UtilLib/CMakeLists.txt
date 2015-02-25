@@ -9,16 +9,14 @@ endif (WIN32)
 
 set( util_SRC
 	AttributeList.cpp
-    DinA.cpp
     GeneralException.cpp
     Incremental.cpp
     Line.cpp
     LineAttributes.cpp
     LogStream.cpp
-	Named.cpp
-    Page.cpp
+    Named.cpp
     ParameterScan.cpp
-	Persistant.cpp
+    Persistant.cpp
     PositionInCm.cpp
     RGBValue.cpp
     Rect.cpp
@@ -30,7 +28,6 @@ set( util_SRC
     Series.cpp
     Streamable.cpp
     Timer.cpp
-    Util.cpp
     UtilLibException.cpp
     UtilTest.cpp )
     
@@ -40,7 +37,6 @@ set( util_HEADERS
     BasicDefinitions.h
     ColorTable.h
     ConcreteStreamable.h
-    DinA.h
     FailAlloc.h
     GeneralException.h
     Incremental.h
@@ -53,7 +49,6 @@ set( util_HEADERS
     MToCm.h
 	Named.h
     NumericException.h
-    Page.h
     PaperFormatError.h
     ParameterScan.h
 	Persistant.h

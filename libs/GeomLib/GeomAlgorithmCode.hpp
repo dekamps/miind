@@ -102,6 +102,8 @@ namespace GeomLib {
 		const std::vector<MPILib::NodeType>& typeVector
 	)
 	{
+	         assert(nodeVector.size() >0);
+		 assert(nodeVector.size() == weightVector.size());
 		_p_zl->sortConnectionVector(nodeVector,weightVector,typeVector);
 	}
 

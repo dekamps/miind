@@ -35,8 +35,8 @@ namespace algorithm {
  * In some simulations connections must be implemented with time delays. If that needs to be done with
  * high precision, create a node, configure it with a DelayAlgorithm, connected the output to be delayed
  * to this node and connect the output of this node to the node specified by the original connection. At the
- * moment this is the only way to implement delays. A less precise effect can be achieved with Wilson-Cowan algorithms.
- * For large-scale simulations this solution may not be sustainable. Please provide feedback if this is the case.
+ * moment this is the only way to implement delays. Please note that it is expected that the node that
+ * carries this algorithm expects one and only one input node. 
  *
  */
 template<class Weight>
@@ -68,16 +68,16 @@ public:
 	/**
 	 * Evolve the node state. Overwrite this method if your algorithm does not
 	 * need to know the NodeTypes.
-	 * @param nodeVector Vector of the node States
-	 * @param weightVector Vector of the weights of the nodes
+	 * @param nodeVector Vector of the node States. If the size its different from 1, results are undefined. In Debug builds an assert will be triggered.
+	 * @param weightVector Vector of the weights of the nodes. It must have length one. The numerial value of the weight will be ignored.
 	 * @param time Time point of the algorithm
 	 */
 	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
 			const std::vector<Weight>& weightVector, Time time);
 
 	/**
-	 * The current timepoint
-	 * @return The current time point
+	 * The current time
+	 * @return The current time
 	 */
 	virtual Time getCurrentTime() const;
 
@@ -92,6 +92,13 @@ public:
 	 * @return The state of the algorithm
 	 */
 	virtual AlgorithmGrid getGrid() const;
+
+	/**
+	 * Gets the delay time determining this algorithm. Does not need
+	 * to be virtual, as it is not part of the AlgorithmInterface
+	 */
+
+	Time getDelayTime() const { return _t_delay; }
 
 private:
 

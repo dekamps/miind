@@ -47,14 +47,16 @@ std::vector<NodeId> RootReportHandler::_nodes(0);
 ValueHandlerHandler RootReportHandler::_valueHandler;
 
 RootReportHandler::RootReportHandler(const std::string& file_name,
-		bool writeState) :
+		bool writeState, bool bOnCanvas, const CanvasParameter& par_canvas) :
 		AbstractReportHandler(file_name), //
-		_isStateWriteMandatory(writeState) {
+		_isStateWriteMandatory(writeState),_bOnCanvas(bOnCanvas),_canvas(par_canvas)
+		{
 }
 
 RootReportHandler::RootReportHandler(const RootReportHandler& rhs) :
 		AbstractReportHandler(rhs.getFileName()), //
-		_isStateWriteMandatory(rhs._isStateWriteMandatory) {
+		_isStateWriteMandatory(rhs._isStateWriteMandatory),
+		_bOnCanvas(rhs._bOnCanvas),_canvas(rhs.getCanvasParameter()){
 	if (rhs._spCurrentRateGraph)
 		throw utilities::Exception(STR_HANDLER_STALE);
 }
@@ -84,13 +86,16 @@ void RootReportHandler::writeReport(const Report& report) {
 
 	_spCurrentRateGraph->SetPoint(_nrReports++, report._time, report._rate);
 
+	_canvas.Render(RATE,report._id,_spCurrentRateGraph.get());
 	_spCurrentStateGraph.reset();
 	_spCurrentStateGraph = convertAlgorithmGridToGraph(report);
 
-	if (report._type == STATE && isConnectedToAlgorithm()
-			&& (isStateWriteMandatory()))
-		_spCurrentStateGraph->Write();
+	_canvas.Render(STATE,report._id,_spCurrentStateGraph.get());
 
+	if (report._type == STATE && isConnectedToAlgorithm()
+			&& (isStateWriteMandatory())){
+		_spCurrentStateGraph->Write();
+	}
 	// always log ReportValue elements
 	_valueHandler.addReport(report);
 }
@@ -191,6 +196,16 @@ bool RootReportHandler::isConnectedToAlgorithm() const {
 
 bool RootReportHandler::isStateWriteMandatory() const {
 	return _isStateWriteMandatory;
+}
+
+void RootReportHandler::addNodeToCanvas(NodeId id) {
+	if (_bOnCanvas)
+		_canvas.addNode(id);
+}
+
+CanvasParameter RootReportHandler::getCanvasParameter() const
+{
+	return _canvas.getCanvasParameter();
 }
 
 } // end namespace of handler

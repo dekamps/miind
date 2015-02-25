@@ -32,18 +32,18 @@ namespace MPILib {
 //! of the simulation must be specified. Report time indicates at which time the simulation results should be written
 //! by the Handler. Clearly one wants to set a report time that on the one hand represents the simulation accurately,
 //! but on the other hand does not burden the simulation by writing out massive amounts of data, thereby impeding
-//! simulation effciency. An update time allows to set a report time for an online visualisation module. The objective
+//! simulation efficiency. An update time allows to set a report time for an online visualisation module. The objective
 //! of online visualization is typically to monitor whether the simulation behaves as expected, whilst running.
 //! Since visualization can make a heavy demand on processing time on a single core machine (e.g. during development),
 //! it makes sense to update much less than to report.
 //! The maximum number of iterations is there to prevent endless loops or to specify a maximum number of
 //! iterations that is reasonable. It allows for automatically breaking off simulations that have gone on expectedly
-//! long. The string specfies the path of the log file, where the status of the simulation is reported during running.
+//! long. The string specifies the path of the log file, where the status of the simulation is reported during running.
 //! In some simulations, typically involving population density techniques, the nodes have an activity as well as a
 //! state. By default only activities are written into the simulation results by the handler, but optionally an
-//! Algorithms state can be stored as well. This is specfied by the State Report time, which must be set in order
+//! Algorithms state can be stored as well. This is specified by the State Report time, which must be set in order
 //! for more than just the beginning and the end state to be written out.
-//! See the example programs in PopulistLib for applications.
+//! See the example programs in BasicDemos for applications.
 
 class SimulationRunParameter {
 public:
@@ -58,11 +58,12 @@ public:
 	 * @param t_step Network step time
 	 * @param name_log Log file path name @attention without extension If you do not provide a string the log is printed to \c std::cerr
 	 * @param t_state_report Report State time
+	 * @param bOnCanvas Whether or not a simulation should shown on a Canvas. This only works on code that has been compiled with MPI_ENABLED switched off.
 	 */
 	SimulationRunParameter(
 			const report::handler::AbstractReportHandler& handler,
 			Number max_iter, Time t_begin, Time t_end, Time t_report,
-			Time t_step, const std::string& name_log ="", Time t_state_report = 0);
+			Time t_step, const std::string& name_log ="", Time t_state_report = 0, bool bOnCanvas = false);
 
 	/**
 	 * copy constructor
@@ -140,7 +141,7 @@ private:
 
 	Time _tStateReport;
 
-
+	bool _bOnCanvas;
 };
 
 } // end of namespace MPILib

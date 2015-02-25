@@ -29,6 +29,7 @@ using namespace MPILib;
 
 //BOOST_FIXTURE_TEST_SUITE( s, SinglePopulationNetworkFixture<OrnsteinUhlenbeckConnection> )
 
+/*
 //____________________________________________________________________________//
 
 BOOST_AUTO_TEST_CASE( QIF_Algorithm_Create_And_Copy )
@@ -138,7 +139,7 @@ BOOST_AUTO_TEST_CASE(SingleInputTest)
 }
 */
 //-----------------------------------------------
-BOOST_AUTO_TEST_CASE(NoInputNetworkTest)
+/*BOOST_AUTO_TEST_CASE(NoInputNetworkTest)
 {
 
 	Potential V_min		 = -10.0;
@@ -370,7 +371,7 @@ BOOST_AUTO_TEST_CASE(LIFSingleInputTest){
 
 }
 
-
+*//*
 BOOST_AUTO_TEST_CASE(LIFSingleInputTestWithNegativePotential){
 
 	Potential V_min	     = -1.0;
@@ -382,7 +383,7 @@ BOOST_AUTO_TEST_CASE(LIFSingleInputTestWithNegativePotential){
 
 	Number n_bins = 300;
 
-	PopulationParameter par_neuron(V_peak, V_reset, V_reversal, t_ref, t_mem);
+	NeuronParameter par_neuron(V_peak, V_reset, V_reversal, t_ref, t_mem);
 
 	InitialDensityParameter par_dense(V_min,0.0);
 	OdeParameter
@@ -396,7 +397,7 @@ BOOST_AUTO_TEST_CASE(LIFSingleInputTestWithNegativePotential){
 
 	LifNeuralDynamics dyn(par_ode, 0.01);
 	LeakingOdeSystem sys(dyn);
-	GeomAlgorithm<PopulationConnection> alg_geom(sys);
+	GeomAlgorithm<DelayedConnection> alg_geom(sys);
 
 	AlgorithmInputSimulationFixture<OU_Connection> fixt(800.,0.03);
 	pair<predecessor_iterator, predecessor_iterator>  par = fixt.GenerateInput();

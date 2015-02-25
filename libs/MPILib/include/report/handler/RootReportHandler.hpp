@@ -25,7 +25,9 @@
 #include <memory>
 #include <MPILib/include/report/handler/AbstractReportHandler.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/report/handler/ValueHandlerHandler.hpp>
+#include "CanvasParameter.hpp"
+#include "RootCanvasNoMPI.hpp"
+#include "ValueHandlerHandler.hpp"
 
 // forward declarations 
 
@@ -54,9 +56,10 @@ public:
 	/**
 	 * Constructor
 	 * @param file_name The name of the root file
-	 * @param b_force_state_write True if the state should be written to the root file
+	 * @param b_force_state_write Set true if the state should be written to the root file
+	 * @param bOnScreen Set true if a running simulation must be shown on a Canvas. Ineffective if compiled with MPI_ENABELED
 	 */
-	RootReportHandler(const std::string& file_name, bool b_force_state_write = false);
+	RootReportHandler(const std::string& file_name, bool b_force_state_write = false, bool bOnCanvas = false, const CanvasParameter& = DEFAULT_CANVAS);
 
 	/**
 	 * Copy constructor
@@ -92,6 +95,17 @@ public:
 	 * @param nodeId The NodeId of the Node
 	 */
 	virtual void detachHandler(const NodeId& nodeId);
+
+	/**
+	 * To show a running simulation a node must be adde to a canvas. The state and rate
+	 * of the node will be rendered as the simulation progresses.
+	 */
+	void addNodeToCanvas(NodeId);
+
+	/**
+	 *  get the parameter that was used to configure the canvas;
+	 */
+	CanvasParameter getCanvasParameter() const;
 
 private:
 
@@ -161,6 +175,9 @@ private:
 	 */
 	int _nrReports = 0;
 
+	bool _bOnCanvas = false;
+
+	RootCanvas _canvas;
 };
 
 }// end namespace of handler

@@ -51,6 +51,8 @@ void DelayAlgorithm<Weight>::evolveNodeState(
 		const std::vector<Rate>& nodeVector,
 		const std::vector<Weight>& weightVector, Time time) {
 
+        assert(nodeVector.size() == 1);
+	assert(weightVector.size() == 1);
 	Rate rate = (*nodeVector.begin());
 
 	rate_time_pair p;
