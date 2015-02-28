@@ -168,6 +168,7 @@ namespace
     	Number n_bins = system.NumberOfBins();
         Index i_reset  = system.IndexResetBin();
  //       cout << "rate_e: " << rate_e << endl;
+
     	for (Index i = 0; i < n_bins; i++){
 
             BinEstimator::CoverPair pair_cover = vec_cover_pair[i];
@@ -219,8 +220,9 @@ namespace
     {
     	Number n_bins = system.NumberOfBins();
    // 	cout << "rate_i: " << rate_i << endl;
+
     	for (Index i = 0; i < n_bins; i++){
-            BinEstimator::CoverPair pair_cover = vec_cover_pair[i];
+           BinEstimator::CoverPair pair_cover = vec_cover_pair[i];
             if (pair_cover.first._index == pair_cover.second._index) {
                  if (pair_cover.first._index >= 0 && pair_cover.first._index < static_cast<int>(n_bins)) {
                      Index i_trans = pair_cover.first._index;
@@ -252,8 +254,8 @@ namespace
 
              if (i > static_cast<Index>(i_shift))
                  dydt[system.MapPotentialToProbabilityBin(i)] -= rate_i * y[system.MapPotentialToProbabilityBin(i)];
-         }
 
+    	}
     }
 
     void SetDyDtZero(double dydt[], Number n_bins)
@@ -359,6 +361,7 @@ double NumericalMasterEquation::RecaptureProbability()
 
 void NumericalMasterEquation::apply(Time t)
 {
+
     InitializeIntegrator();
     // initialize caching values for the bin estimator
 
@@ -374,6 +377,7 @@ void NumericalMasterEquation::apply(Time t)
     t_integrator = 0.0;
 
     double p = 0;
+
     while (t_integrator < t){
         t_integrator = _integrator.Evolve(t);
         p += RecaptureProbability();

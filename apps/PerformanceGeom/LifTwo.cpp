@@ -34,8 +34,8 @@ int main(){
   LeakingOdeSystem sys_e(dyn_e);
   LeakingOdeSystem sys_i(dyn_i);
 
-  GeomParameter par_e(sys_e,PerformanceGeom::EXC_DIFF,1.0);
-  GeomParameter par_i(sys_i,PerformanceGeom::INH_DIFF,1.0);
+  GeomParameter par_e(sys_e,PerformanceGeom::EXC_DIFF);
+  GeomParameter par_i(sys_i,PerformanceGeom::INH_DIFF);
 
   NodeId id_cortical_background;
   NodeId id_excitatory_main;
@@ -52,10 +52,28 @@ int main(){
      par_i
      );
 
+
+  MPILib::report::handler::RootReportHandler handler("test/twopopcanvas.root", true);
+  handler.addNodeToCanvas(id_excitatory_main);
+  handler.addNodeToCanvas(id_inhibitory_main);
+
+  SimulationRunParameter
+    par_run
+    (
+     handler,
+     1000000000,
+     0.,
+     0.05,
+     1e-4,
+     1e-5,
+     "test/twopop.log",
+     1e-4
+     );
+
  
   network.configureSimulation
   (
-   PerformanceGeom::TWOPOP_PARAMETER
+   par_run
    );
 
  

@@ -85,12 +85,13 @@ void RootReportHandler::writeReport(const Report& report) {
 	}
 
 	_spCurrentRateGraph->SetPoint(_nrReports++, report._time, report._rate);
-
-	_canvas.Render(RATE,report._id,_spCurrentRateGraph.get());
+	if (_bOnCanvas)
+		_canvas.Render(RATE,report._id,_spCurrentRateGraph.get());
 	_spCurrentStateGraph.reset();
 	_spCurrentStateGraph = convertAlgorithmGridToGraph(report);
 
-	_canvas.Render(STATE,report._id,_spCurrentStateGraph.get());
+	if (_bOnCanvas)
+		_canvas.Render(STATE,report._id,_spCurrentStateGraph.get());
 
 	if (report._type == STATE && isConnectedToAlgorithm()
 			&& (isStateWriteMandatory())){

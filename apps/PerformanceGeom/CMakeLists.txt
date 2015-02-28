@@ -32,6 +32,10 @@ set (TWOLIF_GEOM_SRC
 	LifTwo.cpp
 )
 
+set (TWOLIF_CANVAS_GEOM_SRC 
+	LifTwoCanvas.cpp
+)
+
 set (ONEQIF_GEOM_SRC
         QifJumpPoisson.cpp)	
 
@@ -66,6 +70,9 @@ target_link_libraries(LifOneCanvas ${LIBLIST})
 
 add_executable(LifTwo ${TWOLIF_GEOM_SRC})
 target_link_libraries(LifTwo ${LIBLIST})
+
+add_executable(LifTwoCanvas ${TWOLIF_CANVAS_GEOM_SRC})
+target_link_libraries(LifTwoCanvas ${LIBLIST})
 
 add_executable(QifOnePoisson ${ONEQIF_GEOM_SRC})
 target_link_libraries(QifOnePoisson ${LIBLIST})

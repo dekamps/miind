@@ -45,13 +45,12 @@ namespace GeomLib {
 		//! Standard constructor
 		CurrentCompensationParameter
 		(
-			MPILib::Potential I = 0,    //!< current
-			MPILib::Potential sigma = 0 //!< variability
+			MPILib::Potential I,    //!< current
+			MPILib::Potential sigma  //!< variability
 		):
 		_I(I),
 		_sigma(sigma)
 		{
-			assert( ! (I != 0 && sigma == 0.0 ));
 		}
 
 		//! Many models will not use CurrentCompensation; the convention is that as long as sigma is positive

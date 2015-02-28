@@ -89,26 +89,7 @@ const GeomLib::InitialDensityParameter
 
   // prevent endless loop
   const Number TWOPOP_NUMBER_INTEGRATION_MAXIMUM = 1000000;
-  const MPILib::report::handler::RootReportHandler
 
-  TWOPOP_HANDLER
-  (
-   "test/twopoptest.root",
-   true
-  );
-
-	const SimulationRunParameter 
-		TWOPOP_PARAMETER
-		(
-			TWOPOP_HANDLER,
-			TWOPOP_NUMBER_INTEGRATION_MAXIMUM,
-			TWOPOP_T_BEGIN,
-			TWOPOP_T_END,
-			TWOPOP_T_REPORT,
-			TWOPOP_T_NETWORK,
-			"test/twopoptest.log",
-			1e-5
-		);
 }
 
 #endif // include guard
