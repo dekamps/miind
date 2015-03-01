@@ -22,6 +22,7 @@
 #include <vector>
 #include <iostream>
 #include <cassert>
+#include <algorithm>
 #include <MPILib/include/report/handler/RootCanvasNoMPI.hpp>
 #include <TCanvas.h>
 #include <TH2F.h>
@@ -94,7 +95,7 @@ void RootCanvas::Render(report::ReportType type, NodeId id, TGraph* p_graph){
 void RootCanvas::AddToCycle(NodeId id)
 {
 	// could be more efficient but rendering takes a lot of time anyway; this will not be the performance bottleneck
-	std::vector<NodeId>::iterator iter = find(_vec_id.begin(),_vec_id.end(),id);
+	std::vector<NodeId>::iterator iter = std::find(_vec_id.begin(),_vec_id.end(),id);
 	if (iter == _vec_id.end())
 		return;
 
@@ -104,7 +105,7 @@ void RootCanvas::AddToCycle(NodeId id)
 
 bool RootCanvas::IsCycleComplete(){
 	std::vector<int>::iterator iter;
-	iter = find(_vec_scratch.begin(),_vec_scratch.end(),0);
+	iter = std::find(_vec_scratch.begin(),_vec_scratch.end(),0);
 	if (iter == _vec_scratch.end()){
 		for (iter = _vec_scratch.begin(); iter != _vec_scratch.end(); iter++)
 			*iter = 0;

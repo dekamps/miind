@@ -21,6 +21,7 @@
 #ifndef  MPILIB_REPORT_HANDLER_ROOTCANVASMPI_HP
 #define  MPILIB_REPORT_HANDLER_ROOTCANVASMPI_HP
 
+#include "CanvasParameter.hpp"
 namespace MPILib {
  // MPI enable so these are no-ops
 class RootCanvas {

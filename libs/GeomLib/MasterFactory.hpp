@@ -47,6 +47,6 @@ namespace GeomLib {
 			);
 
 	};
-};
+}
 
 #endif // include guard

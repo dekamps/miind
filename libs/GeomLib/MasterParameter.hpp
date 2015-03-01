@@ -28,7 +28,7 @@ using MPILib::Rate;
 
 namespace GeomLib {
 
-		//! An auxilliary struct to help communicate with GSL C code. This parameter
+		//! An auxiliary struct to help communicate with GSL C code. This parameter
 		//! is passed in as void* and recovered by a recast. For this reason there
 		//! are naked pointers in this object. They do not own. In an earlier version
 		//! of the code a cache was included, which may have led to undefined behaviour.
@@ -54,7 +54,7 @@ namespace GeomLib {
 
 
 		};
-};
+}
 
 
 
