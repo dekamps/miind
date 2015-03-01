@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(SingleInputTest) {
 	NeuronParameter par_neuron(20e-3,0.0,0.0,0.,10e-3);
 	DiffusionParameter par_diff(0.03,0.05);
 
-	CurrentCompensationParameter par_curr;
+	CurrentCompensationParameter par_curr(0.,0.);
 	InitialDensityParameter par_dense(0.,0.);
 
 	Number n_bins = 5;

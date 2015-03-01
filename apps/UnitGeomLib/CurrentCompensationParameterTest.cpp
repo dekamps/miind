@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(CurrentCompensationParameterTest ) {
 	CurrentCompensationParameter par_2(0.0,0.01);
 	BOOST_CHECK(par_2.NoCurrentCompensation() == false);
 
-	CurrentCompensationParameter par_3;
+	CurrentCompensationParameter par_3(0.0,0.0);
 	BOOST_CHECK(par_3.NoCurrentCompensation() == true);
 
 	CurrentCompensationParameter par_4(0.0,0.0);

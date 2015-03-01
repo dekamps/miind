@@ -30,14 +30,6 @@
 const int CANVAS_X_DIMENSION    = 800;
 const int CANVAS_Y_DIMENSION    = 800;
 const int NUMBER_HISTO_CHANNELS = 500;
-const double T_MIN = 0.0;
-const double T_MAX = 0.3;
-const double F_MIN = 0.0;
-const double F_MAX = 20.0;
-const double POTENTIAL_MIN = 0.0;
-const double POTENTIAL_MAX = 1.0;
-const double DENSITY_MIN   = 0.0;
-const double DENSITY_MAX   = 1.0;
 
 // need one global application object
 TApplication APPLICATION("application",0,0);
