@@ -13,3 +13,8 @@
 12_11_2014: Replaced test on EXCITATORY (INHIBITORY) in Dale's law test in MPINetworkCode.hpp by a test on IsExcitatory (IsInhibitory)
 
 19-11-2014: Added ENABLE_MPI to libs/MPILib/test/utilities/MPIProxy_test.cpp in order to compile when MPI_ENABLE is OFF
+
+25-01-2015  miind-1.0
+
+* Added RootCanvas: when ENABLE_MPI is not true, a running simulation an be tracked in a ROOT Canvas
+* Fixed a bug in GeomParameter
