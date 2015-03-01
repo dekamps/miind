@@ -1,0 +1,123 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<AbstractAlgorithm  type="GeomAlgorithm">
+<GeomAlgorithm Name="STN"  system="LeakingOdeSystem" lambda="0.01">
+<OdeParameter>
+<NeuronParameter>
+<t_membrane>6e-3</t_membrane>
+<t_refractive>2e-3</t_refractive>
+<V_threshold>20e-3</V_threshold>
+<V_reset>0</V_reset>
+<V_reversal>0</V_reversal>
+</NeuronParameter>
+<InitialDensityParameter> 
+<mu>0.0</mu>
+<sigma>0.0</sigma> 
+</InitialDensityParameter>
+<V_min>-0.02</V_min>
+<N_bins>2000</N_bins>
+</OdeParameter>
+</GeomAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm  type="GeomAlgorithm">
+<GeomAlgorithm Name="GPE"  system="LeakingOdeSystem" lambda="0.01">
+<OdeParameter>
+<NeuronParameter>
+<t_membrane>14e-3</t_membrane>
+<t_refractive>2e-3</t_refractive>
+<V_threshold>20e-3</V_threshold>
+<V_reset>0</V_reset>
+<V_reversal>0</V_reversal>
+</NeuronParameter>
+<InitialDensityParameter> 
+<mu>0.0</mu>
+<sigma>0.0</sigma> 
+</InitialDensityParameter>
+<V_min>-0.02</V_min>
+<N_bins>2000</N_bins>
+</OdeParameter>
+</GeomAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="RateAlgorithm">
+<RateAlgorithm Name="Input">
+<rate>1.8</rate>
+</RateAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="DelayAlgorithm">
+<DelayAlgorithm Name="I_STN_A">
+<delay>0.0</delay>
+</DelayAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="DelayAlgorithm">
+<DelayAlgorithm Name="I_STN_B">
+<delay>0.1</delay>
+</DelayAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="DelayAlgorithm">
+<DelayAlgorithm Name="STN_GPE">
+<delay>8e-3</delay>
+</DelayAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="DelayAlgorithm">
+<DelayAlgorithm Name="GPE_STN">
+<delay>8e-3</delay>
+</DelayAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="DelayAlgorithm">
+<DelayAlgorithm Name="GPE_GPE">
+<delay>4e-3</delay>
+</DelayAlgorithm>
+</AbstractAlgorithm>
+</Algorithms>
+<Nodes>
+<Node name="Node_STN" type="EXCITATORY_GAUSSIAN" algorithm="STN"></Node>
+<Node name="Node_GPE" type="EXCITATORY_GAUSSIAN" algorithm="GPE"></Node>
+<Node name="Node_Input" type="EXCITATORY_GAUSSIAN" algorithm="Input"></Node>
+<Node name="Delay_I_STN_A" type="EXCITATORY_GAUSSIAN" algorithm="I_STN_A"></Node>
+<Node name="Delay_I_STN_B" type="EXCITATORY_GAUSSIAN" algorithm="I_STN_B"></Node>
+<Node name="Delay_STN_GPE" type="EXCITATORY_GAUSSIAN" algorithm="STN_GPE"></Node>
+<Node name="Delay_GPE_STN" type="INHIBITORY_GAUSSIAN" algorithm="GPE_STN"></Node>
+<Node name="Delay_GPE_GPE" type="EXCITATORY_GAUSSIAN" algorithm="GPE_GPE"></Node>
+</Nodes>
+<Connections>
+<Connection In="Node_Input" Out="Node_GPE">3000 0.0002 0.0</Connection>
+<Connection In="Node_Input" Out="Delay_I_STN_A">1 1 0.0</Connection>
+<Connection In="Node_Input" Out="Delay_I_STN_B">1 1 0.0</Connection>
+<Connection In="Node_STN" Out="Delay_STN_GPE">1 1 0.0</Connection>
+<Connection In="Node_GPE" Out="Delay_GPE_STN">1 1 0.0</Connection>
+<Connection In="Node_GPE" Out="Delay_GPE_GPE">1 1 0.0</Connection>
+<Connection In="Delay_I_STN_A" Out="Node_STN">3000 0.0004 0.0</Connection>
+<Connection In="Delay_I_STN_B" Out="Node_STN">3000 0.0002 0.0</Connection>
+<Connection In="Delay_GPE_STN" Out="Node_STN">1250 -6e-6 0.0</Connection>
+<Connection In="Delay_STN_GPE" Out="Node_STN">1250  3e-5 0.0</Connection>
+<Connection In="Delay_GPE_GPE" Out="Node_GPE">10000  1e-10 0.0</Connection>
+</Connections>
+<SimulationIO>
+<SimulationName>duffin</SimulationName>
+<OnScreen>FALSE</OnScreen>
+<WithState>TRUE</WithState>
+<WriteNet>FALSE</WriteNet>
+<CanvasParameter>
+<T_min>0</T_min>
+<T_max>0.3</T_max>
+<F_max>0</F_max>
+<F_max>10</F_max>
+<State_min>0</State_min>
+<State_max>0.02</State_max>
+<Dense_max>0</Dense_max>
+<Dense_max>250</Dense_max>
+</CanvasParameter>
+<CanvasNodes>Name="LIF E" Name="LIF I"</CanvasNodes>
+</SimulationIO>
+<SimulationRunParameter>
+<max_iter>1000000</max_iter>
+<t_begin>0</t_begin>
+<t_end>50.0</t_end>
+<t_report>1e-05</t_report>
+<t_state_report>1e-03</t_state_report>
+<t_step>1e-05</t_step>
+<t_update>1e-05</t_update>
+<name_log>omurtag.log</name_log>
+</SimulationRunParameter>
+</Simulation>
