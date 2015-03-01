@@ -73,7 +73,7 @@ int main(){
 	network.makeFirstInputOfSecond(id_7,id_1,con_7_1);
 	// generation simulation parameter
 	MPILib::report::handler::RootReportHandler handler("duffin",true);
-	SimulationRunParameter par_run( handler,1000000,0,5.0,1e-05,1e-05,"omurtag.log",1e-03);
+	SimulationRunParameter par_run( handler,1000000,0,50.0,1e-05,1e-05,"omurtag.log",1e-03);
 	network.configureSimulation(par_run);
 	network.evolve();
 	return 0;
