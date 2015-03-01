@@ -23,6 +23,7 @@
 #define  MPILIB_REPORT_HANDLER_ROOTCANVASNOMPI_HP
 
 #include <vector>
+#include <memory>
 #include <TCanvas.h>
 #include <TGraph.h>
 #include <TPad.h>
