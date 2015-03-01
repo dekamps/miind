@@ -26,6 +26,7 @@
 #include <MPILib/include/report/handler/AbstractReportHandler.hpp>
 #include <MPILib/include/report/handler/RootCanvasMPI.hpp>
 #include <MPILib/include/report/handler/RootCanvasNoMPI.hpp>
+#include <MPILib/include/report/Report.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include "CanvasParameter.hpp"
 #include "ValueHandlerHandler.hpp"

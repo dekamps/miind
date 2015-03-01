@@ -37,7 +37,7 @@ public:
 	RootCanvas(const RootCanvas&){}
 
 	//! Get the dimensions of the canvas
-	CanvasParameter getCanvasParameter() const{}
+	CanvasParameter getCanvasParameter() const{return _par_canvas;}
 
 	//! Command that will cause the rendering of TGraph* belonging to the NodeId
 	void Render(report::ReportType, NodeId, TGraph*){}
@@ -46,6 +46,8 @@ public:
 	void addNode(NodeId){}
 
 private:
+
+	CanvasParameter _par_canvas;
 
 };
 
