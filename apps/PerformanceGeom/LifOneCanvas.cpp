@@ -85,7 +85,7 @@ int main(){
 	MPILib::DelayedConnection con(1,0.03,0.0);
 	network.makeFirstInputOfSecond(id_rate,id_alg,con);
 
-	MPILib::report::handler::RootReportHandler handler("test/singlepoptest", true, true );
+	MPILib::report::handler::RootReportHandler handler("singlepoptest", true, true);
 	handler.addNodeToCanvas(id_alg);
 
 	const SimulationRunParameter
@@ -94,8 +94,8 @@ int main(){
 			handler,
 			10000000,
 			0.0,
-			10.0,
-			1e-2,
+			0.5,
+			1e-3,
 			1e-4,
 			"test/singlepoptest.log"
 		);

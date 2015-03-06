@@ -39,6 +39,9 @@ set (TWOLIF_CANVAS_GEOM_SRC
 set (ONEQIF_GEOM_SRC
         QifJumpPoisson.cpp)	
 
+set (QIF_GEOM_SRC_CORRELATED
+        QifCorrelated.cpp)	
+
 #############################################################################
 # Libraries
 #############################################################################
@@ -76,5 +79,8 @@ target_link_libraries(LifTwoCanvas ${LIBLIST})
 
 add_executable(QifOnePoisson ${ONEQIF_GEOM_SRC})
 target_link_libraries(QifOnePoisson ${LIBLIST})
+
+add_executable(QifCorrelated ${QIF_GEOM_SRC_CORRELATED})
+target_link_libraries(QifCorrelated ${LIBLIST})
 
 

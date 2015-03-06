@@ -29,8 +29,6 @@ using GeomLib::DiffusionParameter;
 using GeomLib::GeomAlgorithm;
 using GeomLib::GeomParameter;
 using GeomLib::InitialDensityParameter;
-using GeomLib::LeakingOdeSystem;
-using GeomLib::LifNeuralDynamics;
 using GeomLib::OdeParameter;
 using GeomLib::NeuronParameter;
 using GeomLib::SpikingQifNeuralDynamics;
@@ -77,7 +75,7 @@ int main(){
 	GeomLib::QifParameter
 	  par_qif
 	  (
-	    0.5, // I = -1, negative net contribution
+	    0.5, // 
 	    0.5  // default gamma sys
 	  );
 
@@ -110,9 +108,9 @@ int main(){
 	par_canvas._t_min         = 0.0;
 	par_canvas._t_max         = 0.5;
 	par_canvas._f_min         = 0.0;
-	par_canvas._f_max         = 50.0;
+	par_canvas._f_max         = 10.0;
 	par_canvas._dense_min     = 0.0;
-	par_canvas._dense_max     = 20.0;
+	par_canvas._dense_max     = 5.0;
 
 
 	MPILib::report::handler::RootReportHandler handler("test/twopopcanvas.root", true, true, par_canvas);
@@ -127,7 +125,7 @@ int main(){
 			10000000,
 			0.0,
 			0.5,
-			1e-4,
+			2e-3,
 			1e-4,
 			"test/singlepoptest.log"
 		);

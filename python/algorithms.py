@@ -75,7 +75,78 @@ def parse_initialdensity_parameter(idp,i):
     s += sigma.text + ');\n'
     
     return s
+
+def parse_diffusion_parameter(i,alg):
+    s = ''
+    dp=alg.find('GeomAlgorithm/DiffusionParameter') 
+    dl=dp.find('diffusion_limit')
+    dj=dp.find('diffusion_jump')
+
+    s += '\tGeomLib::DiffusionParameter par_diffusion_' + str(i) +'('
+    s += dj.text + ','
+    s += dl.text + ');\n'
     
+    return s
+    
+def parse_current_compensation_parameter(i,alg):
+    s = ''
+    cc=alg.find('GeomAlgorithm/CurrentCompensationParameter')
+    mu=cc.find('mu')
+    si=cc.find('sigma')
+    
+    s += '\tGeomLib::CurrentCompensationParameter par_current_' + str(i) + '('
+    s += mu.text + ','
+    s += si.text + ');\n'
+    
+    return s
+    
+def DetermineSpikingSystem(i,alg):
+    sodes = alg.find('GeomAlgorithm/SpikingNeuralDynamics')
+
+    s = '\tGeomLib::'  + sodes.attrib['type']
+    s += ' dyn_'     + str(i) + '('
+    s += 'par_ode_'  + str(i) +','
+    s += 'par_qif_'  + str(i) + ');\n' 
+    
+    return s
+    
+def parse_current_parameter(i,alg):
+    s = ''
+    qp=alg.find('GeomAlgorithm/SpikingNeuralDynamics/QifParameter')
+    ii=qp.find('I')
+    s += '\tGeomLib::QifParameter par_qif_' + str(i) + '('
+    s += ii.text + ',' + ii.text + ');\n'
+
+    return s
+    
+def publish_spiking_ode_system(i,alg):
+    s=''
+    s += parse_current_parameter(i,alg)
+    s += parse_diffusion_parameter(i,alg)
+    s += parse_current_compensation_parameter(i,alg)
+    s += DetermineSpikingSystem(i,alg)    
+    s += '\tGeomLib::QifOdeSystem sys_ode_' + str(i) + '('
+    s += 'dyn_' + str(i) + ');\n'
+    
+    return s
+
+def publish_leaking_ode_system(lambdavalue,i):
+    s = ''    
+     
+    s += '\tGeomLib::LifNeuralDynamics dyn_ode_leak_' + str(i) + '('
+    s += 'par_ode_'     + str(i) + ', '
+    s += lambdavalue    + ');\n'
+    # ode sytem must be determined from the file
+    s += '\tGeomLib::LeakingOdeSystem sys_ode_' + str(i) +'('
+    s += 'dyn_ode_leak_' + str(i)  + ');\n'
+    return s
+    
+def  NonDefaultGeomParameterArgs(system, i):
+    if system == 'LeakingOdeSystem':
+        return ''
+    if system == 'SpikingOdeSystem':
+        return ', par_diffusion_' + str(i) + ', par_current_' + str(i)  
+
 def wrap_up_geom_algorithm(alg, i):
     s = ''
     algorithmname=alg.find('GeomAlgorithm')
@@ -83,32 +154,34 @@ def wrap_up_geom_algorithm(alg, i):
 
     if not 'Name' in  d.keys():
         raise NameError('Name tag expected')
-  
-    if d['system'] == 'LeakingOdeSystem':
-        if not 'lambda' in d.keys():
-            raise NameError('LeakingOdeSystem requires a lambda parameter')
-    else:
-        if d['system'] != 'SpikingOdeSystem':
-            raise NameError('Unknown system type')
 
     s += '\tGeomLib::OdeParameter par_ode_' + str(i) + '('
     s += 'n_bins_'      + str(i) + ','
     s += 'v_min_'       + str(i) + ','
     s += 'par_neur_'    + str(i) + ','
     s += 'par_dense_'   + str(i) + ');\n'
-     
-    s += '\tGeomLib::LifNeuralDynamics dyn_ode_leak_' + str(i) + '('
-    s += 'par_ode_'     + str(i) + ', '
-    s += d['lambda']    + ');\n'
-    # ode sytem must be determined from the file
-    s += '\tGeomLib::LeakingOdeSystem sys_ode_' + str(i) +'('
-    s += 'dyn_ode_leak_' + str(i)  + ');\n'
+  
+    if d['system'] == 'LeakingOdeSystem':
+        if not 'lambda' in d.keys():
+            raise NameError('LeakingOdeSystem requires a lambda parameter')
+        else:
+            s += publish_leaking_ode_system(d['lambda'],i)
+    else:
+        if d['system'] == 'SpikingOdeSystem':
+            s += publish_spiking_ode_system(i,alg)
+        else:
+            raise NameError('Unknown system type')
+
+
     # default parameters must be handled by GeomParameter
     s += '\tGeomLib::GeomParameter par_geom_' + str(i) + '('
-    s += 'sys_ode_'+ str(i) + ');\n'
+    s += 'sys_ode_'+ str(i) 
+    s +=  NonDefaultGeomParameterArgs(d['system'],i)       
+    s += ');\n'
     cpp_name = 'alg_geom_' + str(i)
     s += '\tGeomLib::GeomAlgorithm<DelayedConnection> ' + cpp_name + '('
-    s += 'par_geom_' + str(i) + ');\n'
+    s += 'par_geom_' + str(i)  
+    s += ');\n'
     s += '\n'
     Register(d['Name'], cpp_name)
 
