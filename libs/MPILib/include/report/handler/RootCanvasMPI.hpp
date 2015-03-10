@@ -1,3 +1,4 @@
+// Copyright (c) 2005 - 2015 Marc de Kamps
 //
 // All rights reserved.
 //
@@ -21,12 +22,25 @@
 #ifndef  MPILIB_REPORT_HANDLER_ROOTCANVASMPI_HP
 #define  MPILIB_REPORT_HANDLER_ROOTCANVASMPI_HP
 
-#include <TGraph.h>
-#include "CanvasParameter.hpp"
+#include <vector>
+#include <memory>
 #include <MPILib/include/TypeDefinitions.hpp>
+#include "CanvasParameter.hpp"
+#include "../ReportType.hpp"
+
+class TGraph;
+
 
 namespace MPILib {
- // MPI enable so these are no-ops
+/**
+ * @brief Represents a ROOT canvas for the visualization of a running simulation. In general this class will not be created by the typical user.
+ *
+ * A RootReportHandler is responsible for logging the simulation results. When
+ * ENABLE_MPI is not active, it is possible to add nodes to a canvas, and the
+ * state and firing rate of each population is then rendered as the simulation
+ * progresses. When ENABLE_MPI is not active all its functions are no-ops.
+ */
+
 class RootCanvas {
 public:
 
@@ -37,7 +51,7 @@ public:
 	RootCanvas(const RootCanvas&){}
 
 	//! Get the dimensions of the canvas
-	CanvasParameter getCanvasParameter() const{return _par_canvas;}
+	CanvasParameter getCanvasParameter() const { return _par_canvas; }
 
 	//! Command that will cause the rendering of TGraph* belonging to the NodeId
 	void Render(report::ReportType, NodeId, TGraph*){}
@@ -46,14 +60,11 @@ public:
 	void addNode(NodeId){}
 
 private:
-
 	CanvasParameter _par_canvas;
-
 };
 
+} //end of MPILib
+
+#endif //ENABLE_MPI
 
 #endif // include guard
-
-#endif // ENABLE_MPI
-
-

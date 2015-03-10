@@ -4,7 +4,61 @@ Created on Wed Jan 21 14:28:18 2015
 
 @author: scsmdk
 """
+from nodes import NODE_NAMES
 
+def parse_canvas_handler(tree):
+    par=tree.find('CanvasParameter')
+    tmin=par.find('T_min')
+    s = ''
+    s += '\tconst MPILib::Time tmin = '
+    s += tmin.text +';\n'
+    
+    tmax = par.find('T_max')
+    s += '\tconst MPILib::Time tmax = '
+    s += tmax.text +';\n'
+
+    fmin = par.find('F_min')
+    s += '\tconst MPILib::Rate fmin = '
+    s += fmin.text +';\n'
+
+    fmax = par.find('F_max')
+    s += '\tconst MPILib::Rate fmax = '
+    s += fmax.text +';\n'
+
+    statemin = par.find('State_min')
+    s += '\tconst MPILib::Potential statemin = '
+    s += statemin.text +';\n'
+
+    statemax = par.find('State_max')
+    s += '\tconst MPILib::Potential statemax = '
+    s += statemax.text +';\n'
+
+    densemin = par.find('Dense_min')
+    s += '\tconst MPILib::Potential densemin = '
+    s += densemin.text +';\n'
+
+    densemax = par.find('Dense_max')
+    s += '\tconst MPILib::Potential densemax = '
+    s += densemax.text +';\n'
+
+    s += '\tMPILib::CanvasParameter par_canvas('
+    s += 'tmin,'
+    s += 'tmax,'
+    s += 'fmin,'
+    s += 'fmax,'
+    s += 'statemin,'
+    s += 'statemax,'
+    s += 'densemin,'
+    s += 'densemax);\n\n'
+    return s
+    
+def add_nodes(tree):
+    s= ''
+    nodes=tree.findall('CanvasNode')
+    for node in nodes:
+        s += '\thandler.addNodeToCanvas(id_' +  str(NODE_NAMES[node.attrib['Name']]) + ');\n'
+    return s
+    
 def parse_simulation(tree,outfile):
     name=tree.find('SimulationName')
     name_str = name.text
@@ -18,10 +72,20 @@ def parse_simulation(tree,outfile):
             state_bool='false'
         else:
             raise NameError('Cannot interpret WithState')
-            
-    s  = '\tMPILib::report::handler::RootReportHandler handler(\"'
-    s += name_str   + '\",'
-    s += state_bool + ');\n'
+    
+    screen=tree.find('OnScreen')
+    if screen.text == 'TRUE':
+        s = parse_canvas_handler(tree)
+        s += '\tMPILib::report::handler::RootReportHandler handler(\"'
+        s += name_str + '\",'
+        s += state_bool + ','
+        s += 'true, par_canvas);\n'
+        
+        s += add_nodes(tree)
+    else: 
+        s  = '\tMPILib::report::handler::RootReportHandler handler(\"'
+        s += name_str   + '\",'
+        s += state_bool + ');\n\n'
     
     outfile.write(s)
     return

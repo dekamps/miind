@@ -34,8 +34,19 @@ int main(){
 	DelayedConnection con_1_0(800,0.03,0);
 	network.makeFirstInputOfSecond(id_1,id_0,con_1_0);
 	// generation simulation parameter
-	MPILib::report::handler::RootReportHandler handler("omurtag",true);
-	SimulationRunParameter par_run( handler,1000000,0,0.3,1e-05,1e-05,"omurtag.log",1e-03);
+	const MPILib::Time tmin = 0;
+	const MPILib::Time tmax = 0.1;
+	const MPILib::Rate fmin = 0;
+	const MPILib::Rate fmax = 100;
+	const MPILib::Potential statemin = -10.0;
+	const MPILib::Potential statemax = 10.0;
+	const MPILib::Potential densemin = 0;
+	const MPILib::Potential densemax = 2;
+	MPILib::CanvasParameter par_canvas(tmin,tmax,fmin,fmax,statemin,statemax,densemin,densemax);
+
+	MPILib::report::handler::RootReportHandler handler("omurtag",true,true, par_canvas);
+	handler.addNodeToCanvas(id_0);
+	SimulationRunParameter par_run( handler,1000000,0,0.3,1e-03,1e-05,"omurtag.log",1e-03);
 	network.configureSimulation(par_run);
 	network.evolve();
 	return 0;

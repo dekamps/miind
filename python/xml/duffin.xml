@@ -101,7 +101,7 @@
 <CanvasParameter>
 <T_min>0</T_min>
 <T_max>0.3</T_max>
-<F_max>0</F_max>
+<F_min>0</F_min>
 <F_max>10</F_max>
 <State_min>0</State_min>
 <State_max>0.02</State_max>
