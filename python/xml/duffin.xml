@@ -95,7 +95,7 @@
 </Connections>
 <SimulationIO>
 <SimulationName>duffin</SimulationName>
-<OnScreen>FALSE</OnScreen>
+<OnScreen>TRUE</OnScreen>
 <WithState>TRUE</WithState>
 <WriteNet>FALSE</WriteNet>
 <CanvasParameter>
@@ -105,10 +105,10 @@
 <F_max>10</F_max>
 <State_min>0</State_min>
 <State_max>0.02</State_max>
-<Dense_max>0</Dense_max>
+<Dense_min>0</Dense_min>
 <Dense_max>250</Dense_max>
 </CanvasParameter>
-<CanvasNodes>Name="LIF E" Name="LIF I"</CanvasNodes>
+<CanvasNode Name="Node_GPE"></CanvasNode>
 </SimulationIO>
 <SimulationRunParameter>
 <max_iter>1000000</max_iter>
