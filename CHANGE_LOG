@@ -1,20 +1,1292 @@
-10-11-2014: Added warning for intel compiler support, some required C++11 features are not yet supported.
+*Important changes with respect to the 1.0 version:
+- A bug in the copy constructor of GeomParameter was removed
+- The running canvas option is back non-MPI enebaled versions: you can observe running simulations
+- XML examples were added
 
-12-11-2014: Moved all applications to subdirectories: BasicDemos, largeNetwork
 
-12-11-2014: Added UnitGeomLib test suite in the apps directory
 
-12-11-2014: Added UnitGeomLib to libs
+2015-03-11  Marc de Kamps  <scsmdk@campus-10-41-141-40.wireless.leeds.ac.uk>
 
-12-11-2014: Replaced EXCITATORY (INHIBITORY) by EXCITATORY_GAUSSIAN (INHIBITORY_GAUSSIAN)
+		modified:   python/xml/duffin.xml
 
-12_11_2014: Replaced EXCITATORY_BURST (INHIBITORY_BURST) by EXCITATORY_DIRECT  (INHIBITORY_DIRECT)
+2015-03-10  Marc de Kamps  <scsmdk@locals-mbp-3.lan>
 
-12_11_2014: Replaced test on EXCITATORY (INHIBITORY) in Dale's law test in MPINetworkCode.hpp by a test on IsExcitatory (IsInhibitory)
+	Committer: Marc de Kamps <scsmdk@locals-mbp-3.lan> 	modified:   apps/BasicDemos/miind.cpp 	modified:   libs/MPILib/include/report/handler/RootCanvasMPI.hpp 	modified:   python/simulation.py 	modified:   python/xml/duffin.xml 	modified:   python/xml/omurtag.xml 	modified:   python/xml/twopop.xml 	modified:   python/xml/wilsoncowan.xml
 
-19-11-2014: Added ENABLE_MPI to libs/MPILib/test/utilities/MPIProxy_test.cpp in order to compile when MPI_ENABLE is OFF
+2015-03-06  Marc de Kamps  <scsmdk@campus-10-41-142-95.wireless.leeds.ac.uk>
 
-25-01-2015  miind-1.0
+		new file:   apps/PerformanceGeom/QifCorrelated.cpp
 
-* Added RootCanvas: when ENABLE_MPI is not true, a running simulation an be tracked in a ROOT Canvas
-* Fixed a bug in GeomParameter
+		modified:   apps/BasicDemos/miind.cpp 	modified:   apps/PerformanceGeom/CMakeLists.txt 	modified:   apps/PerformanceGeom/LifOneCanvas.cpp 	modified:   apps/PerformanceGeom/QifJumpPoisson.cpp 	modified:   python/algorithms.py
+
+2015-03-01  Marc de Kamps  <scsmdk@locals-mbp-3.lan>
+
+		modified:   libs/MPILib/include/report/handler/RootCanvasMPI.hpp 	modified:   libs/MPILib/include/report/handler/RootReportHandler.hpp
+
+		modified:   libs/MPILib/include/report/handler/RootCanvasMPI.hpp
+
+		modified:   libs/MPILib/include/report/handler/RootCanvasNoMPI.hpp
+
+		modified:   libs/GeomLib/MasterFactory.hpp 	modified:   libs/GeomLib/MasterParameter.hpp 	modified:   libs/MPILib/include/report/handler/RootCanvasMPI.hpp 	modified:   libs/MPILib/include/report/handler/RootReportHandler.hpp 	modified:   libs/MPILib/src/report/handler/RootCanvasNoMPI.cpp
+
+		renamed:    libs/MPILib/include/report/handler/RootCanvasNoMPi.hpp -> libs/MPILib/include/report/handler/RootCanvasNoMPI.hpp 	modified:   libs/MPILib/include/report/handler/RootReportHandler.hpp 	modified:   libs/MPILib/src/report/handler/RootCanvasNoMPI.cpp
+
+		modified:   apps/UnitGeomLib/CurrentCompensationParameterTest.cpp 	modified:   apps/UnitGeomLib/GeomInputConvertorTest.cpp 	modified:   libs/MPILib/src/report/handler/RootCanvasNoMPI.cpp
+
+		new file:   libs/MPILib/include/report/handler/RootCanvasNoMPi.hpp
+
+		new file:   libs/MPILib/include/report/handler/CanvasParameter.hpp
+
+		new file:   libs/MPILib/src/report/handler/CanvasParameter.cpp 	new file:   libs/MPILib/src/report/handler/RootCanvasNoMPI.cpp 	apps/UnitMPILib/DelayAlgorithm_test.cpp 	libs/MPILib/include/report/handler/CanvasParameter.hpp 	libs/MPILib/include/report/handler/RootCanvasNoMPi.hpp
+
+		modified:   CHANGE_LOG 	new file:   apps/PerformanceGeom/LifOneCanvas.cpp 	new file:   apps/PerformanceGeom/LifTwoCanvas.cpp
+
+		new file:   python/xml/duffin.xml 	renamed:    python/miind.xml -> python/xml/miind.xml 	renamed:    python/omurtag.xml -> python/xml/omurtag.xml 	new file:   python/xml/twopop.xml 	new file:   python/xml/wilsoncowan.xml
+
+		new file:   libs/MPILib/include/report/handler/RootCanvasMPI.hpp
+
+2015-02-28  Marc de Kamps  <scsmdk@locals-mbp-3.lan>
+
+		modified:   apps/PerformanceGeom/CMakeLists.txt 	modified:   apps/PerformanceGeom/LifOne.cpp 	modified:   apps/PerformanceGeom/LifTwo.cpp 	modified:   apps/PerformanceGeom/QifJumpPoisson.cpp 	modified:   apps/PerformanceGeom/TwoPopulationDefinitions.hpp 	modified:   libs/GeomLib/CurrentCompensationParameter.hpp 	modified:   libs/GeomLib/NumericalMasterEquation.cpp 	modified:   libs/MPILib/src/report/handler/RootReportHandler.cpp
+
+2015-02-25  Marc de Kamps  <scsmdk@campus-10-41-137-195.wireless.leeds.ac.uk>
+
+		modified:   apps/BasicDemos/miind.cpp 	modified:   apps/PerformanceGeom/CMakeLists.txt 	modified:   apps/PerformanceGeom/LifOne.py 	modified:   apps/UnitGeomLib/GeomAlgorithmTest.cpp 	modified:   apps/UnitGeomLib/MuSigmaScalarProductTest.cpp 	modified:   apps/UnitGeomLib/QifOdeSystemTest.cpp 	modified:   libs/GeomLib/GeomAlgorithmCode.hpp 	modified:   libs/MPILib/CMakeLists.txt 	modified:   libs/MPILib/include/SimulationRunParameter.hpp 	modified:   libs/MPILib/include/algorithm/DelayAlgorithm.hpp 	modified:   libs/MPILib/include/algorithm/DelayAlgorithmCode.hpp 	modified:   libs/MPILib/include/report/handler/RootReportHandler.hpp 	modified:   libs/MPILib/src/SimulationRunParameter.cpp 	deleted:    libs/MPILib/src/populist/zeroLeakEquations/ABConvertor.cpp 	modified:   libs/MPILib/src/populist/zeroLeakEquations/LIFConvertor.cpp 	modified:   libs/MPILib/src/report/handler/RootReportHandler.cpp 	modified:   libs/MPILib/test/algorithm/CMakeLists.txt 	deleted:    libs/MPILib/test/algorithm/DelayAlgorithm_test.cpp 	modified:   libs/MPILib/test/algorithm/RateAlgorithm_test.cpp 	deleted:    libs/MPILib/test/populist/zeroLeakEquations/ABConvertor_test.cpp 	deleted:    libs/MPILib/test/populist/zeroLeakEquations/ABQStruct_test.cpp 	deleted:    libs/MPILib/test/populist/zeroLeakEquations/ABScalarProduct_test.cpp 	deleted:    libs/MPILib/test/populist/zeroLeakEquations/OneDMZeroLeakEquation_test.cpp 	modified:   libs/MPILib/test/report/handler/RootReportHandler_test.cpp 	modified:   libs/UtilLib/CMakeLists.txt 	deleted:    libs/UtilLib/DinA.cpp 	deleted:    libs/UtilLib/DinA.h 	deleted:    libs/UtilLib/Page.cpp 	deleted:    libs/UtilLib/Page.h 	deleted:    libs/UtilLib/Util.cpp 	modified:   libs/UtilLib/UtilLib.h
+
+2015-02-02  Marc de Kamps  <scsmdk@campus-10-41-142-228.wireless.leeds.ac.uk>
+
+		new file:   apps/UnitMPILib/UnitMPILib.cpp
+
+		new file:   apps/PerformanceGeom/QifJumpPoisson.cpp 	deleted:    apps/UnitMPILib/UnitMPILIb.cpp
+
+		modified:   libs/GeomLib/GeomInputConvertor.cpp
+
+	Committer: Marc de Kamps <scsmdk@campus-10-41-142-228.wireless.leeds.ac.uk> Changes to be committed: 	modified:   apps/PerformanceGeom/CMakeLists.txt modified:   doc/Mainpage.hpp 	modified:   doc/examples.hpp 	modified:   doc/xml_example.hpp 	modified:   libs/GeomLib/GeomInputConvertor.cpp 	modified:   libs/GeomLib/GeomInputConvertor.hpp 	modified:   libs/GeomLib/GeomParameter.cpp 	modified:   libs/GeomLib/GeomParameter.hpp 	modified:   libs/GeomLib/QifOdeSystem.hpp 	modified:   libs/GeomLib/SpikingQifNeuralDynamics.hpp
+
+2015-01-25  Marc de Kamps  <scsmdk@locals-mbp-3.lan>
+
+	 Committer: Marc de Kamps <scsmdk@locals-mbp-3.lan> 	modified:   python/algorithms.py
+
+		modified:   doc/Mainpage.hpp modified:   doc/xml_example.hpp 	modified:   libs/GeomLib/BinEstimator.hpp 	modified:   libs/GeomLib/CurrentCompensationParameter.hpp 	modified:   libs/GeomLib/GeomParameter.hpp 	modified:   libs/GeomLib/LifNeuralDynamics.hpp 	modified:   libs/GeomLib/OdeParameter.hpp 	modified:   libs/GeomLib/QifParameter.hpp 	new file:   libs/MPILib/include/algorithm/RateFunctor.hpp 	new file:   libs/MPILib/include/algorithm/RateFunctorCode.hpp 	modified:   libs/MPILib/include/populist/PopulationAlgorithm.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/NumericalZeroLeakEquations.hpp
+
+		new file:   python/omurtag.xml
+
+		new file:   doc/xml_example.hpp 	new file:   images/xml_alg.png 	new file:   images/xml_io.png 	new file:   images/xml_nodes.png 	new file:   images/xml_simpar.png 	new file:   images/xml_top.png
+
+		new file:   apps/UnitMPILib/CMakeLists.txt 	new file:   apps/UnitMPILib/RateFunctorTest.cpp 	new file:   apps/UnitMPILib/UnitMPILIb.cpp
+
+	Committer: Marc de Kamps <scsmdk@locals-mbp-3.lan> Changes to be committed: 	modified:   apps/BasicDemos/miind.cpp 	modified:   apps/BasicDemos/population-example.cpp 	modified:   apps/CMakeLists.txt 	modified:   doc/Doxyfile.cmake 	modified:   doc/cpp_example.hpp 	modified:   doc/examples.hpp 	modified:   doc/installation.hpp 	modified:   libs/GeomLib/AbstractNeuralDynamics.hpp 	modified:   libs/GeomLib/AbstractOdeSystem.hpp 	modified:   libs/GeomLib/OdeParameter.hpp 	modified:   libs/GeomLib/QifOdeSystem.hpp 	modified:   libs/GeomLib/QifParameter.hpp 	modified:   libs/GeomLib/SpikingLifNeuralDynamics.hpp 	modified:   libs/GeomLib/SpikingQifNeuralDynamics.hpp 	modified:   libs/MPILib/include/MPINode.hpp 	modified:   libs/MPILib/include/algorithm/RateAlgorithm.hpp 	modified:   python/algorithms.py 	modified:   python/connections.py 	modified:   python/include.py 	modified:   python/miind.py 	modified:   python/miind.xml
+
+2015-01-21  Marc de Kamps  <scsmdk@campus-10-41-141-173.wireless.leeds.ac.uk>
+
+	Committer: Marc de Kamps <scsmdk@campus-10-41-141-173.wireless.leeds.ac.uk> On branch integration  Your branch is ahead of 'origin/integration' by 2 commits.
+	Changes to be committed:
+	new file:   images/dense.png
+	new file:   images/dense.svg
+	new file:   images/rate.png
+	new file:   images/rate.svg
+	new file:   images/spikeraster.png
+
+	Committer: Marc de Kamps <scsmdk@campus-10-41-141-173.wireless.leeds.ac.uk> Changes to be committed: 	new file:   apps/PerformanceGeom/LifOne.py 	new file:   apps/PerformanceGeom/density_count.dat 	new file:   apps/PerformanceGeom/om_counts.dat 	new file:   doc/cpp_example.hpp 	new file:   doc/examples.hpp
+
+	 Committer: Marc de Kamps <scsmdk@campus-10-41-141-173.wireless.leeds.ac.uk>  On branch integration  Your branch is up-to-date with 'origin/integration'.  Changes to be committed: 	new file:   apps/BasicDemos/miind.cpp 	modified:   apps/BasicDemos/population-example.cpp 	modified:   apps/PerformanceGeom/LifOne.cpp 	modified:   doc/Doxyfile.cmake 	modified:   doc/Mainpage.hpp 	modified:   doc/customdoxygen.css 	modified:   libs/MPILib/include/MPINetwork.hpp 	modified:   libs/MPILib/include/populist/ProbabilityQueue.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/LIFZeroLeakEquations.hpp 	deleted:    libs/MPILib/include/populist/zeroLeakEquations/OneDMZeroLeakEquations.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/SingleInputZeroLeakEquations.hpp 	modified:   libs/MPILib/src/populist/ZeroLeakBuilder.cpp 	deleted:    libs/MPILib/src/populist/zeroLeakEquations/OneDMZeroLeakEquations.cpp 	modified:   python/algorithms.py 	modified:   python/miind.py 	new file:   python/miind.xml 	new file:   python/simulation.py
+
+2015-01-17  Marc de Kamps  <scsmdk@Locals-MacBook-Pro-3.local>
+
+		modified:   apps/BasicDemos/CMakeLists.txt 	modified:   apps/PerformanceGeom/LifTwo.cpp 	modified:   libs/GeomLib/GeomParameter.cpp 	modified:   libs/GeomLib/GeomParameter.hpp 	new file:   python/algorithms.py 	new file:   python/connections.py 	new file:   python/include.py 	new file:   python/miind.py 	new file:   python/nodes.py
+
+2015-01-08  Marc de Kamps  <scsmdk@locals-mbp-3.lan>
+
+		modified:   libs/GeomLib/GeomAlgorithmCode.hpp
+
+		modified:   apps/BasicDemos/CMakeLists.txt 	modified:   apps/BasicDemos/population-example.cpp 	modified:   apps/PerformanceGeom/CMakeLists.txt 	modified:   apps/PerformanceGeom/CreateTwoPopulationNetwork.hpp 	modified:   apps/PerformanceGeom/CreateTwoPopulationNetworkCode.hpp 	modified:   apps/PerformanceGeom/LifOne.cpp 	modified:   apps/PerformanceGeom/LifTwo.cpp 	modified:   apps/PerformanceGeom/TwoPopulationDefinitions.hpp 	modified:   apps/UnitGeomLib/BinEstimatorTest.cpp 	modified:   apps/UnitGeomLib/CMakeLists.txt 	modified:   apps/UnitGeomLib/GeomInputConvertorTest.cpp 	modified:   apps/UnitGeomLib/GeomParameterTest.cpp 	modified:   apps/UnitGeomLib/LeakingOdeSystemTest.cpp 	modified:   apps/UnitGeomLib/LifNeuralDynamicsTest.cpp 	modified:   apps/UnitGeomLib/MuSigmaScalarProductTest.cpp 	modified:   apps/UnitGeomLib/NeuronParameterTest.cpp 	modified:   apps/largeNetwork/GenerateHexagonalNetwork.hpp 	modified:   apps/largeNetwork/LargeNetwork.cpp 	modified:   doc/Doxyfile.cmake 	modified:   doc/MPILibDoc.hpp 	modified:   doc/Mainpage.hpp 	modified:   doc/doxygen.css 	modified:   libs/GeomLib/AbstractMasterEquation.hpp 	modified:   libs/GeomLib/CMakeLists.txt 	modified:   libs/GeomLib/GeomAlgorithm.hpp 	modified:   libs/GeomLib/GeomInputConvertor.cpp 	modified:   libs/GeomLib/GeomInputConvertor.hpp 	modified:   libs/GeomLib/MuSigmaScalarProduct.cpp 	modified:   libs/GeomLib/MuSigmaScalarProduct.hpp 	renamed:    libs/GeomLib/OrnsteinUhlenbeckParameter.hpp -> libs/GeomLib/NeuronParameter.hpp 	modified:   libs/GeomLib/NumericalMasterEquation.cpp 	modified:   libs/GeomLib/NumericalMasterEquation.h 	modified:   libs/GeomLib/OdeParameter.cpp 	modified:   libs/GeomLib/OdeParameter.hpp 	modified:   libs/MPILib/CMakeLists.txt 	renamed:    libs/MPILib/include/populist/OrnsteinUhlenbeckConnection.hpp -> libs/MPILib/include/DelayedConnection.hpp 	modified:   libs/MPILib/include/algorithm/WilsonCowanAlgorithm.hpp 	modified:   libs/MPILib/include/populist/PopulationAlgorithm.hpp 	modified:   libs/MPILib/include/populist/PopulationAlgorithmCode.hpp 	modified:   libs/MPILib/include/populist/PopulationGridController.hpp 	modified:   libs/MPILib/include/populist/PopulationGridControllerCode.hpp 	modified:   libs/MPILib/include/populist/rateComputation/AbstractRateComputation.hpp 	modified:   libs/MPILib/include/populist/rateComputation/IntegralRateComputation.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/ABConvertor.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/ABScalarProduct.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/AbstractZeroLeakEquations.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/ConnectionSquaredProduct.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/InputConvertor.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/LIFConvertor.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/LIFZeroLeakEquations.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/MuSigmaScalarProduct.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/NumericalZeroLeakEquations.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/OldLifZeroLeakEquations.hpp 	modified:   libs/MPILib/include/populist/zeroLeakEquations/OneDMZeroLeakEquations.hpp 	modified:   libs/MPILib/src/populist/zeroLeakEquations/InputConvertor.cpp 	modified:   libs/MPILib/src/populist/zeroLeakEquations/LIFZeroLeakEquations.cpp 	modified:   libs/MPILib/src/populist/zeroLeakEquations/MuSigmaScalarProduct.cpp 	modified:   libs/MPILib/src/populist/zeroLeakEquations/NumericalZeroLeakEquations.cpp 	modified:   libs/MPILib/test/populist/OrnsteinUhlenbeckConnection_test.cpp
+
+2014-12-28  Marc de Kamps  <scsmdk@locals-mbp-3.lan>
+
+		new file:   apps/UnitGeomLib/GeomAlgorithmTest.cpp
+
+		new file:   apps/PerformanceGeom/CMakeLists.txt 	new file:   apps/PerformanceGeom/CreateTwoPopulationNetwork.hpp 	new file:   apps/PerformanceGeom/CreateTwoPopulationNetworkCode.hpp 	new file:   apps/PerformanceGeom/LifOne.cpp 	new file:   apps/PerformanceGeom/LifTwo.cpp 	new file:   apps/PerformanceGeom/TwoPopulationDefinitions.hpp
+
+		modified:   apps/CMakeLists.txt 	modified:   libs/GeomLib/GeomInputConvertor.cpp 	modified:   libs/GeomLib/GeomParameter.hpp 	modified:   libs/GeomLib/NumericalMasterEquation.cpp
+
+2014-12-23  Marc de Kamps  <scsmdk@locals-mbp-3.lan>
+
+		modified:   libs/MPILib/src/populist/ProbabilityQueue.cpp
+
+		new file:   libs/GeomLib/AbstractMasterEquation.hpp
+
+		new file:   libs/GeomLib/MasterFactory.cpp 	new file:   libs/GeomLib/MasterFactory.hpp
+
+		new file:   apps/UnitGeomLib/NumericalMasterEquationTest.cpp
+
+		modified:   apps/BasicDemos/population-example.cpp 	modified:   apps/UnitGeomLib/CMakeLists.txt 	modified:   apps/UnitGeomLib/GeomParameterTest.cpp 	modified:   libs/GeomLib/BasicDefinitions.hpp 	modified:   libs/GeomLib/BinEstimator.hpp 	modified:   libs/GeomLib/CMakeLists.txt 	modified:   libs/GeomLib/CNZLCache.cpp 	modified:   libs/GeomLib/GeomAlgorithm.hpp 	modified:   libs/GeomLib/GeomAlgorithmCode.hpp 	modified:   libs/GeomLib/GeomInputConvertor.hpp 	modified:   libs/GeomLib/GeomLib.hpp 	modified:   libs/GeomLib/GeomParameter.cpp 	modified:   libs/GeomLib/GeomParameter.hpp 	modified:   libs/GeomLib/NumericalMasterEquation.cpp 	modified:   libs/GeomLib/NumericalMasterEquation.h 	modified:   libs/MPILib/include/MPINetworkCode.hpp 	modified:   libs/MPILib/include/algorithm/AlgorithmInterface.hpp 	modified:   libs/MPILib/include/populist/PopulationAlgorithm.hpp
+
+2014-12-14  Marc de Kamps  <scsmdk@locals-mbp-3.lan>
+
+		modified:   libs/GeomLib/GeomParameter.hpp
+
+		new file:   UnitGeomLib/QifOdeSystemTest.cpp
+
+		new file:   apps/BasicDemos/population-example.cpp
+
+		new file:   apps/UnitGeomLib/BinEstimatorTest.cpp
+
+		new file:   apps/UnitGeomLib/GeomInputConvertorTest.cpp
+
+		new file:   libs/GeomLib/LifParameter.hpp 	new file:   libs/GeomLib/MasterParameter.hpp
+
+		new file:   libs/GeomLib/QifOdeSystem.cpp 	new file:   libs/GeomLib/QifOdeSystem.hpp 	new file:   libs/GeomLib/QifParameter.hpp
+
+		new file:   libs/GeomLib/NumericalMasterEquation.cpp 	new file:   libs/GeomLib/NumericalMasterEquation.h
+
+		new file:   libs/GeomLib/MatrixMasterEquation.cpp 	new file:   libs/GeomLib/MatrixMasterEquation.h
+
+		new file:   libs/GeomLib/CurrentParameter.hpp 	new file:   libs/GeomLib/DiffusionParameter.hpp 	modified:   libs/GeomLib/GeomInputConvertor.hpp 	modified:   libs/GeomLib/GeomParameter.hpp
+
+		new file:   libs/GeomLib/SpikingLifNeuralDynamics.cpp 	new file:   libs/GeomLib/SpikingLifNeuralDynamics.hpp 	new file:   libs/GeomLib/SpikingNeuralDynamics.cpp 	new file:   libs/GeomLib/SpikingNeuralDynamics.hpp 	new file:   libs/GeomLib/SpikingOdeSystem.cpp 	new file:   libs/GeomLib/SpikingOdeSystem.hpp 	new file:   libs/GeomLib/SpikingQifNeuralDynamics.cpp 	new file:   libs/GeomLib/SpikingQifNeuralDynamics.hpp
+
+		new file:   libs/GeomLib/GeomAlgorithm.hpp 	new file:   libs/GeomLib/GeomAlgorithmCode.hpp
+
+		new file:   libs/GeomLib/BinEstimator.cpp 	new file:   libs/GeomLib/BinEstimator.hpp 	new file:   libs/GeomLib/CNZLCache.cpp 	new file:   libs/GeomLib/CNZLCache.hpp
+
+		new file:   UnitGeomLib/GeomParameterTest.cpp
+
+		modified:   apps/BasicDemos/CMakeLists.txt 	modified:   apps/UnitGeomLib/CMakeLists.txt 	modified:   apps/UnitGeomLib/LifNeuralDynamicsTest.cpp 	modified:   libs/GeomLib/AbstractNeuralDynamics.hpp 	modified:   libs/GeomLib/AbstractOdeSystem.cpp 	modified:   libs/GeomLib/AbstractOdeSystem.hpp 	modified:   libs/GeomLib/BasicDefinitions.hpp 	modified:   libs/GeomLib/CMakeLists.txt 	modified:   libs/GeomLib/CurrentCompensationParameter.hpp 	modified:   libs/GeomLib/GeomInputConvertor.cpp 	modified:   libs/GeomLib/GeomInputConvertor.hpp 	modified:   libs/GeomLib/GeomLib.hpp 	new file:   libs/GeomLib/GeomParameter.cpp 	new file:   libs/GeomLib/GeomParameter.hpp 	modified:   libs/GeomLib/InputParameterSet.hpp 	modified:   libs/MPILib/include/MPINetwork.hpp 	modified:   libs/MPILib/include/populist/ProbabilityQueue.hpp 	modified:   libs/MPILib/src/populist/ProbabilityQueue.cpp
+
+2014-11-28  Marc de Kamps  <scsmdk@locals-mbp-3.lan>
+
+		new file:   libs/GeomLib/CMakeLists.txt
+
+		modified:   apps/UnitGeomLib/CMakeLists.txt 	modified:   apps/UnitGeomLib/LeakingOdeSystemTest.cpp 	modified:   apps/UnitGeomLib/LifNeuralDynamicsTest.cpp 	modified:   apps/UnitGeomLib/NeuronParameterTest.cpp 	modified:   libs/CMakeLists.txt 	modified:   libs/GeomLib/AbstractOdeSystem.cpp 	renamed:    libs/GeomLib/AbstractOdeSystem.h -> libs/GeomLib/AbstractOdeSystem.hpp 	modified:   libs/GeomLib/GeomInputConvertor.hpp 	modified:   libs/GeomLib/GeomLib.hpp 	modified:   libs/GeomLib/LeakingOdeSystem.hpp 	modified:   libs/GeomLib/MuSigmaScalarProduct.hpp 	modified:   libs/GeomLib/OrnsteinUhlenbeckParameter.hpp
+
+		modified:   apps/UnitGeomLib/CurrentCompensationParameterTest.cpp 	modified:   apps/UnitGeomLib/InitialDensityParameterTest.cpp 	modified:   apps/UnitGeomLib/LeakingOdeSystemTest.cpp 	modified:   apps/UnitGeomLib/LifNeuralDynamicsTest.cpp 	modified:   apps/UnitGeomLib/MuSigmaScalarProductTest.cpp 	modified:   apps/UnitGeomLib/NeuronParameterTest.cpp 	modified:   apps/UnitGeomLib/OdeParameterTest.cpp 	new file:   libs/GeomLib/GeomLib.hpp
+
+		new file:   libs/GeomLib/BasicDefinitions.hpp 	new file:   libs/GeomLib/CurrentCompensationParameter.hpp 	new file:   libs/GeomLib/GeomInputConvertor.cpp 	new file:   libs/GeomLib/GeomInputConvertor.hpp 	new file:   libs/GeomLib/LifNeuralDynamics.cpp 	new file:   libs/GeomLib/LifNeuralDynamics.hpp 	new file:   libs/GeomLib/MuSigma.hpp 	new file:   libs/GeomLib/OdeParameter.cpp 	new file:   libs/GeomLib/OdeParameter.hpp
+
+		new file:   libs/GeomLib/InitialDensityParameter.hpp
+
+		new file:   apps/UnitGeomLib/CurrentCompensationParameterTest.cpp 	new file:   apps/UnitGeomLib/InitialDensityParameterTest.cpp 	new file:   apps/UnitGeomLib/LeakingOdeSystemTest.cpp 	new file:   apps/UnitGeomLib/LifNeuralDynamicsTest.cpp 	new file:   apps/UnitGeomLib/MuSigmaScalarProductTest.cpp 	new file:   apps/UnitGeomLib/NeuronParameterTest.cpp 	new file:   apps/UnitGeomLib/OdeParameterTest.cpp 	new file:   libs/GeomLib/AbstractNeuralDynamics.cpp 	new file:   libs/GeomLib/AbstractNeuralDynamics.hpp 	new file:   libs/GeomLib/AbstractOdeSystem.cpp 	new file:   libs/GeomLib/AbstractOdeSystem.h 	new file:   libs/NumtoolsLib/Modulo.h
+
+		modified:   CHANGE_LOG 	modified:   apps/UnitGeomLib/CMakeLists.txt 	new file:   libs/GeomLib/GeomLibException.hpp 	new file:   libs/GeomLib/InputParameterSet.hpp 	new file:   libs/GeomLib/LeakingOdeSystem.cpp 	new file:   libs/GeomLib/LeakingOdeSystem.hpp 	new file:   libs/GeomLib/MuSigmaScalarProduct.cpp 	new file:   libs/GeomLib/MuSigmaScalarProduct.hpp 	new file:   libs/GeomLib/OrnsteinUhlenbeckParameter.hpp 	modified:   libs/MPILib/include/algorithm/AlgorithmInterface.hpp 	new file:   libs/MPILib/include/populist/parameters/NeuronParameter.hpp 	modified:   libs/MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp 	modified:   libs/MPILib/include/utilities/MPIProxy.hpp 	modified:   libs/MPILib/src/populist/zeroLeakEquations/MuSigmaScalarProduct.cpp 	modified:   libs/MPILib/test/utilities/MPIProxy_test.cpp 	modified:   libs/NumtoolsLib/NumtoolsLib.h
+		apps/UnitGeomLib/CMakeLists.txt~
+		apps/UnitGeomLib/CurrentCompensationParameterTest.cpp
+		apps/UnitGeomLib/InitialDensityParameterTest.cpp
+		apps/UnitGeomLib/LeakingOdeSystemTest.cpp
+		apps/UnitGeomLib/LifNeuralDynamicsTest.cpp
+		apps/UnitGeomLib/MuSigmaScalarProductTest.cpp
+		apps/UnitGeomLib/NeuronParameterTest.cpp
+		apps/UnitGeomLib/OdeParameterTest.cpp
+		apps/UnitGeomLib/OdeParameterTest.cpp~
+		apps/largeNetwork/.gitignore
+		libs/GeomLib/AbstractNeuralDynamics.cpp
+		libs/GeomLib/AbstractNeuralDynamics.hpp
+		libs/GeomLib/AbstractOdeSystem.cpp
+		libs/GeomLib/AbstractOdeSystem.h
+		libs/GeomLib/BasicDefinitions.hpp
+		libs/GeomLib/CurrentCompensationParameter.hpp
+		libs/GeomLib/GeomInputConvertor.cpp
+		libs/GeomLib/GeomInputConvertor.hpp
+		libs/GeomLib/GeomLib.h
+		libs/GeomLib/InitialDensityParameter.hpp
+		libs/GeomLib/LifNeuralDynamics.cpp
+		libs/GeomLib/LifNeuralDynamics.hpp
+		libs/GeomLib/MuSigma.hpp
+		libs/GeomLib/OdeParameter.cpp
+		libs/GeomLib/OdeParameter.hpp
+		libs/NumtoolsLib/Modulo.h
+
+2014-11-19  Marc de Kamps  <scsmdk@campus-10-41-136-222.wireless.leeds.ac.uk>
+
+		new file:   Interpolation.cpp
+
+		modified:   MPILib/include/MPINetworkCode.hpp 	modified:   MPILib/include/populist/rateComputation/AbstractRateComputation.hpp 	modified:   MPILib/src/populist/rateComputation/AbstractRateComputation.cpp 	modified:   MPILib/src/populist/zeroLeakEquations/LIFConvertor.cpp 	deleted:    MPILib/src/populist/zeroLeakEquations/OldLifZeroLeakEquations.cpp 	modified:   MPILib/test/MPINetwork_test.cpp 	modified:   MPILib/test/MPINode_test.cpp 	modified:   MPILib/test/NodeType_test.cpp 	modified:   MPILib/test/populist/zeroLeakEquations/ABConvertor_test.cpp 	modified:   NumtoolsLib/CMakeLists.txt 	modified:   NumtoolsLib/GaussianDistribution.h 	deleted:    NumtoolsLib/Interpolation.cpp 	deleted:    NumtoolsLib/InterpolationTest.cpp
+
+2014-11-12  de Kamps  <scsmdk@login1.arc2.leeds.ac.uk>
+
+		modified:   libs/MPILib/include/MPINetworkCode.hpp 	modified:   libs/MPILib/include/NodeType.hpp 	modified:   libs/MPILib/src/populist/zeroLeakEquations/InputConvertor.cpp
+
+		modified:   apps/CMakeLists.txt 	modified:   cmake-modules/FindRoot.cmake 	modified:   libs/MPILib/include/MPINetworkCode.hpp 	modified:   libs/MPILib/include/NodeType.hpp 	modified:   libs/MPILib/src/populist/zeroLeakEquations/InputConvertor.cpp
+
+		modified:   CMakeLists.txt 	modified:   apps/CMakeLists.txt 	modified:   cmake-modules/FindRoot.cmake 	modified:   libs/MPILib/include/MPINetworkCode.hpp 	modified:   libs/MPILib/include/NodeType.hpp 	modified:   libs/MPILib/src/populist/zeroLeakEquations/InputConvertor.cpp
+
+		new file:   apps/largeNetwork/CMakeLists.txt 	modified:   apps/largeNetwork/GenerateHexagonalNetwork.cpp 	modified:   apps/largeNetwork/LargeNetwork.cpp 	modified:   CMakeLists.txt 	modified:   apps/CMakeLists.txt 	modified:   cmake-modules/FindRoot.cmake 	modified:   libs/MPILib/include/MPINetworkCode.hpp 	modified:   libs/MPILib/include/NodeType.hpp 	modified:   libs/MPILib/src/populist/zeroLeakEquations/InputConvertor.cpp
+
+		new file:   CHANGE_LOG 	new file:   apps/BasicDemos/CMakeLists.txt 	new file:   apps/BasicDemos/miind-mpi.cpp 	new file:   apps/BasicDemos/two-population.cpp 	new file:   apps/UnitGeomLib/CMakeLists.txt 	deleted:    apps/UnitGeomLib/UnitGeom.cpp 	modified:   CMakeLists.txt 	modified:   apps/CMakeLists.txt 	modified:   apps/largeNetwork/GenerateHexagonalNetwork.cpp 	modified:   apps/largeNetwork/LargeNetwork.cpp 	modified:   cmake-modules/FindRoot.cmake 	modified:   libs/MPILib/include/MPINetworkCode.hpp 	modified:   libs/MPILib/include/NodeType.hpp 	modified:   libs/MPILib/src/populist/zeroLeakEquations/InputConvertor.cpp 	apps/largeNetwork/CMakeLists.txt
+
+		new file:   apps/UnitGeomLib/UnitGeom.cpp 	new file:   apps/UnitGeomLib/UnitGeomLib.cpp 	renamed:    apps/LargeNetwork.cpp -> apps/largeNetwork/LargeNetwork.cpp 	deleted:    apps/miind-mpi.cpp 	deleted:    apps/two-population.cpp 	modified:   CMakeLists.txt 	modified:   apps/CMakeLists.txt 	modified:   apps/largeNetwork/GenerateHexagonalNetwork.cpp 	modified:   apps/largeNetwork/LargeNetwork.cpp 	modified:   cmake-modules/FindRoot.cmake 	modified:   libs/MPILib/include/MPINetworkCode.hpp 	modified:   libs/MPILib/include/NodeType.hpp 	modified:   libs/MPILib/src/populist/zeroLeakEquations/InputConvertor.cpp
+		CHANGE_LOG
+		apps/BasicDemos/
+		apps/UnitGeomLib/CMakeLists.txt
+		apps/largeNetwork/CMakeLists.txt
+
+2014-07-22  Marc de Kamps  <M.deKamps@leeds.ac.uk>
+
+		modified:   miind_logo.png
+
+		modified:   Mainpage.hpp 	modified:   customdoxygen.css 	modified:   footer.html 	modified:   header.html 	modified:   installation.hpp
+
+2014-07-21  Marc de Kamps  <m.dekamps@leeds.ac.uk>
+
+		new file:   customdoxygen.css 	new file:   footer.html 	modified:   header.html
+
+		modified:   Mainpage.hpp
+
+		new file:   hbp.png
+
+		new file:   miind_logo.png
+
+2013-06-26  David Sichau  <mailatsichau.eu>
+
+	fixed tests
+
+2013-02-25  David-Matthias Sichau  <mail@sichau.eu>
+
+	Added affiliation.
+
+2013-02-13  David-Matthias Sichau  <mail@sichau.eu>
+
+	Rewritten the main simulation loop section. Adding more details on the underlying mli parallelization.
+
+2013-02-06  David-Matthias Sichau  <mail@sichau.eu>
+
+	Rewritten section partly and added source code
+
+	Added figure about the two population network and more text about mpi added.
+
+	ignore more temporary tex files.
+
+2013-01-29  Marc  <marc@miind.(none)>
+
+	Trying to merge
+
+		new file:   bib.bib
+
+		modified:   pmiind.tex
+
+2013-01-28  David-Matthias Sichau  <mail@sichau.eu>
+
+	Written more about the parallelization.
+
+2013-01-18  David-Matthias Sichau  <mail@sichau.eu>
+
+	fixed double entry in bib
+
+2013-01-11  Marc  <marc@miind.(none)>
+
+	Adding bib file
+
+	frontiers bst file
+
+2013-01-11  David-Matthias Sichau  <mail@sichau.eu>
+
+	Added gitignore for the latex rubbish
+
+	Added the publication to the repository.
+
+2013-01-10  David-Matthias Sichau  <mail@sichau.eu>
+
+	added Barrier to method addNode to make sure that the order is always the same removed the type of the second Node at the method makeFirstInput to avoid any inconsitencies.
+
+2013-01-09  David-Matthias Sichau  <mail@sichau.eu>
+
+	removed wrong files. merged header files.
+
+2013-01-08  Marc  <marc@miind.(none)>
+
+	missing files
+
+	Christmas changes Mdk
+
+2012-10-01  David-Matthias Sichau  <mail@sichau.eu>
+
+	Fixed bug in the generation of the network.
+
+2012-09-30  David-Matthias Sichau  <mail@sichau.eu>
+
+	Added changes from cvs version.
+
+	Added changes from cvs version.
+
+2012-08-13  David-Matthias Sichau  <mail@sichau.eu>
+
+	fixed compiler warning of gcc4.7
+
+2012-08-09  David-Matthias Sichau  <mail@sichau.eu>
+
+	Documentation for adaption of old code added.
+
+2012-08-08  David-Matthias Sichau  <mail@sichau.eu>
+
+	fixed forgotten std::
+
+	fixed unused variable warnings
+
+	doc fix
+
+	fixed unused variable warnings
+
+	Removed unneded cmake modules
+
+	Removed not MPI related libraries.
+
+2012-08-07  David-Matthias Sichau  <mail@sichau.eu>
+
+	doc update
+
+2012-08-06  David-Matthias Sichau  <mail@sichau.eu>
+
+	fixed false include
+
+	fixed typo
+
+	doc update
+
+	Debug Levels changed, as they are not really important :)
+
+	The Log Level is defined at compile time.
+
+	This is done via a compile flag
+
+	Test and interfaces adapted to the new NodeType distribution
+
+	The nodeTypes of the precursors are now added during the call of makeFirstInputOfSecond, as the Distribution over the network is not possible with larger networks, as the messages cannot be differentiated anymore.
+
+	Loging changed
+
+	Log Messages added for MPI communication.
+
+	changed to typedef
+
+	get std::exceptions also.
+
+	Moved files out of library. Error with wrong NodeIds fixed.
+
+	try to fix linker error
+
+	try to fix linker error
+
+	try to fix linker error
+
+	Large network added to MPILib for benchmarks.
+
+2012-08-02  David-Matthias Sichau  <mail@sichau.eu>
+
+	New wrapper function added to avoid to always write out the access to the singleton instance.
+
+	Added Singleton class. The MPIProxy is now a singleton instance to avoid unnecessary creation and deletion.
+
+	removed unneeded constants
+
+2012-07-31  David-Matthias Sichau  <mail@sichau.eu>
+
+	Fixes for Delay ALgorithm
+
+	Added Delay Algorithm
+
+	doc update
+
+	doc update
+
+	doc update
+
+	NDEBUG is stetted if not debug build is chosen
+
+	Doc update
+
+	Revert "Revert "Doc update for rebinner""
+	This reverts commit 69d3e8b7838b2e14fa3f05b30dd76f4d7c53567d.
+
+	Merge branch 'templateNode' of ssh://miind.git.sourceforge.net/gitroot/miind/miind into templateNode
+
+	doc update
+
+	Revert "Doc update for rebinner"
+
+	Doc update for rebiller
+
+2012-07-30  David-Matthias Sichau  <mail@sichau.eu>
+
+	Merge branch 'newLogger' into templateNode
+
+	fix for wrong test oracle
+
+	Doc update for RateComputation
+
+	Merge branch 'newLogger' into templateNode
+
+	Doc for NonCirculantSolvers added
+
+	added different filenames for the different methods
+
+	fix for wrong test oracle
+
+	typo fixed
+
+	Changed the default logLevel to logINFO instead of logDEBUG4.
+
+	Merge branch 'newLogger' into templateNode
+
+	Doc for CirculantSolvers added
+
+	Log messages formated nicer.
+
+	Log message is set to a lower level if it is not a debug build. Instead of debug messages to std::cout they are printed to the log.
+
+	Printed error message to log instead of std::bout
+
+	removed unneeded tests.
+
+	Switched to new logger instead of LogStream
+
+2012-07-27  David-Matthias Sichau  <mail@sichau.eu>
+
+	Doc update
+
+	Test for CirculantMode added.
+
+	Formatting of the source code added C++11 features
+
+2012-07-26  David-Matthias Sichau  <mail@sichau.eu>
+
+	GCC does now compile without -fpermissive
+
+	added missed namespace
+
+	fixed missing includes
+
+	Added stub tests
+
+	Namespace for ZEROLEAKEQUATIONS classes added.
+
+	Namespace for rebinner classes added.
+
+	Namespace for RATECOMPUTATION classes added.
+
+	Namespace for NONCIRCULANTSOLVERS classes added.
+
+	Moved CiculantSolvers in own namespace
+
+	VArray moved to circulantSolvers
+
+	Moved Adaptive Hazard to zeroLeakEquations
+
+	Moved MuSigma classes into zeroLeakEquations
+
+	Mock test for rebiller move rebiller class into own folder replaced boost::shared_ptr with std::shared_ptr
+
+	Moved rateComputation related stuff in own folder.
+
+	Moved nonCiculantSolvers in own folder and added mock test
+
+	Moved circulantEquations into own folder added mock test.
+
+	Stub test added for ZeroLeakEquations
+
+2012-07-25  David-Matthias Sichau  <mail@sichau.eu>
+
+	fix replace auto_ptr with unique_ptr
+
+	Doc update for OldLifZeroLeakEquation C++11 features added.
+
+	fixes forgotten include dir
+
+	set c++11 flags also for non mph build
+
+	fixed missing pointer cast
+
+	Added -fpermissive flag for gcc in all build types
+
+	Compiler flags set for Release and Debug compilations.
+
+	Added better timing.
+
+2012-07-24  David-Matthias Sichau  <mail@sichau.eu>
+
+	Log test fix for brutus
+
+	Log test fix for brutus
+
+	Log test fix for brutus
+
+	Set gcc flag -fpermissive to remove error. This needs to be fixed.
+
+	Fix for gcc
+
+	Merge commit '350c538e3058f4784495a483b9a2470b988f1e35' into templateNode
+
+	Fix for gcc
+
+	Fix for gcc
+
+	fixed missing include for gcc
+
+	fixed forgotten throw() statement
+
+	fixed CaseSensitive inclued
+
+	Added messages about root during configuration.
+
+	fixed missing include for gcc
+
+	switched from queue to list, as the queue resulted in interoperability between gcc and clang
+
+	Removed unused-parameter warning in gcc
+
+	Fix for gcc as it assumes no throw in default destructor.
+
+2012-07-23  David-Matthias Sichau  <mail@sichau.eu>
+
+	Doc update Converted from boost::shared_ptr to std::shared_ptr Included stub tests
+
+	Test for LIFConvertor added.
+
+	- doc update - interface renaming to naming scheme
+
+	Fixed missing namespace declarator.
+
+2012-07-20  David-Matthias Sichau  <mail@sichau.eu>
+
+	Doc update.
+
+	Moved ZeroLeakEquations related classes into the Folder zeroLeakEquations/
+
+	Moved parameter classes of populib in namespace parameters.
+
+	Fixed illegal read
+
+	fixed wrong initialization of unsigned int.
+
+	fixed test, as they failed with MPI enabled. This was due to generation of the MPIProxy before the MPI environment was constructed.
+
+2012-07-19  David-Matthias Sichau  <mail@sichau.eu>
+
+	Fixed memory leak. Now the application does not contain any memory leaks :)
+
+	Memory leak in node fixed.
+
+	MPI test now have a fallback to normal test.
+
+	Fixed CircularDistribution such that it is possible to generate it at compile time.
+
+	Fixed memory leak, buy switching to static members and references instead of pointers.
+
+	memory leak fixed in the Circular Distribution. Now uses members instead of pointers.
+
+	Fixed memory leak caused by circular shared_ptr. Use weak_ptr instead to resolve this circular dependency.
+
+	Compiler Warnings fixed.
+
+2012-07-18  David-Matthias Sichau  <mail@sichau.eu>
+
+	Fixed memory leak in ValueHandlerHandler
+
+	Memtest works. Now the memory leaks need to be fixed.
+
+	Different testing implemented. Only test that need to have an MPI Environment are executed with MPI. All other test will be executed like normal unit test. This reduced the time of a test run significantly, as the MPI environment does not be generated. Additional for this test memory test can be executed. As the are very slow this feature is only enabled if wanted (therefore the flag ENABLE_MEMORY_TEST is introduced)
+
+	PopulistParameters moved into folder parameters Doc update test implemented.
+
+	OrnsteinUhlenbeckParameter moved into folder parameters Doc updated Test implemented
+
+	OneDMParameter refractored Doc update Test implemented
+
+	OneDMInputSetParameter moved into folder parameters Doc update
+
+	NumericalZeroLeakParameter moved to folder parameters Doc updated Test implemented
+
+	Moved InptParameterSet to folder parameters
+
+	Adapted include paths.
+
+	Moved AdaptionParameter to folder parameters Doc update Test generated for AdaptionParameter
+
+	Moved Parameters in own folder but not own namespace at the moment.
+
+	Test for PopulistSpecificParameters added
+
+	PopulistSpecificParameter adapted interface to naming scheme. Doc update C++11 features added.
+
+	Test for InitialDensityParameter added
+
+	Test for ABScalarProduct added. Doc update.
+
+2012-07-17  David-Matthias Sichau  <mail@sichau.eu>
+
+	removed todo, as this issue is already fixed.
+
+	Revert "removed todo, as this issue is already fixed."
+	This reverts commit c16c057070c4ededc41c0b67020e7b2b0a04f2ca.
+
+	removed todo, as this issue is already fixed.
+
+	Fixed inheritance from std lib
+
+	Logo added to doc
+
+	Added documentation about license and Installation.
+
+	Licence update.
+
+	Log class changed to shared_ptr. Added real setter and getter for the Log class.
+
+2012-07-13  David-Matthias Sichau  <mail@sichau.eu>
+
+	Added test for the log class.
+
+	Pictures for doxygen added.
+
+	Doc update
+
+	Log Class further improved. It now logs if the report level is changed. It also provides getter and setter for the reportingLevel
+
+	Log class simplified.
+
+2012-07-12  David-Matthias Sichau  <mail@sichau.eu>
+
+	time added to the log.
+
+	New Log class
+
+	More C++11 refractoring
+
+	More C++11 refractoring
+
+	first refractoring to c++11
+
+	doc update
+
+	Doc updates.
+
+2012-07-11  David-Matthias Sichau  <mail@sichau.eu>
+
+	Adapted interface to naming scheme Added override notation to population algorithm.
+
+	Splited the basic definitions in 3 files. One for types one for strings and one for numerical values.
+
+	Fixed bug which caused wrong naming of graphs. The bug was due to wrong default initialization.
+
+	doc update
+
+	Moved all MPI Code from MPINode to the MPIProxy
+
+	The main methods only contain the generation of the mpi environment.
+
+	Added test for the MPI Proxy
+
+	Code can be compiles without mpi and it works.
+
+	RootHighThroughputHandler depends on MPIProxy instead of boost mpi
+
+	Config file is copied in build dir instead of source dir.
+
+2012-07-10  David-Matthias Sichau  <mail@sichau.eu>
+
+	Adapted test
+
+	Added broadcast operation to MPIProxy and removed broadcast from MPINetwork
+
+	Depend only on MPIProxy
+
+	CircularDistribution depends on MPIProxy for all MPI stuff
+
+	Removed stupid bug, local variables generated instead change of attributes.
+
+	Simplified MPIProxy
+
+	Cmake changes
+
+	Added MPI Proxy Class to hide the mpi implementation.
+
+	Added Precompiler Statements to exclude mph code if needed.
+
+	Wrong tags corrected. The old version only worked of one node was on one process, otherwise it would have failed. Therefore now the nodeIds are used as tags instead of the ranks of the processes.
+
+	fixed test, as wait all is called from external.
+
+2012-07-09  David-Matthias Sichau  <mail@sichau.eu>
+
+	Added single executable for the two populist test.
+
+	Merge branch 'clang' into templateNode
+	Conflicts:
+		.gitignore
+
+	Fixed all clang errors.
+
+	Initialization done in own method.
+
+	mpiStatuses need to be static, otherwise a deadlock occurs.
+
+2012-07-06  David-Matthias Sichau  <mail@sichau.eu>
+
+	Added forgotten method. It now compiles and links.
+
+	Remove 2 linker errors and compile errors.
+
+	Compiles but still linking errors.
+
+	Added weight template to Rate Algorithm
+
+	Added more classes to MPILib
+
+2012-07-05  David-Matthias Sichau  <mail@sichau.eu>
+
+	Adapted lot of code to MPILib. This is not finished yet
+
+	Added source files to cmake
+
+	Added more classes to MPILib
+
+	Added more classes to MPILib
+
+	Added more classes to MPILib
+
+	Added more classes to MPILib
+
+	Added more classes to MPILib
+
+	Added gridcontroler
+
+	Added more classes from Populib to mpilib
+
+	Moved initialization to prepareEvolve
+
+	Added prepare Evolve method to the algorithm interface
+
+	Added prepareEvolve method which than can be used instead of the CollectExternalInput method.
+
+2012-07-04  David-Matthias Sichau  <mail@sichau.eu>
+
+	Added PopulationAlgorithm to MPILib
+
+	Adapted two-population to the new added classes.
+
+	Merge branch 'NodeTypesAdded' into templateNode
+
+	Doc update
+
+	Added a new method to the algorithm interface. One can overwrite either of them to get the desired behaviour.
+
+	Added test case for nodeType exchange
+
+	Added exchange of the NodeTypes to the MPINodes.
+
+	changed code such that clang does not throw a warning
+
+2012-07-03  David-Matthias Sichau  <mail@sichau.eu>
+
+	Interface adaptions.
+
+	Adapted Interfaces, to MPILib
+
+2012-07-02  David-Matthias Sichau  <mail@sichau.eu>
+
+	More files added from populist
+
+	More classes added from populib
+
+	More Classes added to MPILib
+
+	Added more Populist classes to mpi lib
+
+	More files added for population list
+
+	Moved populist related files in own namespace populist instead of algorithm.
+
+2012-07-01  David-Matthias Sichau  <mail@sichau.eu>
+
+	Does need changes.
+
+2012-06-29  David Sichau  <mail@sichau.eu>
+
+	Added PopulistSpecificParameters to MPILib
+
+	Added initialDensityparamters to mpilib
+
+	Added parameter to Basic Definitions
+
+	AbstractRateComputation added to MPILib
+
+	Added input paramter set to mpi lib
+
+	Added abstract Rebinner to MPILib
+
+	OrnsteinUhlenbeckParameters added to MPILib
+
+2012-06-28  David Sichau  <mail@sichau.eu>
+
+	Added Poplist parameter
+
+	Added two population test to cake but it does not compile at the moment.
+
+	Added first Algorithm needed for two population test
+
+2012-06-27  David Sichau  <mail@sichau.eu>
+
+	Coverage with full path but still does not work
+
+	Simplified cake adding of the sources.
+
+	Preparation for code coverage with clang
+
+	Code compiles with clang.
+
+	Moved todo messages to doxygen
+
+	Added test for RoothighThroughputHandler improved other tests.
+
+	switched to nullptr removed unneded parameter in constructor
+
+	The RootHighThroughputHandler now stores the gloabal node ids and retriev them for the generation of the graphs.
+
+2012-06-26  David Sichau  <mail@sichau.eu>
+
+	Fixed documentation, the node id do not work at the moment.
+
+	No warnings for MPILib with gcc
+
+	supressed warnings
+
+	fixed more gcc warnings
+
+	Removed compiler warnings
+
+	Added the local nodes to the root file.
+
+	Removed unneeded variables.
+
+	RootHighThroughputHandler is working. But he needs to get the number of nodes on a CPU.
+
+	Added the number of local nodes to the report.
+
+2012-06-25  David Sichau  <mail@sichau.eu>
+
+	Added Fatal Error if Clang is detected.
+
+	Removed duplicate of NodeType Attribute
+
+2012-06-24  David Sichau  <mail@sichau.eu>
+
+	Add ignore of  eclipse settings
+
+2012-06-22  David Sichau  <mail@sichau.eu>
+
+	- doc update
+
+	Coverage fails with gccc 4.7 one need to wait for the lcov update. There is a patch available for lcov.
+
+	Code Coverage added, with a mac it does not work. Does it work on Linux??
+
+	- Doc update, no doxygen warnings anymore
+
+	excluded std files from doxygen
+
+	Added target make doc to Miind-mpi
+
+	moved implementation code into cpp file
+
+	Fixed test, as now the output files are named differently
+
+	The file renaming is automatically handled, one need only provide the prefix of the file name
+
+	Switched to generating of filenames with FileNameGenerator
+
+	- Doc update
+
+	Helper Class for Filenames generated.
+
+2012-06-21  David Sichau  <mail@sichau.eu>
+
+	Test the highthroughput handler unfortunally it does not work anymore.
+
+	- Doc update - renamed to consistent naming scheme
+
+	Added RootHighThroughputHandler to MPILib
+
+	-ValueHandlerHandler test added - Doc update
+
+	- Doc Update - Test for Inactive and Root-ReportHandler added.
+
+	- doc update of GraphKey - added test for GraphKey
+
+	- Added test for ReportType and ReportValue - Improved doc
+
+	- Added test for Report - Doc update for Report
+
+2012-06-20  David Sichau  <mail@sichau.eu>
+
+	WilsonCowanParamter c++11 features added Test for WilsonCowanParamter added.
+
+	Added helper class for a test algorithm
+
+	Test for WilsonCowanAlgorithm
+
+	fixed exceptions they are thrown again
+
+	Removed not anymore needed sleep algorithm
+
+	Improved the RateAlgorithm test
+
+	Changed interface of AlgorithmGrid.
+
+	Changed test from BOOST_REQUIRED to BOOST_CHECK, as this will print all erros and not only the first one. Added test for the AlgorithmGrid
+
+2012-06-19  David Sichau  <mail@sichau.eu>
+
+	Interface renaming
+
+	- Doc updates - Interface naming - Moved implementation code to cpp files
+
+	Improved Exception test, now it checks if a exception is catched at the correct position
+
+	Added test for IterationNumberException
+
+	Added test for logStream
+
+	Added test for the ProgressBar
+
+	Added Test for Timer and refractored Timer
+
+	Added test for time exception
+
+	Added test for NetworkState, refractored NetworkState
+
+	small unit test for NodeType
+
+	Added Test for SimulationRunParameter
+
+	renamed getter to start with get. Moved implementation into cpp file.
+
+	Improved MPINetwork test
+
+	Made cosmetic code changes
+
+	Added Dales Law to MiindMPI
+
+2012-06-18  David Sichau  <mail@sichau.eu>
+
+	Adapted include guards to new paths.
+
+	moved report and report handler in own namespaces.
+
+	Changed loop to c++11 foreach loop
+
+	Removed the infotuple from the root handler
+
+2012-06-15  David Sichau  <mail@sichau.eu>
+
+	removed time test
+
+2012-06-14  David Sichau  <mail@sichau.eu>
+
+	MPINode has a timer for the algorithm and mpi time.
+
+	working progress bar.
+
+	Added progressbar and removed unneded Time classes.
+
+2012-06-13  David Sichau  <mail@sichau.eu>
+
+	Added boost timers to application.
+
+	in class initialisation of MPINetwork
+
+	switched to std shared_ptr
+
+	Removed more code related to grapical output.
+
+	switched to std shared_ptr. Removed Stuff related to grapical updates.
+
+	Cleaned and documented the RootHandler Interface
+
+	Added the .settings folder to gitignore
+
+	Cleaned up the code of the RootReportHandler, the two static raw pointers still need to be refractored in the future
+
+	Removed the functionality related to printing output to the screen.
+
+	Moved to unique ptr in Root Handler instead of raw pointers.
+
+	Merge branch 'templateNode' of ssh://dmssmd@miind.git.sourceforge.net/gitroot/miind/miind into templateNode
+
+2012-06-12  David Sichau  <mail@sichau.eu>
+
+	Make sure that the build is done with gcc 4.7 as previous versions does not support all c++11 features used in the code. Added a warning if the compiler is not gcc.
+
+	Moved report related files into subfolder reportHandler
+
+	moved report in own folder
+
+	Working version only depends on numlib and utillib.
+
+	Working version without dependency on DynamicLib
+
+	Added root report Handler to MPILib
+
+	Added WilsonCowanParameters to MPILib
+
+	Removed dependency on UtilLib
+
+	Removed more dependencies on DynamicLib
+
+	Added IterationNumberException Removed unneded dependencies on DynamicLib
+
+	Added reduced AlgorithmGrid to MPILib
+
+	Added Report to MPILib
+
+	Removed unneded dependencies.
+
+	Added reduced AbstractReportHandler to MPILib
+
+	Added reduced SimulationRunParameter to MPILib
+
+	switched to ranged based for loop where ever it make sense.
+
+	Made Code compatible with GCC4.7 and C++11
+
+2012-06-11  David Sichau  <mail@sichau.eu>
+
+	switched to c++11 best feature Right angle bracket :)
+
+	Added cmake configuration for gcc. However for other compiler this might not work.
+
+	set compiler to c++11. Ony need to fix finite, as this was a no longer supported function.
+
+	Test for WilsonCowan and Rate Algorithm added.
+
+	git test commit
+
+	Added wilsonCowan example to dynamiclib to verify the mpi results.
+
+	Call detach Handler in the Node to write the report to the file.
+
+2012-06-08  David Sichau  <mail@sichau.eu>
+
+	SleepAlgorithm has a static constant to define the sleep time.
+
+	renamed sleep algorithm to have no time in it.
+
+	reduce sleeptime to 1 sec
+
+	renamed algorithm folder moved all algorithms in the algorithm namespace.
+
+	CmakeLists for each subfolder in test.
+
+	Added files in CmakeLists in same folder.
+
+	Moved all Algorithms in own folder.
+
+	changed AlgorithmInterface to consistent naming convention
+
+	Adapted MPINode interface to naming convention.
+
+	Network interface cleared and converted to naming convention.
+
+	Changes to get the correct root report, however no success so far.
+
+	Added forgotten <<operator for int
+
+	Reports added to nodes. However they seem not to work correct.
+
+2012-06-07  David Sichau  <mail@sichau.eu>
+
+	It now runs but not sure if it does any meaningfull yet.
+
+	Compiling version  of Wilson Example.
+
+	Compilation and linking of all files.
+
+	Test compile and pass.
+
+	removed files available in DynamicLib
+
+	Make MPILib dependent on the rest to increase reuse.
+
+	Small interface changes
+
+	Added WilsonCowanAlgorithm
+
+2012-06-06  David Sichau  <mail@sichau.eu>
+
+	Added Wextra code warnings and removed them.
+
+	removed all warnings.
+
+	Added warnings flags
+
+	Cleaned up include dirs.
+
+	Merge branch 'mpi_complete_new' into templateNode
+	Conflicts:
+		libs/MPILib/include/MPINetwork.hpp
+		libs/MPILib/include/MPINode.hpp
+		libs/MPILib/src/MPINetwork.cpp
+		libs/MPILib/src/MPINode.cpp
+		libs/MPILib/test/MPINode_test.cpp
+
+	Changed local Nodes and NodeDistribution to pointers.
+
+	Template Argument for the node Distribution.
+
+2012-06-05  David Sichau  <mail@sichau.eu>
+
+	doc update
+
+	doc update.
+
+	Working templates with algorithm interface as template.
+
+	First working template version.
+
+	Added getCurrentRate and getCurrentTime to the algorithm interface.
+
+	Renamed EmptyAlgorithm to Sleep10secAlgorithm
+
+	Measure the runtime of the Evolve method and take the maximum of all processors.
+
+	Added test for Time.hpp
+
+	Added platform independent Time handling.
+
+2012-06-04  David Sichau  <mail@sichau.eu>
+
+	Added a algorithm interface.
+
+	Test for MPINode added.
+
+	improved test.
+
+	cleaned test.
+
+	Doc update, include variables in the headers.
+
+	doc update and adding variables in the header.
+
+	private inheritance from boost::noncopyable
+
+	Make reference const to avoid misuse.
+
+	Local "communication" also works.
+
+	A node now also stores a reference to the local nodes.
+
+	for this case working version of send and recv.
+
+2012-06-01  David Sichau  <mail@sichau.eu>
+
+	Deaktivated mem test as they do not work at the moment.
+
+	Nicer messages. Spring cleaning of the cmake code.
+
+	doc added.
+
+	Easier adding of test in cmake file. Removed the example test as now there exist enough other tests.
+
+	Added test for ParallelException
+
+	Added test for the exception. Make sure that the test are executed with two processors.
+
+	Test for CircularDistribution added.
+
+	Removed distibution related code in MPINode and replaced it with the NodeDistribution from MPINetwork.
+
+	refractored the code related to the NodeDistribution to own class. New ways to add different types of Distribution can be added via the NodeDistributionInterface.
+
+2012-05-31  David Sichau  <mail@sichau.eu>
+
+	Ignore more eclipse stuff
+
+	Test for MPINetwork added.
+
+	removed wrong assert
+
+	Memory test now also with mpi
+
+	simplified cmake files removed not needed dependencies.
+
+	test which compiles and need mpirun. However Cmake at the moment does not execute the test with mpirun.
+
+	Added testing with CTest and Boost Test Framework. Also added memory tests with valgrind.
+
+	Changed CMake to build with ENABLE_MPI only the mpi library.
+
+	Removed forgotten to remove Macro
+
+2012-05-30  David Sichau  <mail@sichau.eu>
+
+	First implementation of the send and recv operations.
+
+	Changed the error handling for MPINetwork to exceptions.
+
+	added namespace to convenience macros.
+
+	Renamed include guards to make sure that they have the same convention.
+
+	 - Moved files to directories  - Added Namespace for all classes
+
+	Catch exceptions thrown.
+
+	Change exceptions - Nicer output of error message. - Switched from boost::exception to std::exception, as no coping of exceptions is needed (no shared memory parallelisation)
+
+	Now ParallelExecution works.
+
+	Added exception class for parallel execution failures.
+
+	Added Exception, use one from libpipe released with the MIT Licence.
+
+2012-05-29  David Sichau  <mail@sichau.eu>
+
+	Stub methods for recieving and sending data added.
+
+	Added the node state.
+
+	changed const correctness
+
+	Added information about the current processor and the number of processors to the Node.
+
+	added connection of nodes. Each node stores its precursors and successors to allow easier data collection from them.
+
+	Extracted common types in own header file
+
+	Doxygen update
+
+	Synchronization of the maxNodeId between the networks. This allows the generation of nodes without assigning numbers to the nodes.
+
+2012-05-25  David Sichau  <mail@sichau.eu>
+
+	automatic find of mpi under Linux with cmake
+
+	docs
+
+	Node distribution is working.
+
+	added linking against boost mpi
+
+	added forgetten include directories
+
+	First MPINetwork interface
+
+	Start from scratch. Simple example to make sure cmake works.
+
+2012-05-24  David Sichau  <mail@sichau.eu>
+
+	Typo removed
+
+	Added cmake files for new MPILib
+
+	ignore the DS_ files of Mac OS X
+
+	Include the mpi executable to cmake and use cmake to link the needed boost libraries. However at the moment the compiler settings need to be done with setting an environment variable. This need to be changed in the future.
+
+2012-05-23  David Sichau  <mail@sichau.eu>
+
+	Merge branch 'master' into clang
+
+	added eclipse folder to gitignore
+
+	clang fixes to get rid of the "error: use of undeclared identifier" messages
+
+	added gitignore file, at the moment only to avoid the accidental commitment of the build folder
+
+	initial commit
