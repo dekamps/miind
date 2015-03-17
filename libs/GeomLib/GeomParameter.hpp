@@ -69,7 +69,7 @@ namespace GeomLib {
 
 		unique_ptr<AbstractOdeSystem>			_p_sys_ode;
 		Potential								_scale;
-		const DiffusionParameter&				_par_diff;
+		const DiffusionParameter				_par_diff;
 		const CurrentCompensationParameter		_par_cur;
 		const string							_name_master;
 		bool									_no_master_equation;

@@ -1,6 +1,10 @@
 /*!
 \mainpage Miind Documentation
 \section sec_announce Announcement
+MIIND version 1.01 was released on 11 March 2015. Appart from bug fixes it contains a visualization tool
+to monitor progress of a running simulation (including the evolution of the densities!).
+
+
 MIIND version 1.0 was released 25 January 2015. It is now solely dedicated to population density techniques 
 and neural mass models. Important new features include:
 - Full support for 1D neural models. These include leaky-integrate-and-fire and quadratic-integrate-and-fire neurons. Other neuron  models
