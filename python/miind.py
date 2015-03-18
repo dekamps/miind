@@ -22,19 +22,22 @@ def generate_preamble(outfile):
 def generate_closing(outfile):
     outfile.write('\tnetwork.configureSimulation(par_run);\n')
     outfile.write('\tnetwork.evolve();\n')    
+    outfile.write('\t} catch(std::exception exc){\n')
+    outfile.write('\t\tstd::cout << exc.what() << std::endl;\n')
+
     outfile.write('#ifdef ENABLE_MPI\n')
     outfile.write('\t//Abort the MPI environment in the correct way :\n')                                                                                             
     outfile.write('\tenv.abort(1);\n')
     outfile.write('#endif\n')
-
+    outfile.write('\t}\n\n')
 
     outfile.write('\tMPILib::utilities::MPIProxy().barrier();\n')
     outfile.write('\tt.stop();\n')
     outfile.write('\tif (MPILib::utilities::MPIProxy().getRank() == 0) {\n')
     outfile.write('\n\t\tstd::cout << \"Overall time spend\\n\";\n')
     outfile.write('\t\tt.report();\n')
-    outfile.write('\t}\n')
-   
+    outfile.write('\t}\n')    
+    
     outfile.write('\treturn 0;\n}\n')
     
     for t in  algorithms.RATEFUNCTIONS:
@@ -77,6 +80,7 @@ def generate_opening(outfile):
     outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')                                                                                 
     outfile.write('\tboost::mpi::environment env(argc, argv);\n')
     outfile.write('#endif\n\n')
+    outfile.write('\ttry {')
      
     
 if __name__ == "__main__":

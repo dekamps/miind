@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
 	boost::mpi::environment env(argc, argv);
 #endif
 
-	// generating algorithms
+	try {	// generating algorithms
 	const MPILib::Potential v_min_0 = -0.02;
 	const MPILib::Number n_bins_0 = 500;
 	GeomLib::NeuronParameter par_neur_0(1.0,0,0,0,50e-3);
@@ -53,10 +53,14 @@ int main(int argc, char *argv[]){
 	SimulationRunParameter par_run( handler,1000000,0,0.3,1e-03,1e-05,"omurtag.log",1e-03);
 	network.configureSimulation(par_run);
 	network.evolve();
+	} catch(std::exception exc){
+		std::cout << exc.what() << std::endl;
 #ifdef ENABLE_MPI
 	//Abort the MPI environment in the correct way :
 	env.abort(1);
 #endif
+	}
+
 	MPILib::utilities::MPIProxy().barrier();
 	t.stop();
 	if (MPILib::utilities::MPIProxy().getRank() == 0) {
