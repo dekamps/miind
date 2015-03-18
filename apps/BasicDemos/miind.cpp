@@ -10,7 +10,7 @@
 #include <MPILib/include/algorithm/DelayAlgorithmCode.hpp>
 #include <MPILib/include/algorithm/RateFunctorCode.hpp>
 typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
-int main(){
+int main(int argc, char *argv[]){
 	Network network;
 	boost::timer::auto_cpu_timer t;
 

@@ -71,7 +71,7 @@ def parse_xml(infile, outfile):
     return define_network_type(outfile,s), tree
 
 def generate_opening(outfile):
-    outfile.write('int main(){\n\tNetwork network;\n')
+    outfile.write('int main(int argc, char *argv[]){\n\tNetwork network;\n')
     outfile.write('\tboost::timer::auto_cpu_timer t;\n\n')
     outfile.write('#ifdef ENABLE_MPI\n')
     outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')                                                                                 
