@@ -20,7 +20,7 @@
 #ifndef MPILIB_MPINODE_HPP_
 #define MPILIB_MPINODE_HPP_
 
-#include <MPILib/config.hpp>
+//#include <MPILib/config.hpp>
 #include <vector>
 #include <map>
 #include <memory>

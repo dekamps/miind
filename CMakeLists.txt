@@ -47,6 +47,7 @@ MESSAGE(STATUS "MPI enabled")
 # Require MPI for this project:
 IF(ENABLE_MPI)
 	find_package(MPI REQUIRED)
+	add_definitions( -DENABLE_MPI=1 )
 ENDIF(ENABLE_MPI)
 
  #   add the flags for C++11 

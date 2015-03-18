@@ -108,10 +108,10 @@ target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} )
 #############################################################################
 # Cmake generated header files
 #############################################################################
-CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.cmake 
-    ${CMAKE_CURRENT_BINARY_DIR}/config.hpp
-)
+#CONFIGURE_FILE(
+#    ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.cmake 
+#    ${CMAKE_CURRENT_BINARY_DIR}/config.hpp
+#)
 
 
 #############################################################################

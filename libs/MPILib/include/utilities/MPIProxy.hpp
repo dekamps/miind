@@ -19,7 +19,7 @@
 
 #ifndef MPILIB_UTILITIES_MPIPROXY_HPP_
 #define MPILIB_UTILITIES_MPIPROXY_HPP_
-#include <MPILib/config.hpp>
+//#include <MPILib/config.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/utilities/Singleton.hpp>
 #include <MPILib/include/utilities/Log.hpp>

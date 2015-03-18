@@ -19,7 +19,7 @@
 #ifndef MPILIB_POPULIST_PARAMETERS_POPULISTSPECIFICPARAMETER_HPP_
 #define MPILIB_POPULIST_PARAMETERS_POPULISTSPECIFICPARAMETER_HPP_
 
-#include <MPILib/config.hpp>
+//#include <MPILib/config.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/InitialDensityParameter.hpp>
 

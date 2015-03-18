@@ -18,7 +18,7 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
-#include <MPILib/config.hpp>
+//#include <MPILib/config.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
 #include <MPILib/include/utilities/Exception.hpp>

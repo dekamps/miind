@@ -20,7 +20,7 @@
 #ifndef MPILIB_ALGORITHMS_DELAYALGORITHM_CODE_HPP_
 #define MPILIB_ALGORITHMS_DELAYALGORITHM_CODE_HPP_
 
-#include <MPILib/config.hpp>
+//#include <MPILib/config.hpp>
 #include <cassert>
 #include <MPILib/include/algorithm/DelayAlgorithm.hpp>
 

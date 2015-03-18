@@ -16,7 +16,7 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-#include <MPILib/config.hpp>
+//#include <MPILib/config.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
 #include <MPILib/include/utilities/Log.hpp>
 #include <MPILib/include/utilities/Exception.hpp>

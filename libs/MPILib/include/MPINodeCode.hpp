@@ -20,7 +20,6 @@
 #ifndef CODE_MPILIB_MPINODE_HPP_
 #define CODE_MPILIB_MPINODE_HPP_
 
-#include <MPILib/config.hpp>
 #include <MPILib/include/MPINode.hpp>
 #include <iostream>
 #include <MPILib/include/utilities/Exception.hpp>

@@ -20,7 +20,7 @@
 #ifndef MPILIB_ALGORITHMS_WILSONCOWANALGORITHM_HPP_
 #define MPILIB_ALGORITHMS_WILSONCOWANALGORITHM_HPP_
 
-#include <MPILib/config.hpp>
+//#include <MPILib/config.hpp>
 #include <NumtoolsLib/NumtoolsLib.h>
 #include <MPILib/include/algorithm/WilsonCowanParameter.hpp>
 

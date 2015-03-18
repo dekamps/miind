@@ -20,7 +20,7 @@
 #ifndef MPILIB_MPINETWORK_CODE_HPP_
 #define MPILIB_MPINETWORK_CODE_HPP_
 
-#include <MPILib/config.hpp>
+//#include <MPILib/config.hpp>
 #include <sstream>
 #include <iostream>
 #include <cassert>
