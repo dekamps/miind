@@ -5,6 +5,7 @@ import nodes
 import connections
 import simulation
 import xml.etree.ElementTree as ET
+import argparse
 
 XML_EXTENSION = '.xml'
 
@@ -82,9 +83,8 @@ def generate_opening(outfile):
     outfile.write('#endif\n\n')
     outfile.write('\ttry {')
      
-    
-if __name__ == "__main__":
-    infile, outfile=check_call(sys.argv)
+
+def generate_outputfile(infile, outfile):
     generate_preamble(outfile)
     nettype, tree = parse_xml(infile,outfile)
     outfile.write(nettype)
@@ -105,3 +105,9 @@ if __name__ == "__main__":
     simpar = tree.find('SimulationRunParameter')
     simulation.parse_parameter(simpar,outfile)
     generate_closing(outfile)
+    
+if __name__ == "__main__":
+    
+
+    infile, outfile=check_call(sys.argv)
+    generate_outputfile(infile, outfile)

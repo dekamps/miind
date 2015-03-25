@@ -55,6 +55,7 @@ def parse_canvas_handler(tree):
 def add_nodes(tree):
     s= ''
     nodes=tree.findall('CanvasNode')
+
     for node in nodes:
         s += '\thandler.addNodeToCanvas(id_' +  str(NODE_NAMES[node.attrib['Name']]) + ');\n'
     return s

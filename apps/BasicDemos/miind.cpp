@@ -9,7 +9,7 @@
 #include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
 #include <MPILib/include/algorithm/DelayAlgorithmCode.hpp>
 #include <MPILib/include/algorithm/RateFunctorCode.hpp>
-typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
+typedef MPILib::MPINetwork<double, MPILib::utilities::CircularDistribution> Network;
 int main(int argc, char *argv[]){
 	Network network;
 	boost::timer::auto_cpu_timer t;
@@ -20,37 +20,23 @@ int main(int argc, char *argv[]){
 #endif
 
 	try {	// generating algorithms
-	const MPILib::Potential v_min_0 = -0.02;
-	const MPILib::Number n_bins_0 = 500;
-	GeomLib::NeuronParameter par_neur_0(1.0,0,0,0,50e-3);
-	const GeomLib::InitialDensityParameter par_dense_0(0.0, 0.0);
-	GeomLib::OdeParameter par_ode_0(n_bins_0,v_min_0,par_neur_0,par_dense_0);
-	GeomLib::LifNeuralDynamics dyn_ode_leak_0(par_ode_0, 0.01);
-	GeomLib::LeakingOdeSystem sys_ode_0(dyn_ode_leak_0);
-	GeomLib::GeomParameter par_geom_0(sys_ode_0);
-	GeomLib::GeomAlgorithm<DelayedConnection> alg_geom_0(par_geom_0);
-
-	MPILib::algorithm::RateAlgorithm<DelayedConnection> rate_alg_1(1.0);
+	const MPILib::Time t_mem_0 = 50e-3;
+	const double f_noise_0 = 1.0;
+	MPILib::Rate f_max_0 = 10.0;
+	MPILib::Rate I_ext_0 = 0;
+	MPILib::algorithm::WilsonCowanParameter  par_wil_0(t_mem_0,f_max_0,f_noise_0,I_ext_0);
+	MPILib::algorithm::WilsonCowanAlgorithm alg_wc_0(par_wil_0);
+	MPILib::algorithm::RateAlgorithm<double> rate_alg_1(100.0);
 	// generating nodes
-	MPILib::NodeId id_0 = network.addNode(alg_geom_0,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_0 = network.addNode(alg_wc_0,MPILib::EXCITATORY_GAUSSIAN);
 	MPILib::NodeId id_1 = network.addNode(rate_alg_1,MPILib::EXCITATORY_GAUSSIAN);
 	// generating connections
-	DelayedConnection con_1_0(800,0.03,0);
+	double con_1_0(0.1);
 	network.makeFirstInputOfSecond(id_1,id_0,con_1_0);
 	// generation simulation parameter
-	const MPILib::Time tmin = 0;
-	const MPILib::Time tmax = 0.3;
-	const MPILib::Rate fmin = 0;
-	const MPILib::Rate fmax = 20;
-	const MPILib::Potential statemin = 0;
-	const MPILib::Potential statemax = 1.0;
-	const MPILib::Potential densemin = 0;
-	const MPILib::Potential densemax = 2.5;
-	MPILib::CanvasParameter par_canvas(tmin,tmax,fmin,fmax,statemin,statemax,densemin,densemax);
+	MPILib::report::handler::RootReportHandler handler("wilsoncowan",true);
 
-	MPILib::report::handler::RootReportHandler handler("omurtag",true,true, par_canvas);
-	handler.addNodeToCanvas(id_0);
-	SimulationRunParameter par_run( handler,1000000,0,0.3,1e-03,1e-05,"omurtag.log",1e-03);
+	SimulationRunParameter par_run( handler,1000000,0,0.3,1e-03,1e-04,"wilson.log",1e-03);
 	network.configureSimulation(par_run);
 	network.evolve();
 	} catch(std::exception exc){
