@@ -7,6 +7,7 @@
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 #include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
+#include <MPILib/include/algorithm/PersistantAlgorithm.hpp>
 #include <MPILib/include/algorithm/DelayAlgorithmCode.hpp>
 #include <MPILib/include/algorithm/RateFunctorCode.hpp>
 typedef MPILib::MPINetwork<double, MPILib::utilities::CircularDistribution> Network;
@@ -20,22 +21,80 @@ int main(int argc, char *argv[]){
 #endif
 
 	try {	// generating algorithms
-	const MPILib::Time t_mem_0 = 50e-3;
+	const MPILib::Time t_mem_0 = 20e-3;
 	const double f_noise_0 = 1.0;
-	MPILib::Rate f_max_0 = 10.0;
+	MPILib::Rate f_max_0 = 100.0;
 	MPILib::Rate I_ext_0 = 0;
 	MPILib::algorithm::WilsonCowanParameter  par_wil_0(t_mem_0,f_max_0,f_noise_0,I_ext_0);
 	MPILib::algorithm::WilsonCowanAlgorithm alg_wc_0(par_wil_0);
-	MPILib::algorithm::RateAlgorithm<double> rate_alg_1(100.0);
+	const MPILib::Time t_mem_1 = 10e-3;
+	const double f_noise_1 = 1.0;
+	MPILib::Rate f_max_1 = 100.0;
+	MPILib::Rate I_ext_1 = 0;
+	MPILib::algorithm::WilsonCowanParameter  par_wil_1(t_mem_1,f_max_1,f_noise_1,I_ext_1);
+	MPILib::algorithm::WilsonCowanAlgorithm alg_wc_1(par_wil_1);
+	MPILib::algorithm::RateAlgorithm<double> rate_alg_2(100.0);
+	MPILib::algorithm::RateAlgorithm<double> rate_alg_3(100.0);
+	MPILib::Rate RateFunction_4(MPILib::Time);
+	MPILib::algorithm::RateFunctor<double> rate_functor_4(RateFunction_4);
+	MPILib::algorithm::PersistantAlgorithm pers_alg_5;
 	// generating nodes
 	MPILib::NodeId id_0 = network.addNode(alg_wc_0,MPILib::EXCITATORY_GAUSSIAN);
-	MPILib::NodeId id_1 = network.addNode(rate_alg_1,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_1 = network.addNode(alg_wc_0,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_2 = network.addNode(alg_wc_1,MPILib::INHIBITORY_GAUSSIAN);
+	MPILib::NodeId id_3 = network.addNode(alg_wc_1,MPILib::INHIBITORY_GAUSSIAN);
+	MPILib::NodeId id_4 = network.addNode(rate_alg_2,MPILib::INHIBITORY_GAUSSIAN);
+	MPILib::NodeId id_5 = network.addNode(rate_alg_3,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_6 = network.addNode(rate_functor_4,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_7 = network.addNode(pers_alg_5,MPILib::EXCITATORY_GAUSSIAN);
+	MPILib::NodeId id_8 = network.addNode(alg_wc_1,MPILib::INHIBITORY_GAUSSIAN);
 	// generating connections
-	double con_1_0(0.1);
-	network.makeFirstInputOfSecond(id_1,id_0,con_1_0);
+	double con_4_0(-0.1);
+	network.makeFirstInputOfSecond(id_4,id_0,con_4_0);
+	double con_4_1(-0.1);
+	network.makeFirstInputOfSecond(id_4,id_1,con_4_1);
+	double con_4_2(-0.1);
+	network.makeFirstInputOfSecond(id_4,id_2,con_4_2);
+	double con_4_3(-0.1);
+	network.makeFirstInputOfSecond(id_4,id_3,con_4_3);
+	double con_4_8(-0.1);
+	network.makeFirstInputOfSecond(id_4,id_8,con_4_8);
+	double con_5_0(0.1);
+	network.makeFirstInputOfSecond(id_5,id_0,con_5_0);
+	double con_0_1(0.2);
+	network.makeFirstInputOfSecond(id_0,id_1,con_0_1);
+	double con_0_2(0.2);
+	network.makeFirstInputOfSecond(id_0,id_2,con_0_2);
+	double con_2_1(-0.5);
+	network.makeFirstInputOfSecond(id_2,id_1,con_2_1);
+	double con_6_3(0.1);
+	network.makeFirstInputOfSecond(id_6,id_3,con_6_3);
+	double con_3_2(-0.5);
+	network.makeFirstInputOfSecond(id_3,id_2,con_3_2);
+	double con_1_7(0.1);
+	network.makeFirstInputOfSecond(id_1,id_7,con_1_7);
+	double con_7_8(100.0);
+	network.makeFirstInputOfSecond(id_7,id_8,con_7_8);
+	double con_8_0(-0.2);
+	network.makeFirstInputOfSecond(id_8,id_0,con_8_0);
 	// generation simulation parameter
-	MPILib::report::handler::RootReportHandler handler("wilsoncowan",true);
+	const MPILib::Time tmin = 0;
+	const MPILib::Time tmax = 0.3;
+	const MPILib::Rate fmin = 0;
+	const MPILib::Rate fmax = 100;
+	const MPILib::Potential statemin = 0;
+	const MPILib::Potential statemax = 0.02;
+	const MPILib::Potential densemin = 0;
+	const MPILib::Potential densemax = 250;
+	MPILib::CanvasParameter par_canvas(tmin,tmax,fmin,fmax,statemin,statemax,densemin,densemax);
 
+	MPILib::report::handler::RootReportHandler handler("wilsoncowan",true,true, par_canvas);
+	handler.addNodeToCanvas(id_0);
+	handler.addNodeToCanvas(id_1);
+	handler.addNodeToCanvas(id_2);
+	handler.addNodeToCanvas(id_3);
+	handler.addNodeToCanvas(id_6);
+	handler.addNodeToCanvas(id_7);
 	SimulationRunParameter par_run( handler,1000000,0,0.3,1e-03,1e-04,"wilson.log",1e-03);
 	network.configureSimulation(par_run);
 	network.evolve();
@@ -55,4 +114,7 @@ int main(int argc, char *argv[]){
 		t.report();
 	}
 	return 0;
+}
+MPILib::Rate RateFunction_4(MPILib::Time t){
+	return  t > 0.1 ? 100 : 0;
 }

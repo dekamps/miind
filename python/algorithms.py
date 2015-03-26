@@ -254,6 +254,18 @@ def parse_wilsoncowan_algorithm(alg, i, weighttype):
     s += wrapup_wilsoncowan_algorithm(alg, i, weighttype)
     return s
 
+def parse_persistant_algorithm(alg, i, weighttype):
+    s = ''
+    
+    dp = alg.find('PersistantAlgorithm')
+    
+    if not 'Name' in dp.keys():
+        raise NameError('Name tag expected')
+    cpp_name = 'pers_alg_'  + str(i)
+    Register(dp.attrib['Name'],cpp_name)    
+    s += '\tMPILib::algorithm::PersistantAlgorithm ' + cpp_name + ';\n'
+    return s
+
 def parse_delay_algorithm(alg,i,weighttype):
     s = ''
     dg = alg.find('DelayAlgorithm')
@@ -282,6 +294,7 @@ def parse_ratefunctor_algorithm(alg, i, weighttype):
     cpp_name = 'rate_functor_' + str(i)
     Register(rf.attrib['Name'],cpp_name)
     
+    print 'yip'
     s += '\tMPILib::Rate RateFunction_' + str(i) + '(MPILib::Time);\n'
     
     s += '\tMPILib::algorithm::RateFunctor<' + weighttype.text + '> ' + cpp_name + '(' 
@@ -308,6 +321,8 @@ def parse_algorithm(alg,i,weighttype):
         return parse_ratefunctor_algorithm(alg,i,weighttype)
     if algname == 'DelayAlgorithm':
         return parse_delay_algorithm(alg,i,weighttype)
+    if algname == 'PersistantAlgorithm':
+        return parse_persistant_algorithm(alg,i,weighttype)
     if algname =='RateAlgorithm':
         return  parse_rate_algorithm(alg,i,weighttype)
     if algname =='GeomAlgorithm':
