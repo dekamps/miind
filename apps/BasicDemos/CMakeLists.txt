@@ -37,8 +37,6 @@ set ( LIBLIST
 #############################################################################
 # executables
 #############################################################################
-add_executable(miind miind.cpp)
-target_link_libraries(miind ${LIBLIST})
 
 #add_executable(wilsoncowanDemo miind-mpi.cpp)
 #target_link_libraries(wilsoncowanDemo ${LIBLIST})

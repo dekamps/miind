@@ -1,3 +1,4 @@
+import os
 import sys
 import include
 import algorithms
@@ -6,6 +7,7 @@ import connections
 import simulation
 import xml.etree.ElementTree as ET
 import argparse
+import directories
 
 XML_EXTENSION = '.xml'
 
@@ -46,20 +48,27 @@ def generate_closing(outfile):
         
     return
 
-def check_call(argv):   
-    if len(argv) > 2 :
-        raise ValueError
-    if len(argv) == 1:
-        infile = open ('miind.xml','r')
-    else:
-        if argv[1][-4:] == '.xml':
-            infile = open(argv[1],'r')
-        else:
-            raise NameError('No XML file provided')
-            
-    outfile= open('../apps/BasicDemos/miind.cpp','w') 
+def check_call(argv):
 
+    if len(argv) != 2 :
+        raise ValueError
+    if argv[1][-4:] == '.xml':
+        infile = open(argv[1],'r')
+    else:
+        raise NameError('No XML file provided')
+    fn = os.path.split(argv[1])[1]
+    base = fn[:-4]
+    fname = base + '.cpp'
+
+    dirname = directories.miind_root() + os.sep + 'apps' + os.sep + base  
+    if not os.path.exists(dirname):
+        directories.add_executable(fn)
+        
+
+    outname  = dirname + os.sep + fname
+    outfile= open(outname,'w') 
     return infile, outfile
+
 
 def define_network_type(outfile, type):
     if type ==  "DelayedConnection":
