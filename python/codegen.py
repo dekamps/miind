@@ -93,4 +93,7 @@ def generate_outputfile(infile, outfile):
     simpar = tree.find('SimulationRunParameter')
     simulation.parse_parameter(simpar,outfile)
     generate_closing(outfile)
+    algorithms.reset_algorithms()
+    nodes.reset_nodes()
+
     

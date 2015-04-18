@@ -1,6 +1,8 @@
 import os
 import errno
 import string
+import inspect
+import codegen
 
 # global variable to hold absolute path
 ABS_PATH=''
@@ -11,7 +13,10 @@ PATH_VARS_DEFINED=False
 
 def initialize_global_variables():
     global ABS_PATH
-    ABS_PATH=os.getcwd()
+
+    filename = inspect.getframeinfo(inspect.currentframe()).filename
+    path = os.path.dirname(os.path.abspath(filename))    
+    ABS_PATH=path
     global MIIND_ROOT
     MIIND_ROOT =  ABS_PATH[0:-6]
     global PATH_VARS_DEFINED
@@ -33,7 +38,7 @@ def miind_root():
     return MIIND_ROOT
 
 def create_dir(name):
-    ''' Name of the executable to be generated. Should not end in '.xml' '''
+    ''' Name of the executable to be generated. Should not end in '.xml'. The directory will be created relative to MIIND_ROOT. '''
     sep = os.path.sep
     initialize_global_variables()
     global MIIND_ROOT
@@ -56,7 +61,7 @@ def insert_cmake_template(name,full_path_name):
     if os.path.exists(outname):
         return
 
-    with open('cmake_template') as f:
+    with open(miind_root() + sep + 'python' + sep + 'cmake_template') as f:
         lines=f.readlines()
     with open(outname,'w') as fout:
         for line in lines:
@@ -71,9 +76,11 @@ def parse_apps_cmake(file):
     return lines
 
 def generate_apps_cmake(l, dir_path):
+    ''' First, the last argument is stripped from dir_path. If a CMakeLists.txt file is not present in the resulting directory, one will be created. If there is one,
+    a line will be added for each executable present in l, except if it is already present in the CMakeLists.txt'''
     path=os.path.split(os.path.normpath(dir_path))[0]
     cpath= os.path.join(path,'CMakeLists.txt')
-    
+
     with open(cpath,'w') as f:
         for line in l:
             f.write(line)
@@ -92,11 +99,46 @@ def insert_parent_cmake(prog_name, dir_path):
 
     fn= os.path.join(path,'CMakeLists.txt')
 
+    if not os.path.exists(fn):
+        with open(fn,'w') as f:
+            f.write('# Machine generated CMakeLists.txt file by directories.py\n')
+            
     with open(fn) as f:
         l=parse_apps_cmake(f)
     if not prog_name in executable_list(l):
         l.append('ADD_SUBDIRECTORY( ' + prog_name + ' )\n')
         generate_apps_cmake(l, dir_path)
+
+def detach_executable(name):
+    ''' Remove an executable or execuatble tree from the build tree. After calling a 'make' command
+    will no longer trry to compile the executable 'name', or the executables under the directory 'name'.
+    No files are removed.'''
+
+    dir_path =path=os.path.join(miind_root(),'apps')
+    
+    fn = os.path.join(dir_path,'CMakeLists.txt')
+    
+    with open(fn) as f:
+        l=parse_apps_cmake(f)
+
+    if name in executable_list(l):
+        index = executable_list(l).index(name)
+        del l[index]
+        # generate_apps_cmake operates on parent directory, therefore the dummy argument
+        dir_path = os.path.join(dir_path,'dummy')
+        generate_apps_cmake(l, dir_path)
+    else:
+        print 'Name not in excutable list. No action taken.'
+
+def create_cpp_file(name, dir_path, prog_name):
+
+    cpp_name = prog_name + '.cpp'
+    abs_path = os.path.join(dir_path,cpp_name)
+    with open(abs_path,'w') as fout:
+        with open(name) as fin:
+            codegen.generate_outputfile(fin,fout)
+    return
+            
     
 def add_executable(name,versions=None):
     ''' Add a user defined executable to miind's compilation tree.
@@ -118,17 +160,28 @@ def add_executable(name,versions=None):
     if not PATH_VARS_DEFINED:
         initialize_global_variables()
 
-    prog_name = check_and_strip_name(name)
-    dir_path = create_dir(prog_name)   
+    sep = os.path.sep
 
     if versions != None:
+        dir_path = create_dir(name)
+        insert_parent_cmake(name,dir_path)
         for version in versions:
-            versname = prog_name + '/' + version
-            insert_cmake_template(versname,dir_path)
+            prog_name = check_and_strip_name(version)
+            versname = name + sep + prog_name
+            dir_path = create_dir(versname)
+
+            insert_parent_cmake(prog_name, dir_path)
+            insert_cmake_template(prog_name,dir_path)
+            create_cpp_file(version, dir_path, prog_name)
     else:
+        prog_name = check_and_strip_name(name)
+        dir_path = create_dir(prog_name)
+    
         insert_parent_cmake(prog_name, dir_path)
-        insert_cmake_template(prog_name,dir_path)        
+        insert_cmake_template(prog_name,dir_path)
+        create_cpp_file(name, dir_path, prog_name)
 
 if __name__ == "__main__":
     initialize_global_variables()
-    add_executable('omurtag.xml')
+    add_executable('masterblaster', ['omurtag.xml', 'twopop.xml'])
+    detach_executable('masterblaster')

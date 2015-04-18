@@ -341,6 +341,10 @@ def parse_algorithms(alg_list,weighttype,outfile):
         outfile.write(s)
     return 
 
+def reset_algorithms():
+    ALGORITHM_NAMES.clear()
+    del RATEFUNCTIONS[:]
+    
 if __name__ == "__main__":
     alg_list, weighttype = setup_test()
     outfile=open('alg.cpp','w')

@@ -26,3 +26,6 @@ def parse_nodes(node_list, weighttype, outfile):
         s = parse_node(node,weighttype,i)
         i+=1
         outfile.write(s)
+
+def reset_nodes():
+    NODE_NAMES.clear()
