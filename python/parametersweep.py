@@ -17,9 +17,10 @@ class xml_tag_convertor:
     
 class xml_tag:
 
-    def __init__(self,tag_tuple):
-        self.name = tag_tuple[0]
-        self.dict = tag_tuple[1]
+    def __init__(self,tag):
+        self.convertor = xml_tag_convertor(tag)
+        self.name = self.convertor.convert()[0]
+        self.dict = self.convertor.convert()[1]
 
 
 
@@ -40,6 +41,7 @@ class xml_file:
             if el.attrib == xml_tag.dict:
                 store = el
                 count += 1
+
         if count != 1:
             raise
         textlist = el.text.split()
@@ -63,6 +65,7 @@ class xml_file:
 
 
     def replace_xml_tag(self, xml_tag, value, position = 0):
+
         text_list = self.get_text_attribute(xml_tag)
 
         '''it is assumed that the value is a numeral, i.e. it will need
