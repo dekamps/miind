@@ -5,7 +5,7 @@ import codegen
 import sys
 import os
 import directories
-
+import jobs
 
 
 if __name__ == "__main__":
@@ -21,9 +21,11 @@ if __name__ == "__main__":
     if vars(args)['r'] == False:
         if dirname == None:
             fn = filename[0]
-            directories.add_executable(fn)            
+            directories.add_executable(fn)    
+            jobs.write_out_job(fn)
         else:
             directories.add_executable(dirname, filename)
+            jobs.write_out_jobs(dirname, filename)
     else:    
         if dirname == None:
             fn = directories.check_and_strip_name(filename[0])

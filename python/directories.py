@@ -110,7 +110,7 @@ def insert_parent_cmake(prog_name, dir_path):
         generate_apps_cmake(l, dir_path)
 
 def detach_executable(name):
-    ''' Remove an executable or execuatble tree from the build tree. After calling a 'make' command
+    ''' Remove an executable or executable tree from the build tree. After calling a 'make' command
     will no longer trry to compile the executable 'name', or the executables under the directory 'name'.
     No files are removed.'''
 
