@@ -42,8 +42,11 @@ def generate_xml_file(base_file_name, element):
     tag_log = xml_tag('<name_log>response.log</name_log>')
     f_xml.replace_xml_tag(tag_log, base_file_name + '.log')
 
-    tag_time = xml_tag('<T_max>0.3</T_max>')
+    tag_time = xml_tag('<t_end>0.3</t_end>')
     f_xml.replace_xml_tag(tag_time,1.0)
+
+    tag_screen = xml_tag('<OnScreen>TRUE</OnScreen>')
+    f_xml.replace_xml_tag(tag_screen,'FALSE')
 
     f_xml.write(base_file_name+element[2]+'.xml')
 
