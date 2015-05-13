@@ -19,21 +19,21 @@ class cd:
     def __exit__(self, etype, value, traceback):
         os.chdir(self.savedPath)
 
-dir=sys.argv[1]
+if __name__ == "__main__":
+	dir=sys.argv[1]
 
-build = os.path.join(directories.miind_root(),'build')
-path  = os.path.join(build,'jobs',dir)
+	build = os.path.join(directories.miind_root(),'build')
+	path  = os.path.join(build,'jobs',dir)
 
-with cd(build):
-	subprocess.call(["ls","-l"])
-	subprocess.call(['make'])
+	with cd(build):
+		subprocess.call(["ls","-l"])
+		subprocess.call(['make'])
 
-with open(os.path.join(path,'joblist')) as f:
-	lines = f.readlines()
-	with cd(path):
-		for line in lines:
-			name = line.split()[0]
-			print name
-			subprocess.call([name, '>&log&'])
+	with open(os.path.join(path,'joblist')) as f:
+		lines = f.readlines()
+		with cd(path):
+			for line in lines:
+				name = line.split()[0]
+				subprocess.call([name, '>&log&'])
 
 

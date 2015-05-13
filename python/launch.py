@@ -1,6 +1,10 @@
+#!/usr/bin/env python
+
 import subprocess 
 import submit
-
+import sys
+import os
+import directories
 
 dir=sys.argv[1]
 
