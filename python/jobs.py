@@ -13,10 +13,26 @@ def create_dir(name):
     abspath = os.path.join(miind_root,'build', 'jobs', name)
     return abspath
     
+    
 
 def write_out_job(job_name):
     ''' Just a single job needs to be added.'''
-    print name
+    dirname=job_name[:-4]
+    if job_name[-4:] != '.xml':
+        raise NameError
+
+    abspath=create_dir(dirname)
+    try:
+        os.makedirs(abspath)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+
+    joblistname = os.path.join(abspath,'joblist')
+    with open(joblistname,'w') as f:
+        path = os.path.join(directories.miind_root(), 'build' ,'apps', job_name)
+        f.write(path + '\n')
+    
     return
 
 def write_out_jobs(base_name, job_names):
