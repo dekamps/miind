@@ -28,7 +28,7 @@ def no_decay():
     tag_bins= xml_tag('<N_bins>500</N_bins>')
     f.replace_xml_tag(tag_bins,100000)
 
-    tag_sim_results = xml_tag('<SimulationName>omurtag</SimulationName>')
+    tag_sim_results = xml_tag('<SimulationName>response</SimulationName>')
     f.replace_xml_tag(tag_sim_results,'no_decay')
 
     f.write('no_decay.xml')
@@ -48,13 +48,26 @@ def no_input():
     tag_screen = xml_tag('<OnScreen>TRUE</OnScreen>')
     f.replace_xml_tag(tag_screen,'FALSE')
 
-    tag_sim_results = xml_tag('<SimulationName>omurtag</SimulationName>')
+    tag_sim_results = xml_tag('<SimulationName>response</SimulationName>')
     f.replace_xml_tag(tag_sim_results,'no_input')
 
 
     f.write('no_input.xml')
 
+def single():
+    f=xml_file('response.xml')
+
+    tag_screen = xml_tag('<OnScreen>TRUE</OnScreen>')
+    f.replace_xml_tag(tag_screen,'FALSE')
+
+    tag_sim_results = xml_tag('<SimulationName>response</SimulationName>')
+    f.replace_xml_tag(tag_sim_results,'single')
+
+
+    f.write('response.xml')
+
 
 if __name__ == "__main__": 
     no_decay()
     no_input()
+    single()

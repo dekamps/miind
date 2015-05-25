@@ -34,7 +34,7 @@
 <Connection In="Cortical Background" Out="LIF E">800 0.03 0</Connection>
 </Connections>
 <SimulationIO>
-<SimulationName>omurtag</SimulationName>
+<SimulationName>response</SimulationName>
 <OnScreen>TRUE</OnScreen>
 <WithState>TRUE</WithState>
 <WriteNet>FALSE</WriteNet>

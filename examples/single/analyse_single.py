@@ -82,7 +82,7 @@ def noinput():
 
 def single_state():
 	filepath = os.path.split(jobpath)[0]
-	path = os.path.join(filepath,'response_0.root')
+	path = os.path.join(filepath,'single_0.root')
 	f=ROOT.TFile(path)
 
 	c = ROOT.TCanvas("c3")
