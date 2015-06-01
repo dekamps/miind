@@ -97,7 +97,7 @@ int main(){
 			0.5,
 			1e-3,
 			1e-4,
-			"test/singlepoptest.log"
+			"singlepoptest.log"
 		);
 
 	network.configureSimulation(par_run);
