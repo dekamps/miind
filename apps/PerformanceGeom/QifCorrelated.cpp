@@ -113,7 +113,7 @@ int main(){
 	par_canvas._dense_max     = 5.0;
 
 
-	MPILib::report::handler::RootReportHandler handler("test/twopopcanvas.root", true, true, par_canvas);
+	MPILib::report::handler::RootReportHandler handler("twopopcanvas.root", true, true, par_canvas);
 	handler.addNodeToCanvas(id_alg);
 
       

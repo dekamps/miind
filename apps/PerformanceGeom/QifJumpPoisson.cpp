@@ -79,7 +79,7 @@ int main(){
 	    0.5  // default gamma sys
 	  );
 
-	DiffusionParameter par_diffusion(0.03,0.05);
+	DiffusionParameter par_diffusion(0.03,0.03);
 	CurrentCompensationParameter par_current(0.0,0.0);
 	SpikingQifNeuralDynamics dyn(par_ode,par_qif);
 	QifOdeSystem sys(dyn);
@@ -88,8 +88,8 @@ int main(){
 
 
 	// Reproduce mu = 0.6, sigma = 0.7       
-	Rate rate_ext = 625;
-	Efficacy h    = -8e-2;
+	Rate rate_ext = 6000;
+	Efficacy h    = -8e-3;
 
 	RateAlgorithm<MPILib::DelayedConnection> alg_ext(rate_ext);
 

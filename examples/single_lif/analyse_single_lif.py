@@ -20,7 +20,6 @@ def nodecay():
 	f=ROOT.TFile(path)
 	c=ROOT.TCanvas('c')
 	c.SetGrayscale()
-
 	h = ROOT.TH2F("h","No leakage",500,0.01,1.,500,0.,40.)
 	h.SetXTitle('V')
 	h.SetYTitle('#rho')
@@ -39,7 +38,7 @@ def nodecay():
 	g4.Draw('BL)')
 	g3.Draw('BL')
 	g2.Draw('BL')
-	c.SaveAs('no_decay.png')
+	c.Print('no_decay.pdf')
 
 def noinput():
 
@@ -72,13 +71,13 @@ def noinput():
 	g4.SetLineColor(ROOT.kCyan+4)
 	g5.Draw('L')
 
-	p=ROOT.TPad("p","",0.5,0.5,0.90,0.85)
+	p=ROOT.TPad("p","",0.5,0.5,0.85,0.85)
 	p.Draw()
 	p.cd()
 	h2=ROOT.TH2F("h2","",500,0.,0.3,500,0.,0.000001)
 	h2.Draw()
 	g5.Draw('L')
-	c.SaveAs('no_input.png')
+	c.Print('no_input.pdf')
 
 def single_state():
 	filepath = os.path.split(jobpath)[0]
@@ -94,9 +93,10 @@ def single_state():
 
 	g=f.Get('grid_0_0.29901305')
 	g.Draw('L')
-	c.SaveAs('steadystate.png')
+	c.Print('state.pdf')
 
 	c2=ROOT.TCanvas("c4")
+	ps_rate = ROOT.TPDF('frate.pdf')
 	h=ROOT.TH2F("h2","Rate",500,0.,0.3,500,0.,20.)
 	h.SetYTitle('f (spikes/s)')
 	h.SetXTitle('t (s)')
@@ -104,8 +104,8 @@ def single_state():
 	h.Draw()
 	g=f.Get('rate_0')
 	g.Draw('L')
-	c2.SaveAs('frate.png')
-	
+	c.Print('rate.pdf')
+
 def single():
 	single_state()
 
