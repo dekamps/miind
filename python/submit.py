@@ -20,20 +20,23 @@ class cd:
         os.chdir(self.savedPath)
 
 if __name__ == "__main__":
-	dir=sys.argv[1]
+    
+    if sys.arc != 2:
+        print 'submit requirs exactly one argument: the subdirectory under which the jobs are organizded.'
+    dir=sys.argv[1]
 
-	build = os.path.join(directories.miind_root(),'build')
-	path  = os.path.join(build,'jobs',dir)
+    build = os.path.join(directories.miind_root(),'build')
+    path  = os.path.join(build,'jobs',dir)
 
-	with cd(build):
-		subprocess.call(["ls","-l"])
-		subprocess.call(['make'])
+    with cd(build):
+       	subprocess.call(["ls","-l"])
+        subprocess.call(['make'])
 
-	with open(os.path.join(path,'joblist')) as f:
-		lines = f.readlines()
-		with cd(path):
-			for line in lines:
-				name = line.split()[0]
-				subprocess.call([name, '>&log&'])
+    with open(os.path.join(path,'joblist')) as f:
+       	lines = f.readlines()
+       	with cd(path):
+	       	for line in lines:
+	       		name = line.split()[0]
+	       		subprocess.call([name, '>&log&'])
 
 
