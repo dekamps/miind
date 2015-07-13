@@ -2,8 +2,8 @@ import string
 import xml.etree.ElementTree as ET
 
 class xml_tag_convertor:
-    '''Take an xml tag directly frpm a simulation XML file.
-    Convert it ino a tag/dictonary tuple'''
+    '''Take an xml tag directly from a simulation XML file.
+    Convert it into a tag/dictonary tuple'''
 
     def __init__(self, tag):
         ''' This tag is a tag line from the XML file, whose values are candidates
@@ -21,8 +21,7 @@ class xml_tag:
         self.convertor = xml_tag_convertor(tag)
         self.name = self.convertor.convert()[0]
         self.dict = self.convertor.convert()[1]
-
-
+    
 
 class xml_file:
     '''Represents an XML file as a parsed tree. One can present an XML tag in
@@ -35,17 +34,11 @@ class xml_file:
 
     def get_text_attribute(self, xml_tag):
         root = self.tree.getroot()
-        l=root.iter(xml_tag.name)
-        count = 0
-        for el in l:
-            if el.attrib == xml_tag.dict:
-                store = el
-                count += 1
-
-        if count != 1:
+        gen=root.iter(xml_tag.name)
+        hits = [l for l in gen if l.attrib == xml_tag.dict]
+        if len (hits) != 1: 
             raise
-        textlist = el.text.split()
-        return textlist
+        return hits[0].text.split()
 
     def join(self,l):
         s = ''
@@ -84,14 +77,6 @@ class xml_file:
  
 
 if __name__ == "__main__":
-
-    conv = xml_tag_convertor('<Connection In="Cortical Background" Out="LIF E">800 0.03 0</Connection>')
-
-    tag=xml_tag(conv.convert())
-    file = xml_file('xml/omurtag.xml')
-
-    file.replace_xml_tag(tag,500.0,0)
-    file.replace_xml_tag(tag,0.1,1)
-#    file.write('kadaver.xml')
+    print 'Not intended to run as a standlone script.'
     
        
