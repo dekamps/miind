@@ -21,7 +21,7 @@ class cd:
 
 if __name__ == "__main__":
     
-    if sys.arc != 2:
+    if len(sys.argv) != 2:
         print 'submit requirs exactly one argument: the subdirectory under which the jobs are organizded.'
     dir=sys.argv[1]
 
