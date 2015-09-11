@@ -25,10 +25,7 @@ def parse_connection(connection, weighttype):
 
     # Multiple connections with same label are allowed, so we need to keep a tally
     count = register(i,o)
-    if count == 0:
-        tally = ''
-    else:
-        tally = '_' + str(count) + '_'
+    tally = '_' + str(count) 
 
     s = ''
     if weighttype.text == 'DelayedConnection':
@@ -44,7 +41,7 @@ def parse_connection(connection, weighttype):
     s += '\tnetwork.makeFirstInputOfSecond('
     s += 'id_' + i  + ','
     s += 'id_' + o  + ','    
-    s += 'con_' + i + '_' + o + ');\n'
+    s += 'con_' + i + '_' + o + tally + ');\n'
     
     return s
     

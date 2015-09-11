@@ -28,7 +28,7 @@
 </Algorithms>
 <Nodes>
 <Node algorithm="LIF_excitatory Algorithm" name="LIF E" type="EXCITATORY_GAUSSIAN" />
-<Node algorithm="Cortical Background Algorithm" name="Cortical Background" type="EXCITATORY_GAUSSIAN" />
+<Node algorithm="Cortical Background Algorithm" name="Cortical Background" type="EXCITATORY_DIRECT" />
 </Nodes>
 <Connections>
 <Connection In="Cortical Background" Out="LIF E">800 0.03 0</Connection>
