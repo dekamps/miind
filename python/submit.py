@@ -22,7 +22,8 @@ class cd:
 if __name__ == "__main__":
     
     if len(sys.argv) != 2:
-        print 'submit requirs exactly one argument: the subdirectory under which the jobs are organizded.'
+        print 'submit requirs exactly one argument: the subdirectory under which the jobs are organized.'
+        sys.exit()
     dir=sys.argv[1]
 
     build = os.path.join(directories.miind_root(),'build')
