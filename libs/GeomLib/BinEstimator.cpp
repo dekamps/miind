@@ -21,9 +21,11 @@
 #include <gsl/gsl_spline.h>
 #include <GeomLib/BinEstimator.hpp>
 #include "../UtilLib/UtilLib.h"
+#include "../NumtoolsLib/NumtoolsLib.h"
 #include "GeomLibException.hpp"
 
 using namespace GeomLib;
+using namespace NumtoolsLib;
 using namespace UtilLib;
 
 BinEstimator::BinEstimator
@@ -56,6 +58,18 @@ Index BinEstimator::SearchBin(Potential v) const {
 		
 }
 
+int BinEstimator::Search(Index ind, Potential v, Potential dv) const {
+  int sg = (dv > 0) - (dv < 0);
+  int n = static_cast<int>(_vec_interpretation.size());
+  for (Index i = 0; i < n; i++){
+    Index j = modulo(ind + sg*i, n);
+    if (_vec_interpretation[j] <= v && (j == n-1 || _vec_interpretation[j+1] > v) )
+      return j;
+  }
+  assert(false);
+  throw GeomLibException("BinEstimator sreach failed");
+}
+
 int BinEstimator::SearchBin(Index ind, Potential v, Potential dv) const {
 
 	int i = ind;
@@ -67,28 +81,8 @@ int BinEstimator::SearchBin(Index ind, Potential v, Potential dv) const {
 
 	if (dv == 0)
 		return i;
-	int i_ret;
-	if (dv > 0 ){
-		while(1) {
-			if (_vec_interpretation[i] < v && (i == n - 1 ||_vec_interpretation[i+1] > v ) ){
-				i_ret = static_cast<Index>(i);
-				break;
-			}
-			i++;
-			if (i == n )
-				i = 0;
-		}
-	} else {
-		while(1){
-			if (_vec_interpretation[i] < v && (i == n - 1 || _vec_interpretation[i+1] > v) ){
-				i_ret = static_cast<Index>(i);
-				break;
-			}
-			i--;
-			if (i < 0) 
-				i = n-1;
-		}
-	}
+
+	int i_ret = Search(i,v, dv);
 	assert( i == n-1 || (_vec_interpretation[i] <= v && _vec_interpretation[i+1] > v));
 	return i_ret;			
 }
@@ -128,7 +122,6 @@ BinEstimator::CoverPair BinEstimator::CalculateBinCover(Index i, Potential delta
 
 	Potential trans_low  = Translate(low,	delta_v);
 	Potential trans_high = Translate(high,	delta_v);
-
 	int i_tr_low  = this->SearchBin(i,trans_low, delta_v);
 	int i_tr_high = this->SearchBin(i,trans_high,delta_v);
 
