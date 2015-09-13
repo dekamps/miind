@@ -100,6 +100,15 @@ namespace GeomLib {
 				Potential
 			) const;
 
+		int 
+			Search
+			(
+				Index, 
+				Potential,
+				Potential
+			) const;
+
+
 		double 
 			BinLowFraction
 			(
