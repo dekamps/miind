@@ -35,10 +35,11 @@ struct WilsonCowanParameter {
 	 * @param rate_maximum maximum firing rate in Hz
 	 * @param f_noise noise parameter for sigmoid
 	 * @param f_input input
+	 * @param f_bias bias
 	 */
 	WilsonCowanParameter(Time time_membrane, Rate rate_maximum, double f_noise,
-			double f_input = 0) :
-			_time_membrane(time_membrane), _rate_maximum(rate_maximum), _f_noise(
+			     double f_bias = 0, double f_input = 0) :
+	  _time_membrane(time_membrane), _rate_maximum(rate_maximum), _f_bias(f_bias),_f_noise(
 					f_noise), _f_input(f_input) {
 	}
 
@@ -57,6 +58,11 @@ struct WilsonCowanParameter {
 	 * maximum firing rate
 	 */
 	Rate _rate_maximum = 0;
+
+	/**
+	 * bias parameter
+	 */
+	double _f_bias = 0;
 
 	/**
 	 * noise parameter
