@@ -24,8 +24,8 @@ def generate_h_rate_sequence():
     return l
 
 def generate_xml_file(base_file_name, element):
-    global BASE_FILE
-    f_xml = xml_file(BASE_FILE +'.xml')
+
+    f_xml = xml_file(base_file_name +'.xml')
     # adapt threshold
     tag_th  = xml_tag('<V_threshold>1.0</V_threshold>')
     f_xml.replace_xml_tag(tag_th,str(THETA))
@@ -54,7 +54,7 @@ def generate_xml_sequence(base_file_name):
     global FILE
     l = generate_h_rate_sequence()
     for element in l:
-        generate_xml_file(BASE_FILE, element)
+        generate_xml_file(base_file_name, element)
 
 if __name__ == "__main__":
     generate_xml_sequence('response')
