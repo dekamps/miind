@@ -42,6 +42,9 @@ set (ONEQIF_GEOM_SRC
 set (QIF_GEOM_SRC_CORRELATED
         QifCorrelated.cpp)	
 
+set (RESPONSE_DATA
+        ResponseData.cpp)	
+
 #############################################################################
 # Libraries
 #############################################################################
@@ -82,5 +85,8 @@ target_link_libraries(QifOnePoisson ${LIBLIST})
 
 add_executable(QifCorrelated ${QIF_GEOM_SRC_CORRELATED})
 target_link_libraries(QifCorrelated ${LIBLIST})
+
+add_executable(ResponseData ${RESPONSE_DATA})
+target_link_libraries(ResponseData ${LIBLIST})
 
 

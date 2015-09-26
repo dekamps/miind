@@ -27,6 +27,7 @@ MuSigmaScalarProduct.cpp
 NumericalMasterEquation.cpp
 OdeParameter.cpp
 QifOdeSystem.cpp
+Response.cpp
 SpikingNeuralDynamics.cpp
 SpikingOdeSystem.cpp
 SpikingQifNeuralDynamics.cpp
@@ -55,6 +56,8 @@ NeuronParameter.hpp
 NumericalMasterEquation.h
 OdeParameter.hpp
 QifOdeSystem.hpp
+Response.hpp
+ResponseParameter.hpp
 SpikingNeuralDynamics.hpp
 SpikingOdeSystem.hpp
 SpikingQifNeuralDynamics.hpp
