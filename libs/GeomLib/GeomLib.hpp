@@ -26,6 +26,7 @@
 #include "OdeParameter.hpp"
 #include "LeakingOdeSystem.hpp"
 #include "MuSigmaScalarProduct.hpp"
+#include "Response.hpp"
 #include "SpikingQifNeuralDynamics.hpp"
 #include "QifOdeSystem.hpp"
 

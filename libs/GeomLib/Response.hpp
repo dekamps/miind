@@ -22,6 +22,15 @@
 
 #include "ResponseParameter.hpp"
 
+/*! \file
+*/
+  
+
+/*!  Gain curve for LIF neurons
+
+    Gain curve (or transfer function; response function) for LIF neurons and Gaussian white noise input. In ResponseParameter you provide mean, variance
+    and neuron parameters. A population firing rate is returned. This function provides corrections on the well known result for DC input.
+*/
 
 
 namespace GeomLib {

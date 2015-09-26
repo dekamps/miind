@@ -22,11 +22,17 @@
 
 #include "ResponseParameter.hpp"
 
+/*! \fn ResponseFunction
+    \brief A test class.
+
+    Gain curve (or transfer function; response function) for LIF neurons and Gaussian white noise input. In ResponseParameter you provide mean, variance
+    and neuron parameters. A population firing rate is returned. This function provides corrections on the well known result for DC input.
+*/
 
 
 namespace GeomLib {
 
-  double GeomLib::ResponseFunction ( const GeomLib::ResponseParameter& );
+  double ResponseFunction ( const GeomLib::ResponseParameter& );
 }
 
 #endif // include guard
