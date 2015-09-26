@@ -7,7 +7,7 @@ BASE_FILE = 'response'
 
 def generate_mu_sigma():
     tau  = 20e-3
-    mu = np.arange(15e-3,21e-3,0.1e-3)
+    mu = np.arange(15e-3,21e-3,0.5e-3)
     sigma = [1e-3, 2e-3, 5e-3]
     return tau, mu, sigma
 
