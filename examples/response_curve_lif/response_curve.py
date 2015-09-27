@@ -29,9 +29,9 @@ def generate_xml_file(base_file_name, element):
     f_xml = xml_file(base_file_name +'.xml')
     # adapt threshold
     tag_th  = xml_tag('<V_threshold>1.0</V_threshold>')
-    f_xml.replace_xml_tag(tag_th,str(THETA))
+    f_xml.replace_xml_tag(tag_th,THETA)
     tag_tau = xml_tag('<t_membrane>50e-3</t_membrane>')
-    f_xml.replace_xml_tag(tag_tau,str(TAU))
+    f_xml.replace_xml_tag(tag_tau,TAU)
 
     tag_con=xml_tag('<Connection In="Cortical Background" Out="LIF E">800 0.03 0</Connection>')
     f_xml.replace_xml_tag(tag_con,element[1],0)
@@ -56,7 +56,7 @@ def generate_xml_file(base_file_name, element):
     f_xml.write(base_file_name+element[2]+'.xml')
 
 def generate_xml_sequence(base_file_name):
-    global FILE
+
     l = generate_h_rate_sequence()
     for element in l:
         generate_xml_file(base_file_name, element)
