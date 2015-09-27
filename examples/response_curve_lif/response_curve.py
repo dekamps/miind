@@ -3,6 +3,7 @@ from parametersweep import *
 
 THETA     = 20e-3
 TAU       = 20e-3
+NBINS     = 5000
 BASE_FILE = 'response'
 
 def generate_mu_sigma():
@@ -38,6 +39,10 @@ def generate_xml_file(base_file_name, element):
 
     tag_fn  = xml_tag('<SimulationName>response</SimulationName>')
     f_xml.replace_xml_tag(tag_fn,base_file_name +  element[2])
+
+    tag_nbins = xml_tag('<N_bins>500</N_bins>') 
+    f_xml.replace_xml_tag(tag_nbins,str(NBINS))
+
 
     tag_log = xml_tag('<name_log>response.log</name_log>')
     f_xml.replace_xml_tag(tag_log, base_file_name + '.log')
