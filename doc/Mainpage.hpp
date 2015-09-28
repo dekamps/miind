@@ -1,8 +1,14 @@
 /*!
 \mainpage Miind Documentation
 \section sec_announce Announcement
+MIIND on the Hackathon session of the HBP summit. There is a <a href="http://miind.sf.net/tutorial.pdf">tutorial</a>.
+Although very rough, it will help you get going.
+
+MIIND version 1.02 was released on 19 September 2015. It cintains a major bug fix.
+
 MIIND version 1.01 was released on 11 March 2015. Appart from bug fixes it contains a visualization tool
 to monitor progress of a running simulation (including the evolution of the densities!).
+
 
 
 MIIND version 1.0 was released 25 January 2015. It is now solely dedicated to population density techniques 
