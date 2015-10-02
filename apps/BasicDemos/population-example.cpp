@@ -26,82 +26,97 @@
 #include <GeomLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
+#include <MPILib/include/algorithm/RateFunctorCode.hpp>
+#include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 
-using GeomLib::GeomAlgorithm;
-using GeomLib::GeomParameter;
-using GeomLib::InitialDensityParameter;
-using GeomLib::LeakingOdeSystem;
-using GeomLib::LifNeuralDynamics;
-using GeomLib::OdeParameter;
-using GeomLib::NeuronParameter;
-
 using MPILib::EXCITATORY_DIRECT;
+using MPILib::INHIBITORY_DIRECT;
 using MPILib::NodeId;
 using MPILib::SimulationRunParameter;
 using MPILib::algorithm::RateAlgorithm;
+using MPILib::algorithm::RateFunctor;
+using MPILib::algorithm::WilsonCowanAlgorithm;
+using MPILib::algorithm::WilsonCowanParameter;
 
 using std::cout;
 using std::endl;
 
-typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
-typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
+typedef MPILib::MPINetwork<double, MPILib::utilities::CircularDistribution> Network;
+
+Rate Inp(Time t){
+  return (t > 1.0 && t < 1.3) ? 20.0 : 0;
+}
+
+Rate Opl(Time t){
+  return (t > 0.5 && t < 1.5) ? 20.0 : 0;
+}
 
 int main(){
-  //! [preamble]
-	cout << "Demonstrating Omurtag et al. (2000)" << endl;
-	Number    n_bins = 330;
-	Potential V_min  = 0.0;
+  
+  Rate rate_ext = 0;
 
-	NeuronParameter
-		par_neuron
-		(
-			1.0,
-			0.0,
-			0.0,
-			0.0,
-			50e-3
-		);
+  RateFunctor<double> input(Inp);
+  RateFunctor<double> openlock(Opl);
 
-	OdeParameter
-		par_ode
-		(
-			n_bins,
-			V_min,
-			par_neuron,
-			InitialDensityParameter(0.0,0.0)
-		);
+  RateAlgorithm<double> alg_ext(rate_ext);
 
-	double min_bin = 0.01;
-	LifNeuralDynamics dyn(par_ode,min_bin);
-	LeakingOdeSystem sys(dyn);
-	GeomParameter par_geom(sys);
-	GeomDelayAlg alg(par_geom);
+	WilsonCowanParameter par_wc;
+	par_wc._f_bias        = 0;
+	par_wc._f_noise       = 1.0;
+	par_wc._rate_maximum  = 50;
+	par_wc._time_membrane = 50e-3;
+  
 
-	Rate rate_ext = 800.0;
-	RateAlgorithm<MPILib::DelayedConnection> alg_ext(rate_ext);
+	WilsonCowanAlgorithm alg(par_wc);
 
 	Network network;
 
-	NodeId id_rate = network.addNode(alg_ext,EXCITATORY_DIRECT);
-	NodeId id_alg  = network.addNode(alg,    EXCITATORY_DIRECT);
+	NodeId id_input = network.addNode(input, EXCITATORY_DIRECT);
+	NodeId id_gate = network.addNode(alg, EXCITATORY_DIRECT);
+	NodeId id_output = network.addNode(alg, EXCITATORY_DIRECT);
+	NodeId id_lock = network.addNode(alg, INHIBITORY_DIRECT);
+	NodeId id_openlock = network.addNode(openlock ,INHIBITORY_DIRECT);
 
-	MPILib::DelayedConnection con(1,0.03,0.0);
-	network.makeFirstInputOfSecond(id_rate,id_alg,con);
+	double weight = 1.0;
 
-	const MPILib::report::handler::RootReportHandler handler("test/singlepoptest", true );
+	network.makeFirstInputOfSecond(id_input, id_gate, weight);
+	network.makeFirstInputOfSecond(id_input, id_lock, weight);
+	network.makeFirstInputOfSecond(id_gate, id_output, weight);
+	network.makeFirstInputOfSecond(id_lock, id_gate, -1*weight);
+	network.makeFirstInputOfSecond(id_openlock, id_lock, -2*weight);
+
+	MPILib::CanvasParameter par_canvas;
+	par_canvas._state_min     = -0.020;
+	par_canvas._state_max     = 0.020;
+	par_canvas._t_min         = 0.0;
+	par_canvas._t_max         = 2.0;
+	par_canvas._f_min         = 0.0;
+	par_canvas._f_max         = 50.0;
+	par_canvas._dense_min     = 0.0;
+	par_canvas._dense_max     = 200.0;
+
+
+
+	MPILib::report::handler::RootReportHandler handler("singlepoptest", true, true, par_canvas );
+
+	handler.addNodeToCanvas(id_input);
+	handler.addNodeToCanvas(id_gate);
+	handler.addNodeToCanvas(id_output);
+	handler.addNodeToCanvas(id_lock);
+	handler.addNodeToCanvas(id_openlock);
 
 	const SimulationRunParameter
 		par_run
 		(
-			handler,
-	        10000000,
-			0.0,
-			10.0,
-	        1e-4,
-			1e-4,
-			"test/singlepoptest.log"
+		  handler,
+		  10000000,
+		  0.0,
+		  2.0,
+	          1e-3,
+		  1e-3,
+		   "wilsom.log"
 		);
 
 	network.configureSimulation(par_run);

@@ -36,7 +36,7 @@ int sigmoid(double, const double y[], double f[], void *params) {
 
 	f[0] = (-y[0]
 			+ p_parameter->_rate_maximum
-					/ (1 + exp(-p_parameter->_f_noise * p_parameter->_f_input)))
+					/ (1 + exp(-p_parameter->_f_noise * p_parameter->_f_input - p_parameter->_f_bias)))
 			/ p_parameter->_time_membrane;
 
 	return GSL_SUCCESS;
