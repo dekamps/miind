@@ -90,7 +90,7 @@
 <Connection In="Delay_I_STN_A" Out="Node_STN">3000 0.0004 0.0</Connection>
 <Connection In="Delay_I_STN_B" Out="Node_STN">3000 0.0002 0.0</Connection>
 <Connection In="Delay_GPE_STN" Out="Node_STN">1250 -6e-6 0.0</Connection>
-<Connection In="Delay_STN_GPE" Out="Node_STN">1250  3e-5 0.0</Connection>
+<Connection In="Delay_STN_GPE" Out="Node_GPE">1250  3e-5 0.0</Connection>
 <Connection In="Delay_GPE_GPE" Out="Node_GPE">10000  1e-10 0.0</Connection>
 </Connections>
 <SimulationIO>
@@ -100,21 +100,22 @@
 <WriteNet>FALSE</WriteNet>
 <CanvasParameter>
 <T_min>0</T_min>
-<T_max>0.3</T_max>
+<T_max>2.5</T_max>
 <F_min>0</F_min>
-<F_max>10</F_max>
-<State_min>0</State_min>
+<F_max>100</F_max>
+<State_min>-0.02</State_min>
 <State_max>0.02</State_max>
 <Dense_min>0</Dense_min>
-<Dense_max>250</Dense_max>
+<Dense_max>350</Dense_max>
 </CanvasParameter>
 <CanvasNode Name="Node_GPE"></CanvasNode>
+<CanvasNode Name="Node_STN"></CanvasNode>
 </SimulationIO>
 <SimulationRunParameter>
 <max_iter>1000000</max_iter>
 <t_begin>0</t_begin>
-<t_end>50.0</t_end>
-<t_report>1e-05</t_report>
+<t_end>2.5</t_end>
+<t_report>1e-03</t_report>
 <t_state_report>1e-03</t_state_report>
 <t_step>1e-05</t_step>
 <t_update>1e-05</t_update>
