@@ -67,7 +67,7 @@ int BinEstimator::Search(Index ind, Potential v, Potential dv) const {
       return j;
   }
   assert(false);
-  throw GeomLibException("BinEstimator sreach failed");
+  throw GeomLibException("BinEstimator search failed");
 }
 
 int BinEstimator::SearchBin(Index ind, Potential v, Potential dv) const {
@@ -83,7 +83,6 @@ int BinEstimator::SearchBin(Index ind, Potential v, Potential dv) const {
 		return i;
 
 	int i_ret = Search(i,v, dv);
-	assert( i == n-1 || (_vec_interpretation[i] <= v && _vec_interpretation[i+1] > v));
 	return i_ret;			
 }
 

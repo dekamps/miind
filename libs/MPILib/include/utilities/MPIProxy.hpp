@@ -38,10 +38,15 @@ namespace utilities {
 /**
  * @brief A class to handle all MPI related code. It also provides works if MPI is disabled
  *
- * This class encapsulate all MPI related code. The class also works if MPI is not enabled,
- * such that the code does not depend if MPI is enabled or not. At the moment only in the
- * main method the MPI environment needs to be generated. All other MPI calls are handled
- * by this class
+ * MIIND relies on BOOST.MPI to simplify MPI calling.This class encapsulate all MPI related code. The class also works if MPI is not enabled,
+ * so that the code does not depend on whether MPI is enabled or not. At the moment only in the
+ * main method the MPI environment needs to be generated, i.e. the main program requires an
+ * mpi::environment instance to communicate run parameters, such as the number of processors
+ * to the program. Consult the largeNetwork program for an example on its definition.
+ * All other MPI calls are handled
+ * by this class, which encapsulates the mpi::world object. MIIND uses broadcasts and blocking  irecv and isend calls for point-to-point calls.
+ * 
+ * 
  */
 class MPIProxy_ {
 public:
@@ -68,7 +73,7 @@ public:
 	void barrier();
 
 	/**
-	 * waits until all request stored in the vector _mpiStatus are finished
+	 * waits until all requests stored in the vector _mpiStatus are finished
 	 */
 	void waitAll();
 

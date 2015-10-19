@@ -34,8 +34,19 @@
 namespace MPILib {
 
 /**
- * MPINode the class for the actual network nodes which are distributed with MPI.
+ * \brief Class for nodes in an MPINetwork.
+ *
+ * An MPINode is responsible for maintaing an algorithm through a shared_ptr to an  AlgorithmInterface object. It is also responsible
+ * for being aware of who its predecessors and successors are in the network and thereby inplements the connectivity table. Most of the
+ * MPI communication is handled by this class. MPINode::receiveData and MPINode::sendOwnData are used to transmit information about its state, and to
+ * collate information about its precursor nodes so that this information can be passed on to its AlgorithmInterface instance.
+ * Two hooks are provided for designers of AlgorithmInterface classes:
+ * MPINode::prepareEvolve calls AlgorithmInterface::prepareEvolve, which allows algorithms to collate input contributions to this particular node, 
+ * whilst MPINode::evolve calls AlgorithmInterface::evolve. These methods can then be overloaded by the designers of a sub class of AlgorithmInterface,
+ * i.e. the designers of algorithms. The separation between prepareEvolve and evolve ensure that synchronous network updating can be implemented.
+ * The MPINetwork::addPrecursor and MPI::Network::addSuccesor are used by MPINetwork::addNode.
  */
+
 template<class Weight, class NodeDistribution>
 class MPINode {
 public:

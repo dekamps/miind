@@ -41,28 +41,28 @@ namespace GeomLib {
 		MatrixMasterEquation
 		(
 			SpikingOdeSystem&,		    //! system
-			Number,						//! maximum number of iterations of the algorithm
-			Index,						//! index reset bin
-			const Precision&,			//! precision parameter for integrator
-			Time,						//! initial time
-			Time						//! time step
+			Number,				    //! maximum number of iterations of the algorithm
+			Index,				    //! index reset bin
+			const Precision&,		    //! precision parameter for integrator
+			Time,				    //! initial time
+			Time				    //! time step
 
 		);
 
 		void Initialize
 		(
-			Index,								//! probability index
+			Index,					//! probability index
 			const vector<InputParameterSet>&	//! input parameter vector
 		);
 
 		const SpikingOdeSystem&					_system;
 		const vector<Potential>&				_vec_potential;
-		vector<Density>&						_vec_density;
-		Index									_i_reset;
-		vector<Density>							_vec_matrix_state;
+		vector<Density>&					_vec_density;
+		Index							_i_reset;
+		vector<Density>						_vec_matrix_state;
 
 		NumtoolsLib::ExStateDVIntegrator<MasterParameter> 	_matrix_integrator;
-		NumtoolsLib::QaDirty<double>						_mat_transit;
+		NumtoolsLib::QaDirty<double>				_mat_transit;
 	};
 }
 

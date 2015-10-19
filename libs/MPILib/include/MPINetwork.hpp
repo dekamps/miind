@@ -33,6 +33,43 @@
 
 namespace MPILib {
 
+  /** \brief A representation of the network class. Probably the most central class that a client will use. MPINodes and their connections are created through
+   * its interface.
+   *
+   * \section MPINetwork_introduction Introduction to MPINetwork
+   *
+   * The network can be constructed through its default constructor, and at this stage does not have nodes. Instantiation requires two template arguments: WeightValue
+   * and NodeDistribution. WeightValue determines the type of the connections that are used in connecting nodes in the network. Important examples are double,
+   * a single real value that indicates the strength of a connection, or DelayedConnection, a type that determines number of connections; efficacy; delay. NodeDistribution
+   * is a type that determines how the network simulation will be parallelized by MPI. At present we use CircularDistribution.
+   * It is strongly recommended to look at example programs to see how an MPINetwork is instantiated.
+   * 
+   * Nodes can be added to the network through the MPINetwork.addNode method, which takes two arguments: a reference to an AlgorithmInterface, and a NodeType. The method
+   * returns an int, which is a handle to the node that has just been created. The AlgorithmInterface
+   * determines which algorithm is run during a simulation on a given node. The network is agnostic with regards to what algorithm runs on which node. When a simulation
+   * step is made, all the network does is to signal each MPINode that is part of it that it must update its state. The MPINode in turn will forward this command
+   * to the algorithm via the AlgorithmInterface. As a consequence MPINetwork can be used for future simulations involving algorithms that currently do not yet exist.
+   * The NodeType determines whether a node is excitatory or inhibitory. We find that this
+   * prevents errors in providing the sign of the connection. Connectivity values associated with inhibitory nodes must be negative, whilst values associated with
+   * excitatory nodes must be positive. This mechanism can be bypassed: for individual nodes by giving them NodeType NEUTRAL, for the network as a whole by
+   * MPINetwork.setDalesLaw(false). Connections are inserted between nodes with the aid of the handles that were provide upon node creation.
+   * This handle must be converted to a NodeId. The MPINetwork.makeFirstInputOfSecond then can be used to indert a connection between to nodes
+   * indicated by two NodeId instances, with a value defined by the WeighValue argument. An MPINetwork must be configured by a SimulationRunParameter, where
+   * begin and end time of the simulation are specified, the log and the simulation file names are defined, etc. A simple call to MPINetwork.evolve(), then
+   * causes the simulation to be executed.
+   *
+   * \section MPINetwork_simulation_loop The Simulation Loop
+   *  An MPINetwork instance may live in several threads, if MPI was enabled during compilation.  The MPI coordination requires a boost::communicator object
+   * which is part of MPIProxy. The MPINetwork._nodeDistribution keeps track of which NodeId
+   * handles are local to the thread. A static map instance - MPINetwork._localNodes - maps NodeId to an MPINode instance. Upon a call to MPINetwork.addNode,
+   * it is first established whether the new node lives in the local thread. This is done by a call to the MPINetwork._nodeDistribution object that will
+   * work out wether the new node will be local to the current thread or not, based on the new NodeId and its local knowledge of how node numbers relate
+   * to processor numbers. If the new NodeId will be current to the local thread, the MPINode constructor is called, providing the new NodeId, a reference
+   * to the AlgorithmInterface and NodeType, that were provided by the client upon calling MPINetwork.addNode, and a reference to the MPINetwork._nodeDistribution
+   * and the MPINetwork._localNodes distibution. The newly created MPINode will be added to the MPINetwork._localNodes map, with the new NodeId as key.
+   * As this map is particular to the address space of the thread, the node has indeed become a local node.
+   * 
+   */
 template<class WeightValue, class NodeDistribution>
 class MPINetwork{
 

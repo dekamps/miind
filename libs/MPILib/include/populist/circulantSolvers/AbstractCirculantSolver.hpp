@@ -29,14 +29,6 @@ namespace MPILib {
 namespace populist {
 namespace circulantSolvers {
 
-/**
- * Both AbstractCirculantSolver and AbstractNonCirculantSolver instances sometimes can cut calculations short
- * by terminating the series \f$ e^{-t}\frac{t^k}{k!}$\f$, when it falls below a certain precision.
- * @param t The parameter t
- * @param precision The precision
- * @param n_max The max number of terms
- * @return The max number of terms considered
- */
 inline Number NumberOfSolverTerms(Time t, double precision, Number n_max) {
 	double fact = 1.0;
 	double et = exp(-t);
@@ -48,15 +40,6 @@ inline Number NumberOfSolverTerms(Time t, double precision, Number n_max) {
 	return n_max;
 }
 
-/**
- * @brief This class stores the integrated non-circulant density areas (the f^0) and the computed
- * circulant solution.
- *
- *  This class stores the integrated non-circulant density areas (the f^0) and the computed
- *  also references to the current input parameters and the density profile, so that a circulant
- *  algorithm always has access to the variables. The Index method allows the PopulationgridControlller
- *  to access the calculated circulant solution.
- */
 class AbstractCirculantSolver {
 
 public:

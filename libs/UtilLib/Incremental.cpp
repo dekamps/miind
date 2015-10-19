@@ -22,9 +22,10 @@
 #endif
 
 #include <vector>
-#include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include "Incremental.h"
 #include "UtilLibException.h"
 
@@ -72,7 +73,7 @@ bool Incremental::FromStream(istream& s){
 		throw UtilLibException(text_exception);
 
 	vector<string> split_values;
-	split(split_values,split_vec[STRING_TAG],is_any_of(" "));
+	split(split_values,split_vec[STRING_TAG],boost::is_any_of(" "));
 
 	_name = split_values[INDEX_NAME];
 

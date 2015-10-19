@@ -122,7 +122,7 @@ namespace utilities {
  */
 
 /**
- * The log levels for more details see \ref provided_error_levels
+ * The log levels for more details see \ref provided_debug_levels
  */
 enum LogLevel {
 	logERROR,  //!< logERROR

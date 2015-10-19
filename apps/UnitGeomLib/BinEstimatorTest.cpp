@@ -86,8 +86,6 @@ BOOST_AUTO_TEST_CASE(BinEstimatorTest)
     BOOST_REQUIRE(b_catch);
 }
 
-
-
 BOOST_AUTO_TEST_CASE(ExcitatoryBinEstimatorCoverTest)
 {
 
@@ -225,7 +223,7 @@ BOOST_AUTO_TEST_CASE(InhibitoryBinEstimatorCoverTest)
 
     vector<double> array_interpretation(n_bins, 0);
     vector<double> array_density(n_bins);
-;
+
     sys.PrepareReport(&array_interpretation[0], &array_density[0]);
 
     BinEstimator estimator(array_interpretation, par_ode);
@@ -258,3 +256,4 @@ BOOST_AUTO_TEST_CASE(InhibitoryBinEstimatorCoverTest)
     BOOST_CHECK_CLOSE(pair.first._alpha, 0.05489251, 1e-4);
     BOOST_CHECK(pair.second._alpha == 0.0);
 }
+

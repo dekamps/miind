@@ -44,8 +44,3 @@ set ( LIBLIST
 add_executable(populationDemo population-example.cpp)
 target_link_libraries(populationDemo ${LIBLIST})
 
-add_executable(wta1 wta1.cpp)
-target_link_libraries(wta1 ${LIBLIST})
-
-add_executable(wta2 wta2.cpp)
-target_link_libraries(wta2 ${LIBLIST})

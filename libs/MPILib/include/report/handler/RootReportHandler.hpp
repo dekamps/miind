@@ -57,9 +57,9 @@ public:
 
 	/**
 	 * Constructor
-	 * @param file_name The name of the root file
-	 * @param b_force_state_write Set true if the state should be written to the root file
-	 * @param bOnScreen Set true if a running simulation must be shown on a Canvas. Ineffective if compiled with MPI_ENABELED
+	 * @param file_name The name of the root file.
+	 * @param b_force_state_write Set to true if the state should be written to the root file.
+	 * @param bOnCanvas Set to true if a running simulation must be shown on a Canvas. Ignored when compiled with MPI_ENABELED.
 	 */
 	RootReportHandler(const std::string& file_name, bool b_force_state_write = false, bool bOnCanvas = false, const CanvasParameter& = DEFAULT_CANVAS);
 

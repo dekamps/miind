@@ -18,7 +18,6 @@
 //
 
 
-#include <MPILib/config.hpp>
 #ifdef ENABLE_MPI
 #include <boost/mpi/communicator.hpp>
 #endif

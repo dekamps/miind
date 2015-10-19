@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 	boost::timer::auto_cpu_timer t;
 
 #ifdef ENABLE_MPI
-	// initialise the mpi environment this cannot be forwarded to a class
+	// Initialise the mpi environment. This cannot be forwarded to a class
 	boost::mpi::environment env(argc, argv);
 #endif
 	try {

@@ -74,10 +74,10 @@ struct null_deleter {
  */
 LogLevel Log::_reportingLevel = DEBUGLEVEL;
 
-/**
- * Default the log is printed to std::cerr. To avoid the deletion of std::cerr
- * a null_deleter is provided.
- */
+
+  //  Default the log is printed to std::cerr. To avoid the deletion of std::cerr
+  //  a null_deleter is provided.
+ 
 std::shared_ptr<std::ostream> Log::_pStream(&std::cerr, null_deleter());
 
 std::shared_ptr<std::ostream> Log::getStream() {

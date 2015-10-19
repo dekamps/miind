@@ -17,7 +17,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#include <MPILib/config.hpp>
 #define private public
 #define protected public
 #include <MPILib/include/utilities/Log.hpp>

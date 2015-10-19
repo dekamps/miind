@@ -51,7 +51,11 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 		NodeType nodeType) {
 
 	assert(
-			nodeType == EXCITATORY_GAUSSIAN || nodeType == INHIBITORY_GAUSSIAN || nodeType == NEUTRAL || nodeType == EXCITATORY_DIRECT || nodeType == INHIBITORY_DIRECT);
+			nodeType == EXCITATORY_GAUSSIAN || 
+			nodeType == INHIBITORY_GAUSSIAN || 
+			nodeType == NEUTRAL || 
+			nodeType == EXCITATORY_DIRECT || 
+			nodeType == INHIBITORY_DIRECT);
 
 	NodeId tempNodeId = getMaxNodeId();
 	if (_nodeDistribution.isLocalNode(tempNodeId)) {

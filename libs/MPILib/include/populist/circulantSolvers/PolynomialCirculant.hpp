@@ -27,11 +27,6 @@ namespace MPILib {
 namespace populist {
 namespace circulantSolvers {
 
-/**
- * This uses the short-time polynomial expansion of the analytic solution
- * The algorithm can only be used for small values of tau and will throw an
- * exception if it enters an unvalid regime.
- */
 class PolynomialCirculant: public AbstractCirculantSolver {
 public:
 

@@ -29,11 +29,6 @@ namespace MPILib {
 namespace populist {
 namespace circulantSolvers {
 
-/**
- * This is the literal implementation of the analytic solution from (de Kamps, 2006).
- * It is not efficient and should probably not be used in realistic applications, but
- * is important in the benchmarking of other circulant solvers
- */
 class CirculantSolver: public AbstractCirculantSolver {
 public:
 	/**

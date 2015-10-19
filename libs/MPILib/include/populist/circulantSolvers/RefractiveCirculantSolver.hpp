@@ -26,14 +26,6 @@ namespace MPILib {
 namespace populist {
 namespace circulantSolvers {
 
-/**
- * @brief This AbstractCirculantSolver subclass stores proability density for, presumably LIF, neurons in a priority queue.
- * Immediately after the refractive period ends for those neurons, the corrsponding prability is reintroduced in the reset bin.
- *
- * RefractiveCirculantSolver is designed to run before any NonCirculantSolver. The perecision argument of the
- * RefractiveCirculantSolver and the NonCirculantSolver should match, otherwise the probability sum between
- * them may differ frome one.
- */
 class RefractiveCirculantSolver: public AbstractCirculantSolver {
 public:
 

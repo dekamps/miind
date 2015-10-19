@@ -48,9 +48,9 @@ The latest tar bal can be found <a href="http://sourceforge.net/projects/miind">
 is straightforward, using cmake. The procedure is explained
 in \ref installation. You can checkout a snapshot of the latest
 code with:
+
 git clone git://git.code.sf.net/p/miind/git miind-git
 
-Make sure you use the integration branch. We will change to the main branch in February.
 
 The components are Open Source software under a BSD licence.
 \section licence Licence
