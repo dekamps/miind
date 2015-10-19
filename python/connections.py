@@ -35,7 +35,7 @@ def parse_connection(connection, weighttype):
         s += connection.text.split()[2] + ');\n'    
     else:
         if weighttype.text == 'double':
-            s += '\tdouble con_' + i + '_' + o +'('
+            s += '\tdouble con_' + i + '_' + o + tally + '('
             s += connection.text + ');\n'
             
     s += '\tnetwork.makeFirstInputOfSecond('

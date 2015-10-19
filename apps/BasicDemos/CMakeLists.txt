@@ -38,8 +38,8 @@ set ( LIBLIST
 # executables
 #############################################################################
 
-#add_executable(wilsoncowanDemo miind-mpi.cpp)
-#target_link_libraries(wilsoncowanDemo ${LIBLIST})
+add_executable(wilsoncowanDemo wilsoncowan.cpp)
+target_link_libraries(wilsoncowanDemo ${LIBLIST})
 
 add_executable(populationDemo population-example.cpp)
 target_link_libraries(populationDemo ${LIBLIST})
