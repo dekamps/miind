@@ -79,23 +79,23 @@ namespace GeomLib {
 		Density RecaptureProbability();
 
 		Density Checksum() const;
-		AbstractOdeSystem&					_system;
-		const DiffusionParameter			_par_diffusion;
+		AbstractOdeSystem&	      		_system;
+		const DiffusionParameter	       	_par_diffusion;
 		const CurrentCompensationParameter	_par_current;
 
-		Time				       		_time_current;
+		Time			       		_time_current;
 
 		BinEstimator		       		_estimator;
-		GeomInputConvertor				_convertor;
-		CNZLCache			       		_cache;
+		GeomInputConvertor	       		_convertor;
+		CNZLCache	              		_cache;
 
 		ExStateDVIntegrator<MasterParameter>    _integrator; 
-		ProbabilityQueue						_queue;
-		Rate									_rate;
+		ProbabilityQueue      			_queue;
+		Rate			      		_rate;
 
 		static Number	                        _max_iteration;
-		mutable vector<Density>					_scratch_dense;
-		mutable vector<Potential>				_scratch_pot;
+		mutable vector<Density>	       		_scratch_dense;
+		mutable vector<Potential>	       	_scratch_pot;
 	};
 }
 

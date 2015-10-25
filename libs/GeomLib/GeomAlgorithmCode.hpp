@@ -117,23 +117,23 @@ namespace GeomLib {
 	{
 
 	    double n = (t - _t_cur)/_t_step;
-		Number n_steps = static_cast<Number>(ceil(n));
-		if (n_steps == 0)
+	    Number n_steps = static_cast<Number>(ceil(n));
+	    if (n_steps == 0)
 		  n_steps++;
 
-		for (Index i = 0; i < n_steps; i++){
-		  _p_system->Evolve(_t_step);
-		}
+	    for (Index i = 0; i < n_steps; i++){
+	      _p_system->Evolve(_t_step);
+	    }
 
-		//MdK-08/01/2015: Decoupled zero leak time step from grid time step
-		if (_b_zl)
-			_p_zl->apply(n_steps*_t_step);
+	    //MdK-08/01/2015: Decoupled zero leak time step from grid time step
+	    if (_b_zl)
+	      _p_zl->apply(n_steps*_t_step);
 
-		_t_cur = _p_system->CurrentTime();
+	    _t_cur = _p_system->CurrentTime();
 
 
-		// previously, a report was prepared here at report time. That is
-		// unnecessary. This can be handled in the Grid method.
+	    // previously, a report was prepared here at report time. That is
+	    // unnecessary. This can be handled in the Grid method.
 
 	}
 
@@ -154,13 +154,7 @@ namespace GeomLib {
 			return false;
 			
 	}
-/*
-	template <class WeightValue>
-	NodeState GeomAlgorithm<WeightValue>::State() const
-	{
-		return NodeState(vector<double>(0));
-	}
-*/
+
 	template <class WeightValue>
 	AlgorithmGrid GeomAlgorithm<WeightValue>::getGrid() const
 	{

@@ -46,11 +46,11 @@ namespace GeomLib {
 
 		GeomInputConvertor
 		(
-			const NeuronParameter&,						//! Neuron parameter of the receiving population, required to be able to interpret the white noise contribution
-			const DiffusionParameter&,					//! Determines when white noise is emulated internally by one or two Poisson inputs
-			const CurrentCompensationParameter&,		//! Creates an extra internal white noise source thatimplements the crrent compensation
-			const std::vector<MPILib::Potential>&,		//! Interpretation array from the relevan tAbstractOdeSystem
-			bool  force_small_bins = false				//! Inactive at the moment
+			const NeuronParameter&,	       		//! Neuron parameter of the receiving population, required to be able to interpret the white noise contribution
+			const DiffusionParameter&,     		//! Determines when white noise is emulated internally by one or two Poisson inputs
+			const CurrentCompensationParameter&,   	//! Creates an extra internal white noise source that implements the current compensation
+			const std::vector<MPILib::Potential>&, 	//! Interpretation array from the relevant AbstractOdeSystem
+			bool  force_small_bins = false 		//! Inactive at the moment
 		);
 
 
@@ -97,22 +97,23 @@ namespace GeomLib {
 			std::vector<MPILib::Rate>*
 
 		);
+
 		bool IsSingleDiffusionProcess(MPILib::Potential h) const;
 
 		MPILib::Potential MinVal(const std::vector<MPILib::Potential>&) const;
 
 		const NeuronParameter	            	_par_neuron;
-		const DiffusionParameter				_par_diff;
-		const CurrentCompensationParameter		_par_curr;
-		std::vector<MPILib::Potential>			_vec_interpretation;
-		std::vector<InputParameterSet>			_vec_set;
+		const DiffusionParameter      		_par_diff;
+		const CurrentCompensationParameter     	_par_curr;
+		std::vector<MPILib::Potential>	       	_vec_interpretation;
+		std::vector<InputParameterSet>	       	_vec_set;
 
-		std::vector<MPILib::Index>				_vec_direct;
-		std::vector<MPILib::Index>				_vec_diffusion;
+		std::vector<MPILib::Index>    		_vec_direct;
+		std::vector<MPILib::Index>     		_vec_diffusion;
 
-		MPILib::Potential						_min_step;
+		MPILib::Potential    		       	_min_step;
 
-		bool						_force_small_bins;
+		bool				      	_force_small_bins;
 
 
 	};

@@ -98,19 +98,19 @@ namespace GeomLib {
 
 		bool  IsReportDue() const;
 
-		const GeomParameter					_par_geom;
-		AlgorithmGrid		      			_grid;
-		unique_ptr<AbstractOdeSystem>		_p_system;
-	    unique_ptr<AbstractMasterEquation>	_p_zl;
+    const GeomParameter	      		_par_geom;
+    AlgorithmGrid	      		_grid;
+    unique_ptr<AbstractOdeSystem>      	_p_system;
+    unique_ptr<AbstractMasterEquation>	_p_zl;
 
-	    bool    _b_zl;
-		Time	_t_cur;
-	    Time    _t_step;
-		Time	_t_report;
+    bool    _b_zl;
+    Time    _t_cur;
+    Time    _t_step;
+    Time    _t_report;
 
-		mutable Number	_n_report;
+    mutable Number _n_report;
 
-	};
+  };
 }
 
 #endif // include guard

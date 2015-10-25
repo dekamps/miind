@@ -32,131 +32,6 @@ namespace
     {
         enum Type {EXCITATORY, INHIBITORY};
     }
-/*    void AddCachedToRow
-    (
-        double                  dydt[],
-        Index                   i,
-        const double            y[],
-        const AbstractOdeSystem& system,
-        Index                   j,
-        Rate                    rate,
-        const CNZLCache&        cache,
-        Type                    type
-    )
-    {
-
-        BinEstimator::CoverPair pair_cover = (type == EXCITATORY) ? cache.List()[j].first[i] : cache.List()[j].second[i];
-        Number n_bins = system.NumberOfBins();
-        cout << pair_cover.first._index << " " << pair_cover.second._index << endl;
-
-        if (pair_cover.first._index == pair_cover.second._index) {
-            if (pair_cover.first._index >= 0 && pair_cover.first._index < static_cast<int>(n_bins)) {
-                Index i_trans = pair_cover.first._index;
-                double lower_bound = (1 - pair_cover.first._alpha);
-                dydt[system.MapPotentialToProbabilityBin(i)] += rate * (pair_cover.second._alpha - lower_bound) * y[system.MapPotentialToProbabilityBin(i_trans)];
-            }
-        }
-
-        if (pair_cover.first._index < pair_cover.second._index) {
-            if (pair_cover.first._index >= 0 && pair_cover.first._index < static_cast<int>(n_bins))
-                dydt[system.MapPotentialToProbabilityBin(i)] += rate * pair_cover.first._alpha * y[system.MapPotentialToProbabilityBin(pair_cover.first._index)];
-
-            if (pair_cover.second._index >= 0 && pair_cover.second._index < static_cast<int>(n_bins))
-                dydt[system.MapPotentialToProbabilityBin(i)] += rate * pair_cover.second._alpha * y[system.MapPotentialToProbabilityBin(pair_cover.second._index)];
-
-            for (int j = pair_cover.first._index + 1; j < pair_cover.second._index; j++)
-                dydt[system.MapPotentialToProbabilityBin(i)] += rate * y[system.MapPotentialToProbabilityBin(j)];
-        }
-
-        assert(!(pair_cover.first._index > pair_cover.second._index));
-    }
-    void
-    AddCachedInputContributionToRow
-    (
-        double                      dydt[],
-        Index                       i,
-        const double                y[],
-        const AbstractOdeSystem&    system,
-        Index                       j,
-        const InputParameterSet&    set,
-        const CNZLCache&            cache
-    )
-    {
-        // determine the boundaries of this bin; mind the minus sign: exc input comes from lower, inh from higher
-        if (set._rate_exc != 0)
-            AddCachedToRow(dydt, i, y, system, j, set._rate_exc, cache, EXCITATORY);
-
-        if (set._rate_inh != 0)
-            AddCachedToRow(dydt, i, y, system, j, set._rate_inh, cache, INHIBITORY);
-    }
-
-    void
-    AddCachedRowDeriv
-    (
-        double                              dydt[],
-        Index                               i,
-        const double                        y[],
-        const AbstractOdeSystem&            system,
-        const vector<InputParameterSet>&    vec_set,
-        const CNZLCache&                    cache
-    )
-    {
-        dydt[system.MapPotentialToProbabilityBin(i)] = 0.0;
-        Number n_bins  = system.NumberOfBins();
-        Number n_input = vec_set.size();
-
-        Index i_reset  = system.IndexResetBin();
-
-        for (Index j = 0; j < n_input; j++) {
-            Rate rate_e = vec_set[j]._rate_exc;
-            Rate rate_i = vec_set[j]._rate_inh;
-
-            if (rate_i > 0) {
-                BinEstimator::CoverPair pair = cache.List()[j].second[0];
-                Index i_shift = static_cast<Index>(pair.first._index);
-                assert(i_shift >= 0);
-
-                if (i == i_shift)
-                    dydt[system.MapPotentialToProbabilityBin(i)] -= (rate_i * pair.first._alpha) * y[system.MapPotentialToProbabilityBin(i)];
-
-                if (i > static_cast<Index>(i_shift))
-                    dydt[system.MapPotentialToProbabilityBin(i)] -= rate_i * y[system.MapPotentialToProbabilityBin(i)];
-            }
-
-
-            if (rate_e > 0) {
-                if (i == i_reset) {
-                	dydt[n_bins] = 0.0;
-
-                    Rate rate = 0;
-                    BinEstimator::CoverPair pair = cache.List()[j].first[n_bins - 1];
-                    rate += rate_e * (1 - pair.second._alpha) * y[system.MapPotentialToProbabilityBin(pair.second._index)];
-
-                    for (Index ir = pair.second._index + 1; ir < n_bins; ir++)
-                        rate += rate_e * y[system.MapPotentialToProbabilityBin(ir)];
-                    // n_bins, does exist!
-                    dydt[n_bins] += rate;
-                }
-            }
-
-            dydt[system.MapPotentialToProbabilityBin(i)] -= rate_e * y[system.MapPotentialToProbabilityBin(i)];
-            AddCachedInputContributionToRow(dydt, i, y, system, j, vec_set[j], cache);
-
-       }
-    }
-
-    int CachedDeriv(double t, const double y[], double dydt[], void* params)
-    {
-        MasterParameter* p_par = static_cast<MasterParameter*>(params);
-        Number n_bins = p_par->_p_system->NumberOfBins();
-
-        for (Index i = 0; i < n_bins; i++)
-            AddCachedRowDeriv(dydt, i, y, *(p_par->_p_system), *(p_par->_p_vec_set), *(p_par->_p_cache));
-
-        return GSL_SUCCESS;
-    }
-}
-*/
     void HandleExcitatoryInput
 	(	Rate 									rate_e,
 		const AbstractOdeSystem& 				system,
@@ -167,7 +42,6 @@ namespace
     {
     	Number n_bins = system.NumberOfBins();
         Index i_reset  = system.IndexResetBin();
- //       cout << "rate_e: " << rate_e << endl;
 
     	for (Index i = 0; i < n_bins; i++){
 
@@ -219,7 +93,6 @@ namespace
 	)
     {
     	Number n_bins = system.NumberOfBins();
-   // 	cout << "rate_i: " << rate_i << endl;
 
     	for (Index i = 0; i < n_bins; i++){
            BinEstimator::CoverPair pair_cover = vec_cover_pair[i];

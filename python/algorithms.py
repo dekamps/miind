@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 
 ALGORITHMS = { 'RateAlgorithm'   : {'Connection' : 'double', 'Parameter': '' }, 
                'RateAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter' : ''}, 
+               'OUAlgorithm'     : {'Connection' : 'DelayedConnection', 'Parameter' : 'NeuronParameter'} 
                'GeomAlgorithmDC' : {'Connection' : 'DelayedConnection', 'Parameter' : 'GeomParameter'} }
 
 ALGORITHM_NAMES = {}
@@ -187,7 +188,7 @@ def wrap_up_geom_algorithm(alg, i):
 
     return s
     
-def parse_geom_algorithm(alg, i,weightype):
+def parse_geom_algorithm(alg, i, weighttype):
     s = ''    
     s += parse_individual_parameters(alg,i)
     
@@ -201,6 +202,13 @@ def parse_geom_algorithm(alg, i,weightype):
     s += wrap_up_geom_algorithm(alg, i)
     
     return s
+
+def parse_ou_algorithm(alg, i,  weighttype):
+    s = ''
+    np=alg.find('OUAlgorithm/NeuronParameter')
+    str_np = parse_neuron_parameter(np,i)
+   
+
 
 def parse_wilsoncowan_parameter(alg, i, weighttype):
     wcpar= alg.find('WilsonCowanAlgorithm/WilsonCowanParameter')
