@@ -24,6 +24,7 @@
 #include "GeomAlgorithmCode.hpp"
 #include "GeomParameter.hpp"
 #include "OdeParameter.hpp"
+#include "OUAlgorithm.hpp"
 #include "LeakingOdeSystem.hpp"
 #include "MuSigmaScalarProduct.hpp"
 #include "Response.hpp"

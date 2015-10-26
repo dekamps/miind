@@ -45,6 +45,7 @@ namespace algorithm{
 
 class WilsonCowanAlgorithm: public AlgorithmInterface<double> {
 public:
+ 
 	WilsonCowanAlgorithm();
 
 	WilsonCowanAlgorithm(const WilsonCowanParameter&);

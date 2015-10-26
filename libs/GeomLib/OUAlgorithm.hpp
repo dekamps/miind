@@ -18,8 +18,8 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
-#ifndef MPILIB_ALGORITHMS_WILSONCOWANALGORITHM_HPP_
-#define MPILIB_ALGORITHMS_WILSONCOWANALGORITHM_HPP_
+#ifndef MPILIB_ALGORITHMS_OUALGORITHM_HPP_
+#define MPILIB_ALGORITHMS_OUALGORITHM_HPP_
 
 #include <NumtoolsLib/NumtoolsLib.h>
 #include <MPILib/include/algorithm/WilsonCowanParameter.hpp>
@@ -39,52 +39,30 @@ using MPILib::Time;
 using NumtoolsLib::DVIntegrator;
 
 namespace GeomLib {
-namespace algorithm{
 
-	//! \page steady_state Modelling the steady state of leaky-integrate-and-fire populations
-	//! \section steady-state_introduction Introduction
-	//! When cortical neurons experience a barrage from other cortical neurons the input can sometimes
-	//! usefully be described as a Gaussian white noise process, characterised by a mean \f$ \mu \f$ and variance
-	//! \f$ \sigma \f$. The response of an entire population, where it is assumed that individual neurons
-	//! each see different spike trains, but where the statistics of the input of each neuron is assumed to be the same
-	//! can be evaluated for some neuronal models. For leaky-integrate-and-fire (LIF) neurons, modelling
-	//! such a response can be done analytically if the input is steady (i.e. not varying over time; individual
-	//! neurons will experience variation, due to their noisy input spike trains, but with steady state we indicate that
-	//! \f$ \mu \f$ and \f$\sigma $\f are constant. Clearly, in the brain activation mostly is not steady state,
-	//! and when a steady state description is not useful, population density techniques must be used (see \ref population_density).
-	//! Often, however, investigating steady state conditions helps in understanding the structure of neural circuits.
-	//! Under the assumption of steady state Gaussian white noise input the firing rate of populations can be calculated analytically.
-	//! A Wilson-Cowan-like algorithm that gives the correct steady state of an Ornstein-Uhlenbeck process.
-	//!
-	//! The steady state of a large population of leaky-integrate-and-fire neurons can be descibed accurately
-	//! by a so-called spike response function. This spike response function can be calculated analytically if
-	//! the input rate on the population is high and the synaptic efficacies deliver small contributions to the
-	//! membrane potential (small with respect to threshold). Under such assumptions the membrane potential distribution
-	//! of the population may be approximated by a diffusion process, the Ornstein-Uhlenbeck process. The steady
-	//! state response of the population can be calculated from that. Networks modelled with this algorithm will
-	//! describe the steady states of networks of leaky-integrate-and-fire neurons accurately (if the populations
-	//! are large), but not the transient dynamics. Use PopulistLib if this is an issue. Since the name is unwieldy,
-	//! there is a typedef OUAlgorithm.
+  //!< \brief Rate-based model with gain function based on a diffusion process.
+
+ 
   class OUAlgorithm : public AlgorithmInterface<MPILib::DelayedConnection> {
 	public:
 
 
-    //! Create an OUAlgorithm from neuronal parameters 
+    /// Create an OUAlgorithm from neuronal parameters 
     OUAlgorithm
     (
      const NeuronParameter&
      );
 
-    //! copy ctor
+    /// copy ctor
     OUAlgorithm
     (
      const OUAlgorithm&
      );
 
-    //! virtual destructor
+    /// virtual destructor
     virtual ~OUAlgorithm();
 
-    //! configure algorithm
+    /// configure algorithm
     virtual void configure
     (
      const SimulationRunParameter& //!< simulation run parameter
@@ -103,7 +81,7 @@ namespace algorithm{
 		   Time time
 		   );
 
-    //! Current AlgorithmGrid
+    /// Current AlgorithmGrid
     virtual AlgorithmGrid getGrid() const;
 
     /**                                                                                                                                                                          
@@ -136,7 +114,6 @@ namespace algorithm{
     MuSigmaScalarProduct                _scalar_product;
   };
 
-}  // algorithm
 }  // GeomLib
 
 #endif // include guard
