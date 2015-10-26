@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 
 ALGORITHMS = { 'RateAlgorithm'   : {'Connection' : 'double', 'Parameter': '' }, 
                'RateAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter' : ''}, 
-               'OUAlgorithm'     : {'Connection' : 'DelayedConnection', 'Parameter' : 'NeuronParameter'} 
+               'OUAlgorithm'     : {'Connection' : 'DelayedConnection', 'Parameter' : 'NeuronParameter'}, 
                'GeomAlgorithmDC' : {'Connection' : 'DelayedConnection', 'Parameter' : 'GeomParameter'} }
 
 ALGORITHM_NAMES = {}
