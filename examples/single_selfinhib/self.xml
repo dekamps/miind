@@ -1,0 +1,82 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<AbstractAlgorithm type="OUAlgorithm">
+<OUAlgorithm Name="OU_LIF_I">
+<NeuronParameter>
+<t_membrane>20e-3</t_membrane>
+<t_refractive>0</t_refractive>
+<V_threshold>20e-3</V_threshold>
+<V_reset>10e-3</V_reset>
+<V_reversal>0</V_reversal>
+</NeuronParameter>
+</OUAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="GeomAlgorithm">
+<GeomAlgorithm Name="LIF_Inhibitory" lambda="0.01" system="LeakingOdeSystem">
+<OdeParameter>
+<NeuronParameter>
+<t_membrane>20e-3</t_membrane>
+<t_refractive>0</t_refractive>
+<V_threshold>20e-3</V_threshold>
+<V_reset>10e-3</V_reset>
+<V_reversal>0</V_reversal>
+</NeuronParameter>
+<InitialDensityParameter> 
+<mu>0.0</mu>
+<sigma>0.0</sigma> 
+</InitialDensityParameter>
+<V_min>-0.1</V_min>
+<N_bins>2000</N_bins>
+</OdeParameter>
+</GeomAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="RateAlgorithm">
+<RateAlgorithm Name="Cortical Background Algorithm">
+<rate>1.5</rate>
+</RateAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="DelayAlgorithm">
+<DelayAlgorithm Name="delay_I_I">
+<delay>1.3e-3</delay>
+</DelayAlgorithm>
+</AbstractAlgorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="LIF_Inhibitory" name="LIF I" type="EXCITATORY_GAUSSIAN" />
+<Node algorithm="Cortical Background Algorithm" name="Cortical Background" type="EXCITATORY_GAUSSIAN" />
+<Node algorithm="delay_I_I" name="delay" type="INHIBITORY_GAUSSIAN" />
+</Nodes>
+<Connections>
+<Connection In="Cortical Background" Out="LIF I">1000 0.001 0</Connection>
+<Connection In="LIF I" Out="delay">1 1 0</Connection>
+<Connection In="delay" Out="LIF I">1000 -0.001 0</Connection>
+</Connections>
+<SimulationIO>
+<SimulationName>selfinhib</SimulationName>
+<OnScreen>TRUE</OnScreen>
+<WithState>FALSE</WithState>
+<WriteNet>FALSE</WriteNet>
+<CanvasParameter>
+<T_min>0</T_min>
+<T_max>0.2</T_max>
+<F_min>0</F_min>
+<F_max>10</F_max>
+<State_min>-10e-3</State_min>
+<State_max>20e-3</State_max>
+<Dense_min>0</Dense_min>
+<Dense_max>100</Dense_max>
+</CanvasParameter>
+<CanvasNode Name="LIF I"></CanvasNode> 
+</SimulationIO>
+<SimulationRunParameter>
+<max_iter>1000000</max_iter>
+<t_begin>0</t_begin>
+<t_end>0.2</t_end>
+<t_report>1e-04</t_report>
+<t_state_report>1e-04</t_state_report>
+<t_step>1e-05</t_step>
+<t_update>1e-04</t_update>
+<name_log>single.log</name_log>
+</SimulationRunParameter>
+</Simulation>

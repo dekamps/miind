@@ -205,9 +205,19 @@ def parse_geom_algorithm(alg, i, weighttype):
 
 def parse_ou_algorithm(alg, i,  weighttype):
     s = ''
+
+    algorithmname=alg.find('OUAlgorithm')
+    d=algorithmname.attrib
+
     np=alg.find('OUAlgorithm/NeuronParameter')
     str_np = parse_neuron_parameter(np,i)
-   
+    s += str_np
+
+    cpp_name = 'alg_ou_' + str(i)
+    s += '\tGeomLib::OUAlgorithm ' + cpp_name +'(par_neur_' + str(i) +');\n'
+    Register(d['Name'], cpp_name)
+
+    return s
 
 
 def parse_wilsoncowan_parameter(alg, i, weighttype):
@@ -333,6 +343,8 @@ def parse_algorithm(alg,i,weighttype):
         return parse_persistant_algorithm(alg,i,weighttype)
     if algname =='RateAlgorithm':
         return  parse_rate_algorithm(alg,i,weighttype)
+    if algname =='OUAlgorithm':
+        return  parse_ou_algorithm(alg,i,weighttype)
     if algname =='GeomAlgorithm':
         if weighttype.text == 'DelayedConnection':
             return parse_geom_algorithm(alg,i,weighttype)
