@@ -79,7 +79,7 @@ namespace {
 	vector<double> OUAlgorithm::InitialState() const
 	{
 		vector<double> array_return(OU_STATE_DIMENSION);
-		array_return[0] = 0;
+		array_return[0] = 10.0;
 		return array_return;
 	}
 
@@ -89,7 +89,7 @@ namespace {
 	) const
 	{
 		ResponseParameter  par;
-		par.tau		   = parameter._tau;
+		par.tau		       = parameter._tau;
 		par.tau_refractive = parameter._tau_refractive;
 		par.V_reset        = parameter._V_reset;
 		par.theta          = parameter._theta;
@@ -97,6 +97,7 @@ namespace {
 
 		return par;
 	}
+
 
 	void OUAlgorithm::configure
 	(
@@ -124,9 +125,6 @@ void OUAlgorithm::evolveNodeState
  Time                                          time
 )
 {
-  MuSigma ms = _scalar_product.Evaluate(nodeVector,weightVector,time);
-  _integrator.Parameter().mu    = ms._mu;
-  _integrator.Parameter().sigma = ms._sigma;
 
   try
     {
@@ -140,6 +138,22 @@ void OUAlgorithm::evolveNodeState
       else 
 	throw except;
     }
+}
+
+
+void OUAlgorithm::prepareEvolve
+(
+	const std::vector<MPILib::Rate>& nodeVector,
+	const std::vector<MPILib::DelayedConnection>& weightVector,
+	const std::vector<MPILib::NodeType >& typeVector
+)
+{
+     assert(nodeVector.size() >0);
+	 assert(nodeVector.size() == weightVector.size());
+	  MuSigma ms = _scalar_product.Evaluate(nodeVector,weightVector,_integrator.Parameter().tau);
+	  _integrator.Parameter().mu    = ms._mu;
+	  _integrator.Parameter().sigma = ms._sigma;
+
 }
 
 OUAlgorithm* OUAlgorithm::clone() const

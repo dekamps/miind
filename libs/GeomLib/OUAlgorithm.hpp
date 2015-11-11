@@ -81,6 +81,18 @@ namespace GeomLib {
 		   Time time
 		   );
 
+	/**
+	 * prepare the Evolve method
+	 * @param nodeVector Vector of the node States
+	 * @param weightVector Vector of the weights of the nodes
+	 * @param typeVector Vector of the NodeTypes of the precursors
+	 */
+	virtual void prepareEvolve(const std::vector<MPILib::Rate>& nodeVector,
+			const std::vector<MPILib::DelayedConnection>& weightVector,
+			const std::vector<MPILib::NodeType>& typeVector);
+
+
+
     /// Current AlgorithmGrid
     virtual AlgorithmGrid getGrid() const;
 

@@ -30,7 +30,6 @@ if __name__ == "__main__":
     path  = os.path.join(build,'jobs',dir)
 
     with cd(build):
-       	subprocess.call(["ls","-l"])
         subprocess.call(['make'])
 
     with open(os.path.join(path,'joblist')) as f:

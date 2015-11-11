@@ -312,7 +312,7 @@ def parse_ratefunctor_algorithm(alg, i, weighttype):
     cpp_name = 'rate_functor_' + str(i)
     Register(rf.attrib['Name'],cpp_name)
     
-    print 'yip'
+
     s += '\tMPILib::Rate RateFunction_' + str(i) + '(MPILib::Time);\n'
     
     s += '\tMPILib::algorithm::RateFunctor<' + weighttype.text + '> ' + cpp_name + '(' 
