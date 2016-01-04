@@ -30,8 +30,13 @@ namespace GeomLib {
 
 	//! A geometric grid to represent population densities.
 
-	//! Internally, the system uses two arrays: one to represent probability mass and one one to represent
-	//! the bin boundaries in membrane potential. A one-to-one mapping identifies each mass bin with a
+	//! Internally, GeomAlgorithm uses two arrays: one to represent probability mass and one one to represent
+	//! the bin boundaries in membrane potential. We call this a system. In this base class: AbstractOdeSystem,
+    //! both the buffer storing the probability mass and the array storing the bin boundaries are kept.
+	//! Solvers for the density operate on the mass buffer: AbstractOdeSystem::_buffer_mass.
+    //! The grid boundaries are stored in AbstractOdeSystem::_buffer_interpretation. The relationship between mass
+	//! bins and grid boundaries is time dependent, AbstractOdeSytem keeps track of that.
+    //!A one-to-one mapping identifies each mass bin with a
 	//! a potential bin, thus providing a basis for a density representation. The mapping is time dependent, and
 	//! depends on the topology of the neural system under consideration. Derived classes provide concrete
 	//! implementations of these different topologies. LeakingOdeSystem implements the topology of

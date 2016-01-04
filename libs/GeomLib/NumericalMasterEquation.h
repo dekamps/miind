@@ -40,6 +40,15 @@ using NumtoolsLib::ExStateDVIntegrator;
 
 namespace GeomLib {
 
+	//! Solves the Poisson Master equation on the probability mass bins.
+
+	//! The Poisson master equation is determined by the combination
+	//! of synaptic efficacy h and potential grid. Transitions occur
+	//! away from this bin and probability enters from density a step
+	//! h away. We calculate a transition matrix by translating the
+	//! current bin and finding out which bins it covers. The system
+	//! of equations that is described in http://arxiv.org/abs/1309.1654
+	//! is then set up and solved.
 
 	class NumericalMasterEquation : public AbstractMasterEquation {
 	public:
@@ -48,17 +57,20 @@ namespace GeomLib {
 
 		NumericalMasterEquation
 		(
-			AbstractOdeSystem&,
+			AbstractOdeSystem&,					 //!< OdeSystem defining the geometric grid
 			const DiffusionParameter&,
 			const CurrentCompensationParameter&
 		);
 
+		//! Destructor
 		virtual ~NumericalMasterEquation();
 
-		//! apply the master equations over a period of time
+		//! Apply the master equations over a period of time
 		virtual void apply(MPILib::Time);
 
 
+		//! Interpretation of the input is done by a GeomInputConvertor object.
+		//! This is a hook to provide that object with the required information
 		virtual void sortConnectionVector
 		(
 			const std::vector<MPILib::Rate>&,
@@ -79,11 +91,11 @@ namespace GeomLib {
 		Density RecaptureProbability();
 
 		Density Checksum() const;
-		AbstractOdeSystem&	      		_system;
+		AbstractOdeSystem&	      			_system;
 		const DiffusionParameter	       	_par_diffusion;
 		const CurrentCompensationParameter	_par_current;
 
-		Time			       		_time_current;
+		Time			       			_time_current;
 
 		BinEstimator		       		_estimator;
 		GeomInputConvertor	       		_convertor;
@@ -91,11 +103,11 @@ namespace GeomLib {
 
 		ExStateDVIntegrator<MasterParameter>    _integrator; 
 		ProbabilityQueue      			_queue;
-		Rate			      		_rate;
+		Rate			      			_rate;
 
-		static Number	                        _max_iteration;
-		mutable vector<Density>	       		_scratch_dense;
-		mutable vector<Potential>	       	_scratch_pot;
+		static Number	           		_max_iteration;
+		mutable vector<Density>	       	_scratch_dense;
+		mutable vector<Potential>	   	_scratch_pot;
 	};
 }
 

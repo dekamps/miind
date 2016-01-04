@@ -58,6 +58,23 @@ namespace MPILib {
    * begin and end time of the simulation are specified, the log and the simulation file names are defined, etc. A simple call to MPINetwork.evolve(), then
    * causes the simulation to be executed.
    *
+   *
+   *
+   * \msc["Node creation"]
+   *  client, MPINetwork, "MPINetwork:_localNodes", MPINode;
+   *
+   *  client     box client [label="client"];
+   *  MPINetwork box "MPINetwork:_localNodes" [label="MPINetwork"];
+   *  MPINode    box MPINode [label="MPINode"];
+   *
+   *  client=>MPINetwork[label="addNode(NodeType, const AlgorithmInterface&)", URL="\ref MPINetwork::addNode()"];
+   *  MPINetwork=>MPINetwork[label="getMaxNodeId()"];
+   *  MPINetwork=>MPINode[label="create(const AlgorithmInterface&)", URL="\ref MPINode::MPINode()"];
+   *  MPINetwork<<MPINode[label="returns node"];
+   *  MPINetwork=>"MPINetwork:_localNodes"[label="insert(pair<tempNodeId,node>)", URL="\ref MPINetwork::insert()"];
+   * \endmsc
+   *
+   *
    * \section MPINetwork_simulation_loop The Simulation Loop
    *  An MPINetwork instance may live in several threads, if MPI was enabled during compilation.  The MPI coordination requires a boost::communicator object
    * which is part of MPIProxy. The MPINetwork._nodeDistribution keeps track of which NodeId
@@ -66,9 +83,44 @@ namespace MPILib {
    * work out wether the new node will be local to the current thread or not, based on the new NodeId and its local knowledge of how node numbers relate
    * to processor numbers. If the new NodeId will be current to the local thread, the MPINode constructor is called, providing the new NodeId, a reference
    * to the AlgorithmInterface and NodeType, that were provided by the client upon calling MPINetwork.addNode, and a reference to the MPINetwork._nodeDistribution
-   * and the MPINetwork._localNodes distibution. The newly created MPINode will be added to the MPINetwork._localNodes map, with the new NodeId as key.
+   * and the MPINetwork._localNodes distribution. The newly created MPINode will be added to the MPINetwork._localNodes map, with the new NodeId as key.
    * As this map is particular to the address space of the thread, the node has indeed become a local node.
-   * 
+   *
+   *\msc["Main loop"]
+   *     client, MPINetwork, MPINode, "MPINode:pAlgorithm", Report, ReportHandler, MPIProxy;
+   *
+   * 	 client box client [label="client"];
+   *	 MPINetwork box MPINetwork [label="MPINetwork"];
+   *	 MPINode box MPINode [label="MPINode"];
+   *	 "MPINode:pAlgorithm" box "MPINode:pAlgorithm" [label="MPINode:pAlgorithm"];
+   *	 client note  MPINode [label="SimulationTime < (ReportTime and StateTime)"];
+   *
+   *	 client=>MPINetwork[label="evolve()"];
+   *	 MPINetwork=>MPINode[label="waitAll()"];
+   *	 MPINode=>MPIProxy[label="waitAll()"];
+   *	 MPINetwork=>MPINode[label="prepareEvolve()"];
+   *	 MPINetwork=>MPINode[label="evolve(Time)"];
+   *	 MPINode note MPINode [label="CurrentTime < Time"];
+   *	 MPINode=>"MPINode:pAlgorithm"[label="evolveNodeState()"];
+   *	 MPINode=>MPINode[label="sendOwnActivity()"];
+   *	 MPINode=>MPIProxy[label="isend(_node_id,_activity)"];
+   *	 MPINode=>MPINode[label="receiveData()"];
+   *	 MPINode note MPINode[label="if data not local"];
+   *	 MPINode=>MPIProxy[label="irecv(_precursorActivity)"];
+   *	 MPINetwork<<MPINode[label="current time"];
+   *
+   *	 MPINetwork note  MPINode [label="SimulationTime > ReportTime"];
+   *	 MPINetwork=>MPINetwork[label="updateReportTime()"];
+   *	 MPINetwork=>MPINetwork[label="collectReport(Rate)"];
+   *	 MPINetwork=>MPINode[label="reportAll(Rate)"];
+   *	 MPINode=>"MPINode:pAlgorithm"[label="getActivity()"];
+   *	 MPINode<<"MPINode:pAlgorithm";
+   *	 MPINode=>"MPINode:pAlgorithm"[label="getGrid()"];
+   *	 MPINode<<"MPINode:pAlgorithm";
+   * 	 MPINode=>Report[label="create()"];
+   *	 MPINode->ReportHandler[label="writeReport(Report)"];
+   *\endmsc
+   *
    */
 template<class WeightValue, class NodeDistribution>
 class MPINetwork{

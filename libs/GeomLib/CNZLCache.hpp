@@ -51,6 +51,7 @@ namespace GeomLib {
 		typedef pair<vector<BinEstimator::CoverPair>, vector<BinEstimator::CoverPair> >  input_pair_list;
 
 		const vector<input_pair_list>& List() const {return _vec_coverpair;}
+
 	private:
 
 		bool InputStepsHaveChanged() const;

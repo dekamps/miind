@@ -1,9 +1,8 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<AbstractAlgorithm type="GeomAlgorithm">
-<GeomAlgorithm Name="LIF_excitatory Algorithm" lambda="0.01" system="LeakingOdeSystem">
-<OdeParameter>
+<AbstractAlgorithm type="OUAlgorithm">
+<OUAlgorithm Name="OULIF_excitatory Algorithm" lambda="0.01" system="LeakingOdeSystem">
 <NeuronParameter>
 <t_membrane>50e-3</t_membrane>
 <t_refractive>0</t_refractive>
@@ -11,14 +10,7 @@
 <V_reset>0</V_reset>
 <V_reversal>0</V_reversal>
 </NeuronParameter>
-<InitialDensityParameter> 
-<mu>0.0</mu>
-<sigma>0.0</sigma> 
-</InitialDensityParameter>
-<V_min>-0.02</V_min>
-<N_bins>500</N_bins>
-</OdeParameter>
-</GeomAlgorithm>
+</OUAlgorithm>
 </AbstractAlgorithm>
 <AbstractAlgorithm type="RateAlgorithm">
 <RateAlgorithm Name="Cortical Background Algorithm">
@@ -27,8 +19,8 @@
 </AbstractAlgorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="LIF_excitatory Algorithm" name="LIF E" type="EXCITATORY_DIRECT" />
-<Node algorithm="Cortical Background Algorithm" name="Cortical Background" type="EXCITATORY_DIRECT" />
+<Node algorithm="OULIF_excitatory Algorithm" name="LIF E" type="EXCITATORY_GAUSSIAN" />
+<Node algorithm="Cortical Background Algorithm" name="Cortical Background" type="EXCITATORY_GAUSSIAN" />
 </Nodes>
 <Connections>
 <Connection In="Cortical Background" Out="LIF E">800 0.03 0</Connection>

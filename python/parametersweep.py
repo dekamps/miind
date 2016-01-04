@@ -36,9 +36,9 @@ class xml_file:
         root = self.tree.getroot()
         gen=root.iter(xml_tag.name)
         hits = [l for l in gen if l.attrib == xml_tag.dict]
-        if len (hits) != 1: 
-            raise
-        return hits[0].text.split()
+        if len (hits) > 1: 
+            print 'Warning, you are about to the same parameter value in different positions of the file. If this is not what you want please hand edit the new files. '''
+        return [ x.text.split() for x in hits]
 
     def join(self,l):
         s = ''
@@ -64,11 +64,12 @@ class xml_file:
         '''it is assumed that the value is a numeral, i.e. it will need
         to be converted to a string in the tag list.'''
     
-        if position >= len(text_list):
-            raise
-        text_list[position]=str(value)      
+        for item in text_list:
+            if position >= len(item):
+                raise
+            item[position]=str(value)      
 
-        self.insert_text_attribute(xml_tag,text_list)
+            self.insert_text_attribute(xml_tag,item)
         return
 
 

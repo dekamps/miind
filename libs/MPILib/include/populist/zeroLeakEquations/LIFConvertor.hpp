@@ -196,7 +196,7 @@ private:
 	 */
 	std::vector<Rate> _vec_burst;
 	/**
-	 * vector of diffucion rates
+	 * vector of diffusion rates
 	 */
 	std::vector<Rate> _vec_diffusion;
 };} /* namespace zeroLeakEquations */

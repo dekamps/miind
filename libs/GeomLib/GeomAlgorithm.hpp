@@ -34,7 +34,50 @@ using MPILib::SimulationRunParameter;
 using MPILib::Time;
 
 namespace GeomLib {
+  //! Population density algorithm based on Geometric binning: http://arxiv.org/abs/1309.1654
 
+  //! Population density techniques are used to model neural populations. See
+  //! http://link.springer.com/article/10.1023/A:1008964915724 for an introduction.
+  //! This algorithm uses a geometric binning scheme as described in http://arxiv.org/abs/1309.1654 .
+  //! The rest of this comment will describe the interaction with the MIIND framework and the
+  //! objects that it requires.
+  //! \section label_geom_intro Introduction
+  //! GeomAlgorithm inherits from AlgorithmInterface. This implies that a node in an MPINetwork
+  //! can be configured with this algorithm, and that network simulations can be run, where
+  //! each node represents a neuronal population. The simulations are equivalent to spiking neuron
+  //! simulations of point model neurons, such as performed by NEST, with some caveats. GeomAlgorithm
+  //! deals with one dimensional point models, such as leaky-integrate-and-fire, quadratic-integrate-and-fire
+  //! and exponential-integrate-and-fire. 2D models such adaptive-exponential-integrate-and-fire and conductance
+  //! based models will be handled by another algorithm, which is in alpha stage. GeomAlgorithm
+  //! is instantiated using a GeomParameter, which specifies, among other things, the neuronal model
+  //! and its parameter values, in the form of an AbstractOdeSystem. From the user perspective, this is
+  //! the most important, and the documentation of AbstractOdeSystem, and more the important the
+  //! <a href="http://miind.sf.net/tutorial.pdf">MIIND tutorial</a> is the first port of call. In the remainder
+  //! of this documentation section the interaction of GeomAlgorithm with other objects will be discussed.
+  //!
+  //! \section label_geom_initialization The Initialization Sequence
+  //!
+  //! The creation sequence is lengthy although the user only sees the first two stages, represented in blue.
+  //! NeuronParameter defines quantities common to most neuronal models, such as membrane potential,
+  //! membrane time constant, threshold, etc. OdeParameter accepts a NeuronParameter, and other parameters
+  //! that set the dimension of the grid. LifNeuralDynamics defines the neuronal model itself in terms of
+  //! a method 	LifNeuralDynamics::EvolvePotential(MPILib::Potential,MPILib::Time), which describes
+  //! how a potential evolves over time under the dynamics of the neuronal model, in this case leaky-integrate-and
+  //! fire dynamics. For most users the dynamics of a model will already have been defined. The introduction
+  //! of novel dynamics requires an overload of the corresponding function of AbstractNeuralDynamics.
+  //! LifOdeSystem is a representation of the grid itself. Note that for spiking neural dynamics another
+  //! grid representation is needed: SpikingNeuralDynamics. This difference will be removed in the future.
+  //! The constructor call requires the following initialization sequence.
+  //! \msc["Main loop"]
+  //!     NeuronParameter, OdeParameter, LifNeuralDynamics, LifOdeSystem, GeomParameter;
+  //!
+  //!   NeuronParameter=>OdeParameter [label="argument", linecolor="blue"];
+  //!   OdeParameter=>LifNeuralDynamics[label="argument", linecolor="blue"];
+  //!   LifNeuralDynamics=>LifOdeSystem[label="argument"];
+  //!   LifOdeSystem=>GeomParameter[label="argument"];
+  //! \endmsc
+  //!
+  //! section label_geom_creation The Creation Sequence
   template <class WeightValue>
 	class GeomAlgorithm : public AlgorithmInterface<WeightValue>  {
 	public:
@@ -98,8 +141,8 @@ namespace GeomLib {
 
 		bool  IsReportDue() const;
 
-    const GeomParameter	      		_par_geom;
-    AlgorithmGrid	      		_grid;
+    const GeomParameter	      			_par_geom;
+    AlgorithmGrid	      				_grid;
     unique_ptr<AbstractOdeSystem>      	_p_system;
     unique_ptr<AbstractMasterEquation>	_p_zl;
 
