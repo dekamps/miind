@@ -32,6 +32,7 @@ namespace GeomLib {
         //! bins, and these values are cached. These cached values, rather than the outcome of a BinEstimator are
         //! used by NumericalMasterEquation.
 
+	template <class Estimator>
 	class CNZLCache {
 	public:
 
@@ -43,12 +44,12 @@ namespace GeomLib {
 		(
 			const AbstractOdeSystem&,
 			const vector<InputParameterSet>& set,
-			const BinEstimator&
+			const Estimator&
 		);
 
 		void InitializeCoverPairs();
 
-		typedef pair<vector<BinEstimator::CoverPair>, vector<BinEstimator::CoverPair> >  input_pair_list;
+		typedef pair<vector<typename Estimator::CoverPair>, vector<typename Estimator::CoverPair> >  input_pair_list;
 
 		const vector<input_pair_list>& List() const {return _vec_coverpair;}
 
@@ -59,7 +60,7 @@ namespace GeomLib {
 		Number				       			_n_bins;
 		const vector<InputParameterSet>*	_p_vec_set;
 		vector<InputParameterSet>	        _old_set;
-		const BinEstimator*	       			_p_estimator;
+		const Estimator*	       			_p_estimator;
 		const AbstractOdeSystem*		   	_p_sys;
 
 		vector<input_pair_list>  _vec_coverpair;

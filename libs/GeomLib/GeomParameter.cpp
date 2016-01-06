@@ -35,10 +35,10 @@ using namespace GeomLib;
 GeomParameter::GeomParameter
 (
 	const AbstractOdeSystem& 			sys,
+	const string& 						name_master,
 	const DiffusionParameter& 			par_diff,
 	const CurrentCompensationParameter&	par_cur,
 	Potential 							scale,
-	const string& 						name_master,
 	bool								no_master_equation
 ):
 _p_sys_ode			(sys.Clone()),

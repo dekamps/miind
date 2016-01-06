@@ -18,9 +18,10 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
-
+#include "BinEstimator.hpp"
+#include "LifEstimator.hpp"
 #include "MasterFactory.hpp"
-#include "NumericalMasterEquation.h"
+#include "NumericalMasterEquationCode.hpp"
 #include "GeomLibException.hpp"
 
 using namespace GeomLib;
@@ -31,16 +32,19 @@ MasterFactory::MasterFactory()
 
 unique_ptr<AbstractMasterEquation> MasterFactory::Create
 (
-	const string& name,
-	AbstractOdeSystem& 					sys,
-	const DiffusionParameter&		 	par_diffusion,
+    const string&                       name,
+	AbstractOdeSystem& 	      			sys,
+	const DiffusionParameter&	      	par_diffusion,
 	const CurrentCompensationParameter&	par_current
 ){
 	if (name == "" || name == "NumericalMasterEquation" ){
-		AbstractMasterEquation* p =  new NumericalMasterEquation(sys, par_diffusion, par_current);
+		AbstractMasterEquation* p =  new NumericalMasterEquation<BinEstimator>(sys, par_diffusion, par_current);
 		return unique_ptr<AbstractMasterEquation>(p);
 	}
-
+	if (name == "" || name == "LifNumericalMasterEquation" ){
+		AbstractMasterEquation* p =  new NumericalMasterEquation<LifEstimator>(sys, par_diffusion, par_current);
+		return unique_ptr<AbstractMasterEquation>(p);
+	}
 
 	throw GeomLibException("Unknown master equations");
 }

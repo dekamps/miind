@@ -34,8 +34,8 @@ int main(){
   LeakingOdeSystem sys_e(dyn_e);
   LeakingOdeSystem sys_i(dyn_i);
 
-  GeomParameter par_e(sys_e,PerformanceGeom::EXC_DIFF);
-  GeomParameter par_i(sys_i,PerformanceGeom::INH_DIFF);
+  GeomParameter par_e(sys_e,"LifNumericalMasterEquation",PerformanceGeom::EXC_DIFF);
+  GeomParameter par_i(sys_i,"LifNumericalMasterEquation",PerformanceGeom::INH_DIFF);
 
   NodeId id_cortical_background;
   NodeId id_excitatory_main;

@@ -57,12 +57,12 @@ namespace GeomLib {
 
 		const SpikingOdeSystem&					_system;
 		const vector<Potential>&				_vec_potential;
-		vector<Density>&					_vec_density;
-		Index							_i_reset;
-		vector<Density>						_vec_matrix_state;
+		vector<Density>&						_vec_density;
+		Index									_i_reset;
+		vector<Density>							_vec_matrix_state;
 
 		NumtoolsLib::ExStateDVIntegrator<MasterParameter> 	_matrix_integrator;
-		NumtoolsLib::QaDirty<double>				_mat_transit;
+		NumtoolsLib::QaDirty<double>			_mat_transit;
 	};
 }
 

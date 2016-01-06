@@ -83,7 +83,7 @@ int main(){
 	CurrentCompensationParameter par_current(0.0,0.0);
 	SpikingQifNeuralDynamics dyn(par_ode,par_qif);
 	QifOdeSystem sys(dyn);
-	GeomDelayAlg alg_qif(GeomParameter(sys,  par_diffusion, par_current));
+	GeomDelayAlg alg_qif(GeomParameter(sys,"NumericalMasterEquation",  par_diffusion, par_current));
       
 
 

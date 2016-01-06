@@ -115,12 +115,14 @@ double BinEstimator::BinHighFraction(Potential v, int i_tr_high) const {
 }
 
 BinEstimator::CoverPair BinEstimator::CalculateBinCover(Index i, Potential delta_v) const{
+	assert(i < _vec_interpretation.size());
 	CoverPair pair_ret;
 	Potential low = _vec_interpretation[i];
 	Potential high = (i != _vec_interpretation.size() - 1) ? _vec_interpretation[i+1] : _par_ode._par_pop._theta;
 
 	Potential trans_low  = Translate(low,	delta_v);
 	Potential trans_high = Translate(high,	delta_v);
+
 	int i_tr_low  = this->SearchBin(i,trans_low, delta_v);
 	int i_tr_high = this->SearchBin(i,trans_high,delta_v);
 

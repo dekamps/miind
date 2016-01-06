@@ -58,20 +58,20 @@ namespace GeomLib {
 		GeomParameter
 		(
 			const AbstractOdeSystem& sys,														//!< Any OdeSystem object, this defines the neural model. This object will be cloned.
+			const string& name_master					= "NumericalMasterEquation",			//!< By default, a numerical scheme for the solution of the Master equation
 			const DiffusionParameter& par_diff          = DiffusionParameter(0.03, 0.03),		//!< Typical values are 3% of the scale
 			const CurrentCompensationParameter& par_cur = CurrentCompensationParameter(0.,0.),	//!< By default, no current compensation
 			Potential scale								= 1.0,  								//!< In a diffusion interpretation of the input, it must be made clear what scale is considered to be small
-			const string& name_master					= "NumericalMasterEquation",			//!< By default, a numerical scheme for the solution of the Master equation
 			bool  no_master_equations               	= false									//!< Do not run master equation when true
 		);
 
 		GeomParameter(const GeomParameter&);
 
 		unique_ptr<AbstractOdeSystem>			_p_sys_ode;
+		const string							_name_master;
 		Potential								_scale;
 		const DiffusionParameter				_par_diff;
 		const CurrentCompensationParameter		_par_cur;
-		const string							_name_master;
 		bool									_no_master_equation;
 	};
 }

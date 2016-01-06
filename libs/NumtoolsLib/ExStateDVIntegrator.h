@@ -85,9 +85,6 @@ namespace NumtoolsLib
 		//! virtual destructor
 		virtual ~ExStateDVIntegrator();
 
-/*		//! Show State (returns copy of the initial state)
-		vector<double> State() const;
-*/
 		//! Set a new state
 		bool Reconfigure
 		(
@@ -116,7 +113,6 @@ namespace NumtoolsLib
 		ParameterObject& Parameter();
 
 	private:
-
 
 
 	}; // end of NodeIntegrator

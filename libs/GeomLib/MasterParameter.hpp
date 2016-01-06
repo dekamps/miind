@@ -34,6 +34,7 @@ namespace GeomLib {
 		//! of the code a cache was included, which may have led to undefined behaviour.
 		//! This object should be kept as light weight as possible. In particular the
 		//! inclusion of complex objects should be avoided.
+	    template <class Estimator>
 		struct MasterParameter {
 
 
@@ -41,18 +42,15 @@ namespace GeomLib {
 
 			const vector<InputParameterSet>* _p_vec_set;
 
-			const BinEstimator*			_p_estimator;
+			const Estimator*			_p_estimator;
 			const AbstractOdeSystem*	_p_system;
-			const CNZLCache*			_p_cache;
+			const CNZLCache<Estimator>*	_p_cache;
 
 			Time						_gamma_sys;
 			Rate						_rate;
 
 			Number						_nr_bins;
 			Index						_i_reset;
-
-
-
 		};
 }
 

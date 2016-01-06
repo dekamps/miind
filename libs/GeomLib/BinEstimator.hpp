@@ -39,8 +39,6 @@ namespace GeomLib {
         //! a single bin partially. The object uses linear search to determine where in which
         //! bin the translated end points of a given bin fall.
 
-        //! TODO: This is a potential cause of inefficiencies. The bin can be found by representing
-        //! the inverse function of the characteristics.
 
 	class BinEstimator {
 	public:

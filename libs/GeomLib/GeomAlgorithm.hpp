@@ -24,7 +24,7 @@
 #include <boost/circular_buffer.hpp>
 #include <MPILib/include/algorithm/AlgorithmInterface.hpp>
 #include "GeomParameter.hpp"
-#include "NumericalMasterEquation.h"
+#include "NumericalMasterEquationCode.hpp"
 
 using MPILib::algorithm::AlgorithmGrid;
 using MPILib::algorithm::AlgorithmInterface;
