@@ -26,7 +26,7 @@
 #include "OdeParameter.hpp"
 #include "OUAlgorithm.hpp"
 #include "LeakingOdeSystem.hpp"
-#include "Lifestimator.hpp"
+#include "LifEstimator.hpp"
 #include "NumericalMasterEquationCode.hpp"
 #include "MuSigmaScalarProduct.hpp"
 #include "Response.hpp"
