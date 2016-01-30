@@ -20,7 +20,7 @@
 #ifndef _CODE_APPS_LARGENETWORK_INCLUDE_GUARD
 #define _CODE_APPS_LARGENETWORK_INCLUDE_GUARD
 
-
+#include <GeomLib.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/PopulistParameter.hpp>
@@ -29,7 +29,7 @@
 
 namespace LargeNetwork {
 	
-	const MPILib::populist::parameters::OrnsteinUhlenbeckParameter 
+  const GeomLib::NeuronParameter 
 		TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER 
 		(
 			20e-3, // V_threshold: 20 mV
@@ -39,7 +39,7 @@ namespace LargeNetwork {
 			10e-3  // tau membrane; 10 ms
 		);
 
-	const MPILib::populist::parameters::OrnsteinUhlenbeckParameter 
+  const GeomLib::NeuronParameter 
 		TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER
 		(
 			20e-3,  // V_threshold; 20 mV
@@ -65,7 +65,7 @@ namespace LargeNetwork {
 	const MPILib::Efficacy TWOPOPULATION_J_II = g*TWOPOPULATION_J_IE;
 
 
-	const MPILib::populist::parameters::InitialDensityParameter
+	const GeomLib::InitialDensityParameter
 		TWOPOP_INITIAL_DENSITY
 		(
 			0.0,
@@ -79,31 +79,6 @@ namespace LargeNetwork {
 	const double TWOPOP_EXPANSION_FACTOR = 1.1;
 
 	const MPILib::Potential TWOPOP_V_MIN  = -1.0*TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER._theta;
-
-	const MPILib::populist::parameters::PopulistSpecificParameter
-		TWOPOP_SPECIFIC
-		(
-			TWOPOP_V_MIN,
-			TWOPOP_NUMBER_OF_INITIAL_BINS,
-			TWOPOP_NUMBER_OF_BINS_TO_ADD,
-			TWOPOP_INITIAL_DENSITY,
-			TWOPOP_EXPANSION_FACTOR,
-			"NumericalZeroLeakEquations"
-		);
-
-    const MPILib::populist::parameters::PopulistParameter
-		TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP
-		(
-			TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER,
-			TWOPOP_SPECIFIC
-		);
-
-	const MPILib::populist::parameters::PopulistParameter
-		TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP
-		(
-			TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER,
-			TWOPOP_SPECIFIC
-		);
 
 	const double BURST_FACTOR = 1.0;
 

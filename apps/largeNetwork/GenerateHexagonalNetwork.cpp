@@ -22,6 +22,7 @@
 #include "LargeNetwork.hpp"
 #include "GenerateHexagonalNetwork.hpp"
 
+#include <GeomLib.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/algorithm/DelayAlgorithmCode.hpp>
 #include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
@@ -30,6 +31,9 @@
 using namespace LargeNetwork;
 using namespace MPILib;
 using namespace MPILib::populist;
+
+typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
+
 namespace {
 
 	Rate CorticalBackground(Time t)
@@ -200,21 +204,26 @@ namespace {
 
 void GenerateHexagonalNetwork
 (
-	Number								n_rings,				//! number of rings
-	Pop_Network*						p_net,					//! network to which populations should be added
-	NodeId*								p_id_cent,				//! id of the central node id
-	NodeId*								p_id_bg,				//! id of the background node
-	vector<IdGrid>*						p_vec_grid,				//! list of Ids and positions for the excitatory nodes in the hexagon
+	Number	      				n_rings,				//! number of rings
+	Pop_Network*		      		p_net,					//! network to which populations should be added
+	NodeId*			      		p_id_cent,				//! id of the central node id
+	NodeId*				      	p_id_bg,				//! id of the background node
+	vector<IdGrid>*		      		p_vec_grid,				//! list of Ids and positions for the excitatory nodes in the hexagon
 	vector<pair<NodeId,NodeId> >*		p_vec_link,				//! list of neighbours for the excitatory nodes
-	vector<NodeId>*						p_vec_inh,				//! list of inhibitory nodes
-	vector<NodeId>*						p_vec_delay,			//! list of delay nodes
-	int*								p_offset				//! offset between excitatory and inhibitory nodes
+	vector<NodeId>*	      			p_vec_inh,				//! list of inhibitory nodes
+	vector<NodeId>*			      	p_vec_delay,			        //! list of delay nodes
+	int*		      			p_offset				//! offset between excitatory and inhibitory nodes
 )
 {
 	BuildHexagonalGrid(p_vec_grid,p_vec_link,n_rings);
 
-	PopulationAlgorithm alg_e(TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER_POP);
+        OdeParameter par_ode_e(TWOPOP_NUMBER_OF_INITIAL_BINS,TWOPOP_V_MIN,TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER,TWOPOP_INITIAL_DENSITY);
+	double lambda = 0.01;
 
+	LifNeuralDynamics dyn_e(par_ode_e,lambda);
+        LeakingOdeSystem sys_e(dyn_e);
+        GeomParameter par_geom_e(sys_e);
+	GeomDelayAlg alg_e(par_geom_e);
 	*p_id_cent = NodeId(0);
 
 	for (Index i = 0; i < p_vec_grid->size(); i++){
@@ -223,7 +232,13 @@ void GenerateHexagonalNetwork
        		assert(id_e == (*p_vec_grid)[i]._id);
 	}
 
-	PopulationAlgorithm alg_i(TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP);
+	//	PopulationAlgorithm alg_i(TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP);
+        OdeParameter par_ode_i(TWOPOP_NUMBER_OF_INITIAL_BINS,TWOPOP_V_MIN,TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER,TWOPOP_INITIAL_DENSITY);
+	LifNeuralDynamics dyn_i(par_ode_i,lambda);
+        LeakingOdeSystem sys_i(dyn_i);
+        GeomParameter par_geom_i(sys_i);
+	GeomDelayAlg alg_i(par_geom_i);
+
 	for (Index i = 0; i < p_vec_grid->size(); i++)
 		p_vec_inh->push_back(p_net->addNode(alg_i,INHIBITORY_GAUSSIAN));
 

@@ -53,7 +53,7 @@ int main(){
      );
 
 
-  MPILib::report::handler::RootReportHandler handler("twopopcanvas.root", true);
+  MPILib::report::handler::RootReportHandler handler("twopopcanvas.root", false);
   handler.addNodeToCanvas(id_excitatory_main);
   handler.addNodeToCanvas(id_inhibitory_main);
 
@@ -64,10 +64,10 @@ int main(){
      1000000000,
      0.,
      0.05,
-     1e-4,
+     1e-3,
      1e-5,
      "twopop.log",
-     1e-4
+     1e-3
      );
 
  

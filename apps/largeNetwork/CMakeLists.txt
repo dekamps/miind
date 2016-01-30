@@ -8,6 +8,7 @@ INCLUDE_DIRECTORIES(
 )
 
 
+include_directories( ../../libs/GeomLib )
 include_directories( ../../libs/MPILib )
 
 include_directories( ${GSL_INCLUDE_DIRS} )
@@ -23,6 +24,7 @@ if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
 set ( LIBLIST       
+    ${MIIND_LIBRARY_PREFIX}geom     
     ${MIIND_LIBRARY_PREFIX}mpi      
     ${MPI_LIBRARIES} 
     ${ROOT_LIBRARIES}

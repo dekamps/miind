@@ -33,15 +33,15 @@ using MPILib::NodeId;
 
 void GenerateHexagonalNetwork
 (
-	Number,							//! number of rings
-	MPILib::populist::Pop_Network*,					//! network to which populations should be added
-	NodeId*,						//! id of the central node id
-	NodeId*,						//! id of the background rate node
+	Number,					       	//! number of rings
+	MPILib::populist::Pop_Network*,	      		//! network to which populations should be added
+	NodeId*,			       		//! id of the central node id
+	NodeId*,			       		//! id of the background rate node
 	vector<IdGrid>*,				//! list of Ids and positions for the excitatory nodes in the hexagon
-	vector<pair<NodeId,NodeId> >*,  //! list of neighbours for the excitatory nodes
+	vector<pair<NodeId,NodeId> >*,                  //! list of neighbours for the excitatory nodes
 	vector<NodeId>*,				//! list of inhibitory nodes
 	vector<NodeId>*,				//! list of delay nodes
-	int*							//! offset between excitatory and inhibitory nodes
+	int*				       		//! offset between excitatory and inhibitory nodes
 );
 
 #endif //include guard
