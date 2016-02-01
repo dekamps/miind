@@ -1,0 +1,111 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<AbstractAlgorithm type="OUAlgorithm">
+<OUAlgorithm Name="OULIF_excitatory">
+<NeuronParameter>
+<t_membrane>10e-3</t_membrane>
+<t_refractive>0</t_refractive>
+<V_threshold>20e-3</V_threshold>
+<V_reset>0</V_reset>
+<V_reversal>0</V_reversal>
+</NeuronParameter>
+</OUAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="OUAlgorithm">
+<OUAlgorithm Name="OULIF_inhibitory">
+<NeuronParameter>
+<t_membrane>3e-3</t_membrane>
+<t_refractive>0</t_refractive>
+<V_threshold>20e-3</V_threshold>
+<V_reset>0</V_reset>
+<V_reversal>0</V_reversal>
+</NeuronParameter>
+</OUAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm  type="GeomAlgorithm">
+<GeomAlgorithm Name="LIF_excitatory"  system="LeakingOdeSystem" lambda="0.01">
+<OdeParameter>
+<NeuronParameter>
+<t_membrane>10e-3</t_membrane>
+<t_refractive>0</t_refractive>
+<V_threshold>20e-3</V_threshold>
+<V_reset>0</V_reset>
+<V_reversal>0</V_reversal>
+</NeuronParameter>
+<InitialDensityParameter> 
+<mu>0.0</mu>
+<sigma>0.0</sigma> 
+</InitialDensityParameter>
+<V_min>-0.02</V_min>
+<N_bins>2200</N_bins>
+</OdeParameter>
+</GeomAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="GeomAlgorithm">
+<GeomAlgorithm Name="LIF_inhibitory"  system="LeakingOdeSystem" lambda="0.01">
+<OdeParameter>
+<NeuronParameter>
+<t_membrane>3e-3</t_membrane>
+<t_refractive>0</t_refractive>
+<V_threshold>20e-3</V_threshold>
+<V_reset>0</V_reset>
+<V_reversal>0</V_reversal>
+</NeuronParameter>
+<InitialDensityParameter> 
+<mu>0.0</mu> 
+<sigma>0.0</sigma>
+</InitialDensityParameter>
+<V_min>-0.02</V_min>
+<N_bins>2200</N_bins>
+</OdeParameter>
+</GeomAlgorithm>
+</AbstractAlgorithm>
+<AbstractAlgorithm type="RateFunctor">
+<RateAlgorithm Name="Cortical Background Algorithm">
+<expression><![CDATA[2.0]]</expression>
+</RateFunctor>
+</AbstractAlgorithm>
+</Algorithms>
+<Nodes>
+<Node name="LIF E" type="EXCITATORY_GAUSSIAN" algorithm="OULIF_excitatory"></Node>
+<Node name="LIF I" type="INHIBITORY_GAUSSIAN" algorithm="OULIF_inhibitory"></Node>
+<Node name="Cortical Background" type="EXCITATORY_GAUSSIAN" algorithm="Cortical Background Algorithm"></Node>
+</Nodes>
+<Connections>
+<Connection In="LIF E" Out="LIF E">10000 0.000117647 0</Connection>
+<Connection In="LIF I" Out="LIF I">2000 -0.00085531 0</Connection>
+<Connection In="LIF E" Out="LIF I">10000 0.000285103 0</Connection>
+<Connection In="LIF I" Out="LIF E">2000 -0.000352941 0</Connection>
+<Connection In="Cortical Background" Out="LIF E">10000 0.000117647 0</Connection>
+<Connection In="Cortical Background" Out="LIF I">10000 0.000285103 0</Connection>
+</Connections>
+<SimulationIO>
+<SimulationName>two_pop</SimulationName>
+<OnScreen>TRUE</OnScreen>
+<WithState>TRUE</WithState>
+<WriteNet>FALSE</WriteNet>
+<CanvasParameter>
+<T_min>0</T_min>
+<T_max>0.05</T_max>
+<F_min>0</F_min>
+<F_max>10</F_max>
+<State_min>-0.02</State_min>
+<State_max>0.02</State_max>
+<Dense_min>0</Dense_min>
+<Dense_max>250</Dense_max>
+</CanvasParameter>
+<CanvasNode Name="LIF E"></CanvasNode> 
+<CanvasNode Name="LIF I"></CanvasNode>
+</SimulationIO>
+<SimulationRunParameter>
+<max_iter>1000000</max_iter>
+<t_begin>0</t_begin>
+<t_end>0.05</t_end>
+<t_report>1e-04</t_report>
+<t_state_report>1e-04</t_state_report>
+<t_step>1e-06</t_step>
+<t_update>1e-04</t_update>
+<name_log>twopoptest.log</name_log>
+</SimulationRunParameter>
+</Simulation>
