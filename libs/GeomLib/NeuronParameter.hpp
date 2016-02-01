@@ -27,7 +27,7 @@
 namespace GeomLib {
 
 
-	//! Parameters necessary for the configuration of an OUAlgorithm
+	//! Parameters necessary for the configuration of a GeomAlgorithm or an OUAlgorithm
 	//!
 	//! These are the parameters that define a leaky-integrate-and-fire neuron.
 
@@ -64,8 +64,6 @@ namespace GeomLib {
 		_tau(tau){
 			if (_V_reset > theta || _V_reversal > theta)
 				throw GeomLibException("Threshold should be largest potential");
-			if (_tau_refractive > _tau)
-				throw GeomLibException("tau_ref > tau");
 		}
 
 	};

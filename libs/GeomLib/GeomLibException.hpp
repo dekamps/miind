@@ -25,11 +25,15 @@ using std::string;
 
 namespace GeomLib {
 
+        //! Base class for all exceptions thrown in GeomLib
+  
 	class GeomLibException {
 	public:
-
+	  //! constructor
 		GeomLibException(const string& description):_description(description){}
+	  //! message containing a description of the error
 
+	  std::string description() const { return _description; }
 	private:
 
 		string _description;

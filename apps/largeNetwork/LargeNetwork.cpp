@@ -18,7 +18,6 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
-//#include <MPILib/config.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
@@ -37,18 +36,17 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/DelayedConnection.hpp>
 
-#include <MPILib/include/populist/PopulationAlgorithmCode.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 int main(int argc, char* argv[]) {
-	boost::timer::auto_cpu_timer t;
+  	boost::timer::auto_cpu_timer t;
 
 #ifdef ENABLE_MPI
 	// Initialise the mpi environment. This cannot be forwarded to a class
-	boost::mpi::environment env(argc, argv);
+  	boost::mpi::environment env(argc, argv);
 #endif
-	try {
+  	try {
 
 		std::shared_ptr<std::ostream> p_stream(
 				new std::ofstream(
@@ -70,7 +68,7 @@ int main(int argc, char* argv[]) {
 
 		// generates a network of hexgonal rings
 		GenerateHexagonalNetwork(
-				3,	// number of rings, increase if you want a larger network
+				LargeNetwork::NR_RINGS,	// number of rings, increase if you want a larger network
 				&net, &id_centrum, &id_bg, &vec_grid, &vec_link, &vec_inh,
 				&vec_delay, & i_offset);
 
@@ -105,6 +103,9 @@ int main(int argc, char* argv[]) {
 		env.abort(1);
 #endif
 	}
+	catch (GeomLib::GeomLibException& exc){
+	  std::cout << exc.description() << std::endl;
+	}
 
 	MPILib::utilities::MPIProxy().barrier();
 	t.stop();
@@ -112,6 +113,6 @@ int main(int argc, char* argv[]) {
 
 		std::cout << "Overall time spend\n";
 		t.report();
-	}
+		}
 	return 0;
 }

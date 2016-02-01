@@ -222,7 +222,7 @@ void GenerateHexagonalNetwork
 
 	LifNeuralDynamics dyn_e(par_ode_e,lambda);
         LeakingOdeSystem sys_e(dyn_e);
-        GeomParameter par_geom_e(sys_e);
+        GeomParameter par_geom_e(sys_e,"LifNumericalMasterEquation");
 	GeomDelayAlg alg_e(par_geom_e);
 	*p_id_cent = NodeId(0);
 
@@ -236,7 +236,7 @@ void GenerateHexagonalNetwork
         OdeParameter par_ode_i(TWOPOP_NUMBER_OF_INITIAL_BINS,TWOPOP_V_MIN,TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER,TWOPOP_INITIAL_DENSITY);
 	LifNeuralDynamics dyn_i(par_ode_i,lambda);
         LeakingOdeSystem sys_i(dyn_i);
-        GeomParameter par_geom_i(sys_i);
+        GeomParameter par_geom_i(sys_i,"LifNumericalMasterEquation");
 	GeomDelayAlg alg_i(par_geom_i);
 
 	for (Index i = 0; i < p_vec_grid->size(); i++)
@@ -267,3 +267,4 @@ void GenerateHexagonalNetwork
 
 	p_net->makeFirstInputOfSecond(id_burst,*p_id_cent,connection_J_EE_Burst);
 }
+

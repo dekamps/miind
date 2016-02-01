@@ -144,7 +144,7 @@ def publish_leaking_ode_system(lambdavalue,i):
     
 def  NonDefaultGeomParameterArgs(system, i):
     if system == 'LeakingOdeSystem':
-        return ''
+        return ',\"LifNumericalMasterEquation\"'
     if system == 'SpikingOdeSystem':
         return ', par_diffusion_' + str(i) + ', par_current_' + str(i)  
 

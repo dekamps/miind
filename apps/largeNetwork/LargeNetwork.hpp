@@ -28,7 +28,9 @@
 
 
 namespace LargeNetwork {
-	
+  
+  const int NR_RINGS = 2;
+
   const GeomLib::NeuronParameter 
 		TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER 
 		(
@@ -49,7 +51,7 @@ namespace LargeNetwork {
 			3e-3    // tau membrane 3 ms
 		);
 
-	const MPILib::Rate RATE_TWOPOPULATION_EXCITATORY_BACKGROUND = 2.0; // Hz
+  	const MPILib::Rate RATE_TWOPOPULATION_EXCITATORY_BACKGROUND = 2.0; // Hz
 
 	const double TWOPOPULATION_FRACTION = 0.5;
 
@@ -73,16 +75,14 @@ namespace LargeNetwork {
 		);
 
 	const MPILib::Number TWOPOP_NUMBER_OF_INITIAL_BINS		= 2200; //crank this up if you want to have higher CPU load
-	const MPILib::Number TWOPOP_NUMBER_OF_BINS_TO_ADD		= 1;
 	const MPILib::Number TWOPOP_MAXIMUM_NUMBER_OF_ITERATIONS	= 1000000;
 
-	const double TWOPOP_EXPANSION_FACTOR = 1.1;
 
 	const MPILib::Potential TWOPOP_V_MIN  = -1.0*TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER._theta;
 
-	const double BURST_FACTOR = 1.0;
+	const double BURST_FACTOR  = 1.0;
 
-	const MPILib::Time T_DELAY = 10e-3;
-}
+        const MPILib::Time T_DELAY = 1e-3;
+	}
 
 #endif // include guard
