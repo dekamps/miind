@@ -72,8 +72,8 @@ MPILib::Time LifEstimator::TStep() const
 
 MPILib::Time LifEstimator::TPeriod() const
 {
-  assert( _par._V_min   <= _par._par_pop._V_reset);
-  assert( _par._par_pop._V_reset <  _par._par_pop._theta );
+  assert( _par_ode._V_min   <= _par_ode._par_pop._V_reset);
+  assert( _par_ode._par_pop._V_reset <  _par_ode._par_pop._theta );
 
   double V_plus = _par_ode._par_pop._V_reversal + _lambda*(_par_ode._par_pop._theta - _par_ode._par_pop._V_reversal);
   return _par_ode._par_pop._tau*log((_par_ode._par_pop._theta -_par_ode._par_pop._V_reversal)/(V_plus - _par_ode._par_pop._V_reversal));

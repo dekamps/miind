@@ -61,9 +61,9 @@ Index BinEstimator::SearchBin(Potential v) const {
 int BinEstimator::Search(Index ind, Potential v, Potential dv) const {
   int sg = (dv > 0) - (dv < 0);
   int n = static_cast<int>(_vec_interpretation.size());
-  for (Index i = 0; i < n; i++){
+  for (int i = 0; i < n; i++){
     Index j = modulo(ind + sg*i, n);
-    if (_vec_interpretation[j] <= v && (j == n-1 || _vec_interpretation[j+1] > v) )
+    if (_vec_interpretation[j] <= v && (j == static_cast<Index>(n-1) || _vec_interpretation[j+1] > v) )
       return j;
   }
   assert(false);
