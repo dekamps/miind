@@ -1,6 +1,9 @@
 #include <GeomLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
+#include <MPILib/include/algorithm/BoxcarAlgorithm.hpp>
+// I think this should not be done, direct import of .cpp
+#include <MPILib/src/algorithm/BoxcarAlgorithm.cpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 
@@ -15,8 +18,10 @@ using GeomLib::NeuronParameter;
 using MPILib::EXCITATORY_DIRECT;
 using MPILib::INHIBITORY_DIRECT;
 using MPILib::NodeId;
+using MPILib::Event;
 using MPILib::SimulationRunParameter;
 using MPILib::algorithm::RateAlgorithm;
+using MPILib::algorithm::BoxcarAlgorithm;
 
 using std::cout;
 using std::endl;
@@ -247,6 +252,7 @@ int main(){
 
     Network network;
     Report handler("circuits", true , false);
+    // Report handler2("circuitsplot", false , true);
 
 // Configure algorithms
 
@@ -281,8 +287,17 @@ int main(){
     Rate rate_ext = 800.0;
     RateAlgorithm<MPILib::DelayedConnection> alg_ext(rate_ext);
 
+    Event someevents[2];
+    someevents[0].start = 0.1;
+    someevents[0].end = 0.2;
+    someevents[0].rate = 5.0;
+    someevents[1].start = 0.3;
+    someevents[1].end = 0.4;
+    someevents[1].rate = 10.0;
+    BoxcarAlgorithm<MPILib::DelayedConnection> alg_box(someevents, 2);
+
 // Setup main assemblies and controls
-    NodeId source_main_assembly  = network.addNode(alg_ext, EXCITATORY_DIRECT);
+    NodeId source_main_assembly  = network.addNode(alg_box, EXCITATORY_DIRECT);
     NodeId target_main_assembly  = network.addNode(alg_ext, EXCITATORY_DIRECT);
     NodeId ctrl1  = network.addNode(alg_ext, INHIBITORY_DIRECT);
     NodeId ctrl2  = network.addNode(alg_ext, INHIBITORY_DIRECT);
@@ -311,8 +326,8 @@ int main(){
             10000000,
             0.0,
             0.5,
-            1e-4,
-            1e-4,
+            1e-3,
+            1e-3,
             "circuits.log"
         );
 

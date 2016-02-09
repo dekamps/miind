@@ -24,7 +24,7 @@ set(MPI_SRCS
     src/HebbianAlgorithm.cpp
     src/PersistantAlgorithm.cpp
     src/WilsonCowanAlgorithm.cpp
-    
+    # Add  boxcar algorithm here
 
     src/ProbabilityQueue.cpp
     
