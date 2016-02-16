@@ -47,7 +47,7 @@ template<class Weight>
 class BoxcarAlgorithm: public AlgorithmInterface<Weight> {
 public:
 
-    BoxcarAlgorithm(Event *events, int n_events);
+    BoxcarAlgorithm(std::vector<Event>& events events);
 
     virtual ~BoxcarAlgorithm();
 

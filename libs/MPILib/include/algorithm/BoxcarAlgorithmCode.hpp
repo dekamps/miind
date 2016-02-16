@@ -33,10 +33,10 @@ namespace MPILib {
 namespace algorithm {
 
 template<class Weight>
-BoxcarAlgorithm<Weight>::BoxcarAlgorithm(Event *events, int n_events) :
+BoxcarAlgorithm<Weight>::BoxcarAlgorithm(std::vector<Event>& events) :
         AlgorithmInterface<Weight>(), _time_current(
                 std::numeric_limits<double>::max()), _rate(0),
-                _events(events), _n_events(n_events), _current_event(-1){}
+                _events(events), _n_events(events.size()), _current_event(-1){}
 
 template<class Weight>
 BoxcarAlgorithm<Weight>::~BoxcarAlgorithm() {}
@@ -54,6 +54,10 @@ void BoxcarAlgorithm<Weight>::configure(const SimulationRunParameter& simParam) 
 template<class Weight>
 void BoxcarAlgorithm<Weight>::evolveNodeState(const std::vector<Rate>& nodeVector,
         const std::vector<Weight>& weightVector, Time time) {
+
+    try{if(weightVector.size() > 0){throw "no connections to this node"};}
+    catch(string s){cout << s << '\n'; throw 0;}
+
     _time_current = time;
     // WE ARE ASSUMING EVENTS DO NOT HAVE 0 RATE
     if((_current_event < (_n_events - 1)) && (_rate == 0))
@@ -87,7 +91,9 @@ Rate BoxcarAlgorithm<Weight>::getCurrentRate() const {
 
 template<class Weight>
 AlgorithmGrid BoxcarAlgorithm<Weight>::getGrid() const {
-    AlgorithmGrid grid(1);
+    std::vector<double>& array_state(1);
+    array_state[0] = _rate;
+    AlgorithmGrid grid(array_state);
     return grid;
 }
 

@@ -1,9 +1,7 @@
 #include <GeomLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
-#include <MPILib/include/algorithm/BoxcarAlgorithm.hpp>
-// I think this should not be done, direct import of .cpp
-#include <MPILib/src/algorithm/BoxcarAlgorithm.cpp>
+#include <MPILib/include/algorithm/BoxcarAlgorithmCode.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 
