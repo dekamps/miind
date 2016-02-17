@@ -24,12 +24,16 @@
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/StringDefinitions.hpp>
 #include <fstream>
+#include <iostream>
+
+using std::cout;
+using std::endl;
 
 namespace MPILib {
 namespace report {
 namespace handler {
 
-std::ofstream* CsvReportHandler::_pFile = nullptr;
+std::ofstream CsvReportHandler::_pFile;
 
 std::vector<NodeId> CsvReportHandler::_nodes(0);
 
@@ -39,7 +43,7 @@ CsvReportHandler::CsvReportHandler(const std::string& file_name,
                                    bool writeState):
         AbstractReportHandler(file_name), _isStateWriteMandatory(writeState)
         {
-
+            // _pfile.open(file_name << ".txt")
         }
 
 CsvReportHandler::CsvReportHandler(const CsvReportHandler& rhs) :
@@ -50,10 +54,10 @@ CsvReportHandler::CsvReportHandler(const CsvReportHandler& rhs) :
 CsvReportHandler::~CsvReportHandler()
 // 11-07-2007: test on p_tuple by Volker Baier
 {
-    if (_pFile) {
-        _pFile->close();
-        delete _pFile;
-        _pFile = nullptr;
+    if (_pFile.is_open()) {
+        _pFile.close();
+        // delete _pFile;
+        // _pFile = nullptr;
     }
 }
 
@@ -67,9 +71,13 @@ void CsvReportHandler::writeReport(const Report& report) {
 
     // auto vectorOfGridValues = report._grid.toStateVector();
     // _nrReports++, report._time, report._rate;
-
+    _pFile << "report received" << endl;
+    _pFile << "report _type" << report._type << endl;
     if (report._type == STATE && (isStateWriteMandatory())){
-        
+        _pFile << _nrReports++ << ',';
+        _pFile << report._id << ',';
+        _pFile << report._time << ',';
+        _pFile << report._rate << ',' << endl;
     }
     // always log ReportValue elements
     _valueHandler.addReport(report);
@@ -82,17 +90,19 @@ CsvReportHandler* CsvReportHandler::clone() const {
 void CsvReportHandler::initializeHandler(const NodeId& nodeId) {
     // Purpose: this function will be called by MPINode upon configuration.
     // no canvas are generated as it would cause lot of problems with mpi
-    if (!_pFile) {
-        std::ofstream outputfile;
-        outputfile.open(getRootOutputFileName().c_str());
-        _pFile = &outputfile;
-
+    if (!_pFile.is_open()) {
+        // std::ofstream outputfile;
+        // outputfile.open(getRootOutputFileName().c_str());
+        // _pFile = outputfile;
+        _pFile.open(getRootOutputFileName().c_str());
+        cout << "created _pfile" << endl;
         // if (_pFile->IsZombie())
         //     throw utilities::Exception(STR_ROOT_FILE_OPENED_FAILED);
 
         _valueHandler.reset();
     }
     // store the node
+    cout << "initialize node" << nodeId << endl;
     _nodes.push_back(nodeId);
 }
 
@@ -107,7 +117,7 @@ void CsvReportHandler::detachHandler(const NodeId& nodeId) {
 
     if (!_valueHandler.isWritten())
         _valueHandler.write();
-
+    cout << "removing node " << nodeId << endl;
     if (_nodes.empty())
         finalize();
 }
@@ -123,12 +133,14 @@ void CsvReportHandler::removeFromNodeList(NodeId nodeId) {
 }
 
 void CsvReportHandler::finalize() {
-    _pFile->close();
-
-    if (_pFile) {
-        delete _pFile;
-        _pFile = nullptr;
-    }
+    cout << "close simulation file" << endl;
+    _pFile.close();
+    cout << "delete simulation file" << endl;
+    // if (_pFile) {
+    //     delete _pFile;
+    //     _pFile = nullptr;
+    // }
+    cout << "finalizing simulation" << endl;
     _nodes.clear();
 }
 

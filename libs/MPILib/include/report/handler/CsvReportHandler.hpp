@@ -113,9 +113,9 @@ private:
     bool isStateWriteMandatory() const;
 
     /**
-     * Pointer to the file.
+     * File stream object
      */
-    static std::ofstream* _pFile;
+    static std::ofstream _pFile;
 
     /**
      * The Value Handler
