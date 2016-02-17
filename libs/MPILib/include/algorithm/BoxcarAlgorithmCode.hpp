@@ -55,8 +55,20 @@ template<class Weight>
 void BoxcarAlgorithm<Weight>::evolveNodeState(const std::vector<Rate>& nodeVector,
         const std::vector<Weight>& weightVector, Time time) {
 
-    try{if(weightVector.size() > 0){throw "no connections to this node";};}
-    catch(string s){cout << s << '\n'; throw 0;}
+    try
+    {
+        if(weightVector.size() > 0)
+        {
+            cout << weightVector.size() << endl;
+            cout << nodeVector.size() << endl;
+            string s = "no connections should be done to a BoxcarNode";
+            throw s;
+        };
+    }
+    catch(string s)
+    {
+        cout << s ; throw 0;
+    }
 
     _time_current = time;
     // WE ARE ASSUMING EVENTS DO NOT HAVE 0 RATE
