@@ -55,7 +55,7 @@ template<class Weight>
 void BoxcarAlgorithm<Weight>::evolveNodeState(const std::vector<Rate>& nodeVector,
         const std::vector<Weight>& weightVector, Time time) {
 
-    try{if(weightVector.size() > 0){throw "no connections to this node"};}
+    try{if(weightVector.size() > 0){throw "no connections to this node";};}
     catch(string s){cout << s << '\n'; throw 0;}
 
     _time_current = time;
@@ -91,7 +91,7 @@ Rate BoxcarAlgorithm<Weight>::getCurrentRate() const {
 
 template<class Weight>
 AlgorithmGrid BoxcarAlgorithm<Weight>::getGrid() const {
-    std::vector<double>& array_state(1);
+    std::vector<double> array_state(1);
     array_state[0] = _rate;
     AlgorithmGrid grid(array_state);
     return grid;

@@ -3,7 +3,7 @@
 #include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
 #include <MPILib/include/algorithm/BoxcarAlgorithmCode.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
-#include <MPILib/include/report/handler/RootReportHandler.hpp>
+#include <MPILib/include/report/handler/CsvReportHandler.hpp>
 
 using GeomLib::GeomAlgorithm;
 using GeomLib::GeomParameter;
@@ -26,7 +26,7 @@ using std::endl;
 
 typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
-typedef MPILib::report::handler::RootReportHandler Report;
+typedef MPILib::report::handler::CsvReportHandler Report;
 
 class Gating_circuit
 {
@@ -74,8 +74,8 @@ Gating_circuit::Gating_circuit(Network& network, Report& handler,
     network.makeFirstInputOfSecond(gate, target_assembly, con);
 
 // Add internal nodes to handler
-    handler.addNodeToCanvas(gate_keeper);
-    handler.addNodeToCanvas(gate);
+    handler.initializeHandler(gate_keeper);
+    handler.initializeHandler(gate);
 }
 
 class Memory_circuit
@@ -123,7 +123,7 @@ Memory_circuit::Memory_circuit(Network& network, Report& handler,
 // All connections were setup by gating circuits
 
 // Add internal nodes to handler
-    handler.addNodeToCanvas(delay_assembly);
+    handler.initializeHandler(delay_assembly);
 }
 
 class Control_circuit
@@ -240,8 +240,8 @@ BBcell_circuit::BBcell_circuit(Network& network, Report& handler,
 // Already done by the circuits
 
 // Add internal nodes to handler
-    handler.addNodeToCanvas(source_sub_assembly);
-    handler.addNodeToCanvas(target_sub_assembly);
+    handler.initializeHandler(source_sub_assembly);
+    handler.initializeHandler(target_sub_assembly);
 }
 
 int main(){
@@ -249,8 +249,7 @@ int main(){
     cout << "Demonstrating Blackboard circuit cell" << endl;
 
     Network network;
-    Report handler("circuits", true , false);
-    // Report handler2("circuitsplot", false , true);
+    Report handler("circuits", false);
 
 // Configure algorithms
 
@@ -285,14 +284,14 @@ int main(){
     Rate rate_ext = 800.0;
     RateAlgorithm<MPILib::DelayedConnection> alg_ext(rate_ext);
 
-    Event someevents[2];
+    std::vector<Event> someevents(2);
     someevents[0].start = 0.1;
     someevents[0].end = 0.2;
     someevents[0].rate = 5.0;
     someevents[1].start = 0.3;
     someevents[1].end = 0.4;
     someevents[1].rate = 10.0;
-    BoxcarAlgorithm<MPILib::DelayedConnection> alg_box(someevents, 2);
+    BoxcarAlgorithm<MPILib::DelayedConnection> alg_box(someevents);
 
 // Setup main assemblies and controls
     NodeId source_main_assembly  = network.addNode(alg_box, EXCITATORY_DIRECT);
@@ -302,12 +301,12 @@ int main(){
     NodeId ctrl3  = network.addNode(alg_ext, INHIBITORY_DIRECT);
     NodeId ctrl4  = network.addNode(alg_ext, INHIBITORY_DIRECT);
 
-    handler.addNodeToCanvas(source_main_assembly);
-    handler.addNodeToCanvas(target_main_assembly);
-    handler.addNodeToCanvas(ctrl1);
-    handler.addNodeToCanvas(ctrl2);
-    handler.addNodeToCanvas(ctrl3);
-    handler.addNodeToCanvas(ctrl4);
+    handler.initializeHandler(source_main_assembly);
+    handler.initializeHandler(target_main_assembly);
+    handler.initializeHandler(ctrl1);
+    handler.initializeHandler(ctrl2);
+    handler.initializeHandler(ctrl3);
+    handler.initializeHandler(ctrl4);
 
 // Create circuit
 
