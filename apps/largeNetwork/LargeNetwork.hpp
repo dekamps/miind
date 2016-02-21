@@ -29,7 +29,7 @@
 
 namespace LargeNetwork {
   
-  const int NR_RINGS = 2;
+  const int NR_RINGS = 4;
 
   const GeomLib::NeuronParameter 
 		TWOPOPULATION_NETWORK_EXCITATORY_PARAMETER 
@@ -82,7 +82,7 @@ namespace LargeNetwork {
 
 	const double BURST_FACTOR  = 1.0;
 
-        const MPILib::Time T_DELAY = 1e-3;
+  const MPILib::Time T_DELAY = 2e-3;
 	}
 
 #endif // include guard

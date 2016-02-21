@@ -232,16 +232,17 @@ void GenerateHexagonalNetwork
        		assert(id_e == (*p_vec_grid)[i]._id);
 	}
 
-	//	PopulationAlgorithm alg_i(TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER_POP);
         OdeParameter par_ode_i(TWOPOP_NUMBER_OF_INITIAL_BINS,TWOPOP_V_MIN,TWOPOPULATION_NETWORK_INHIBITORY_PARAMETER,TWOPOP_INITIAL_DENSITY);
 	LifNeuralDynamics dyn_i(par_ode_i,lambda);
         LeakingOdeSystem sys_i(dyn_i);
         GeomParameter par_geom_i(sys_i,"LifNumericalMasterEquation");
 	GeomDelayAlg alg_i(par_geom_i);
 
-	for (Index i = 0; i < p_vec_grid->size(); i++)
-		p_vec_inh->push_back(p_net->addNode(alg_i,INHIBITORY_GAUSSIAN));
-
+	for (Index i = 0; i < p_vec_grid->size(); i++){
+	  NodeId id_i = p_net->addNode(alg_i,INHIBITORY_GAUSSIAN);
+		p_vec_inh->push_back(id_i);
+		cout << "I" << id_i << endl;
+	}
 	*p_offset = (*p_vec_inh)[0] - (*p_id_cent); // one being the id value of the central id node
 
 	// Create cortical background, and add to network

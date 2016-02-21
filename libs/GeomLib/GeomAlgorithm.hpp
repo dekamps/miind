@@ -78,7 +78,7 @@ namespace GeomLib {
   //! \endmsc
   //!
   //! section label_geom_creation The Creation Sequence
-  template <class WeightValue>
+    template <class WeightValue>
 	class GeomAlgorithm : public AlgorithmInterface<WeightValue>  {
 	public:
 

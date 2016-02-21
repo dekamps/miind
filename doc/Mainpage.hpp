@@ -1,8 +1,9 @@
 /*!
 \mainpage Miind Documentation
 \section sec_announce Announcement
-MIIND on the Hackathon session of the HBP summit. There is a <a href="http://miind.sf.net/tutorial.pdf">tutorial</a>.
-Although very rough, it will help you get going.
+ There is a now <a href="http://miind.sf.net/tutorial.pdf">tutorial</a>.
+
+MIIND version 1.03 was released om 9 February 2016. It contains more efficient leaky-integrate-and-fire support, and an extended example section.
 
 MIIND version 1.02 was released on 19 September 2015. It contains a major bug fix.
 
@@ -37,8 +38,8 @@ focusses strongly on so-called population density techniques.
 
 To get a feeling for the simulator and its capabilities, go to the \subpage page_examples page.
 
-To run the simulator, go to the \ref workflow page, after installation is completed. Make sure
-you have had a glance at the \ref ugh page.
+To run the simulator, go to the \ref page_workflow page, after installation is completed. Make sure
+you have had a glance at the \ref \subpage page_examples  page.
 
 \image html hbp.png
 Currently, part of the developent is funded by the <a href="http://www.humanbrainproject.eu/">Human Brain Project</a>.  
@@ -46,11 +47,13 @@ Currently, part of the developent is funded by the <a href="http://www.humanbrai
 \section sec_download Download
 The latest tar bal can be found <a href="http://sourceforge.net/projects/miind">here</a>. Install on Unix platforms
 is straightforward, using cmake. The procedure is explained
-in \ref installation. You can checkout a snapshot of the latest
+in \ref page_installation. You can checkout a snapshot of the latest
 code with:
 
 git clone git://git.code.sf.net/p/miind/git miind-git
 
+In anticipation of a move to GitHub, we push our commits to a mirror repository there:
+<a href="https://github.com/dekamps/miind">the MIIND GitHub page</a>
 
 The components are Open Source software under a BSD licence.
 \section licence Licence
@@ -58,7 +61,7 @@ The components are Open Source software under a BSD licence.
 MIIND is free and Open Source. It is distributed under a  BSD license (see \ref license)
 
 \section sec_install Installation
-Use cmake and make. For more details see \ref installation.
+Use cmake and make. For more details see \ref page_installation.
 
 \section sec_dependencies Dependencies
 For more details see \ref dependencies
@@ -69,7 +72,8 @@ The MIIND <a href="http://sourceforge.net/p/miind/wiki/Home">wiki</a>.
 The WIKI contains more details about the extra work that needs to be done to install MIIND under windows.
 
 \section sec_bug Report a Bug
-Please create a <a href="https://sourceforge.net/p/miind/bugs/">ticket</a>.
+Please raise an <a href="https://github.com/dekamps/miind/issues">issue</a>. (Press on the green button), or send
+an email to M.deKamps@leeds.ac.uk
 
 */
 

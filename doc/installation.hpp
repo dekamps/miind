@@ -1,117 +1,89 @@
 /**
-\page installation Installation
-\section sec_prelim Preliminaries. 
-At the moment, it is necessary to install 
-<a href="http://root.cern.ch">ROOT</a>. Under Unix systems, this is 
-straightforward. ROOT is a powerful analysis platform that has similar
-capablities as MATLAB, but is optimized for high performance. Use
-a pre-compiled version or compile yourself. Make sure that the
-version you use is configured with --enable-python. You can
-use  Python to inspect the simulation results, and convert
-them to numpy objects if you feel the need. 
+\page page_installation Installation
 
+\section sec_tpd Third Party Dependencies
 
+It is necessary to install <a href="http://cern.root.ch">ROOT</a>. ROOT is a powerful analysis platform that has similar capabilities as MATLAB,
+but is optimized for high end performance. Under Unix systems, this is straightforward.
+For almost all UNIX-like distributions there is a binary. This can be installed in a directory of your choice. If you
+have <i>sudo</i> or <i>root</i> permission, you can opt to have ROOT installed under <i>/usr/local</i>, thereby making the framework
+available to all users. It is also possible to install the package locally. Regardless of whether you install the package locally or under
+<i>/usr/local</i>, the top of the ROOT directory structure is always a directory called 'root'.
 
+Alternatively, you can compile the package from source, using the <i>configure</i> script} in the top directory of the download. There is a comprehensive
+description on how to do this: https://root.cern.ch/building-root.  Make sure you have all the prerequisites installed that are listed at https://root.cern.ch/build-prer\
+equisites.
 
+Make sure that the version you use is configured with \verbatim --enable-python, --enable-table, --enable-mathmore \endverbatim. You
+can use Python to inspect the simulation results, and convert them to numpy objects if you feel the need.
+
+Whether you install ROOT locally or system-wide, make sure that the script <i>root/bin/thisroot.sh</i> is sourced, i.e. issue the command:
+\verbatim source ~/root/bin/thisroot.sh \endverbatim if you have installed the package in your home directory. 
+You have to do this every time before you use													       
+ROOT, so it is worth to include in a <i>.bashrc</i> file or equivalent.
+
+													       
 You will also need:
-<ul>
- <li> The Gnu Scientific Library, <a href="http://www.gnu.org/software/gsl/">GSL</a> for short</li>
- <li>  A recent (> 1.48) version of <a href="http://www.boost.org">BOOST</a>.
-</ul>
+													       
+- The GNU Scientific Library, GSL for short
+																				    
+- A recent (> 1.48) version of BOOST.
 
-\section Basic Installation
-Whether you down load the tar file or checkout the code from the
-repository, you will have a top directory called 'code'. Where you place
-this is immaterial. Preform the following steps:
-<ol>
-<li> Directly below 'code', create a directory called 'build'. This 'build' directory will be at the same level as 'apps' and 'libs'.</li>
-<li> cd build </li>
-<li> ccmake ..</li>
-<li> Indicate whether you want a Release or a Debug version.</li>
-<li> You may have to indicate where ROOT is. CMake is intelligent enough
-to work out where, once you have provided the location of the root excutable.</li>
-<li> Generate the Make file ('g')</li> 
-<li> Quit ('q') </li>
-<li> Type 'make'</li>
-</ol>
-The libraries will built in build/libs, the excetuables in buid/apps.
+section sec_procedure Procedure
+Whether you down load the tar file or checkout the code from the repository, you will have a top directory called 'miind-git'. This is the <B> MIIND_ROOT</B>.
+Where you place this is immaterial.
+Perform the following steps:
 
-\section Release
-Once you have done this and want to make changes, it may be easier
-to run cmake, although the description below applies to ccmake as well.
-<ol>
-<li> Run cmake:
 
-You have the following options:
-<dl>
-<dt>
-ENABLE_TESTING [Default: TRUE]
-</dt>
-<dd>compiles the tests</dd>
-<dt>
-ENABLE_MEMORY_TEST [Default: FALSE]
-</dt>
-<dd>compiles the memory tests. Attention this increase the duration of the test run significantly</dd>
-<dt>
-ENABLE_COVERAGE [Default: FALSE]
-</dt>
-<dd>allows to generate a coverage report. Does not work at the moment</dd>
-<dt>
-DEBUGLEVEL [Default: logINFO]
-</dt>
-<dd>set the debug level see the avilable levels at \ref provided_debug_levels</dd>
-<dt>
-ENABLE_MPI [Default: FALSE]
-</dt>
-<dd>enable mpi for the miind mpi lib</dd>
-<dt>
-MPIEXEC
-</dt>
-<dd>the path to the mpirun executable</dd>
-<dt>
-CMAKE_INSTALL_PREFIX [Default: /usr/local]
-</dt>
-<dd>allows to specify the installation path</dd>
-<dt>
-CMAKE_BUILD_TYPE
-</dt>
-<dd>controls the type of build
-<ul><li>None (CMAKE_C_FLAGS or CMAKE_CXX_FLAGS used)
-</li><li>Debug (CMAKE_C_FLAGS_DEBUG or CMAKE_CXX_FLAGS_DEBUG)
-</li><li>Release (CMAKE_C_FLAGS_RELEASE or CMAKE_CXX_FLAGS_RELEASE)
-</li><li>RelWithDebInfo (CMAKE_C_FLAGS_RELWITHDEBINFO or CMAKE_CXX_FLAGS_RELWITHDEBINFO
-</li><li>MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL)
-</li></ul>
-</dd>
-</dl>
+ - Directly below 'code', create a directory called 'build'. This 'build' directory will be at the same level as 'apps' and 'libs'.
+ - 'cd build'
+ - 'ccmake ..'
+ - Indicate whether you want a Release or a Debug version, by setting the <B>CMAKE_BUILD_TYPE</B> field.
+ - You may have to indicate where ROOT is. CMake is intelligent enough to work out where, once you have provided the location of the root excutable.
+ - Configure ('c')
+ - Generate the Make file ('g')
+ - Quit ('q')
+ - Type 'make'
+ 
+The libraries will built in <i>build/libs</i>, the excetuables in buid/apps.
+In general, you want set your <B>PATH</B> and <B>PYTHONPATH</B> such that they include the path to <B>MIIND_ROOT</B>/python.						      
 
-e.g. run cmake like this
+CMake can be used directly from the command line, e.g.:						 
+								  \verbatim                                      
+cmake path_to_miind_src -DENABLE_MPI=TRUE -DCMAKE_BUILD_TYPE=Debug -DMPIEXEC=/opt/local/bin/openmpirun     
+         \endverbatim
+  To compile the project type:
+\verbatim
+make
+\endverbatim
+To build the documentation type:
+\verbatim
+make doc
+\endverbatim
 
-\code cmake path_to_miind_src -DENABLE_MPI=TRUE -DCMAKE_BUILD_TYPE=Debug -DMPIEXEC=/opt/local/bin/openmpirun\endcode
-</li>
-<li> To compile the project run:
 
-\code make \endcode
-</li>
-<li> To build the docs:
 
-\code make doc \endcode
-</li>
-</ol>
+\section sec_ubuntu A Clean Ubuntu Install
 
-\section Testing
-For testing you can run the included test and measure the coverage of the tests.
-<ol>
-<li> Call cmake with ENABLE_TESTING true. If you want a coverage report also set ENABLE_COVERAGE to true and make a debug build.
-\code \code cmake path_to_miind_src -DENABLE_COVERAGE=TRUE -DENABLE_TESTING=TRUE -DCMAKE_BUILD_TYPE=Debug \endcode
-</li>
-<li> To execute the tests run:
+We start with a clean Ubuntu 14-04 machine. Install the following packages with <i>sudo apt-get install</i>:
+\verbatim
+ g++ (this should be at least g++ 4.8, which you should get by default.)
+ python-scipy
+ cmake-curses-gui
+ libboost-all-dev
+ libgsl0-dev
+  git
+\endverbatim
 
-\code make test \endcode
-</li>
-<li> To generate the coverage report run:
-\code make coverage \endcode
-</li>
-</ol>
+Do not use a Ubuntu package for ROOT! It does exist, but misses a few libraries that MIIND depends on.
+  Go to the ROOT web site: http://root.cern.ch, go to <i>Download</i> and click on the most recent version. Download the Ubuntu binary
+    and unpack it in a directory of your choice. Issue the command 
+\verbatim source cwd/root/bin/thisroot.sh
+\endverbatim
+, where 'cwd' should be replaced by the name of the
+    directory where you unpacked. If you now type 'root' anywhere in a shell, ROOT's CINT interpreter should start and a splash screen should appear.
+Exit CINT by typing ' .q'. Start a Python shell, and type 'import ROOT'. This module should now load without any comment. You may want
+to incorporate the 'source' command described above in a <i>.bashrc</i> file or equivalent.
 
 */
+
