@@ -62,14 +62,14 @@
 </GeomAlgorithm>
 </AbstractAlgorithm>
 <AbstractAlgorithm type="RateFunctor">
-<RateAlgorithm Name="Cortical Background Algorithm">
-<expression><![CDATA[2.0]]</expression>
+<RateFunctor Name="Cortical Background Algorithm">
+<expression><![CDATA[2.0]]></expression>
 </RateFunctor>
 </AbstractAlgorithm>
 </Algorithms>
 <Nodes>
-<Node name="LIF E" type="EXCITATORY_GAUSSIAN" algorithm="OULIF_excitatory"></Node>
-<Node name="LIF I" type="INHIBITORY_GAUSSIAN" algorithm="OULIF_inhibitory"></Node>
+<Node name="LIF E" type="EXCITATORY_GAUSSIAN" algorithm="LIF_excitatory"></Node>
+<Node name="LIF I" type="INHIBITORY_GAUSSIAN" algorithm="LIF_inhibitory"></Node>
 <Node name="Cortical Background" type="EXCITATORY_GAUSSIAN" algorithm="Cortical Background Algorithm"></Node>
 </Nodes>
 <Connections>
