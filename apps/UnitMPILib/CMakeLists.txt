@@ -22,6 +22,7 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 
 set (UNIT_MPI_SRC 
     UnitMPILib.cpp
+    DelayAssemblyTest.cpp
     HebbianAlgorithmTest.cpp
     RateFunctorTest.cpp
 )

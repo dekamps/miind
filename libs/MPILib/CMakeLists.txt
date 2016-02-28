@@ -2,7 +2,7 @@
 # include the header files
 ##############################################################################
 
-#one below that MPILib is included in the paths they are needed for the camke config files
+#one below that MPILib is included in the paths they are needed for the cmake config files
 INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_SOURCE_DIR}/../
    ${CMAKE_CURRENT_BINARY_DIR}/../

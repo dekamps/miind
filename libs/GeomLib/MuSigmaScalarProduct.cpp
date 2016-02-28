@@ -24,7 +24,47 @@
 
 using namespace GeomLib;
 
-MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<MPILib::Rate>& nodeVector,
+template <>
+MPILib::Potential MuSigmaScalarProduct<double>::InnerProduct(
+		const std::vector<MPILib::Rate>& nodeVector,
+		const std::vector<double>& weightVector) const {
+
+	return std::inner_product(nodeVector.begin(), nodeVector.end(),
+			weightVector.begin(), 0.0);
+}
+
+template <>
+MPILib::Potential MuSigmaScalarProduct<double>::InnerSquaredProduct(
+		const std::vector<MPILib::Rate>& nodeVector,
+		const std::vector<double>& weightVector) const {
+
+	return 0;
+}
+
+
+template <>
+MPILib::Potential MuSigmaScalarProduct<MPILib::DelayedConnection>::InnerProduct(
+		const std::vector<MPILib::Rate>& nodeVector,
+		const std::vector<MPILib::DelayedConnection>& weightVector) const {
+
+	return std::inner_product(nodeVector.begin(), nodeVector.end(),
+			weightVector.begin(), 0.0);
+}
+
+
+template <>
+MPILib::Potential MuSigmaScalarProduct<MPILib::DelayedConnection>::InnerSquaredProduct(
+		const std::vector<MPILib::Rate>& nodeVector,
+		const std::vector<MPILib::DelayedConnection>& weightVector) const {
+
+	return inner_product(nodeVector.begin(), nodeVector.end(),
+			weightVector.begin(), 0.0, std::plus<double>(),
+			MPILib::populist::zeroLeakEquations::ConnectionSquaredProduct());
+}
+
+
+template <>
+MuSigma MuSigmaScalarProduct<MPILib::DelayedConnection>::Evaluate(const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<MPILib::DelayedConnection>& weightVector,
 		MPILib::Time tau) const {
 	MuSigma ret;
@@ -36,19 +76,5 @@ MuSigma MuSigmaScalarProduct::Evaluate(const std::vector<MPILib::Rate>& nodeVect
 	return ret;
 }
 
-MPILib::Potential MuSigmaScalarProduct::InnerProduct(
-		const std::vector<MPILib::Rate>& nodeVector,
-		const std::vector<MPILib::DelayedConnection>& weightVector) const {
 
-	return std::inner_product(nodeVector.begin(), nodeVector.end(),
-			weightVector.begin(), 0.0);
-}
 
-MPILib::Potential MuSigmaScalarProduct::InnerSquaredProduct(
-		const std::vector<MPILib::Rate>& nodeVector,
-		const std::vector<MPILib::DelayedConnection>& weightVector) const {
-
-	return inner_product(nodeVector.begin(), nodeVector.end(),
-			weightVector.begin(), 0.0, std::plus<double>(),
-			MPILib::populist::zeroLeakEquations::ConnectionSquaredProduct());
-}

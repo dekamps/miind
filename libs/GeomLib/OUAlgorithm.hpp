@@ -120,10 +120,10 @@ namespace GeomLib {
      const NeuronParameter& 
      ) const;
 
-    NeuronParameter                     _parameter_neuron;
-    ResponseParameter     		_parameter_response;
+    NeuronParameter                 _parameter_neuron;
+    ResponseParameter     			_parameter_response;
     DVIntegrator<ResponseParameter>	_integrator;
-    MuSigmaScalarProduct                _scalar_product;
+    MuSigmaScalarProduct<MPILib::DelayedConnection> _scalar_product;
   };
 
 }  // GeomLib

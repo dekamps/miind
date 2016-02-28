@@ -195,7 +195,7 @@ void GeomInputConvertor::AddDiffusionParameter
 
 	SortDiffusionInput(vec_con,vec_rates, &vec_diff_con,&vec_diff_rates);
 
-	MuSigmaScalarProduct scalar;
+	MuSigmaScalarProduct<MPILib::DelayedConnection> scalar;
 	MuSigma par = 
 		scalar.Evaluate
 		(

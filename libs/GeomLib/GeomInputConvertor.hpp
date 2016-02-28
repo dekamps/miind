@@ -46,11 +46,11 @@ namespace GeomLib {
 
 		GeomInputConvertor
 		(
-			const NeuronParameter&,	       		//! Neuron parameter of the receiving population, required to be able to interpret the white noise contribution
-			const DiffusionParameter&,     		//! Determines when white noise is emulated internally by one or two Poisson inputs
+			const NeuronParameter&,	       			//! Neuron parameter of the receiving population, required to be able to interpret the white noise contribution
+			const DiffusionParameter&,     			//! Determines when white noise is emulated internally by one or two Poisson inputs
 			const CurrentCompensationParameter&,   	//! Creates an extra internal white noise source that implements the current compensation
 			const std::vector<MPILib::Potential>&, 	//! Interpretation array from the relevant AbstractOdeSystem
-			bool  force_small_bins = false 		//! Inactive at the moment
+			bool  force_small_bins = false 			//! Inactive at the moment
 		);
 
 
@@ -103,7 +103,7 @@ namespace GeomLib {
 		MPILib::Potential MinVal(const std::vector<MPILib::Potential>&) const;
 
 		const NeuronParameter	            	_par_neuron;
-		const DiffusionParameter      		_par_diff;
+		const DiffusionParameter      			_par_diff;
 		const CurrentCompensationParameter     	_par_curr;
 		std::vector<MPILib::Potential>	       	_vec_interpretation;
 		std::vector<InputParameterSet>	       	_vec_set;

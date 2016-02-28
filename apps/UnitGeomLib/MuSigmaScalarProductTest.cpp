@@ -31,7 +31,7 @@ using MPILib::DelayedConnection;
 
 BOOST_AUTO_TEST_CASE(MuSigmaScalarTest)
 {
-	MuSigmaScalarProduct prod;
+        MuSigmaScalarProduct<MPILib::DelayedConnection>  prod;
 
 	vector<NodeType> vec_type;
 	vec_type.push_back(EXCITATORY_GAUSSIAN);

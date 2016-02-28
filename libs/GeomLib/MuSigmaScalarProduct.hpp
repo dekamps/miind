@@ -29,9 +29,9 @@
 namespace GeomLib {
 
 /**
- * @brief Evaluates the scalar product of an input which arrives over OU_Connections.
+ * @brief Evaluates the scalar product of an input which arrives over double or MPILib::DelayedConnection.
  *
- * Evaluates the scalar product of an input which arrives over OU_Connections.
+ * Evaluates the scalar product of an input which arrives over double or DelayedConnectipm.
  * The formulae are:
  * \f[
  * \mu = N \tau \sum_i \nu_i J_i
@@ -40,7 +40,9 @@ namespace GeomLib {
  * \f[
  * \sigma^2 = N \tau \sum_i \nu_i J^2_i
  * \f]
+ * for MPILib::DelayedConnection. For a double, a \f[ \sigma \f] of 0 is returned
  */
+template <class WeightType>
 class MuSigmaScalarProduct {
 public:
 	/**
@@ -53,7 +55,7 @@ public:
 	MuSigma Evaluate
 			(
 				const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<MPILib::DelayedConnection>& weightVector,
+				const std::vector<WeightType>& weightVector,
 				MPILib::Time tau
 			) const;
 
@@ -68,7 +70,7 @@ private:
 	MPILib::Potential InnerProduct
 				(
 					const std::vector<MPILib::Rate>& nodeVector,
-					const std::vector<MPILib::DelayedConnection>& weightVector
+					const std::vector<WeightType>& weightVector
 				) const;
 
 	/**
@@ -80,7 +82,7 @@ private:
 	MPILib::Potential InnerSquaredProduct
 				(
 					const std::vector<MPILib::Rate>& nodeVector,
-					const std::vector<MPILib::DelayedConnection>& weightVector
+					const std::vector<WeightType>& weightVector
 				) const;
 
 };

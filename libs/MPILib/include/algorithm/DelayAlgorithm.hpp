@@ -1,4 +1,4 @@
-// Copyright (c) 2005 - 2012 Marc de Kamps
+ // Copyright (c) 2005 - 2012 Marc de Kamps
 //						2012 David-Matthias Sichau
 // All rights reserved.
 //
