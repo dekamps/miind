@@ -71,14 +71,19 @@ void CsvReportHandler::writeReport(const Report& report) {
 
     // auto vectorOfGridValues = report._grid.toStateVector();
     // _nrReports++, report._time, report._rate;
-    _pFile << "report received" << endl;
-    _pFile << "report _type" << report._type << endl;
-    if (report._type == STATE && (isStateWriteMandatory())){
-        _pFile << _nrReports++ << ',';
-        _pFile << report._id << ',';
-        _pFile << report._time << ',';
-        _pFile << report._rate << ',' << endl;
-    }
+    // _pFile << "report received" << endl;
+    // _pFile << "report _type" << report._type << endl;
+    // if (report._type == STATE && (isStateWriteMandatory())){
+    //     _pFile << _nrReports++ << ',';
+    //     _pFile << report._id << ',';
+    //     _pFile << report._time << ',';
+    //     _pFile << report._rate << ',' << endl;
+    // }
+
+    _pFile << _nrReports++ << ',';
+    _pFile << report._id << ',';
+    _pFile << report._time << ',';
+    _pFile << report._rate << endl;
     // always log ReportValue elements
     _valueHandler.addReport(report);
 }
@@ -102,7 +107,7 @@ void CsvReportHandler::initializeHandler(const NodeId& nodeId) {
         _valueHandler.reset();
     }
     // store the node
-    cout << "initialize node" << nodeId << endl;
+    // cout << "initialize node" << nodeId << endl;
     _nodes.push_back(nodeId);
 }
 
@@ -117,7 +122,7 @@ void CsvReportHandler::detachHandler(const NodeId& nodeId) {
 
     if (!_valueHandler.isWritten())
         _valueHandler.write();
-    cout << "removing node " << nodeId << endl;
+    // cout << "removing node " << nodeId << endl;
     if (_nodes.empty())
         finalize();
 }
@@ -133,14 +138,14 @@ void CsvReportHandler::removeFromNodeList(NodeId nodeId) {
 }
 
 void CsvReportHandler::finalize() {
-    cout << "close simulation file" << endl;
+    // cout << "close simulation file" << endl;
     _pFile.close();
-    cout << "delete simulation file" << endl;
+    // cout << "delete simulation file" << endl;
     // if (_pFile) {
     //     delete _pFile;
     //     _pFile = nullptr;
     // }
-    cout << "finalizing simulation" << endl;
+    // cout << "finalizing simulation" << endl;
     _nodes.clear();
 }
 

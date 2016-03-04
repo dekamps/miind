@@ -2,6 +2,8 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
 #include <MPILib/include/algorithm/BoxcarAlgorithmCode.hpp>
+#include <MPILib/include/algorithm/DelayAssemblyAlgorithmCode.hpp>
+#include <MPILib/include/algorithm/DelayAssemblyParameter.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/CsvReportHandler.hpp>
 
@@ -20,6 +22,8 @@ using MPILib::Event;
 using MPILib::SimulationRunParameter;
 using MPILib::algorithm::RateAlgorithm;
 using MPILib::algorithm::BoxcarAlgorithm;
+using MPILib::algorithm::DelayAssemblyAlgorithm;
+using MPILib::algorithm::DelayAssemblyParameter;
 
 using std::cout;
 using std::endl;
@@ -60,11 +64,10 @@ Gating_circuit::Gating_circuit(Network& network, Report& handler,
     target_assembly = t_assembly;
 
 // Configure nodes
-
     gate_keeper = network.addNode(alg, INHIBITORY_DIRECT);
     gate  = network.addNode(alg, EXCITATORY_DIRECT);
-// Configure network graph
 
+// Configure network graph
     MPILib::DelayedConnection con(1, 0.03, 0.0);
     MPILib::DelayedConnection icon(1, -0.03, 0.0);
     network.makeFirstInputOfSecond(source_assembly, gate, con);
@@ -73,9 +76,6 @@ Gating_circuit::Gating_circuit(Network& network, Report& handler,
     network.makeFirstInputOfSecond(control, gate_keeper, icon);
     network.makeFirstInputOfSecond(gate, target_assembly, con);
 
-// Add internal nodes to handler
-    // handler.initializeHandler(gate_keeper);
-    // handler.initializeHandler(gate);
 }
 
 class Memory_circuit
@@ -107,7 +107,6 @@ Memory_circuit::Memory_circuit(Network& network, Report& handler,
     target_assembly = t_assembly;
 
 // Configure nodes
-
     delay_assembly  = network.addNode(alg, INHIBITORY_DIRECT);
 
     forward_circuit = Gating_circuit(network, handler, source_assembly,
@@ -122,8 +121,6 @@ Memory_circuit::Memory_circuit(Network& network, Report& handler,
 // Configure network graph
 // All connections were setup by gating circuits
 
-// Add internal nodes to handler
-    // handler.initializeHandler(delay_assembly);
 }
 
 class Control_circuit
@@ -160,8 +157,8 @@ Control_circuit::Control_circuit(Network& network, Report& handler,
     target_assembly = t_assembly;
     forward_control = f_ctrl;
     backward_control = b_ctrl;
-// Configure nodes
 
+// Configure nodes
     forward_circuit = Gating_circuit(network, handler, source_assembly,
                                      target_assembly, forward_control, alg);
     backward_circuit = Gating_circuit(network, handler, target_assembly,
@@ -170,8 +167,6 @@ Control_circuit::Control_circuit(Network& network, Report& handler,
 // Configure network graph
 // All connections were setup by gating circuits
 
-// Add internal nodes to handler
-// No internal nodes created
 }
 
 class BBcell_circuit
@@ -202,7 +197,8 @@ class BBcell_circuit
                        NodeId ctrlfc2,
                        NodeId ctrlbc1,
                        NodeId ctrlbc2,
-                       GeomDelayAlg alg);
+                       GeomDelayAlg alg,
+                       std::ofstream& node_desc);
 };
 
 BBcell_circuit::BBcell_circuit(Network& network, Report& handler,
@@ -212,7 +208,8 @@ BBcell_circuit::BBcell_circuit(Network& network, Report& handler,
                                NodeId ctrlfc2,
                                NodeId ctrlbc1,
                                NodeId ctrlbc2,
-                               GeomDelayAlg alg)
+                               GeomDelayAlg alg,
+                               std::ofstream& node_desc)
 {
     cout << "Building blackboard cell circuit" << endl;
     source_main_assembly = s_assembly;
@@ -223,7 +220,6 @@ BBcell_circuit::BBcell_circuit(Network& network, Report& handler,
     control_bc2 = ctrlbc2;
 
 // Configure nodes
-
     source_sub_assembly  = network.addNode(alg, EXCITATORY_DIRECT);
     target_sub_assembly  = network.addNode(alg, EXCITATORY_DIRECT);
     // Setup control circuit
@@ -236,12 +232,22 @@ BBcell_circuit::BBcell_circuit(Network& network, Report& handler,
     cc2 = Control_circuit(network, handler, target_sub_assembly,
                           target_main_assembly, control_fc2, control_bc2, alg);
 
-// Configure network graph
-// Already done by the circuits
-
-// Add internal nodes to handler
-    // handler.initializeHandler(source_sub_assembly);
-    // handler.initializeHandler(target_sub_assembly);
+// Write node description on file
+    node_desc << "source-sub-assembly," << source_sub_assembly << endl;
+    node_desc << "target-sub-assembly," << target_sub_assembly << endl;
+    node_desc << "cc1_forward_gate-keeper," << cc1.forward_circuit.gate_keeper << endl;
+    node_desc << "cc1_forward_gate," << cc1.forward_circuit.gate << endl;
+    node_desc << "cc1_backward_gate-keeper," << cc1.backward_circuit.gate_keeper << endl;
+    node_desc << "cc1_backward_gate," << cc1.backward_circuit.gate << endl;
+    node_desc << "mc_delay-assembly," << mc.delay_assembly << endl;
+    node_desc << "mc_forward_gate-keeper," << mc.forward_circuit.gate_keeper << endl;
+    node_desc << "mc_forward_gate," << mc.forward_circuit.gate << endl;
+    node_desc << "mc_backward_gate-keeper," << mc.backward_circuit.gate_keeper << endl;
+    node_desc << "mc_backward_gate," << mc.backward_circuit.gate << endl;
+    node_desc << "cc2_forward_gate-keeper," << cc2.forward_circuit.gate_keeper << endl;
+    node_desc << "cc2_forward_gate," << cc2.forward_circuit.gate << endl;
+    node_desc << "cc2_backward_gate-keeper," << cc2.backward_circuit.gate_keeper << endl;
+    node_desc << "cc2_backward_gate," << cc2.backward_circuit.gate << endl;
 }
 
 int main(){
@@ -250,9 +256,10 @@ int main(){
 
     Network network;
     Report handler("circuits_test", true);
+    std::ofstream node_desc;
+    node_desc.open("node_desc.csv");
 
 // Configure algorithms
-
     Number    n_bins = 330;
     Potential V_min  = 0.0;
 
@@ -301,21 +308,20 @@ int main(){
     NodeId ctrl3  = network.addNode(alg_ext, INHIBITORY_DIRECT);
     NodeId ctrl4  = network.addNode(alg_ext, INHIBITORY_DIRECT);
 
-    // handler.initializeHandler(source_main_assembly);
-    // handler.initializeHandler(target_main_assembly);
-    // handler.initializeHandler(ctrl1);
-    // handler.initializeHandler(ctrl2);
-    // handler.initializeHandler(ctrl3);
-    // handler.initializeHandler(ctrl4);
+// Write node description on file
+    node_desc << "source-main-assembly," << source_main_assembly << endl;
+    node_desc << "target-main-assembly," << target_main_assembly << endl;
+    node_desc << "control-1," << ctrl1 << endl;
+    node_desc << "control-2," << ctrl2 << endl;
+    node_desc << "control-4," << ctrl4 << endl;
+    node_desc << "control-3," << ctrl3 << endl;
 
 // Create circuit
-
     BBcell_circuit circuit(network, handler, source_main_assembly,
                            target_main_assembly,
-                           ctrl1, ctrl2, ctrl3, ctrl4, alg);
+                           ctrl1, ctrl2, ctrl3, ctrl4, alg, node_desc);
 
-// Run simulation
-
+// Setup simulation
     const SimulationRunParameter
         par_run
         (
@@ -325,12 +331,14 @@ int main(){
             0.5,
             1e-3,
             1e-3,
-            "circuits.log"
+            "circuits.log",
+            1
         );
-
     network.configureSimulation(par_run);
     cout << "Circuit setup done. Starting simulation..." << endl;
-    network.evolve();
 
+// Run simulation
+    network.evolve();
+    node_desc.close();
     return 0;
 }
