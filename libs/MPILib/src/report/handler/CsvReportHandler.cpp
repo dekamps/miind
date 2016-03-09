@@ -100,7 +100,11 @@ void CsvReportHandler::initializeHandler(const NodeId& nodeId) {
         // outputfile.open(getRootOutputFileName().c_str());
         // _pFile = outputfile;
         _pFile.open(getRootOutputFileName().c_str());
-        cout << "created _pfile" << endl;
+        _pFile << "report_number" << ',';
+        _pFile << "node_id" << ',';
+        _pFile << "time" << ',';
+        _pFile << "rate" << endl;
+        // cout << "created _pfile" << endl;
         // if (_pFile->IsZombie())
         //     throw utilities::Exception(STR_ROOT_FILE_OPENED_FAILED);
 

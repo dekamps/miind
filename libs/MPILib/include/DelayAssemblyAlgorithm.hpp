@@ -82,7 +82,7 @@ private:
 	DelayAssemblyParameter _par;
 	MPILib::Time           _t_current;
 	MPILib::Rate           _r_current;
-
+	MPILib::Time           _last_activation;
 };
 
 } /* namespace MPILib */

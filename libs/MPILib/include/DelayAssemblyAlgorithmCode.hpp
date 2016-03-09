@@ -32,6 +32,7 @@ namespace MPILib {
     _t_current(0.0),
     _r_current(0.0)
     {
+        _last_activation = -std::numeric_limits<Time>::max();
     }
 
     template <class WeightType>
@@ -63,15 +64,29 @@ namespace MPILib {
 
     	GeomLib::MuSigmaScalarProduct<WeightType> prod;
     	// don't use the membrane time constant; not interested in diffusion approximation
-    	GeomLib::MuSigma ms = prod.Evaluate(nodeVector,weightVector,1.0);
+    	GeomLib::MuSigma ms = prod.Evaluate(nodeVector, weightVector, 1.0);
 
-    	if (ms._mu > _par._th_exc)
+    	if (ms._mu > _par._th_exc){
     		_r_current = _par._rate;
+            _last_activation = _t_current;
+        }
 
-    	if (ms._mu < _par._th_inh)
+    	if (ms._mu < _par._th_inh){
     		_r_current = 0.0;
+        }
 
+        if (_t_current - _last_activation > _par._time_membrane){
+            _r_current = 0.0;
+        }
 
+        // for (int i = 0; i < nodeVector.size() ; i = i + 1){
+        //     cout << "nodeVector" << i << ": " << nodeVector[i] << endl;
+        // }
+        // cout << "sigma: " << ms._mu << endl;
+        // cout << "th: " << _par._th_exc << endl;
+        // cout << "last time: " << _last_activation << endl;
+        // cout << "time past: " << _t_current - _last_activation << endl;
+        // cout << "giving: " << _r_current << endl;
     }
 
 } /* end namespace MPILib */

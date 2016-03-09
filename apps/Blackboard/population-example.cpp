@@ -51,7 +51,7 @@ typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 int main(){
   //! [preamble]
 	cout << "Demonstrating Omurtag et al. (2000)" << endl;
-	Number    n_bins = 330;
+	Number    n_bins = 300;
 	Potential V_min  = 0.0;
 
 	NeuronParameter
@@ -79,7 +79,7 @@ int main(){
 	GeomParameter par_geom(sys);
 	GeomDelayAlg alg(par_geom);
 
-	Rate rate_ext = 800.0;
+	Rate rate_ext = 600.0;
 	RateAlgorithm<MPILib::DelayedConnection> alg_ext(rate_ext);
 
 	Network network;
@@ -87,7 +87,7 @@ int main(){
 	NodeId id_rate = network.addNode(alg_ext,EXCITATORY_DIRECT);
 	NodeId id_alg  = network.addNode(alg,    EXCITATORY_DIRECT);
 
-	MPILib::DelayedConnection con(1,0.03,0.0);
+	MPILib::DelayedConnection con(2, 0.03,0.0);
 	network.makeFirstInputOfSecond(id_rate,id_alg,con);
 
 	MPILib::report::handler::RootReportHandler handler("singlepoptest", true , true);
@@ -100,7 +100,7 @@ int main(){
 	        10000000,
 			0.0,
 			0.5,
-	        1e-4,
+	        1e-3,
 			1e-4,
 			"singlepoptest.log"
 		);

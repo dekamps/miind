@@ -31,6 +31,8 @@ using std::endl;
 typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 typedef MPILib::report::handler::CsvReportHandler Report;
+typedef MPILib::algorithm::BoxcarAlgorithm<MPILib::DelayedConnection> BoxcarAlg;
+typedef MPILib::algorithm::DelayAssemblyAlgorithm<MPILib::DelayedConnection> DecayAlg;
 
 class Gating_circuit
 {
@@ -68,8 +70,8 @@ Gating_circuit::Gating_circuit(Network& network, Report& handler,
     gate  = network.addNode(alg, EXCITATORY_DIRECT);
 
 // Configure network graph
-    MPILib::DelayedConnection con(1, 0.03, 0.0);
-    MPILib::DelayedConnection icon(1, -0.03, 0.0);
+    MPILib::DelayedConnection con(50, 0.03, 0.0);
+    MPILib::DelayedConnection icon(60, -0.04, 0.0);
     network.makeFirstInputOfSecond(source_assembly, gate, con);
     network.makeFirstInputOfSecond(source_assembly, gate_keeper, con);
     network.makeFirstInputOfSecond(gate_keeper, gate, icon);
@@ -94,20 +96,22 @@ class Memory_circuit
         Memory_circuit(Network& network, Report& handler,
                        NodeId s_assembly,
                        NodeId t_assembly,
-                       GeomDelayAlg alg);
+                       GeomDelayAlg alg,
+                       DecayAlg decayalg);
 };
 
 Memory_circuit::Memory_circuit(Network& network, Report& handler,
                                NodeId s_assembly,
                                NodeId t_assembly,
-                               GeomDelayAlg alg)
+                               GeomDelayAlg alg,
+                               DecayAlg decayalg)
 {
     cout << "Building memory circuit" << endl;
     source_assembly = s_assembly;
     target_assembly = t_assembly;
 
 // Configure nodes
-    delay_assembly  = network.addNode(alg, INHIBITORY_DIRECT);
+    delay_assembly  = network.addNode(decayalg, INHIBITORY_DIRECT);
 
     forward_circuit = Gating_circuit(network, handler, source_assembly,
                                      target_assembly, delay_assembly, alg);
@@ -198,6 +202,7 @@ class BBcell_circuit
                        NodeId ctrlbc1,
                        NodeId ctrlbc2,
                        GeomDelayAlg alg,
+                       DecayAlg decayalg,
                        std::ofstream& node_desc);
 };
 
@@ -209,6 +214,7 @@ BBcell_circuit::BBcell_circuit(Network& network, Report& handler,
                                NodeId ctrlbc1,
                                NodeId ctrlbc2,
                                GeomDelayAlg alg,
+                               DecayAlg decayalg,
                                std::ofstream& node_desc)
 {
     cout << "Building blackboard cell circuit" << endl;
@@ -225,9 +231,9 @@ BBcell_circuit::BBcell_circuit(Network& network, Report& handler,
     // Setup control circuit
     cc1 = Control_circuit(network, handler, source_main_assembly,
                           source_sub_assembly, control_fc1, control_bc1, alg);
-    // // Setup memory circuit
+    // Setup memory circuit
     mc = Memory_circuit(network, handler, source_sub_assembly,
-                        target_sub_assembly, alg);
+                        target_sub_assembly, alg, decayalg);
     // Setup control circuit
     cc2 = Control_circuit(network, handler, target_sub_assembly,
                           target_main_assembly, control_fc2, control_bc2, alg);
@@ -260,17 +266,40 @@ int main(){
     node_desc.open("node_desc.csv");
 
 // Configure algorithms
+
+    //Fixed rate alg
+    Rate rate_ext = 0.0;
+    RateAlgorithm<MPILib::DelayedConnection> alg_ext(rate_ext);
+
+    //Decay assembly alg
+    DelayAssemblyParameter decayparam(0.5, 1000.0, 45.0, -45.0);
+    DecayAlg decayalg(decayparam);
+
+    //Boxcar alg
+    std::vector<Event> ctrlevents(2);
+    ctrlevents[0].start = 0.1;
+    ctrlevents[0].end = 0.2;
+    ctrlevents[0].rate = 1000.0;
+    BoxcarAlg ctrl_box(ctrlevents);
+
+    std::vector<Event> inputevents(2);
+    inputevents[0].start = 0.0;
+    inputevents[0].end = 0.05;
+    inputevents[0].rate = 2000.0;
+    BoxcarAlg input_box(inputevents);
+
+    //Population density method alg
     Number    n_bins = 330;
-    Potential V_min  = 0.0;
+    Potential V_min  = 0.00;
 
     NeuronParameter
         par_neuron
         (
-            1.0,
-            0.0,
-            0.0,
-            0.0,
-            50e-3
+            1.0,   // v_threshold
+            0.0,   // v_reset
+            0.0,   // v_reversal
+            0.0,   // tau_refractive
+            50e-3  // tau
         );
 
     OdeParameter
@@ -279,7 +308,7 @@ int main(){
             n_bins,
             V_min,
             par_neuron,
-            InitialDensityParameter(0.0,0.0)
+            InitialDensityParameter(0.0, 0.0)
         );
 
     double min_bin = 0.01;
@@ -288,38 +317,45 @@ int main(){
     GeomParameter par_geom(sys);
     GeomDelayAlg alg(par_geom);
 
-    Rate rate_ext = 800.0;
-    RateAlgorithm<MPILib::DelayedConnection> alg_ext(rate_ext);
-
-    std::vector<Event> someevents(2);
-    someevents[0].start = 0.1;
-    someevents[0].end = 0.2;
-    someevents[0].rate = 5.0;
-    someevents[1].start = 0.3;
-    someevents[1].end = 0.4;
-    someevents[1].rate = 10.0;
-    BoxcarAlgorithm<MPILib::DelayedConnection> alg_box(someevents);
-
 // Setup main assemblies and controls
-    NodeId source_main_assembly  = network.addNode(alg_ext, EXCITATORY_DIRECT);
-    NodeId target_main_assembly  = network.addNode(alg_ext, EXCITATORY_DIRECT);
-    NodeId ctrl1  = network.addNode(alg_box, INHIBITORY_DIRECT);
+    NodeId input_source = network.addNode(input_box, EXCITATORY_DIRECT);
+    NodeId input_target = network.addNode(input_box, EXCITATORY_DIRECT);
+
+    NodeId source_mem  = network.addNode(decayalg, EXCITATORY_DIRECT);
+    NodeId target_mem  = network.addNode(alg_ext, EXCITATORY_DIRECT);
+
+    NodeId source_main_assembly  = network.addNode(alg, EXCITATORY_DIRECT);
+    NodeId target_main_assembly  = network.addNode(alg, EXCITATORY_DIRECT);
+    NodeId ctrl1  = network.addNode(ctrl_box, INHIBITORY_DIRECT);
     NodeId ctrl2  = network.addNode(alg_ext, INHIBITORY_DIRECT);
     NodeId ctrl3  = network.addNode(alg_ext, INHIBITORY_DIRECT);
-    NodeId ctrl4  = network.addNode(alg_ext, INHIBITORY_DIRECT);
+    NodeId ctrl4  = network.addNode(ctrl_box, INHIBITORY_DIRECT);
+
+    MPILib::DelayedConnection con(50, 0.03, 0.0);
+    network.makeFirstInputOfSecond(input_source, source_mem, con);
+    network.makeFirstInputOfSecond(input_target, target_mem, con);
+    network.makeFirstInputOfSecond(source_mem, source_main_assembly, con);
+    network.makeFirstInputOfSecond(target_mem, target_main_assembly, con);
 
 // Write node description on file
+    node_desc << "node_name," << "node_id" << endl;
+    node_desc << "input-source," << input_source << endl;
+    node_desc << "input-target," << input_target << endl;
+    node_desc << "source-mem," << source_mem << endl;
+    node_desc << "target-mem," << target_mem << endl;
     node_desc << "source-main-assembly," << source_main_assembly << endl;
     node_desc << "target-main-assembly," << target_main_assembly << endl;
-    node_desc << "control-1," << ctrl1 << endl;
-    node_desc << "control-2," << ctrl2 << endl;
-    node_desc << "control-4," << ctrl4 << endl;
-    node_desc << "control-3," << ctrl3 << endl;
+    node_desc << "control-fc1," << ctrl1 << endl;
+    node_desc << "control-fc2," << ctrl2 << endl;
+    node_desc << "control-bc1," << ctrl4 << endl;
+    node_desc << "control-bc2," << ctrl3 << endl;
 
 // Create circuit
     BBcell_circuit circuit(network, handler, source_main_assembly,
                            target_main_assembly,
-                           ctrl1, ctrl2, ctrl3, ctrl4, alg, node_desc);
+                           ctrl1, ctrl2, ctrl3, ctrl4,
+                           alg, decayalg,
+                           node_desc);
 
 // Setup simulation
     const SimulationRunParameter
@@ -327,12 +363,11 @@ int main(){
         (
             handler,
             10000000,
-            0.0,
-            0.5,
-            1e-3,
-            1e-3,
-            "circuits.log",
-            1
+            0.0,  // start time
+            1.0,  // end time
+            1e-3,  // report step
+            1e-4,  // simulation step
+            "circuits.log"
         );
     network.configureSimulation(par_run);
     cout << "Circuit setup done. Starting simulation..." << endl;
