@@ -34,6 +34,87 @@ typedef MPILib::report::handler::CsvReportHandler Report;
 typedef MPILib::algorithm::BoxcarAlgorithm<MPILib::DelayedConnection> BoxcarAlg;
 typedef MPILib::algorithm::DelayAssemblyAlgorithm<MPILib::DelayedConnection> DecayAlg;
 
+class EIB_Population_Pair
+{
+    public:
+        NodeId inhibitory_node;
+        NodeId excitatory_node;
+        NodeId baseline_node;
+
+        EIB_Population_Pair(){};
+
+        EIB_Population_Pair(Network& network, Report& handler,
+                            GeomDelayAlg alg);
+};
+
+EIB_Population_Pair::EIB_Population_Pair(Network& network, Report& handler,
+                                         GeomDelayAlg alg)
+{
+//Population density method alg
+    Number    n_bins = 330;
+    Potential V_min  = 0.00;
+
+    NeuronParameter
+        par_neuron
+        (
+            1.0,   // v_threshold
+            0.0,   // v_reset
+            0.0,   // v_reversal
+            0.0,   // tau_refractive
+            50e-3  // tau
+        );
+
+    OdeParameter
+        par_ode1
+        (
+            n_bins,
+            V_min,
+            par_neuron,
+            InitialDensityParameter(0.0, 0.0)
+        );
+
+    double min_bin = 0.01;
+    LifNeuralDynamics dyn1(par_ode1,min_bin);
+    LeakingOdeSystem sys1(dyn1);
+    GeomParameter par_geom1(sys1);
+    GeomDelayAlg alg1(par_geom1);
+
+    OdeParameter
+        par_ode2
+        (
+            n_bins,
+            V_min,
+            par_neuron,
+            InitialDensityParameter(0.0, 0.0)
+        );
+
+    LifNeuralDynamics dyn2(par_ode2,min_bin);
+    LeakingOdeSystem sys2(dyn2);
+    GeomParameter par_geom2(sys2);
+    GeomDelayAlg alg2(par_geom2);
+
+//Boxcar alg
+    std::vector<Event> ctrlevents(2);
+    ctrlevents[0].start = 0.0;
+    ctrlevents[0].end = 1.0;
+    ctrlevents[0].rate = 1000.0;
+    BoxcarAlg ctrl_box(ctrlevents);
+
+// Configure nodes
+    inhibitory_node = network.addNode(alg2, INHIBITORY_DIRECT);
+    excitatory_node = network.addNode(alg1, EXCITATORY_DIRECT);
+    baseline_node = network.addNode(ctrl_box, EXCITATORY_DIRECT);
+
+// Configure network graph
+    MPILib::DelayedConnection con(70, 0.04, 0.0);
+    MPILib::DelayedConnection icon(70, -0.04, 0.0);
+    network.makeFirstInputOfSecond(excitatory_node, inhibitory_node, con);
+    network.makeFirstInputOfSecond(inhibitory_node, excitatory_node, icon);
+    network.makeFirstInputOfSecond(baseline_node, excitatory_node, con);
+    network.makeFirstInputOfSecond(baseline_node, inhibitory_node, con);
+}
+
+
 class Gating_circuit
 {
     public:
@@ -317,45 +398,51 @@ int main(){
     GeomParameter par_geom(sys);
     GeomDelayAlg alg(par_geom);
 
-// Setup main assemblies and controls
-    NodeId input_source = network.addNode(input_box, EXCITATORY_DIRECT);
-    NodeId input_target = network.addNode(input_box, EXCITATORY_DIRECT);
-
-    NodeId source_mem  = network.addNode(decayalg, EXCITATORY_DIRECT);
-    NodeId target_mem  = network.addNode(alg_ext, EXCITATORY_DIRECT);
-
-    NodeId source_main_assembly  = network.addNode(alg, EXCITATORY_DIRECT);
-    NodeId target_main_assembly  = network.addNode(alg, EXCITATORY_DIRECT);
-    NodeId ctrl1  = network.addNode(ctrl_box, INHIBITORY_DIRECT);
-    NodeId ctrl2  = network.addNode(alg_ext, INHIBITORY_DIRECT);
-    NodeId ctrl3  = network.addNode(alg_ext, INHIBITORY_DIRECT);
-    NodeId ctrl4  = network.addNode(ctrl_box, INHIBITORY_DIRECT);
-
-    MPILib::DelayedConnection con(50, 0.03, 0.0);
-    network.makeFirstInputOfSecond(input_source, source_mem, con);
-    network.makeFirstInputOfSecond(input_target, target_mem, con);
-    network.makeFirstInputOfSecond(source_mem, source_main_assembly, con);
-    network.makeFirstInputOfSecond(target_mem, target_main_assembly, con);
-
-// Write node description on file
+    EIB_Population_Pair pair(network, handler, alg);
     node_desc << "node_name," << "node_id" << endl;
-    node_desc << "input-source," << input_source << endl;
-    node_desc << "input-target," << input_target << endl;
-    node_desc << "source-mem," << source_mem << endl;
-    node_desc << "target-mem," << target_mem << endl;
-    node_desc << "source-main-assembly," << source_main_assembly << endl;
-    node_desc << "target-main-assembly," << target_main_assembly << endl;
-    node_desc << "control-fc1," << ctrl1 << endl;
-    node_desc << "control-fc2," << ctrl2 << endl;
-    node_desc << "control-bc1," << ctrl4 << endl;
-    node_desc << "control-bc2," << ctrl3 << endl;
+    node_desc << "inh," << pair.inhibitory_node << endl;
+    node_desc << "exc," << pair.excitatory_node << endl;
+    node_desc << "base," << pair.baseline_node << endl;
 
-// Create circuit
-    BBcell_circuit circuit(network, handler, source_main_assembly,
-                           target_main_assembly,
-                           ctrl1, ctrl2, ctrl3, ctrl4,
-                           alg, decayalg,
-                           node_desc);
+// // Setup main assemblies and controls
+//     NodeId input_source = network.addNode(input_box, EXCITATORY_DIRECT);
+//     NodeId input_target = network.addNode(input_box, EXCITATORY_DIRECT);
+
+//     NodeId source_mem  = network.addNode(decayalg, EXCITATORY_DIRECT);
+//     NodeId target_mem  = network.addNode(alg_ext, EXCITATORY_DIRECT);
+
+//     NodeId source_main_assembly  = network.addNode(alg, EXCITATORY_DIRECT);
+//     NodeId target_main_assembly  = network.addNode(alg, EXCITATORY_DIRECT);
+//     NodeId ctrl1  = network.addNode(ctrl_box, INHIBITORY_DIRECT);
+//     NodeId ctrl2  = network.addNode(alg_ext, INHIBITORY_DIRECT);
+//     NodeId ctrl3  = network.addNode(alg_ext, INHIBITORY_DIRECT);
+//     NodeId ctrl4  = network.addNode(ctrl_box, INHIBITORY_DIRECT);
+
+//     MPILib::DelayedConnection con(50, 0.03, 0.0);
+//     network.makeFirstInputOfSecond(input_source, source_mem, con);
+//     network.makeFirstInputOfSecond(input_target, target_mem, con);
+//     network.makeFirstInputOfSecond(source_mem, source_main_assembly, con);
+//     network.makeFirstInputOfSecond(target_mem, target_main_assembly, con);
+
+// // Write node description on file
+//     node_desc << "node_name," << "node_id" << endl;
+//     node_desc << "input-source," << input_source << endl;
+//     node_desc << "input-target," << input_target << endl;
+//     node_desc << "source-mem," << source_mem << endl;
+//     node_desc << "target-mem," << target_mem << endl;
+//     node_desc << "source-main-assembly," << source_main_assembly << endl;
+//     node_desc << "target-main-assembly," << target_main_assembly << endl;
+//     node_desc << "control-fc1," << ctrl1 << endl;
+//     node_desc << "control-fc2," << ctrl2 << endl;
+//     node_desc << "control-bc1," << ctrl4 << endl;
+//     node_desc << "control-bc2," << ctrl3 << endl;
+
+// // Create circuit
+//     BBcell_circuit circuit(network, handler, source_main_assembly,
+//                            target_main_assembly,
+//                            ctrl1, ctrl2, ctrl3, ctrl4,
+//                            alg, decayalg,
+//                            node_desc);
 
 // Setup simulation
     const SimulationRunParameter
@@ -364,7 +451,7 @@ int main(){
             handler,
             10000000,
             0.0,  // start time
-            1.0,  // end time
+            3.0,  // end time
             1e-3,  // report step
             1e-4,  // simulation step
             "circuits.log"
