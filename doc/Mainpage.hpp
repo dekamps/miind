@@ -42,6 +42,8 @@ To run the simulator, go to the \ref page_workflow page, after installation is c
 you have had a glance at the \ref \subpage page_examples  page.
 
 \image html hbp.png
+\image latex hbp.png "MIIND development is now co-funded by the Human Brain Project." width=5cm
+
 Currently, part of the developent is funded by the <a href="http://www.humanbrainproject.eu/">Human Brain Project</a>.  
 
 \section sec_download Download
