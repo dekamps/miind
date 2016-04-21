@@ -33,6 +33,7 @@ namespace MPILib {
     _r_current(0.0)
     {
         _last_activation = -std::numeric_limits<Time>::max();
+        _change_factor = 1.0;
     }
 
     template <class WeightType>
@@ -67,17 +68,28 @@ namespace MPILib {
     	GeomLib::MuSigma ms = prod.Evaluate(nodeVector, weightVector, 1.0);
 
     	if (ms._mu > _par._th_exc){
-    		_r_current = _par._rate;
             _last_activation = _t_current;
-        }
+        };
 
     	if (ms._mu < _par._th_inh){
-    		_r_current = 0.0;
-        }
+            if (_r_current > 0.0){
+                _r_current -= _change_factor;
+            };
+        };
 
         if (_t_current - _last_activation > _par._time_membrane){
-            _r_current = 0.0;
+            if (_r_current - _change_factor > 0.0){
+                _r_current -= _change_factor;
+            }
+            else{
+                _r_current = 0.0;
+            };
         }
+        else{
+            if (_r_current < _par._rate){
+                _r_current += _change_factor;
+            };
+        };
 
         // for (int i = 0; i < nodeVector.size() ; i = i + 1){
         //     cout << "nodeVector" << i << ": " << nodeVector[i] << endl;

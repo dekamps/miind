@@ -83,6 +83,7 @@ private:
 	MPILib::Time           _t_current;
 	MPILib::Rate           _r_current;
 	MPILib::Time           _last_activation;
+	MPILib::Rate           _change_factor;
 };
 
 } /* namespace MPILib */

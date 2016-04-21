@@ -35,8 +35,9 @@ namespace algorithm {
 template<class Weight>
 BoxcarAlgorithm<Weight>::BoxcarAlgorithm(std::vector<Event>& events) :
         AlgorithmInterface<Weight>(), _time_current(
-                std::numeric_limits<double>::max()), _rate(0),
-                _events(events), _n_events(events.size()), _current_event(-1){}
+                std::numeric_limits<double>::max()), _rate(0.0),
+                _events(events), _n_events(events.size()), _current_event(0),
+                _event_on(false), _change_factor(1.0), _counter(0){}
 
 template<class Weight>
 BoxcarAlgorithm<Weight>::~BoxcarAlgorithm() {}
@@ -71,34 +72,56 @@ void BoxcarAlgorithm<Weight>::evolveNodeState(const std::vector<Rate>& nodeVecto
     }
 
     _time_current = time;
-    // WE ARE ASSUMING EVENTS DO NOT HAVE 0 RATE
-    if((_current_event < (_n_events - 1)) && (_rate == 0))
+
+    if(_current_event < _n_events)
     {
-        if(_time_current >= _events[_current_event+1].start)
-        {
-            _rate = _events[_current_event+1].rate;
-            _current_event ++;
+        if (_event_on){
+            if (_time_current >= _events[_current_event].end){
+                // cout << "event ended";
+                _event_on = false;
+                _current_event ++;
+            }
+            else{
+                if (_rate < _events[_current_event].rate){
+                    _rate += _change_factor;
+                }; // Stuck in rate if next event is soon after and lower
+            };
         }
+        else {
+            if (_time_current >= _events[_current_event].start){
+                // cout << " event started ";
+                _event_on = true;
+                // _change_factor = _events[_current_event].rate/10000.0
+            }
+            else{
+                if (_rate - _change_factor > 0.0){
+                    _rate -= _change_factor;
+                }
+                else {
+                    _rate = 0.0;
+                };
+            };
+        };
     }
-    else
-    {
-        if(_time_current >= _events[_current_event].end)
-        {
-            _rate = 0;
+    else{
+        if ((_rate - _change_factor) > 0.0){
+            _rate -= _change_factor;
         }
-    }
+        else {
+            _rate = 0.0;
+        };
+    };
+
 }
 
 template<class Weight>
 Time BoxcarAlgorithm<Weight>::getCurrentTime() const {
     return _time_current;
-
 }
 
 template<class Weight>
 Rate BoxcarAlgorithm<Weight>::getCurrentRate() const {
     return _rate;
-
 }
 
 template<class Weight>

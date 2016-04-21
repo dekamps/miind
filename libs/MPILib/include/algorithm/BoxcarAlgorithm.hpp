@@ -93,6 +93,9 @@ private:
     int _current_event;
     Time _time_current;
     Rate _rate;
+    Rate _change_factor;
+    bool _event_on;
+    int _counter;
 };
 
 } /* namespace algorithm */
