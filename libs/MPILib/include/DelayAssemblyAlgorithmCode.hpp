@@ -33,7 +33,7 @@ namespace MPILib {
     _r_current(0.0)
     {
         _last_activation = -std::numeric_limits<Time>::max();
-        _change_factor = 1.0;
+        _change_factor = 0.01;
     }
 
     template <class WeightType>

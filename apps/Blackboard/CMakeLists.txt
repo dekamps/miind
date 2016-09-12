@@ -38,13 +38,9 @@ set ( LIBLIST
 # executables
 #############################################################################
 
-add_executable(MarPopExample population-example.cpp)
-target_link_libraries(MarPopExample ${LIBLIST})
-add_executable(MarWta1 wta1.cpp)
-target_link_libraries(MarWta1 ${LIBLIST})
-add_executable(MarWta2 wta2.cpp)
-target_link_libraries(MarWta2 ${LIBLIST})
-add_executable(Circuit circuits.cpp)
-target_link_libraries(Circuit ${LIBLIST})
-add_executable(EIB eib_pair.cpp)
-target_link_libraries(EIB ${LIBLIST})
+add_executable(Activity_circuit activity_circuit.cpp)
+target_link_libraries(Activity_circuit ${LIBLIST})
+add_executable(Partial_Activity_circuit partial_activity_circuit.cpp)
+target_link_libraries(Partial_Activity_circuit ${LIBLIST})
+add_executable(Baseline_circuit baseline_circuit.cpp)
+target_link_libraries(Baseline_circuit ${LIBLIST})

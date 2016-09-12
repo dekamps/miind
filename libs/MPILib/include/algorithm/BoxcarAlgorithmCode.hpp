@@ -33,11 +33,11 @@ namespace MPILib {
 namespace algorithm {
 
 template<class Weight>
-BoxcarAlgorithm<Weight>::BoxcarAlgorithm(std::vector<Event>& events) :
+BoxcarAlgorithm<Weight>::BoxcarAlgorithm(std::vector<Event>& events, Rate change) :
         AlgorithmInterface<Weight>(), _time_current(
                 std::numeric_limits<double>::max()), _rate(0.0),
                 _events(events), _n_events(events.size()), _current_event(0),
-                _event_on(false), _change_factor(1.0), _counter(0){}
+                _event_on(false), _change_factor(change), _counter(0){}
 
 template<class Weight>
 BoxcarAlgorithm<Weight>::~BoxcarAlgorithm() {}
