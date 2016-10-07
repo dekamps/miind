@@ -37,10 +37,10 @@ set ( LIBLIST
 #############################################################################
 # executables
 #############################################################################
-
+if (ENABLE_ROOT)
 add_executable(wilsoncowanDemo wilsoncowan.cpp)
 target_link_libraries(wilsoncowanDemo ${LIBLIST})
 
 add_executable(populationDemo population-example.cpp)
 target_link_libraries(populationDemo ${LIBLIST})
-
+endif (ENABLE_ROOT)

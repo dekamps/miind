@@ -16,6 +16,7 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+#ifdef WANTROOT
 #ifdef WIN32
 #pragma warning(disable: 4267 4996)
 #endif
@@ -109,3 +110,4 @@ void ValueHandlerHandler::distributeEvent(const Event& ev) {
 } // end namespace of handler
 } // end namespace of report
 } // end namespace of MPILib
+#endif // don't bother if you don't want ROOT

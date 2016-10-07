@@ -30,14 +30,17 @@ namespace MPILib {
 template<class Weight, class NodeDistribution>
 MPINode<Weight, NodeDistribution>::MPINode(
 		const algorithm::AlgorithmInterface<Weight>& algorithm,
-		NodeType nodeType, NodeId nodeId,
+		NodeType nodeType,
+		NodeId nodeId,
 		const NodeDistribution& nodeDistribution,
-		const std::map<NodeId, MPINode<Weight, NodeDistribution>>& localNode) :
+		const std::map<NodeId, MPINode<Weight, NodeDistribution>>& localNode,
+		const std::string& name) :
 		_pAlgorithm(algorithm.clone()), //
 		_nodeType(nodeType), //
 		_nodeId(nodeId), //
 		_rLocalNodes(localNode), //
-		_rNodeDistribution(nodeDistribution) {
+		_rNodeDistribution(nodeDistribution),
+		_name(name){
 }
 
 template<class Weight, class NodeDistribution>
@@ -52,7 +55,6 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 
 		_pAlgorithm->evolveNodeState(_precursorActivity, _weights, time,
 				_precursorTypes);
-
 	}
 
 	// update state
@@ -74,6 +76,7 @@ void MPINode<Weight, NodeDistribution>::prepareEvolve() {
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 		const SimulationRunParameter& simParam) {
+
 	_maximum_iterations = simParam.getMaximumNumberIterations();
 	_pAlgorithm->configure(simParam);
 
@@ -84,7 +87,6 @@ void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 			simParam.getHandler().clone());
 
 	_pHandler->initializeHandler(_nodeId);
-
 }
 
 template<class Weight, class NodeDistribution>
@@ -150,10 +152,10 @@ void MPINode<Weight, NodeDistribution>::sendOwnActivity() {
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::reportAll(
 		report::ReportType type) const {
-
 	std::vector<report::ReportValue> vec_values;
 
 	if (type == report::RATE || type == report::STATE) {
+
 		report::Report report(_pAlgorithm->getCurrentTime(),
 				Rate(this->getActivity()), this->_nodeId,
 				_pAlgorithm->getGrid(), type, vec_values, _rLocalNodes.size());
@@ -164,8 +166,8 @@ void MPINode<Weight, NodeDistribution>::reportAll(
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::clearSimulation() {
-	_pHandler->detachHandler(_nodeId);
 
+	_pHandler->detachHandler(_nodeId);
 }
 
 template<class Weight, class NodeDistribution>

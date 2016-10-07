@@ -86,6 +86,12 @@ private:
 				) const;
 
 };
+
+
+
+
+
+
 } /* namespace GeomLib */
 
 

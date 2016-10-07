@@ -51,7 +51,8 @@ struct StampedProbability {
 	 * The time
 	 */
 	Time _time = 0.0;
-};} /* namespace populist */
+}
+;} /* namespace populist */
 } /* namespace MPILib */
 
 #endif // include guard

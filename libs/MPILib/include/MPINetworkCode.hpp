@@ -128,6 +128,7 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 		const SimulationRunParameter& simParam) {
+
 	_currentReportTime = simParam.getTReport();
 	_currentSimulationTime = simParam.getTBegin();
 	_parameterSimulationRun = simParam;
@@ -152,13 +153,14 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 	if (_stateNetwork.isConfigured()) {
 		_stateNetwork.toggleConfigured();
+
 		LOG(utilities::logINFO) << "Starting simulation";
+
 		try {
 			utilities::ProgressBar pb(
 					getEndTime() / _parameterSimulationRun.getTReport()
 							+ getEndTime()
 									/ _parameterSimulationRun.getTState());
-
 			do {
 				do {
 
@@ -236,7 +238,6 @@ void MPINetwork<WeightValue, NodeDistribution>::collectReport(
 	for (auto& it : _localNodes) {
 		it.second.reportAll(type);
 	}
-
 }
 
 template<class WeightValue, class NodeDistribution>

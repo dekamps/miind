@@ -86,7 +86,7 @@ if( ROOT_INCLUDE_DIRS AND ROOT_LIBRARY_DIRS )
 endif( ROOT_INCLUDE_DIRS AND ROOT_LIBRARY_DIRS )
 
 if( ROOT_FOUND )
-    add_definitions( -DHAVE_LIBCORE )
+    add_definitions( -DHAVEROOT )
     if( NOT ROOT_FIND_QUIETLY )
         message( STATUS "Found the ROOT library: ${ROOT_LIBRARY_DIRS}" )
     endif( NOT ROOT_FIND_QUIETLY )

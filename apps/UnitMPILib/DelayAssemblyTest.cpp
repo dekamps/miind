@@ -31,7 +31,6 @@ typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::Circula
 typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 
 using MPILib::algorithm::RateFunctor;
-using MPILib::report::handler::RootReportHandler;
 using MPILib::algorithm::DelayAssemblyParameter;
 using MPILib::algorithm::DelayAssemblyAlgorithm;
 using MPILib::Time;
@@ -42,8 +41,7 @@ using MPILib::Time;
 BOOST_AUTO_TEST_CASE(DelayAssemblyConstructionTest ) {
   
   MPILib::algorithm::DelayAssemblyParameter par_ass;
-  MPILib::algorithm::DelayAssemblyAlgorithm<double> alg_ass(par_ass);   
-  
+  MPILib::algorithm::DelayAssemblyAlgorithm<MPILib::DelayedConnection> alg_ass(par_ass);
 }
 
 Rate SwitchOnAndOff(Time t){
@@ -79,7 +77,7 @@ BOOST_AUTO_TEST_CASE(DelayAssemblyNetworkTest) {
 
   network.makeFirstInputOfSecond(id_switch,id_ass,MPILib::DelayedConnection(1.0,1.0,0.0));
 
-  RootReportHandler handler("delayass.root", false, false);
+  MPILib::report::handler::RootReportHandler handler("delayass.root", false, false);
   SimulationRunParameter par_run(handler,1000000,0.,1.,1e-2,1e-4,"delayass.log");
   network.configureSimulation(par_run);
 

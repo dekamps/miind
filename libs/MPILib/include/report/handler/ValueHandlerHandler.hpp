@@ -16,6 +16,8 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+#ifdef WANTROOT 
+
 #ifndef MPILIB_REPORT_HANDLER_VALUEVALUEHANDLER_HPP_
 #define MPILIB_REPORT_HANDLER_VALUEVALUEHANDLER_HPP_
 
@@ -49,7 +51,7 @@ public:
 	void write();
 
 	/**
-	 * every thing is stored as an event
+	 * everything is stored as an event
 	 */
 	struct Event {
 		std::string _str;
@@ -87,3 +89,4 @@ private:
 } // end namespace of MPILib
 
 #endif // include guard
+#endif // don't bother if you don't want ROOT

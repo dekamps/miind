@@ -64,7 +64,7 @@ public:
 	virtual AbstractReportHandler* clone() const = 0;
 
 	/**
-	 * During Configuration a MPINode will associate itself with the handler.
+	 * During Configuration an MPINode will associate itself with the handler.
 	 * @param nodeId The NodeId of the Node
 	 */
 	virtual void initializeHandler(const NodeId& nodeId) = 0;

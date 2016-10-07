@@ -57,6 +57,7 @@ set(MPI_SRCS
     src/report/handler/CanvasParameter.cpp
     src/report/handler/GraphKey.cpp
     src/report/handler/InactiveReportHandler.cpp
+    src/report/handler/MinimalReportHandler.cpp
     src/report/handler/RootHighThroughputHandler.cpp
     src/report/handler/RootCanvasNoMPI.cpp
     src/report/handler/RootReportHandler.cpp
@@ -88,19 +89,7 @@ set ( LIBLIST
     ${MPI_LIBRARIES} 
     ${MIIND_LIBRARY_PREFIX}numtools
     ${gsl_LINK_FLAGS} 
-	gsl
-	${LIB_PREFIX}Core
-    ${LIB_PREFIX}RIO
-    ${LIB_PREFIX}Hist
-    ${LIB_PREFIX}Tree
-    ${LIB_PREFIX}Table
-	${LIB_PREFIX}Matrix
-	${LIB_PREFIX}MathCore
-	${LIB_PREFIX}MathMore
-    ${LIB_PREFIX}Gpad
-	${LIB_PREFIX}Graf
-	${LIB_PREFIX}Postscript
-    
+	gsl    
 )
 
 add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${MPI_SRCS} ${MPI_HEADER})

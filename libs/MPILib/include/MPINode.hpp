@@ -59,11 +59,14 @@ public:
 	 * @param nodeDistribution The Node Distribution.
 	 * @param localNode The local nodes of this processor
 	 */
-	explicit MPINode(const algorithm::AlgorithmInterface<Weight>& algorithm,
-			NodeType nodeType, NodeId nodeId,
+	explicit MPINode(
+			const algorithm::AlgorithmInterface<Weight>& algorithm,
+			NodeType nodeType,
+			NodeId nodeId,
 			const NodeDistribution& nodeDistribution,
-
-			const std::map<NodeId, MPINode<Weight, NodeDistribution>>& localNode);
+			const std::map<NodeId, MPINode<Weight, NodeDistribution>>& localNode,
+			const std::string& name = ""
+			);
 
 	/**
 	 * Destructor
@@ -194,6 +197,10 @@ private:
 	 */
 	const NodeDistribution& _rNodeDistribution;
 
+	/**
+	 *  A node can have a name
+	 */
+	const std::string _name;
 	/**
 	 * Activity of this node
 	 */

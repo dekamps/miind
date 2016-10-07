@@ -143,17 +143,6 @@ namespace GeomLib {
 		return _t_cur;
 	}
 
-	template <class WeightValue>
-	bool GeomAlgorithm<WeightValue>::IsReportDue() const
-	{
-		if (_n_report*_t_report < _t_cur){
-			++_n_report;
-			return true;
-		}
-		else 
-			return false;
-			
-	}
 
 	template <class WeightValue>
 	AlgorithmGrid GeomAlgorithm<WeightValue>::getGrid() const

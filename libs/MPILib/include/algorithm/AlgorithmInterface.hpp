@@ -112,7 +112,7 @@ public:
 
 	/**
 	 * Stores the algorithm state in a Algorithm Grid
-	 * @return The state of the algorithm
+	 * @return The state of the algorithm. The Grid must at least contain one element; an empty grid will cause a crash.
 	 */
 	virtual AlgorithmGrid getGrid() const = 0;
 

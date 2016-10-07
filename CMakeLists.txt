@@ -32,6 +32,7 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 ##############################################################################
 
 OPTION(ENABLE_TESTING "Compile tests" ON)
+OPTION(ENABLE_ROOT "Root Desired" OFF)
 OPTION(ENABLE_MEMORY_TEST "Generate memory test" OFF)
 OPTION(ENABLE_MPI "Enable mpi" FALSE)
 OPTION(ENABLE_COVERAGE "Enable GCov coverage analysis (defines a 'coverage' target and enforces static build of miind)" OFF)
@@ -96,12 +97,17 @@ if( Boost_FOUND )
 else ( Boost_FOUND )
    message(FATAL_ERROR "Boost is mandatory to build the libraries")
 endif( Boost_FOUND )
-
+##############################################################################
+#
+##############################################################################
+IF(ENABLE_ROOT)
 find_package( Root )
 if( ROOT_FOUND )
   message(STATUS "Building Root dependent parts")
   message(STATUS "Root include directories:" ${ROOT_INCLUDE_DIRS})
   message(STATUS "Root library directories:" ${ROOT_LIBRARY_DIRS})
+  set (ROOT_LIBRARIES Core Hist Tree Table Matrix MathCore MathMore Gpad Graf Postscript RIO)
+  add_definitions(-DWANTROOT)
 else( ROOT_FOUND )
   message(FATAL_ERROR "Root is required for MPILib")
 endif( ROOT_FOUND )
@@ -112,6 +118,7 @@ SET (LIB_PREFIX lib)
 else (WIN32)
 SET (CBLAS_PREFIX gsl)
 endif (WIN32)
+ENDIF (ENABLE_ROOT)
 #############################################################################
 # code coverage analysis
 #############################################################################
