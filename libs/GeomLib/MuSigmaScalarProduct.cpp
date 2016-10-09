@@ -22,7 +22,7 @@
 #include <functional>
 #include <numeric>
 
-using namespace GeomLib;
+namespace GeomLib {
 
 template <>
 MPILib::Potential MuSigmaScalarProduct<double>::InnerProduct(
@@ -76,5 +76,5 @@ MuSigma MuSigmaScalarProduct<MPILib::DelayedConnection>::Evaluate(const std::vec
 	return ret;
 }
 
-
+}
 
