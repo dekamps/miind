@@ -51,7 +51,7 @@ namespace algorithm {
     }
 
     template <class WeightType>
-    AlgorithmGrid DelayAssemblyAlgorithm<WeightType>::getGrid() const {
+    AlgorithmGrid DelayAssemblyAlgorithm<WeightType>::getGrid(MPILib::NodeId) const {
     	vector<double> g(1);
     	g[0] = _r_current;
     	return AlgorithmGrid(g);

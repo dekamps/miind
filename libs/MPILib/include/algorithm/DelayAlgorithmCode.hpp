@@ -82,7 +82,7 @@ Rate DelayAlgorithm<Weight>::getCurrentRate() const {
 }
 
 template<class Weight>
-AlgorithmGrid DelayAlgorithm<Weight>::getGrid() const {
+AlgorithmGrid DelayAlgorithm<Weight>::getGrid(MPILib::NodeId) const {
 	AlgorithmGrid grid(1);
 	return grid;
 }

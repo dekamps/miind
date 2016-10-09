@@ -68,7 +68,6 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::prepareEvolve() {
-
 	_pAlgorithm->prepareEvolve(_precursorActivity, _weights, _precursorTypes);
 
 }
@@ -158,7 +157,7 @@ void MPINode<Weight, NodeDistribution>::reportAll(
 
 		report::Report report(_pAlgorithm->getCurrentTime(),
 				Rate(this->getActivity()), this->_nodeId,
-				_pAlgorithm->getGrid(), type, vec_values, _rLocalNodes.size());
+				_pAlgorithm->getGrid(this->_nodeId), type, vec_values, _rLocalNodes.size());
 
 		_pHandler->writeReport(report);
 	}

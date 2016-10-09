@@ -68,7 +68,7 @@ Rate RateAlgorithm<Weight>::getCurrentRate() const {
 }
 
 template<class Weight>
-AlgorithmGrid RateAlgorithm<Weight>::getGrid() const {
+AlgorithmGrid RateAlgorithm<Weight>::getGrid(MPILib::NodeId) const {
 	std::vector<double> vector_grid(RATE_STATE_DIMENSION, _rate);
 	std::vector<double> vector_interpretation(RATE_STATE_DIMENSION, 0);
 	return AlgorithmGrid(vector_grid, vector_interpretation);

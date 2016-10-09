@@ -74,7 +74,7 @@ public:
 	 * Stores the algorithm state in a Algorithm Grid not used here
 	 * @return The state of the algorithm
 	 */
-	virtual algorithm::AlgorithmGrid getGrid() const
+	virtual algorithm::AlgorithmGrid getGrid(MPILib::NodeId) const
 	override;
 	/**
 	 * Cloning operation, to provide each DynamicNode with its own

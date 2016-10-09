@@ -145,7 +145,7 @@ namespace GeomLib {
 
 
 	template <class WeightValue>
-	AlgorithmGrid GeomAlgorithm<WeightValue>::getGrid() const
+	AlgorithmGrid GeomAlgorithm<WeightValue>::getGrid(NodeId) const
 	{
 		Number N = _p_system->NumberOfBins();
 		vector<double> array_interpretation(N);

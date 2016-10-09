@@ -91,7 +91,7 @@ public:
 	 * Stores the algorithm state in a Algorithm Grid
 	 * @return The state of the algorithm
 	 */
-	virtual AlgorithmGrid getGrid() const;
+	virtual AlgorithmGrid getGrid(MPILib::NodeId) const;
 
 	/**
 	 * Gets the delay time determining this algorithm. Does not need

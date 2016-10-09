@@ -162,7 +162,7 @@ OUAlgorithm* OUAlgorithm::clone() const
 }
 
 
-AlgorithmGrid OUAlgorithm::getGrid() const
+AlgorithmGrid OUAlgorithm::getGrid(MPILib::NodeId) const
 {
   return _integrator.State();
 }

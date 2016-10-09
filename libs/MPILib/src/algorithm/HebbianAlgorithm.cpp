@@ -53,7 +53,7 @@ MPILib::Time HebbianAlgorithm::getCurrentTime() const {
 	return _time;
 }
 
-MPILib::algorithm::AlgorithmGrid HebbianAlgorithm::getGrid() const {
+MPILib::algorithm::AlgorithmGrid HebbianAlgorithm::getGrid(NodeId) const {
 	vector<MPILib::Efficacy> vec_ret(_rate,1);
 	return MPILib::algorithm::AlgorithmGrid(vec_ret);
 }

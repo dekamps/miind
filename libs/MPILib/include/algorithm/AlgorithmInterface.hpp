@@ -112,9 +112,10 @@ public:
 
 	/**
 	 * Stores the algorithm state in a Algorithm Grid
+	 * @param NodeId of the node associated with the algorithm
 	 * @return The state of the algorithm. The Grid must at least contain one element; an empty grid will cause a crash.
 	 */
-	virtual AlgorithmGrid getGrid() const = 0;
+	virtual AlgorithmGrid getGrid(MPILib::NodeId) const = 0;
 
 
 	std::valarray<double>& getArrayState(AlgorithmGrid& grid) const

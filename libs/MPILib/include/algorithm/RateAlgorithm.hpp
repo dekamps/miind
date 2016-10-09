@@ -75,7 +75,7 @@ public:
 	 */
 	virtual Rate getCurrentRate() const;
 
-	virtual AlgorithmGrid getGrid() const;
+	virtual AlgorithmGrid getGrid(MPILib::NodeId) const;
 
 private:
 

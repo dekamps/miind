@@ -135,7 +135,7 @@ namespace GeomLib {
 		 * Stores the algorithm state in a Algorithm Grid
 		 * @return The state of the algorithm
 		 */
-		virtual AlgorithmGrid getGrid() const;
+		virtual AlgorithmGrid getGrid(NodeId) const;
 
 	private:
 

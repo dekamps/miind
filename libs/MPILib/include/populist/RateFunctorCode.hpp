@@ -43,7 +43,7 @@ void RateFunctor<WeightValue>::evolveNodeState(
 }
 
 template<class WeightValue>
-algorithm::AlgorithmGrid RateFunctor<WeightValue>::getGrid() const {
+algorithm::AlgorithmGrid RateFunctor<WeightValue>::getGrid(MPILib::NodeId) const {
 	std::vector<double> vector_grid(1, _function(_current_time));
 	return algorithm::AlgorithmGrid(vector_grid);
 }

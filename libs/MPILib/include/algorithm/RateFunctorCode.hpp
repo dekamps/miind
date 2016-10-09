@@ -47,7 +47,7 @@ namespace algorithm {
 	}
 
 	template <class WeightValue>
-	AlgorithmGrid RateFunctor<WeightValue>::getGrid() const
+	AlgorithmGrid RateFunctor<WeightValue>::getGrid(MPILib::NodeId) const
 	{
 		std::vector<double> vector_grid(1,_function(_current_time));
 		return AlgorithmGrid(vector_grid);

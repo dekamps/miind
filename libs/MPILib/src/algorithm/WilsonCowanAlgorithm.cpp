@@ -149,7 +149,7 @@ std::vector<double> WilsonCowanAlgorithm::getInitialState() const {
 	return array_return;
 }
 
-AlgorithmGrid WilsonCowanAlgorithm::getGrid() const {
+AlgorithmGrid WilsonCowanAlgorithm::getGrid(NodeId) const {
 	return _integrator.State();
 }
 
