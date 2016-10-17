@@ -122,7 +122,6 @@ void WilsonCowanAlgorithm::evolveNodeState(const std::vector<Rate>& nodeVector,
 
 Time WilsonCowanAlgorithm::getCurrentTime() const {
 	return _integrator.CurrentTime();
-
 }
 
 Rate WilsonCowanAlgorithm::getCurrentRate() const {
