@@ -17,7 +17,7 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-
+/*
 #include <cassert>
 #include "LargeNetwork.hpp"
 #include "GenerateHexagonalNetwork.hpp"
@@ -201,8 +201,8 @@ namespace {
 		}
 	}
 }
-
-void GenerateHexagonalNetwork
+*/
+/*void GenerateHexagonalNetwork
 (
 	Number	      				n_rings,				//! number of rings
 	Pop_Network*		      		p_net,					//! network to which populations should be added
@@ -268,4 +268,4 @@ void GenerateHexagonalNetwork
 
 	p_net->makeFirstInputOfSecond(id_burst,*p_id_cent,connection_J_EE_Burst);
 }
-
+*/

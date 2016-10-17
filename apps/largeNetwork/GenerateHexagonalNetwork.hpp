@@ -19,7 +19,7 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #ifndef _CODE_LIBS_LARGENETWORK_GENERATEHEXAGONALNETWORK_INCLUDE_GUARD
 #define _CODE_LIBS_LARGENETWORK_GENERATEHEXAGONALNETWORK_INCLUDE_GUARD
-
+/*
 #include <MPILib/include/DelayedConnection.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 
@@ -43,5 +43,5 @@ void GenerateHexagonalNetwork
 	vector<NodeId>*,				//! list of delay nodes
 	int*				       		//! offset between excitatory and inhibitory nodes
 );
-
+*/
 #endif //include guard

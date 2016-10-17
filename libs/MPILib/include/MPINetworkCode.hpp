@@ -173,6 +173,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 					MPINode<WeightValue, NodeDistribution>::waitAll();
 
+
 					for (auto& it : _localNodes) {
 						it.second.prepareEvolve();
 					}
@@ -181,6 +182,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					for (auto& it : _localNodes) {
 						it.second.evolve(getCurrentSimulationTime());
 					}
+
 
 				} while (getCurrentSimulationTime() < getCurrentReportTime()
 						&& getCurrentSimulationTime() < getCurrentStateTime());

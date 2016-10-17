@@ -19,7 +19,7 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #ifndef _CODE_APPS_LARGENETWORK_INCLUDE_GUARD
 #define _CODE_APPS_LARGENETWORK_INCLUDE_GUARD
-
+/*
 #include <GeomLib.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
@@ -84,5 +84,5 @@ namespace LargeNetwork {
 
   const MPILib::Time T_DELAY = 2e-3;
 	}
-
+*/
 #endif // include guard
