@@ -22,9 +22,9 @@
 #include <boost/test/execution_monitor.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/NodeType.hpp>
-#include <MPILib/include/algorithm/DelayAssemblyAlgorithmCode.hpp>
+#include <MPILib/algorithm/DelayAssemblyAlgorithmCode.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
-#include <MPILib/include/algorithm/RateFunctorCode.hpp>
+#include <MPILib/algorithm/RateFunctorCode.hpp>
 #include <GeomLib.hpp>
 
 typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;

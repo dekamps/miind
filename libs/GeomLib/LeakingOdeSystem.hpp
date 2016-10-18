@@ -57,7 +57,7 @@ namespace GeomLib {
     virtual LeakingOdeSystem* Clone() const;
 
     //! Maps a given mass bin to its current potential interval; 0 <= index < Par()._n_bins
-    Index MapProbabilityToPotentialBin(Index) const;
+    MPILib::Index MapProbabilityToPotentialBin(MPILib::Index) const;
 
     //! Move the mass to a new bin (one step of decay)
 	void UpdateIndex() { _index++;}
@@ -73,7 +73,7 @@ namespace GeomLib {
 	virtual MPILib::Rate CurrentRate() const;
 
 
-	pair<Number,Number> BinDistribution() const;
+    std::pair<MPILib::Number,MPILib::Number> BinDistribution() const;
 
 
   private:
@@ -83,22 +83,22 @@ namespace GeomLib {
     void   ReversalBinScoop		();
     void   UpdateCacheMap		();
     void   UpdateCacheMapReverse();
-    Index  UpdateMapProbabilityToPotentialBin(Index i);
-    Index  UpdateMapPotentialToProbabilityBin(Index i);
+    MPILib::Index  UpdateMapProbabilityToPotentialBin(MPILib::Index);
+    MPILib::Index  UpdateMapPotentialToProbabilityBin(MPILib::Index);
 
     const LifNeuralDynamics	_dyn;
 
-    Number _N_pos;
-    Number _N_neg;
-    Number _N_bins;
+    MPILib::Number _N_pos;
+    MPILib::Number _N_neg;
+    MPILib::Number _N_bins;
 
 	int		_index;
 
-	vector<Index> _map_cache_reverse;
+    vector<MPILib::Index> _map_cache_reverse;
 
   };
 
-  inline Index LeakingOdeSystem::MapProbabilityToPotentialBin(Index i) const {
+  inline MPILib::Index LeakingOdeSystem::MapProbabilityToPotentialBin(MPILib::Index i) const {
 	  assert (i < _map_cache.size());
 	  return _map_cache_reverse[i];
   }

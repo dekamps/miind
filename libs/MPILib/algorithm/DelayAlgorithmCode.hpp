@@ -22,7 +22,7 @@
 
 //#include <MPILib/config.hpp>
 #include <cassert>
-#include <MPILib/include/algorithm/DelayAlgorithm.hpp>
+#include <MPILib/algorithm/DelayAlgorithm.hpp>
 
 namespace MPILib {
 namespace algorithm {

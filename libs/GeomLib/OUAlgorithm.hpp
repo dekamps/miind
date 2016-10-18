@@ -22,8 +22,8 @@
 #define MPILIB_ALGORITHMS_OUALGORITHM_HPP_
 
 #include <NumtoolsLib/NumtoolsLib.h>
-#include <MPILib/include/algorithm/WilsonCowanParameter.hpp>
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/algorithm/WilsonCowanParameter.hpp>
+#include <MPILib/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/DelayedConnection.hpp>
 #include "GeomInputConvertor.hpp"
 #include "MuSigmaScalarProduct.hpp"

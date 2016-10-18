@@ -26,7 +26,6 @@
 #include "OdeParameter.hpp"
 
 using std::vector;
-using UtilLib::Index;
 
 namespace GeomLib {
 
@@ -61,21 +60,26 @@ namespace GeomLib {
 
 		~BinEstimator();
 
-		//! Use for testing purposes, for any normal usage CalculateBinCover should be used
-		Index SearchBin(Potential) const;
+		//! Use for testing purposes, for any normal usage CalculateBinCover should be used. This function
+		//! returns the index of the bin that contains the potential and throws an exception if the Potential
+		//! is below the minimum or above the maximum of the potential range covered by the interpretation array.
+	    MPILib::Index SearchBin(Potential) const;
 
 		//! Cover pair looks at the boundaries of the current bins and calculates where they would end up if
 		//! a potential difference is applied to them. The translated lower boundary is represented as the
 		//! first element of the pair of type BinCover. Its _index member gives the index of the translated boundary
 		//! where _alpha gives the fraction of the bin that is covered. The coverage is calculated from the upper boundary
 		//! of the corresponding bin in the interpretation array for the first element in the pair, but from the lower 
-		//! boundary of the corresponding bin .
+		//! boundary of the corresponding bin. If a translated bin boundary ends up below the minimum potential,
+	    //! the index will be -1. If a translated bin boundary ends up above the maximum potential, the index will be
+	    //! n, where n is the size of the interpretation array. A client must test for these cases. This is odd, and will
+	    //! change in future implementations so that a CoverPair can be reliably used in a loop.
 
 		CoverPair 
 			CalculateBinCover
 			(
-				Index i,  //! Index of the bin whose boundaries are shifted.
-				Potential //! Difference in potential with respect to the boundaries of bin i. Careful! For an excitatory input this value must be negative
+			 MPILib::Index i,  //! Index of the bin whose boundaries are shifted.
+				Potential      //! Difference in potential with respect to the boundaries of bin i. Careful! For an excitatory input this value must be negative.
 			) const;
 
 		//! Read only access to the interpretation array
@@ -93,7 +97,7 @@ namespace GeomLib {
 		int 
 			SearchBin
 			(
-				Index, 
+			 MPILib::Index, 
 				Potential,
 				Potential
 			) const;
@@ -101,7 +105,7 @@ namespace GeomLib {
 		int 
 			Search
 			(
-				Index, 
+			 MPILib::Index, 
 				Potential,
 				Potential
 			) const;
@@ -122,7 +126,6 @@ namespace GeomLib {
 			) const;
 
 		const OdeParameter	_par_ode;
-
 
 		vector<double>		_vec_interpretation;
 	};

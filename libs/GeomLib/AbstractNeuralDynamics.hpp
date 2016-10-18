@@ -21,6 +21,7 @@
 #ifndef _CODE_LIBS_GEOMLIB_ABSTRACTNEURALDYNAMICS_H_
 #define _CODE_LIBS_GEOMLIB_ABSTRACTNEURALDYNAMICS_H_
 
+#include <vector>
 #include <MPILib/include/BasicDefinitions.hpp>
 #include "CurrentCompensationParameter.hpp"
 #include "OdeParameter.hpp"
@@ -71,7 +72,7 @@ class AbstractNeuralDynamics {
 		virtual MPILib::Time TPeriod() const = 0;
 
 		//! Generate the bin boundaries for geometric binning based on the dyn
-		virtual vector<Potential> InterpretationArray() const = 0;
+                virtual std::vector<Potential> InterpretationArray() const = 0;
 
 		//! Return the current compensation object; can be used to test whether current compensation is applied.
 		const CurrentCompensationParameter& ParCur() const { return _par_current; }

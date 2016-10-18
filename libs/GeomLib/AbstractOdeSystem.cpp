@@ -17,6 +17,7 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
+#include <cmath>
 #include "AbstractOdeSystem.hpp"
 #include "GeomLibException.hpp"
 
@@ -35,7 +36,7 @@ _buffer_mass	       	(this->InitializeDensity()),
 _i_reset 	       		(this->InitializeResetBin()),
 _i_reversal				(this->InitializeReversalBin()),
 _t_current   	       	(0.0),
-_map_cache				(vector<Index>(0)),
+_map_cache				(vector<MPILib::Index>(0)),
 _number_of_bins			(_buffer_interpretation.size())
 {
 }
@@ -62,23 +63,23 @@ AbstractOdeSystem::~AbstractOdeSystem()
 {
 }
 
-Index AbstractOdeSystem::InitializeResetBin() const
+MPILib::Index AbstractOdeSystem::InitializeResetBin() const
 {
-	Index i_ret;
+  MPILib::Index i_ret;
 	i_ret = this->FindBin(_par._par_pop._V_reset);
 	return i_ret;
 }
 
-Index AbstractOdeSystem::InitializeReversalBin() const
+MPILib::Index AbstractOdeSystem::InitializeReversalBin() const
 {
-	Index i_ret;
+  MPILib::Index i_ret;
 	i_ret = this->FindBin(_par._par_pop._V_reversal);
 	return i_ret;
 }
 
-Index AbstractOdeSystem::FindBin(Potential V) const
+MPILib::Index AbstractOdeSystem::FindBin(Potential V) const
 {
-	Index i_reset_bin;
+  MPILib::Index i_reset_bin;
 	if ( V < _par._V_min || V > _par._par_pop._theta)
 		throw GeomLibException("Reset potential doesn't make sense");
 
@@ -86,7 +87,7 @@ Index AbstractOdeSystem::FindBin(Potential V) const
 		i_reset_bin = _buffer_interpretation.size() - 1;
 		return i_reset_bin;
 	} else
-		for (Index i = 0; i < _buffer_interpretation.size() - 1; i++ ){
+	  for (MPILib::Index i = 0; i < _buffer_interpretation.size() - 1; i++ ){
 			if ( V >= _buffer_interpretation[i] && V < _buffer_interpretation[i+1] ){
 				i_reset_bin = i;
 				return i_reset_bin;
@@ -101,9 +102,9 @@ void AbstractOdeSystem::PrepareReport
  double* array_mass
 ) const
 {
-  Number n_bins = this->NumberOfBins();
+  MPILib::Number n_bins = this->NumberOfBins();
 
-  for (Index i = 0; i < n_bins-1; i++){
+  for (MPILib::Index i = 0; i < n_bins-1; i++){
     array_interpretation[i] = _buffer_interpretation[i];
     array_mass[i] = _buffer_mass[ MapPotentialToProbabilityBin(i)]/(_buffer_interpretation[i+1]-_buffer_interpretation[i]);
   }
@@ -121,7 +122,7 @@ void AbstractOdeSystem::InitializeSingleBin(vector<MPILib::Density>* p_vec) cons
 	assert (par_ode._par_dens._mu >= this->_par._V_min);
 	assert (par_ode._par_dens._mu <= this->_par._par_pop._theta);
 
-	Index j = this->FindBin(par_ode._par_dens._mu);
+	MPILib::Index j = this->FindBin(par_ode._par_dens._mu);
 	if ( j == n_bins - 1 )
 		buffer_mass[j] = 1.0/(this->_par._par_pop._theta - _buffer_interpretation[n_bins -1]);
 	else
@@ -134,7 +135,7 @@ void AbstractOdeSystem::InitializeGaussian(vector<MPILib::Density>* p_vec_dense)
 	vector<MPILib::Density>& buffer_mass = *p_vec_dense;
 	const OdeParameter& par_ode = this->Par();
 	Number n_bins = p_vec_dense->size();
-	for (Index i = 0; i < n_bins; i++)
+	for (MPILib::Index i = 0; i < n_bins; i++)
 	{
 		double v   = _buffer_interpretation[i];
 		double sqr = (v - par_ode._par_dens._mu)*(v - par_ode._par_dens._mu)/(par_ode._par_dens._sigma*par_ode._par_dens._sigma);
@@ -163,15 +164,15 @@ void AbstractOdeSystem::NormaliseDensity
 	double sum = 0;
 	Number n_bins = p_vec->size();
 
-	for (Index i = 0; i < n_bins - 1; i++)
+	for (MPILib::Index i = 0; i < n_bins - 1; i++)
 		buffer_mass[i] *= (_buffer_interpretation[i+1] - _buffer_interpretation[i]);
 
 	buffer_mass[n_bins-1] *= (this->_par._par_pop._theta - _buffer_interpretation[n_bins-1]);
 
-	for (Index i = 0; i < n_bins; i++)
+	for (MPILib::Index i = 0; i < n_bins; i++)
 		sum += buffer_mass[i];
 
-	for (Index i = 0; i < n_bins; i++)
+	for (MPILib::Index i = 0; i < n_bins; i++)
 		buffer_mass[i] /= sum;
 }
 

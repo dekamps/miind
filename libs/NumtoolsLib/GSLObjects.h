@@ -23,14 +23,14 @@
 #include <boost/shared_ptr.hpp>
 #include <gsl/gsl_odeiv.h>
 #include <gsl/gsl_errno.h>
-#include "../UtilLib/UtilLib.h"
 #include "Precision.h"
 
 using boost::shared_ptr;
-using UtilLib::Number;
+
 
 namespace NumtoolsLib {
-	
+  typedef unsigned int Number;
+
 	typedef int (*Function)   (double t, const double y[], double dydt[], void * params);
 	typedef int (*Derivative) (double t, const double y[], double * dfdy, double dfdt[], void * params);	
 

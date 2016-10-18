@@ -19,10 +19,10 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 # add the source files
 ##############################################################################
 set(MPI_SRCS
-    src/algorithm/AlgorithmGrid.cpp
-    src/algorithm/HebbianAlgorithm.cpp
-    src/algorithm/PersistantAlgorithm.cpp
-    src/algorithm/WilsonCowanAlgorithm.cpp
+    algorithm/AlgorithmGrid.cpp
+    algorithm/HebbianAlgorithm.cpp
+    algorithm/PersistantAlgorithm.cpp
+    algorithm/WilsonCowanAlgorithm.cpp
         
     
     src/populist/InitializeAlgorithmGrid.cpp

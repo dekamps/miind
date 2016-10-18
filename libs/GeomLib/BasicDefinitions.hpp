@@ -22,7 +22,6 @@
 
 #include <MPILib/include/BasicDefinitions.hpp>
 #include "../NumtoolsLib/NumtoolsLib.h"
-using UtilLib::Number;
 
 //! GeomLib
 

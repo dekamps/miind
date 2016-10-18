@@ -280,6 +280,8 @@ BOOST_AUTO_TEST_CASE(LifCoverTest)
 
 	LifNeuralDynamics dyn(par_ode, 0.01);
 	LeakingOdeSystem sys(dyn);
+
+
     vector<double> array_interpretation(dyn.NumberOfBins(), 0);
     vector<double> array_density(dyn.NumberOfBins());
 
@@ -300,12 +302,12 @@ BOOST_AUTO_TEST_CASE(LifCoverTest)
     //  0.1
     //  0.316228
 
-
     Index i = estimator.SearchBin(V_min);
+
     Potential h = 0.95;
     BinEstimator::CoverPair pair = estimator.CalculateBinCover(i, h);
     // the first boundary should be firmly in bin 0, but isn't
-    // because -3.16228 + h is still below V_min; therefore -1
+    // because -3.16228 + h is still below V_min (= -2); therefore -1
     // the second one should be in bin 3
     BOOST_CHECK( pair.first._index  == -1);
     BOOST_CHECK( pair.second._index ==  3);
@@ -313,11 +315,9 @@ BOOST_AUTO_TEST_CASE(LifCoverTest)
     i = estimator.SearchBin(0.05);
     h = 0.25;
     pair = estimator.CalculateBinCover(i,h);
-    std::cout << pair.first._index << std::endl;
-    std::cout << pair.first._alpha << std::endl;
-    std::cout << pair.second._index << std::endl;
-    std::cout << pair.second._alpha << std::endl;
 
+    BOOST_CHECK( pair.first._index  == 9);
+    BOOST_CHECK( pair.second._index == 10);
 }
 
 BOOST_AUTO_TEST_CASE(LifEstimatorTest)
@@ -364,7 +364,7 @@ BOOST_AUTO_TEST_CASE(LifEstimatorTest)
     //  0.1
     //  0.316228
 
-    Index i = estimator.SearchBin(V_min-1e-10);
+    int i = estimator.SearchBin(V_min-1e-10);
     BOOST_CHECK (i == -1);
     i = estimator.SearchBin(V_min);
     BOOST_CHECK(i == 0);
@@ -410,9 +410,10 @@ BOOST_AUTO_TEST_CASE(LifEstimatorTest)
     i = estimator.SearchBin(0.05);
     h = 0.25;
     pair = estimator.CalculateBinCover(i,h);
-    std::cout << pair.first._index << std::endl;
-    std::cout << pair.first._alpha << std::endl;
-    std::cout << pair.second._index << std::endl;
-    std::cout << pair.second._alpha << std::endl;
+
+
+    BOOST_CHECK( pair.first._index  == 9);
+    BOOST_CHECK( pair.second._index == 10);
+
 }
 

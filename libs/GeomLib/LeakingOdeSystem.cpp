@@ -37,12 +37,12 @@ LeakingOdeSystem::LeakingOdeSystem
  _N_bins				(_N_pos+_N_neg),
   _index				(0)
 {
-	_map_cache         = vector<Index>(_N_bins);
-	_map_cache_reverse = vector<Index>(_N_bins);
+  _map_cache         = vector<MPILib::Index>(_N_bins);
+	_map_cache_reverse = vector<MPILib::Index>(_N_bins);
 
-	for (Index i = 0; i < _N_bins; i++)
+	for (MPILib::Index i = 0; i < _N_bins; i++)
 		_map_cache[i] = i;
-	for (Index i = 0; i < _N_bins; i++)
+	for (MPILib::Index i = 0; i < _N_bins; i++)
 		_map_cache_reverse[i] = i;
 
 }
@@ -57,12 +57,12 @@ _N_bins					(sys._N_bins),
 _index					(0), // do not copy the state but force the start of a new simulation
 _map_cache_reverse		(sys._map_cache_reverse)
 {
-	_map_cache         = vector<Index>(_N_bins);
-	_map_cache_reverse = vector<Index>(_N_bins);
+  _map_cache         = std::vector<MPILib::Index>(_N_bins);
+  _map_cache_reverse = std::vector<MPILib::Index>(_N_bins);
 
-	for (Index i = 0; i < _N_bins; i++)
+	for (MPILib::Index i = 0; i < _N_bins; i++)
 		_map_cache[i] = i;
-	for (Index i = 0; i < _N_bins; i++)
+	for (MPILib::Index i = 0; i < _N_bins; i++)
 		_map_cache_reverse[i] = i;
 
 }
@@ -72,9 +72,9 @@ LeakingOdeSystem* LeakingOdeSystem::Clone() const
 	return new LeakingOdeSystem(*this);
 }
 
-std::pair<Number, Number> LeakingOdeSystem::BinDistribution() const
+std::pair<MPILib::Number, MPILib::Number> LeakingOdeSystem::BinDistribution() const
 {
-	std::pair<Number,Number> pair_ret;
+  std::pair<MPILib::Number,MPILib::Number> pair_ret;
 	pair_ret.first  = _N_pos;
 	pair_ret.second = _N_neg;
 	return pair_ret;
@@ -102,15 +102,15 @@ MPILib::Rate LeakingOdeSystem::CurrentRate() const
 
 void LeakingOdeSystem::ReversalBinScoop()
 {
-	Index i_rev = this->MapPotentialToProbabilityBin(_i_reversal);
-	Index i_th  = this->MapPotentialToProbabilityBin(_N_pos +_N_neg - 1);
+  MPILib::Index i_rev = this->MapPotentialToProbabilityBin(_i_reversal);
+  MPILib::Index i_th  = this->MapPotentialToProbabilityBin(_N_pos +_N_neg - 1);
 
 	_buffer_mass[i_rev] += _buffer_mass[i_th];
 	_buffer_mass[i_th] = 0.0;
 
 	if (_N_neg > 0){
 		i_rev        = this->MapPotentialToProbabilityBin(_i_reversal-1);
-		Index i_vmin = this->MapPotentialToProbabilityBin(0);
+		MPILib::Index i_vmin = this->MapPotentialToProbabilityBin(0);
 		_buffer_mass[i_rev] += _buffer_mass[i_vmin];
 		_buffer_mass[i_vmin] = 0.0;
 	}
@@ -118,19 +118,19 @@ void LeakingOdeSystem::ReversalBinScoop()
 
 void LeakingOdeSystem::UpdateCacheMapReverse()
 {
-	for (Index i = 0; i < _N_bins; i++){
+  for (MPILib::Index i = 0; i < _N_bins; i++){
 		_map_cache_reverse[i] = UpdateMapProbabilityToPotentialBin(i);
 		assert(_map_cache[_map_cache_reverse[i]] == i);
 	}
 }
 
 void LeakingOdeSystem::UpdateCacheMap(){
-	for (Index i = 0; i < _N_bins; i++)
+  for (MPILib::Index i = 0; i < _N_bins; i++)
 		_map_cache[i] = UpdateMapPotentialToProbabilityBin(i);
 }
 
 
-Index LeakingOdeSystem::UpdateMapPotentialToProbabilityBin(Index i)
+MPILib::Index LeakingOdeSystem::UpdateMapPotentialToProbabilityBin(MPILib::Index i)
 {
 	assert( i < _dyn.Npos() + _dyn.Nneg());
 	return (i >= _i_reversal )?
@@ -138,7 +138,7 @@ Index LeakingOdeSystem::UpdateMapPotentialToProbabilityBin(Index i)
 			modulo( i - _index, _N_neg );
 }
 
-Index LeakingOdeSystem::UpdateMapProbabilityToPotentialBin(Index i)
+MPILib::Index LeakingOdeSystem::UpdateMapProbabilityToPotentialBin(MPILib::Index i)
 {
 	  int r = static_cast<int>(i) - static_cast<int>(_N_neg);
 	  return ( r >= 0) ?

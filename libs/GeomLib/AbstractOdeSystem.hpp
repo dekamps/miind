@@ -21,6 +21,7 @@
 #define _CODE_LIBS_POPULISTLIB_ABSTRACTODESYSTEM_INCLUDE_GUARD
 
 #include <vector>
+#include <boost/shared_ptr.hpp>
 #include "AbstractNeuralDynamics.hpp"
 #include "OdeParameter.hpp"
 
@@ -83,7 +84,7 @@ namespace GeomLib {
 		virtual Potential DCContribution() const { return 0;}
 
 		//! Number of bins used in the grid representation
-		Number NumberOfBins() const {return _number_of_bins; }
+	        MPILib::Number NumberOfBins() const {return _number_of_bins; }
 
 		//! Access to the array of bin limits; be aware of the convention that the upper limit of the highest bin is
 		//! not present in this array, and is equal to VMax, which can be obtained by Par()._nr_bins
@@ -105,13 +106,13 @@ namespace GeomLib {
 		const vector<MPILib::Potential>& MassBuffer() const           { return _buffer_mass; }
 
 		//! Index of the reset bin relative to the interpretation array, i.e. constant during simulation
-		Index IndexResetBin() const {return _i_reset;}
+	  MPILib::Index IndexResetBin() const {return _i_reset;}
 
 		//! Find which bin in the interpretation array contains this potential.
-		Index FindBin(Potential) const;
+	  MPILib::Index FindBin(Potential) const;
 
 		//! Maintains the current mapping from a probability mass bin to its current poetntial bin in the interpretation array
-		Index MapPotentialToProbabilityBin(Index i) const { assert(i < _map_cache.size()); return _map_cache[i]; }
+	  MPILib::Index MapPotentialToProbabilityBin(MPILib::Index i) const { assert(i < _map_cache.size()); return _map_cache[i]; }
 
 		//! Represents the current density profile. Both double pointers must point to contiguous memory at least NumberOfBins() large.
 		//! After calling the first array will contain
@@ -132,16 +133,16 @@ namespace GeomLib {
 		vector<MPILib::Potential>	_buffer_interpretation;
 		vector<MPILib::Density>		_buffer_mass;
 
-		Index		       	_i_reset;
-		Index				_i_reversal;
+	  MPILib::Index		       	_i_reset;
+	  MPILib::Index				_i_reversal;
 		MPILib::Time       	_t_current;
 
-		vector<Index>		_map_cache;
+	  vector<MPILib::Index>		_map_cache;
 
 	private:
 
-		Index InitializeResetBin    () const;
-		Index InitializeReversalBin () const;
+	  MPILib::Index InitializeResetBin    () const;
+	  MPILib::Index InitializeReversalBin () const;
 
 		vector<MPILib::Density> InitializeDensity	() const;
 

@@ -23,10 +23,10 @@
 //#include <MPILib/config.hpp> //TODO: this file is actually created in the build directory ... why? leave for now
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
-#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
 #include <MPILib/include/NodeType.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <vector>
+#include "AlgorithmGrid.hpp"
 
 namespace MPILib {
 namespace algorithm {

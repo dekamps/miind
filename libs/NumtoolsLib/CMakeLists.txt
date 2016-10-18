@@ -21,7 +21,6 @@ set( numtools_SRC
     GaussianDistribution.cpp
     GSLObjects.cpp
     Interpolation.cpp
-    NumtoolsTest.cpp
     PoissonDistribution.cpp
     RandomGenerator.cpp
     Rational.cpp
@@ -47,7 +46,6 @@ set( numtools_HEADERS
     MinMaxTrackerCode.h
     NumtoolsLib.h
     NumtoolsLibException.h
-    NumtoolsTest.h
     PoissonDistribution.h
     QaDirty.h
     QaDirtyImplementation.h
@@ -59,7 +57,6 @@ set( numtools_HEADERS
 add_library( ${MIIND_LIBRARY_PREFIX}numtools ${LIB_TYPE} ${numtools_SRC} ${numtools_HEADERS})
 
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}numtools
-    ${MIIND_LIBRARY_PREFIX}util
     ${gsl_LINK_FLAGS} )
 
 install( FILES ${numtools_HEADERS}

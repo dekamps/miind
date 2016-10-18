@@ -24,14 +24,11 @@
 #include <vector>
 #include <gsl/gsl_odeiv.h>
 #include <gsl/gsl_errno.h>
-#include "../UtilLib/UtilLib.h"
 #include "AbstractDVIntegratorCode.h"
 #include "BasicDefinitions.h"
 #include "DVIntegratorException.h"
 #include "DVIntegratorStateParameter.h"
 
-using UtilLib::Number;
-using UtilLib::Streamable;
 using std::vector;
 using std::istream;
 using std::ostream;

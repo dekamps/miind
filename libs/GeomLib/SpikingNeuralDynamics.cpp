@@ -42,11 +42,11 @@ SpikingNeuralDynamics::~SpikingNeuralDynamics()
 {
 }
 
-vector<Potential> SpikingNeuralDynamics::InterpretationArray() const
+std::vector<Potential> SpikingNeuralDynamics::InterpretationArray() const
 {
 	Number n_bins = this->Par()._nr_bins;
 
-	vector<Potential> vec_ret(n_bins);
+	std::vector<Potential> vec_ret(n_bins);
 
 	Time delta_t = this->TPeriod()/n_bins;
 	for (Index i = 0; i < n_bins; i++)

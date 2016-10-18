@@ -22,7 +22,7 @@
 #ifndef MPILIB_ALGORITHMS_RATEFUNCTOR_HPP_
 #define MPILIB_ALGORITHMS_RATEFUNCTOR_HPP_
 
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {

@@ -46,7 +46,7 @@ namespace GeomLib {
 
 		virtual SpikingNeuralDynamics* Clone() const  = 0;
 
-		virtual vector<Potential> InterpretationArray() const;
+	        virtual std::vector<Potential> InterpretationArray() const;
 
 	protected:
 

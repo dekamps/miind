@@ -29,57 +29,11 @@
 #include <cmath>
 #include <string>
 
-#include "AttributeList.h"
-#include "ColorTable.h"
-#include "GeneralException.h"
-#include "FailAlloc.h"
-#include "IsNan.h"
-#include "IsFinite.h"
-#include "MToCm.h"
-#include "NumericException.h"
-#include "ParameterScan.h"
-#include "Persistant.h"
-#include "Point.h"
-#include "PointerContainerIteratorCode.h"
-#include "PositionInCm.h"
-#include "LogStream.h"
-#include "RGBValue.h"
-#include "Shape.h"
-#include "ConcreteStreamable.h"
-#include "SequenceIteratorIterator.h"
-#include "ToValarray.h"
-#include "ToVector.h"
 
 
 //! namespace Util
 
 namespace UtilLib
 {
-	class  NoTimeErr 
-	{
-	};
-	
-	class RegisteryException 
-	{
-	};
-	
-	class Registery 
-	{
-		public:
-		
-			Registery( size_t, size_t );
-			int Next();
-			void ReserveRange( size_t, size_t );
-			size_t NrValuesLeft() const;
-			void GiveBack( size_t );
-		
-		private:
-		
-			size_t NrIndexFromValue( size_t ) const;
-			size_t NrValueFromIndex( size_t ) const;
-		
-			std::vector<bool> _vec_reg;
-			size_t _offset;
-	};
 }
 #endif // include guard 

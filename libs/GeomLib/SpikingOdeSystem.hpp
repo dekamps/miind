@@ -51,14 +51,14 @@ namespace GeomLib {
 
 		virtual Potential DCContribution() const = 0;
 
-		virtual Index CurrentIndex() const = 0;
+	  virtual MPILib::Index CurrentIndex() const = 0;
 
 	protected:
 
-		vector<Index> InitializeCacheMap(Number);
+	  std::vector<MPILib::Index> InitializeCacheMap(MPILib::Number);
 		void UpdateCacheMap();
 
-		Index UpdateMapPotentialToProbabilityBin(Index i) const;
+	  MPILib::Index UpdateMapPotentialToProbabilityBin(MPILib::Index i) const;
 
 		int		_index;
 
@@ -69,7 +69,7 @@ namespace GeomLib {
 
 	};
 
-	inline Index SpikingOdeSystem::UpdateMapPotentialToProbabilityBin(Index i) const {
+  inline MPILib::Index SpikingOdeSystem::UpdateMapPotentialToProbabilityBin(MPILib::Index i) const {
 		assert( i < this->Par()._nr_bins);
 		int j = _index + i;
 		return (j >= 0) ? i + _index : i + _index + this->Par()._nr_bins; 

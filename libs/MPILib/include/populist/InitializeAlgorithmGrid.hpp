@@ -23,7 +23,7 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/populist/parameters/InitialDensityParameter.hpp>
 #include <MPILib/include/populist/parameters/OrnsteinUhlenbeckParameter.hpp>
-#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
+#include <MPILib/algorithm/AlgorithmGrid.hpp>
 
 namespace MPILib {
 namespace populist {

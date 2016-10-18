@@ -24,19 +24,17 @@
 // Author: Marc de Kamps
 // Short Description: Every exception in Numtools derives from this one
 
-#include "../UtilLib/UtilLib.h"
-
-using UtilLib::GeneralException;
+#include <string>
 
 namespace NumtoolsLib
 {
-	class NumtoolsException : public GeneralException
+	class NumtoolsException 
 	{
 	public:
 
 		NumtoolsException
 			(
-				const string& message
+			 const std::string& message
 			):
 		_message(message)
 		{
@@ -44,11 +42,12 @@ namespace NumtoolsLib
 
 		virtual ~NumtoolsException(){}
 
-		virtual string Description() const { return _message; }
+		virtual std::string Description() const { return _message; }
 
 	private:
 
-		const string _message;
+		const std::string _message;
+
 	}; // end of NumtoolsException
 
 } // end of Numtools

@@ -20,7 +20,7 @@
 #ifndef MPILIB_POPULIST_RATEFUNCTOR_HPP_
 #define MPILIB_POPULIST_RATEFUNCTOR_HPP_
 
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/algorithm/AlgorithmInterface.hpp>
 
 namespace MPILib {
 namespace populist {

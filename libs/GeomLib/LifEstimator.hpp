@@ -25,7 +25,7 @@
 #include "OdeParameter.hpp"
 
 using std::vector;
-using UtilLib::Index;
+using MPILib::Index;
 
 namespace GeomLib {
     //!  Does what a BinEstimator does, but is more efficient if the dynamics is leaky-integrate-and-fire. Calculates the coverage corresponding a given bin and a potential difference.
@@ -73,19 +73,19 @@ public:
 	CoverPair
 		CalculateBinCover
 		(
-			Index i,  //! Index of the bin whose boundaries are shifted.
+		 MPILib::Index i,  //! Index of the bin whose boundaries are shifted.
 			Potential //! Difference in potential with respect to the boundaries of bin i. Careful! For an excitatory input this value must be negative
 		) const;
 
 	//! Read only access to the interpretation array
-	const vector<double>& InterpretationArray() const { return _vec_interpretation; }
+  const std::vector<double>& InterpretationArray() const { return _vec_interpretation; }
 
 private:
 
-	Number Nposinit() const;
-	Number Nneginit() const;
+  MPILib::Number Nposinit() const;
+  MPILib::Number Nneginit() const;
 
-	Index IndexReversalBin() const;
+  MPILib::Index IndexReversalBin() const;
 
 	MPILib::Time TStep() const;
 	MPILib::Time TPeriod() const;
@@ -96,15 +96,15 @@ private:
 	double GetLambda() const;
 
 	const OdeParameter	_par_ode;
-	vector<double>		_vec_interpretation;
+  std::vector<double>		_vec_interpretation;
 
 	Index  _i_reversal;
 	double _lambda;
 
 	MPILib::Time 	_t_period;
-	Number 	        _N_pos;
+  MPILib::Number 	        _N_pos;
 	MPILib::Time 	_t_step;
-	Number 	        _N_neg;
+  MPILib::Number 	        _N_neg;
 };
 
 }

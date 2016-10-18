@@ -32,13 +32,12 @@
 #define  _CODE_LIBS_GEOMLIB_ODEPARAMETER
 
 #include <string>
-#include "../UtilLib/UtilLib.h"
 #include "CurrentCompensationParameter.hpp"
 #include "NeuronParameter.hpp"
 #include "InitialDensityParameter.hpp"
 
 using MPILib::Potential;
-using UtilLib::Number;
+using MPILib::Number;
 using std::string;
 
 namespace GeomLib

@@ -21,7 +21,7 @@
 #define MPILIB_ALGORITHMS_DELAYASSEMBLYALGORITHM_CODE_HPP_
 
 #include <cassert>
-#include <MPILib/include/algorithm/DelayAssemblyAlgorithm.hpp>
+#include <MPILib/algorithm/DelayAssemblyAlgorithm.hpp>
 #include "MuSigmaScalarProduct.hpp"
 
 namespace MPILib {

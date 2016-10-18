@@ -69,7 +69,6 @@ namespace NumtoolsLib {
 	(
 		const AbstractDVIntegrator<ParameterObject>& rhs
 	):
-	UtilLib::Streamable(),
 	_time_begin				(rhs._time_begin),
 	_time_current			(rhs._time_current),
 	_step					(rhs._step),

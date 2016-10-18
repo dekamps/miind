@@ -28,7 +28,7 @@ namespace NumtoolsLib {
 
 	//! Interface class to GSL ODE solvers.
 	template <class ParameterObject=double>
-	class AbstractDVIntegrator : public Streamable
+	class AbstractDVIntegrator
 	{
 	public:
 

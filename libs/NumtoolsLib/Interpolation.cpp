@@ -29,7 +29,7 @@ Interpolator::Interpolator
 (
 	const InterpType type,
 	const std::valarray<double>& x, 
-	const valarray<double>& y
+	const std::valarray<double>& y
 ) :
 	_x(const_cast<std::valarray<double>&>(x)), // const cast is justfied by the fact that 
 	_y(const_cast<std::valarray<double>&>(y)), // gsl_interp takes const pointers, valarray doesn't have a const method to access its data address

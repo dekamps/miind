@@ -41,7 +41,7 @@ _vec_interpretation(vec_interpretation)
 BinEstimator::~BinEstimator(){
 }
 
-Index BinEstimator::SearchBin(Potential v) const {
+MPILib::Index BinEstimator::SearchBin(Potential v) const {
 	if( v > _par_ode._par_pop._theta )
 		throw GeomLibException("BinEstimator: v larger than V_max");
 	if( v < _par_ode._V_min )
@@ -50,27 +50,26 @@ Index BinEstimator::SearchBin(Potential v) const {
 	if ( v > _vec_interpretation.back() )
 		return n-1;
 	// changed search: now from one onwards
-	for (Index i = 1; i < n; i++)
+	for (MPILib::Index i = 1; i < n; i++)
 		if ( v < _vec_interpretation[i] )
 			return i-1;
 
-	throw GeomLibException("No sensible return for SearchBin");
-		
+	throw GeomLibException("No sensible return for SearchBin");		
 }
 
-int BinEstimator::Search(Index ind, Potential v, Potential dv) const {
+int BinEstimator::Search(MPILib::Index ind, Potential v, Potential dv) const {
   int sg = (dv > 0) - (dv < 0);
   int n = static_cast<int>(_vec_interpretation.size());
   for (int i = 0; i < n; i++){
-    Index j = modulo(ind + sg*i, n);
-    if (_vec_interpretation[j] <= v && (j == static_cast<Index>(n-1) || _vec_interpretation[j+1] > v) )
+    MPILib::Index j = modulo(ind + sg*i, n);
+    if (_vec_interpretation[j] <= v && (j == static_cast<MPILib::Index>(n-1) || _vec_interpretation[j+1] > v) )
       return j;
   }
   assert(false);
   throw GeomLibException("BinEstimator search failed");
 }
 
-int BinEstimator::SearchBin(Index ind, Potential v, Potential dv) const {
+int BinEstimator::SearchBin(MPILib::Index ind, Potential v, Potential dv) const {
 
 	int i = ind;
 	if ( v < _par_ode._V_min)
@@ -114,7 +113,7 @@ double BinEstimator::BinHighFraction(Potential v, int i_tr_high) const {
 	return (v - low_bin)/(high_bin - low_bin);
 }
 
-BinEstimator::CoverPair BinEstimator::CalculateBinCover(Index i, Potential delta_v) const{
+BinEstimator::CoverPair BinEstimator::CalculateBinCover(MPILib::Index i, Potential delta_v) const{
 	assert(i < _vec_interpretation.size());
 	CoverPair pair_ret;
 	Potential low = _vec_interpretation[i];
@@ -123,6 +122,7 @@ BinEstimator::CoverPair BinEstimator::CalculateBinCover(Index i, Potential delta
 	Potential trans_low  = Translate(low,	delta_v);
 	Potential trans_high = Translate(high,	delta_v);
 
+	// delta_v is being passed on to determine the sign of the translation
 	int i_tr_low  = this->SearchBin(i,trans_low, delta_v);
 	int i_tr_high = this->SearchBin(i,trans_high,delta_v);
 

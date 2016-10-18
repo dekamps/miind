@@ -3,13 +3,13 @@
 #include <boost/timer/timer.hpp>
 #include <GeomLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
-#include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
+#include <MPILib/algorithm/RateAlgorithmCode.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
-#include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
-#include <MPILib/include/algorithm/PersistantAlgorithm.hpp>
-#include <MPILib/include/algorithm/DelayAlgorithmCode.hpp>
-#include <MPILib/include/algorithm/RateFunctorCode.hpp>
+#include <MPILib/algorithm/WilsonCowanAlgorithm.hpp>
+#include <MPILib/algorithm/PersistantAlgorithm.hpp>
+#include <MPILib/algorithm/DelayAlgorithmCode.hpp>
+#include <MPILib/algorithm/RateFunctorCode.hpp>
 
 typedef MPILib::MPINetwork<double, MPILib::utilities::CircularDistribution> Network;
 

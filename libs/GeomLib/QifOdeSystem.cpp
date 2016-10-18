@@ -75,7 +75,7 @@ QifOdeSystem* QifOdeSystem::Clone() const
 
 MPILib::Rate QifOdeSystem::CurrentRate() const
 {
-	Index i_th;
+  MPILib::Index i_th;
 	Number n_bins = this->NumberOfBins();
 	i_th = (_index < 0 ) ? _index + n_bins : _index;
 

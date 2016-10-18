@@ -25,7 +25,7 @@
 #include <map>
 #include <memory>
 
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/NodeType.hpp>
 

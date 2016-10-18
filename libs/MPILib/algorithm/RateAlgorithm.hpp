@@ -21,7 +21,7 @@
 #define MPILIB_ALGORITHMS_RATEALGORITHM_HPP_
 
 
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 
 

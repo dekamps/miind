@@ -17,6 +17,8 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
+#include <cmath>
+#include <vector>
 #include "LifNeuralDynamics.hpp"
 
 using namespace GeomLib;
@@ -83,21 +85,21 @@ MPILib::Time LifNeuralDynamics::TimePeriod() const
 }
 
 
-vector<MPILib::Potential> LifNeuralDynamics::InterpretationArray() const
+std::vector<MPILib::Potential> LifNeuralDynamics::InterpretationArray() const
 {
-  vector<MPILib::Potential> vec_ret(_N_pos +_N_neg);
+  std::vector<MPILib::Potential> vec_ret(_N_pos +_N_neg);
   assert(_N_pos + _N_neg > 3);
 
   vec_ret[ 0 + _N_neg] = _par._par_pop._V_reversal;
   vec_ret[ 1 + _N_neg] = _par._par_pop._V_reversal + _lambda*(_par._par_pop._theta - _par._par_pop._V_reversal);
 
-  for (int i = 2; i < _N_pos; i++)
+  for (MPILib::Index i = 2; i < _N_pos; i++)
 	  vec_ret[i + _N_neg] = _par._par_pop._V_reversal + (_par._par_pop._theta - _par._par_pop._V_reversal)*exp((-_t_step/_par._par_pop._tau)*(_N_pos - i));
 
   if (_N_neg > 0){
 	  vec_ret[-1 + _N_neg] = _par._par_pop._V_reversal - _lambda*(_par._par_pop._theta- _par._par_pop._V_reversal);
 
-	  for (int i = -2; i >= - _N_neg; i--)
+	  for (int i = -2; i >= - static_cast<int>(_N_neg); i--)
 		  vec_ret[i + _N_neg] = _par._par_pop._V_reversal - (_par._par_pop._theta - _par._par_pop._V_reversal)*exp((-_t_step/_par._par_pop._tau)*((int)_N_pos + i));
   }
   return vec_ret;

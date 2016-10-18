@@ -22,7 +22,7 @@
 
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
-#include <MPILib/include/algorithm/RateAlgorithm.hpp>
+#include <MPILib/algorithm/RateAlgorithm.hpp>
 
 namespace MPILib {
 namespace algorithm{

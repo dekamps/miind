@@ -67,7 +67,7 @@ namespace GeomLib {
 
 		GeomParameter(const GeomParameter&);
 
-		unique_ptr<AbstractOdeSystem>			_p_sys_ode;
+	  std::unique_ptr<AbstractOdeSystem>			_p_sys_ode;
 		const string							_name_master;
 		Potential								_scale;
 		const DiffusionParameter				_par_diff;

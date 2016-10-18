@@ -73,10 +73,10 @@ void SpikingOdeSystem::RetrieveFromQueue()
 	_buffer_mass[i_reset] += p;
 }
 
-vector<Index> SpikingOdeSystem::InitializeCacheMap(Number n){
-  vector<Index> vec_ret(n);
+std::vector<MPILib::Index> SpikingOdeSystem::InitializeCacheMap(MPILib::Number n){
+  std::vector<MPILib::Index> vec_ret(n);
 
-  for (Index i = 0; i < n; i++)
+  for (MPILib::Index i = 0; i < n; i++)
     vec_ret[i] = i;
 
   return vec_ret;
@@ -84,8 +84,8 @@ vector<Index> SpikingOdeSystem::InitializeCacheMap(Number n){
 
 void SpikingOdeSystem::UpdateCacheMap(){
 
-  Number n_bins = this->NumberOfBins();
+  MPILib::Number n_bins = this->NumberOfBins();
 
-  for (Index i = 0; i < n_bins; i++)
+  for (MPILib::Index i = 0; i < n_bins; i++)
     _map_cache[i] = this->UpdateMapPotentialToProbabilityBin(i);
 }

@@ -21,10 +21,8 @@
 #define _CODE_LIBS_NUMTOOLSLIB_DVINTEGRATORSTATEPARAMETER_INCLUDE_GUARD
 
 #include <vector>
-#include "../UtilLib/UtilLib.h"
 #include "BasicDefinitions.h"
 
-using UtilLib::Number;
 
 namespace NumtoolsLib
 {

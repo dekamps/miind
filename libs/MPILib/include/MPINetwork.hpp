@@ -26,7 +26,7 @@
 
 #include <MPILib/include/MPINode.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/NetworkState.hpp>
 #include <MPILib/include/report/handler/InactiveReportHandler.hpp>
 #include <MPILib/include/NodeType.hpp>

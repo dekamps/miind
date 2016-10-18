@@ -22,7 +22,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/execution_monitor.hpp>
 #include <GeomLib.hpp>
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/algorithm/AlgorithmInterface.hpp>
 #include <MPILib/include/DelayedConnection.hpp>
 
 using namespace GeomLib;

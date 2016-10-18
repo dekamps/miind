@@ -18,9 +18,9 @@
 //
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
 #include <MPILib/include/StringDefinitions.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
+#include "WilsonCowanAlgorithm.hpp"
 
 #include <NumtoolsLib/NumtoolsLib.h>
 #include <gsl/gsl_matrix.h>

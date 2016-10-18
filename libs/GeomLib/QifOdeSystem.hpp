@@ -63,7 +63,7 @@ namespace GeomLib {
 		//! return the DC contribution applied in current compensation
 		virtual Potential DCContribution() const { return _par_qif.Gammasys() - _par_qif._gamma; }
 
-		virtual Index CurrentIndex() const { return _index; }
+	  virtual MPILib::Index CurrentIndex() const { return _index; }
 
 		double TBatch() const { return _queue.TBatch(); }
 

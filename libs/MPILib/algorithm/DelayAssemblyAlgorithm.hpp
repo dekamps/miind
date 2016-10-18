@@ -21,9 +21,9 @@
 #define MPILIB_ALGORITHMS_DELAYASSEMBLYALGORITHM_HPP_
 
 #include <NumtoolsLib/NumtoolsLib.h>
-#include <MPILib/include/algorithm/DelayAssemblyParameter.hpp>
+#include <MPILib/algorithm/DelayAssemblyParameter.hpp>
 
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/algorithm/AlgorithmInterface.hpp>
 
 namespace MPILib {
 namespace algorithm{

@@ -22,7 +22,7 @@
 #define _CODE_LIBS_GEOMLIB_GEOMALGORITHM_INCLUDE_GUARD
 
 #include <boost/circular_buffer.hpp>
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/algorithm/AlgorithmInterface.hpp>
 #include "GeomParameter.hpp"
 #include "NumericalMasterEquationCode.hpp"
 

@@ -66,7 +66,7 @@ namespace GeomLib {
 		//! Produce an array that contains the bin limits. The are contains the lower bin limits
 		//! the highest bin limit of the highest bin is the threshold value of the neuron, theta
 		//! which is not included in the array.
-		virtual vector<Potential> InterpretationArray() const;
+	        virtual std::vector<Potential> InterpretationArray() const;
 
 		//! Number of bins in the grid
 		Number NumberOfBins() const {return _N_pos + _N_neg;}
