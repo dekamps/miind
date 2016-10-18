@@ -120,9 +120,8 @@ namespace
                  for (int j = pair_cover.first._index + 1; j < pair_cover.second._index; j++)
                      dydt[system.MapPotentialToProbabilityBin(i)] += rate_i * y[system.MapPotentialToProbabilityBin(j)];
              }
-             if ((pair_cover.first._index > pair_cover.second._index))
-            	 std::cout << pair_cover.first._index << " " << pair_cover.second._index << std::endl;
-//             assert(!(pair_cover.first._index > pair_cover.second._index));
+
+             assert(!(pair_cover.first._index > pair_cover.second._index));
 
              typename Estimator::CoverPair pair = vec_cover_pair[0];
              Index i_shift = static_cast<Index>(pair.first._index);

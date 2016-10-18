@@ -17,7 +17,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 #include "MuSigmaScalarProduct.hpp"
-#include <MPILib/include/populist/zeroLeakEquations/ConnectionSquaredProduct.hpp>
+#include "ConnectionSquaredProduct.hpp"
 #include <math.h>
 #include <functional>
 #include <numeric>
@@ -59,7 +59,7 @@ MPILib::Potential MuSigmaScalarProduct<MPILib::DelayedConnection>::InnerSquaredP
 
 	return inner_product(nodeVector.begin(), nodeVector.end(),
 			weightVector.begin(), 0.0, std::plus<double>(),
-			MPILib::populist::zeroLeakEquations::ConnectionSquaredProduct());
+			ConnectionSquaredProduct());
 }
 
 
