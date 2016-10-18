@@ -20,7 +20,7 @@
 //Hack to test privat members
 #define private public
 #define protected public
-#include <MPILib/include/algorithm/WilsonCowanParameter.hpp>
+#include <MPILib/algorithm/WilsonCowanParameter.hpp>
 #undef protected
 #undef private
 

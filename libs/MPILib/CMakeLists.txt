@@ -25,8 +25,7 @@ set(MPI_SRCS
     algorithm/WilsonCowanAlgorithm.cpp
         
     
-    src/populist/InitializeAlgorithmGrid.cpp
-    src/populist/ProbabilityQueue.cpp
+    src/ProbabilityQueue.cpp
     
     src/report/handler/AbstractReportHandler.cpp
     src/report/handler/CanvasParameter.cpp

@@ -20,7 +20,7 @@
 //Hack to test privat members
 #define private public
 #define protected public
-#include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
+#include <MPILib/algorithm/WilsonCowanAlgorithm.hpp>
 #undef protected
 #undef private
 
@@ -184,7 +184,7 @@ void test_getGrid() {
 	WilsonCowanParameter par_sigmoid(tau, rate_max, noise);
 
 	WilsonCowanAlgorithm alg(par_sigmoid);
-	AlgorithmGrid grid = alg.getGrid();
+	AlgorithmGrid grid = alg.getGrid(0);
 	BOOST_CHECK(grid._arrayState[0]==0.0);
 	BOOST_CHECK(grid._arrayInterpretation[0]==0.0);
 }

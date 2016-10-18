@@ -1,4 +1,4 @@
-// Copyright (c) 2005 - 2009 Marc de Kamps
+// Copyright (c) 2005 - 2014 Marc de Kamps
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,26 +17,65 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#ifndef _CODE_LIBS_UTIL_LOCALDEFINITIONS_INCLUDE_GUARD
-#define _CODE_LIBS_UTIL_LOCALDEFINITIONS_INCLUDE_GUARD
+#ifndef _CODE_LIBS_MPILIB_PRIORITYQUEUE_INCLUDE_GUARD
+#define _CODE_LIBS_MPILIB_PRIORITYQUEUE_INCLUDE_GUARD
 
-#ifdef WIN32
-#pragma warning(disable: 4786)
-#endif
+#include <queue>
+#include <MPILib/include/BasicDefinitions.hpp>
+#include "StampedProbability.hpp"
 
-#include <map>
-#include <cmath>
-#include <string>
+using std::queue;
 
-using std::string;
+namespace MPILib {
+namespace populist {
 
-namespace UtilLib
-{
-	const string GENERAL_EXCEPTION_DESCRIPTION("A GeneralException was thrown. This is the highest level of exception. At this level no further information is available.");
-	const string PAPERFORMAT_EXCEPTION("Unkown paper format");
-	const string STR_UNDEFINED("<Undefined>");
-	const string STR_SERIES_CORRUPTED("Series string corrupted");
+  //! @brief A queue to store probability density, effectively a pipeline.
+  //!
+  //! ProbabilityQueue stores StampedProbability instances.
+	class ProbabilityQueue {
+	public:
+		//! Probability is grouped in batches
+		ProbabilityQueue(Time time_step = TIME_REFRACT_MIN);
 
-} // end of Util
+		//! destructor
+		~ProbabilityQueue(){}
 
+		//! push time stamped probability on the queue
+		void push(const StampedProbability& prob);
+
+		//! if there is time stamped probability that would be retrieved by CollectAndRemove before this will return true, false otherwise
+		bool HasProbability(Time) const;
+
+		//! add all probability that is batched below the current time and remove it from the queue
+		Probability CollectAndRemove(Time);
+
+		//! Total probability in queue
+		Probability TotalProbability() const {return _scale*_total;}
+
+		//! Stamped Probability must entered in the queue in the right time order
+		bool IsConsistent() const;
+
+		//! Current time based on last CollectAndRemove call
+		Time TimeCurrent() const { return _t_current; }
+
+		//! Sometimes, after rebinning the probability in the queue needs to be rescaled
+		void Scale(double);
+
+		Time TBatch () const { return _t_batch_size; }
+
+	private:
+
+		double _scale;
+		Time _t_batch_size;
+		Time _t_current;
+		Time _t_current_batch;
+
+		Probability _prob_current_batch;
+		Probability _total;
+
+		std::queue<StampedProbability> _queue;
+
+	};
+} // populist
+} //MPILib
 #endif // include guard

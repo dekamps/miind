@@ -20,7 +20,7 @@
 //Hack to test privat members
 #define private public
 #define protected public
-#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
+#include <MPILib/algorithm/AlgorithmGrid.hpp>
 #undef protected
 #undef private
 

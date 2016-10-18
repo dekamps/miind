@@ -17,7 +17,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-//Hack to test privat members
+//Hack to test private members
+/*
 #define private public
 #define protected public
 #include <MPILib/include/report/handler/ValueHandlerHandler.hpp>
@@ -29,7 +30,7 @@ using namespace MPILib::report::handler;
 
 
 void test_Constructor() {
-	ValueHandlerHandler vh;
+        ValueHandlerHandler vh;
 	BOOST_CHECK(vh._is_written==false);
 	BOOST_CHECK(vh._vec_names.empty()==true);
 	BOOST_CHECK(vh._vec_quantity.empty()==true);
@@ -131,3 +132,4 @@ int test_main(int argc, char* argv[]) // note the name!
 	return 0;
 
 }
+*/

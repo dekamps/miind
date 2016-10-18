@@ -16,40 +16,43 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+#ifndef _CODE_LIBS_POPULISTLIB_STAMPEDPROBABILITY_INCLUDE_GUARD
+#define _CODE_LIBS_POPULISTLIB_STAMPEDPROBABILITY_INCLUDE_GUARD
 
-#include <vector>
 #include <MPILib/include/TypeDefinitions.hpp>
-#define private public
-#define protected public
-#include <MPILib/include/populist/nonCirculantSolvers/MatrixNonCirculant.hpp>
-#undef protected
-#undef private
 
+namespace MPILib {
+namespace populist {
 
-#include <boost/test/minimal.hpp>
-using namespace boost::unit_test;
-using namespace MPILib::populist;
-using namespace MPILib;
+/**
+ * @brief A time stamped measure of probability
+ */
+struct StampedProbability {
 
-void test_Constructor() {
-	///@todo implement test for this class
+	/**
+	 * default constructor
+	 */
+	StampedProbability()=default;
 
+	/**
+	 * default constructor
+	 * @param prob The Probability
+	 * @param time The time
+	 */
+	StampedProbability(Probability prob, Time time) :
+	_prob(prob), _time(time) {
+	}
+
+	/**
+	 * The Probability
+	 */
+	Probability _prob = 0.0;
+	/**
+	 * The time
+	 */
+	Time _time = 0.0;
 }
+;} /* namespace populist */
+} /* namespace MPILib */
 
-int test_main(int argc, char* argv[]) // note the name!
-		{
-
-	test_Constructor();
-
-	return 0;
-//    // six ways to detect and report the same error:
-//    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
-//    BOOST_CHECK( add( 2,2 ) == 4 );      // #2 throws on error
-//    if( add( 2,2 ) != 4 )
-//        BOOST_ERROR( "Ouch..." );          // #3 continues on error
-//    if( add( 2,2 ) != 4 )
-//        BOOST_FAIL( "Ouch..." );           // #4 throws on error
-//    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
-//
-//    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
-}
+#endif // include guard

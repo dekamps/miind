@@ -1,7 +1,0 @@
-ADD_MIIND_TEST( AdaptionParameter_test.cpp)
-ADD_MIIND_TEST( InitialDensityParameter_test.cpp)
-ADD_MIIND_TEST( NumericalZeroLeakParameter_test.cpp)
-ADD_MIIND_TEST( OneDMParameter_test.cpp)
-ADD_MIIND_TEST( OrnsteinUhlenbeckParameter_test.cpp)
-ADD_MIIND_TEST( PopulistParameter_test.cpp)
-ADD_MIIND_TEST( PopulistSpecificParameter_test.cpp)

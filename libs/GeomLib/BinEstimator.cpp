@@ -20,13 +20,11 @@
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_spline.h>
 #include <GeomLib/BinEstimator.hpp>
-#include "../UtilLib/UtilLib.h"
 #include "../NumtoolsLib/NumtoolsLib.h"
 #include "GeomLibException.hpp"
 
 using namespace GeomLib;
 using namespace NumtoolsLib;
-using namespace UtilLib;
 
 BinEstimator::BinEstimator
 (

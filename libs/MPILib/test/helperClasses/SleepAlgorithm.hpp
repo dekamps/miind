@@ -19,7 +19,7 @@
 
 #ifndef SLEEPALGORITHM_HPP_
 #define SLEEPALGORITHM_HPP_
-#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
+#include <MPILib/algorithm/AlgorithmGrid.hpp>
 #include <boost/thread/thread.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 
@@ -59,7 +59,7 @@ public:
 
 	}
 
-	algorithm::AlgorithmGrid getGrid() const {
+	algorithm::AlgorithmGrid getGrid(NodeId) const {
 		std::vector<double> vector_grid(RATE_STATE_DIMENSION, 1);
 		std::vector<double> vector_interpretation(RATE_STATE_DIMENSION, 0);
 		return algorithm::AlgorithmGrid(vector_grid, vector_interpretation);

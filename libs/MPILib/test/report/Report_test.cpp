@@ -25,7 +25,7 @@
 #undef private
 #include <MPILib/include/report/ReportType.hpp>
 
-#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
+#include <MPILib/algorithm/AlgorithmGrid.hpp>
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;

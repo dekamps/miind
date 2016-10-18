@@ -1,5 +1,0 @@
-ADD_MIIND_TEST(AbstractNonCirculantSolver_test.cpp)
-ADD_MIIND_TEST(LimitedNonCirculant_test.cpp)
-ADD_MIIND_TEST(MatrixNonCirculant_test.cpp)
-ADD_MIIND_TEST(NonCirculantSolver_test.cpp)
-

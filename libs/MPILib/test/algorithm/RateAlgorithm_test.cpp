@@ -20,7 +20,7 @@
 //Hack to test private members
 #define private public
 #define protected public
-#include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
+#include <MPILib/algorithm/RateAlgorithmCode.hpp>
 #undef protected
 #undef private
 
@@ -120,7 +120,7 @@ void test_getCurrentRate() {
 void test_getGrid() {
 	double rate = 2.1;
 	RateAlgorithm<double> rAlg(rate);
-	AlgorithmGrid grid = rAlg.getGrid();
+	AlgorithmGrid grid = rAlg.getGrid(0);
 
 	BOOST_CHECK(grid._arrayState[0]==2.1);
 	BOOST_CHECK(grid._arrayInterpretation[0]==0.0);

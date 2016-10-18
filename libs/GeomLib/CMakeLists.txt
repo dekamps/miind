@@ -70,7 +70,6 @@ SpikingQifNeuralDynamics.hpp
 add_library( ${MIIND_LIBRARY_PREFIX}geom ${LIB_TYPE} ${GEOM_SRC} ${GEOM_HEADERS})
 
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}geom
-    ${MIIND_LIBRARY_PREFIX}util
     ${gsl_LINK_FLAGS} )
 
 install( FILES ${numtools_HEADERS}

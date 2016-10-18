@@ -21,7 +21,6 @@
 
 #include <iostream>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <UtilLib/IsNan.h>
 
 namespace MPILib {
 
@@ -93,11 +92,10 @@ inline double toEfficacy(const DelayedConnection& connection) {
  * @param connection The connection
  * @return true if the connection is NAN
  */
-inline int IsNan(
-		const MPILib::DelayedConnection& connection) {
-	return IsNan(connection._efficacy)
-			+ IsNan(connection._number_of_connections)
-			+ IsNan(connection._delay);
+inline int IsNan( const MPILib::DelayedConnection& connection) {
+  return (std::numeric_limits<MPILib::Efficacy>::signaling_NaN() == connection._efficacy ||
+          std::numeric_limits<double>::signaling_NaN() == connection._number_of_connections ||
+	  std::numeric_limits<MPILib::Time>::signaling_NaN() == connection._delay);
 }
 
 #endif // include guard MPILIB_POPULIST_ORNSTEINUHLENBECKCONNECTION_HPP_

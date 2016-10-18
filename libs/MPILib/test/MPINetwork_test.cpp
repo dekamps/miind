@@ -32,7 +32,7 @@
 
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
-#include <MPILib/include/algorithm/AlgorithmGrid.hpp>
+#include <MPILib/algorithm/AlgorithmGrid.hpp>
 
 #include <boost/test/minimal.hpp>
 using namespace boost::unit_test;

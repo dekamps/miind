@@ -21,7 +21,6 @@
 #define _CODE_LIBS_GEOMLIB_CNZLECACHE_INCLUDE_GUARD
 
 #include <GeomLib/BinEstimator.hpp>
-#include "../UtilLib/UtilLib.h"
 #include "InputParameterSet.hpp"
 #include "SpikingOdeSystem.hpp"
 

@@ -22,7 +22,6 @@
 
 #include <vector>
 #include <gsl/gsl_spline.h>
-#include "../UtilLib/UtilLib.h"
 #include "OdeParameter.hpp"
 
 using std::vector;
