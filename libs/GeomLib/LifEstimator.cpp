@@ -16,6 +16,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+#include <algorithm>
 #include <cmath>
 #include "LifEstimator.hpp"
 using namespace GeomLib;
@@ -48,7 +49,7 @@ Number LifEstimator::Nneginit() const
 Index LifEstimator::IndexReversalBin() const
 {
 	// find the reversal potential. It must be in the interpretation array
-	auto it = find(_vec_interpretation.begin(),_vec_interpretation.end(),_par_ode._par_pop._V_reversal);
+	auto it = std::find(_vec_interpretation.begin(),_vec_interpretation.end(),_par_ode._par_pop._V_reversal);
 	if (it == _vec_interpretation.end())
 		throw GeomLibException("Reversal potential not in interpretation array.");
 	return it - _vec_interpretation.begin();

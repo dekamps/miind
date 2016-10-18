@@ -19,7 +19,7 @@
 #ifndef MPILIB_POPULIST_DELAYEDCONNECTION_HPP_
 #define MPILIB_POPULIST_DELAYEDCONNECTION_HPP_
 
-#include <iostream>
+#include <limits>
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
