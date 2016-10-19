@@ -19,10 +19,10 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 # add the source files
 ##############################################################################
 set(MPI_SRCS
-    src/algorithm/AlgorithmGrid.cpp
-    src/algorithm/HebbianAlgorithm.cpp
-    src/algorithm/PersistantAlgorithm.cpp
-    src/algorithm/WilsonCowanAlgorithm.cpp
+    src/AlgorithmGrid.cpp
+    src/HebbianAlgorithm.cpp
+    src/PersistantAlgorithm.cpp
+    src/WilsonCowanAlgorithm.cpp
     
     src/populist/circulantSolvers/AbstractCirculantSolver.cpp
     src/populist/circulantSolvers//CirculantSolver.cpp
