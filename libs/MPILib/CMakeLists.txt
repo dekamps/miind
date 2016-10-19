@@ -25,15 +25,8 @@ set(MPI_SRCS
     src/PersistantAlgorithm.cpp
     src/WilsonCowanAlgorithm.cpp
     
-<<<<<<< HEAD
+
     src/ProbabilityQueue.cpp
-=======
-    
-    
-    src/populist/InitializeAlgorithmGrid.cpp
-    src/populist/ProbabilityQueue.cpp
-    src/populist/ZeroLeakBuilder.cpp
->>>>>>> dev
     
     src/report/handler/AbstractReportHandler.cpp
     src/report/handler/CanvasParameter.cpp
