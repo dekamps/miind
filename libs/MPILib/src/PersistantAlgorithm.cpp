@@ -18,7 +18,7 @@
 //
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/algorithm/PersistantAlgorithm.hpp>
+#include <MPILib/include/PersistantAlgorithm.hpp>
 #include <MPILib/include/StringDefinitions.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 

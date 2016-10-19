@@ -21,9 +21,9 @@
 #define MPILIB_ALGORITHMS_WILSONCOWANALGORITHM_HPP_
 
 #include <NumtoolsLib/NumtoolsLib.h>
-#include <MPILib/include/algorithm/WilsonCowanParameter.hpp>
+#include <MPILib/include/WilsonCowanParameter.hpp>
 
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/AlgorithmInterface.hpp>
 
 namespace MPILib {
 namespace algorithm{

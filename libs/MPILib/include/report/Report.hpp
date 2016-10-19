@@ -23,7 +23,7 @@
 #include <MPILib/include/report/ReportType.hpp>
 #include <MPILib/include/report/ReportValue.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/algorithm/AlgorithmGrid.hpp>
+#include <MPILib/AlgorithmGrid.hpp>
 
 #include <sstream>
 #include <string>
