@@ -20,7 +20,7 @@
 #define MPILIB_ALGORITHMS_PERSISTANTALGORITHM_HPP_
 
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/AlgorithmInterface.hpp>
 #include "HebbianParameter.hpp"
 
 namespace MPILib {

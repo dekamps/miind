@@ -18,7 +18,7 @@
 //
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/algorithm/WilsonCowanAlgorithm.hpp>
+#include <MPILib/include/WilsonCowanAlgorithm.hpp>
 #include <MPILib/include/StringDefinitions.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 

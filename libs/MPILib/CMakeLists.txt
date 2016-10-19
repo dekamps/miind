@@ -24,30 +24,7 @@ set(MPI_SRCS
     src/PersistantAlgorithm.cpp
     src/WilsonCowanAlgorithm.cpp
     
-    src/populist/circulantSolvers/AbstractCirculantSolver.cpp
-    src/populist/circulantSolvers//CirculantSolver.cpp
-    src/populist/circulantSolvers/PolynomialCirculant.cpp
-    src/populist/circulantSolvers/RefractiveCirculantSolver.cpp
-    src/populist/circulantSolvers/VArray.cpp
-     
-    src/populist/nonCirculantSolvers/AbstractNonCirculantSolver.cpp
-    src/populist/nonCirculantSolvers/LimitedNonCirculant.cpp
-    src/populist/nonCirculantSolvers/MatrixNonCirculant.cpp
-    src/populist/nonCirculantSolvers/NonCirculantSolver.cpp
     
-    src/populist/parameters/PopulistSpecificParameter.cpp
-    
-    src/populist/rateComputation/AbstractRateComputation.cpp
-    src/populist/rateComputation/IntegralRateComputation.cpp
-    
-    src/populist/rebinner/AbstractRebinner.cpp
-    src/populist/rebinner/InterpolationRebinner.cpp
-
-    src/populist/zeroLeakEquations/InputConvertor.cpp
-    src/populist/zeroLeakEquations/LIFZeroLeakEquations.cpp
-    src/populist/zeroLeakEquations/MuSigmaScalarProduct.cpp
-    src/populist/zeroLeakEquations/NumericalZeroLeakEquations.cpp
-    src/populist/zeroLeakEquations/SingleInputZeroLeakEquations.cpp
     
     src/populist/InitializeAlgorithmGrid.cpp
     src/populist/ProbabilityQueue.cpp

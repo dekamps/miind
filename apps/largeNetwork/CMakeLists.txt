@@ -38,7 +38,7 @@ set ( LIBLIST
 #############################################################################
 # executables
 #############################################################################
-if (EANBLE_ROOT)
+if (ENABLE_ROOT)
 add_executable(largeNetwork LargeNetwork.cpp Hexagon.cpp GenerateHexagonalNetwork.cpp)
 target_link_libraries(largeNetwork ${LIBLIST})
 endif (ENABLE_ROOT)
