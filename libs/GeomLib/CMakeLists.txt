@@ -1,5 +1,5 @@
 
-project( ${MIIND_LIBRARY_PREFIX}numtools )
+project( ${MIIND_LIBRARY_PREFIX}geom )
 
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )

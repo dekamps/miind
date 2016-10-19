@@ -136,7 +136,7 @@ namespace
     	}
     }
 
-    void SetDyDtZero(double dydt[], Number n_bins)
+    static inline void SetDyDtZero(double dydt[], Number n_bins)
     {
     	// mind the equality sign
     	for (Index i = 0; i <=n_bins; i++)
