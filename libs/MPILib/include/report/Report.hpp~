@@ -23,7 +23,7 @@
 #include <MPILib/include/report/ReportType.hpp>
 #include <MPILib/include/report/ReportValue.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/algorithm/AlgorithmGrid.hpp>
+#include <MPILib/include/AlgorithmGrid.hpp>
 
 #include <sstream>
 #include <string>
@@ -54,7 +54,7 @@ struct Report {
 	/**
 	 * The state space of the Algorithm
 	 */
-	algorithm::AlgorithmGrid _grid = (0);
+	AlgorithmGrid _grid = (0);
 	/**
 	 * Information for the handler on how to treat the Report
 	 */

@@ -21,11 +21,10 @@
 #define MPILIB_ALGORITHMS_DELAYASSEMBLYALGORITHM_CODE_HPP_
 
 #include <cassert>
-#include <MPILib/include/algorithm/DelayAssemblyAlgorithm.hpp>
+#include <MPILib/include/DelayAssemblyAlgorithm.hpp>
 #include "MuSigmaScalarProduct.hpp"
 
 namespace MPILib {
-namespace algorithm {
 
     template <class WeightType>
     DelayAssemblyAlgorithm<WeightType>::DelayAssemblyAlgorithm(const DelayAssemblyParameter& par):
@@ -51,7 +50,7 @@ namespace algorithm {
     }
 
     template <class WeightType>
-    AlgorithmGrid DelayAssemblyAlgorithm<WeightType>::getGrid() const {
+    AlgorithmGrid DelayAssemblyAlgorithm<WeightType>::getGrid(NodeId) const {
     	vector<double> g(1);
     	g[0] = _r_current;
     	return AlgorithmGrid(g);
@@ -75,8 +74,6 @@ namespace algorithm {
 
     }
 
-
-} /* end namespace algorithm */
 } /* end namespace MPILib */
 
 #endif  //include guard MPILIB_ALGORITHMS_DELAYASSEMBLYALGORITHM_CODE_HPP_

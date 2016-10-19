@@ -29,7 +29,7 @@ namespace MPILib {
 
 template<class Weight, class NodeDistribution>
 MPINode<Weight, NodeDistribution>::MPINode(
-		const algorithm::AlgorithmInterface<Weight>& algorithm,
+		const AlgorithmInterface<Weight>& algorithm,
 		NodeType nodeType,
 		NodeId nodeId,
 		const NodeDistribution& nodeDistribution,

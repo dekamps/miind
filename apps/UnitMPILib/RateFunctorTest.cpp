@@ -20,7 +20,7 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include <boost/test/execution_monitor.hpp>
-#include <MPILib/algorithm/RateFunctorCode.hpp>
+#include <MPILib/include/RateFunctorCode.hpp>
 
 using MPILib::Time;
 
@@ -33,7 +33,7 @@ MPILib::Rate SinFun(MPILib::Time t)
 
 BOOST_AUTO_TEST_CASE(RateFunctorConstructionTest ) {
 
-  MPILib::algorithm::RateFunctor<double> funky(SinFun);
+  MPILib::RateFunctor<double> funky(SinFun);
   
 }
 

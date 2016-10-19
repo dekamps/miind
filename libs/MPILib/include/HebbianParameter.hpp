@@ -21,13 +21,11 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
-namespace algorithm {
 
 	struct HebbianParameter {
 		MPILib::Efficacy 	_base_line;
 		MPILib::Time		_decay_time;
 	};
-}
 }
 
 #endif // include guard

@@ -21,6 +21,7 @@
 #include "Response.hpp"
 
 using namespace GeomLib;
+using namespace MPILib;
 using NumtoolsLib::Precision;
 
 const int OU_STATE_DIMENSION       = 1;

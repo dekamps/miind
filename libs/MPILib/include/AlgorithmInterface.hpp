@@ -20,7 +20,6 @@
 #ifndef MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
 #define MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_
 
-//#include <MPILib/config.hpp> //TODO: this file is actually created in the build directory ... why? leave for now
 #include <MPILib/include/TypeDefinitions.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/AlgorithmGrid.hpp>
@@ -29,7 +28,6 @@
 #include <vector>
 
 namespace MPILib {
-namespace algorithm {
 
 /**
  * @brief The interface for all algorithm classes.
@@ -114,7 +112,7 @@ public:
 	 * Stores the algorithm state in a Algorithm Grid
 	 * @return The state of the algorithm. The Grid must at least contain one element; an empty grid will cause a crash.
 	 */
-	virtual AlgorithmGrid getGrid() const = 0;
+	virtual AlgorithmGrid getGrid(NodeId) const = 0;
 
 
 	std::valarray<double>& getArrayState(AlgorithmGrid& grid) const
@@ -139,6 +137,5 @@ public:
 
 };
 
-} /* namespace algorithm */
 } /* namespace MPILib */
 #endif /* MPILIB_ALGORITHMS_ALGORITHMINTERFACE_HPP_ */

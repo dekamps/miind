@@ -25,7 +25,7 @@
 #include <map>
 #include <memory>
 
-#include <MPILib/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/AlgorithmInterface.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/NodeType.hpp>
 
@@ -60,7 +60,7 @@ public:
 	 * @param localNode The local nodes of this processor
 	 */
 	explicit MPINode(
-			const algorithm::AlgorithmInterface<Weight>& algorithm,
+			const AlgorithmInterface<Weight>& algorithm,
 			NodeType nodeType,
 			NodeId nodeId,
 			const NodeDistribution& nodeDistribution,
@@ -176,7 +176,7 @@ private:
 	/**
 	 * A Pointer that holds the Algorithm
 	 */
-	std::shared_ptr<algorithm::AlgorithmInterface<Weight>> _pAlgorithm;
+	std::shared_ptr<AlgorithmInterface<Weight>> _pAlgorithm;
 
 	/**
 	 * The type of this node needed for dales law

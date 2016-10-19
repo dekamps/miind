@@ -22,28 +22,22 @@
 #define MPILIB_ALGORITHMS_OUALGORITHM_HPP_
 
 #include <NumtoolsLib/NumtoolsLib.h>
-#include <MPILib/algorithm/WilsonCowanParameter.hpp>
-#include <MPILib/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/WilsonCowanParameter.hpp>
+#include <MPILib/include/AlgorithmInterface.hpp>
 #include <MPILib/include/DelayedConnection.hpp>
 #include "GeomInputConvertor.hpp"
 #include "MuSigmaScalarProduct.hpp"
 #include "NeuronParameter.hpp"
 #include "ResponseParameter.hpp"
 
-using MPILib::algorithm::AlgorithmGrid;
-using MPILib::algorithm::AlgorithmInterface;
-using MPILib::DelayedConnection;
-using MPILib::Rate;
-using MPILib::SimulationRunParameter;
-using MPILib::Time;
-using NumtoolsLib::DVIntegrator;
+
 
 namespace GeomLib {
 
   //!< \brief Rate-based model with gain function based on a diffusion process.
 
  
-  class OUAlgorithm : public AlgorithmInterface<MPILib::DelayedConnection> {
+  class OUAlgorithm : public MPILib::AlgorithmInterface<MPILib::DelayedConnection> {
 	public:
 
 
@@ -65,7 +59,7 @@ namespace GeomLib {
     /// configure algorithm
     virtual void configure
     (
-     const SimulationRunParameter& //!< simulation run parameter
+     const MPILib::SimulationRunParameter& //!< simulation run parameter
      );
 
     /**                                                                                                                                                                          
@@ -76,9 +70,9 @@ namespace GeomLib {
      */
     virtual void evolveNodeState
                   (
-		   const std::vector<Rate>& nodeVector,
+		   const std::vector<MPILib::Rate>& nodeVector,
 		   const std::vector<MPILib::DelayedConnection>& weightVector, 
-		   Time time
+		   MPILib::Time time
 		   );
 
 	/**
@@ -94,7 +88,7 @@ namespace GeomLib {
 
 
     /// Current AlgorithmGrid
-    virtual AlgorithmGrid getGrid(MPILib::NodeId) const;
+    virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId) const;
 
     /**                                                                                                                                                                          
      * Cloning operation, to provide each DynamicNode with its own                                                                                                               
@@ -103,15 +97,15 @@ namespace GeomLib {
     virtual OUAlgorithm* clone() const;
 
     //! Current tme of the simulation
-    virtual Time getCurrentTime() const;
+    virtual MPILib::Time getCurrentTime() const;
     
     //! Current output rate of the population
-    virtual Rate getCurrentRate() const;
+    virtual MPILib::Rate getCurrentRate() const;
 
 
   private:
 
-    AlgorithmGrid InitialGrid() const;
+    MPILib::AlgorithmGrid InitialGrid() const;
     vector<double> InitialState() const;
 
     ResponseParameter 
@@ -122,7 +116,7 @@ namespace GeomLib {
 
     NeuronParameter                 _parameter_neuron;
     ResponseParameter     			_parameter_response;
-    DVIntegrator<ResponseParameter>	_integrator;
+    NumtoolsLib::DVIntegrator<ResponseParameter>	_integrator;
     MuSigmaScalarProduct<MPILib::DelayedConnection> _scalar_product;
   };
 

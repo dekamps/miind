@@ -21,7 +21,7 @@
 #ifndef _CODE_LIBS_GEOMLIB_MASTEREQUATIONS_INCLUDE_GUARD
 #define _CODE_LIBS_GEOMLIB_MASTEREQUATIONS_INCLUDE_GUARD
 
-#include <MPILib/include/populist/ProbabilityQueue.hpp>
+#include <MPILib/include/ProbabilityQueue.hpp>
 #include "../NumtoolsLib/NumtoolsLib.h"
 #include "AbstractMasterEquation.hpp"
 #include "AbstractOdeSystem.hpp"

@@ -24,7 +24,6 @@
 #include "RateFunctor.hpp"
 
 namespace MPILib {
-namespace algorithm {
 
 	template <class WeightValue>
 	RateFunctor<WeightValue>::RateFunctor(RateFunction function):
@@ -47,14 +46,14 @@ namespace algorithm {
 	}
 
 	template <class WeightValue>
-	AlgorithmGrid RateFunctor<WeightValue>::getGrid() const
+	AlgorithmGrid RateFunctor<WeightValue>::getGrid(NodeId) const
 	{
 		std::vector<double> vector_grid(1,_function(_current_time));
 		return AlgorithmGrid(vector_grid);
 	}
 	
 	template <class WeightValue>
-	MPILib::algorithm::RateFunctor<WeightValue>* RateFunctor<WeightValue>::clone() const
+	MPILib::RateFunctor<WeightValue>* RateFunctor<WeightValue>::clone() const
 	{
 		return new RateFunctor<WeightValue>(*this);
 	}
@@ -71,6 +70,5 @@ namespace algorithm {
 		return _current_rate;
 	}
 
-}
 }
 #endif // include guard

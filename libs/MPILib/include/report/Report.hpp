@@ -23,11 +23,7 @@
 #include <MPILib/include/report/ReportType.hpp>
 #include <MPILib/include/report/ReportValue.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-<<<<<<< HEAD
-#include <MPILib/AlgorithmGrid.hpp>
-=======
 #include <MPILib/include/AlgorithmGrid.hpp>
->>>>>>> dev
 
 #include <sstream>
 #include <string>
@@ -58,7 +54,7 @@ struct Report {
 	/**
 	 * The state space of the Algorithm
 	 */
-	algorithm::AlgorithmGrid _grid = (0);
+	AlgorithmGrid _grid = (0);
 	/**
 	 * Information for the handler on how to treat the Report
 	 */
@@ -90,7 +86,7 @@ struct Report {
 	 * @param vec_values Ad hoc values that need to be logged in the simulation file
 	 * @param nrNodes The number of nodes on this processor
 	 */
-	Report(Time time, Rate rate, NodeId id, algorithm::AlgorithmGrid grid,
+	Report(Time time, Rate rate, NodeId id, AlgorithmGrid grid,
 			ReportType type, std::vector<ReportValue> vec_values, int nrNodes =
 					0);
 

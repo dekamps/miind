@@ -20,7 +20,7 @@
 #ifndef _CODE_LIBS_GEOMLIB_SPIKINGODESYSTEM_INCLUDE_GUARD
 #define _CODE_LIBS_GEOMLIB_SPIKINGODESYSTEM_INCLUDE_GUARD
 
-#include <MPILib/include/populist/ProbabilityQueue.hpp>
+#include <MPILib/include/ProbabilityQueue.hpp>
 #include "AbstractOdeSystem.hpp"
 #include "SpikingNeuralDynamics.hpp"
 

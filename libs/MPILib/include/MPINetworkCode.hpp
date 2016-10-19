@@ -47,7 +47,7 @@ MPINetwork<WeightValue, NodeDistribution>::~MPINetwork() {
 
 template<class WeightValue, class NodeDistribution>
 int MPINetwork<WeightValue, NodeDistribution>::addNode(
-		const algorithm::AlgorithmInterface<WeightValue>& alg,
+		const AlgorithmInterface<WeightValue>& alg,
 		NodeType nodeType) {
 
 	assert(

@@ -29,7 +29,7 @@
 #include <functional>
 #include <numeric>
 
-using namespace MPILib::algorithm;
+using namespace MPILib;
 
 HebbianAlgorithm::HebbianAlgorithm(const HebbianParameter& par_heb):
 _rate(0),
@@ -53,9 +53,9 @@ MPILib::Time HebbianAlgorithm::getCurrentTime() const {
 	return _time;
 }
 
-MPILib::algorithm::AlgorithmGrid HebbianAlgorithm::getGrid() const {
+MPILib::AlgorithmGrid HebbianAlgorithm::getGrid(NodeId) const {
 	vector<MPILib::Efficacy> vec_ret(_rate,1);
-	return MPILib::algorithm::AlgorithmGrid(vec_ret);
+	return MPILib::AlgorithmGrid(vec_ret);
 }
 
 void HebbianAlgorithm::configure(const SimulationRunParameter& par_run){

@@ -21,12 +21,11 @@
 #define MPILIB_ALGORITHMS_RATEALGORITHM_HPP_
 
 
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/AlgorithmInterface.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 
 
 namespace MPILib {
-namespace algorithm{
 /**
  * @brief An Algorithm with constant rate
  */
@@ -75,7 +74,7 @@ public:
 	 */
 	virtual Rate getCurrentRate() const;
 
-	virtual AlgorithmGrid getGrid() const;
+	virtual AlgorithmGrid getGrid(NodeId) const;
 
 private:
 
@@ -84,6 +83,5 @@ private:
 
 };
 
-} /* namespace algorithm */
 } /* namespace MPILib */
 #endif /* MPILIB_ALGORITHMS_RATEALGORITHM_HPP_ */

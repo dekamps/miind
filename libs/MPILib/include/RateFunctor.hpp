@@ -22,11 +22,10 @@
 #ifndef MPILIB_ALGORITHMS_RATEFUNCTOR_HPP_
 #define MPILIB_ALGORITHMS_RATEFUNCTOR_HPP_
 
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/AlgorithmInterface.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
-namespace algorithm{
 
 	typedef MPILib::Rate (*RateFunction)(MPILib::Time);
 
@@ -86,7 +85,7 @@ namespace algorithm{
 		virtual MPILib::Rate getCurrentRate() const;
 
 
-		virtual AlgorithmGrid getGrid() const;
+		virtual AlgorithmGrid getGrid(NodeId) const;
 
 
 	private:
@@ -99,7 +98,6 @@ namespace algorithm{
 
 	typedef RateFunctor<double> D_RateFunctor;
 
-} // end of algorithm
 } // end of MPILib
 
 #endif // include guard

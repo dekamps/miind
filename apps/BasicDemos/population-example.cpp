@@ -25,9 +25,9 @@
 //! [preamble]
 #include <GeomLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
-#include <MPILib/algorithm/RateAlgorithmCode.hpp>
-#include <MPILib/algorithm/RateFunctorCode.hpp>
-#include <MPILib/algorithm/WilsonCowanAlgorithm.hpp>
+#include <MPILib/include/RateAlgorithmCode.hpp>
+#include <MPILib/include/RateFunctorCode.hpp>
+#include <MPILib/include/WilsonCowanAlgorithm.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 
@@ -35,10 +35,10 @@ using MPILib::EXCITATORY_DIRECT;
 using MPILib::INHIBITORY_DIRECT;
 using MPILib::NodeId;
 using MPILib::SimulationRunParameter;
-using MPILib::algorithm::RateAlgorithm;
-using MPILib::algorithm::RateFunctor;
-using MPILib::algorithm::WilsonCowanAlgorithm;
-using MPILib::algorithm::WilsonCowanParameter;
+using MPILib::RateAlgorithm;
+using MPILib::RateFunctor;
+using MPILib::WilsonCowanAlgorithm;
+using MPILib::WilsonCowanParameter;
 
 using std::cout;
 using std::endl;

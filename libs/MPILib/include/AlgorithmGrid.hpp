@@ -24,7 +24,6 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
-namespace algorithm {
 
 /**
  * @brief AlgorithmGrid
@@ -133,7 +132,6 @@ private:
 	std::valarray<double> _arrayInterpretation;
 };
 
-}
 } // end of namespace
 
 #endif //MPILIB_ALGORITHMS_ALGORITHMGRID_HPP_ include guard

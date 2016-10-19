@@ -24,7 +24,6 @@
 #include "HebbianParameter.hpp"
 
 namespace MPILib {
-namespace algorithm {
 
 	class HebbianAlgorithm : public AlgorithmInterface<double>{
 	public:
@@ -69,13 +68,12 @@ namespace algorithm {
 		 */
 		virtual Rate getCurrentRate() const;
 
-		virtual AlgorithmGrid getGrid() const;
+		virtual AlgorithmGrid getGrid(NodeId) const;
 
 	private:
 
 		MPILib::Rate _rate;
 		MPILib::Time _time;
 	};
-}
 }
 #endif // include guard

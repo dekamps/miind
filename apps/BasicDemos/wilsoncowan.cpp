@@ -3,13 +3,13 @@
 #include <boost/timer/timer.hpp>
 #include <GeomLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
-#include <MPILib/algorithm/RateAlgorithmCode.hpp>
+#include <MPILib/include/RateAlgorithmCode.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
-#include <MPILib/algorithm/WilsonCowanAlgorithm.hpp>
-#include <MPILib/algorithm/PersistantAlgorithm.hpp>
-#include <MPILib/algorithm/DelayAlgorithmCode.hpp>
-#include <MPILib/algorithm/RateFunctorCode.hpp>
+#include <MPILib/include/WilsonCowanAlgorithm.hpp>
+#include <MPILib/include/PersistantAlgorithm.hpp>
+#include <MPILib/include/DelayAlgorithmCode.hpp>
+#include <MPILib/include/RateFunctorCode.hpp>
 
 typedef MPILib::MPINetwork<double, MPILib::utilities::CircularDistribution> Network;
 
@@ -27,9 +27,9 @@ int main(int argc, char *argv[]) {
         const double f_noise_0 = 1.0;
         MPILib::Rate f_max_0 = 10.0;
         MPILib::Rate I_ext_0 = 0;
-        MPILib::algorithm::WilsonCowanParameter  par_wil_0(t_mem_0,f_max_0,f_noise_0,I_ext_0);
-        MPILib::algorithm::WilsonCowanAlgorithm alg_wc_0(par_wil_0);
-        MPILib::algorithm::RateAlgorithm<double> rate_alg_1(100.0);
+        MPILib::WilsonCowanParameter  par_wil_0(t_mem_0,f_max_0,f_noise_0,I_ext_0);
+        MPILib::WilsonCowanAlgorithm alg_wc_0(par_wil_0);
+        MPILib::RateAlgorithm<double> rate_alg_1(100.0);
         // generating nodes
         MPILib::NodeId id_0 = network.addNode(alg_wc_0,MPILib::EXCITATORY_GAUSSIAN);
         MPILib::NodeId id_1 = network.addNode(rate_alg_1,MPILib::EXCITATORY_GAUSSIAN);

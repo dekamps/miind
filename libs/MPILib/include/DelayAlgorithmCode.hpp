@@ -22,14 +22,14 @@
 
 //#include <MPILib/config.hpp>
 #include <cassert>
-#include <MPILib/include/algorithm/DelayAlgorithm.hpp>
+#include <MPILib/include/DelayAlgorithm.hpp>
 
 namespace MPILib {
 namespace algorithm {
 
 template<class Weight>
 DelayAlgorithm<Weight>::DelayAlgorithm(Time t_delay) :
-		algorithm::AlgorithmInterface<Weight>(), _t_current(0.0), _t_delay(
+		AlgorithmInterface<Weight>(), _t_current(0.0), _t_delay(
 				t_delay), _rate_current(0.0) {
 }
 

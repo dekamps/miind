@@ -24,7 +24,6 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
-namespace algorithm {
 struct DelayAssemblyParameter {
 
 	DelayAssemblyParameter() {
@@ -70,7 +69,6 @@ struct DelayAssemblyParameter {
 
      };
 
-}
 } // end of namespaces
 
 #endif // include guard

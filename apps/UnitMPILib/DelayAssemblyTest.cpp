@@ -22,17 +22,17 @@
 #include <boost/test/execution_monitor.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/NodeType.hpp>
-#include <MPILib/algorithm/DelayAssemblyAlgorithmCode.hpp>
+#include <MPILib/include/DelayAssemblyAlgorithmCode.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
-#include <MPILib/algorithm/RateFunctorCode.hpp>
+#include <MPILib/include/RateFunctorCode.hpp>
 #include <GeomLib.hpp>
 
 typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 
-using MPILib::algorithm::RateFunctor;
-using MPILib::algorithm::DelayAssemblyParameter;
-using MPILib::algorithm::DelayAssemblyAlgorithm;
+using MPILib::RateFunctor;
+using MPILib::DelayAssemblyParameter;
+using MPILib::DelayAssemblyAlgorithm;
 using MPILib::Time;
 
 
@@ -40,8 +40,8 @@ using MPILib::Time;
 
 BOOST_AUTO_TEST_CASE(DelayAssemblyConstructionTest ) {
   
-  MPILib::algorithm::DelayAssemblyParameter par_ass;
-  MPILib::algorithm::DelayAssemblyAlgorithm<MPILib::DelayedConnection> alg_ass(par_ass);
+  MPILib::DelayAssemblyParameter par_ass;
+  MPILib::DelayAssemblyAlgorithm<MPILib::DelayedConnection> alg_ass(par_ass);
 }
 
 Rate SwitchOnAndOff(Time t){

@@ -23,7 +23,7 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
-namespace algorithm {
+
 struct WilsonCowanParameter {
 
 	WilsonCowanParameter() {
@@ -75,7 +75,7 @@ struct WilsonCowanParameter {
 	double _f_input = 0;
 };
 
-}
+
 } // end of namespaces
 
 #endif // include guard

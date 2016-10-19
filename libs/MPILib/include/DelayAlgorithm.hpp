@@ -23,7 +23,7 @@
 #include <deque>
 #include <MPILib/include/TypeDefinitions.hpp>
 
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/AlgorithmInterface.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 
 namespace MPILib {

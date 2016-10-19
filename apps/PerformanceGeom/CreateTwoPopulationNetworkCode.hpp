@@ -21,7 +21,7 @@
 #define _CODE_LIBS_POPULISTLIB_CREATETWOPOPULATIONNETWORKCODE_INCLUDE_GUARD
 
 #include "CreateTwoPopulationNetwork.hpp"
-#include <MPILib/include/populist/RateFunctorCode.hpp>
+#include <MPILib/include/RateFunctorCode.hpp>
 namespace PerformanceGeom {
 
 	inline Rate CorticalBackground(Time t)
@@ -60,7 +60,7 @@ namespace PerformanceGeom {
         Network network;
 
        	// Create cortical background, and add to network
-	MPILib::populist::RateFunctor<typename Algorithm::WeightType> cortical_background(CorticalBackground);
+	MPILib::RateFunctor<typename Algorithm::WeightType> cortical_background(CorticalBackground);
        	*p_id_cortical_background = network.addNode(cortical_background, MPILib::EXCITATORY_GAUSSIAN);
 
        	// Create excitatory main population

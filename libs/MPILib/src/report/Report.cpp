@@ -26,7 +26,7 @@ Report::Report(Time time, Rate rate, NodeId id) :
 		_time(time), _rate(rate), _id(id) {
 }
 
-Report::Report(Time time, Rate rate, NodeId id, algorithm::AlgorithmGrid grid,
+Report::Report(Time time, Rate rate, NodeId id, AlgorithmGrid grid,
 		ReportType type, std::vector<ReportValue> vec_values, int nrNodes) :
 		_time(time), _rate(rate), _id(id), _grid(grid), _type(type), _values(
 				vec_values), _nrNodes(nrNodes) {

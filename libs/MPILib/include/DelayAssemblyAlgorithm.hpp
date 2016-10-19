@@ -21,12 +21,11 @@
 #define MPILIB_ALGORITHMS_DELAYASSEMBLYALGORITHM_HPP_
 
 #include <NumtoolsLib/NumtoolsLib.h>
-#include <MPILib/include/algorithm/DelayAssemblyParameter.hpp>
+#include <MPILib/include/DelayAssemblyParameter.hpp>
 
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/AlgorithmInterface.hpp>
 
 namespace MPILib {
-namespace algorithm{
 
   template <class WeightType>
 class DelayAssemblyAlgorithm: public AlgorithmInterface<WeightType> {
@@ -71,7 +70,7 @@ public:
 	 */
 	virtual Rate getCurrentRate() const {return _r_current; }
 
-	virtual AlgorithmGrid getGrid() const;
+	virtual AlgorithmGrid getGrid(NodeId) const;
 
 private:
 
@@ -86,6 +85,5 @@ private:
 
 };
 
-} /* namespace algorithm */
 } /* namespace MPILib */
 #endif /* MPILIB_ALGORITHMS_WILSONCOWANALGORITHM_HPP_ */

@@ -22,16 +22,10 @@
 #define _CODE_LIBS_GEOMLIB_GEOMALGORITHM_INCLUDE_GUARD
 
 #include <boost/circular_buffer.hpp>
-#include <MPILib/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/AlgorithmInterface.hpp>
 #include "GeomParameter.hpp"
 #include "NumericalMasterEquationCode.hpp"
 
-using MPILib::algorithm::AlgorithmGrid;
-using MPILib::algorithm::AlgorithmInterface;
-using MPILib::DelayedConnection;
-using MPILib::Rate;
-using MPILib::SimulationRunParameter;
-using MPILib::Time;
 
 namespace GeomLib {
   //! Population density algorithm based on Geometric binning: http://arxiv.org/abs/1309.1654
@@ -107,7 +101,7 @@ namespace GeomLib {
 		 * Configure the Algorithm
 		 * @param simParam The simulation parameter
 		 */
-		virtual void configure(const SimulationRunParameter& simParam);
+      virtual void configure(const MPILib::SimulationRunParameter& simParam);
 
 
 		virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
@@ -129,13 +123,13 @@ namespace GeomLib {
 		 * The calculated rate of the node
 		 * @return The rate of the node
 		 */
-		virtual Rate getCurrentRate() const;
+      virtual MPILib::Rate getCurrentRate() const;
 
 		/**
 		 * Stores the algorithm state in a Algorithm Grid
 		 * @return The state of the algorithm
 		 */
-		virtual AlgorithmGrid getGrid(NodeId) const;
+      virtual MPILib::AlgorithmGrid getGrid(NodeId) const;
 
 	private:
 

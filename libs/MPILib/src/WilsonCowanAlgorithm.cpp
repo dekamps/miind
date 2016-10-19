@@ -32,7 +32,7 @@
 namespace {
 
 int sigmoid(double, const double y[], double f[], void *params) {
-	auto p_parameter = (MPILib::algorithm::WilsonCowanParameter *) params;
+	auto p_parameter = (MPILib::WilsonCowanParameter *) params;
 
 	f[0] = (-y[0]
 			+ p_parameter->_rate_maximum
@@ -44,7 +44,7 @@ int sigmoid(double, const double y[], double f[], void *params) {
 
 int sigmoidprime(double , const double[], double *dfdy, double dfdt[],
 		void *params) {
-	auto p_parameter = (MPILib::algorithm::WilsonCowanParameter *) params;
+	auto p_parameter = (MPILib::WilsonCowanParameter *) params;
 	gsl_matrix_view dfdy_mat = gsl_matrix_view_array(dfdy, 1, 1);
 
 	gsl_matrix * m = &dfdy_mat.matrix;
@@ -59,18 +59,17 @@ int sigmoidprime(double , const double[], double *dfdy, double dfdt[],
 }
 
 
-namespace MPILib {
-namespace algorithm {
+using namespace MPILib;
 
 WilsonCowanAlgorithm::WilsonCowanAlgorithm() :
-		AlgorithmInterface<double>(), _integrator(0, getInitialState(), 0, 0,
+  MPILib::AlgorithmInterface<double>(), _integrator(0, getInitialState(), 0, 0,
 				NumtoolsLib::Precision(WC_ABSOLUTE_PRECISION,
 						WC_RELATIVE_PRECISION), sigmoid, sigmoidprime) {
 
 }
 
 WilsonCowanAlgorithm::WilsonCowanAlgorithm(const WilsonCowanParameter&parameter) :
-		AlgorithmInterface<double>(), _parameter(parameter), _integrator(0,
+  MPILib::AlgorithmInterface<double>(), _parameter(parameter), _integrator(0,
 				getInitialState(), 0, 0,
 				NumtoolsLib::Precision(WC_ABSOLUTE_PRECISION,
 						WC_RELATIVE_PRECISION), sigmoid, sigmoidprime) {
@@ -149,9 +148,7 @@ std::vector<double> WilsonCowanAlgorithm::getInitialState() const {
 	return array_return;
 }
 
-AlgorithmGrid WilsonCowanAlgorithm::getGrid() const {
+AlgorithmGrid WilsonCowanAlgorithm::getGrid(NodeId) const {
 	return _integrator.State();
 }
 
-} /* namespace algorithm */
-} /* namespace MPILib */

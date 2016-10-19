@@ -26,7 +26,6 @@
 #include <MPILib/include/AlgorithmInterface.hpp>
 
 namespace MPILib {
-namespace algorithm{
 
 /*! \page wilson_cowan The Wilson-Cowan Algorithm
  *  \section wilson_cowan_introduction The Wilson-Cowan Algorithm
@@ -85,7 +84,7 @@ public:
 	 */
 	virtual Rate getCurrentRate() const;
 
-	virtual AlgorithmGrid getGrid() const;
+	virtual AlgorithmGrid getGrid(NodeId) const;
 
 private:
 
@@ -100,6 +99,5 @@ private:
 
 };
 
-} /* namespace algorithm */
 } /* namespace MPILib */
 #endif /* MPILIB_ALGORITHMS_WILSONCOWANALGORITHM_HPP_ */

@@ -17,7 +17,7 @@
 //
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
-#include "../MPILib/algorithm/AlgorithmInterface.hpp"
+#include "../MPILib/include/AlgorithmInterface.hpp"
 #include "GeomInputConvertor.hpp"
 #include "MuSigmaScalarProduct.hpp"
 #include "NeuronParameter.hpp"

@@ -20,12 +20,12 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include <boost/test/execution_monitor.hpp>
-#include <MPILib/algorithm/HebbianAlgorithm.hpp>
+#include <MPILib/include/HebbianAlgorithm.hpp>
 
 
 using MPILib::Time;
 
-using namespace MPILib::algorithm;
+using namespace MPILib;
 
 BOOST_AUTO_TEST_CASE(HebbianParameterTest) {
 	HebbianParameter par_heb;

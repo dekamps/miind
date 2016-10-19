@@ -20,7 +20,7 @@
 
 #include <GeomLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
-#include <MPILib/algorithm/RateAlgorithmCode.hpp>
+#include <MPILib/include/RateAlgorithmCode.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 
@@ -35,7 +35,7 @@ using GeomLib::NeuronParameter;
 using MPILib::EXCITATORY_DIRECT;
 using MPILib::NodeId;
 using MPILib::SimulationRunParameter;
-using MPILib::algorithm::RateAlgorithm;
+using MPILib::RateAlgorithm;
 
 using std::cout;
 using std::endl;

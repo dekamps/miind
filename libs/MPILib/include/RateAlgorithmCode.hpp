@@ -22,10 +22,9 @@
 
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
-#include <MPILib/include/algorithm/RateAlgorithm.hpp>
+#include "RateAlgorithm.hpp"
 
 namespace MPILib {
-namespace algorithm{
 
 template<class Weight>
 RateAlgorithm<Weight>::RateAlgorithm(Rate rate) :
@@ -68,13 +67,12 @@ Rate RateAlgorithm<Weight>::getCurrentRate() const {
 }
 
 template<class Weight>
-AlgorithmGrid RateAlgorithm<Weight>::getGrid() const {
+AlgorithmGrid RateAlgorithm<Weight>::getGrid(NodeId) const {
 	std::vector<double> vector_grid(RATE_STATE_DIMENSION, _rate);
 	std::vector<double> vector_interpretation(RATE_STATE_DIMENSION, 0);
 	return AlgorithmGrid(vector_grid, vector_interpretation);
 }
 
-} /* namespace algorithm */
 } /* namespace MPILib */
 
 #endif //end include guard MPILIB_ALGORITHMS_RATEALGORITHM_CODE_HPP_
