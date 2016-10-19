@@ -17,7 +17,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+<<<<<<< HEAD
 #include <MPILib/include/AlgorithmGrid.hpp>
+=======
+#include "AlgorithmGrid.hpp"
+>>>>>>> dev
 #include <cassert>
 #include <functional>
 
