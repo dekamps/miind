@@ -16,7 +16,6 @@ INCLUDE_DIRECTORIES(
 set( TWOD_SRC
 CSRMatrix.cpp			
 Master.cpp			
-ParseConfig.cpp			
 TransitionMatrix.cpp	 
 Cell.cpp											
 MasterOMP.cpp		   
@@ -56,7 +55,6 @@ TransitionList.hpp
 Uniform.hpp
 CheckSystem.hpp																  	       			 
 MasterOMP.hpp	       
-ParseConfig.hpp   
 TransitionMatrix.hpp  
 modulo.hpp
 Coordinates.hpp										 		       			 

@@ -46,9 +46,9 @@ Mesh::Mesh(const Mesh& m):
 _vec_block(m._vec_block),
 _vec_vec_quad(m._vec_vec_quad),
 _vec_vec_gen(m._vec_vec_gen),
+_t_step(m._t_step),
 _map(m._map),
-_vec_vec_cell(m._vec_vec_cell),
-_t_step(m._t_step)
+_vec_vec_cell(m._vec_vec_cell)
 {
 }
 

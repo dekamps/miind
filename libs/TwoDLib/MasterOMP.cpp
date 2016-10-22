@@ -64,7 +64,7 @@ _init(_rate)
 		 }
 
 #pragma omp parallel for
-		 for (int imass = 0; imass < _sys._vec_mass.size(); imass++)
+		 for (MPILib::Index imass = 0; imass < _sys._vec_mass.size(); imass++)
 			 _sys._vec_mass[imass] += _add._h*_dydt[imass];
 	 }
  }

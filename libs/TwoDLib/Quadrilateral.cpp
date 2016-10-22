@@ -19,6 +19,7 @@
 #include <iostream>
 #include <sstream>
 #include <NumtoolsLib/NumtoolsLib.h>
+#include <MPILib/include/TypeDefinitions.hpp>
 #include "LineSegment.hpp"
 #include "Quadrilateral.hpp"
 #include "TwoDLibException.hpp"
@@ -79,7 +80,7 @@ bool Quadrilateral::IsSimple() const {
 
 	// Run over all 4 edges. The only edge that needs to be tested is the non neighbouring one.
 	// Unlike other functions, this one is particular to Quadrilaterals
-	for (int i = 0; i < _n_points/2; i++){
+  for (MPILib::Index i = 0; i < _n_points/2; i++){
 		Point p_2 = _vec_points[modulo(i+2,_n_points)];
 		Point p_3 = _vec_points[modulo(i+3,_n_points)];
 
@@ -97,7 +98,7 @@ bool Quadrilateral::IsConvex() const
 {
 
 	vector<double> cp(_n_points);
-	for (int i = 0; i < _n_points; i++){
+	for (MPILib::Index i = 0; i < _n_points; i++){
 		double dx1 = _vec_points[modulo(i+1,_n_points)][0] - _vec_points[modulo(i,  _n_points)][0];
 		double dx2 = _vec_points[modulo(i+2,_n_points)][0] - _vec_points[modulo(i+1,_n_points)][0];
 		double dy1 = _vec_points[modulo(i+1,_n_points)][1] - _vec_points[modulo(i,  _n_points)][1];

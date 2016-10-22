@@ -73,8 +73,8 @@ void Write
 	const std::vector<TwoDLib::TransitionList>& list,
 	double tr_v,
 	double tr_w,
-	unsigned int l_min,
-	unsigned int l_max
+	MPILib::Index l_min,
+	MPILib::Index l_max
 )
 {
 	std::ofstream ofst(fn);
@@ -104,9 +104,9 @@ void Write
 			double tr_v,
 			double tr_w,
 			double tr_reset,
-			unsigned int nr_points,
-			unsigned int l_min,
-			unsigned int l_max
+			MPILib::Number nr_points,
+			MPILib::Index l_min,
+			MPILib::Index l_max
 	){
 	    std::vector<TwoDLib::TransitionList> transitions;
 
@@ -135,7 +135,7 @@ void Write
 
 		std::vector<TwoDLib::Coordinates> strays;
 
-		int min_strip, max_strip;
+		MPILib::Index min_strip, max_strip;
 		if (l_min == 0 && l_max == 0){
 			min_strip = 0;
 			max_strip = mesh.NrQuadrilateralStrips();
@@ -144,9 +144,9 @@ void Write
 			max_strip = l_max;
 		}
 
-		for( int i = min_strip; i <  max_strip; i++){
+		for( MPILib::Index i = min_strip; i <  max_strip; i++){
 			std::cout << i << " " << mesh.NrCellsInStrip(i) << std::endl;
-			for (int j = 0; j < mesh.NrCellsInStrip(i); j++){
+			for (MPILib::Index j = 0; j < mesh.NrCellsInStrip(i); j++){
 
 				// Only generate if the origin is in BELOW, or in EQUAL
 				TwoDLib::Coordinates c(i,j);

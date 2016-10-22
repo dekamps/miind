@@ -17,7 +17,7 @@
 //
 #ifndef _CODE_LIBS_TWODLIB_PARSECONFIG_INCLUDE_GUARD
 #define _CODE_LIBS_TWODLIB_PARSECONFIG_INCLUDE_GUARD
-
+/*
 #include <vector>
 #include <fstream>
 #include "FiducialElement.hpp"
@@ -64,5 +64,5 @@ namespace TwoDLib {
 	TwoDLib::Config                     ParseConfig     (std::ifstream&);
 	std::vector<TwoDLib::Quadrilateral> ParseStationary (std::ifstream&);
 
-}
+	}*/
 #endif // include guard

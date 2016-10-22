@@ -20,8 +20,12 @@
 #define _CODE_LIBS_TWODLIBLIB_MESHALGORITHMCODE_INCLUDE_GUARD
 
 #include <boost/filesystem.hpp>
+#include <MPILib/include/utilities/Log.hpp>
+#include <fstream>
 #include "MeshAlgorithm.hpp"
 #include "Stat.hpp"
+#include "TwoDLibException.hpp"
+
 namespace {
 
 	// predicate that helps to locate "Mapping" nodes in an xml structure
@@ -49,7 +53,7 @@ namespace TwoDLib {
 		pugi::xml_node  root = _doc.first_child();
 
 		if (result.status != pugi::status_ok)
-			throw TwoDLibException("Can't open .model file.");
+		  throw TwoDLib::TwoDLibException("Can't open .model file.");
 		return root;
 	}
 
@@ -59,7 +63,7 @@ namespace TwoDLib {
 		pugi::xml_node mesh_node = _root.first_child();
 
 		if (mesh_node.name() != std::string("Mesh") )
-			throw TwoDLibException("Couldn't find mesh node in model file");
+		  throw TwoDLib::TwoDLibException("Couldn't find mesh node in model file");
 		std::ostringstream ostmesh;
 		mesh_node.print(ostmesh);
 		std::istringstream istmesh(ostmesh.str());
@@ -163,20 +167,21 @@ namespace TwoDLib {
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
 
+		// the integration time step, stored in the MasterParameter, is gauged with respect to the
+		// network time step.
 		MPILib::Number n_ode = static_cast<MPILib::Number>(std::floor(t_step/_h));
-
 		MasterParameter par((n_ode > 1) ? n_ode : 1 );
 
 		// vec_mat will go out of scope; MasterOMP will convert the matrices
 		// internally and we don't want to keep two versions.
 		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
-		std::cout << vec_mat.size() << std::endl;
+	 
  		std::unique_ptr<TwoDLib::MasterOMP> p_master(new MasterOMP(_sys,vec_mat, par));
 
 		_p_master = std::move(p_master);
 
 		// at this stage initialization must have taken place, either by default in (0,0),
-		// or by the user call Initialize if there is no strip 0
+		// or by the user calling Initialize if there is no strip 0
 
 		double sum = _sys.P();
 		if (sum == 0.)
@@ -212,13 +217,24 @@ namespace TwoDLib {
 		const std::vector<MPILib::NodeType>& typeVector
 	)
 	{
+	  // The network time step must be an integer multiple of the network time step; in principle
+	  // we would expect this multiple to be one, but perhaps there are reasons to allow a population
+	  // have a finer time resolution than others, so we allow larger multiples but write a warning in the log file.
 		// determine number of steps and fix at the first step.
 		if (_n_steps == 0){
+		  // since n_steps == 0, time is the network time step
 			double n = (time - _t_cur)/_dt;
-			// ceil because at least time must be achieved
-			MPILib::Number n_steps = static_cast<MPILib::Number>(ceil(n));
+		    
+			_n_steps = static_cast<MPILib::Number>(round(n));
 			if (_n_steps == 0)
-				_n_steps++;
+			  throw TwoDLibException("Network time step is smaller than this grid's time step.");
+
+			if (fabs(_n_steps - n) > 1e-6)
+			  throw TwoDLibException("Mismatch of mesh time step and network time step. Network time step should be a multiple (mostly one) of network time step");
+			if (_n_steps > 1)
+			  LOG(MPILib::utilities::logWARNING)<< "Mesh runs at a time step which is a multiple of the network time step. Is this intended?";
+			else
+			  ; // else is fine
 		}
 
 	    // mass rotation

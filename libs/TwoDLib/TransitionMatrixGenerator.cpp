@@ -18,6 +18,7 @@
 #include <iostream>
 #include <cmath>
 #include <limits>
+#include "MPILib/include/TypeDefinitions.hpp"
 #include "QuadGenerator.hpp"
 #include "TransitionMatrixGenerator.hpp"
 
@@ -99,8 +100,8 @@ TransitionMatrixGenerator::Hit TransitionMatrixGenerator::Locate(const Point& pt
 	// after this call, the count value may have been set to 'Accounted'.
 
 	// Just linear search then
-	for (int i = 0; i < _tree.MeshRef().NrQuadrilateralStrips(); i++)
-		for (int j = 0; j < _tree.MeshRef().NrCellsInStrip(i); j++ ){
+	for (MPILib::Index i = 0; i < _tree.MeshRef().NrQuadrilateralStrips(); i++)
+	  for (MPILib::Index j = 0; j < _tree.MeshRef().NrCellsInStrip(i); j++ ){
 			if (_tree.MeshRef().Quad(i,j).IsInside(pt_translated) ){
 				hit._count = 1;
 				hit._cell = Coordinates(i,j);

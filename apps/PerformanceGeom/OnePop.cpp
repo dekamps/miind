@@ -82,7 +82,7 @@ int main(int argc, char* argv[]){
 			0.0,
 			1.0,
 			1e-2,
-			1e-4,
+			algmesh.MeshReference().TimeStep(),
 			"singlepoptest.log"
 		);
 		network.configureSimulation(par_run);

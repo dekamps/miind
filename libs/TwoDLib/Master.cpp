@@ -43,7 +43,7 @@ _init(_rate)
  {
 	 int imat = 0;
 	 for (double rate: rates){
-		 _rate = t_step*rates[imat];
+		 _rate = t_step*rate;
 		 for (MPILib::Index j = 0; j < _par._N_steps; j++){
 			 std::transform(_sys._vec_mass.begin(),_sys._vec_mass.end(),_dydt.begin(),_init);
 			 std::for_each(_vec_mat[imat]._vec_line.begin(),_vec_mat[imat]._vec_line.end(),_derivative);

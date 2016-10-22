@@ -223,8 +223,8 @@ private:
  *
  */
 #define LOG(level) \
-if (level > utilities::Log::getReportingLevel() || !utilities::Log::getStream()) ; \
-else utilities::Log().writeReport(level)
+  if (level > MPILib::utilities::Log::getReportingLevel() || ! MPILib::utilities::Log::getStream()) ; \
+  else MPILib::utilities::Log().writeReport(level)
 
 } /* namespace MPILib */
 #endif /* MPILIB_UTILITIES_LOG_HPP_ */
