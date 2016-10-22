@@ -14,7 +14,6 @@
 #include "Bind.hpp"
 #include "CorrectStrays.hpp"
 #include "GenerateMatrix.hpp"
-#include "ParseConfig.hpp"
 #include "ConstructResetMapping.hpp"
 
 using namespace std;

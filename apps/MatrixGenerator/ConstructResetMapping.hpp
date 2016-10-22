@@ -19,7 +19,6 @@
 #define _CODE_LIBS_TWODLIB_CONSTRUCTRESETMAPPING_INCLUDE_GUARD
 
 #include "Mesh.hpp"
-#include "ParseConfig.hpp"
 #include "TransitionMatrixGenerator.hpp"
 namespace TwoDLib {
 
