@@ -84,13 +84,9 @@ void CSRMatrix::Validate(const TransitionMatrix& mat){
 	for (auto& line: lines)
 		if (line._from[0] == 0) count++;
 
-
-	// On MACOS this exception is not caught, so exit for now. TODO: fix
-	if ( count != m.NrCellsInStrip(0) ){
-		std::cout << "There is no strip 0 in your mat file, but the mesh has one." << std::endl;
-		exit(0);
-//		throw TwoDLib::TwoDLibException("Mismatch in stationary points between mesh and mat file");
-	}
+	if ( count != m.NrCellsInStrip(0) )	
+	   throw TwoDLib::TwoDLibException("There is a stationary point in your mesh file, but no entries in the mat file that lead away from it.");
+      
 }
 
 void CSRMatrix::CSR(const vector<vector<MPILib::Index> >& vec_mat, const vector<vector<double> >& mat_vals){
