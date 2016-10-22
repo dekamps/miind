@@ -10,6 +10,7 @@ INCLUDE_DIRECTORIES(
 
 include_directories( ../../libs/MPILib )
 include_directories( ../../libs/GeomLib )
+include_directories( ../../libs/TwoDLib )
 
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
@@ -19,6 +20,11 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 #############################################################################
 # UnitGeom source and header files
 #############################################################################
+
+set (ONEPOP_TWOD_SRC 
+	OnePop.cpp
+)
+
 
 set (ONELIF_GEOM_SRC 
 	LifOne.cpp
@@ -55,6 +61,7 @@ endif (UNIX)
 set ( LIBLIST       
     ${MIIND_LIBRARY_PREFIX}geom
     ${MIIND_LIBRARY_PREFIX}mpi      
+    ${MIIND_LIBRARY_PREFIX}twod      
     ${MPI_LIBRARIES} 
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
@@ -68,6 +75,9 @@ set ( LIBLIST
 #############################################################################
 # executables
 #############################################################################
+add_executable(OnePop ${ONEPOP_TWOD_SRC})
+target_link_libraries(OnePop ${LIBLIST})
+
 add_executable(LifOne ${ONELIF_GEOM_SRC})
 target_link_libraries(LifOne ${LIBLIST})
 
