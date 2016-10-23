@@ -38,12 +38,12 @@ def miind_root():
     return MIIND_ROOT
 
 def create_dir(name):
-    ''' Name of the executable to be generated. Should not end in '.xml'. The directory will be created relative to MIIND_ROOT. '''
+    ''' Name of the executable to be generated. Should not end in '.xml'. The directory will be created relative to the calling directory. '''
     sep = os.path.sep
     initialize_global_variables()
     global MIIND_ROOT
 
-    abs_path = MIIND_ROOT + sep + 'apps' + sep + name
+    abs_path = './' + sep + name
 
     try:
         os.makedirs(abs_path)
@@ -51,6 +51,16 @@ def create_dir(name):
         if exception.errno != errno.EEXIST:
             raise
     return abs_path
+
+def filter(lines):
+    nw = []
+    for line in lines:
+        if '${CMAKE_SOURCE_DIR}' in line:
+            hh=string.replace(line,'${CMAKE_SOURCE_DIR}',MIIND_ROOT)
+            nw.append(hh)
+        else:
+            nw.append(line)
+    return nw
 
 def insert_cmake_template(name,full_path_name):
     ''' name is the executable name, full_path is the directory where the cmake template
@@ -63,16 +73,25 @@ def insert_cmake_template(name,full_path_name):
 
     with open(miind_root() + sep + 'python' + sep + 'cmake_template') as f:
         lines=f.readlines()
+
+    # filter the template CMakeLists.txt to that was is needed locally
+    replace = filter(lines)
+
     with open(outname,'w') as fout:
-        for line in lines:
+        for line in replace:
             fout.write(line)
 
+        # add  the miind libraries explicitly
+        libbase = MIIND_ROOT + '/build/libs'
+        numdir  = libbase + '/NumtoolsLib'
+        geomdir = libbase + '/GeomLib'
+        mpidir  = libbase + '/MPILib'
+        fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir +')\n')
         fout.write('\nadd_executable( ' + name + ' ' + name + '.cpp)\n')
         fout.write('target_link_libraries( ' + name  + ' ${LIBLIST} )\n')
 
 def parse_apps_cmake(file):
     lines = file.readlines()
-
     return lines
 
 def generate_apps_cmake(l, dir_path):
@@ -141,6 +160,7 @@ def create_cpp_file(name, dir_path, prog_name):
             
     
 def add_executable(name,versions=None):
+
     ''' Add a user defined executable to miind's compilation tree.
 
     If only a name is provided, but no versions argument, the name
@@ -164,20 +184,17 @@ def add_executable(name,versions=None):
 
     if versions != None:
         dir_path = create_dir(name)
-        insert_parent_cmake(name,dir_path)
+#        insert_parent_cmake(name,dir_path)
         for version in versions:
             prog_name = check_and_strip_name(version)
-            versname = name + sep + prog_name
-            dir_path = create_dir(versname)
 
-            insert_parent_cmake(prog_name, dir_path)
+#            insert_parent_cmake(prog_name, dir_path)
             insert_cmake_template(prog_name,dir_path)
             create_cpp_file(version, dir_path, prog_name)
     else:
         prog_name = check_and_strip_name(name)
         dir_path = create_dir(prog_name)
-    
-        insert_parent_cmake(prog_name, dir_path)
+#        insert_parent_cmake(prog_name, dir_path)
         insert_cmake_template(prog_name,dir_path)
         create_cpp_file(name, dir_path, prog_name)
 
