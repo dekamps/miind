@@ -1,8 +1,35 @@
 ##############################################################################
 # include the header files
 ##############################################################################
-cmake_minimum_required(VERSION 2.8)
 
+##############################################################################
+# find ROOT
+##############################################################################
+OPTION(ENABLE_ROOT "Root Desired" ON)
+
+IF(ENABLE_ROOT)
+find_package( Root )
+if( ROOT_FOUND )
+  message(STATUS "Building Root dependent parts")
+  message(STATUS "Root include directories:" ${ROOT_INCLUDE_DIRS})
+  message(STATUS "Root library directories:" ${ROOT_LIBRARY_DIRS})
+  set (ROOT_LIBRARIES Core Hist Tree Table Matrix MathCore MathMore Gpad Graf Postscript RIO)
+  add_definitions(-DWANTROOT)
+else( ROOT_FOUND )
+  message(FATAL_ERROR "Root is required for MPILib")
+endif( ROOT_FOUND )
+
+# TODO:  This is ugly and must be fixed in the windows install procedure
+if (WIN32)
+SET (LIB_PREFIX lib)
+else (WIN32)
+SET (CBLAS_PREFIX gsl)
+endif (WIN32)
+ENDIF (ENABLE_ROOT)
+
+#############################################################################
+
+cmake_minimum_required(VERSION 2.8)
 FIND_PACKAGE(GSL REQUIRED)
 
 set(MIIND_LIBRARY_PREFIX miind)
@@ -56,4 +83,4 @@ set ( LIBLIST
 #############################################################################
 # executables
 #############################################################################
-add_definitions("-std=gnu++11")
+add_definitions("-std=gnu++11 -DWANTROOT")
