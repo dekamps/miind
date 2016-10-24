@@ -21,21 +21,27 @@
 #include <GeomLib.hpp>
 #include <TwoDLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
-#include <MPILib/include/RateAlgorithmCode.hpp>
+#include <MPILib/include/RateFunctorCode.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
-#include <MPILib/include/report/handler/RootReportHandler.hpp>
+#include <MPILib/include/report/handler/MinimalReportHandler.hpp>
 
 
 using MPILib::EXCITATORY_DIRECT;
 using MPILib::NodeId;
 using MPILib::SimulationRunParameter;
-using MPILib::RateAlgorithm;
+using MPILib::RateFunctor;
 
 using std::cout;
 using std::endl;
 
 typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
+
+Rate RATE;
+
+MPILib::Rate Func(MPILib::Time t){
+  return (t < 0.5) ? RATE : 0.0;
+    }
 
 int main(int argc, char* argv[]){
 
@@ -56,7 +62,9 @@ int main(int argc, char* argv[]){
 		std::istringstream ist_rate(argv[3]);
 		Rate rate_ext;
 		ist_rate >> rate_ext;
-		RateAlgorithm<MPILib::DelayedConnection> alg_ext(rate_ext);
+		RATE = rate_ext;
+
+		RateFunctor<MPILib::DelayedConnection> alg_ext(Func);
 
 		std::istringstream ist_eff(argv[4]);
 		Efficacy eff;
@@ -81,7 +89,7 @@ int main(int argc, char* argv[]){
 			10000000,
 			0.0,
 			1.0,
-			1e-2,
+			1e-3,
 			algmesh.MeshReference().TimeStep(),
 			"singlepoptest.log"
 		);
