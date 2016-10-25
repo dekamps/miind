@@ -83,8 +83,8 @@ int main(int argc, char* argv[]){
 			handler,
 			10000000,
 			0.0,
-			1.0,
-			1e-3,
+			2.0,
+			1e-2,
 			algmesh.MeshReference().TimeStep(),
 			"singlepoptest.log"
 		);

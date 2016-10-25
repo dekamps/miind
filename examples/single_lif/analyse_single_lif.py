@@ -11,11 +11,10 @@ import numpy as np
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 
-jobpath  = os.path.join(directories.miind_root(),'build','jobs','single','joblist')
 
 
 def nodecay():
-	filepath = os.path.split(jobpath)[0]
+	filepath = 'single/no_decay'
 	path = os.path.join(filepath,'no_decay_0.root')
 	f=ROOT.TFile(path)
 	c=ROOT.TCanvas('c')
@@ -42,7 +41,7 @@ def nodecay():
 
 def noinput():
 
-	filepath = os.path.split(jobpath)[0]
+	filepath = 'single/no_input'
 	path = os.path.join(filepath,'no_input_0.root')
 	f=ROOT.TFile(path)
 
@@ -79,8 +78,8 @@ def noinput():
 	g5.Draw('L')
 	c.Print('no_input.pdf')
 
-def single_state():
-	filepath = os.path.split(jobpath)[0]
+def singlestate():
+	filepath = "single/response"
 	path = os.path.join(filepath,'single_0.root')
 	f=ROOT.TFile(path)
 
@@ -110,17 +109,12 @@ def single():
 	single_state()
 
 def parsejoblist():
-	with open(jobpath) as f:
-		lines = f.readlines()
-		for line in lines:
-			job =  os.path.split(line.strip())[1]
-			print job
-			if  job == 'no_decay':
-				nodecay()
-			if job == 'no_input':
-				noinput()	
-			if job == 'response':
-				single()
+	if os.path.exists("single/response"):
+		singlestate()
+        if os.path.exists("single/no_decay"):
+		nodecay()
+        if os.path.exists("single/no_input"):
+		noinput()
 
 if __name__ == '__main__':
 	parsejoblist()

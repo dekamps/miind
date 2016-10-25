@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-'''Expects the job name - not a path. Will fail if there is no directory
-in '${MIIND_ROOT}/build/jobs/[jobname]' with a corresponding job name.'''
 
 import directories
 import sys
@@ -19,6 +17,7 @@ class cd:
     def __exit__(self, etype, value, traceback):
         os.chdir(self.savedPath)
 
+
 if __name__ == "__main__":
     
     if len(sys.argv) != 2:
@@ -26,17 +25,20 @@ if __name__ == "__main__":
         sys.exit()
     dir=sys.argv[1]
 
-    build = os.path.join(directories.miind_root(),'build')
-    path  = os.path.join(build,'jobs',dir)
-
-    with cd(build):
-        subprocess.call(['make'])
-
-    with open(os.path.join(path,'joblist')) as f:
-       	lines = f.readlines()
-       	with cd(path):
-	       	for line in lines:
-	       		name = line.split()[0]
-	       		subprocess.call([name, '>&log&'])
-
-
+    # investigate the directory
+    with cd(dir):
+        files=subprocess.check_output(["ls"]).split()
+        if 'CMakeLists.txt' in files:
+            subprocess.call(['cmake', '-DCMAKE_BUILD_TYPE=Release'])
+            subprocess.call(['make'])
+        else:
+            # all directories in this one should contain a CMakeLists.txt
+            for file in files:
+                with cd(file):
+                    localfiles=subprocess.check_output(["ls"]).split()
+                    
+                    if 'CMakeLists.txt' in localfiles:
+                        subprocess.call(['cmake','-DCMAKE_BUILD_TYPE=Release', '.'])
+                        subprocess.call(['make'])
+                        # file name is the same as directory name, if miind was called
+                        subprocess.call('./' + file)
