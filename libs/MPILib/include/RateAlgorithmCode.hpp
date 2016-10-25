@@ -50,8 +50,8 @@ void RateAlgorithm<Weight>::configure(
 }
 
 template<class Weight>
-void RateAlgorithm<Weight>::evolveNodeState(const std::vector<Rate>& nodeVector,
-		const std::vector<Weight>& weightVector, Time time) {
+void RateAlgorithm<Weight>::evolveNodeState(const std::vector<Rate>&,
+		const std::vector<Weight>&, Time time) {
 	_time_current = time;
 }
 

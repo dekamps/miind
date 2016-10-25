@@ -34,12 +34,12 @@ namespace MPILib {
 	}
 
 	template <class WeightValue>
-	void RateFunctor<WeightValue>::configure( const SimulationRunParameter& parameter_run ){
+	void RateFunctor<WeightValue>::configure( const SimulationRunParameter&){
 	}
 
 	template <class WeightValue>
-	void RateFunctor<WeightValue>::evolveNodeState(const std::vector<MPILib::Rate>& nodeVector,
-			const std::vector<WeightValue>& weightVector, Time time)
+	void RateFunctor<WeightValue>::evolveNodeState(const std::vector<MPILib::Rate>&,
+			const std::vector<WeightValue>&, Time time)
 	{
 		_current_time = time; 
 		_current_rate = _function(_current_time);

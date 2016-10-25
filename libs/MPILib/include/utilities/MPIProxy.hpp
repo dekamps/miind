@@ -83,7 +83,7 @@ public:
 	 * @param root The root process
 	 */
 	template<typename T>
-	void broadcast(T& value, int root);
+	void broadcast(T&, int);
 
 	/**
 	 * asynchronous receive operation the mpi status is stored in _mpiStatus
@@ -92,7 +92,7 @@ public:
 	 * @param value The value received
 	 */
 	template<typename T>
-	void irecv(int source, int tag, T& value) const;
+	void irecv(int, int, T&) const;
 
 	/**
 	 * asynchronous send operation the mpi status is stored in _mpiStatus
@@ -101,7 +101,7 @@ public:
 	 * @param value The value sended
 	 */
 	template<typename T>
-	void isend(int dest, int tag, const T& value) const;
+	void isend(int, int, const T&) const;
 
 
 private:

@@ -49,7 +49,7 @@ void DelayAlgorithm<Weight>::configure(const SimulationRunParameter& par) {
 template<class Weight>
 void DelayAlgorithm<Weight>::evolveNodeState(
 		const std::vector<Rate>& nodeVector,
-		const std::vector<Weight>& weightVector, Time time) {
+		const std::vector<Weight>&, Time time) {
 
         assert(nodeVector.size() == 1);
 	assert(weightVector.size() == 1);

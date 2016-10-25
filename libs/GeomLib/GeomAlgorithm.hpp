@@ -104,12 +104,12 @@ namespace GeomLib {
       virtual void configure(const MPILib::SimulationRunParameter& simParam);
 
 
-		virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
-				const std::vector<WeightValue>& weightVector, Time time);
+		virtual void evolveNodeState(const std::vector<Rate>&,
+				const std::vector<WeightValue>&, Time);
 
-		virtual void prepareEvolve(const std::vector<Rate>& nodeVector,
-				const std::vector<WeightValue>& weightVector,
-				const std::vector<MPILib::NodeType>& typeVector);
+		virtual void prepareEvolve(const std::vector<Rate>&,
+				const std::vector<WeightValue>&,
+				const std::vector<MPILib::NodeType>&);
 
 
 		/**

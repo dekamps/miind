@@ -144,7 +144,7 @@ namespace
     }
 
   template <class Estimator>
-  int CachedDeriv(double t, const double y[], double dydt[], void* params)
+  int CachedDeriv(double, const double y[], double dydt[], void* params)
   {
         MasterParameter<Estimator>* p_par = static_cast<MasterParameter<Estimator>* >(params);
     	const vector<InputParameterSet>& vec_set = *(p_par->_p_vec_set);

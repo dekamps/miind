@@ -51,7 +51,7 @@ public:
 	 * Configure the Algorithm
 	 * @param simParam
 	 */
-	virtual void configure(const SimulationRunParameter& simParam);
+	virtual void configure(const SimulationRunParameter&);
 
 	/**
 	 * Evolve the node state
@@ -59,8 +59,8 @@ public:
 	 * @param weightVector Vector of the weights of the nodes
 	 * @param time Time point of the algorithm
 	 */
-	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
-			const std::vector<Weight>& weightVector, Time time);
+	virtual void evolveNodeState(const std::vector<Rate>&,
+			const std::vector<Weight>&, Time);
 
 	/**
 	 * The current timepoint
