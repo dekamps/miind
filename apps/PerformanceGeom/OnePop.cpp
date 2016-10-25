@@ -21,7 +21,7 @@
 #include <GeomLib.hpp>
 #include <TwoDLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
-#include <MPILib/include/RateFunctorCode.hpp>
+#include <MPILib/include/RateAlgorithmCode.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/MinimalReportHandler.hpp>
 
@@ -29,7 +29,7 @@
 using MPILib::EXCITATORY_DIRECT;
 using MPILib::NodeId;
 using MPILib::SimulationRunParameter;
-using MPILib::RateFunctor;
+using MPILib::RateAlgorithm;
 
 using std::cout;
 using std::endl;
@@ -37,11 +37,7 @@ using std::endl;
 typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 
-Rate RATE;
 
-MPILib::Rate Func(MPILib::Time t){
-  return (t < 0.5) ? RATE : 0.0;
-    }
 
 int main(int argc, char* argv[]){
 
@@ -51,20 +47,19 @@ int main(int argc, char* argv[]){
 	}
 	try {
 		// Processing command line
-		const string mesh_name = argv[1];
+		const string model_name = argv[1];
 		vector<string> mat_names;
 		mat_names.push_back(argv[2]);
 
 		Time h = 1e-4;
 
-		TwoDLib::MeshAlgorithm<MPILib::DelayedConnection> algmesh(mesh_name,mat_names,h);
+		TwoDLib::MeshAlgorithm<MPILib::DelayedConnection> algmesh(model_name,mat_names,h);
 
 		std::istringstream ist_rate(argv[3]);
 		Rate rate_ext;
 		ist_rate >> rate_ext;
-		RATE = rate_ext;
 
-		RateFunctor<MPILib::DelayedConnection> alg_ext(Func);
+		RateAlgorithm<MPILib::DelayedConnection> alg_ext(rate_ext);
 
 		std::istringstream ist_eff(argv[4]);
 		Efficacy eff;
@@ -80,7 +75,7 @@ int main(int argc, char* argv[]){
 
 		network.makeFirstInputOfSecond(id_rate,id_alg,con);
 
-		const MPILib::report::handler::MinimalReportHandler handler("onepop_result");
+		const MPILib::report::handler::MinimalReportHandler handler("onepop");
 
 		const SimulationRunParameter
 		par_run

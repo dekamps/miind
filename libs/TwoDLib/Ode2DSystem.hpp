@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <numeric>
+#include "MPILib/include/TypeDefinitions.hpp"
 #include "Mesh.hpp"
 #include "modulo.hpp"
 #include "Redistribution.hpp"
@@ -59,7 +60,7 @@ namespace TwoDLib {
 
 		//! Map coordinates to a position in the density array. Map(0,0) may be defined or not, this depends on the Mesh and whether Mesh::InsertStationary
 		//! was called. The safe way to use Map is in a loop that uses Mesh::NrCellsInStrip and Mesh::NrQuadrilateralStrips.
-		unsigned int Map(unsigned int i, unsigned int j) const {return _vec_cumulative[i] + modulo(j-_t,_vec_length[i]);}
+		unsigned int Map(unsigned int i, unsigned int j) const {return _map[i][j];}
 
 		//! Shift the density
 		void Evolve();
@@ -145,25 +146,31 @@ namespace TwoDLib {
 			vector<double>&	_vec_mass;
 		};
 
-		vector<unsigned int> InitializeLength(const Mesh&) const;
-		vector<unsigned int> InitializeCumulative(const Mesh&) const;
-		vector<double>       InitializeArea(const Mesh&) const;
-		vector<double>       InitializeMass() const;
-		bool                 CheckConsistency() const;
+		vector<MPILib::Index> InitializeLength(const Mesh&) const;
+		vector<MPILib::Index> InitializeCumulative(const Mesh&) const;
+		vector<double>        InitializeArea(const Mesh&) const;
+		vector<double>        InitializeMass() const;
+		bool                  CheckConsistency() const;
 
-		const Mesh&          _mesh;
-		vector<unsigned int> _vec_length;
-		vector<unsigned int> _vec_cumulative;
-		vector<double>	     _vec_mass;
-		vector<double>		 _vec_area;
+		vector< vector<MPILib::Index> > InitializeMap() const;
+		void                  UpdateMap();
+
+		const Mesh&           _mesh;
+		vector<MPILib::Index> _vec_length;
+		vector<MPILib::Index> _vec_cumulative;
+		vector<double>	      _vec_mass;
+		vector<double>		  _vec_area;
+
 		unsigned int	_t;
 		double			_f;
 
+		vector<vector<MPILib::Index> > _map;
+
 		vector<Redistribution> _vec_reversal;
 		vector<Redistribution> _vec_reset;
-		Reversal             _reversal;
-		Reset                _reset;
-		Clean				 _clean;
+		Reversal               _reversal;
+		Reset                  _reset;
+		Clean				   _clean;
 	};
 
 }

@@ -245,13 +245,11 @@ namespace TwoDLib {
 
 	    // master equation
 	    _p_master->Apply(_n_steps*_dt,_vec_mapped_rates);
-
         _sys.RedistributeProbability();
 
  	    _t_cur += _n_steps*_dt;
  	    _rate = _sys.F();
  	    _n_evolve++;
-
 	}
 
 	template <class WeightValue>

@@ -37,12 +37,13 @@ std::vector<TwoDLib::Redistribution> TwoDLib::ReMapping(std::istream& ifst)
 
 	std::istringstream  ist(doc.first_child().first_child().value());
 
-	std::vector <TwoDLib::Redistribution> vec_reset;
+	std::vector <TwoDLib::Redistribution> vec_reset(0);
 	std::string from, to, fraction;
     boost::char_separator<char> sep(",");
 
     std::vector<unsigned int> vec_c(2,0);
     Redistribution red;
+
     // bug fix (MdK): 22/09/2016. Was ifst, needs to be ist, otherwise the test for goodness is meaningless
 	while(ist){
 
