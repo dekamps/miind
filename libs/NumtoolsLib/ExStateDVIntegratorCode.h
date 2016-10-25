@@ -105,18 +105,6 @@ namespace NumtoolsLib
 	}
 
 	template <class ParameterObject>
-	bool ExStateDVIntegrator<ParameterObject>::FromStream(istream& s)
-	{
-		return true;
-	}
-
-	template <class ParameterObject>
-	bool ExStateDVIntegrator<ParameterObject>::ToStream(ostream& s) const
-	{
-		return true;
-	}
-
-	template <class ParameterObject>
 	bool ExStateDVIntegrator<ParameterObject>::Reconfigure
 	(
 		const DVIntegratorStateParameter<ParameterObject>& parameter

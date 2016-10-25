@@ -11,7 +11,7 @@ if( WIN32 )
 else( WIN32 )
   link_directories( ${GSL_LIBRARY_DIRS} )
   include( RequireGSL )
-  set( LIB_TYPE SHARED )
+  set( LIB_TYPE STATIC )
 endif( WIN32 )
 
 include_directories( ${GSL_INCLUDE_DIRS} )

@@ -97,12 +97,6 @@ namespace NumtoolsLib
 		//! Ditto
 		const double* EndState  () const;
 
-		//! Store on stream
-		virtual bool ToStream  (ostream&) const;
-
-		//! Get from stream
-		virtual bool FromStream(istream&);
-
 		//! streaming tag
 		virtual string Tag () const;
 

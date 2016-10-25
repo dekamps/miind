@@ -33,7 +33,7 @@ MinimalReportHandler::MinimalReportHandler
 ):
 AbstractReportHandler(result_name)
 {
-	_ofst = std::move(std::ofstream("result_name"));
+	_ofst = std::move(std::ofstream(result_name));
 }
 
 MinimalReportHandler::MinimalReportHandler(const MinimalReportHandler& rhs):

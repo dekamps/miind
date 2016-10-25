@@ -34,7 +34,7 @@ def parse_rate_algorithm(alg, i , weighttype):
     cpp_name = 'rate_alg_' + str(i)
     Register(rg.attrib['Name'],cpp_name)
 
-    s += '\tMPILib::algorithm::RateAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('
+    s += '\tMPILib::RateAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('
     
     rt = rg.find('rate')
     s += rt.text
@@ -244,7 +244,7 @@ def parse_wilsoncowan_parameter(alg, i, weighttype):
     s += '\tMPILib::Rate ' + I_name
     s += ' = ' + I_ext.text + ';\n'
 
-    s += '\tMPILib::algorithm::WilsonCowanParameter  par_wil_' + str(i) +'('
+    s += '\tMPILib::WilsonCowanParameter  par_wil_' + str(i) +'('
     s += t_name +','
     s += f_name + ','
     s += noise_name  + ','
@@ -258,7 +258,7 @@ def wrapup_wilsoncowan_algorithm(alg,i,weighttype):
     if not 'Name' in d.keys():
         raise NameError('Name tag expected in WilsonCowanAlgorithm')    
 
-    s = '\tMPILib::algorithm::WilsonCowanAlgorithm '
+    s = '\tMPILib::WilsonCowanAlgorithm '
     s += 'alg_wc_' + str(i) + '('
     s += 'par_wil_' + str(i)
     s += ');\n'
@@ -281,7 +281,7 @@ def parse_persistant_algorithm(alg, i, weighttype):
         raise NameError('Name tag expected')
     cpp_name = 'pers_alg_'  + str(i)
     Register(dp.attrib['Name'],cpp_name)    
-    s += '\tMPILib::algorithm::PersistantAlgorithm ' + cpp_name + ';\n'
+    s += '\tMPILib::PersistantAlgorithm ' + cpp_name + ';\n'
     return s
 
 def parse_delay_algorithm(alg,i,weighttype):
@@ -294,7 +294,7 @@ def parse_delay_algorithm(alg,i,weighttype):
     cpp_name = 'delay_alg_' + str(i)
     Register(dg.attrib['Name'],cpp_name)
 
-    s += '\tMPILib::algorithm::DelayAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('
+    s += '\tMPILib::DelayAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('
     
     dt = dg.find('delay')
     s += dt.text
@@ -315,7 +315,7 @@ def parse_ratefunctor_algorithm(alg, i, weighttype):
 
     s += '\tMPILib::Rate RateFunction_' + str(i) + '(MPILib::Time);\n'
     
-    s += '\tMPILib::algorithm::RateFunctor<' + weighttype.text + '> ' + cpp_name + '(' 
+    s += '\tMPILib::RateFunctor<' + weighttype.text + '> ' + cpp_name + '(' 
     s += 'RateFunction_' + str(i) + ');\n'
     rb = rf.find('expression')
     body=rb.text

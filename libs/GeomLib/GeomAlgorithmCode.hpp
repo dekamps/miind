@@ -110,8 +110,8 @@ namespace GeomLib {
 	template <class WeightValue>
 	void GeomAlgorithm<WeightValue>::evolveNodeState
 	(
-		const std::vector<Rate>& nodeVector,
-		const std::vector<WeightValue>& weightVector,
+		const std::vector<Rate>&,
+		const std::vector<WeightValue>&,
 		Time t
 		)
 	{
