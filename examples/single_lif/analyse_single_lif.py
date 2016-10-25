@@ -93,9 +93,8 @@ def singlestate():
 	g=f.Get('grid_0_0.29901305')
 	g.Draw('L')
 	c.Print('state.pdf')
-
+	c.Close()
 	c2=ROOT.TCanvas("c4")
-	ps_rate = ROOT.TPDF('frate.pdf')
 	h=ROOT.TH2F("h2","Rate",500,0.,0.3,500,0.,20.)
 	h.SetYTitle('f (spikes/s)')
 	h.SetXTitle('t (s)')
@@ -103,7 +102,7 @@ def singlestate():
 	h.Draw()
 	g=f.Get('rate_0')
 	g.Draw('L')
-	c.Print('rate.pdf')
+	c2.Print('rate.pdf')
 
 def single():
 	single_state()
