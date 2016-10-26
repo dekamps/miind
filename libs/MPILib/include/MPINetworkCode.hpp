@@ -173,7 +173,6 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 					MPINode<WeightValue, NodeDistribution>::waitAll();
 
-
 					for (auto& it : _localNodes) {
 						it.second.prepareEvolve();
 					}

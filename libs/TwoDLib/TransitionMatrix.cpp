@@ -20,6 +20,7 @@
 #include <numeric>
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
+#include "MPILib/include/utilities/Log.hpp"
 #include "TransitionMatrix.hpp"
 #include "TwoDLibException.hpp"
 
@@ -28,8 +29,10 @@ using namespace TwoDLib;
 TransitionMatrix::TransitionMatrix(const std::string& fn)
 {
 	std::ifstream ifst(fn);
-	if (!ifst)
-		throw TwoDLibException("Couldn't open matrix file");
+	if (!ifst){
+		LOG(MPILib::utilities::logERROR) << "Can't open matrix file";
+		throw TwoDLib::TwoDLibException("Couldn't open matrix file");
+	}
 
 	boost::char_separator<char> sepsc(";");
 	boost::char_separator<char> sepc(",");

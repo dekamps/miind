@@ -175,7 +175,6 @@ namespace TwoDLib {
 		// vec_mat will go out of scope; MasterOMP will convert the matrices
 		// internally and we don't want to keep two versions.
 		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
-	 
  		std::unique_ptr<TwoDLib::MasterOMP> p_master(new MasterOMP(_sys,vec_mat, par));
 
 		_p_master = std::move(p_master);
@@ -260,21 +259,21 @@ namespace TwoDLib {
 	{
 		// this function will only be called once;
 
-		for(const auto& weight: vec_weights){
+ 		for(const auto& weight: vec_weights){
 			for (unsigned int i = 0; i < _p_master->NrMatrix(); i++){
 				if ( fabs( _p_master->Efficacy(i) - weight._efficacy) < _tolerance ){
 					if (std::find(_vec_map.begin(),_vec_map.end(),i) == _vec_map.end())
 						_vec_map.push_back(i);
-					else
+					else{
 						throw TwoDLib::TwoDLibException("Weight in FillMap not unique");
-
+					}
 				}
 			}
 		}
 
-		if (_vec_map.size() != vec_weights.size())
+		if (_vec_map.size() != vec_weights.size()){
 			throw TwoDLib::TwoDLibException("FillMap map size differs from number of weights");
-
+		}
 		_vec_mapped_rates = std::vector<MPILib::Rate>(_vec_map.size(),0);
 	}
 

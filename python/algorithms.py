@@ -218,7 +218,7 @@ def parse_mesh_algorithm(alg, i, weighttype):
     # don't use i below
     for k, fl in enumerate(matfilelist):
         if k > 0:
-            s +='\",\" '
+            s +='\",\"'
         s += fl.text 
     s += '\"};\n'
 
