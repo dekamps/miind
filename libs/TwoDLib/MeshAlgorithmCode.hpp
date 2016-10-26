@@ -217,6 +217,7 @@ namespace TwoDLib {
 		const std::vector<MPILib::NodeType>& typeVector
 	)
 	{
+
 	  // The network time step must be an integer multiple of the network time step; in principle
 	  // we would expect this multiple to be one, but perhaps there are reasons to allow a population
 	  // have a finer time resolution than others, so we allow larger multiples but write a warning in the log file.
@@ -226,11 +227,13 @@ namespace TwoDLib {
 			double n = (time - _t_cur)/_dt;
 		    
 			_n_steps = static_cast<MPILib::Number>(round(n));
-			if (_n_steps == 0)
-			  throw TwoDLibException("Network time step is smaller than this grid's time step.");
+			if (_n_steps == 0){
 
-			if (fabs(_n_steps - n) > 1e-6)
+			  throw TwoDLibException("Network time step is smaller than this grid's time step.");
+			}
+			if (fabs(_n_steps - n) > 1e-6){
 			  throw TwoDLibException("Mismatch of mesh time step and network time step. Network time step should be a multiple (mostly one) of network time step");
+			}
 			if (_n_steps > 1)
 			  LOG(MPILib::utilities::logWARNING)<< "Mesh runs at a time step which is a multiple of the network time step. Is this intended?";
 			else

@@ -152,7 +152,8 @@ void MPIProxy_::irecv(int source, int tag, T& value) const {
 }
 
 template<typename T>
-void MPIProxy_::isend(int dest, int tag, const T& value) const {
+void MPIProxy_::isend
+(int dest, int tag, const T& value) const {
 #ifdef ENABLE_MPI
 	mpi::communicator world;
 	_mpiStatus.push_back(world.isend(dest, tag, value));

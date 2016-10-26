@@ -4,7 +4,8 @@ import xml.etree.ElementTree as ET
 ALGORITHMS = { 'RateAlgorithm'   : {'Connection' : 'double', 'Parameter': '' }, 
                'RateAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter' : ''}, 
                'OUAlgorithm'     : {'Connection' : 'DelayedConnection', 'Parameter' : 'NeuronParameter'}, 
-               'GeomAlgorithmDC' : {'Connection' : 'DelayedConnection', 'Parameter' : 'GeomParameter'} }
+               'GeomAlgorithmDC' : {'Connection' : 'DelayedConnection', 'Parameter' : 'GeomParameter'}, 
+               'MeshAlgorithm'   : {'Connection' : 'double', 'Parameter': ''} }
 
 ALGORITHM_NAMES = {}
 
@@ -203,6 +204,35 @@ def parse_geom_algorithm(alg, i, weighttype):
     
     return s
 
+def parse_mesh_algorithm(alg, i, weighttype):
+    s = ''
+
+    algorithmname=alg.find('MeshAlgorithm')
+    d=algorithmname.attrib
+
+    s += '\tstd::vector<std::string> '
+    vec_name = 'vec_mat_' + str(i)
+    s += vec_name + '{\"'
+
+    matfilelist =algorithmname.iter('MatrixFile')
+    # don't use i below
+    for k, fl in enumerate(matfilelist):
+        if k > 0:
+            s +='\",\" '
+        s += fl.text 
+    s += '\"};\n'
+
+
+    timestep = algorithmname.find('TimeStep')
+
+
+    cpp_name = 'alg_mesh_' + str(i)
+    s += '\tTwoDLib::MeshAlgorithm<DelayedConnection> ' + cpp_name + '(\"'
+    s += d['modelfile'] + '\",' + vec_name + ',' + timestep.text + ');\n'
+
+    Register(d['Name'], cpp_name)
+    return s
+
 def parse_ou_algorithm(alg, i,  weighttype):
     s = ''
 
@@ -348,6 +378,11 @@ def parse_algorithm(alg,i,weighttype):
     if algname =='GeomAlgorithm':
         if weighttype.text == 'DelayedConnection':
             return parse_geom_algorithm(alg,i,weighttype)
+        else:
+            raise NameError('Wrong conection type for GeomAlgorithm')
+    if algname =='MeshAlgorithm':
+        if weighttype.text == 'DelayedConnection':
+            return parse_mesh_algorithm(alg,i,weighttype)
         else:
             raise NameError('Wrong conection type for GeomAlgorithm')
     else:

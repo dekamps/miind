@@ -11,6 +11,7 @@ set(MIIND_LIBRARY_PREFIX miind)
 
 include_directories( ${CMAKE_SOURCE_DIR}/libs )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/GeomLib )
+include_directories( ${CMAKE_SOURCE_DIR}/libs/TwoDLib )
 
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
@@ -71,6 +72,7 @@ endif (UNIX)
 set ( LIBLIST       
     ${MIIND_LIBRARY_PREFIX}geom
     ${MIIND_LIBRARY_PREFIX}mpi           
+    ${MIIND_LIBRARY_PREFIX}twod           
     ${MIIND_LIBRARY_PREFIX}numtools
     ${MPI_LIBRARIES} 
     ${ROOT_LIBRARIES}

@@ -86,7 +86,8 @@ def insert_cmake_template(name,full_path_name):
         numdir  = libbase + '/NumtoolsLib'
         geomdir = libbase + '/GeomLib'
         mpidir  = libbase + '/MPILib'
-        fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir +')\n')
+        twodir  = libbase + '/TwoDLib'
+        fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ')\n')
         fout.write('\nadd_executable( ' + name + ' ' + name + '.cpp)\n')
         fout.write('target_link_libraries( ' + name  + ' ${LIBLIST} )\n')
 
@@ -137,5 +138,3 @@ def add_executable(dirname, xmlfiles):
 
 if __name__ == "__main__":
     initialize_global_variables()
-    add_executable('masterblaster', ['omurtag.xml', 'twopop.xml'])
-    detach_executable('masterblaster')
