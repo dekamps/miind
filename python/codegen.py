@@ -25,7 +25,7 @@ def generate_preamble(outfile):
 def generate_closing(outfile):
     outfile.write('\tnetwork.configureSimulation(par_run);\n')
     outfile.write('\tnetwork.evolve();\n')    
-    outfile.write('\t} catch(std::exception exc){\n')
+    outfile.write('\t} catch(std::exception& exc){\n')
     outfile.write('\t\tstd::cout << exc.what() << std::endl;\n')
 
     outfile.write('#ifdef ENABLE_MPI\n')
