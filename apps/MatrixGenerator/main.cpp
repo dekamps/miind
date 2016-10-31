@@ -49,7 +49,7 @@ int main(int argc, char** argv){
 			throw TwoDLib::TwoDLibException("Don't understand use case.");
 	}
 	catch(const TwoDLib::TwoDLibException& excep){
-		std::cout << excep.Description() << std::endl;
+		std::cout << excep.what() << std::endl;
 	}
 
 	return 0;

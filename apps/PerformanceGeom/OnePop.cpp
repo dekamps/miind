@@ -38,7 +38,6 @@ typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::Circula
 typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 
 
-
 int main(int argc, char* argv[]){
 
 	if (argc != 5){
@@ -51,7 +50,7 @@ int main(int argc, char* argv[]){
 		vector<string> mat_names;
 		mat_names.push_back(argv[2]);
 
-		Time h = 1e-4;
+		Time h = 1e-2;
 
 		TwoDLib::MeshAlgorithm<MPILib::DelayedConnection> algmesh(model_name,mat_names,h);
 
@@ -83,8 +82,8 @@ int main(int argc, char* argv[]){
 			handler,
 			10000000,
 			0.0,
-			1,
-			1e-3,
+			24.,
+			0.08,
 			algmesh.MeshReference().TimeStep(),
 			"singlepoptest.log"
 		);
@@ -92,7 +91,7 @@ int main(int argc, char* argv[]){
 		network.evolve();
 	}
 	catch(TwoDLib::TwoDLibException& excep){
-		std::cout << excep.Description() << std::endl;
+		std::cout << excep.what() << std::endl;
 	}
 	catch(...){
 		std::cout << "Something happened" << std::endl;

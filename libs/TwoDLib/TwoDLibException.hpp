@@ -20,21 +20,20 @@
 #define _CODE_LIBS_TWODLIB_TWODLIBEXCEPTION
 
 #include <string>
+#include "MPILib/include/utilities/Exception.hpp"
 
 using std::string;
 
 namespace TwoDLib {
 
-	class TwoDLibException {
+	class TwoDLibException : public MPILib::utilities::Exception {
 	public:
 
-		TwoDLibException(const string& description):_description(description){}
-
-		string Description() const {return _description;}
+		TwoDLibException(const string& description):Exception(description){}
 
 	private:
 
-		string _description;
+
 	};
 }
 

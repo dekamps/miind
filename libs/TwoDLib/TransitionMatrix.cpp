@@ -30,6 +30,7 @@ TransitionMatrix::TransitionMatrix(const std::string& fn)
 {
 	std::ifstream ifst(fn);
 	if (!ifst){
+		std::cerr << "Can't open matrix file" << std::endl;
 		LOG(MPILib::utilities::logERROR) << "Can't open matrix file";
 		throw TwoDLib::TwoDLibException("Couldn't open matrix file");
 	}

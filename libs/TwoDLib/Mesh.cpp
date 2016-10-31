@@ -225,8 +225,10 @@ _vec_vec_gen(0)
 {
 	std::ifstream ifst(file_name);
 
-	if (!ifst)
+	if (!ifst){
+		std::cerr << "Can't open mesh file." << std::endl;
 		throw TwoDLibException("Can't open mesh file.");
+	}
 	else {
 		string line;
 		getline(ifst,line);
