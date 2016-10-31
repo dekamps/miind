@@ -20,7 +20,7 @@
 #ifndef MPILIB_UTILITIES_PARALLELEXCEPTION_HPP_
 #define MPILIB_UTILITIES_PARALLELEXCEPTION_HPP_
 
-#include <MPILib/include/utilities/Exception.hpp>
+#include "Exception.hpp"
 
 namespace MPILib {
 namespace utilities {

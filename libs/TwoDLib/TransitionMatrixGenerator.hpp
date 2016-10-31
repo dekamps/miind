@@ -102,7 +102,7 @@ namespace TwoDLib {
 	  Hit CheckTree					(const Point&, const vector<Point>&);
 	  Hit CheckFiducial				(const Point&);
 
-	  vector<TwoDLib::FiducialElement> InitializeFiducialVector(const Mesh&, const FidElementList&) const;
+	  vector<FiducialElement> InitializeFiducialVector(const Mesh&, const FidElementList&) const;
 
 	  static double scale_distance;
 
@@ -114,7 +114,7 @@ namespace TwoDLib {
 	  std::vector<Point>	_lost;
 	  std::vector<Point>	_accounted;
 
-	  std::vector<TwoDLib::FiducialElement>	_vec_fiducial;
+	  std::vector<FiducialElement>	_vec_fiducial;
   };
 }
 

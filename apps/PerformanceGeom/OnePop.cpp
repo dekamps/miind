@@ -25,7 +25,6 @@
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/MinimalReportHandler.hpp>
 
-
 using MPILib::EXCITATORY_DIRECT;
 using MPILib::NodeId;
 using MPILib::SimulationRunParameter;

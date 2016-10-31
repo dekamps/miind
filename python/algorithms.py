@@ -349,7 +349,7 @@ def parse_ratefunctor_algorithm(alg, i, weighttype):
     s += 'RateFunction_' + str(i) + ');\n'
     rb = rf.find('expression')
     body=rb.text
-    
+
     t = 'MPILib::Rate RateFunction_' + str(i) + '(MPILib::Time t){\n'
     t += '\treturn ' + body + ';\n}\n'
     

@@ -45,7 +45,6 @@ _init(_rate)
 
  void MasterOMP::Apply(double t_step, const vector<double>& rates)
  {
-
 	 for (unsigned int j = 0; j < _par._N_steps; j++){
 
 #pragma omp parallel for

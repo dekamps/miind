@@ -22,6 +22,7 @@
 #include <boost/filesystem.hpp>
 #include <MPILib/include/utilities/Log.hpp>
 #include <fstream>
+#include <iostream>
 #include "MeshAlgorithm.hpp"
 #include "Stat.hpp"
 #include "TwoDLibException.hpp"
@@ -285,13 +286,16 @@ namespace TwoDLib {
 		const std::vector<MPILib::NodeType>& typeVector
 	)
 	{
-
+		if (weightVector.size() != _p_master->NrMatrix())
+			throw TwoDLib::TwoDLibException("There must be as many connections to a population as there are matrices.");
 		// We assume that: 1) the ordering of weights during an evolve never changes; 2) transition matrices can be uniquely defined by their efficacies
+
 		if (_vec_map.size() == 0)
 			FillMap(weightVector);
 
-		for (unsigned int i = 0; i < nodeVector.size(); i++)
+		for (unsigned int i = 0; i < nodeVector.size(); i++){
 			_vec_mapped_rates[_vec_map[i]] = nodeVector[i];
+		}
 	}
 }
 
