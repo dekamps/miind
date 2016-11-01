@@ -5,6 +5,7 @@ import algorithms
 import nodes
 import connections
 import simulation
+import variables
 import xml.etree.ElementTree as ET
 import argparse
 import directories
@@ -76,6 +77,9 @@ def generate_outputfile(infile, outfile):
     generate_preamble(outfile)
     nettype, tree = parse_xml(infile,outfile)
     outfile.write(nettype)
+    outfile.write('\t// defining variables\n') # whatever variables are use are global
+    variable_list = tree.findall('Variable')
+    variables.parse_variables(variable_list,outfile)
     alg_list = tree.findall('Algorithms/AbstractAlgorithm')
     weighttype = tree.find('WeightType')
     generate_opening(outfile)
