@@ -240,15 +240,18 @@ namespace TwoDLib {
 			  ; // else is fine
 		}
 
+		double evol;
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 	      _sys.Evolve();
           _sys.RemapReversal();
+          double reversal = _sys.P();
 	    }
 
 	    // master equation
 	    _p_master->Apply(_n_steps*_dt,_vec_mapped_rates);
         _sys.RedistributeProbability();
+
 
  	    _t_cur += _n_steps*_dt;
  	    _rate = _sys.F();

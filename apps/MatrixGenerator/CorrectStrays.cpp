@@ -19,20 +19,21 @@
 #include <cmath>
 #include <cstddef>
 #include <sstream>
+#include "MPILib/include/TypeDefinitions.hpp"
 #include "CorrectStrays.hpp"
 #include "TwoDLibException.hpp"
 
 namespace {
-	vector<TwoDLib::Hit>::iterator find_nearest(std::vector<TwoDLib::Hit>& vec_th, const TwoDLib::Hit& h){
+	MPILib::Index find_nearest(const std::vector<TwoDLib::Coordinates>& vec_th, const TwoDLib::Hit& h){
 		vector<double> dist;
 
-		for(auto hth: vec_th){
-			double d = std::pow(hth._cell[0] -  h._cell[0],2) + std::pow(hth._cell[1] - h._cell[1],2);
+		for(const auto& c: vec_th){
+			double d = std::pow(c[0] -  h._cell[0],2) + std::pow(c[1] - h._cell[1],2);
 			dist.push_back(d);
 		}
 
 		ptrdiff_t i_min = std::distance(dist.begin(), std::min_element(dist.begin(),dist.end()));
-		return vec_th.begin() + i_min;
+		return i_min;
 	}
 }
 
@@ -46,36 +47,51 @@ TwoDLib::TransitionList TwoDLib::CorrectStrays
 	list_ret._origin = l._origin;
 	list_ret._number = l._number;
 
-	std::vector<TwoDLib::Hit> vec_th;
 	std::vector<TwoDLib::Hit> vec_above;
 
+	// all cells in the destination list that are below or on threshold can be used as
+	// but we make a list of destinations above threshold; they will have to be remapped onto the threshold
 	for(const TwoDLib::Hit& h: l._destination_list){
-		if ( std::find(ths.begin(), ths.end(), h._cell) != ths.end() ){
-			vec_th.push_back(h);
-		}
+		if ( std::find(above.begin(), above.end(), h._cell) != above.end() )
+			vec_above.push_back(h);
 		else
-			if ( std::find(above.begin(),above.end(),h._cell) != above.end() ){
-				vec_above.push_back(h);
+			list_ret._destination_list.push_back(h);
+	}
+
+	vector<MPILib::Index> vec_close;
+	// for each destination in the above list we must find the threshold cell that is closest
+	for (const auto& h: vec_above){
+		MPILib::Index i_n = find_nearest(ths,h);
+		vec_close.push_back(i_n);
+	}
+
+
+	// now for each above cell check if there is already a hit corresponding to that threshold cell in the destination list
+	for(MPILib::Index i = 0; i < vec_above.size(); i++ ){
+		Coordinates nearest_th = ths[vec_close[i]];
+
+		// if there is, increase the count by the hit of the above cell
+		// if there isn't insert a with a count of the above cell
+		bool b_hit = false;
+		MPILib::Index i_list = 0;
+		for(MPILib::Index i = 0; i < list_ret._destination_list.size(); i++){
+			const Hit& h = list_ret._destination_list[i];
+			if (h._cell[0] == nearest_th[0] && h._cell[1] == nearest_th[1]){
+				b_hit = true;
+				i_list = i;
 			}
- 			else
-				list_ret._destination_list.push_back(h);
-	}
-
-//	if (vec_th.size() == 0 && vec_above.size() != 0){
-//		std::ostringstream ost;
-//		ost << "Cell: " << l._origin[0] << "," <<  l._origin[1] << ". Stray, but no threshold cell in this transition\n";
-//		throw TwoDLib::TwoDLibException(ost.str());
-//	}
-
-	if (vec_th.size() > 0 ){
-		for (auto a: vec_above){
-			auto it = find_nearest(vec_th, a);
-			it->_count += a._count;
 		}
-	}
+		if (b_hit){
+			list_ret._destination_list[i_list]._count += vec_above[i]._count;
+		} else {
 
-	for (auto h: vec_th)
-		list_ret._destination_list.push_back(h);
+			Hit new_hit;
+			new_hit._cell = nearest_th;
+			new_hit._count = vec_above[i]._count;
+			list_ret._destination_list.push_back(new_hit);
+		}
+
+	}
 
 	return list_ret;
 }

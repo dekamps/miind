@@ -96,11 +96,11 @@ namespace TwoDLib {
 	  bool CheckHitList				(const Point&);
 	  void ApplyTranslation			(vector<Point>*, const Point&);
 	  double DetermineDistance		(const Quadrilateral&);
-	  void ProcessTranslatedPoints	(const vector<Point>& vec, const vector<Point>&);
+	  void ProcessTranslatedPoints	(const vector<Point>& vec);
 	  bool IsInAssociated			(const FiducialElement&, const Point&, Coordinates*);
-	  Hit Locate					(const Point&, const vector<Point>&);
+	  SearchResult Locate			(const Point&, Coordinates*);
 	  Hit CheckTree					(const Point&, const vector<Point>&);
-	  Hit CheckFiducial				(const Point&);
+	  SearchResult CheckFiducial	(const Point&, Coordinates*);
 
 	  vector<FiducialElement> InitializeFiducialVector(const Mesh&, const FidElementList&) const;
 

@@ -21,6 +21,7 @@
 #include "MPILib/include/TypeDefinitions.hpp"
 #include "QuadGenerator.hpp"
 #include "TransitionMatrixGenerator.hpp"
+#include "TwoDLibException.hpp"
 
 using namespace TwoDLib;
 
@@ -62,75 +63,61 @@ bool TransitionMatrixGenerator::CheckHitList(const Point& p)
 	return false;
 }
 
+TransitionMatrixGenerator::SearchResult TransitionMatrixGenerator::Locate(const Point& pt_translated, Coordinates* pc){
 
-TransitionMatrixGenerator::Hit TransitionMatrixGenerator::CheckTree(const Point& pt_translated, const vector<Point>& nbs)
-{
-	Hit hit;
-	// nbs is filled by the kdtree to expedite things. if nbs is empty,
-	for (auto it = nbs.begin(); it != nbs.end(); it++){
-		vector<Coordinates> vec_c = _tree.MeshRef().PointBelongsTo(*it);
-		for (auto itcell = vec_c.begin(); itcell != vec_c.end(); itcell++){
-			unsigned int i = (*itcell)[0];
-			unsigned int j = (*itcell)[1];
+	SearchResult res = CheckFiducial(pt_translated, pc);
+	if ( res == Found || res == Accounted)
+		return res;
 
-			const Quadrilateral& quad = _tree.MeshRef().Quad(i,j);
-
-			if (quad.IsInside(pt_translated)){
-				hit._cell = *itcell;
-				hit._count = 1;
-				return hit;
-			}
-		}
-	}
-	return hit;
-}
-
-TransitionMatrixGenerator::Hit TransitionMatrixGenerator::Locate(const Point& pt_translated, const vector<Point>& nbs){
-	// If the point can be located in the kdtree, or in the fiducial volume, the cell coordinates will
-	// be returned with hit count 1. If linear search yields nothing, the hit count is returned as 'Lost',
-	// if the point is not in a fiducial element, of 'Accounted', if it is within a fiducial volume.
-
-	Hit hit = CheckTree(pt_translated,nbs);
-	if (hit._count == 1)
-		return hit;
-	// else: no luck
-	hit = CheckFiducial(pt_translated);
-	if (hit._count == 1)
-		return hit;
-	// after this call, the count value may have been set to 'Accounted'.
-
-	// Just linear search then
+	// It wasn't in the fiducial element
 	for (MPILib::Index i = 0; i < _tree.MeshRef().NrQuadrilateralStrips(); i++)
 	  for (MPILib::Index j = 0; j < _tree.MeshRef().NrCellsInStrip(i); j++ ){
 			if (_tree.MeshRef().Quad(i,j).IsInside(pt_translated) ){
-				hit._count = 1;
-				hit._cell = Coordinates(i,j);
-				return hit;
+				*pc = Coordinates(i,j);
+				return Found;
 			}
 		}
-
-	return hit;
+	return Lost;
 }
 
-void TransitionMatrixGenerator::ProcessTranslatedPoints(const vector<Point>& vec, const vector<Point>& nbs)
+void TransitionMatrixGenerator::ProcessTranslatedPoints(const vector<Point>& vec)
 {
+	Coordinates c(0,0);
+
 	for(auto it = vec.begin(); it != vec.end(); it++){
-		if (! CheckHitList(*it) ){
-			Hit h = Locate(*it,nbs);
-			if (h._count > 0)
-				_hit_list.push_back(h);
-			else
-				if (h._count == Accounted)
-					_accounted.push_back(*it);
-				else
-					_lost.push_back(*it);
+		SearchResult res = Locate(*it,&c) ;
+
+		switch(res){
+			case (Found):
+				if (!CheckHitList(*it)){
+						Hit h;
+						h._cell = c;
+						h._count = 1;
+						_hit_list.push_back(h);
+				}
+				break;
+			case(Accounted):
+					if (!CheckHitList(*it)){
+						Hit h;
+						h._cell = c;
+						h._count = 1;
+						_hit_list.push_back(h);
+				}
+				_accounted.push_back(*it);
+				break;
+
+			case(Lost):
+				_lost.push_back(*it);
+				break;
+			default:
+				throw TwoDLibException("Unexpected result from Locate.");
 		}
 	}
-
 }
 
 void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsigned int cell_no, double v, double w)
 {
+
 	const Quadrilateral& quad = _tree.MeshRef().Quad(strip_no,cell_no);
 	Point p(v,w);
 	// scale_distance determines the maximum search radius
@@ -139,11 +126,7 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 	QuadGenerator gen(quad, _uni);
 	gen.Generate(&vec_point);
 	ApplyTranslation(&vec_point,p);
-	// pick any translated point and look for points in the tree that are close, but far enough to be likely to cover the cell
-	// if you want to use kdtree here, use FindNearestN here. This has been disabled because of stack size
-	// problems.
-	vector<Point> nbs;
-	ProcessTranslatedPoints(vec_point,nbs);
+	ProcessTranslatedPoints(vec_point);
 }
 
 
@@ -210,27 +193,29 @@ bool TransitionMatrixGenerator::IsInAssociated
 	return false;
 }
 
-TransitionMatrixGenerator::Hit TransitionMatrixGenerator::CheckFiducial(const Point& p){
+TransitionMatrixGenerator::SearchResult TransitionMatrixGenerator::CheckFiducial(const Point& p, Coordinates* pc){
 	Hit hit;
 
 	Coordinates closet(0,0);
 	for (auto it = _vec_fiducial.begin(); it != _vec_fiducial.end(); it++){
 		if (it->_quad->IsInside(p)){
-			hit._count = Accounted;
 			Coordinates cell;
 			if (IsInAssociated(*it,p,&cell)){
-				hit._count = 1;
-				hit._cell =  cell;
-				return hit;
+
+				*pc =  cell;
+				return Found;
 			} else {
-				if (it->_overflow == CONTAIN) // force it into the next closest cell
-					hit._count = 1;
-					hit._cell = cell;
-					return hit;
+				if (it->_overflow == CONTAIN) // force it into the next closest cell, but then it counts as found
+					*pc = cell;
+					return Found;
+				if (it->_overflow  == LEAK)    // we don't add the hit anywhere, but accept its loss and it is accounted for
+					*pc=Coordinates(0,0);
+					return Accounted;
+				throw TwoDLibException("Fiducial elements should be LEAK or CONTAIN");
 			}
 		}
 	}
 
-	return hit;
+	return Lost;
 }
 
