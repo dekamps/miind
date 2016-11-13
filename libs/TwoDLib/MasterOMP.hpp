@@ -36,7 +36,7 @@ namespace TwoDLib {
 			const MasterParameter&
 		);
 
-		void Apply(double, const vector<double>&);
+		void Apply(double, const vector<double>&, const vector<MPILib::Index>&);
 
 		unsigned int NrMatrix() const { return _vec_csr.size(); }
 

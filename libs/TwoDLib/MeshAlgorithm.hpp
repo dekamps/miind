@@ -158,7 +158,7 @@ namespace TwoDLib {
 
 		// map incoming rates onto the order used by MasterOMP
 		std::vector<unsigned int> _vec_map;
-		std::vector<MPILib::Rate> _vec_mapped_rates; // this is fed to the apply step of MasterOMP
+		std::vector<MPILib::Rate> _vec_rates; // this is fed to the apply step of MasterOMP
 
 		MPILib::Time 						_dt;     // mesh time step
 		TwoDLib::Ode2DSystem 				_sys;

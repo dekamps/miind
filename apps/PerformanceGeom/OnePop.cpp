@@ -49,7 +49,7 @@ int main(int argc, char* argv[]){
 		vector<string> mat_names;
 		mat_names.push_back(argv[2]);
 
-		Time h = 1e-2;
+		Time h = 2e-4;
 
 		TwoDLib::MeshAlgorithm<MPILib::DelayedConnection> algmesh(model_name,mat_names,h);
 
@@ -81,8 +81,8 @@ int main(int argc, char* argv[]){
 			handler,
 			10000000,
 			0.0,
-			24.,
-			0.08,
+			2e-3,
+			2e-4,
 			algmesh.MeshReference().TimeStep(),
 			"singlepoptest.log"
 		);

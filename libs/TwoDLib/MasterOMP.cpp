@@ -43,18 +43,21 @@ _init(_rate)
  {
  }
 
- void MasterOMP::Apply(double t_step, const vector<double>& rates)
+ void MasterOMP::Apply(double t_step, const vector<double>& rates, const vector<MPILib::Index>& vec_map)
  {
+
 	 for (unsigned int j = 0; j < _par._N_steps; j++){
 
 #pragma omp parallel for
 		 for(unsigned int id = 0; id < _dydt.size(); id++)
 			 _dydt[id] = 0.;
 
-		 for (unsigned int imat = 0; imat < rates.size(); imat++){
-			 _rate = t_step*rates[imat];
+		 for (unsigned int irate = 0; irate < rates.size(); irate++){
+			 // do NOT map the rate
+			 _rate = t_step*rates[irate];
 
-			 _vec_csr[imat].MVMapped
+			 // it is only the matrices that need to be mapped
+			 _vec_csr[vec_map[irate]].MVMapped
 			 (
 			    _dydt,
 			 	_sys._vec_mass,

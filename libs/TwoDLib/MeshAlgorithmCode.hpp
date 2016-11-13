@@ -197,6 +197,7 @@ namespace TwoDLib {
 
 		std::ostringstream ost;
 		ost << id << "_" << _t_cur;
+		ost << id << "_" << _sys.P();
 		string fn("mesh_" + ost.str());
 
 		if (!boost::filesystem::exists(_model_name + "_mesh" ) )
@@ -240,16 +241,14 @@ namespace TwoDLib {
 			  ; // else is fine
 		}
 
-		double evol;
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 	      _sys.Evolve();
           _sys.RemapReversal();
-          double reversal = _sys.P();
 	    }
 
 	    // master equation
-	    _p_master->Apply(_n_steps*_dt,_vec_mapped_rates);
+	    _p_master->Apply(_n_steps*_dt,_vec_rates,_vec_map);
         _sys.RedistributeProbability();
 
 
@@ -261,24 +260,27 @@ namespace TwoDLib {
 	template <class WeightValue>
 	void MeshAlgorithm<WeightValue>::FillMap(const std::vector<WeightValue>& vec_weights)
 	{
-		// this function will only be called once;
 
- 		for(const auto& weight: vec_weights){
-			for (unsigned int i = 0; i < _p_master->NrMatrix(); i++){
-				if ( fabs( _p_master->Efficacy(i) - weight._efficacy) < _tolerance ){
-					if (std::find(_vec_map.begin(),_vec_map.end(),i) == _vec_map.end())
-						_vec_map.push_back(i);
-					else{
-						throw TwoDLib::TwoDLibException("Weight in FillMap not unique");
-					}
+
+		// this function will only be called once;
+		_vec_map = std::vector<MPILib::Index>(vec_weights.size(),std::numeric_limits<MPILib::Index>::max());
+
+ 		for(MPILib::Index i_weight = 0; i_weight < _vec_map.size(); i_weight++){
+			for (MPILib::Index i_mat = 0; i_mat < _p_master->NrMatrix(); i_mat++){
+
+				if ( fabs( _p_master->Efficacy(i_mat) - vec_weights[i_weight]._efficacy) < _tolerance ){
+					if (_vec_map[i_weight] == std::numeric_limits<MPILib::Index>::max())
+						_vec_map[i_weight] = i_mat;
+					else
+						throw TwoDLib::TwoDLibException("There are two matrices associated with this weight.");
 				}
 			}
+			if (_vec_map[i_weight] == std::numeric_limits<MPILib::Index>::max())
+				throw TwoDLib::TwoDLibException("There are no matrices associated with this weight.");
 		}
 
-		if (_vec_map.size() != vec_weights.size()){
-			throw TwoDLib::TwoDLibException("FillMap map size differs from number of weights");
-		}
-		_vec_mapped_rates = std::vector<MPILib::Rate>(_vec_map.size(),0);
+ 		_vec_rates = std::vector<double>(vec_weights.size(),0.);
+
 	}
 
 	template <class WeightValue>
@@ -289,16 +291,10 @@ namespace TwoDLib {
 		const std::vector<MPILib::NodeType>& typeVector
 	)
 	{
-		if (weightVector.size() != _p_master->NrMatrix())
-			throw TwoDLib::TwoDLibException("There must be as many connections to a population as there are matrices.");
-		// We assume that: 1) the ordering of weights during an evolve never changes; 2) transition matrices can be uniquely defined by their efficacies
-
 		if (_vec_map.size() == 0)
 			FillMap(weightVector);
 
-		for (unsigned int i = 0; i < nodeVector.size(); i++){
-			_vec_mapped_rates[_vec_map[i]] = nodeVector[i];
-		}
+		std::copy(nodeVector.begin(),nodeVector.end(),_vec_rates.begin());
 	}
 }
 
