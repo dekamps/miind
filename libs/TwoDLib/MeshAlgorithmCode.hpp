@@ -293,8 +293,11 @@ namespace TwoDLib {
 	{
 		if (_vec_map.size() == 0)
 			FillMap(weightVector);
+		// take into account the number of connections
 
-		std::copy(nodeVector.begin(),nodeVector.end(),_vec_rates.begin());
+		assert(nodeVector.size() == weightVector.size());
+		for (int i = 0; i < nodeVector.size(); i++)
+			_vec_rates[i] = nodeVector[i]*weightVector[i]._number_of_connections;
 	}
 }
 

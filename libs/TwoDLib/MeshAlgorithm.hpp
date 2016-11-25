@@ -125,7 +125,7 @@ namespace TwoDLib {
 		/**
 		 * Initialize a given Mesh cell before simulation starts
 		 */
-		void InitializeDensity(MPILib::Index, MPILib::Index);
+		void InitializeDensity(MPILib::Index i, MPILib::Index j){_sys.Initialize(i,j);}
 
 	private:
 

@@ -324,7 +324,7 @@ void Mesh::FromXML(istream& s)
 }
 
 void Mesh::ToXML(ostream& s) const{
-	s << std::setprecision(10);
+	s << std::setprecision(14);
 	s << "<Mesh>\n";
 	s << "<TimeStep>" << this->TimeStep() << "</TimeStep>\n";
 	for(unsigned int i = 0; i < _vec_vec_quad.size(); i++){
