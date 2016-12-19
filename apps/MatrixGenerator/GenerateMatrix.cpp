@@ -37,6 +37,13 @@ void FixModelFile(const string& basename){
 	if ( model.name() != std::string("Model") )
 		throw TwoDLib::TwoDLibException("Can't parse model file");
 
+	// see if there is a reset mapping already; if yes, the rest is not necessary
+	for (pugi::xml_node mapping = model.child("Mapping"); mapping; mapping = mapping.next_sibling("Mapping"))
+	{
+	    if (mapping.attribute("type").value() == string("Reset") )
+	    	return;
+	}
+
 	// get reset mapping
 	pugi::xml_document doc_reset;
 	string resname = basename + std::string(".res");
