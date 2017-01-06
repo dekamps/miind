@@ -197,7 +197,7 @@ namespace TwoDLib {
 
 		std::ostringstream ost;
 		ost << id << "_" << _t_cur;
-		ost << id << "_" << _sys.P();
+		ost << "_" << _sys.P();
 		string fn("mesh_" + ost.str());
 
 		if (!boost::filesystem::exists(_model_name + "_mesh" ) )
