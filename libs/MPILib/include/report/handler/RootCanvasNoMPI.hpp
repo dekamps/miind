@@ -76,7 +76,7 @@ private:
 
 	const CanvasParameter _par_canvas;
 
-	static TCanvas* _p_canvas;
+	static std::unique_ptr<TCanvas> _p_canvas;
 
 	static std::vector<NodeId>	_vec_id;
 	static std::vector<int>	    _vec_scratch;
