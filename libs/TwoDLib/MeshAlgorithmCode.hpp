@@ -218,7 +218,6 @@ namespace TwoDLib {
 		const std::vector<MPILib::NodeType>& typeVector
 	)
 	{
-
 	  // The network time step must be an integer multiple of the network time step; in principle
 	  // we would expect this multiple to be one, but perhaps there are reasons to allow a population
 	  // have a finer time resolution than others, so we allow larger multiples but write a warning in the log file.
@@ -261,18 +260,17 @@ namespace TwoDLib {
 	void MeshAlgorithm<WeightValue>::FillMap(const std::vector<WeightValue>& vec_weights)
 	{
 
-
 		// this function will only be called once;
 		_vec_map = std::vector<MPILib::Index>(vec_weights.size(),std::numeric_limits<MPILib::Index>::max());
 
  		for(MPILib::Index i_weight = 0; i_weight < _vec_map.size(); i_weight++){
 			for (MPILib::Index i_mat = 0; i_mat < _p_master->NrMatrix(); i_mat++){
-
 				if ( fabs( _p_master->Efficacy(i_mat) - vec_weights[i_weight]._efficacy) < _tolerance ){
 					if (_vec_map[i_weight] == std::numeric_limits<MPILib::Index>::max())
 						_vec_map[i_weight] = i_mat;
 					else
 						throw TwoDLib::TwoDLibException("There are two matrices associated with this weight.");
+
 				}
 			}
 			if (_vec_map[i_weight] == std::numeric_limits<MPILib::Index>::max())
@@ -296,7 +294,7 @@ namespace TwoDLib {
 		// take into account the number of connections
 
 		assert(nodeVector.size() == weightVector.size());
-		for (int i = 0; i < nodeVector.size(); i++)
+		for (MPILib::Index i = 0; i < nodeVector.size(); i++)
 			_vec_rates[i] = nodeVector[i]*weightVector[i]._number_of_connections;
 	}
 }

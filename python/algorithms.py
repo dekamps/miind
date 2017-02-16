@@ -384,7 +384,7 @@ def parse_algorithm(alg,i,weighttype):
         if weighttype.text == 'DelayedConnection':
             return parse_mesh_algorithm(alg,i,weighttype)
         else:
-            raise NameError('Wrong conection type for GeomAlgorithm')
+            raise NameError('Wrong conection type for MeshAlgorithm')
     else:
         raise NameError('Wrong algorithm name')
     return ''

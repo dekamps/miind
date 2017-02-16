@@ -115,7 +115,6 @@ namespace GeomLib {
 		Time t
 		)
 	{
-
 	    double n = (t - _t_cur)/_t_step;
 	    Number n_steps = static_cast<Number>(ceil(n));
 	    if (n_steps == 0)

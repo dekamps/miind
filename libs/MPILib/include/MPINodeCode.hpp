@@ -154,11 +154,9 @@ void MPINode<Weight, NodeDistribution>::reportAll(
 	std::vector<report::ReportValue> vec_values;
 
 	if (type == report::RATE || type == report::STATE) {
-
 		report::Report report(_pAlgorithm->getCurrentTime(),
 				Rate(this->getActivity()), this->_nodeId,
 				_pAlgorithm->getGrid(this->_nodeId), type, vec_values, _rLocalNodes.size());
-
 		_pHandler->writeReport(report);
 	}
 }

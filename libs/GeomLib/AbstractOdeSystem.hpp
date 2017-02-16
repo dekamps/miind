@@ -37,7 +37,7 @@ namespace GeomLib {
 	//! Solvers for the density operate on the mass buffer: AbstractOdeSystem::_buffer_mass.
     //! The grid boundaries are stored in AbstractOdeSystem::_buffer_interpretation. The relationship between mass
 	//! bins and grid boundaries is time dependent, AbstractOdeSytem keeps track of that.
-    //!A one-to-one mapping identifies each mass bin with a
+    //! A one-to-one mapping identifies each mass bin with a
 	//! a potential bin, thus providing a basis for a density representation. The mapping is time dependent, and
 	//! depends on the topology of the neural system under consideration. Derived classes provide concrete
 	//! implementations of these different topologies. LeakingOdeSystem implements the topology of

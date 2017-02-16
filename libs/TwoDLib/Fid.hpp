@@ -38,6 +38,7 @@ namespace TwoDLib {
 		std::vector<FiducialElement> Generate(const Mesh&) const;
 
 	private:
+
 		std::vector<ProtoFiducial>   _vec_prot;
 		std::vector<FiducialElement> _vec_element;
 	};

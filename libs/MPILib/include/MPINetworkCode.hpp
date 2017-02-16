@@ -155,7 +155,6 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 		_stateNetwork.toggleConfigured();
 
 		LOG(utilities::logINFO) << "Starting simulation";
-
 		try {
 			utilities::ProgressBar pb(
 					getEndTime() / _parameterSimulationRun.getTReport()
@@ -172,7 +171,6 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					updateSimulationTime();
 
 					MPINode<WeightValue, NodeDistribution>::waitAll();
-
 					for (auto& it : _localNodes) {
 						it.second.prepareEvolve();
 					}
@@ -181,7 +179,6 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					for (auto& it : _localNodes) {
 						it.second.evolve(getCurrentSimulationTime());
 					}
-
 
 				} while (getCurrentSimulationTime() < getCurrentReportTime()
 						&& getCurrentSimulationTime() < getCurrentStateTime());
@@ -193,6 +190,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					updateReportTime();
 					collectReport(report::RATE);
 				}
+
 				// just a rate or also a state?
 				if (getCurrentSimulationTime() >= getCurrentStateTime()) {
 					// a rate as well as a state

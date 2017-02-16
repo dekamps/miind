@@ -3,6 +3,7 @@ import errno
 import string
 import inspect
 import codegen
+import subprocess as sp
 
 # global variable to hold absolute path
 ABS_PATH=''
@@ -26,7 +27,7 @@ def check_and_strip_name(full_path_name):
     '''Expects full path to the xml file'''
     sep = os.path.sep
     name = full_path_name.split(sep)[-1]
-    
+
     if name[-4:] != '.xml':
         raise NameError
     else:
@@ -92,33 +93,24 @@ def insert_cmake_template(name,full_path_name):
         fout.write('target_link_libraries( ' + name  + ' ${LIBLIST} )\n')
 
 
-def create_cpp_file(name, dir_path, prog_name):
+def create_cpp_file(name, dir_path, prog_name, mod_name):
 
     cpp_name = prog_name + '.cpp'
     abs_path = os.path.join(dir_path,cpp_name)
     with open(abs_path,'w') as fout:
         with open(name) as fin:
             codegen.generate_outputfile(fin,fout)
+
+    if mod_name != None:
+        for f in mod_name:
+            sp.call(['cp',f,dir_path])
     return
             
     
-def add_executable(dirname, xmlfiles):
+def add_executable(dirname, xmlfiles, modname):
 
-    ''' Add a user defined executable to miind's compilation tree.
-
-    If only a name is provided, but no versions argument, the name
-    is expected to be an xml file, with an xml extension. The file name
-    with the extension stripped is used to create a directory in the 'apps' subdirectory
-    in the miind code tree. CMake files will be added in the appropriate directory.
-    If miind was compiled successfully previously, typing 'make' in the 'build'
-     subdirectory will cause the new executable to part of the build structure.
-
-    If the versions list is not empty, the name of the xml file with the extension
-    stripped will be created in the 'apps' subdirectory. Then for each element in the version
-    list a subdirectory will be created, and each of these subdirectories will correspond to an executable,
-    that will be part of the build sub structure.
+    ''' Add a user defined executable to the current working directory.
      '''
-
     global PATH_VARS_DEFINED    
     if not PATH_VARS_DEFINED:
         initialize_global_variables()
@@ -128,13 +120,13 @@ def add_executable(dirname, xmlfiles):
         dirpath = create_dir(dirname)
         progname = check_and_strip_name(xmlfiles[0])
         insert_cmake_template(progname,dirpath)
-        create_cpp_file(xmlfiles[0], dirpath, progname)
+        create_cpp_file(xmlfiles[0], dirpath, progname, modname)
     else:
         for xmlfile in xmlfiles:
             progname = check_and_strip_name(xmlfile)
             dirpath = create_dir(dirname + '/' + progname)
             insert_cmake_template(progname,dirpath)
-            create_cpp_file(xmlfile, dirpath, progname)
+            create_cpp_file(xmlfile, dirpath, progname, modname)
 
 if __name__ == "__main__":
     initialize_global_variables()

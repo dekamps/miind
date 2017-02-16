@@ -18,6 +18,7 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <cmath>
+#include <iostream>
 #include "AbstractOdeSystem.hpp"
 #include "GeomLibException.hpp"
 
@@ -145,7 +146,7 @@ void AbstractOdeSystem::InitializeGaussian(vector<MPILib::Density>* p_vec_dense)
 
 vector<MPILib::Density> AbstractOdeSystem::InitializeDensity() const
 {
-	vector<MPILib::Density> vec_dense(_buffer_interpretation.size()+1); // TODO: review, rather hacky
+	vector<MPILib::Density> vec_dense(_buffer_interpretation.size() + 1 ); // TODO: review, rather hacky, but do not remove without considering line 168
 	if (this->Par()._par_dens._sigma == 0.0)
 		this->InitializeSingleBin(&vec_dense);
 	else
@@ -160,19 +161,25 @@ void AbstractOdeSystem::NormaliseDensity
 	vector<MPILib::Density>* p_vec
 ) const
 {
+	assert(p_vec != 0);
+
 	vector<MPILib::Density>& buffer_mass = *p_vec;
 	double sum = 0;
-	Number n_bins = p_vec->size();
+	Number n_bins = p_vec->size() - 1; // This is the compensation for adding + 1 in line 149
+
+	assert(n_bins > 0);
 
 	for (MPILib::Index i = 0; i < n_bins - 1; i++)
 		buffer_mass[i] *= (_buffer_interpretation[i+1] - _buffer_interpretation[i]);
 
-	buffer_mass[n_bins-1] *= (this->_par._par_pop._theta - _buffer_interpretation[n_bins-1]);
+	//MdK: 16-01-2017 remove index reference to _buffer_interpretation and replace by back
+	buffer_mass[n_bins-1] *= (this->_par._par_pop._theta - _buffer_interpretation.back());
 
 	for (MPILib::Index i = 0; i < n_bins; i++)
 		sum += buffer_mass[i];
 
 	for (MPILib::Index i = 0; i < n_bins; i++)
 		buffer_mass[i] /= sum;
+
 }
 
