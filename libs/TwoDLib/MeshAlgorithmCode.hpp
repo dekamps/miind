@@ -200,10 +200,14 @@ namespace TwoDLib {
 		ost << "_" << _sys.P();
 		string fn("mesh_" + ost.str());
 
-		if (!boost::filesystem::exists(_model_name + "_mesh" ) )
-			boost::filesystem::create_directory(_model_name + "_mesh");
+		std::string model_path = _model_name;
+		boost::filesystem::path path(model_path);
+		const std::string dirname = path.filename().string() + "_mesh";
 
-		std::ofstream ofst(_model_name + "_mesh/" + fn);
+		if (! boost::filesystem::exists(dirname) ){
+			boost::filesystem::create_directory(dirname);
+		}
+		std::ofstream ofst(dirname + "/" + fn);
 		_sys.Dump(ofst);
 
 		return MPILib::AlgorithmGrid(array_state,array_interpretation);

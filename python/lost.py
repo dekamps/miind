@@ -1,9 +1,11 @@
+import matplotlib 
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import sys
 import ast
 import xml.etree.ElementTree as ET
 from matplotlib.path import Path
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 
 
 curr_points = []
