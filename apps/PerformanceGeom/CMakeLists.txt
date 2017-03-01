@@ -68,6 +68,7 @@ set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}numtools
     ${gsl_LINK_FLAGS} 
     gsl
+    gslcblas
 
 )
 
