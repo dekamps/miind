@@ -79,6 +79,7 @@ set ( LIBLIST
     ${Boost_LIBRARIES}
     ${gsl_LINK_FLAGS} 
     gsl
+    gslcblas
 )
 
 
