@@ -33,7 +33,9 @@ MinimalReportHandler::MinimalReportHandler
 ):
 AbstractReportHandler(result_name)
 {
-	_ofst = std::move(std::ofstream(result_name));
+	std::ofstream ofst(result_name);
+	_ofst = move(ofst);
+//	ofst.close();
 }
 
 MinimalReportHandler::MinimalReportHandler(const MinimalReportHandler& rhs):
@@ -59,18 +61,6 @@ void MinimalReportHandler::detachHandler(const NodeId& nodeId) {
 }
 
 void MinimalReportHandler::initializeHandler(const NodeId& nodeId) {
-	// Purpose: this function will be called by MPINode upon configuration.
-	// no canvas are generated as it would cause lot of problems with mpi
-/*	if (!_pFile) {
-		_pFile = new TFile(this->getRootOutputFileName().c_str(), "RECREATE");
 
-		if (_pFile->IsZombie())
-			throw utilities::Exception(STR_ROOT_FILE_OPENED_FAILED);
-
-		_valueHandler.reset();
-
-	}
-	// store the node
-	_nodes.push_back(nodeId);*/
 }
 
