@@ -3,6 +3,8 @@ import glob
 import os
 import numpy as np
 import subprocess as sp
+import sys
+
 # the tolerance by which efficacies can be distinguished from their file names                                                                                                     
 tolerance = 1e-8
 
