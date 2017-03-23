@@ -29,8 +29,10 @@ class xml_file:
     the attribute values in the file are replaced by those in the presented tag.'''
 
     def __init__(self,file_name):
+        '''Initialize with the XML file name'''
         self.name = file_name
         self.tree = ET.parse(file_name)
+
 
     def get_text_attribute(self, xml_tag):
         root = self.tree.getroot()
