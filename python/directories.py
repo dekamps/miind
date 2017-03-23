@@ -116,12 +116,6 @@ def add_executable(dirname, xmlfiles, modname):
         initialize_global_variables()
 
     sep = os.path.sep
-#    if len(xmlfiles) == 1:
-#        dirpath = create_dir(dirname)
-#        progname = check_and_strip_name(xmlfiles[0])
-#        insert_cmake_template(progname,dirpath)
-#        create_cpp_file(xmlfiles[0], dirpath, progname, modname)
-#    else:
     for xmlfile in xmlfiles:
         progname = check_and_strip_name(xmlfile)
         dirpath = create_dir(dirname + '/' + progname)
