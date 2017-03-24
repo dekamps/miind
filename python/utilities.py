@@ -4,6 +4,8 @@ import os
 import numpy as np
 import subprocess as sp
 import sys
+import visualize
+import ROOT
 
 # the tolerance by which efficacies can be distinguished from their file names                                                                                                     
 tolerance = 1e-8
@@ -56,7 +58,7 @@ def find_results(dir_name):
         raise ValueError
 
     respath = os.path.join(dir_name,dir_name)
-    with ut.cd(respath):
+    with cd(respath):
         fns=sp.check_output(['ls']).split('\n')
         abspath = os.getcwd()
         retlist = [ d for d in fns if dir_name in d]
@@ -102,7 +104,7 @@ def produce_data_summary(dir_name, population_list, model, mapping_dictionary = 
     path, dirs = find_results(dir_name)
 
     for di in dirs:
-        with ut.cd(os.path.join(path,di)):
+        with cd(os.path.join(path,di)):
             rt = dir_name + '_' + '0' + '.root'
             print di , rt
             if os.path.exists(rt):
@@ -131,7 +133,7 @@ def produce_data_summary(dir_name, population_list, model, mapping_dictionary = 
 
                     # the density files reside here:                                                                                                                                 
                     dir_density = model + '_mesh'
-                    with ut.cd(dir_density):
+                    with cd(dir_density):
                         dfs = sp.check_output(['ls']).split('\n')
                         dfn=find_last_density_file(dfs)
                         v=visualize.Model1DVisualizer(os.path.join(sys.path[0],model))
