@@ -157,14 +157,12 @@ void Write
 
 				// Only generate if the origin is in BELOW, or in EQUAL
 				TwoDLib::Coordinates c(i,j);
-
 				if (std::find(above.begin(),above.end(),c) == above.end() ){
 					gen.Reset(nr_points);
 					gen.GenerateTransition(i,j,tr_v,tr_w);
 					l._number = gen.N();
 					l._origin = TwoDLib::Coordinates(i,j);
 					l._destination_list = gen.HitList();
-
 					TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above);
 					transitions.push_back(lcor);
 				}

@@ -38,7 +38,6 @@ void TwoDLib::ConstructResetMapping
 			}
 	);
 
-
 	// loop over all threshold bins
 	for ( const Coordinates& c: ths){
 		// determine the translated reset point

@@ -78,7 +78,6 @@ You can inspect the file:
 f.ls()
 \endverbatim
 You will get a list of names of TGraph objects. To get them from the file, do, for example:
-\lstset{label='rate'}
 \verbatim
 g=f.Get('rate_1')
 g.Draw('AP')
@@ -118,7 +117,7 @@ add_executable(populationDemo population-example.cpp)
 target_link_libraries(populationDemo \${LIBLIST})
 \endverbatim
 Copy this entry in the same file under the same section  using an editor and change this entry into:
-\verbatim}
+\verbatim
 add_executable(myProgram new.cpp)
 target_link_libraries(myProgram \${LIBLIST})
 \endverbatim

@@ -43,14 +43,17 @@ TwoDLib::TransitionList TwoDLib::CorrectStrays
 	const vector<TwoDLib::Coordinates>& ths,     	//! list of cells on threshold
 	const vector<TwoDLib::Coordinates>& above	    //! list of cells above threshold
 ){
+	// the transition list contains transitions, regardless of whether some of them may be above
+	// threshold. CorrectStrays maps a transition to a cell above back to a cell on threshold. The cleaned
+	// translation list is returned.
+
 	TransitionList list_ret;
 	list_ret._origin = l._origin;
 	list_ret._number = l._number;
 
 	std::vector<TwoDLib::Hit> vec_above;
 
-	// all cells in the destination list that are below or on threshold can be used as
-	// but we make a list of destinations above threshold; they will have to be remapped onto the threshold
+	// we make a list of destinations above threshold; they will have to be remapped onto the threshold
 	for(const TwoDLib::Hit& h: l._destination_list){
 		if ( std::find(above.begin(), above.end(), h._cell) != above.end() )
 			vec_above.push_back(h);
@@ -65,13 +68,11 @@ TwoDLib::TransitionList TwoDLib::CorrectStrays
 		vec_close.push_back(i_n);
 	}
 
-
 	// now for each above cell check if there is already a hit corresponding to that threshold cell in the destination list
 	for(MPILib::Index i = 0; i < vec_above.size(); i++ ){
 		Coordinates nearest_th = ths[vec_close[i]];
 
 		// if there is, increase the count by the hit of the above cell
-		// if there isn't insert a with a count of the above cell
 		bool b_hit = false;
 		MPILib::Index i_list = 0;
 		for(MPILib::Index i = 0; i < list_ret._destination_list.size(); i++){
@@ -84,7 +85,7 @@ TwoDLib::TransitionList TwoDLib::CorrectStrays
 		if (b_hit){
 			list_ret._destination_list[i_list]._count += vec_above[i]._count;
 		} else {
-
+			// if there isn't insert a hit with a count of the above cell
 			Hit new_hit;
 			new_hit._cell = nearest_th;
 			new_hit._count = vec_above[i]._count;
