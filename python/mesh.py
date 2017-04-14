@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import ROOT
 import numpy as np
@@ -188,8 +190,7 @@ class Quadrilateral(Cell):
     def isSimple(self):
 	diag_1=[self.points[0].tolist(),self.points[2].tolist()]
 	diag_2=[self.points[1].tolist(),self.points[3].tolist()]
-#	print diag_1,diag_2
-	if np_seg_intersect(diag_1,diag_2) == None:
+	if np_seg_intersect(diag_1,diag_2) is None: # adapted to prevent elementwise comparison (MdK:7/4/2017)
 	    return False
 	else: 
 	    return True
@@ -200,7 +201,7 @@ class Quadrilateral(Cell):
 	edge_3 = [self.points[2].tolist(), self.points[3].tolist()]
 	edge_4 = [self.points[3].tolist(), self.points[0].tolist()]
 
-	if np_seg_intersect(edge_1, edge_3) == None and np_seg_intersect(edge_2, edge_4) == None:	
+	if np_seg_intersect(edge_1, edge_3) is None and np_seg_intersect(edge_2, edge_4) is None: # adapted to prevent elementwise comparison (MdK:7/4/2017)	
 	    return False
 	else:
 	    return True
@@ -668,7 +669,10 @@ class Mesh:
 
 ####under construction
     def removeBadBins(self):
+
 	new_mesh = Mesh(None)
+        new_mesh.dt = self.dt # Added (MdK): 6/04/2017
+
 	for i, cells in enumerate(self.cells):
 
 	    if i == 0:
@@ -827,7 +831,7 @@ class Mesh:
             l = []
             
             # An empty strip should be allowed for example as a place holder for stationary cells
-            if str.text == None:
+            if str.text is None:
                 continue
 
             coords = [ float(x) for x in str.text.split() ]
