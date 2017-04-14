@@ -50,21 +50,28 @@ void TransitionMatrixGenerator::ApplyTranslation(vector<Point>* pvec, const Poin
 		(*it) += p;
 }
 
-bool TransitionMatrixGenerator::CheckHitList(const Point& p)
+bool TransitionMatrixGenerator::CheckHitList(const Coordinates& c)
 {
-	for (auto it = _hit_list.begin(); it != _hit_list.end(); it++){
-		assert(it->_cell[0] < _tree.MeshRef().NrQuadrilateralStrips());
-		assert(it->_cell[1] < _tree.MeshRef().NrCellsInStrip(it->_cell[0]));
-		if (_tree.MeshRef().Quad(it->_cell[0],it->_cell[1]).IsInside(p) ){
-			it->_count += 1;
+	// If this routine is called, it is assumed that the Point p is in the
+	// Mesh, i.e. that LocatePoint returns Found on this point.
+
+	for ( Hit& h: _hit_list){
+		if( h._cell[0] == c[0] && h._cell[1] == c[1]){
+			h._count += 1;
 			return true;
 		}
 	}
+
 	return false;
 }
 
-TransitionMatrixGenerator::SearchResult TransitionMatrixGenerator::Locate(const Point& pt_translated, Coordinates* pc){
-
+TransitionMatrixGenerator::SearchResult TransitionMatrixGenerator::LocatePoint(const Point& pt_translated, Coordinates* pc){
+	// Walks through the mesh to see if the Point pt_tanslated can be found in the Mesh. It
+	// first checks whether the point is in a Fiducial volume. If it is in one of Mesh cells associated
+	// with the fiducial volume it is found; if it is within the Fiducial volume, it is lost. If it
+	// is not in any Fiducial volume, the Mesh is searched, and if the cell is found, the coordinates that
+	// pc point to are set to the cell corrdinates. If it is not found after an exhaustive search, it is lost,
+	// and that result is retuned as Lost.
 	SearchResult res = CheckFiducial(pt_translated, pc);
 	if ( res == Found || res == Accounted)
 		return res;
@@ -77,19 +84,19 @@ TransitionMatrixGenerator::SearchResult TransitionMatrixGenerator::Locate(const 
 				return Found;
 			}
 		}
+
 	return Lost;
 }
 
 void TransitionMatrixGenerator::ProcessTranslatedPoints(const vector<Point>& vec)
 {
 	Coordinates c(0,0);
-
-	for(auto it = vec.begin(); it != vec.end(); it++){
-		SearchResult res = Locate(*it,&c) ;
+	for(const Point& p : vec){
+		SearchResult res = LocatePoint(p,&c) ;
 
 		switch(res){
 			case (Found):
-				if (!CheckHitList(*it)){
+				if (!CheckHitList(c)){
 						Hit h;
 						h._cell = c;
 						h._count = 1;
@@ -97,17 +104,17 @@ void TransitionMatrixGenerator::ProcessTranslatedPoints(const vector<Point>& vec
 				}
 				break;
 			case(Accounted):
-					if (!CheckHitList(*it)){
+					if (!CheckHitList(c)){
 						Hit h;
 						h._cell = c;
 						h._count = 1;
 						_hit_list.push_back(h);
 				}
-				_accounted.push_back(*it);
+				_accounted.push_back(p);
 				break;
 
 			case(Lost):
-				_lost.push_back(*it);
+				_lost.push_back(p);
 				break;
 			default:
 				throw TwoDLibException("Unexpected result from Locate.");
@@ -127,6 +134,9 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 	gen.Generate(&vec_point);
 	ApplyTranslation(&vec_point,p);
 	ProcessTranslatedPoints(vec_point);
+
+	if (_hit_list.size() > 9000)
+		std::cout << "zopa: " << strip_no << " " << cell_no << std::endl;
 }
 
 
@@ -201,7 +211,6 @@ TransitionMatrixGenerator::SearchResult TransitionMatrixGenerator::CheckFiducial
 		if (it->_quad->IsInside(p)){
 			Coordinates cell;
 			if (IsInAssociated(*it,p,&cell)){
-
 				*pc =  cell;
 				return Found;
 			} else {
