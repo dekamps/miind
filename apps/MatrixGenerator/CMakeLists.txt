@@ -39,6 +39,8 @@ set ( LIBLIST
 #############################################################################
 # executables
 #############################################################################
-add_executable(MatrixGenerator Bind.cpp			ConstructResetMapping.cpp	CorrectStrays.cpp		GenerateMatrix.cpp  main.cpp)
+add_executable(MatrixGenerator ConstructResetMapping.cpp	CorrectStrays.cpp		GenerateMatrix.cpp  MatrixGenerator.cpp TranslationObject.cpp)
+add_executable(Bind Bind.cpp Bind.hpp)
+target_link_libraries(Bind            ${LIBLIST})
 target_link_libraries(MatrixGenerator ${LIBLIST})
 
