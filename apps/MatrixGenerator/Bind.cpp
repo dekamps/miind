@@ -47,22 +47,23 @@ void TwoDLib::Bind(int argc,char** argv){
 	std::string mesh_name(argv[1]);
 	std::vector<string> elem;
 	split(mesh_name,'.',elem);
-	if (elem[1] != string("mesh"))
+	if (elem.size() < 2 || elem[1] != string("mesh"))
 		throw TwoDLib::TwoDLibException("Mesh extension not .mesh");
 	std::string base_name = elem[0];
 	elem.clear();
 	std::string stat_name(argv[2]);
 	split(stat_name,'.',elem);
-	if (elem[1] != string("stat"))
+	if (elem.size() < 2 || elem[1] != string("stat"))
 		throw TwoDLib::TwoDLibException("Stat extension not .stat");
 	string rev_name(argv[3]);
 	elem.clear();
-	split(stat_name,'.',elem);
-	if (elem[1] != string("stat"))
+	split(rev_name,'.',elem);
+	if (elem.size() < 2 || elem[1] != string("rev"))
 		throw TwoDLib::TwoDLibException("rev file extension not .rev");
 
 	std::cout << "Reading mesh" << std::endl;
 	TwoDLib::Mesh mesh(base_name + ".mesh");
+	std::cout << "There are " << mesh.NrQuadrilateralStrips() << " strips." << std::endl;
 	std::cout << "Reading stat file" << std::endl;
 	TwoDLib::Stat stat(base_name + ".stat");
 
@@ -94,4 +95,26 @@ void TwoDLib::Bind(int argc,char** argv){
 
 	Glue(base_name,mesh,stat,vec_rev, V_res, theta);
 	std::cout << "Model file created" << std::endl;
+}
+
+
+void InterpretArguments(int argc, char** argv){
+	if (argc != 6){
+		std::cout << "Usage: ./Bind <basename>.mesh <basename>.stat <basename>.rev V_res theta." << std::endl;
+		exit(0);
+	}
+}
+
+int main(int argc, char** argv){
+
+	try {
+
+		InterpretArguments(argc,argv);
+		TwoDLib::Bind(argc,argv);
+	}
+	catch(const TwoDLib::TwoDLibException& excep){
+		std::cout << excep.what() << std::endl;
+	}
+
+	return 0;
 }

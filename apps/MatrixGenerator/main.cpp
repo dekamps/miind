@@ -19,15 +19,18 @@
 using namespace std;
 
 
-enum UseCase { Binding, MatrixGeneration };
+enum UseCase { Binding, MatrixGeneration, MatrixGeneration };
 
 UseCase InterpretArguments(int argc, char** argv){
 	// better test immediately so that existence of argv[1] is guaranteed.
-	if (argc != 6 && argc != 7  && argc != 9)
-		throw TwoDLib::TwoDLibException("Incorrect number of arguments. Usage is either: ./MatrixGenerator <basename>.mesh <basename>.stat <basename>.rev V_res theta, or ./MatrixGenerator <basename>.model <basename>.fid n_points tr_v tr_w tr_reset [n_min] [n_max].");
+	if (argc != 4 && argc != 6 && argc != 7  && argc != 9)
+		throw TwoDLib::TwoDLibException("Incorrect number of arguments. Usage is: ./MatrixGenerator <basename>.model <basename>.fid n_points tr_v tr_w tr_reset [n_min] [n_max].");
 	std::string mesh_name(argv[1]);
 	std::vector<string> elem;
 	TwoDLib::split(mesh_name,'.',elem);
+
+	if (argc == 4 && elem[1] == string("mesh"))
+		return MatrixGeneration;
 
 	if (argc == 6 && elem[1] == string("mesh"))
 		return Binding;

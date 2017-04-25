@@ -20,10 +20,11 @@
 #include <fstream>
 #include <iostream>
 #include <TwoDLib.hpp>
-#include "Bind.hpp"
+#include "Bind.hpp" // still necessary for definitions of split
 #include "ConstructResetMapping.hpp"
 #include "CorrectStrays.hpp"
 #include "GenerateMatrix.hpp"
+#include "TranslationObject.hpp"
 
 namespace {
 void FixModelFile(const string& basename){
@@ -78,8 +79,7 @@ void Write
 (
 	const string& fn,
 	const std::vector<TwoDLib::TransitionList>& list,
-	double tr_v,
-	double tr_w,
+	const TwoDLib::Translation& efficacy,
 	MPILib::Index l_min,
 	MPILib::Index l_max
 )
@@ -87,7 +87,7 @@ void Write
 	std::ofstream ofst(fn);
 	ofst.precision(10);
 	if (l_min == 0)
-		ofst << tr_v << "\t" << tr_w << "\n";
+		ofst << efficacy._v << "\t" << efficacy._w << "\n";
 
 	for (auto it = list.begin(); it != list.end(); it++){
 		ofst << it->_number     << ";";
@@ -108,14 +108,16 @@ void Write
 			const TwoDLib::Fid& fid,
 			double V_th,
 			double V_reset,
-			double tr_v,
-			double tr_w,
+			std::unique_ptr<TwoDLib::TranslationObject>& p_to,
 			double tr_reset,
 			MPILib::Number nr_points,
 			MPILib::Index l_min,
 			MPILib::Index l_max
 	){
 	    std::vector<TwoDLib::TransitionList> transitions;
+
+	    const std::vector< std::vector<TwoDLib::Translation> >& translation_list = p_to->TranslationList();
+	    const TwoDLib::Translation efficacy =p_to->Efficacy();
 
 		vector<TwoDLib::Coordinates> ths   = mesh.findV(V_th,TwoDLib::Mesh::EQUAL);
 		vector<TwoDLib::Coordinates> above = mesh.findV(V_th,TwoDLib::Mesh::ABOVE);
@@ -160,7 +162,8 @@ void Write
 
 				if (std::find(above.begin(),above.end(),c) == above.end() ){
 					gen.Reset(nr_points);
-					gen.GenerateTransition(i,j,tr_v,tr_w);
+					TwoDLib::Translation tr = translation_list[i][j];
+					gen.GenerateTransition(i,j,tr._v,tr._w);
 					l._number = gen.N();
 					l._origin = TwoDLib::Coordinates(i,j);
 					l._destination_list = gen.HitList();
@@ -174,12 +177,13 @@ void Write
 		std::cout << "Finished. Writing out" << std::endl;
 		std::ostringstream ostfn;
 		ostfn.precision(10);
-		ostfn << "_" << tr_v << "_" << tr_w << "_" << l_min << "_" << l_max << "_";
+
+		ostfn << "_" << efficacy._v << "_" << efficacy._w << "_" << l_min << "_" << l_max << "_";
 		std::string mat_name = base_name + ostfn.str() + ".mat";
 		vector<TwoDLib::Coordinates> resets  = mesh.findV(V_reset,TwoDLib::Mesh::EQUAL);
 
 		std::cout << "There are " << ths.size() << " reset bins." << std::endl;
-		Write(mat_name,transitions,tr_v,tr_w,l_min,l_max);
+		Write(mat_name,transitions,efficacy,l_min,l_max);
 
 
 		// the reset mapping is the same for all ranges
@@ -198,13 +202,14 @@ void Write
 	(
 		const std::string& base_name,
 		unsigned int nr_points,
-		double tr_v,
-		double tr_w,
+		std::unique_ptr<TwoDLib::TranslationObject>& p_to,
 		double tr_reset,
 		unsigned int l_min,
 		unsigned int l_max
 		)
 	{
+		std::cout << "Setup" << std::endl;
+
 		pugi::xml_document doc;
 
 		pugi::xml_parse_result result = doc.load_file((base_name + std::string(".model")).c_str());
@@ -242,68 +247,100 @@ void Write
 		double V_reset;
 		ivr >> V_reset;
 
-		GenerateElements(base_name, mesh,fid,theta,V_reset,tr_v, tr_w, tr_reset, nr_points, l_min,l_max);
+		// make sure the TranslationObject is filled, consistent with mesh
 
+		p_to->GenerateTranslationList(mesh);
+
+		GenerateElements(base_name, mesh,fid,theta,V_reset, p_to, tr_reset, nr_points, l_min,l_max);
 	}
 
-	void PrepareMatrixGeneration(int argc, char** argv){
+	void PrepareMatrixGeneration(int argc, char** argv, TwoDLib::UserTranslationMode mode){
 		std::cout << "Generate transition matrix" << std::endl;
+		// this bit is common: model file, fid file, nr of translation points
 
 		std::string model_name(argv[1]);
 		std::vector<string> elem;
 		TwoDLib::split(model_name,'.',elem);
 		std::string base_name(elem[0]);
-
-		if (elem[1] != string("model"))
+		if (elem.size() < 2 || elem[1] != string("model"))
 			throw TwoDLib::TwoDLibException("Model extension not .model");
 
 
 		std::string fid_name(argv[2]);
 		elem.clear();
 		TwoDLib::split(fid_name,'.',elem);
-		if (elem[1] != string("fid"))
+		if (elem.size() < 2 || elem[1] != string("fid"))
 			throw TwoDLib::TwoDLibException("Fiducial extension not .fid");
-
 
 		std::istringstream istp(argv[3]);
 		unsigned int nr_points;
 		istp >> nr_points;
 
-		std::istringstream istrv(argv[4]);
-		double tr_v;
-		istrv >> tr_v;
-
-		std::istringstream istrw(argv[5]);
-		double tr_w;
-		istrw >> tr_w;
-
-		std::istringstream istre(argv[6]);
-		double tr_reset;
-		istre >> tr_reset;
-
+		// this is also common if the argument parse does not provide values, they are 0
 		unsigned int l_min = 0;
 		unsigned int l_max = 0;
 
-		if (argc == 9){
-			std::istringstream ist_min(argv[7]);
-			std::istringstream ist_max(argv[8]);
-			ist_min >> l_min;
-			ist_max >> l_max;
+		// here, either the translation arguments are provided, or the jump file,
+		// both must provide a translation object
+		std::unique_ptr<TwoDLib::TranslationObject> p_to;
+
+		// finally, at the moment we don't envisage reset values for jump files, but this may change.
+		// in that case we probably should make it integral part of the TranslationObject. For now
+		// we use it separately, as it is used differently by GenerateElements.
+		double tr_reset = 0.;
+		if (mode == TwoDLib::TranslationArguments){
+			std::istringstream istrv(argv[4]);
+			double tr_v;
+			istrv >> tr_v;
+
+			std::istringstream istrw(argv[5]);
+			double tr_w;
+			istrw >> tr_w;
+
+			std::istringstream istre(argv[6]);
+			// already declared and initialized above
+			istre >> tr_reset;
+
+			p_to = std::unique_ptr<TwoDLib::TranslationObject>{new TwoDLib::TranslationObject(tr_v, tr_w)};
+
+			if (argc == 9){
+				std::istringstream ist_min(argv[7]);
+				std::istringstream ist_max(argv[8]);
+				ist_min >> l_min;
+				ist_max >> l_max;
+			}
+
+			if (l_min > l_max){
+				std::cout << "Upper bound range smaller than lower bound" << std::endl;
+				exit(0);
+			}
+
+			std::cout << "Range: " << l_min << " " << l_max << std::endl;
+		} else {
+			std::ifstream ifst(argv[4]);
+			if (!ifst)
+				throw TwoDLib::TwoDLibException("Could not open the jump file.");
+			else
+				p_to = std::unique_ptr<TwoDLib::TranslationObject>{ new TwoDLib::TranslationObject(ifst)};
+			if (argc == 7){
+				std::istringstream ist_min(argv[5]);
+				std::istringstream ist_max(argv[6]);
+				ist_min >> l_min;
+				ist_max >> l_max;
+			}
+
+			if (l_min > l_max){
+				std::cout << "Upper bound range smaller than lower bound" << std::endl;
+				exit(0);
+			}
 		}
 
-		if (l_min > l_max){
-			std::cout << "Upper bound range smaller than lower bound" << std::endl;
-			exit(0);
-		}
-
-		std::cout << "Range: " << l_min << " " << l_max << std::endl;
-
-		SetupObjects(base_name,nr_points,tr_v,tr_w,tr_reset,l_min,l_max);
+		SetupObjects(base_name,nr_points,p_to,tr_reset,l_min,l_max);
 	}
 }
 
 
-void TwoDLib::GenerateMatrix(int argc, char** argv){
+void TwoDLib::GenerateMatrix(int argc, char** argv, TwoDLib::UserTranslationMode mode){
 
-	PrepareMatrixGeneration(argc,argv);
+	PrepareMatrixGeneration(argc,argv, mode);
 }
