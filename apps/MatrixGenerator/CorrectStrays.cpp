@@ -24,11 +24,18 @@
 #include "TwoDLibException.hpp"
 
 namespace {
-	MPILib::Index find_nearest(const std::vector<TwoDLib::Coordinates>& vec_th, const TwoDLib::Hit& h){
+	MPILib::Index find_nearest
+	(
+		const std::vector<TwoDLib::Coordinates>& vec_th,
+		const TwoDLib::Hit& h,
+		const TwoDLib::Mesh& m
+	){
 		vector<double> dist;
 
+		TwoDLib::Point ph = m.Quad(h._cell[0],h._cell[1]).Centroid();
 		for(const auto& c: vec_th){
-			double d = std::pow(c[0] -  h._cell[0],2) + std::pow(c[1] - h._cell[1],2);
+			TwoDLib::Point pc = m.Quad(c[0],c[1]).Centroid();
+			double d = std::pow(ph[0] -  pc[0],2) + std::pow(ph[1] - pc[1],2);
 			dist.push_back(d);
 		}
 
@@ -41,37 +48,39 @@ TwoDLib::TransitionList TwoDLib::CorrectStrays
 (
 	const TwoDLib::TransitionList& l,               //! list of all hits for a transition
 	const vector<TwoDLib::Coordinates>& ths,     	//! list of cells on threshold
-	const vector<TwoDLib::Coordinates>& above	    //! list of cells above threshold
+	const vector<TwoDLib::Coordinates>& above,	    //! list of cells above threshold
+	const Mesh& m 									//! need to be able to find the positions of coordinates
 ){
 	TransitionList list_ret;
 	list_ret._origin = l._origin;
 	list_ret._number = l._number;
+
 
 	std::vector<TwoDLib::Hit> vec_above;
 
 	// all cells in the destination list that are below or on threshold can be used as
 	// but we make a list of destinations above threshold; they will have to be remapped onto the threshold
 	for(const TwoDLib::Hit& h: l._destination_list){
-		if ( std::find(above.begin(), above.end(), h._cell) != above.end() )
+		if ( std::find(above.begin(), above.end(), h._cell) != above.end() ){
 			vec_above.push_back(h);
-		else
+		}	else {
 			list_ret._destination_list.push_back(h);
+		}
 	}
 
 	vector<MPILib::Index> vec_close;
 	// for each destination in the above list we must find the threshold cell that is closest
 	for (const auto& h: vec_above){
-		MPILib::Index i_n = find_nearest(ths,h);
+		MPILib::Index i_n = find_nearest(ths,h, m);
 		vec_close.push_back(i_n);
 	}
-
 
 	// now for each above cell check if there is already a hit corresponding to that threshold cell in the destination list
 	for(MPILib::Index i = 0; i < vec_above.size(); i++ ){
 		Coordinates nearest_th = ths[vec_close[i]];
 
 		// if there is, increase the count by the hit of the above cell
-		// if there isn't insert a with a count of the above cell
+		// if there isn't insert a hit with a count of the above cell
 		bool b_hit = false;
 		MPILib::Index i_list = 0;
 		for(MPILib::Index i = 0; i < list_ret._destination_list.size(); i++){
