@@ -117,7 +117,7 @@ void Write
 	    std::vector<TwoDLib::TransitionList> transitions;
 
 	    const std::vector< std::vector<TwoDLib::Translation> >& translation_list = p_to->TranslationList();
-	    const TwoDLib::Translation efficacy =p_to->Efficacy();
+	    const TwoDLib::Translation efficacy = p_to->Efficacy();
 
 		vector<TwoDLib::Coordinates> ths   = mesh.findV(V_th,TwoDLib::Mesh::EQUAL);
 		vector<TwoDLib::Coordinates> above = mesh.findV(V_th,TwoDLib::Mesh::ABOVE);
@@ -132,6 +132,7 @@ void Write
 		std::cout << "There are " << below.size() << " cells below threshold" << std::endl;
 		std::cout << "There are " << above.size() << " cells above threshold" << std::endl;
 		std::cout << "There are " << ths.size()   << " cells on threshold" << std::endl;
+
 
 		std::cout << "start generation" << std::endl;
 		TwoDLib::MeshTree tree(mesh);
@@ -155,12 +156,13 @@ void Write
 
 		for( MPILib::Index i = min_strip; i <  max_strip; i++){
 			std::cout << i << " " << mesh.NrCellsInStrip(i) << std::endl;
-			for (MPILib::Index j = 0; j < mesh.NrCellsInStrip(i); j++){
+			for (MPILib::Index j = 0; j <  mesh.NrCellsInStrip(i); j++){
 
 				// Only generate if the origin is in BELOW, or in EQUAL
 				TwoDLib::Coordinates c(i,j);
 
 				if (std::find(above.begin(),above.end(),c) == above.end() ){
+
 					gen.Reset(nr_points);
 					TwoDLib::Translation tr = translation_list[i][j];
 					gen.GenerateTransition(i,j,tr._v,tr._w);
@@ -168,7 +170,7 @@ void Write
 					l._origin = TwoDLib::Coordinates(i,j);
 					l._destination_list = gen.HitList();
 
-					TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above);
+					TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
 					transitions.push_back(lcor);
 				}
 			}
