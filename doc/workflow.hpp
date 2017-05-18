@@ -78,7 +78,7 @@ You can inspect the file:
 f.ls()
 \endverbatim
 You will get a list of names of TGraph objects. To get them from the file, do, for example:
-\lstset{label='rate'}
+
 \verbatim
 g=f.Get('rate_1')
 g.Draw('AP')
