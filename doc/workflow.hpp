@@ -118,7 +118,7 @@ add_executable(populationDemo population-example.cpp)
 target_link_libraries(populationDemo \${LIBLIST})
 \endverbatim
 Copy this entry in the same file under the same section  using an editor and change this entry into:
-\verbatim}
+\verbatim
 add_executable(myProgram new.cpp)
 target_link_libraries(myProgram \${LIBLIST})
 \endverbatim

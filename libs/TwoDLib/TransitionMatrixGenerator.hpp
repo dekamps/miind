@@ -85,7 +85,7 @@ namespace TwoDLib {
 	  //! List of points attributed to a fiducial volume, but not a cell
 	  vector<Point> AccountedPoints() const { return _accounted; }
 
-	  //! List of cells that are hit, together with hit count
+	  //! List of cells that are hit by a Monte Carlo point, together with hit count
 	  vector<Hit>   HitList() const { return _hit_list; }
 
 	  //! Number of points used in MC generation
@@ -93,12 +93,12 @@ namespace TwoDLib {
 
   private:
 
-	  bool CheckHitList				(const Point&);
+	  bool CheckHitList				(const Coordinates&);
 	  void ApplyTranslation			(vector<Point>*, const Point&);
 	  double DetermineDistance		(const Quadrilateral&);
 	  void ProcessTranslatedPoints	(const vector<Point>& vec);
 	  bool IsInAssociated			(const FiducialElement&, const Point&, Coordinates*);
-	  SearchResult Locate			(const Point&, Coordinates*);
+	  SearchResult LocatePoint		(const Point&, Coordinates*);
 	  Hit CheckTree					(const Point&, const vector<Point>&);
 	  SearchResult CheckFiducial	(const Point&, Coordinates*);
 

@@ -1,6 +1,7 @@
 /*!
 \mainpage Miind Documentation
 
+
 \section sec_introduction Introduction
 MIIND is a simulator for modeling circuits of neural populations, with an emphasis on population density techniques, co-funded by 
 the <a href="http://www.humanbrainproject.eu/">Human Brain Project</a>.  
@@ -19,6 +20,10 @@ or else that you've worked with rate based models such as Wilson-Cowan dynamics.
 In case of a bug, please raise an <a href="https://github.com/dekamps/miind/issues">issue</a>. (Press on the green button), or send
 an email to M.deKamps@leeds.ac.uk
 
+
+Below, we will  provide an example. We assume that you have
+some familiarity with using neural simulators such as <a href="http://www.nest-simulator.org">NEST</a> or <a href="http://briansimulator.org/">BRIAN</a>, 
+or else that you've worked with rate based models such as Wilson-Cowan dynamics.
 
 \section sec_intro_example Example  1: a one dimensional density
 \image html dense.png
@@ -40,7 +45,6 @@ To get a feeling for the simulator and its capabilities, go to the \subpage page
 
 To run the simulator, go to the \ref page_workflow page, after installation is completed. Make sure
 you have had a glance at the \ref  page_examples  page.
-
 
 \section sec_download Download
 The latest tar bal can be found <a href="http://sourceforge.net/projects/miind">here</a>. Install on Unix platforms
@@ -70,7 +74,10 @@ For more details see \ref dependencies
 
 \section sec_announce the latest developments.
  There is a now <a href="http://miind.sf.net/tutorial.pdf">tutorial</a>.
+<<<<<<< HEAD
 MIIND version 2.0 
+=======
+>>>>>>> master
 
 MIIND version 1.03 was released om 9 February 2016. It contains more efficient leaky-integrate-and-fire support, and an extended example section.
 
@@ -94,15 +101,22 @@ Many new features are in developement. These include:
 - Support for non Poisson statistics
 - Support for activity dependent efficacies
 
+<<<<<<< HEAD
 The old neural network code, as described , including a HMAX implementation is still available, but will no longer be maintained.
+=======
+The old neural network code, including a HMAX implementation is still available, but will no longer be maintained.
+>>>>>>> master
 
 \section sec_wiki WIKI
 The MIIND <a href="http://sourceforge.net/p/miind/wiki/Home">wiki</a>.
 The WIKI contains more details about the extra work that needs to be done to install MIIND under windows.
 
+<<<<<<< HEAD
 
 \image html hbp.png
 \image latex hbp.png "MIIND development is now co-funded by the Human Brain Project." width=5cm
+=======
+>>>>>>> master
 
 */
 

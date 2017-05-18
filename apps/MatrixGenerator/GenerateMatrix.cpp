@@ -160,7 +160,6 @@ void Write
 
 				// Only generate if the origin is in BELOW, or in EQUAL
 				TwoDLib::Coordinates c(i,j);
-
 				if (std::find(above.begin(),above.end(),c) == above.end() ){
 
 					gen.Reset(nr_points);
@@ -171,6 +170,7 @@ void Write
 					l._destination_list = gen.HitList();
 
 					TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
+
 					transitions.push_back(lcor);
 				}
 			}
