@@ -41,6 +41,7 @@ void TwoDLib::ConstructResetMapping
 
 	// loop over all threshold bins
 	for ( const Coordinates& c: ths){
+
 		// determine the translated reset point
 		double w_trans = mesh.Quad(c[0],c[1]).Centroid()[1] + tr_w;
 
