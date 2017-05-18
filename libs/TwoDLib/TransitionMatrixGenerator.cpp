@@ -135,8 +135,6 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 	ApplyTranslation(&vec_point,p);
 	ProcessTranslatedPoints(vec_point);
 
-	if (_hit_list.size() > 9000)
-		std::cout << "zopa: " << strip_no << " " << cell_no << std::endl;
 }
 
 
