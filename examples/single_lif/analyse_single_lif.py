@@ -116,4 +116,7 @@ def parsejoblist():
 		noinput()
 
 if __name__ == '__main__':
+	print 'zopa'
+	if not os.path.exists('single'):
+		raise NameError('Directory single does not exist. Did you call miind.py correctly?')
 	parsejoblist()

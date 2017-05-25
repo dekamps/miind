@@ -232,6 +232,9 @@ _vec_vec_gen(0)
 	else {
 		string line;
 		getline(ifst,line);
+		// in some hand edits the Mesh tag is not place at the beginning; this is valid XML and the parser is not bothered by it,
+		// but it must be passed correctly to the XML:
+		line.erase (std::remove (line.begin(), line.end(), ' '), line.end());
 		if (line == string("<Mesh>")){
 			ifst.close();
 			std::ifstream newifst(file_name);

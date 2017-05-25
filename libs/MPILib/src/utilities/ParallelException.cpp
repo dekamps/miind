@@ -44,7 +44,7 @@ ParallelException::ParallelException(const std::string& message) :
 	msg_ = sstream.str();
 }
 
-ParallelException::~ParallelException() throw () {
+ParallelException::~ParallelException() throw(){
 }
 
 const char* ParallelException::what() const throw () {

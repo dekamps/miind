@@ -40,12 +40,10 @@ def miind_root():
 
 def create_dir(name):
     ''' Name of the executable to be generated. Should not end in '.xml'. The directory will be created relative to the calling directory. '''
-    sep = os.path.sep
     initialize_global_variables()
     global MIIND_ROOT
 
-    abs_path = './' + sep + name
-
+    abs_path=os.path.join('.',name)
     try:
         os.makedirs(abs_path)
     except OSError as exception:
@@ -67,12 +65,11 @@ def insert_cmake_template(name,full_path_name):
     ''' name is the executable name, full_path is the directory where the cmake template
     needs to be written into.'''
 
-    sep = os.path.sep
-    outname = full_path_name + sep + 'CMakeLists.txt'
+    outname = os.path.join(full_path_name, 'CMakeLists.txt')
     if os.path.exists(outname):
         return
-
-    with open(miind_root() + sep + 'python' + sep + 'cmake_template') as f:
+    template_path = os.path.join(miind_root(),'python','cmake_template')
+    with open(template_path) as f:
         lines=f.readlines()
 
     # filter the template CMakeLists.txt to that was is needed locally
@@ -106,7 +103,25 @@ def create_cpp_file(name, dir_path, prog_name, mod_name):
             sp.call(['cp',f,dir_path])
     return
             
-    
+
+def move_model_files(xmlfile,dirpath):
+    '''Collect the model files, and the matrix files that are mentioned in the XML file,
+    and move them to directory dirpath.'''
+    mns =  codegen.model_name(xmlfile)
+    mans = codegen.matrix_names(xmlfile)    
+
+    for model in mns:
+        if not os.path.exists(model):
+            print 'Please put the file: ', model, 'in the same directory as the xml file.'
+
+    for mat in mans:
+        if not os.path.exists(mat):
+            print 'Please put the file: ', mat, 'in the same directory as the xml file.'
+
+    fls = mans + mns
+    for fi in fls:
+        sp.call(['cp',fi,dirpath])
+
 def add_executable(dirname, xmlfiles, modname):
 
     ''' Add a user defined executable to the current working directory.
@@ -115,12 +130,12 @@ def add_executable(dirname, xmlfiles, modname):
     if not PATH_VARS_DEFINED:
         initialize_global_variables()
 
-    sep = os.path.sep
     for xmlfile in xmlfiles:
         progname = check_and_strip_name(xmlfile)
-        dirpath = create_dir(dirname + '/' + progname)
+        dirpath = create_dir(os.path.join(dirname, progname))
         insert_cmake_template(progname,dirpath)
         create_cpp_file(xmlfile, dirpath, progname, modname)
+        move_model_files(xmlfile,dirpath)
 
 if __name__ == "__main__":
     initialize_global_variables()

@@ -56,17 +56,17 @@ public:
 	 * Configure the Algorithm
 	 * @param simParam The simulation parameter
 	 */
-	virtual void configure(const SimulationRunParameter&) = 0;
+	virtual void configure(const SimulationRunParameter& simParam) = 0;
 
 	/**
 	 * Evolve the node state. Overwrite this method if your algorithm does not
 	 * need to know the NodeTypes.
-	 * @param nodeVector Vector of the node States
+	 * @param rateVector Vector of the node States
 	 * @param weightVector Vector of the weights of the nodes
 	 * @param time Time point of the algorithm
 	 */
-	virtual void evolveNodeState(const std::vector<Rate>&,
-			const std::vector<WeightValue>&, Time) {
+	virtual void evolveNodeState(const std::vector<Rate>& rateVector,
+			const std::vector<WeightValue>& weightVector, Time time) {
 		throw utilities::Exception("You need to overwrite this method in your algorithm"
 				" if you want to use it");
 	}

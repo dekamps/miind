@@ -101,11 +101,15 @@ namespace GeomLib {
 		 * Configure the Algorithm
 		 * @param simParam The simulation parameter
 		 */
-      virtual void configure(const MPILib::SimulationRunParameter& simParam);
+		virtual void configure(const MPILib::SimulationRunParameter& simParam);
 
-
-		virtual void evolveNodeState(const std::vector<Rate>&,
-				const std::vector<WeightValue>&, Time);
+		//! Evolve the state of the node, by time t, given input firing rates and weight vector
+		virtual void evolveNodeState
+			(
+				const std::vector<Rate>&,			//!< A vector of instantaneous firing rates
+				const std::vector<WeightValue>&,    //!< A vector of efficacies
+				Time								//!< time by which the state should be evolved
+			);
 
 		virtual void prepareEvolve(const std::vector<Rate>&,
 				const std::vector<WeightValue>&,

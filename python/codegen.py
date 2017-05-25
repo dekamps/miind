@@ -73,6 +73,29 @@ def generate_opening(outfile):
     outfile.write('\ttry {')
      
 
+def model_name(fn):
+    '''Identifies model files mentioned in an XML file. For example used in placing the right model file in
+    the same directory as an XML file.'''
+    infile = open(fn)
+    tree=ET.fromstring(infile.read())
+    ma = tree.findall('Algorithms/Algorithm')
+
+    modelnames = []
+    for a in ma:
+        if a.attrib['type'] == 'MeshAlgorithm':
+            modelnames.append(a.attrib['modelfile'])
+    return modelnames
+
+def matrix_names(fn):
+    '''Find the file names of all MatrixFiles, mentioned in an XML file.'''
+    infile = open(fn)
+    tree=ET.fromstring(infile.read())
+    ma = tree.findall('Algorithms/Algorithm/MatrixFile')
+    matrixnames = []
+    for a in ma:
+        matrixnames.append(a.text)
+    return matrixnames
+
 def generate_outputfile(infile, outfile):
     generate_preamble(outfile)
     nettype, tree = parse_xml(infile,outfile)
@@ -80,7 +103,11 @@ def generate_outputfile(infile, outfile):
     outfile.write('\t// defining variables\n') # whatever variables are use are global
     variable_list = tree.findall('Variable')
     variables.parse_variables(variable_list,outfile)
-    alg_list = tree.findall('Algorithms/AbstractAlgorithm')
+    algies = tree.findall('Algorithms')
+    if len(algies) != 1:
+        raise ValueError
+
+    alg_list = algies[0].findall('Algorithm')
     weighttype = tree.find('WeightType')
     generate_opening(outfile)
     outfile.write('\t// generating algorithms\n')

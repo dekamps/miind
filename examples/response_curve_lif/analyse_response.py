@@ -3,6 +3,10 @@ import ROOT
 import sys
 import os
 import directories
+import glob
+import utilities as ut
+import subprocess as sp
+
 '''Analyse the response curve data.'''
 
 # Don't want flashing canvasses.
@@ -12,35 +16,41 @@ POPULATION_DATAFILE  = 'pop.dat'
 
 ROOT.gROOT.SetBatch(True)
 
-jobpath  = os.path.join(directories.miind_root(),'build','jobs','response','joblist')
+def AnalyseROOTFile(fn):
+	f=ROOT.TFile(fn)
 
-f = open(jobpath)
-lines = f.readlines()
+	items = fn.split('_')
+	mu    = float(items[2])
+	sigma = float(items[1])
 
-def ExtractPopulationResults():
+	# Get the firing rate response of the LIF population
+	g=f.Get('rate_0')
+
+	# Fit and write out
+	fun=ROOT.TF1('func1','pol1',0.8,1.0)
+	g.Fit('func1','R')
+	p = fun.GetParameters()
+
+	return p[0], mu, sigma
+
+
+def ExtractPopResults():
+	'''Assumes  the simulation results are in a directory called response, and that
+	the simulation results are in subdirectories of that directory. Each subdirectory is
+	called: 'response_[sigma]_[mu]_0.root'. '''
+
+	res = [] 
+	with ut.cd('response'):
+		dirs = sp.check_output(['ls']).split()
+		for f in dirs:
+			with ut.cd(f):
+				files = glob.glob("*.root")
+				f, m, s = AnalyseROOTFile(files[0]) # glob returns  a list, even if it has only one member
+				res.append([f,m,s])
+
 	with open(POPULATION_DATAFILE,'w') as fpop:
-		fpop.close()
-
-	for line in lines:
-		path = os.path.split(line.strip())	
-		print path[-1]
-		f=ROOT.TFile(os.path.join(os.path.split(jobpath)[0] ,  path[-1] + '_0.root'))
-
-		# Get the firing rate response of the LIF population
-		g=f.Get('rate_0')
-
-		# Fit and write out
-		fun=ROOT.TF1('func1','pol1',0.8,1.0)
-		g.Fit('func1','R')
-		p = fun.GetParameters()
-
-		with open(POPULATION_DATAFILE,'a') as fpop:
-			items= path[-1].split('_')
-			print items[2], items[1]
-			fpop.write(items[2] + ' ' + items[1] + ' ' +  str(p[0]) + '\n')
-		c=ROOT.TCanvas('c'+ path[-1])
-		g.Draw('AL')
-		c.SaveAs(path[-1] + '.png')
+		for r in res:
+			fpop.write(str(r[0]) +'\t' + str(r[1]) + '\t' + str(r[2]) +'\n')
 
 
 def ParseAnalyticResponse():
@@ -93,8 +103,9 @@ def ParsePopResponse():
 		lines = fp.readlines()
 		for line in lines:
 			items = [float(x) for x in line.split()]
-			m.append(items[0])
-			f.append(items[2])
+			m.append(items[1])
+			f.append(items[0])
+			print items[0], items[2]
 	g=ROOT.TGraph(len(m),np.array(m),np.array(f))
 	return g
 
@@ -122,6 +133,8 @@ def DrawComparisonPlot():
 	g.SetMarkerColor(2)
 	g.Draw('P')
 	c2.Print('anapop.pdf')
+
 if __name__ == "__main__":
-	ExtractPopulationResults()
+#	ExtractPopulationResults()
+	ExtractPopResults()
 	DrawComparisonPlot()

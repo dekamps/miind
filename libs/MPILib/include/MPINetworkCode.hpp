@@ -156,10 +156,8 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 		LOG(utilities::logINFO) << "Starting simulation";
 		try {
-			utilities::ProgressBar pb(
-					getEndTime() / _parameterSimulationRun.getTReport()
-							+ getEndTime()
-									/ _parameterSimulationRun.getTState());
+			// The count should be the end time divided by the state time; corrected MdK 22/04/2017
+			utilities::ProgressBar pb( static_cast<long>(getEndTime()/_parameterSimulationRun.getTState()));
 			do {
 				do {
 
@@ -199,7 +197,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 				}
 				pb++;
 
-			} while (getCurrentReportTime() < getEndTime());
+			} while (getCurrentSimulationTime() < getEndTime()); // it is better to test on simulation time (22/04/2017) MdK
 			// write out the final state
 			collectReport(report::STATE);
 		}

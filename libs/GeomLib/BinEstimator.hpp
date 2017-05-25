@@ -73,12 +73,13 @@ namespace GeomLib {
 	    //! the index will be -1. If a translated bin boundary ends up above the maximum potential, the index will be
 	    //! n, where n is the size of the interpretation array. A client must test for these cases. This is odd, and will
 	    //! change in future implementations so that a CoverPair can be reliably used in a loop.
-
+	    //! @param i [in] Index of the bin whose boundaries will be shifted
+	    //! @param h [in] Potential difference by which bin will be shifted. Careful! Excitation requires a negative shift.
 		CoverPair 
 			CalculateBinCover
 			(
-			 MPILib::Index i,  //! Index of the bin whose boundaries are shifted.
-				Potential      //! Difference in potential with respect to the boundaries of bin i. Careful! For an excitatory input this value must be negative.
+			 MPILib::Index i,
+			 Potential     h
 			) const;
 
 		//! Read only access to the interpretation array

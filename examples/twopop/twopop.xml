@@ -1,8 +1,7 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<AbstractAlgorithm type="OUAlgorithm">
-<OUAlgorithm Name="OULIF_excitatory">
+<Algorithm type="OUAlgorithm" name="OULIF_excitatory">
 <NeuronParameter>
 <t_membrane>10e-3</t_membrane>
 <t_refractive>0</t_refractive>
@@ -10,10 +9,8 @@
 <V_reset>0</V_reset>
 <V_reversal>0</V_reversal>
 </NeuronParameter>
-</OUAlgorithm>
-</AbstractAlgorithm>
-<AbstractAlgorithm type="OUAlgorithm">
-<OUAlgorithm Name="OULIF_inhibitory">
+</Algorithm>
+<Algorithm type="OUAlgorithm" name="OULIF_inhibitory">
 <NeuronParameter>
 <t_membrane>3e-3</t_membrane>
 <t_refractive>0</t_refractive>
@@ -21,10 +18,8 @@
 <V_reset>0</V_reset>
 <V_reversal>0</V_reversal>
 </NeuronParameter>
-</OUAlgorithm>
-</AbstractAlgorithm>
-<AbstractAlgorithm  type="GeomAlgorithm">
-<GeomAlgorithm Name="LIF_excitatory"  system="LeakingOdeSystem" lambda="0.01">
+</Algorithm>
+<Algorithm type="GeomAlgorithm" name="LIF_excitatory"  system="LeakingOdeSystem" lambda="0.01">
 <OdeParameter>
 <NeuronParameter>
 <t_membrane>10e-3</t_membrane>
@@ -40,10 +35,8 @@
 <V_min>-0.02</V_min>
 <N_bins>2200</N_bins>
 </OdeParameter>
-</GeomAlgorithm>
-</AbstractAlgorithm>
-<AbstractAlgorithm type="GeomAlgorithm">
-<GeomAlgorithm Name="LIF_inhibitory"  system="LeakingOdeSystem" lambda="0.01">
+</Algorithm>
+<Algorithm name="LIF_inhibitory"  system="LeakingOdeSystem" lambda="0.01" type="GeomAlgorithm">
 <OdeParameter>
 <NeuronParameter>
 <t_membrane>3e-3</t_membrane>
@@ -59,13 +52,10 @@
 <V_min>-0.02</V_min>
 <N_bins>2200</N_bins>
 </OdeParameter>
-</GeomAlgorithm>
-</AbstractAlgorithm>
-<AbstractAlgorithm type="RateFunctor">
-<RateFunctor Name="Cortical Background Algorithm">
+</Algorithm>
+<Algorithm name="Cortical Background Algorithm" type="RateFunctor">
 <expression><![CDATA[2.0]]></expression>
-</RateFunctor>
-</AbstractAlgorithm>
+</Algorithm>
 </Algorithms>
 <Nodes>
 <Node name="LIF E" type="EXCITATORY_GAUSSIAN" algorithm="LIF_excitatory"></Node>

@@ -34,7 +34,7 @@ struct DelayAssemblyParameter {
 	 * @param time_membrane membrane time constant in ms
 	 * @param rate initial firing rate of the population
 	 * @param th_exc excitatory threshold to switch delay activation on
-	 * param  th_inh inhibitory threshold to switch delay off
+	 * @param  th_inh inhibitory threshold to switch delay off
 	 */
 
   DelayAssemblyParameter(Time time_membrane,Rate rate, Rate th_exc, Rate th_inh):

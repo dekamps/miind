@@ -23,9 +23,10 @@
 
 namespace TwoDLib {
 	TransitionList CorrectStrays(
-			const TwoDLib::TransitionList&, //! list of all hits for a transition
+			const TwoDLib::TransitionList&,         //! list of all hits for a transition
 			const vector<TwoDLib::Coordinates>&,	//! list of cells on threshold
-			const vector<TwoDLib::Coordinates>&	    //! list of cells above threshold
+			const vector<TwoDLib::Coordinates>&,	//! list of cells above threshold
+			const TwoDLib::Mesh& 					//! mesh (need centroids)
 			);
 }
 #endif // include guard

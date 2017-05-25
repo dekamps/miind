@@ -59,7 +59,7 @@ namespace MPILib {
 		 * Configure the Algorithm
 		 * @param simParam
 		 */
-		virtual void configure(const SimulationRunParameter&);
+		virtual void configure(const SimulationRunParameter& simParam);
 
 
 		/**

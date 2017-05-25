@@ -169,7 +169,9 @@ void Ode2DSystem::RemapReversal(){
 
 void Ode2DSystem::RedistributeProbability()
 {
+
 	std::for_each(_vec_reset.begin(),_vec_reset.end(),_reset);
-	std::for_each(_vec_reset.begin(),_vec_reset.end(),_clean);
+ 	std::for_each(_vec_reset.begin(),_vec_reset.end(),_clean);
+
 	_f /= _mesh.TimeStep();
 }

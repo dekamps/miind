@@ -70,11 +70,11 @@ public:
 	//! of the corresponding bin in the interpretation array for the first element in the pair, but from the lower
 	//! boundary of the corresponding bin .
 
-	CoverPair
-		CalculateBinCover
+	//! Calculate a cover pair for the bin indicated by index i and given an efficacy h
+	CoverPair CalculateBinCover
 		(
-		 MPILib::Index i,  //! Index of the bin whose boundaries are shifted.
-			Potential //! Difference in potential with respect to the boundaries of bin i. Careful! For an excitatory input this value must be negative
+			MPILib::Index ,  //! Index of the bin whose boundaries are shifted.
+			Potential        //! Difference in potential with respect to the boundaries of bin i. Careful! For an excitatory input this value must be negative
 		) const;
 
 	//! Read only access to the interpretation array

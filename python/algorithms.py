@@ -5,7 +5,7 @@ ALGORITHMS = { 'RateAlgorithm'   : {'Connection' : 'double', 'Parameter': '' },
                'RateAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter' : ''}, 
                'OUAlgorithm'     : {'Connection' : 'DelayedConnection', 'Parameter' : 'NeuronParameter'}, 
                'GeomAlgorithmDC' : {'Connection' : 'DelayedConnection', 'Parameter' : 'GeomParameter'}, 
-               'MeshAlgorithm'   : {'Connection' : 'double', 'Parameter': ''} }
+               'MeshAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter': ''} }
 
 ALGORITHM_NAMES = {}
 
@@ -20,24 +20,22 @@ def Register(name, cpp_name):
 def setup_test():
     f = open('bla.xml')
     sim = ET.fromstring(f.read())
-    algorithms = sim.findall('Algorithms/AbstractAlgorithm')
+    algorithms = sim.findall('Algorithms/Algorithm')
     weighttype = sim.find('WeightType')
     return algorithms, weighttype
 
-
 def parse_rate_algorithm(alg, i , weighttype):
     s = ''
-    rg = alg.find('RateAlgorithm')
     
-    if not 'Name' in  rg.keys():
+    if not 'name' in  alg.keys():
         raise NameError('Name tag expected')
 
     cpp_name = 'rate_alg_' + str(i)
-    Register(rg.attrib['Name'],cpp_name)
+    Register(alg.attrib['name'],cpp_name)
 
     s += '\tMPILib::RateAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('
     
-    rt = rg.find('rate')
+    rt = alg.find('rate')
     s += rt.text
     
     s += ');\n'
@@ -61,10 +59,11 @@ def parse_neuron_parameter(np,i):
 
 def parse_individual_parameters(alg,i):
     s=''
-    v_min = alg.find('GeomAlgorithm/OdeParameter/V_min')
+
+    v_min = alg.find('OdeParameter/V_min')
     s = '\tconst MPILib::Potential v_min_' + str(i) + ' = ' + v_min.text + ';\n'
     
-    n_bins = alg.find('GeomAlgorithm/OdeParameter/N_bins')
+    n_bins = alg.find('OdeParameter/N_bins')
     s += '\tconst MPILib::Number n_bins_' + str(i) + ' = ' + n_bins.text + ';\n'
     
     return s
@@ -80,7 +79,7 @@ def parse_initialdensity_parameter(idp,i):
 
 def parse_diffusion_parameter(i,alg):
     s = ''
-    dp=alg.find('GeomAlgorithm/DiffusionParameter') 
+    dp=alg.find('DiffusionParameter') 
     dl=dp.find('diffusion_limit')
     dj=dp.find('diffusion_jump')
 
@@ -92,7 +91,7 @@ def parse_diffusion_parameter(i,alg):
     
 def parse_current_compensation_parameter(i,alg):
     s = ''
-    cc=alg.find('GeomAlgorithm/CurrentCompensationParameter')
+    cc=alg.find('CurrentCompensationParameter')
     mu=cc.find('mu')
     si=cc.find('sigma')
     
@@ -114,7 +113,7 @@ def DetermineSpikingSystem(i,alg):
     
 def parse_current_parameter(i,alg):
     s = ''
-    qp=alg.find('GeomAlgorithm/SpikingNeuralDynamics/QifParameter')
+    qp=alg.find('SpikingNeuralDynamics/QifParameter')
     ii=qp.find('I')
     s += '\tGeomLib::QifParameter par_qif_' + str(i) + '('
     s += ii.text + ',' + ii.text + ');\n'
@@ -151,11 +150,11 @@ def  NonDefaultGeomParameterArgs(system, i):
 
 def wrap_up_geom_algorithm(alg, i):
     s = ''
-    algorithmname=alg.find('GeomAlgorithm')
-    d=algorithmname.attrib
 
-    if not 'Name' in  d.keys():
-        raise NameError('Name tag expected')
+    d=alg.attrib
+
+    if not 'name' in  d.keys():
+        raise NameError('name tag expected')
 
     s += '\tGeomLib::OdeParameter par_ode_' + str(i) + '('
     s += 'n_bins_'      + str(i) + ','
@@ -185,19 +184,22 @@ def wrap_up_geom_algorithm(alg, i):
     s += 'par_geom_' + str(i)  
     s += ');\n'
     s += '\n'
-    Register(d['Name'], cpp_name)
+    Register(d['name'], cpp_name)
 
     return s
     
 def parse_geom_algorithm(alg, i, weighttype):
+    
+    if alg.attrib['type'] != 'GeomAlgorithm':
+        raise ValueError
     s = ''    
     s += parse_individual_parameters(alg,i)
     
-    np=alg.find('GeomAlgorithm/OdeParameter/NeuronParameter')
+    np=alg.find('OdeParameter/NeuronParameter')
     str_np =  parse_neuron_parameter(np,i)
     s+= str_np
 
-    idp = alg.find('GeomAlgorithm/OdeParameter/InitialDensityParameter')    
+    idp = alg.find('OdeParameter/InitialDensityParameter')    
     s += parse_initialdensity_parameter(idp,i)    
     
     s += wrap_up_geom_algorithm(alg, i)
@@ -206,15 +208,14 @@ def parse_geom_algorithm(alg, i, weighttype):
 
 def parse_mesh_algorithm(alg, i, weighttype):
     s = ''
-
-    algorithmname=alg.find('MeshAlgorithm')
-    d=algorithmname.attrib
+    if alg.attrib['type'] != 'MeshAlgorithm':
+        raise ValueError
 
     s += '\tstd::vector<std::string> '
     vec_name = 'vec_mat_' + str(i)
     s += vec_name + '{\"'
 
-    matfilelist =algorithmname.iter('MatrixFile')
+    matfilelist = alg.findall('MatrixFile')
     # don't use i below
     for k, fl in enumerate(matfilelist):
         if k > 0:
@@ -223,29 +224,29 @@ def parse_mesh_algorithm(alg, i, weighttype):
     s += '\"};\n'
 
 
-    timestep = algorithmname.find('TimeStep')
-
+    timestep = alg.find('TimeStep')
 
     cpp_name = 'alg_mesh_' + str(i)
     s += '\tTwoDLib::MeshAlgorithm<DelayedConnection> ' + cpp_name + '(\"'
-    s += d['modelfile'] + '\",' + vec_name + ',' + timestep.text + ');\n'
+    s += alg.attrib['modelfile'] + '\",' + vec_name + ',' + timestep.text + ');\n'
 
-    Register(d['Name'], cpp_name)
+    Register(alg.attrib['name'], cpp_name)
+
     return s
 
 def parse_ou_algorithm(alg, i,  weighttype):
     s = ''
-
+    
     algorithmname=alg.find('OUAlgorithm')
-    d=algorithmname.attrib
+    d=alg.attrib
 
-    np=alg.find('OUAlgorithm/NeuronParameter')
+    np=alg.find('NeuronParameter')
     str_np = parse_neuron_parameter(np,i)
     s += str_np
 
     cpp_name = 'alg_ou_' + str(i)
     s += '\tGeomLib::OUAlgorithm ' + cpp_name +'(par_neur_' + str(i) +');\n'
-    Register(d['Name'], cpp_name)
+    Register(d['name'], cpp_name)
 
     return s
 
@@ -335,19 +336,18 @@ def parse_delay_algorithm(alg,i,weighttype):
 
 def parse_ratefunctor_algorithm(alg, i, weighttype):
     s = ''
-    rf = alg.find('RateFunctor')
-    if not 'Name' in rf.keys():
-        raise NameError('Name tag expected')
+    if alg.attrib['type'] != 'RateFunctor':
+        raise ValueError
         
     cpp_name = 'rate_functor_' + str(i)
-    Register(rf.attrib['Name'],cpp_name)
+    Register(alg.attrib['name'],cpp_name)
     
 
     s += '\tMPILib::Rate RateFunction_' + str(i) + '(MPILib::Time);\n'
     
     s += '\tMPILib::RateFunctor<' + weighttype.text + '> ' + cpp_name + '(' 
     s += 'RateFunction_' + str(i) + ');\n'
-    rb = rf.find('expression')
+    rb = alg.find('expression')
     body=rb.text
 
     t = 'MPILib::Rate RateFunction_' + str(i) + '(MPILib::Time t){\n'
@@ -390,7 +390,8 @@ def parse_algorithm(alg,i,weighttype):
     return ''
     
 def parse_algorithms(alg_list,weighttype,outfile):
-    
+    '''alg_list is a list of Algorithm elements as found by the parser. Each element
+    of the list represents an individual algorithm.'''
     for i, alg in enumerate(alg_list):
         s = parse_algorithm(alg,i, weighttype)
         outfile.write(s)

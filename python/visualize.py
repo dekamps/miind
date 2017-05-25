@@ -2,6 +2,7 @@ import numpy as np
 import ROOT
 from palette import *
 from ode2dsystem import *
+from mesh import *
 import StringIO
 import xml.etree.ElementTree as ET
 from itertools import count
@@ -177,7 +178,7 @@ class Visualizer:
         self.c.Modified()
         self.c.Update()
         if pdfname != '':
-            self.c.SaveAs(pdfname +'.png')
+            self.c.SaveAs(pdfname +'.pdf')
 
     def show(self,xlabel='',ylabel='',pdfname='',points=[],pointcolor=3):
         dens=self.density()
@@ -356,3 +357,49 @@ class MatrixVisualizer:
                     self.modelviz.v.sys.mass[self.modelviz.v.sys.map(corig[0],corig[1])] = 0.1
         self.modelviz.v.sys.mass[0] = 1.0
         self.modelviz.v.show()
+
+class ResetVisualizer:
+    '''Show the reset mapping.'''
+    
+    def __init__(self,modelfile):
+        tree = ET.parse(modelfile)
+        root = tree.getroot()
+        mrep = root.findall('Mesh')
+        mstr = ET.tostring(mrep[0]) # there only should be one mesh
+        self.m = Mesh(None)
+        self.m.FromXML(mstr,fromString=True)
+        
+        mres = root.findall('Mapping')
+        for mp in mres:
+            if mp.attrib['type'] == 'Reset':
+                mapstr= mp.text
+                self.resetmap = self.__construct_map__(mapstr)
+
+        self.connections = self.__construct_connections__()
+
+    def __construct_map__(self, mapstr):
+        '''Convert the mapping string into an actual mapping.'''
+        l = mapstr.split('\n')
+        self.resmap = [ [[int(y) for y in x.split()[0].split(',')], [int(y) for y in x.split()[1].split(',')], float(x.split()[2])]  for x in l if len(x.split()) == 3]
+        
+
+    def __construct_connections__(self):
+        self.connects = []
+        for line in self.resmap:
+            fr=line[0]
+            to=line[1]
+
+            self.connects.append( [self.m.cells[fr[0]][fr[1]].centroid, self.m.cells[to[0]][to[1]].centroid] )
+    
+
+    def plot_connects(self):
+        for el in self.connects:
+            plt.plot([el[0][0],el[1][0]],[el[0][1],el[1][1]])
+            
+            delta_x = (el[1][0] - el[0][0])
+            delta_y = (el[1][1] - el[0][1])
+            grad = delta_y/delta_x
+            if grad > 0:
+                print 'BONG', grad
+
+        plt.show()

@@ -1,8 +1,7 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<AbstractAlgorithm type="GeomAlgorithm">
-<GeomAlgorithm Name="LIF_excitatory Algorithm" lambda="0.01" system="LeakingOdeSystem">
+<Algorithm name="LIF_excitatory Algorithm" lambda="0.01" system="LeakingOdeSystem" type="GeomAlgorithm">
 <OdeParameter>
 <NeuronParameter>
 <t_membrane>50e-3</t_membrane>
@@ -18,13 +17,10 @@
 <V_min>-0.02</V_min>
 <N_bins>500</N_bins>
 </OdeParameter>
-</GeomAlgorithm>
-</AbstractAlgorithm>
-<AbstractAlgorithm type="RateAlgorithm">
-<RateAlgorithm Name="Cortical Background Algorithm">
+</Algorithm>
+<Algorithm name="Cortical Background Algorithm" type="RateAlgorithm">
 <rate>1.0</rate>
-</RateAlgorithm>
-</AbstractAlgorithm>
+</Algorithm>
 </Algorithms>
 <Nodes>
 <Node algorithm="LIF_excitatory Algorithm" name="LIF E" type="EXCITATORY_GAUSSIAN" />

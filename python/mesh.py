@@ -713,7 +713,7 @@ class Mesh:
 			break
 	return new_mesh
 
-    def removeWithRenewal(self):
+    def removeWithRenewal(self, threshold = 1e-8):
 	new_mesh = Mesh(None)
 	revname = self.filename.split('.')[0] + '.rev'
 	#new_mesh.filename = fn
@@ -731,12 +731,12 @@ class Mesh:
 		for j, cell in enumerate(cells):
 		    chkCell = self.cells[i][j]
 			
-		    if j == 0 and (chkCell.isSelfIntersecting() or chkCell.isTooSmall()):
+		    if j == 0 and (chkCell.isSelfIntersecting() or chkCell.isTooSmall(threshold)):
 			new_mesh.cells.append([Cell([0.],[0.])])
 			print i,j
-		    elif j == 0 and not (chkCell.isSelfIntersecting() or chkCell.isTooSmall()):
+		    elif j == 0 and not (chkCell.isSelfIntersecting() or chkCell.isTooSmall(threshold)):
 			new_mesh.cells.append([chkCell])
-		    elif not (chkCell.isSelfIntersecting() or chkCell.isTooSmall()):
+		    elif not (chkCell.isSelfIntersecting() or chkCell.isTooSmall(threshold)):
 			new_mesh.cells[i].append(chkCell)
 			    
 			if j == len(self.cells[i]) - 1:
@@ -746,7 +746,7 @@ class Mesh:
 
 #                            end_strips.append([i, j])
 #			    limit_coords.append(ind)
-		    elif (chkCell.isSelfIntersecting() or chkCell.isTooSmall()):
+		    elif (chkCell.isSelfIntersecting() or chkCell.isTooSmall(threshold)):
 			if j != 0:
 			    flagged_cells.append([i,j])    
 			else: 
@@ -819,10 +819,16 @@ class Mesh:
 		        f.write('</wline></Quadrilateral>\n')
 	    f.write('</Stationary>')
 
-    def FromXML(self,fn):
-        self.filename = fn
-        tree = ET.parse(fn)
-        root = tree.getroot()
+    def FromXML(self, fn, fromString = False):
+        '''Constructs a mesh from eithe a file, or a string if fromString == True.'''
+        if not fromString:
+            self.filename = fn
+            tree = ET.parse(fn)
+            root = tree.getroot()
+        else:
+            self.filename=""
+            root = ET.fromstring(fn)
+            
         for ts in root.iter('TimeStep'):
             self.dt = float(ts.text)
 

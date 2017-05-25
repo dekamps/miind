@@ -153,6 +153,7 @@ namespace TwoDLib {
 
 		for (const auto& name: mat_names)
 			vec_mat.push_back(TransitionMatrix(name));
+		std::cout << "bolo:" << vec_mat.size() << std::endl;
 		return vec_mat;
 	}
 
@@ -176,9 +177,17 @@ namespace TwoDLib {
 		// vec_mat will go out of scope; MasterOMP will convert the matrices
 		// internally and we don't want to keep two versions.
 		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
- 		std::unique_ptr<TwoDLib::MasterOMP> p_master(new MasterOMP(_sys,vec_mat, par));
 
-		_p_master = std::move(p_master);
+		try {
+			std::unique_ptr<TwoDLib::MasterOMP> p_master(new MasterOMP(_sys,vec_mat, par));
+			_p_master = std::move(p_master);
+		}
+		// TODO: investigate the following
+		// for some reason, the exception is usually not caught by the main program, which is why we write its message to cerr here.
+		catch(TwoDLibException& e){
+			std::cerr << e.what() << std::endl;
+			throw e;
+		}
 
 		// at this stage initialization must have taken place, either by default in (0,0),
 		// or by the user calling Initialize if there is no strip 0
@@ -255,8 +264,8 @@ namespace TwoDLib {
 
 	    // master equation
 	    _p_master->Apply(_n_steps*_dt,_vec_rates,_vec_map);
-        _sys.RedistributeProbability();
 
+	    _sys.RedistributeProbability();
 
  	    _t_cur += _n_steps*_dt;
  	    _rate = _sys.F();
@@ -266,8 +275,7 @@ namespace TwoDLib {
 	template <class WeightValue>
 	void MeshAlgorithm<WeightValue>::FillMap(const std::vector<WeightValue>& vec_weights)
 	{
-
-		// this function will only be called once;
+ 		// this function will only be called once;
 		_vec_map = std::vector<MPILib::Index>(vec_weights.size(),std::numeric_limits<MPILib::Index>::max());
 
  		for(MPILib::Index i_weight = 0; i_weight < _vec_map.size(); i_weight++){
@@ -275,13 +283,14 @@ namespace TwoDLib {
 				if ( fabs( _p_master->Efficacy(i_mat) - vec_weights[i_weight]._efficacy) < _tolerance ){
 					if (_vec_map[i_weight] == std::numeric_limits<MPILib::Index>::max())
 						_vec_map[i_weight] = i_mat;
-					else
+					else {
 						throw TwoDLib::TwoDLibException("There are two matrices associated with this weight.");
-
+					}
 				}
 			}
-			if (_vec_map[i_weight] == std::numeric_limits<MPILib::Index>::max())
+			if (_vec_map[i_weight] == std::numeric_limits<MPILib::Index>::max()){
 				throw TwoDLib::TwoDLibException("There are no matrices associated with this weight.");
+			}
 		}
 
  		_vec_rates = std::vector<double>(vec_weights.size(),0.);
