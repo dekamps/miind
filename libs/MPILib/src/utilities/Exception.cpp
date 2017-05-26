@@ -32,11 +32,11 @@ Exception::Exception(const std::string& message) :
 {
 }
 
-Exception::~Exception()
+Exception::~Exception() throw()
 {
 }
 
-const char* Exception::what() const
+const char* Exception::what() const throw()
 {
     return msg_.c_str();
 }
