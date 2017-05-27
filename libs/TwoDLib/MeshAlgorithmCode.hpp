@@ -153,7 +153,7 @@ namespace TwoDLib {
 
 		for (const auto& name: mat_names)
 			vec_mat.push_back(TransitionMatrix(name));
-		std::cout << "bolo:" << vec_mat.size() << std::endl;
+
 		return vec_mat;
 	}
 
