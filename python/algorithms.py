@@ -26,18 +26,15 @@ def setup_test():
 
 def parse_rate_algorithm(alg, i , weighttype):
     s = ''
-    
     if not 'name' in  alg.keys():
         raise NameError('Name tag expected')
 
     cpp_name = 'rate_alg_' + str(i)
     Register(alg.attrib['name'],cpp_name)
 
-    s += '\tMPILib::RateAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('
-    
+    s += '\tMPILib::RateAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('    
     rt = alg.find('rate')
-    s += rt.text
-    
+    s += rt.text   
     s += ');\n'
     
     return s
@@ -252,25 +249,25 @@ def parse_ou_algorithm(alg, i,  weighttype):
 
 
 def parse_wilsoncowan_parameter(alg, i, weighttype):
-    wcpar= alg.find('WilsonCowanAlgorithm/WilsonCowanParameter')
+    wcpar= alg.find('WilsonCowanParameter')
     s = ''
        
-    t_mem = alg.find('WilsonCowanAlgorithm/WilsonCowanParameter/t_membrane')
+    t_mem = wcpar.find('t_membrane')
     t_name = 't_mem_' + str(i)
     s += '\tconst MPILib::Time ' + t_name
     s += ' = ' + t_mem.text +';\n'
     
-    f_noise = alg.find('WilsonCowanAlgorithm/WilsonCowanParameter/f_noise')
+    f_noise = wcpar.find('f_noise')
     noise_name ='f_noise_' + str(i)
     s += '\tconst double ' + noise_name 
     s += ' = ' + f_noise.text +';\n'
     
-    f_max = alg.find('WilsonCowanAlgorithm/WilsonCowanParameter/f_max')
+    f_max = wcpar.find('f_max')
     f_name = 'f_max_' + str(i)
     s += '\tMPILib::Rate ' + f_name
     s += ' = ' + f_max.text + ';\n'
 
-    I_ext = alg.find('WilsonCowanAlgorithm/WilsonCowanParameter/I_ext')
+    I_ext = wcpar.find('I_ext')
     I_name = 'I_ext_' + str(i)
     s += '\tMPILib::Rate ' + I_name
     s += ' = ' + I_ext.text + ';\n'
@@ -284,9 +281,9 @@ def parse_wilsoncowan_parameter(alg, i, weighttype):
     return s
     
 def wrapup_wilsoncowan_algorithm(alg,i,weighttype):
-    algorithm = alg.find('WilsonCowanAlgorithm')
-    d=algorithm.attrib
-    if not 'Name' in d.keys():
+    d=alg.attrib
+
+    if not 'name' in d.keys():
         raise NameError('Name tag expected in WilsonCowanAlgorithm')    
 
     s = '\tMPILib::WilsonCowanAlgorithm '
@@ -294,11 +291,12 @@ def wrapup_wilsoncowan_algorithm(alg,i,weighttype):
     s += 'par_wil_' + str(i)
     s += ');\n'
     cpp_name = 'alg_wc_' + str(i)
-    Register(d['Name'], cpp_name)    
+    Register(d['name'], cpp_name)    
     return s
     
 def parse_wilsoncowan_algorithm(alg, i, weighttype):
     s = ''
+
     s += parse_wilsoncowan_parameter(alg, i, weighttype)
     s += wrapup_wilsoncowan_algorithm(alg, i, weighttype)
     return s
