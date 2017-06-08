@@ -33,9 +33,9 @@ MinimalReportHandler::MinimalReportHandler
 ):
 AbstractReportHandler(result_name)
 {
-	std::ofstream ofst(result_name);
-	_ofst = move(ofst);
-//	ofst.close();
+	_ofst.close();
+	_ofst.clear();
+    _ofst.open(result_name);
 }
 
 MinimalReportHandler::MinimalReportHandler(const MinimalReportHandler& rhs):
