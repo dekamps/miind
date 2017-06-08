@@ -66,10 +66,9 @@ else(CMAKE_COMPILER_IS_GNUCXX)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++11")
 	endif()
 	if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
-	        message(FATAL_ERROR "C+11 features are needed. Use gcc 4.7 or higher for the moment.")
+	        message(STATUS "Using Intel compiler.")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c11")
 	endif()
-	
-	message(WARNING "C++11 activated, if you get any compile errors please use a C++11 compatible compiler like GNU gcc 4.7")
 
 endif(CMAKE_COMPILER_IS_GNUCXX)
   
