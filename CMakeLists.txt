@@ -67,7 +67,7 @@ else(CMAKE_COMPILER_IS_GNUCXX)
 	endif()
 	if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
 	        message(STATUS "Using Intel compiler.")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c11")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c++15")
 	endif()
 
 endif(CMAKE_COMPILER_IS_GNUCXX)
