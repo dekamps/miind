@@ -345,12 +345,24 @@ def parse_ratefunctor_algorithm(alg, i, weighttype):
     
     s += '\tMPILib::RateFunctor<' + weighttype.text + '> ' + cpp_name + '(' 
     s += 'RateFunction_' + str(i) + ');\n'
-    rb = alg.find('expression')
-    body=rb.text
 
-    t = 'MPILib::Rate RateFunction_' + str(i) + '(MPILib::Time t){\n'
-    t += '\treturn ' + body + ';\n}\n'
-    
+    cd = alg.find('code')
+    rb = alg.find('expression')
+    print rb, cd
+    if (cd != None and rb != None):
+        raise ValueError('You cannot use expression and code tags in the same RateFunctor.')
+    if cd == None  and rb == 0:
+        raise ValueError('You must use either a code or an expression tag in a rate functor.')
+    if rb != None:
+        body=rb.text
+        t = 'MPILib::Rate RateFunction_' + str(i) + '(MPILib::Time t){\n'
+        t += '\treturn ' + body + ';\n}\n'
+
+    if cd != None:
+        t = 'MPILib::Rate RateFunction_' + str(i) + '(MPILib::Time t){\n'
+        t += cd.text
+        t += '}\n\n'
+
     RATEFUNCTIONS.append(t)
     
     return s
