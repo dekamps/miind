@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <cmath>
 #include "Ode2DSystem.hpp"
 #include "TwoDLibException.hpp"
 
