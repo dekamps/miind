@@ -5,7 +5,7 @@
 #Use current environment variables/ modules
 #$ -V
 #Request one hour of runtime
-#$ -l h_rt=1:00:00
+#$ -l h_rt=24:00:00
 #Email at the beginning and end of the job
 #$ -m be
 #Run the executable 'myprogram' from the current working directory
