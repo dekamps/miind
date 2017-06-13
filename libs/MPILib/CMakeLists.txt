@@ -24,10 +24,9 @@ set(MPI_SRCS
     src/HebbianAlgorithm.cpp
     src/PersistantAlgorithm.cpp
     src/WilsonCowanAlgorithm.cpp
-    # Add  boxcar algorithm here
 
     src/ProbabilityQueue.cpp
-    
+
     src/report/handler/AbstractReportHandler.cpp
     src/report/handler/CanvasParameter.cpp
     src/report/handler/GraphKey.cpp
@@ -36,11 +35,11 @@ set(MPI_SRCS
     src/report/handler/RootHighThroughputHandler.cpp
     src/report/handler/RootCanvasNoMPI.cpp
     src/report/handler/RootReportHandler.cpp
-    # src/report/handler/CsvReportHandler.cpp
     src/report/handler/ValueHandlerHandler.cpp
-    
+    src/report/handler/CsvReportHandler.cpp
+
     src/report/Report.cpp
-    
+
     src/utilities/CircularDistribution.cpp
     src/utilities/Exception.cpp
     src/utilities/FileNameGenerator.cpp
@@ -49,7 +48,7 @@ set(MPI_SRCS
     src/utilities/MPIProxy.cpp
     src/utilities/ParallelException.cpp
     src/utilities/ProgressBar.cpp
-    
+
     src/NetworkState.cpp
     src/SimulationRunParameter.cpp
 )
