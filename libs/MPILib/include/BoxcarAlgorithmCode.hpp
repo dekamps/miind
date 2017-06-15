@@ -124,7 +124,7 @@ Rate BoxcarAlgorithm<Weight>::getCurrentRate() const {
 }
 
 template<class Weight>
-AlgorithmGrid BoxcarAlgorithm<Weight>::getGrid() const {
+AlgorithmGrid BoxcarAlgorithm<Weight>::getGrid(NodeId) const {
     std::vector<double> array_state(1);
     array_state[0] = _rate;
     AlgorithmGrid grid(array_state);
