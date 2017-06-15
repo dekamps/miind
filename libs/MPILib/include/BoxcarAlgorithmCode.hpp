@@ -18,7 +18,7 @@
 
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <MPILib/include/algorithm/BoxcarAlgorithm.hpp>
+#include <MPILib/include/BoxcarAlgorithm.hpp>
 #include <MPILib/include/StringDefinitions.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 
@@ -30,7 +30,6 @@
 #include <numeric>
 
 namespace MPILib {
-namespace algorithm {
 
 template<class Weight>
 BoxcarAlgorithm<Weight>::BoxcarAlgorithm(std::vector<Event>& events, Rate change) :
@@ -132,5 +131,4 @@ AlgorithmGrid BoxcarAlgorithm<Weight>::getGrid() const {
     return grid;
 }
 
-} /* namespace algorithm */
 } /* namespace MPILib */

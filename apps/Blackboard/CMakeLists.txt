@@ -40,7 +40,7 @@ set ( LIBLIST
 
 add_executable(Activity_circuit activity_circuit.cpp)
 target_link_libraries(Activity_circuit ${LIBLIST})
-add_executable(Partial_Activity_circuit partial_activity_circuit.cpp)
-target_link_libraries(Partial_Activity_circuit ${LIBLIST})
-add_executable(Baseline_circuit baseline_circuit.cpp)
-target_link_libraries(Baseline_circuit ${LIBLIST})
+# add_executable(Partial_Activity_circuit partial_activity_circuit.cpp)
+# target_link_libraries(Partial_Activity_circuit ${LIBLIST})
+# add_executable(Baseline_circuit baseline_circuit.cpp)
+# target_link_libraries(Baseline_circuit ${LIBLIST})

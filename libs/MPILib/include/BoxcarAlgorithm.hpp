@@ -21,7 +21,7 @@
 #define MPILIB_ALGORITHMS_BOXCARALGORITHM_HPP_
 
 #include <NumtoolsLib/NumtoolsLib.h>
-#include <MPILib/include/algorithm/AlgorithmInterface.hpp>
+#include <MPILib/include/AlgorithmInterface.hpp>
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
@@ -32,8 +32,6 @@ struct Event
     Time end;
     Rate rate;
 };
-
-namespace algorithm{
 
 /*! \page 
  *  \section 
@@ -98,6 +96,5 @@ private:
     int _counter;
 };
 
-} /* namespace algorithm */
 } /* namespace MPILib */
 #endif /* MPILIB_ALGORITHMS_BOXCARALGORITHM_HPP_ */

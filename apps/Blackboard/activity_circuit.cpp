@@ -1,9 +1,9 @@
 #include <GeomLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
-#include <MPILib/include/algorithm/RateAlgorithmCode.hpp>
-#include <MPILib/include/algorithm/BoxcarAlgorithmCode.hpp>
-#include <MPILib/include/algorithm/DelayAssemblyAlgorithmCode.hpp>
-#include <MPILib/include/algorithm/DelayAssemblyParameter.hpp>
+#include <MPILib/include/RateAlgorithmCode.hpp>
+#include <MPILib/include/BoxcarAlgorithmCode.hpp>
+#include <MPILib/include/DelayAssemblyAlgorithmCode.hpp>
+#include <MPILib/include/DelayAssemblyParameter.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/CsvReportHandler.hpp>
 
@@ -14,16 +14,16 @@ using GeomLib::LeakingOdeSystem;
 using GeomLib::LifNeuralDynamics;
 using GeomLib::OdeParameter;
 using GeomLib::NeuronParameter;
-
+    
 using MPILib::EXCITATORY_DIRECT;
 using MPILib::INHIBITORY_DIRECT;
 using MPILib::NodeId;
 using MPILib::Event;
 using MPILib::SimulationRunParameter;
-using MPILib::algorithm::RateAlgorithm;
-using MPILib::algorithm::BoxcarAlgorithm;
-using MPILib::algorithm::DelayAssemblyAlgorithm;
-using MPILib::algorithm::DelayAssemblyParameter;
+using MPILib::RateAlgorithm;
+using MPILib::BoxcarAlgorithm;
+using MPILib::DelayAssemblyAlgorithm;
+using MPILib::DelayAssemblyParameter;
 
 using std::cout;
 using std::endl;
@@ -31,8 +31,8 @@ using std::endl;
 typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 typedef MPILib::report::handler::CsvReportHandler Report;
-typedef MPILib::algorithm::BoxcarAlgorithm<MPILib::DelayedConnection> BoxcarAlg;
-typedef MPILib::algorithm::DelayAssemblyAlgorithm<MPILib::DelayedConnection> DecayAlg;
+typedef MPILib::BoxcarAlgorithm<MPILib::DelayedConnection> BoxcarAlg;
+typedef MPILib::DelayAssemblyAlgorithm<MPILib::DelayedConnection> DecayAlg;
 
 /**
  * @brief EIB_Population_Pair
