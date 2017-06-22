@@ -22,9 +22,9 @@
 #include <functional>
 #include <numeric>
 
-namespace GeomLib {
+namespace GeomLib{
 
-template <>
+template<>
 MPILib::Potential MuSigmaScalarProduct<double>::InnerProduct(
 		const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<double>& weightVector) const {
@@ -33,7 +33,7 @@ MPILib::Potential MuSigmaScalarProduct<double>::InnerProduct(
 			weightVector.begin(), 0.0);
 }
 
-template <>
+template<>
 MPILib::Potential MuSigmaScalarProduct<double>::InnerSquaredProduct(
 		const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<double>& weightVector) const {
@@ -42,7 +42,7 @@ MPILib::Potential MuSigmaScalarProduct<double>::InnerSquaredProduct(
 }
 
 
-template <>
+template<>
 MPILib::Potential MuSigmaScalarProduct<MPILib::DelayedConnection>::InnerProduct(
 		const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<MPILib::DelayedConnection>& weightVector) const {
@@ -52,7 +52,7 @@ MPILib::Potential MuSigmaScalarProduct<MPILib::DelayedConnection>::InnerProduct(
 }
 
 
-template <>
+template<>
 MPILib::Potential MuSigmaScalarProduct<MPILib::DelayedConnection>::InnerSquaredProduct(
 		const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<MPILib::DelayedConnection>& weightVector) const {
@@ -63,7 +63,7 @@ MPILib::Potential MuSigmaScalarProduct<MPILib::DelayedConnection>::InnerSquaredP
 }
 
 
-template <>
+template<>
 MuSigma MuSigmaScalarProduct<MPILib::DelayedConnection>::Evaluate(const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<MPILib::DelayedConnection>& weightVector,
 		MPILib::Time tau) const {
@@ -76,5 +76,4 @@ MuSigma MuSigmaScalarProduct<MPILib::DelayedConnection>::Evaluate(const std::vec
 	return ret;
 }
 
-}
-
+} /* namespace GeomLib */

@@ -82,8 +82,9 @@ private:
 	DelayAssemblyParameter _par;
 	MPILib::Time           _t_current;
 	MPILib::Rate           _r_current;
-
+	MPILib::Time           _last_activation;
+	MPILib::Rate           _change_factor;
 };
 
 } /* namespace MPILib */
-#endif /* MPILIB_ALGORITHMS_WILSONCOWANALGORITHM_HPP_ */
+#endif /* MPILIB_ALGORITHMS_DELAYASSEMBLYALGORITHM_HPP_ */

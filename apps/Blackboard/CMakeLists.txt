@@ -1,0 +1,52 @@
+##############################################################################
+# include the header files
+##############################################################################
+
+#include the MPILib build dir for the config file
+INCLUDE_DIRECTORIES(
+   ${CMAKE_CURRENT_BINARY_DIR}/../../libs/
+)
+
+include_directories( ../../libs/MPILib )
+include_directories( ../../libs/GeomLib )
+include_directories( ../../libs/TwoDLib )
+
+include_directories( ${GSL_INCLUDE_DIRS} )
+link_directories( ${GSL_LIBRARY_DIRS} )
+include_directories( ${ROOT_INCLUDE_DIRS} )
+link_directories( ${ROOT_LIBRARY_DIRS} )
+
+#############################################################################
+# Libraries
+#############################################################################
+
+if (UNIX)
+   ADD_DEFINITIONS("-fno-strict-aliasing" )
+endif (UNIX)
+set ( LIBLIST       
+    ${MIIND_LIBRARY_PREFIX}geom
+    ${MIIND_LIBRARY_PREFIX}mpi
+    ${MIIND_LIBRARY_PREFIX}twod
+    ${MPI_LIBRARIES} 
+    ${ROOT_LIBRARIES}
+    ${Boost_LIBRARIES}
+    ${MIIND_LIBRARY_PREFIX}numtools
+    ${gsl_LINK_FLAGS} 
+    gsl
+)
+
+
+#############################################################################
+# executables
+#############################################################################
+
+add_executable(Activity_circuit activity_circuit.cpp)
+target_link_libraries(Activity_circuit ${LIBLIST})
+add_executable(Aexp_circuit aexp_circuit.cpp)
+target_link_libraries(Aexp_circuit ${LIBLIST})
+add_executable(Adaptive_example aexp_excit.cpp)
+target_link_libraries(Adaptive_example ${LIBLIST})
+# add_executable(Partial_Activity_circuit partial_activity_circuit.cpp)
+# target_link_libraries(Partial_Activity_circuit ${LIBLIST})
+# add_executable(Baseline_circuit baseline_circuit.cpp)
+# target_link_libraries(Baseline_circuit ${LIBLIST})
