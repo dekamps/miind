@@ -1,4 +1,5 @@
 #include <GeomLib.hpp>
+#include <TwoDLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/RateAlgorithmCode.hpp>
 #include <MPILib/include/BoxcarAlgorithmCode.hpp>
@@ -421,12 +422,12 @@ int main(){
 // MODEL: 1 for LIF and 0 for AdEx
 // N_EVENTS: 0 for baseline, 1 for partial activity, 2 complete activity
 // CONNECTIVITY: 0 for low efficacy, 1 for high efficacy
-    int MODEL = 1;
+    int MODEL = 0;
     int N_EVENTS = 0;
-    int CONNECTIVITY = 1;
+    int CONNECTIVITY = 0;
 //! [preamble]
     cout << "Demonstrating Blackboard circuit cell" << endl;
-    cout << MODEL << " model with " << N_EVENTS << " events" << endl;
+    cout << MODEL << " model with " << N_EVENTS << " events with " << CONNECTIVITY << "connectivity" << endl;
 // There are three possible states to simulate that should
 // be handled by a configuration file. The baseline state in which no input or
 // control is necessary. The partial activity state in which only 1 input node
@@ -516,34 +517,11 @@ int main(){
     // IMPLEMENTS ITS ALGORITHM AT THE MOMENT. SO THIS DEFINITION IS NECESSARY
     // HERE FOR COMPATIBILITY BUT MAKES NO DIFFERENCE IN THE CODE.
     // SHOULD ELIMINATE FROM HERE
-
-    Number    n_bins = 330;
-    Potential V_min  = 0.00;
-
-    NeuronParameter
-        par_neuron
-        (
-            1.0,   // v_threshold
-            0.0,   // v_reset
-            0.0,   // v_reversal
-            0.0,   // tau_refractive
-            50e-3  // tau
-        );
-
-    OdeParameter
-        par_ode
-        (
-            n_bins,
-            V_min,
-            par_neuron,
-            InitialDensityParameter(0.0, 0.0)
-        );
-
-    double min_bin = 0.01;
-    LifNeuralDynamics dyn(par_ode,min_bin);
-    LeakingOdeSystem sys(dyn);
-    GeomParameter par_geom(sys);
-    GeomDelayAlg alg(par_geom);
+  std::vector<std::string> vec_mat_0{"aexp045c42a8-7be8-409a-a37e-a88e1d135c03_1_0_0_0_.mat",
+                  "aexp045c42a8-7be8-409a-a37e-a88e1d135c03_-1_0_0_0_.mat",
+                  "aexp045c42a8-7be8-409a-a37e-a88e1d135c03_3_0_0_0_.mat",
+                  "aexp045c42a8-7be8-409a-a37e-a88e1d135c03_-3_0_0_0_.mat"};
+  TwoDLib::MeshAlgorithm<DelayedConnection> alg("aexp045c42a8-7be8-409a-a37e-a88e1d135c03.model", vec_mat_0, 0.00002);
 
 //Setup connectivity structure
     double eff;
@@ -559,18 +537,18 @@ int main(){
     }
     else if (CONNECTIVITY == 1 && MODEL == 1){
         eff = 0.3;
-        bcon = 10;
-        fcon = 5;
-        icon = 20;
-    }
-    else if (CONNECTIVITY == 0 && MODEL == 0){
-        eff = 0.3;
         bcon = 25;
         fcon = 5;
         icon = 80;
     }
+    else if (CONNECTIVITY == 0 && MODEL == 0){
+        eff = 1;
+        bcon = 80;
+        fcon = 30;
+        icon = 90;
+    }
     else if (CONNECTIVITY == 1 && MODEL == 0){
-        eff = 0.3;
+        eff = 3;
         bcon = 25;
         fcon = 5;
         icon = 80;
@@ -695,10 +673,11 @@ int main(){
             handler,
             10000000,
             0.0,  // start time
-            0.3,  // end time
+            0.05,  // end time
             1e-3,  // report step
             1e-4,  // simulation step
-            "activity.log"
+            "activity.log",
+            1e-03 // ???
         );
     network.configureSimulation(par_run);
     cout << "Circuit setup done. Starting simulation..." << endl;

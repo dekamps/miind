@@ -9,6 +9,7 @@ INCLUDE_DIRECTORIES(
 
 include_directories( ../../libs/MPILib )
 include_directories( ../../libs/GeomLib )
+include_directories( ../../libs/TwoDLib )
 
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
@@ -24,7 +25,8 @@ if (UNIX)
 endif (UNIX)
 set ( LIBLIST       
     ${MIIND_LIBRARY_PREFIX}geom
-    ${MIIND_LIBRARY_PREFIX}mpi           
+    ${MIIND_LIBRARY_PREFIX}mpi
+    ${MIIND_LIBRARY_PREFIX}twod
     ${MPI_LIBRARIES} 
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
@@ -40,6 +42,10 @@ set ( LIBLIST
 
 add_executable(Activity_circuit activity_circuit.cpp)
 target_link_libraries(Activity_circuit ${LIBLIST})
+add_executable(Aexp_circuit aexp_circuit.cpp)
+target_link_libraries(Aexp_circuit ${LIBLIST})
+add_executable(Adaptive_example aexp_excit.cpp)
+target_link_libraries(Adaptive_example ${LIBLIST})
 # add_executable(Partial_Activity_circuit partial_activity_circuit.cpp)
 # target_link_libraries(Partial_Activity_circuit ${LIBLIST})
 # add_executable(Baseline_circuit baseline_circuit.cpp)
