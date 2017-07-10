@@ -10,6 +10,8 @@ from itertools import count
 ROOT.gROOT.SetBatch(False)
 
 AXISCOLOR=1
+DEFAULT_COLOR_LEGEND=[1e-6,1,100]
+MAINFRAC = 0.9
 
 class Visualizer:
 
@@ -17,14 +19,24 @@ class Visualizer:
     '''Wrapper class for ROOT visualization. For generation of visualization plots, use PlotGenerator.'''
     def __init__(self, sys, bbox=[], canvas = None, textpad = True):
 
+        self.colorbar = []
+        self.colorbarplanes = []
         self.id = self._ids.next()
         '''If a reversal bin is required, it must already have been inserted in the Mesh before using this class.'''
-        
+
         self.sys  = sys
         if canvas == None:
             self.c = ROOT.TCanvas("c","",0,0,800,800)
+            self.p = ROOT.TPad("p","",0.,1-MAINFRAC,MAINFRAC,1.)
+            self.p.Draw()
+            self.l = ROOT.TPad("l","",MAINFRAC,0.,1.,1.)
+            self.l.Draw()
         else:
             self.c = canvas
+            self.p = ROOT.TPad("p","",0.,1-MAINFRAC,MAINFRAC,1.)
+            self.p.Draw()
+            self.l = ROOT.TPad("l","",MAINFRAC,0.,1.,1.)
+            self.l.Draw()
 
         self.c.SetFillColor(0)
         self.c.Draw()
@@ -40,6 +52,7 @@ class Visualizer:
         self.h.GetYaxis().SetAxisColor(AXISCOLOR)
         self.h.GetXaxis().SetLabelColor(AXISCOLOR)
         self.h.GetYaxis().SetLabelColor(AXISCOLOR)
+        self.p.cd()
         self.h.Draw()
         
         if textpad == True:
@@ -66,6 +79,7 @@ class Visualizer:
         self.colors  = [ ROOT.TColor.GetColorPalette(i) for i in range(self.ncolors) ]
 
     def __initialize_geom_objects(self):
+        self.p.cd()
         print len(self.sys.m.cells[0])
         self.geom_list = []
         for i, cells in enumerate(self.sys.m.cells):
@@ -94,6 +108,53 @@ class Visualizer:
                     line.SetFillColor(0)
                     line.Draw('Fill')
                     self.geom_list.append(line)
+
+    def __draw_colorbar__(self,colorlegend, mi, ma):
+        ''' Draws a color legend to the side of the plot. '''
+
+        self.l.cd()
+        xmin = 0.
+        xmax = 0.75
+        ymin = 1-MAINFRAC
+        ymax = MAINFRAC
+        ndiv = colorlegend[2]
+        ysize = 1./float(ndiv)
+        ycur = ymin
+        x = np.zeros(4)
+        y = np.zeros(4)
+    
+        n_text_pos = 5
+        textpos = np.linspace(ymin, ymax, n_text_pos)
+        xtext = 0.8
+        labels = []
+        for ytext in textpos:
+            labels.append(ROOT.TText(xtext,ytext,'kadaver'))
+            labels[-1].Draw()
+
+        self.labels = labels
+
+        # generate a pseudodensity based on color legend
+
+        if len(self.colorbarplanes) == 0:
+            for i in range(ndiv):
+                x[0] = xmin
+                y[0] = ycur
+                x[1] = xmax
+                y[1] = ycur
+                x[2] = xmax
+                y[2] = ycur+ysize
+                x[3] = xmin
+                y[3] = ycur+ysize        
+                ycur += ysize
+                l=ROOT.TPolyLine(len(x),x,y)
+        
+                self.colorbarplanes.append(l)
+ 
+        for i in range(ndiv):
+            value = float(i)/float(ndiv)
+            self.colorbarplanes[i].SetFillColor(self.color(value))                
+            self.colorbarplanes[i].Draw('Fill')
+        self.c.cd()
 
     def color(self,x):
         ''' x between 0 and 1.'''
@@ -129,16 +190,23 @@ class Visualizer:
     def SetYTitle(self, title):
         self.h.SetYTitle(title)
 
-    def demo(self,dens,xlabel,ylabel,pdfname, points, pointcolor,runningtext):
-        self.SetXTitle(xlabel)
-        self.SetYTitle(ylabel)
-        fl = np.array(len(dens)*[1e-9])
-
+    def colscale(self,dens,colorlegend):
+        fl = np.array(len(dens)*[colorlegend[0]])
         cols = np.log10(dens+fl)
-
         ma = np.max(cols)
         mi = np.min(cols)    
         vals = (cols - mi)/(ma - mi)
+        return mi, ma, vals
+
+    def demo(self,dens,xlabel,ylabel,pdfname, points, pointcolor,runningtext,colorlegend):
+        self.p.cd()
+        self.SetXTitle(xlabel)
+        self.SetYTitle(ylabel)
+
+        mi, ma, vals = self.colscale(dens,colorlegend)
+
+        self.__draw_colorbar__(colorlegend, mi, ma)
+
         
         # at this stage, there should be a 1-1 correspondence between norm elements and self_geom elements
         print len(dens), len(self.geom_list)
@@ -166,6 +234,7 @@ class Visualizer:
             self.auxhists[-1].Fill(point[0],point[1])
         self.auxhists[-1].Draw('same')
 
+
         if self.have_text == True:
             self.txtpad.SetFillColor(1)
             self.txtpad.Draw()
@@ -174,6 +243,7 @@ class Visualizer:
             self.txt.SetTextColor(68)
             self.txt.SetTextSize(0.5)
             self.txt.Draw()
+
 
         self.c.Modified()
         self.c.Update()
@@ -184,7 +254,7 @@ class Visualizer:
         dens=self.density()
         self.demo(dens,xlabel,ylabel,pdfname,points,pointcolor)
 
-    def showfile(self,filename, xlabel = '', ylabel = '', pdfname = '', points = [], pointcolor = 3, runningtext = ''):
+    def showfile(self,filename, xlabel = '', ylabel = '', pdfname = '', points = [], pointcolor = 3, runningtext = '', colorlegend=DEFAULT_COLOR_LEGEND):
         f=open(filename)
         line=f.readline()
         data = [ float(x) for x in line.split()[2::3] ]
@@ -194,7 +264,7 @@ class Visualizer:
                 raise ValueError
 
         self.density = np.array(data)
-        self.demo(self.density,xlabel,ylabel,pdfname,points,pointcolor,runningtext)
+        self.demo(self.density,xlabel,ylabel,pdfname,points,pointcolor,runningtext,colorlegend)
 
 class PlotGenerator:
     '''Able to visualize a dump from an Ode2DSystem (either generated by the Python or the C++ version). Requires a config file that is no longer in the C++ workflow. 
@@ -233,7 +303,7 @@ class PlotGenerator:
 class ModelVisualizer:
     '''Able to read a Model file and visualize a Ode2DSystem dump. A Model file contains a Mesh with the stationary points already in place. This should
     be used on C++ output. 1D model strips, such as LIF and QIF should be handled by Model1DVisualizer.'''
-    def __init__(self,modelfilename,canvas=None, bbox=[], textpad = False):
+    def __init__(self,modelfilename, canvas=None, bbox=[], textpad = False):
         self.modelfilename = modelfilename
         tree = ET.parse(modelfilename)
         root = tree.getroot()
@@ -250,8 +320,8 @@ class ModelVisualizer:
         self.sys = Ode2DSystem(self.mesh,[],[])
         self.v   = Visualizer(self.sys,canvas=canvas,bbox=bbox,textpad=textpad)
 
-    def showfile(self,filename, xlabel = '', ylabel='', pdfname='', points = [], pointcolor = 3, runningtext = ''):
-        self.v.showfile(filename, xlabel, ylabel, pdfname, points, pointcolor,runningtext)
+    def showfile(self,filename, xlabel = '', ylabel='', pdfname='', points = [], pointcolor = 3, runningtext = '', colorlegend=DEFAULT_COLOR_LEGEND):
+        self.v.showfile(filename, xlabel, ylabel, pdfname, points, pointcolor,runningtext,colorlegend)
 
 
 class Model1DVisualizer:
@@ -299,7 +369,7 @@ class Model1DVisualizer:
             raise ValueError
         print 'w: ', self.w
 
-    def showfile(self,filename, xlabel='', ylabel='', pdfname=''):
+    def showfile(self,filename, xlabel='', ylabel='', pdfname='', colorlegend = DEFAULT_COLOR_LEGEND):
         f=open(filename)
         line=f.readline()
         data = [ float(x) for x in line.split()[2::3] ]

@@ -34,7 +34,7 @@ MPILib::Rate SinFun(MPILib::Time t)
 BOOST_AUTO_TEST_CASE(RateFunctorConstructionTest ) {
 
   MPILib::RateFunctor<double> funky(SinFun);
-  
 }
+
 
 

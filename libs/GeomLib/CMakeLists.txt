@@ -25,6 +25,7 @@ LifNeuralDynamics.cpp
 MasterFactory.cpp
 MuSigmaScalarProduct.cpp
 OdeParameter.cpp
+OdeDtParameter.cpp
 OUAlgorithm.cpp
 QifOdeSystem.cpp
 Response.cpp
@@ -58,6 +59,7 @@ NeuronParameter.hpp
 NumericalMasterEquation.hpp
 NumericalMasterEquationCode.hpp
 OdeParameter.hpp
+OdeDtParameter.hpp
 OUAlgorithm.hpp
 QifOdeSystem.hpp
 Response.hpp

@@ -43,3 +43,4 @@ BOOST_AUTO_TEST_CASE(HebbianAlgorithmTest) {
 	HebbianAlgorithm alg(par_heb);
 }
 
+

@@ -47,6 +47,6 @@ BOOST_AUTO_TEST_CASE( NeuronWrongOrderTest ){
 	Time      tau        = 20e-3;
 
 	BOOST_CHECK_THROW(NeuronParameter par_neuron_wrong(V_reset, theta, V_reversal, t_ref,tau), GeomLibException);
-	BOOST_CHECK_THROW(NeuronParameter par_neuron_wrong_t(theta, V_reset, V_reversal, tau, t_ref),GeomLibException);
+	BOOST_CHECK_THROW(NeuronParameter par_neuron_wrong_t(V_reversal, V_reset, theta, tau, t_ref),GeomLibException);
 }
 

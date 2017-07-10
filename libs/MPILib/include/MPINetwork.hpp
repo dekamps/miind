@@ -206,10 +206,10 @@ private:
 	void updateSimulationTime();
 	void updateStateTime();
 
-	Time getEndTime() const;
-	Time getCurrentReportTime() const;
-	Time getCurrentSimulationTime() const;
-	Time getCurrentStateTime() const;
+	/*Time*/ Index getEndTime() const;
+	/*Time*/ Index getCurrentReportTime() const;
+	/*Time*/ Index getCurrentSimulationTime() const;
+	/*Time*/ Index getCurrentStateTime() const;
 
 	/**
 	 * local nodes of the processor
@@ -226,9 +226,10 @@ private:
 	 */
 	int _maxNodeId = 0;
 
-	Time _currentReportTime = 0;
-	Time _currentStateTime = 0;
-	Time _currentSimulationTime = 0;
+	MPILib::Index _i_report     = 0;
+	MPILib::Index _i_state      = 0;
+	MPILib::Index _i_simulation = 0;
+
 	NetworkState _stateNetwork = 0.0;
 	bool _isDalesLaw = true;
 
@@ -236,6 +237,10 @@ private:
 
 	SimulationRunParameter _parameterSimulationRun = SimulationRunParameter(report::handler::InactiveReportHandler(), 0, 0.0,
 		0.0, 0.0, 0.0, "");
+
+	unsigned long  _n_sim_steps    = 0;
+	MPILib::Number _n_report_steps = 0;
+	MPILib::Number _n_state_steps  = 0;
 
 };
 

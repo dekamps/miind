@@ -110,9 +110,11 @@ public:
 
 	/**
 	 * Stores the algorithm state in a Algorithm Grid
+	 * @param NodeId, id of the node that needs to return the grid
+	 * @param b_state, return the entire state if true, a reduced grid with just the firing rate info if false
 	 * @return The state of the algorithm. The Grid must at least contain one element; an empty grid will cause a crash.
 	 */
-	virtual AlgorithmGrid getGrid(NodeId) const = 0;
+	virtual AlgorithmGrid getGrid(NodeId, bool b_state = true) const = 0;
 
 
 	std::valarray<double>& getArrayState(AlgorithmGrid& grid) const

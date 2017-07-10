@@ -137,12 +137,6 @@ private:
 	bool isConnectedToAlgorithm() const;
 
 	/**
-	 * Does the current State need to be written to the file
-	 * @return True if the State need to be written to the file
-	 */
-	bool isStateWriteMandatory() const;
-
-	/**
 	 * Pointer to the file.
 	 */
 	static TFile* _pFile;
@@ -167,10 +161,6 @@ private:
 	 */
 	std::unique_ptr<TGraph> _spCurrentStateGraph;
 
-	/**
-	 * True if the state should be written to the file
-	 */
-	bool _isStateWriteMandatory = false;
 
 	/**
 	 * Number of reports generated so far

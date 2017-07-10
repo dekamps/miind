@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <sstream>
 #include <assert.h>
+#include <iostream>
 #include <MPILib/include/report/handler/RootReportHandler.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/StringDefinitions.hpp>
@@ -48,14 +49,13 @@ ValueHandlerHandler RootReportHandler::_valueHandler;
 
 RootReportHandler::RootReportHandler(const std::string& file_name,
 		bool writeState, bool bOnCanvas, const CanvasParameter& par_canvas) :
-		AbstractReportHandler(file_name), //
-		_isStateWriteMandatory(writeState),_bOnCanvas(bOnCanvas),_canvas(par_canvas)
+		AbstractReportHandler(file_name,writeState), //
+		_bOnCanvas(bOnCanvas),_canvas(par_canvas)
 		{
 }
 
 RootReportHandler::RootReportHandler(const RootReportHandler& rhs) :
-		AbstractReportHandler(rhs.getFileName()), //
-		_isStateWriteMandatory(rhs._isStateWriteMandatory),
+		AbstractReportHandler(rhs.getFileName(),rhs.isStateWriteMandatory()), //
 		_bOnCanvas(rhs._bOnCanvas),_canvas(rhs.getCanvasParameter()){
 	if (rhs._spCurrentRateGraph)
 		throw utilities::Exception(STR_HANDLER_STALE);
@@ -88,13 +88,15 @@ void RootReportHandler::writeReport(const Report& report) {
 	if (_bOnCanvas)
 		_canvas.Render(RATE,report._id,_spCurrentRateGraph.get());
 	_spCurrentStateGraph.reset();
+
 	_spCurrentStateGraph = convertAlgorithmGridToGraph(report);
+
 
 	if (_bOnCanvas)
 		_canvas.Render(STATE,report._id,_spCurrentStateGraph.get());
 
 	if (report._type == STATE && isConnectedToAlgorithm()
-			&& (isStateWriteMandatory())){
+			&& (this->isStateWriteMandatory())){
 		_spCurrentStateGraph->Write();
 	}
 	// always log ReportValue elements
@@ -193,10 +195,6 @@ std::unique_ptr<TGraph> RootReportHandler::convertAlgorithmGridToGraph(
 
 bool RootReportHandler::isConnectedToAlgorithm() const {
 	return (_spCurrentRateGraph != 0);
-}
-
-bool RootReportHandler::isStateWriteMandatory() const {
-	return _isStateWriteMandatory;
 }
 
 void RootReportHandler::addNodeToCanvas(NodeId id) {

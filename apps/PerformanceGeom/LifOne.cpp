@@ -95,8 +95,9 @@ int main(){
 			0.0,
 			10.0,
 			1e-4,
-			1e-4,
-			"singlepoptest.log"
+			sys.TStep(),
+			"singlepoptest.log",
+			1.0
 		);
 
 	network.configureSimulation(par_run);

@@ -50,7 +50,7 @@ namespace MPILib {
     }
 
     template <class WeightType>
-    AlgorithmGrid DelayAssemblyAlgorithm<WeightType>::getGrid(NodeId) const {
+    AlgorithmGrid DelayAssemblyAlgorithm<WeightType>::getGrid(NodeId, bool b_state) const {
     	vector<double> g(1);
     	g[0] = _r_current;
     	return AlgorithmGrid(g);
@@ -70,7 +70,6 @@ namespace MPILib {
 
     	if (ms._mu < _par._th_inh)
     		_r_current = 0.0;
-
 
     }
 

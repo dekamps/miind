@@ -79,7 +79,7 @@ namespace TwoDLib {
 		 * Stores the algorithm state in a Algorithm Grid
 		 * @return The state of the algorithm
 		 */
-	  virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId) const;
+	  virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId, bool b_state = true) const;
 
 		/**
 		 * Evolve the node state. In the default case it simply calls envolveNodeState

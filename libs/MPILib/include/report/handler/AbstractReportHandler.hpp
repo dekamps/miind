@@ -42,9 +42,10 @@ public:
 	/**
 	 * Constructor
 	 * @param fileName The filename of the output file @attention do not provide a extension this is
+     * @param bStateWrite Indicates whether densities need to be written out
 	 * done automatically
 	 */
-	AbstractReportHandler(const std::string& fileName);
+	AbstractReportHandler(const std::string& fileName, bool bStateWrite = false);
 
 	/**
 	 * Manadatory virtual destructor
@@ -87,13 +88,19 @@ public:
 	 */
 	std::string getFileName() const;
 
+	/**
+	 * Does the current State need to be written to the file
+	 * @return True if the State need to be written to the file
+	 */
+	bool isStateWriteMandatory() const { return _bStateWrite; }
+
 private:
 
 	/**
 	 * The streamFileName without extension
 	 */
 	const std::string _streamFileName;
-
+	const bool _bStateWrite;
 };
 
 }// end namespace of handler

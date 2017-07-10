@@ -26,10 +26,25 @@ typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::Circula
 typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 
 int main(){
-  InitialDensityParameter dense(0.0,0.0);
 
-  LifNeuralDynamics dyn_e(PerformanceGeom::ODE_TWO_EXC,0.001);
-  LifNeuralDynamics dyn_i(PerformanceGeom::ODE_TWO_INH,0.001);
+  InitialDensityParameter dense(0.0,0.0);
+  double lambda = 0.001;
+  LifNeuralDynamics dyn_e(PerformanceGeom::ODE_TWO_EXC,lambda);
+   std::cout << "Time step for the excitatory grid: " << dyn_e.TStep() <<  std::endl;
+   std::cout << "This is then the time step for the network!" << std::endl;
+   Time tau_i = PerformanceGeom::ODE_TWO_INH._par_pop._tau;
+   std::cout << "The membrane time constant for the inhibitory population: " << tau_i <<  std::endl;
+   Number N_pos_i = PerformanceGeom::ODE_TWO_INH._nr_bins;
+   std::cout << "The number of bins for the positive range: " << N_pos_i << std::endl;
+   OdeParameter ode_new_i = PerformanceGeom::ODE_TWO_INH;
+   double fn_bins = 1 - (tau_i/dyn_e.TStep())*log(lambda);
+   std::cout << "New number of bins: " << fn_bins << std::endl;
+   ode_new_i._nr_bins = fn_bins;
+   double lambda_i  = exp( -double(ode_new_i._nr_bins - 1)*dyn_e.TStep()/tau_i);
+   std::cout << "We have dt in the right ball park, but N_i is an integer, so let's adapt "
+		     << "lambda to get the time step exactly right: " << lambda_i << std::endl;
+   LifNeuralDynamics dyn_i(ode_new_i,lambda_i);
+   std::cout << "The new time step is indeed: " << dyn_i.TStep() << std::endl;
 
   LeakingOdeSystem sys_e(dyn_e);
   LeakingOdeSystem sys_i(dyn_i);
@@ -65,7 +80,7 @@ int main(){
      0.,
      0.05,
      1e-3,
-     1e-5,
+     dyn_e.TStep(),
      "twopop.log",
      1e-3
      );

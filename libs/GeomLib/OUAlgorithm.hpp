@@ -88,7 +88,7 @@ namespace GeomLib {
 
 
     /// Current AlgorithmGrid
-    virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId) const;
+    virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId, bool b_state = true) const;
 
     /**                                                                                                                                                                          
      * Cloning operation, to provide each DynamicNode with its own                                                                                                               

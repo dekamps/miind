@@ -115,8 +115,11 @@ namespace GeomLib {
 		Time t
 		)
 	{
+
 	    double n = (t - _t_cur)/_t_step;
-	    Number n_steps = static_cast<Number>(ceil(n));
+	    Number n_steps = static_cast<Number>(round(n)); // MdK: 05/07/2017 change to round;
+	                                                    // MPINetwork now expects Algorithms to move in time
+	                                                    // step that are multiples of the network time step
 	    if (n_steps == 0)
 		  n_steps++;
 
@@ -129,7 +132,6 @@ namespace GeomLib {
 	      _p_zl->apply(n_steps*_t_step);
 
 	    _t_cur = _p_system->CurrentTime();
-
 
 	    // previously, a report was prepared here at report time. That is
 	    // unnecessary. This can be handled in the Grid method.
@@ -144,7 +146,7 @@ namespace GeomLib {
 
 
 	template <class WeightValue>
-	AlgorithmGrid GeomAlgorithm<WeightValue>::getGrid(NodeId) const
+	AlgorithmGrid GeomAlgorithm<WeightValue>::getGrid(NodeId, bool) const
 	{
 		Number N = _p_system->NumberOfBins();
 		vector<double> array_interpretation(N);

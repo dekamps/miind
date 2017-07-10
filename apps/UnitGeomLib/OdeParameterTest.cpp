@@ -19,6 +19,7 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #define BOOST_TEST_DYN_LINK
+#include <iostream>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/execution_monitor.hpp>
 #include <GeomLib.hpp>
@@ -28,8 +29,34 @@ using namespace GeomLib;
 
 BOOST_AUTO_TEST_CASE(OdeParameterTest ) 
 {
-  InitialDensityParameter par_dense(0.0,0.0);
+	// start with OdeParameter
+	Number n_plus = 10;
 
+	Time t_mem        =  10e-3;
+	Time t_ref        =  0.0;
+	Potential V_min   = -0.1;
+	Potential V_peak  =  20e-3;
+	Potential V_reset =  0.0;
+	Potential V_rev   =  0.0;
+
+	NeuronParameter par_neuron(V_peak, V_rev, V_reset, t_ref, t_mem);
+
+	OdeParameter
+		par_ode
+		(
+		 n_plus,
+		 V_min,
+		 par_neuron,
+		 InitialDensityParameter(V_reset,0.0)
+		);
+
+	double lambda = 0.01;
+
+	LifNeuralDynamics dyn(par_ode,lambda);
+	LeakingOdeSystem syst(dyn);
+
+	// then create an OdeDtParameter and see if we achieve the same effect
+	MPILib::Time dt = syst.TStep();
 
 }
 

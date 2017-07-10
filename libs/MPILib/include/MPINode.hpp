@@ -76,7 +76,7 @@ public:
 	/**
 	 * Evolve this algorithm over a time
 	 * @param time Time until the algorithm should evolve
-	 * @return Time the algorithm have evolved
+	 * @return Time the algorithm have evolved, which may be slightly different, due to rounding errors.
 	 */
 	Time evolve(Time time);
 

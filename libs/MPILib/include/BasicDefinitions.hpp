@@ -25,6 +25,8 @@
 
 namespace MPILib {
 
+//! Individual algorithms may make small errors in their time keeping compared to the network
+const double ALGORITHM_NETWORK_DISCREPANCY = 1e-8;
 
 //from basicdefinitions
 const int HAVE_ROOT = 1;

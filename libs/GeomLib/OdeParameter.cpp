@@ -34,9 +34,9 @@ using namespace GeomLib;
 
 OdeParameter::OdeParameter
 (
-	Number			      	nr_bins,
-	Potential	       		V_min,
-	const  NeuronParameter&    	par_pop,
+	Number			      	        nr_bins,
+	Potential	       		        V_min,
+	const  NeuronParameter&    	    par_pop,
 	const InitialDensityParameter&	par_dens 
 ):
 _nr_bins(nr_bins),

@@ -49,7 +49,7 @@ typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 int main(){
 
 	cout << "Demonstrating Quadratic-Integrate-and-Fire under jump response" << endl;
-	Number    n_bins = 1000;
+	Number    n_bins = 2000;
 	Potential V_min  = -10.0;
 
 	NeuronParameter
@@ -81,6 +81,7 @@ int main(){
 
 	DiffusionParameter par_diffusion(0.03,0.03);
 	CurrentCompensationParameter par_current(0.0,0.0);
+
 	SpikingQifNeuralDynamics dyn(par_ode,par_qif);
 	QifOdeSystem sys(dyn);
 	GeomDelayAlg alg_qif(GeomParameter(sys,"NumericalMasterEquation",  par_diffusion, par_current));
@@ -113,10 +114,9 @@ int main(){
 	par_canvas._dense_max     = 5.0;
 
 
-	MPILib::report::handler::RootReportHandler handler("twopopcanvas.root", true, true, par_canvas);
+	MPILib::report::handler::RootReportHandler handler("qifjump.root", true, false, par_canvas);
 	handler.addNodeToCanvas(id_alg);
 
-      
 
 	const SimulationRunParameter
 		par_run
@@ -126,8 +126,8 @@ int main(){
 			0.0,
 			0.5,
 			2e-3,
-			1e-4,
-			"singlepoptest.log"
+			dyn.TStep(),
+			"qifjump.log"
 		);
 
 	network.configureSimulation(par_run);

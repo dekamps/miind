@@ -22,6 +22,7 @@
 
 #include <MPILib/include/MPINode.hpp>
 #include <iostream>
+#include <MPILib/include/BasicDefinitions.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
 #include <MPILib/include/utilities/Log.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
@@ -49,12 +50,22 @@ MPINode<Weight, NodeDistribution>::~MPINode() {
 
 template<class Weight, class NodeDistribution>
 Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
+	// A Node will call its Algorithm to update its state up until time 'time'. It will
+	// return the time maintained by the Algorithm. This time may be sligthly different due to
+	// rounding errors. Network::evolve will use this time to check whether Algorithms keep synchronized
+	// with the overall network within reasonable bounds.
 
-	while (_pAlgorithm->getCurrentTime() < time) {
-		++_number_iterations;
+	// MdK: 05/07/2017. removed a while loop. The algorithm is now entirely responsible
+	// for evolution up until the required time. The MPINetwork::evolve method will
+	// now check whether algorithms keep consistent time.
 
-		_pAlgorithm->evolveNodeState(_precursorActivity, _weights, time,
+	++_number_iterations;
+	_pAlgorithm->evolveNodeState(_precursorActivity, _weights, time,
 				_precursorTypes);
+	Time t_ret = _pAlgorithm->getCurrentTime();
+
+	if (fabs(t_ret - time) > MPILib::ALGORITHM_NETWORK_DISCREPANCY ){
+		throw MPILib::utilities::Exception("There is a discrepancy between Algorithm and Network time");
 	}
 
 	// update state
@@ -153,10 +164,18 @@ void MPINode<Weight, NodeDistribution>::reportAll(
 		report::ReportType type) const {
 	std::vector<report::ReportValue> vec_values;
 
-	if (type == report::RATE || type == report::STATE) {
+	if (type == report::RATE) {
 		report::Report report(_pAlgorithm->getCurrentTime(),
 				Rate(this->getActivity()), this->_nodeId,
-				_pAlgorithm->getGrid(this->_nodeId), type, vec_values, _rLocalNodes.size());
+				_pAlgorithm->getGrid(this->_nodeId,false), type, vec_values, _rLocalNodes.size());
+		_pHandler->writeReport(report);
+
+	} else if ( type == report::STATE) {
+		// We don't want getGrid to be called if there is no requirement to write the state, as this is expensive for some algorithms
+
+		report::Report report(_pAlgorithm->getCurrentTime(),
+				Rate(this->getActivity()), this->_nodeId,
+				_pAlgorithm->getGrid(this->_nodeId,_pHandler->isStateWriteMandatory()), type, vec_values, _rLocalNodes.size());
 		_pHandler->writeReport(report);
 	}
 }

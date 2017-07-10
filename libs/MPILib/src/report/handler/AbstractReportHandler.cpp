@@ -23,8 +23,8 @@ namespace MPILib {
 namespace report {
 namespace handler {
 
-AbstractReportHandler::AbstractReportHandler(const std::string& fileName) :
-		_streamFileName(fileName) {
+AbstractReportHandler::AbstractReportHandler(const std::string& fileName, bool bStateWrite) :
+		_streamFileName(fileName), _bStateWrite(bStateWrite) {
 }
 
 AbstractReportHandler::~AbstractReportHandler(){}

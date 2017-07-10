@@ -25,7 +25,6 @@ set (ONEPOP_TWOD_SRC
 	OnePop.cpp
 )
 
-
 set (ONELIF_GEOM_SRC 
 	LifOne.cpp
 )
@@ -91,8 +90,8 @@ target_link_libraries(LifTwo ${LIBLIST})
 add_executable(LifTwoCanvas ${TWOLIF_CANVAS_GEOM_SRC})
 target_link_libraries(LifTwoCanvas ${LIBLIST})
 
-add_executable(QifOnePoisson ${ONEQIF_GEOM_SRC})
-target_link_libraries(QifOnePoisson ${LIBLIST})
+add_executable(QifJumpPoisson ${ONEQIF_GEOM_SRC})
+target_link_libraries(QifJumpPoisson ${LIBLIST})
 
 add_executable(QifCorrelated ${QIF_GEOM_SRC_CORRELATED})
 target_link_libraries(QifCorrelated ${LIBLIST})

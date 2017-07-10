@@ -99,7 +99,7 @@ std::vector<double> PersistantAlgorithm::getInitialState() const {
 	return array_return;
 }
 
-AlgorithmGrid PersistantAlgorithm::getGrid(NodeId) const {
+AlgorithmGrid PersistantAlgorithm::getGrid(NodeId, bool) const {
 	std::vector<double> array_return(WILSON_COWAN_STATE_DIMENSION);
 	array_return[0] = 0;
 	return AlgorithmGrid(array_return);

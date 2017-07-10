@@ -133,7 +133,7 @@ namespace GeomLib {
 		 * Stores the algorithm state in a Algorithm Grid
 		 * @return The state of the algorithm
 		 */
-      virtual MPILib::AlgorithmGrid getGrid(NodeId) const;
+      virtual MPILib::AlgorithmGrid getGrid(NodeId, bool b_state = true) const;
 
 	private:
 

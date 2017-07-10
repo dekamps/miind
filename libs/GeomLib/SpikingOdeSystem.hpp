@@ -44,10 +44,9 @@ namespace GeomLib {
 
 		virtual ~SpikingOdeSystem() = 0;
 
-		void UpdateIndex() { if (--_index  == -(static_cast<int>(this->Par()._nr_bins)) ) _index = 0; }
+		void UpdateIndex() { if (--_index  == -_nr_bins ) _index = 0; }
 
 		virtual SpikingOdeSystem* Clone() const = 0;
-
 
 		virtual Potential DCContribution() const = 0;
 
@@ -60,7 +59,8 @@ namespace GeomLib {
 
 	  MPILib::Index UpdateMapPotentialToProbabilityBin(MPILib::Index i) const;
 
-		int		_index;
+	    MPILib::Number _nr_bins;
+		int		       _index;
 
 		ProbabilityQueue	_queue;
 
@@ -72,7 +72,7 @@ namespace GeomLib {
   inline MPILib::Index SpikingOdeSystem::UpdateMapPotentialToProbabilityBin(MPILib::Index i) const {
 		assert( i < this->Par()._nr_bins);
 		int j = _index + i;
-		return (j >= 0) ? i + _index : i + _index + this->Par()._nr_bins; 
+		return (j >= 0) ? i + _index : i + _index + _nr_bins;
 	}
 }
 

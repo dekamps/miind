@@ -198,30 +198,31 @@ namespace TwoDLib {
 	}
 
 	template <class WeightValue>
-	MPILib::AlgorithmGrid MeshAlgorithm<WeightValue>::getGrid(MPILib::NodeId id) const
+	MPILib::AlgorithmGrid MeshAlgorithm<WeightValue>::getGrid(MPILib::NodeId id, bool b_state) const
 	{
 		// An empty grid will lead to crashes
 		vector<double> array_interpretation {0.};
 		vector<double> array_state {0.};
 
-		std::ostringstream ost;
-		ost << id  << "_" << _t_cur;
-		ost << "_" << _sys.P();
-		string fn("mesh_" + ost.str());
+		if (b_state){
+			std::ostringstream ost;
+			ost << id  << "_" << _t_cur;
+			ost << "_" << _sys.P();
+			string fn("mesh_" + ost.str());
 
-		std::string model_path = _model_name;
-		boost::filesystem::path path(model_path);
+			std::string model_path = _model_name;
+			boost::filesystem::path path(model_path);
 
-		// MdK 27/01/2017. grid file is now created in the cwd of the program and
-		// not in the directory where the mesh resides.
-		const std::string dirname = path.filename().string() + "_mesh";
+			// MdK 27/01/2017. grid file is now created in the cwd of the program and
+			// not in the directory where the mesh resides.
+			const std::string dirname = path.filename().string() + "_mesh";
 
-		if (! boost::filesystem::exists(dirname) ){
-			boost::filesystem::create_directory(dirname);
+			if (! boost::filesystem::exists(dirname) ){
+				boost::filesystem::create_directory(dirname);
+			}
+			std::ofstream ofst(dirname + "/" + fn);
+			_sys.Dump(ofst);
 		}
-		std::ofstream ofst(dirname + "/" + fn);
-		_sys.Dump(ofst);
-
 		return MPILib::AlgorithmGrid(array_state,array_interpretation);
 	}
 
@@ -234,6 +235,7 @@ namespace TwoDLib {
 		const std::vector<MPILib::NodeType>& typeVector
 	)
 	{
+
 	  // The network time step must be an integer multiple of the network time step; in principle
 	  // we would expect this multiple to be one, but perhaps there are reasons to allow a population
 	  // have a finer time resolution than others, so we allow larger multiples but write a warning in the log file.
@@ -251,7 +253,7 @@ namespace TwoDLib {
 			  throw TwoDLibException("Mismatch of mesh time step and network time step. Network time step should be a multiple (mostly one) of network time step");
 			}
 			if (_n_steps > 1)
-			  LOG(MPILib::utilities::logWARNING)<< "Mesh runs at a time step which is a multiple of the network time step. Is this intended?";
+			  LOG(MPILib::utilities::logWARNING) << "Mesh runs at a time step which is a multiple of the network time step. Is this intended?";
 			else
 			  ; // else is fine
 		}

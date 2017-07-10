@@ -30,15 +30,15 @@ def loop(modelname,option,batch=False):
         filelist=subprocess.check_output(["ls", modelname + '_mesh']).split()
         # nice, but filelist is ordered alphabetically. want sort on time which we expect (!) is the last field
         sortlist=sorted(filelist, key=lambda item: (float(item.split('_')[-2]) ))
-        print sortlist
+        
         if (i == len(sortlist) ): break
         if (len(sortlist) > 0):
             timestring = sortlist[i].split('_')[-2]
             print sortlist[i], timestring
             if (option == ''):
-                m.showfile( modelname + '_mesh' + '/' + sortlist[i], runningtext = 't = ' + timestring)
+                m.showfile( modelname + '_mesh' + '/' + sortlist[i], runningtext = 't = ' + timestring, colorlegend = [1e-6,1, 100])
             else:
-                m.showfile( modelname + '_mesh' + '/' + sortlist[i], pdfname=sortlist[i], runningtext = 't = ' + timestring)
+                m.showfile( modelname + '_mesh' + '/' + sortlist[i], pdfname=sortlist[i], runningtext = 't = ' + timestring, colorlegend = [1e-6,1.,100])
                 
             i+=1
 

@@ -71,7 +71,6 @@ BOOST_AUTO_TEST_CASE(DelayAssemblyNetworkTest) {
   DelayAssemblyAlgorithm<MPILib::DelayedConnection> alg(par_ass);
   NodeId id_ass = network.addNode(alg,EXCITATORY_DIRECT);
 
-
   RateFunctor<MPILib::DelayedConnection> func(SwitchOnAndOff);
   NodeId id_switch = network.addNode(func,NEUTRAL);
 

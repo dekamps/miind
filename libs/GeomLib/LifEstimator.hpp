@@ -82,10 +82,10 @@ public:
 
 private:
 
-  MPILib::Number Nposinit() const;
-  MPILib::Number Nneginit() const;
+    MPILib::Number Nposinit() const;
+    MPILib::Number Nneginit() const;
 
-  MPILib::Index IndexReversalBin() const;
+    MPILib::Index IndexReversalBin() const;
 
 	MPILib::Time TStep() const;
 	MPILib::Time TPeriod() const;
@@ -96,15 +96,15 @@ private:
 	double GetLambda() const;
 
 	const OdeParameter	_par_ode;
-  std::vector<double>		_vec_interpretation;
+    std::vector<double> _vec_interpretation;
 
 	Index  _i_reversal;
 	double _lambda;
 
 	MPILib::Time 	_t_period;
-  MPILib::Number 	        _N_pos;
+    MPILib::Number 	_N_pos;
 	MPILib::Time 	_t_step;
-  MPILib::Number 	        _N_neg;
+    MPILib::Number  _N_neg;
 };
 
 }

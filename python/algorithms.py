@@ -348,7 +348,7 @@ def parse_ratefunctor_algorithm(alg, i, weighttype):
 
     cd = alg.find('code')
     rb = alg.find('expression')
-    print rb, cd
+    
     if (cd != None and rb != None):
         raise ValueError('You cannot use expression and code tags in the same RateFunctor.')
     if cd == None  and rb == 0:

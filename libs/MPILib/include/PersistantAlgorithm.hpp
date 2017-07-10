@@ -69,7 +69,7 @@ namespace algorithm {
 		 */
 		virtual Rate getCurrentRate() const;
 
-		virtual AlgorithmGrid getGrid(NodeId) const;
+		virtual AlgorithmGrid getGrid(NodeId, bool) const;
 
 	private:
 

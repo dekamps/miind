@@ -96,7 +96,7 @@ int main(){
 			0.0,
 			0.5,
 			1e-3,
-			1e-4,
+			sys.TStep(),
 			"singlepoptest.log"
 		);
 

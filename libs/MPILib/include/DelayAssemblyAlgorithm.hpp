@@ -70,7 +70,7 @@ public:
 	 */
 	virtual Rate getCurrentRate() const {return _r_current; }
 
-	virtual AlgorithmGrid getGrid(NodeId) const;
+	virtual AlgorithmGrid getGrid(NodeId, bool b_state = true) const;
 
 private:
 

@@ -63,7 +63,7 @@ const GeomLib::InitialDensityParameter
 			0.0
 		);
 
-  const Number TWOPOP_NUMBER_BINS = 2000;
+  const Number TWOPOP_NUMBER_BINS = 5000;
   const Potential TWOPOP_V_MIN    = -1.0*TWOPOP_NET_EXC_PAR._theta;
 
   const GeomLib::OdeParameter ODE_TWO_EXC(TWOPOP_NUMBER_BINS,TWOPOP_V_MIN,TWOPOP_NET_EXC_PAR,TWOPOP_INITIAL_DENSITY);
