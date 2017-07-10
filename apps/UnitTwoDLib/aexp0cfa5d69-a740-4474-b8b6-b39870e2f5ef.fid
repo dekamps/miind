@@ -1,0 +1,11 @@
+<Fiducial>
+<Quadrilateral type= "Contain"><vline>-31.1290322581 -30.4838709677 -28.2258064516 -28.3870967742 </vline><wline>-125.0 103.125 103.90625 -123.4375 </wline></Quadrilateral>
+<Quadrilateral type= "Contain"><vline>-95.4838709677 -90.3225806452 -90.1612903226 -95.4838709677 </vline><wline>-103.125 -103.90625 -96.875 -95.3125 </wline></Quadrilateral>
+<Quadrilateral type= "Contain"><vline>-45.4838709677 -45.3225806452 -30.0 -30.0 </vline><wline>-117.96875 -122.65625 -123.4375 -117.1875 </wline></Quadrilateral>
+<Quadrilateral type= "Contain"><vline>-45.1612903226 -44.0322580645 -44.0322580645 -46.2903225806 </vline><wline>-127.34375 -128.90625 -118.75 -109.375 </wline></Quadrilateral>
+<Quadrilateral type= "Leak"><vline>-45.8064516129 -46.2903225806 -45.1612903226 -44.3548387097 </vline><wline>103.90625 -111.71875 -109.375 103.90625 </wline></Quadrilateral>
+<Quadrilateral type= "Contain"><vline>-43.5483870968 -64.5161290323 -64.5161290323 -43.3870967742 </vline><wline>96.09375 92.96875 101.5625 104.6875 </wline></Quadrilateral>
+<Quadrilateral type= "Contain"><vline>-64.3548387097 -71.1290322581 -71.935483871 -64.1935483871 </vline><wline>92.1875 84.375 92.96875 99.21875 </wline></Quadrilateral>
+<Quadrilateral type= "Contain"><vline>-71.7741935484 -73.5483870968 -71.7741935484 -70.8064516129 </vline><wline>91.40625 74.21875 75.0 82.8125 </wline></Quadrilateral>
+<Quadrilateral type= "Contain"><vline>-68.3870967742 -74.0322580645 -71.935483871 -66.935483871 </vline><wline>-74.21875 73.4375 73.4375 -73.4375 </wline></Quadrilateral>
+</Fiducial>
