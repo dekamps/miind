@@ -31,6 +31,7 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 # cmake options
 ##############################################################################
 
+OPTION(ENABLE_OPENMP "Enable OpenMP" OFF)
 OPTION(ENABLE_TESTING "Compile tests" ON)
 OPTION(ENABLE_ROOT "Root Desired" OFF)
 OPTION(ENABLE_MEMORY_TEST "Generate memory test" OFF)
@@ -51,6 +52,11 @@ IF(ENABLE_MPI)
 	add_definitions( -DENABLE_MPI=1 )
 ENDIF(ENABLE_MPI)
 
+IF(ENABLE_OPENMP)
+	find_package(OpenMP REQUIRED)
+	add_definitions( -DENABLE_OPENMP=1 )
+ENDIF(ENABLE_OPENMP)
+	
  #   add the flags for C++11 
 if(CMAKE_COMPILER_IS_GNUCXX)
 	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
@@ -71,6 +77,11 @@ else(CMAKE_COMPILER_IS_GNUCXX)
 	endif()
 
 endif(CMAKE_COMPILER_IS_GNUCXX)
+
+IF(ENABLE_OPENMP)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+ENDIF(ENABLE_OPENMP)
   
 IF(ENABLE_MPI)
 	set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
