@@ -837,27 +837,26 @@ class Mesh:
             l = []
             
             # An empty strip should be allowed for example as a place holder for stationary cells
-            if str.text is None:
-                continue
+            if str.text is not None:
 
-            coords = [ float(x) for x in str.text.split() ]
-            if len(coords)%8 != 0:
-                raise ValueError
-            n_chunck = len(coords)/8
+                coords = [ float(x) for x in str.text.split() ]
+                if len(coords)%8 != 0:
+                    raise ValueError
+                n_chunck = len(coords)/8
                     
-            for i in range(0,n_chunck):
-                vs=[]
-                ws=[]
-                vs.append(coords[8*i])
-                vs.append(coords[8*i+2])
-                vs.append(coords[8*i+4])
-                vs.append(coords[8*i+6])
-                ws.append(coords[8*i+1])
-                ws.append(coords[8*i+3])
-                ws.append(coords[8*i+5])
-                ws.append(coords[8*i+7])
-                quad=Quadrilateral(vs,ws)
-                l.append(quad)
+                for i in range(0,n_chunck):
+                    vs=[]
+                    ws=[]
+                    vs.append(coords[8*i])
+                    vs.append(coords[8*i+2])
+                    vs.append(coords[8*i+4])
+                    vs.append(coords[8*i+6])
+                    ws.append(coords[8*i+1])
+                    ws.append(coords[8*i+3])
+                    ws.append(coords[8*i+5])
+                    ws.append(coords[8*i+7])
+                    quad=Quadrilateral(vs,ws)
+                    l.append(quad)
                     
             self.cells.append(l)
         self.__build_neighbours__()
