@@ -61,7 +61,8 @@ bool Ode2DSystem::CheckConsistency() const {
 			throw TwoDLib::TwoDLibException(ost_err.str());
 		}
 		if ( r._from[1] >= _mesh.NrCellsInStrip(r._from[0] ) ){
-			ost_err << "reversal. Nr cells in strip from: " <<  _mesh.NrCellsInStrip(r._from[0] ) << ",from: " << r._from[0];
+			ost_err << "reversal. Nr cells in strip from: " <<  _mesh.NrCellsInStrip(r._from[0] ) << ",from: " << r._from[0] << "\n";
+			ost_err << "In total there are: " << _mesh.NrQuadrilateralStrips() << " strips." << std::endl;
 			throw TwoDLib::TwoDLibException(ost_err.str());
 		}
 	}	

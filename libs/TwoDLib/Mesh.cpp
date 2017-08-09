@@ -318,7 +318,7 @@ void Mesh::FromXML(istream& s)
 		if (cs.size()%8 != 0 )
 			throw TwoDLibException("Unexpected number of points in strip during XML read");
 
-		vector<Quadrilateral> vec_quad = FromVals(cs);
+        vector<Quadrilateral> vec_quad = FromVals(cs);
 		_vec_vec_quad.push_back(vec_quad);
     }
 

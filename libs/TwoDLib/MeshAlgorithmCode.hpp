@@ -235,7 +235,6 @@ namespace TwoDLib {
 		const std::vector<MPILib::NodeType>& typeVector
 	)
 	{
-
 	  // The network time step must be an integer multiple of the network time step; in principle
 	  // we would expect this multiple to be one, but perhaps there are reasons to allow a population
 	  // have a finer time resolution than others, so we allow larger multiples but write a warning in the log file.

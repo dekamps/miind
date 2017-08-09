@@ -129,9 +129,14 @@ Quadrilateral::Quadrilateral
 Cell(vec_point)
 {
 
-	if (! this->SanityCheck())
-			throw TwoDLibException(string("Sanity check failed in quadrilateral: "));
-
+	if (! this->SanityCheck()){
+		std::ostringstream ost;
+		ost << string("Sanity check failed in quadrilateral: ");
+		for(const TwoDLib::Point& p : vec_point)
+			ost << p[0] << " " << p[1] << ";";
+		ost << "\n";
+		throw TwoDLibException(ost.str());
+	}
 
 	if (! this->IsSimple()){
 		std::ostringstream ost;
@@ -150,8 +155,15 @@ Quadrilateral::Quadrilateral
 ):
 Cell(VectorFromPoints(p1,p2,p3,p4))
 {
-	if (! this->SanityCheck())
-			throw TwoDLibException("Sanity check failed in quadrilateral.");
+	if (! this->SanityCheck()){
+		std::ostringstream ost;
+		ost << string("Sanity check failed in quadrilateral: ");
+		for(const TwoDLib::Point& p : _vec_points)
+			ost << p[0] << " " << p[1] << ";";
+		ost << "\n";
+		throw TwoDLibException(ost.str());
+	}
+
 
 	if (! this->IsSimple()){
 		std::ostringstream ost;
@@ -172,9 +184,14 @@ Cell(vec_v,vec_w)
 	assert( vec_v.size() == Quadrilateral::_n_points);
 	assert( vec_w.size() == Quadrilateral::_n_points);
 
-
-	if (! this->SanityCheck())
-			throw TwoDLibException("Sanity check failed in quadrilateral.");
+	if (! this->SanityCheck()){
+		std::ostringstream ost;
+		ost << string("Sanity check failed in quadrilateral: ");
+		for(const TwoDLib::Point& p : _vec_points)
+			ost << p[0] << " " << p[1] << ";";
+		ost << "\n";
+		throw TwoDLibException(ost.str());
+	}
 
 	if (! this->IsSimple()){
 		std::ostringstream ost;
