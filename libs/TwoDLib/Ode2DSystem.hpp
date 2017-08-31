@@ -23,13 +23,13 @@
 
 #include <iostream>
 #include <numeric>
+#include <vector>
 #include "MPILib/include/TypeDefinitions.hpp"
 #include "Mesh.hpp"
 #include "modulo.hpp"
 #include "Redistribution.hpp"
 
 namespace TwoDLib {
-
 
 	class TransitionMatrix;
 
@@ -88,6 +88,8 @@ namespace TwoDLib {
 
 		friend class Master;
 	    friend class MasterOMP;
+	    friend class MasterOdeint;
+
 	    friend void CheckSystem(const Ode2DSystem&, const TransitionMatrix&, const std::vector<Redistribution>&, const std::vector<Redistribution>&, double);
 
 	private:

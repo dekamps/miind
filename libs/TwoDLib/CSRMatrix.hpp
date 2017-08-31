@@ -42,7 +42,7 @@ namespace TwoDLib {
 		//! out += Mv; ranges assert checked
 		void MV(vector<double>& out, const vector<double>& v);
 
-		//!
+		//! Performs a matrix-vector multiplication, taking into account the current density mapping
 		void MVMapped(vector<double>&, const vector<double>&, double) const;
 
 		//! Each matrix corresponds to a well defined jump

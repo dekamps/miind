@@ -44,11 +44,14 @@ BOOST_AUTO_TEST_CASE(TestSingleTransitionGeneration)
 	BOOST_REQUIRE( hit_list[1]._count == 7 );
 }
 
+
 BOOST_AUTO_TEST_CASE(FiducialTest){
 
 	Mesh mesh("aexpoverview.mesh");
 	Uniform uni(789);
 
+	// with mesh you can generate aexpoverview.pdf
+	// inspection with display_mesh shows you cover the central cleft with the following parameter:
 	vector<Point> perim(4);
 	perim[0][0] = -70.9;
 	perim[0][1] =  0.;
@@ -60,12 +63,16 @@ BOOST_AUTO_TEST_CASE(FiducialTest){
 	perim[3][1] =  0.;
 
 	Quadrilateral quad(perim);
-	vector<Coordinates> vec_fiducial = mesh.CellsBelongTo(quad);
+	vector<Coordinates> vec_fiducial = mesh.CellsBelongTo(quad); // create a list of cells associated with the cleft
 	FiducialElement el(mesh,quad,LEAK,vec_fiducial);
+
+	// A substantial number of mesh cells are associated with the cleft
+	BOOST_REQUIRE(vec_fiducial.size() == 722);
 	FidElementList list(vector<FiducialElement>(1,el));
 
 	MeshTree tree(mesh);
 	TransitionMatrixGenerator gen(tree,uni,1000,list);
+	// this translate cell (3,0) by 7 mV and puts it over the cleft.
 	gen.GenerateTransition(3, 0, 7.,0.);
 
 	vector<TransitionMatrixGenerator::Hit> hit_list = gen.HitList();
@@ -73,9 +80,11 @@ BOOST_AUTO_TEST_CASE(FiducialTest){
 	for (auto it = hit_list.begin(); it != hit_list.end(); it++){
 		sum += it->_count;
 	}
-	BOOST_REQUIRE(sum == 882);
-	BOOST_REQUIRE(gen.AccountedPoints().size() == 118);
-	BOOST_REQUIRE(gen.LostPoints().size() == 0);
+
+
+	BOOST_REQUIRE(sum == 1000);    // the total is correct
+	BOOST_REQUIRE(gen.AccountedPoints().size() == 118); // points fall into the cleft, but are accounted for
+	BOOST_REQUIRE(gen.LostPoints().size() == 0); // no points are lost, as all are either accounted for or found.
 }
 
 BOOST_AUTO_TEST_CASE(FiducialContainTest){
@@ -108,8 +117,8 @@ BOOST_AUTO_TEST_CASE(FiducialContainTest){
 		sum += it->_count;
 	}
 
-	BOOST_REQUIRE(sum == 1000);
-	BOOST_REQUIRE(gen.AccountedPoints().size() == 0);
+	BOOST_REQUIRE(sum == 1000); // all points are added
+	BOOST_REQUIRE(gen.AccountedPoints().size() == 0); // points are added to the nearest cell, so all are found
 	BOOST_REQUIRE(gen.LostPoints().size() == 0);
 }
 

@@ -22,7 +22,6 @@
 #include <fstream>
 
 
-
 BOOST_AUTO_TEST_CASE(MeshAlgorithmTest){
 
 	std::string mesh_name = "life21da341-bd4a-4077-93c2-4d11804d0882.model";
@@ -32,5 +31,5 @@ BOOST_AUTO_TEST_CASE(MeshAlgorithmTest){
 
 	double h = 1e-4;
 	TwoDLib::MeshAlgorithm<MPILib::DelayedConnection> alg(mesh_name,mat_names,h);
-
 }
+

@@ -28,7 +28,7 @@ using MPILib::populist::ProbabilityQueue;
 
 namespace GeomLib {
 
-	//! In this system of ordinary differential equations
+	//! In this system of ordinary differential equations it is assumed that dynamics is always spiking.
 	class SpikingOdeSystem : public AbstractOdeSystem {
 	public:
 
@@ -42,10 +42,12 @@ namespace GeomLib {
 			const SpikingOdeSystem&
 		);
 
+		//! This is an abstract base class.
 		virtual ~SpikingOdeSystem() = 0;
 
-		void UpdateIndex() { if (--_index  == -_nr_bins ) _index = 0; }
+		void UpdateIndex() { if (--_index  == -static_cast<int>(_nr_bins) ) _index = 0; }
 
+		//! virtual construction by the framework
 		virtual SpikingOdeSystem* Clone() const = 0;
 
 		virtual Potential DCContribution() const = 0;

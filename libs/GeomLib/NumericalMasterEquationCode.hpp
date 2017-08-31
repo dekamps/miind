@@ -121,7 +121,8 @@ namespace
                      dydt[system.MapPotentialToProbabilityBin(i)] += rate_i * y[system.MapPotentialToProbabilityBin(j)];
              }
 
-             assert(!(pair_cover.first._index > pair_cover.second._index));
+             // the first index should never be larger than the second one, unless the second one = -1, which would not require any execution
+             assert( pair_cover.second._index == -1 || (pair_cover.first._index <= pair_cover.second._index) );
 
              typename Estimator::CoverPair pair = vec_cover_pair[0];
              Index i_shift = static_cast<Index>(pair.first._index);

@@ -213,12 +213,14 @@ TransitionMatrixGenerator::SearchResult TransitionMatrixGenerator::CheckFiducial
 				*pc =  cell;
 				return Found;
 			} else {
-				if (it->_overflow == CONTAIN) // force it into the next closest cell, but then it counts as found
+				if (it->_overflow == CONTAIN){ // force it into the next closest cell, but then it counts as found
 					*pc = cell;
 					return Found;
-				if (it->_overflow  == LEAK)    // we don't add the hit anywhere, but accept its loss and it is accounted for
+				}
+				if (it->_overflow  == LEAK){    // we don't add the hit anywhere, but accept its loss and it is accounted for
 					*pc=Coordinates(0,0);
 					return Accounted;
+				}
 				throw TwoDLibException("Fiducial elements should be LEAK or CONTAIN");
 			}
 		}

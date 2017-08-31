@@ -9,7 +9,6 @@ using namespace TwoDLib;
 
 BOOST_AUTO_TEST_CASE(MeshTreeSimple){
 	Mesh mesh("aexpoverview.mesh");
-	std::cout << "Mesh created" << std::endl;
 	MeshTree tree(mesh);
 
 	Point p = tree.FindNearest(Point(-55.0,20.0));

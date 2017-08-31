@@ -60,4 +60,5 @@ namespace TwoDLib {
 
 	};
 }
+
 #endif

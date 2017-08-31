@@ -26,13 +26,15 @@
 
 namespace TwoDLib {
 
+	//! OpenMP version of a forward Euler integration of the Master equation
+
 	class MasterOMP {
 	public:
 
 		MasterOMP
 		(
 			Ode2DSystem&,
-			const vector<TransitionMatrix>&,
+			const vector<TransitionMatrix>&,  //! vector of all TransitionMatrix instances that determine the input to this population
 			const MasterParameter&
 		);
 

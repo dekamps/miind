@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <MPILib/include/AlgorithmInterface.hpp>
+#include "MasterOdeint.hpp"
 #include "Ode2DSystem.hpp"
 #include "pugixml.hpp"
 
@@ -162,7 +163,7 @@ namespace TwoDLib {
 
 		MPILib::Time 						_dt;     // mesh time step
 		TwoDLib::Ode2DSystem 				_sys;
-		std::unique_ptr<TwoDLib::MasterOMP>	_p_master;
+		std::unique_ptr<TwoDLib::MasterOdeint>	_p_master;
 		MPILib::Number						_n_evolve;
 		MPILib::Number						_n_steps;
 	};

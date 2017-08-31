@@ -162,10 +162,12 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 
 		LOG(utilities::logINFO) << "Starting simulation";
 		try {
-			// The count should be the end time divided by the state time; corrected MdK 22/04/2017
-			std::cout << getEndTime() << " " << _parameterSimulationRun.getTState() << std::endl;
+			// the report time must be taken as a hint if the network time step is larger (MdK: 31/08/2017)
+			long count = (_parameterSimulationRun.getTReport() < _parameterSimulationRun.getTStep()) ? \
+					      static_cast<long>(_parameterSimulationRun.getTEnd()/_parameterSimulationRun.getTStep()) : \
+					      static_cast<long>(_parameterSimulationRun.getTEnd()/_parameterSimulationRun.getTReport());
 
-			utilities::ProgressBar pb( static_cast<long>(getEndTime()/_parameterSimulationRun.getTState()));
+			utilities::ProgressBar pb(count);
 			do {
 				do {
 
@@ -194,7 +196,9 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					// there is something to report
 					// CheckPercentageAndLog(CurrentSimulationTime());
 					collectReport(report::RATE);
-					updateReportTime();				}
+					updateReportTime();
+					pb++;
+				}
 
 				// just a rate or also a state?
 				if (getCurrentSimulationTime() >= getCurrentStateTime()) {
@@ -202,7 +206,7 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					collectReport(report::STATE);
 					updateStateTime();
 				}
-				pb++;
+
 
 			} while (getCurrentSimulationTime() <= getEndTime()); // it is better to test on simulation time (22/04/2017) MdK
 			// write out the final state

@@ -45,6 +45,7 @@ _init(_rate)
 
  void MasterOMP::Apply(double t_step, const vector<double>& rates, const vector<MPILib::Index>& vec_map)
  {
+	 // the time step t_step is split into single solution steps _h, equal to 1/N_steps
 	 for (unsigned int j = 0; j < _par._N_steps; j++){
 
 #pragma omp parallel for
@@ -53,7 +54,7 @@ _init(_rate)
 
 		 for (unsigned int irate = 0; irate < rates.size(); irate++){
 			 // do NOT map the rate
-			 _rate = t_step*rates[irate];
+			 _rate = rates[irate];
 
 			 // it is only the matrices that need to be mapped
 			 _vec_csr[vec_map[irate]].MVMapped
@@ -66,7 +67,7 @@ _init(_rate)
 
 #pragma omp parallel for
 		 for (MPILib::Index imass = 0; imass < _sys._vec_mass.size(); imass++)
-			 _sys._vec_mass[imass] += _add._h*_dydt[imass];
+			 _sys._vec_mass[imass] += _add._h*t_step*_dydt[imass]; // the mult
 	 }
  }
 

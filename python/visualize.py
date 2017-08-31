@@ -473,3 +473,4 @@ class ResetVisualizer:
                 print 'BONG', grad
 
         plt.show()
+

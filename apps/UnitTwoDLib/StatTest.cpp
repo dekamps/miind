@@ -94,17 +94,3 @@ BOOST_AUTO_TEST_CASE(StatTest4)
 }
 
 
-BOOST_AUTO_TEST_CASE(FidTest)
-{
-	Mesh mesh("aexp0cfa5d69-a740-4474-b8b6-b39870e2f5ef.mesh");
-	Fid fid( "aexp0cfa5d69-a740-4474-b8b6-b39870e2f5ef.fid" );
-	std::vector<ProtoFiducial> vec_fid = fid.Extract();
-
-	BOOST_REQUIRE(vec_fid.size() == 9);
-	BOOST_REQUIRE(vec_fid[0].second == CONTAIN);
-	BOOST_REQUIRE(vec_fid[4].second == LEAK);
-
-	std::vector<FiducialElement> list = fid.Generate(mesh);
-
-	BOOST_REQUIRE(list.size() == 9);
-}

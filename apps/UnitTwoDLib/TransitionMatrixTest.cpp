@@ -22,6 +22,9 @@
 #include <fstream>
 #include <iostream>
 
+#include <boost/numeric/ublas/matrix_sparse.hpp>
+#include <boost/numeric/ublas/io.hpp>
+
 using namespace std;
 using namespace TwoDLib;
 
@@ -29,8 +32,7 @@ BOOST_AUTO_TEST_CASE(TransitionMatrixConstructionTest)
 {
 	TransitionMatrix mat("condee2a5ff4-0087-4d69-bae3-c0a223d03693.mat");
 }
-
-
+/*
 BOOST_AUTO_TEST_CASE(SimpleMeshTest){
 	try {
 		Mesh m("simple.mesh");
@@ -54,5 +56,36 @@ BOOST_AUTO_TEST_CASE(SimpleMeshTest){
 	catch(const TwoDLibException& excep){
 		std::cout << excep.what() << std::endl;
 	}
+}*/
+
+BOOST_AUTO_TEST_CASE(TransitionMatrixUblasTest)
+{
+	TransitionMatrix mat("condee2a5ff4-0087-4d69-bae3-c0a223d03693.mat");
+	// little odd, but TransitionMatrix does not record the size of the system it has to work on,
+	// we get that from the mesh and add one for the stationary point
+
+	Mesh mesh("condee2a5ff4-0087-4d69-bae3-c0a223d03693.mesh");
+    using namespace boost::numeric::ublas;
+
+    MPILib::Number n_cells = 1;
+    for (MPILib::Index i = 0; i < mesh.NrQuadrilateralStrips(); i++)
+    	for(MPILib::Index j = 0; j < mesh.NrCellsInStrip(i); j++)
+    		++n_cells;
+
+    compressed_matrix<double> m (n_cells, n_cells);
+    m(10,10) = 5.;
+
+    typedef compressed_matrix<double>::iterator1 i1_t;
+    typedef compressed_matrix<double>::iterator2 i2_t;
+
+#ifdef EXPERIMENT
+    for (i1_t i1 = m.begin1(); i1 != m.end1(); ++i1) {
+       for (i2_t i2 = i1.begin(); i2 != i1.end(); ++i2){
+          cout << "(" << i2.index1() << "," << i2.index2()
+               << ":" << *i2 << ")  ";
+          cout << endl; }
+    }
+#endif
+
 }
 

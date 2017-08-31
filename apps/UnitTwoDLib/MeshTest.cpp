@@ -29,14 +29,13 @@ BOOST_AUTO_TEST_CASE(MeshTest)
 {
 	// Use aexpoverview.mesh for detailed debugging. It is small enough
 	// to see every cell. Use cond.mesh for large scale testing.
-/*	Mesh mesh("cond.mesh");
+	Mesh mesh("condee2a5ff4-0087-4d69-bae3-c0a223d03693.mesh");
 	unsigned int nr_strip = mesh.NrQuadrilateralStrips();
+
 	BOOST_REQUIRE(nr_strip == 199);
-
 	unsigned int nr_cells = mesh.NrCellsInStrip(88);
-	BOOST_REQUIRE(nr_cells == 1000);*/
+	BOOST_REQUIRE(nr_cells == 700);
 }
-
 
 BOOST_AUTO_TEST_CASE(PoinTbelongsToTest){
 
@@ -78,7 +77,7 @@ BOOST_AUTO_TEST_CASE(CellsBelongToTest){
 	Quadrilateral quad(perim);
 
 	vector<Coordinates> vec_fiducial = mesh.CellsBelongTo(quad);
-	std::cout << vec_fiducial.size() << std::endl;
+	BOOST_ASSERT(vec_fiducial.size() == 722);
 }
 
 BOOST_AUTO_TEST_CASE(XMLTest){
@@ -114,3 +113,4 @@ BOOST_AUTO_TEST_CASE(BiggerMeshXML){
 	}
 
 }
+

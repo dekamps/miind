@@ -19,6 +19,7 @@ Master.cpp
 TransitionMatrix.cpp	 
 Cell.cpp											
 MasterOMP.cpp		   
+MasterOdeint.cpp		   
 QuadGenerator.cpp  
 TransitionMatrixGenerator.cpp 
 pugixml.cpp
@@ -50,6 +51,7 @@ Stat.hpp
 TwoDLib.hpp
 Cell.hpp														   		  
 Master.hpp   
+MasterOdeint.hpp   
 Ode2DSystem.hpp   
 TransitionList.hpp  
 Uniform.hpp

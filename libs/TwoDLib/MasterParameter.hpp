@@ -21,9 +21,10 @@
 
 namespace TwoDLib {
 
+	//! Parameters for the configuration of the numerical solution of the Master equation
 	struct MasterParameter {
 
-		unsigned int _N_steps;
+		unsigned int _N_steps; //!< Prescribes the number of sub steps of a forward Euler solution. Typical usage is the MeshAlgorithm communicating to the Master or MasterOMP algorithm in how many steps Delta t must be subdivided.
 
 		MasterParameter(unsigned int n_steps):_N_steps(n_steps){}
 	};

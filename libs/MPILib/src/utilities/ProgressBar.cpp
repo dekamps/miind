@@ -27,6 +27,7 @@ namespace utilities {
 ProgressBar::ProgressBar(unsigned long expectedCount,
 		const std::string & description, std::ostream& os) :
 		_description(description), _outputStream(os) {
+
 	if (MPIProxy().getRank() == 0) {
 		restart(expectedCount);
 	}
@@ -68,6 +69,7 @@ void ProgressBar::display_tic() {
 	} while (++_tic < tics_needed);
 	_nextTicCount =
 			static_cast<unsigned long>((_tic / 50.0) * _expectedCount);
+
 	if (_count == _expectedCount) {
 		if (_tic < 51)
 			_outputStream << '*';
