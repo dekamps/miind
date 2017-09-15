@@ -120,7 +120,6 @@ namespace TwoDLib {
 			Reset(Ode2DSystem& sys, vector<double>& vec_mass):_sys(sys),_vec_mass(vec_mass){}
 
 			void operator()(const Redistribution& map){
-
 				double from =  map._alpha*_vec_mass[_sys.Map(map._from[0],map._from[1])];
 				_vec_mass[_sys.Map(map._to[0],map._to[1])] += from;
 				_sys._f += from;
