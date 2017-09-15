@@ -49,6 +49,7 @@ _clean(*this,_vec_mass)
 {
 	assert(m.TimeStep() != 0.0);
 	this->CheckConsistency();
+
 }
 
 bool Ode2DSystem::CheckConsistency() const {
