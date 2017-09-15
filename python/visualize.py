@@ -369,7 +369,8 @@ class Model1DVisualizer:
             raise ValueError
         print 'w: ', self.w
 
-    def showfile(self,filename, xlabel='', ylabel='', pdfname='', colorlegend = DEFAULT_COLOR_LEGEND):
+
+    def graphfromfile(self, filename):
         f=open(filename)
         line=f.readline()
         data = [ float(x) for x in line.split()[2::3] ]
@@ -386,12 +387,12 @@ class Model1DVisualizer:
             sum_mass += data[i]*self.areas[i]
             self.density[i] = data[i]*self.w
 
-        print 'Mass: ',sum_mass
-        if self.canvas == None:
-            self.canvas = ROOT.TCanvas()
+        return self.interpretation, self.density
 
-        g=ROOT.TGraph(len(data),self.interpretation,self.density)
+    def showfile(self,filename, xlabel='', ylabel='', pdfname='', colorlegend = DEFAULT_COLOR_LEGEND):
 
+        interpretation, density = self.graphfromfile(filename)
+        g=ROOT.TGraph(len(interpretation), interpretation, density)
 
         if self.bbox != []:
             self.h = ROOT.TH2F("h_" ,"",500,self.bbox[0][0],self.bbox[0][1],500,self.bbox[1][0],self.bbox[1][1])
