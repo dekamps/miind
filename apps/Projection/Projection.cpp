@@ -143,7 +143,7 @@ void CreateProjections
   ofst << "</W_max>";
   ofst << "<N_W>";
   ofst << nw;
-  ofst << "</N_w>\n";
+  ofst << "</N_W>\n";
   ofst << "</W_limit>\n";
 
   CalculateProjections(ofst, mesh, v_min, v_max, nv, w_min, w_max, nw);
