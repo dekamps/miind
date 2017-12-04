@@ -21,7 +21,7 @@
 #include <boost/test/unit_test.hpp>
 #include <fstream>
 #include <TwoDLib.hpp>
-/*
+
 using namespace std;
 using namespace TwoDLib;
 
@@ -71,9 +71,6 @@ BOOST_AUTO_TEST_CASE(MapTest){
 
 	mesh.InsertStationary(reversal_bin2);
 	Ode2DSystem sys3(mesh,vec_dummy,vec_dummy);
-	std::cout << sys3.Map(0,0) << std::endl;
-	std::cout << sys3.Map(0,1) << std::endl;
-	std::cout << sys3.Map(1,0) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(EvolutionTest){
@@ -168,4 +165,4 @@ BOOST_AUTO_TEST_CASE(ResetTest){
 	sys.Dump(ofstreset);
 
 }
-*/
+

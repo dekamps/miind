@@ -23,7 +23,7 @@
 
 using namespace std;
 using namespace TwoDLib;
-/*
+
 BOOST_AUTO_TEST_CASE(CellCreationTest)
 {
 	vector<double> vec_v(4);
@@ -271,4 +271,4 @@ BOOST_AUTO_TEST_CASE(CentroidTest){
 	BOOST_REQUIRE(centre[0] == 0.5);
 	BOOST_REQUIRE(centre[1] == 0.5);
 }
-*/
+

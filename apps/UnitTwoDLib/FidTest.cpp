@@ -24,7 +24,7 @@
 using namespace std;
 using namespace TwoDLib;
 
-/*
+
 BOOST_AUTO_TEST_CASE(FidTest)
 {
 	Mesh mesh("aexp0cfa5d69-a740-4474-b8b6-b39870e2f5ef.mesh");
@@ -40,4 +40,4 @@ BOOST_AUTO_TEST_CASE(FidTest)
 	BOOST_REQUIRE(list.size() == 9);
 }
 
-*/
+

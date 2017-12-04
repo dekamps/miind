@@ -24,7 +24,7 @@
 
 using namespace std;
 using namespace TwoDLib;
-/*
+
 BOOST_AUTO_TEST_CASE(TriangleGeneratorTest)
 {
 
@@ -38,7 +38,6 @@ BOOST_AUTO_TEST_CASE(TriangleGeneratorTest)
 	vector<Point> vec(10);
 
 	gen.Generate(&vec);
-
 }
 
 BOOST_AUTO_TEST_CASE(QuadGeneratorTest)
@@ -76,4 +75,4 @@ BOOST_AUTO_TEST_CASE(QuadGeneratorTest)
 	ofst2.close();
 
 }
-*/
+
