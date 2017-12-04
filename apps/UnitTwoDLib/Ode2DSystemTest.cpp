@@ -21,7 +21,7 @@
 #include <boost/test/unit_test.hpp>
 #include <fstream>
 #include <TwoDLib.hpp>
-
+/*
 using namespace std;
 using namespace TwoDLib;
 
@@ -168,3 +168,4 @@ BOOST_AUTO_TEST_CASE(ResetTest){
 	sys.Dump(ofstreset);
 
 }
+*/

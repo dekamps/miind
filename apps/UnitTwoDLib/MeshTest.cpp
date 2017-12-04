@@ -24,7 +24,7 @@
 
 using namespace std;
 using namespace TwoDLib;
-
+/*
 BOOST_AUTO_TEST_CASE(MeshTest)
 {
 	// Use aexpoverview.mesh for detailed debugging. It is small enough
@@ -111,6 +111,11 @@ BOOST_AUTO_TEST_CASE(BiggerMeshXML){
 	catch(const TwoDLib::TwoDLibException& excep){
 		std::cout << excep.what() << std::endl;
 	}
-
 }
+*/
+BOOST_AUTO_TEST_CASE(ModelFile){
+	// if a mesh is buried in a model file, the Mesh constructor should accept it as long as the XML
+	// is structured correctly.
 
+	Mesh mesh("life21da341-bd4a-4077-93c2-4d11804d0882.model");
+}

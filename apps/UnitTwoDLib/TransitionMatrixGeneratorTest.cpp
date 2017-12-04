@@ -23,7 +23,7 @@
 
 using namespace std;
 using namespace TwoDLib;
-
+/*
 BOOST_AUTO_TEST_CASE(TestSingleTransitionGeneration)
 {
 	Uniform uni(789);
@@ -122,4 +122,4 @@ BOOST_AUTO_TEST_CASE(FiducialContainTest){
 	BOOST_REQUIRE(gen.LostPoints().size() == 0);
 }
 
-
+*/

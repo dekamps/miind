@@ -224,7 +224,6 @@ _vec_vec_quad(0),
 _vec_vec_gen(0)
 {
 	std::ifstream ifst(file_name);
-
 	if (!ifst){
 		std::cerr << "Can't open mesh file." << std::endl;
 		throw TwoDLibException("Can't open mesh file.");
@@ -235,7 +234,12 @@ _vec_vec_gen(0)
 		// in some hand edits the Mesh tag is not place at the beginning; this is valid XML and the parser is not bothered by it,
 		// but it must be passed correctly to the XML:
 		line.erase (std::remove (line.begin(), line.end(), ' '), line.end());
-		if (line == string("<Mesh>")){
+
+		// instead of string comparison, merely find if <Mesh> is substring of the first line
+		// MdK: 23/10/2017
+		// accept Model as tag;
+		// MdK: 04/12/2017
+		if (line.find("<Mesh>") != std::string::npos || line.find("<Model>") != std::string::npos){
 			ifst.close();
 			std::ifstream newifst(file_name);
 			this->FromXML(newifst);
@@ -295,7 +299,10 @@ void Mesh::FromXML(istream& s)
     if (!result)
     	throw TwoDLib::TwoDLibException("Couldn't parse Mesh from stream");
 
+
     pugi::xml_node node_mesh = doc.first_child();
+    if  (node_mesh.name() == std::string("Model"))
+    	node_mesh = doc.first_child().child("Mesh");
 
     // Extract time step
     pugi::xml_node node_ts = node_mesh.child("TimeStep");

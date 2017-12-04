@@ -205,7 +205,7 @@ class Visualizer:
 
         mi, ma, vals = self.colscale(dens,colorlegend)
 
-        self.__draw_colorbar__(colorlegend, mi, ma)
+#        self.__draw_colorbar__(colorlegend, mi, ma)
 
         
         # at this stage, there should be a 1-1 correspondence between norm elements and self_geom elements
@@ -250,9 +250,9 @@ class Visualizer:
         if pdfname != '':
             self.c.SaveAs(pdfname +'.png')
 
-    def show(self,xlabel='',ylabel='',pdfname='',points=[],pointcolor=3):
+    def show(self,xlabel='',ylabel='',pdfname='',points=[],pointcolor=3, runningtext='', colorlegend=DEFAULT_COLOR_LEGEND):
         dens=self.density()
-        self.demo(dens,xlabel,ylabel,pdfname,points,pointcolor)
+        self.demo(dens,xlabel,ylabel,pdfname,points,pointcolor,runningtext,colorlegend)
 
     def showfile(self,filename, xlabel = '', ylabel = '', pdfname = '', points = [], pointcolor = 3, runningtext = '', colorlegend=DEFAULT_COLOR_LEGEND):
         f=open(filename)
@@ -424,7 +424,7 @@ class MatrixVisualizer:
                         cont = float(to.split(':')[1])
                         s += cont
                 if np.fabs(s - 1.0) > 1e-6:
-                    print corig[0], corig[1]
+                    print 'Leak cell:', corig[0], corig[1], self.model.viz.v.sys
                     self.modelviz.v.sys.mass[self.modelviz.v.sys.map(corig[0],corig[1])] = 0.1
         self.modelviz.v.sys.mass[0] = 1.0
         self.modelviz.v.show()

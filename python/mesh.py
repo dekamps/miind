@@ -832,12 +832,14 @@ class Mesh:
         for ts in root.iter('TimeStep'):
             self.dt = float(ts.text)
 
+        zopa = False
         for str in root.iter('Strip'):
     
             l = []
             
             # An empty strip should be allowed for example as a place holder for stationary cells
             if str.text is not None:
+
 
                 coords = [ float(x) for x in str.text.split() ]
                 if len(coords)%8 != 0:
@@ -857,7 +859,11 @@ class Mesh:
                     ws.append(coords[8*i+7])
                     quad=Quadrilateral(vs,ws)
                     l.append(quad)
-                    
+
+                if not zopa:
+                    zopa = True
+                    print coords
+
             self.cells.append(l)
         self.__build_neighbours__()
             

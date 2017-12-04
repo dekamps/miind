@@ -23,7 +23,7 @@
 
 using namespace std;
 using namespace TwoDLib;
-
+/*
 BOOST_AUTO_TEST_CASE(StatTest)
 {
 	pugi::xml_document doc;
@@ -93,4 +93,4 @@ BOOST_AUTO_TEST_CASE(StatTest4)
 
 }
 
-
+*/

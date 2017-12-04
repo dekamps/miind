@@ -23,9 +23,10 @@
 
 using namespace std;
 using namespace TwoDLib;
-
+/*
 BOOST_AUTO_TEST_CASE(UniformTest)
 {
 	Uniform uni(10);
 	double d  = uni.GenerateNext();
 }
+*/

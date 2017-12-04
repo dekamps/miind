@@ -194,8 +194,8 @@ int main(int argc, char** argv){
       // Parse input arguments
       TwoDLib::split(mesh_name,'.',elem);
    
-      if (elem.size() < 2 || elem[1] != string("mesh"))
-	throw TwoDLib::TwoDLibException("Mesh extension not .mesh");
+      if (elem.size() < 2 || elem[1] != string("model"))
+	throw TwoDLib::TwoDLibException("Model extension not .model");
 
       std::istringstream ist_vmin(argv[2]);
       std::istringstream ist_vmax(argv[3]);
@@ -227,8 +227,8 @@ int main(int argc, char** argv){
 
       TwoDLib::split(mesh_name,'.',elem);
    
-      if (elem.size() < 2 || elem[1] != string("mesh"))
-	throw TwoDLib::TwoDLibException("Mesh extension not .mesh");
+      if (elem.size() < 2 || elem[1] != string("model"))
+	throw TwoDLib::TwoDLibException("Model extension not .model");
 
       // print some info about the mesh
       const TwoDLib::Mesh mesh(argv[1]);
@@ -240,8 +240,8 @@ int main(int argc, char** argv){
       std::cout << "Upper right: " << point_pair.second[0] << " " << point_pair.second[1] << std::endl;
       std::cout << "Lower left: "  << point_pair.first[0]  << " " << point_pair.first[1] << std::endl;
     } else {
-      std::cout << "Usage: Projection <meshfile> <v_min>  <v_max> <n_points> <w_min> w_max <n_points> or" << std::endl;
-      std::cout << "Usage: Projection <meshfile> to obtain grid boundaries" << std::endl;
+      std::cout << "Usage: Projection <modelfile> <v_min>  <v_max> <n_points> <w_min> <w_max> <n_points> or" << std::endl;
+      std::cout << "Usage: Projection <modelfile> to obtain grid boundaries" << std::endl;
 
     }
   }

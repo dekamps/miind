@@ -29,6 +29,7 @@ void TwoDLib::ConstructResetMapping
 	TransitionMatrixGenerator* pgen
 ){
 
+	std::cout << "zopa: " << tr_w << std::endl;
 	ost << "<Mapping type=\"Reset\">\n";
 	// can't assume sorting
 	vector<Coordinates> ressort = thres;

@@ -179,7 +179,7 @@ namespace TwoDLib {
 		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
 
 		try {
-			std::unique_ptr<TwoDLib::MasterOdeint> p_master(new MasterOdeint(_sys,vec_mat, par));
+			std::unique_ptr<TwoDLib::MasterOMP> p_master(new MasterOMP(_sys,vec_mat, par));
 			_p_master = std::move(p_master);
 		}
 		// TODO: investigate the following
@@ -265,6 +265,7 @@ namespace TwoDLib {
 
 	    // master equation
 	    _p_master->Apply(_n_steps*_dt,_vec_rates,_vec_map);
+
 
 	    _sys.RedistributeProbability();
 

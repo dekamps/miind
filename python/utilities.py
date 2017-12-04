@@ -93,7 +93,7 @@ def find_last_density_file(dense_list):
     return sorted(clean_list, key = lambda f: float(f.split('_')[2]))[-1]
 
 
-def produce_data_summary(dir_name, population_list, model, mapping_dictionary = None):
+def produce_data_summary(dir_name, population_list, model, simulationname='', mapping_dictionary = None):
     ''' dir_name is the directory name of the simulation results. The standard workflow is assumed, which produces a hierarchy of three directories deep:                            
     dir_name/dir_name/[list of result directories]. Only dir_name must be provided, the result directories will be found and listed by the routines.                                 
     Population list is a list of NodeId's. T directory DST_<dir_name> will be created. The firing rates of the populations in                                                        
@@ -102,15 +102,18 @@ def produce_data_summary(dir_name, population_list, model, mapping_dictionary = 
     if not os.path.exists(dstname):
         os.makedirs(dstname)
     path, dirs = find_results(dir_name)
+    curpath = os.getcwd()
 
     for di in dirs:
         with cd(os.path.join(path,di)):
-            rt = dir_name + '_' + '0' + '.root'
-            print di , rt
+            if simulationname == '':
+                rt = dir_name + '_' + '0' + '.root'
+            else:
+                rt = simulationname + '_' + '0' + '.root'
             if os.path.exists(rt):
                 ts, fs = extract_rate_graph(rt, population_list, dstname)
                 # create the DST directory in the script directory                                                                                                                   
-                dst_dir_name = os.path.join(sys.path[0],dstname)
+                dst_dir_name = os.path.join(curpath,os.path.join(sys.path[0],dstname))
 
                 if not os.path.exists(dst_dir_name):
                     os.makedirs(dst_dir_name)
@@ -130,18 +133,20 @@ def produce_data_summary(dir_name, population_list, model, mapping_dictionary = 
                         for freq in fs[i]:
                             f.write(str(freq) + '\t')
                         f.write('\n')
+            else:
+                print 'Cannot find: ', rt
 
                     # the density files reside here:                                                                                                                                 
-                    dir_density = model + '_mesh'
-                    with cd(dir_density):
-                        dfs = sp.check_output(['ls']).split('\n')
-                        dfn=find_last_density_file(dfs)
-                        v=visualize.Model1DVisualizer(os.path.join(sys.path[0],model))
-                        v.showfile(dfn)
-                    with open(os.path.join(dst_dir_name, fname + '_' + str(id) + '.steady'),'w') as f:
-                        for volt in v.interpretation:
-                            f.write(str(volt) + '\t')
-                        f.write('\n')
-                        for dens in v.density:
-                            f.write(str(dens) + '\t')
-                        f.write('\n')
+                    #dir_density = model + '_mesh'
+                    #with cd(dir_density):
+                    #    dfs = sp.check_output(['ls']).split('\n')
+                    #    dfn=find_last_density_file(dfs)
+                    #    v=visualize.Model1DVisualizer('../' + model)
+                    #    v.showfile(dfn)
+                    #with open(os.path.join(dst_dir_name, fname + '_' + str(id) + '.steady'),'w') as f:
+                    #    for volt in v.interpretation:
+                    #        f.write(str(volt) + '\t')
+                    #    f.write('\n')
+                    #    for dens in v.density:
+                    #        f.write(str(dens) + '\t')
+                    #    f.write('\n')

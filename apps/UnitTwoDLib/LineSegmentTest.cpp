@@ -23,7 +23,7 @@
 
 using namespace std;
 using namespace TwoDLib;
-
+/*
 BOOST_AUTO_TEST_CASE(LineSegmentTest)
 {
 	Point p1(0., 0.);
@@ -37,3 +37,4 @@ BOOST_AUTO_TEST_CASE(LineSegmentTest)
 	bool b_diff = l.ArePointsOnTheSameSide(Point(0.5,0.5),Point(-0.5,0.5));
 	BOOST_REQUIRE(b_diff == false);
 }
+*/

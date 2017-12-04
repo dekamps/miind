@@ -6,7 +6,7 @@
 
 using namespace std;
 using namespace TwoDLib;
-
+/*
 BOOST_AUTO_TEST_CASE(MeshTreeSimple){
 	Mesh mesh("aexpoverview.mesh");
 	MeshTree tree(mesh);
@@ -49,7 +49,8 @@ BOOST_AUTO_TEST_CASE(MeshNearest)
 //		std::cout << (*it)[0] << " " << (*it)[1] << std::endl;
 
 }
-
+*/
+/*
 BOOST_AUTO_TEST_CASE(KdSimple){
 #define rand1() (rand() / (double)RAND_MAX)
 #define rand_pt(v) { v.x[0] = rand1(); v.x[1] = rand1(); v.x[2] = rand1(); }
@@ -93,7 +94,7 @@ BOOST_AUTO_TEST_CASE(KdSimple){
 //            testNode.x[0], testNode.x[1], testNode.x[2],
 //            found->x[0], found->x[1], found->x[2],
 //            sqrt(best_dist), visited);
-
+*/
     /* search many random points in million tree to see average behavior.
        tree size vs avg nodes visited:
        10      ~  7
@@ -103,7 +104,7 @@ BOOST_AUTO_TEST_CASE(KdSimple){
        100000      ~ 38.3
        1000000     ~ 42.6
        10000000    ~ 46.7              */
-    int sum = 0, test_runs = 100000;
+/*    int sum = 0, test_runs = 100000;
     for (i = 0; i < test_runs; i++) {
         found = 0;
         visited = 0;
@@ -119,4 +120,4 @@ BOOST_AUTO_TEST_CASE(KdSimple){
     free(large_buffer);
 }
 
-
+*/
