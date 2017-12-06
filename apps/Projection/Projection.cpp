@@ -77,7 +77,7 @@ void CalculateProjections
  unsigned int nw
  ){
   TwoDLib::Uniform uni(123456);
-
+  ofst << "<transitions>\n";
   for( unsigned int i = 0; i < mesh.NrQuadrilateralStrips(); i++ )
     for (unsigned int j = 0; j < mesh.NrCellsInStrip(i); j++ ){
       const TwoDLib::Quadrilateral& quad = mesh.Quad(i,j);
@@ -86,25 +86,31 @@ void CalculateProjections
       gen.Generate(&vec_points);
       vector<float> vec_v(nv,0.), vec_w(nw,0.);
       for(const TwoDLib::Point& point: vec_points){
-	unsigned int bin_v = Bin(point[0], v_min, v_max, nv);
-	vec_v[bin_v]++;
-	unsigned int bin_w = Bin(point[1], w_min, w_max, nw);
-	vec_w[bin_w]++;
+    	  unsigned int bin_v = Bin(point[0], v_min, v_max, nv);
+    	  vec_v[bin_v]++;
+    	  unsigned int bin_w = Bin(point[1], w_min, w_max, nw);
+    	  vec_w[bin_w]++;
       }
-      ofst << i << "," << j << ";";
-      ofst << "<vbins>";
-      for (int i = 0; i < nv; i++){
-	if (vec_v[i] > 0.)
-	  ofst << i << "," << vec_v[i]/N_POINTS << ";";
-      }
-      ofst << "</vbins>";
-      ofst << "<wbins>";
-      for (int i = 0; i < nw; i++){
-	if (vec_w[i] > 0.)
-	  ofst << i << "," << vec_w[i]/N_POINTS << ";";
-      }
-      ofst << "</wbins>\n";
+
+      ofst << "<cell>";
+      	  ofst << "<coordinates>";
+      	  	  ofst << i << "," << j;
+      	  ofst << "</coordinates>";
+      	  ofst << "<vbins>";
+      	  for (int i = 0; i < nv; i++){
+      		  if (vec_v[i] > 0.)
+      			  ofst << i << "," << vec_v[i]/N_POINTS << ";";
+      	  }
+      	  ofst << "</vbins>";
+      	  ofst << "<wbins>";
+      	  for (int i = 0; i < nw; i++){
+      	  if (vec_w[i] > 0.)
+      		  ofst << i << "," << vec_w[i]/N_POINTS << ";";
+      	  }
+      	  ofst << "</wbins>";
+      ofst << "</cell>\n";
     }
+  	ofst << "</transitions>\n";
 }
 
 void CreateProjections
