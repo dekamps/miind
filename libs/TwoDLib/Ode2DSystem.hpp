@@ -75,10 +75,13 @@ namespace TwoDLib {
 		void RemapReversal();
 
 		//! Return the instantaneous firing rate
-		double F() const {return _f; }
+		double F() const {return _f;}
 
 		//! total probability mass in the system, should not be too far away from 1.0
 		double P() const { return std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0); }
+
+		//! average membrane potential
+		double AvgV() const ;
 
 		//! allow direct inspection of the mass array; client must still convert this to a density
 		const vector<double>& Mass() const { return _vec_mass; }

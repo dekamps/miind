@@ -77,6 +77,8 @@ int get_line_intersection(float p0_x, float p0_y, float p1_x, float p1_y,
 }
 
 bool Quadrilateral::IsSimple() const {
+	//----------------CAREFUL, THIS TEST IS NOT APPROPRIATE, BUT MUST BE REPLACED-------------
+	return true;
 
 	// Run over all 4 edges. The only edge that needs to be tested is the non neighbouring one.
 	// Unlike other functions, this one is particular to Quadrilaterals

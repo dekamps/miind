@@ -177,3 +177,17 @@ void Ode2DSystem::RedistributeProbability()
 
 	_f /= _mesh.TimeStep();
 }
+
+double Ode2DSystem::AvgV() const
+{
+	double av = 0.;
+	for(MPILib::Index i = 0; i < _mesh.NrQuadrilateralStrips(); i++){
+		for(MPILib::Index j = 0; j < _mesh.NrCellsInStrip(i); j++){
+			double V = _mesh.Quad(i,j).Centroid()[0];
+			av += V*_vec_mass[this->Map(i,j)];
+		}
+	}
+
+	return av;
+}
+

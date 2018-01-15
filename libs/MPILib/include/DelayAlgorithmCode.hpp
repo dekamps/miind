@@ -82,7 +82,7 @@ Rate DelayAlgorithm<Weight>::getCurrentRate() const {
 }
 
 template<class Weight>
-AlgorithmGrid DelayAlgorithm<Weight>::getGrid() const {
+AlgorithmGrid DelayAlgorithm<Weight>::getGrid(NodeId, bool b_state) const {
 	AlgorithmGrid grid(1);
 	return grid;
 }
@@ -120,6 +120,7 @@ Rate DelayAlgorithm<Weight>::Interpolate() const {
 	return rate;
 
 }
+
 
 } /* end namespace algorithm */
 } /* end namespace MPILib */

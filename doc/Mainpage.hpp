@@ -1,6 +1,19 @@
 /*!
 \mainpage Miind Documentation
 
+\section sec_news News (8 January 2018)!
+We have introduced support for two-dimensional population densities in a new MIIND version (1.04). This requires a  <a href="http://miind.sf.net/miind.pdf">new tutorial</a>, and the
+MIIND tar ball version 1.04 (or a recent clone of the git repository). The old code (miind-1.03) will remain available. For that version you must use
+the <a href="http://miind.sf.net/tutorial.pdf">old tutorial</a>, but unless you are an existing MIIND user, don't use the 1.03 version (or below).
+
+The code can handle a large number of 2D neuronal models, such as adaptive-exponential-integrate-and-fire, conductance-based, Fitzhugh-Nagumo. Each model
+can be run in the same way, using a MeshAlgorithm. The tutorial describes how. When defining a model, you need two kinds of files: a model file and a number of mat files.
+For some neural models these files are available:
+<ul>
+<li><a href="http://miind.sf.net/cond.tar.gz">Conductance-based</a></li>
+<li><a href="http://miind.sf.net/aexp.tar.gz">Adaptive Exponential-Integrate-and-Fire</a></li>
+<li><a href="http://miind.sf.net/fn.tar.gz">Fitzhugh-Naguno</a></li>
+</ul>
 
 \section sec_introduction Introduction
 MIIND is a simulator for modeling circuits of neural populations, with an emphasis on population density techniques, co-funded by 
@@ -74,10 +87,7 @@ For more details see \ref dependencies
 
 \section sec_announce the latest developments.
  There is a now <a href="http://miind.sf.net/tutorial.pdf">tutorial</a>.
-<<<<<<< HEAD
-MIIND version 2.0 
-=======
->>>>>>> master
+MIIND version 1.04 was released on 9 January 2018. It supports 2D density models.
 
 MIIND version 1.03 was released om 9 February 2016. It contains more efficient leaky-integrate-and-fire support, and an extended example section.
 
@@ -101,22 +111,15 @@ Many new features are in developement. These include:
 - Support for non Poisson statistics
 - Support for activity dependent efficacies
 
-<<<<<<< HEAD
-The old neural network code, as described , including a HMAX implementation is still available, but will no longer be maintained.
-=======
 The old neural network code, including a HMAX implementation is still available, but will no longer be maintained.
->>>>>>> master
 
 \section sec_wiki WIKI
 The MIIND <a href="http://sourceforge.net/p/miind/wiki/Home">wiki</a>.
 The WIKI contains more details about the extra work that needs to be done to install MIIND under windows.
 
-<<<<<<< HEAD
 
 \image html hbp.png
 \image latex hbp.png "MIIND development is now co-funded by the Human Brain Project." width=5cm
-=======
->>>>>>> master
 
 */
 

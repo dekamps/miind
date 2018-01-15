@@ -42,9 +42,10 @@ namespace TwoDLib {
 
 		MeshAlgorithm
 		(
-			const std::string&, 			 //!< model file name
-			const std::vector<std::string>&, //!< collection of transition matrix files
-			MPILib::Time                     //!< default time step for Master equation integration
+			const std::string&, 		    	 //!< model file name
+			const std::vector<std::string>&,     //!< collection of transition matrix files
+			MPILib::Time,                        //!< default time step for Master equation integration
+			const string& ratemethod = ""        //!< firing rate computation; by default the mass flux across threshold
 		);
 
 		MeshAlgorithm(const MeshAlgorithm&);
@@ -141,7 +142,8 @@ namespace TwoDLib {
 		double _tolerance;
 
 		const std::string              _model_name;
-		const std::vector<std::string> _mat_names; // it is useful to store the names, but not the matrices, as they will be converted internally by the MasterOMP object
+		const std::vector<std::string> _mat_names;   // it is useful to store the names, but not the matrices, as they will be converted internally by the MasterOMP object
+        const std::string              _rate_method;
 
 		// report quantities
 		MPILib::Time _h;
@@ -166,6 +168,8 @@ namespace TwoDLib {
 		std::unique_ptr<TwoDLib::MasterOdeint>	_p_master;
 		MPILib::Number						_n_evolve;
 		MPILib::Number						_n_steps;
+
+		double (TwoDLib::Ode2DSystem::*_sysfunction) () const;
 	};
 }
 

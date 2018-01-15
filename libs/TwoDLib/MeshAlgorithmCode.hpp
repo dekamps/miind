@@ -100,10 +100,13 @@ namespace TwoDLib {
 	(
 		const std::string& model_name,
 		const std::vector<std::string>& mat_names,
-		MPILib::Time h):
+		MPILib::Time h,
+		const std::string&  rate_method
+	):
 	_tolerance(1e-7),
 	_model_name(model_name),
 	_mat_names(mat_names),
+	_rate_method(rate_method),
 	_h(h),
 	_rate(0.0),
 	_t_cur(0.0),
@@ -115,7 +118,8 @@ namespace TwoDLib {
 	_dt(_mesh.TimeStep()),
 	_sys(_mesh,_vec_rev,_vec_res),
 	_n_evolve(0),
-	_n_steps(0)
+	_n_steps(0),
+	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystem::AvgV : &TwoDLib::Ode2DSystem::F)
 	// master parameter can only be calculated on configuration
 	{
 		// default initialization is (0,0); if there is no strip 0, it's down to the user
@@ -128,6 +132,7 @@ namespace TwoDLib {
 	_tolerance(rhs._tolerance),
 	_model_name(rhs._model_name),
 	_mat_names(rhs._mat_names),
+	_rate_method(rhs._rate_method),
 	_h(rhs._h),
 	_rate(rhs._rate),
 	_t_cur(rhs._t_cur),
@@ -138,7 +143,8 @@ namespace TwoDLib {
 	_dt(_mesh.TimeStep()),
 	_sys(_mesh,_vec_rev,_vec_res),
 	_n_evolve(0),
-	_n_steps(0)
+	_n_steps(0),
+	_sysfunction(rhs._sysfunction)
 	// master parameter can only be calculated on configuration
 	{
 		// default initialization is (0,0); if there is no strip 0, it's down to the user
@@ -269,7 +275,8 @@ namespace TwoDLib {
 	    _sys.RedistributeProbability();
 
  	    _t_cur += _n_steps*_dt;
- 	    _rate = _sys.F();
+ 	    _rate = (_sys.*_sysfunction)();
+
  	    _n_evolve++;
 	}
 

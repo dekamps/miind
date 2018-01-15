@@ -207,6 +207,7 @@ def parse_mesh_algorithm(alg, i, weighttype):
     s = ''
     if alg.attrib['type'] != 'MeshAlgorithm':
         raise ValueError
+ 
 
     s += '\tstd::vector<std::string> '
     vec_name = 'vec_mat_' + str(i)
@@ -220,12 +221,14 @@ def parse_mesh_algorithm(alg, i, weighttype):
         s += fl.text 
     s += '\"};\n'
 
-
     timestep = alg.find('TimeStep')
 
     cpp_name = 'alg_mesh_' + str(i)
     s += '\tTwoDLib::MeshAlgorithm<DelayedConnection> ' + cpp_name + '(\"'
-    s += alg.attrib['modelfile'] + '\",' + vec_name + ',' + timestep.text + ');\n'
+    s += alg.attrib['modelfile'] + '\",' + vec_name + ',' + timestep.text 
+    if 'ratemethod' in alg.keys():
+        s += ', '  + "\"" + alg.attrib['ratemethod'] + "\""    
+    s += ');\n'
 
     Register(alg.attrib['name'], cpp_name)
 
@@ -315,17 +318,15 @@ def parse_persistant_algorithm(alg, i, weighttype):
 
 def parse_delay_algorithm(alg,i,weighttype):
     s = ''
-    dg = alg.find('DelayAlgorithm')
+    if alg.attrib['type'] != 'DelayAlgorithm':
+        raise ValueError
     
-    if not 'Name' in  dg.keys():
-        raise NameError('Name tag expected')
-
     cpp_name = 'delay_alg_' + str(i)
-    Register(dg.attrib['Name'],cpp_name)
+    Register(alg.attrib['name'],cpp_name)
 
-    s += '\tMPILib::DelayAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('
+    s += '\tMPILib::algorithm::DelayAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('
     
-    dt = dg.find('delay')
+    dt = alg.find('delay')
     s += dt.text
     
     s += ');\n'
