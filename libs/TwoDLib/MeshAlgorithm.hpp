@@ -44,7 +44,8 @@ namespace TwoDLib {
 		(
 			const std::string&, 		    	 //!< model file name
 			const std::vector<std::string>&,     //!< collection of transition matrix files
-			MPILib::Time,                        //!< default time step for Master equation integration
+			MPILib::Time,                        //!< default time step for Master equation
+			MPILib::Time tau_refractive = 0,     //!< absolute refractive period
 			const string& ratemethod = ""        //!< firing rate computation; by default the mass flux across threshold
 		);
 

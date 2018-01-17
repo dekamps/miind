@@ -101,6 +101,7 @@ namespace TwoDLib {
 		const std::string& model_name,
 		const std::vector<std::string>& mat_names,
 		MPILib::Time h,
+		MPILib::Time tau_refractive,
 		const std::string&  rate_method
 	):
 	_tolerance(1e-7),
