@@ -16,6 +16,11 @@ def processlist(modelname):
     for fi in sortlist:
         f.write('file \'' + fi + '.png\'\n' )
 
+def display(modelname, mesh, step):
+    m=visualize.ModelVisualizer(modelname)
+    while(1):
+        m.showfile( modelname + '_mesh' + '/mesh_' + mesh + '_' + step + '_1', colorlegend = [1e-6,1, 100])
+
 def loop(modelname,option,batch=False):
 
     if batch == True:
@@ -48,4 +53,6 @@ if __name__ == "__main__":
     if len(sys.argv) == 3:
         loop(sys.argv[1],'y')
     if len(sys.argv) == 4:
-	loop(sys.argv[1],'y',True)
+	    loop(sys.argv[1],'y',True)
+    if len(sys.argv) == 5: # expect demo2Dpy <placeholder i.e disp> model, mesh, step
+	    display(sys.argv[2],sys.argv[3],sys.argv[4])

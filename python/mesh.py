@@ -667,6 +667,25 @@ class Mesh:
 	    plt.show()
 	return chkConcave,chkSelfIntersect
 
+    def checkSmallBins(self):
+    	'''Checks for concave and self-intersecting Quadrilaterals'''
+    	chkSum = 0
+    	x_coords=[]
+    	y_coords=[]
+    	for i, cells in enumerate(self.cells):
+    	    for j, cell in enumerate(cells):
+    		chkCell=self.cells[i][j]
+    		if chkCell.__class__.__name__ == 'Quadrilateral':
+    		    if chkCell.isTooSmall() == True:
+    			    chkSum += 1
+    			    print i,j
+    			    x_coords=np.append(x_coords,chkCell.centroid[0])
+    			    y_coords=np.append(y_coords,chkCell.centroid[1])
+    	plt.scatter(x_coords,y_coords)
+    	if chkSum > 0:
+    	    plt.show()
+    	return chkSum
+
 ####under construction
     def removeBadBins(self):
 
