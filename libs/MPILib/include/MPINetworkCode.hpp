@@ -77,6 +77,14 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 }
 
 template<class WeightValue, class NodeDistribution>
+MPINode<WeightValue, NodeDistribution>* MPINetwork<WeightValue, NodeDistribution>::getNode(NodeId nid) {
+	if (_localNodes.count(nid) > 0)
+		return &(_localNodes.find(nid)->second);
+	else
+		return 0;
+}
+
+template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 		NodeId first, NodeId second, const WeightValue& weight) {
 
@@ -151,6 +159,38 @@ void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 		LOG(utilities::logERROR) << "error during configuration";
 	}
 	_stateNetwork.toggleConfigured();
+}
+
+template<class WeightValue, class NodeDistribution>
+void MPINetwork<WeightValue, NodeDistribution>::evolveSingleStep() {
+	updateSimulationTime();
+
+	MPINode<WeightValue, NodeDistribution>::waitAll();
+	for (auto& it : _localNodes)
+		it.second.prepareEvolve();
+
+	Time t_current = getCurrentSimulationTime()*_parameterSimulationRun.getTStep();
+	int i=0;
+	//evolve all local nodes
+	for (auto& it : _localNodes){
+		it.second.evolve(t_current);}
+
+	/*
+	// now there is something to report or to update
+	if (getCurrentSimulationTime() >= getCurrentReportTime()) {
+		// there is something to report
+		// CheckPercentageAndLog(CurrentSimulationTime());
+		collectReport(report::RATE);
+		updateReportTime();
+		pb++;
+	}
+
+	// just a rate or also a state?
+	if (getCurrentSimulationTime() >= getCurrentStateTime()) {
+		// a rate as well as a state
+		collectReport(report::STATE);
+		updateStateTime();
+	}*/
 }
 
 //! Envolve the network
@@ -316,9 +356,6 @@ Index MPINetwork<WeightValue, NodeDistribution>::getCurrentStateTime() const {
 	return _i_state;
 }
 
-template<class WeightValue, class NodeDistribution>
-std::map<NodeId, MPINode<WeightValue, NodeDistribution>> MPINetwork<WeightValue,
-		NodeDistribution>::_localNodes;
 
 template<class WeightValue, class NodeDistribution>
 NodeDistribution MPINetwork<WeightValue, NodeDistribution>::_nodeDistribution;

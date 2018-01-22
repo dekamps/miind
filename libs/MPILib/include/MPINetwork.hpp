@@ -163,6 +163,13 @@ public:
 	 */
 	void evolve();
 
+	/**
+	 * Envolve the network by a single timestep
+	 */
+	void evolveSingleStep();
+
+	MPINode<WeightValue, NodeDistribution>* getNode(NodeId);
+
 private:
 
 	/**
@@ -214,7 +221,7 @@ private:
 	/**
 	 * local nodes of the processor
 	 */
-	static std::map<NodeId, MPINode<WeightValue, NodeDistribution>> _localNodes;
+	std::map<NodeId, MPINode<WeightValue, NodeDistribution>> _localNodes;
 	/**
 	 * The actual distribution of the nodes.
 	 */

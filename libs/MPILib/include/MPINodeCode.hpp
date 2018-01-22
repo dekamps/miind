@@ -84,10 +84,26 @@ void MPINode<Weight, NodeDistribution>::prepareEvolve() {
 }
 
 template<class Weight, class NodeDistribution>
+ActivityType MPINode<Weight, NodeDistribution>::getActivity(){
+	return _activity;
+}
+
+template<class Weight, class NodeDistribution>
+std::vector<ActivityType> MPINode<Weight, NodeDistribution>::getPrecurserActivity() {
+	return _precursorActivity;
+}
+
+template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::setPrecurserActivity(std::vector<ActivityType> preAct){
+	_precursorActivity = preAct;
+}
+
+template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 		const SimulationRunParameter& simParam) {
 
 	_maximum_iterations = simParam.getMaximumNumberIterations();
+
 	_pAlgorithm->configure(simParam);
 
 	// Add this line or other nodes will not get a proper input at the first simulation step!

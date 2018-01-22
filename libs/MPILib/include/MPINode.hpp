@@ -151,7 +151,11 @@ public:
 
 	void initNode();
 
-private:
+	ActivityType getActivity();
+	std::vector<ActivityType> getPrecurserActivity();
+	void setPrecurserActivity(std::vector<ActivityType>);
+
+protected:
 
 	/**
 	 * Store the nodeIds of the Precursors
