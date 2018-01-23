@@ -356,6 +356,8 @@ Index MPINetwork<WeightValue, NodeDistribution>::getCurrentStateTime() const {
 	return _i_state;
 }
 
+template<class WeightValue, class NodeDistribution>
+std::map<NodeId, MPINode<WeightValue, NodeDistribution>> MPINetwork<WeightValue,NodeDistribution>::_localNodes;
 
 template<class WeightValue, class NodeDistribution>
 NodeDistribution MPINetwork<WeightValue, NodeDistribution>::_nodeDistribution;

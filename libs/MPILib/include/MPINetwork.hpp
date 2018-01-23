@@ -221,7 +221,7 @@ private:
 	/**
 	 * local nodes of the processor
 	 */
-	std::map<NodeId, MPINode<WeightValue, NodeDistribution>> _localNodes;
+	static std::map<NodeId, MPINode<WeightValue, NodeDistribution>> _localNodes;
 	/**
 	 * The actual distribution of the nodes.
 	 */

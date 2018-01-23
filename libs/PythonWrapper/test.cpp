@@ -21,14 +21,12 @@ MPILib::Rate RateFunction_1(MPILib::Time t){
 
 class Wrapped {
 private:
-	int network_id;
 	Network network;
-	MPILib::MPINode<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>* input_node;
+	std::vector<MPILib::MPINode<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>*> nodes =
+		std::vector<MPILib::MPINode<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>*>();
 public:
 
-	void init(int id)
-	{
-		network_id = id;
+	void addNode() {
 		try {	// generating algorithms
 			std::vector<std::string> vec_mat_0{"lif_0.005_0_0.mat"};
 			TwoDLib::MeshAlgorithm<DelayedConnection> alg_mesh_0("lif.model",vec_mat_0,0.000770095348827);
@@ -37,15 +35,23 @@ public:
 			// generating nodes
 			MPILib::NodeId id_0 = network.addNode(alg_mesh_0,MPILib::EXCITATORY_DIRECT);
 			MPILib::NodeId id_1 = network.addNode(rate_functor_1,MPILib::NEUTRAL);
-			input_node = network.getNode(id_0);
+			nodes.push_back(network.getNode(id_0));
 			// generating connections
 			DelayedConnection con_1_0_0(3,0.005,0);
 			network.makeFirstInputOfSecond(id_1,id_0,con_1_0_0);
+		} catch(std::exception& exc){
+			//std::cout << exc.what() << std::endl;
+		}
+	}
+
+	void init()
+	{
+		try {	// generating algorithms
 			// generation simulation parameter
 			std::string sim_name = "lif/lif_";
-			MPILib::report::handler::RootReportHandler handler(sim_name + std::to_string(id),true);
+			MPILib::report::handler::RootReportHandler handler(sim_name,true);
 
-			SimulationRunParameter par_run( handler,1000000,0,5.0,0.00770095348827,0.000770095348827,sim_name + std::to_string(id),0.00770095348827);
+			SimulationRunParameter par_run( handler,1000000,0,5.0,0.00770095348827,0.000770095348827,sim_name,0.00770095348827);
 			network.configureSimulation(par_run);
 			//network.evolve();
 		} catch(std::exception& exc){
@@ -53,20 +59,34 @@ public:
 		}
 	}
 
-	void setPrecurserActivity(double c) {
-		std::vector<double> activity = std::vector<double>();
-		activity.push_back((c*2000));
-		//activity.push_back(c*50000);
+	void setPrecurserActivity(boost::python::list c) {
+		boost::python::ssize_t len = boost::python::len(c);
 
-		input_node->setPrecurserActivity(activity);
+		for(int i=0; i<len; i++) {
+			double ca = boost::python::extract<double>(c[i]);
+
+			std::vector<double> activity = std::vector<double>();
+			activity.push_back((ca*2000));
+			nodes[i]->setPrecurserActivity(activity);
+		}
+
 	}
 
-	double evolveSingleStep() {
-		std::vector<ActivityType> activity = input_node->getPrecurserActivity();
-		printf("Coupled %f\n", activity[1]);
+	boost::python::list evolveSingleStep() {
+		for(int i=0; i<nodes.size(); i++) {
+			std::vector<ActivityType> activity = nodes[i]->getPrecurserActivity();
+			printf("Coupled %f\n", activity[1]);
+		}
+
 		network.evolveSingleStep();
-		printf("Activity %f\n", input_node->getActivity());
-		return input_node->getActivity();
+
+		boost::python::list out;
+		for(int i=0; i<nodes.size(); i++) {
+			printf("Activity %f\n", nodes[i]->getActivity());
+			out.append(nodes[i]->getActivity());
+		}
+
+		return out;
 	}
 };
 
@@ -75,6 +95,7 @@ BOOST_PYTHON_MODULE(libmiindpw)
 	using namespace boost::python;
 	class_<Wrapped>("Wrapped")
 		.def("init", &Wrapped::init)
+		.def("addNode", &Wrapped::addNode)
 		.def("setPrecurserActivity", &Wrapped::setPrecurserActivity)
 		.def("evolveSingleStep", &Wrapped::evolveSingleStep);
 }
