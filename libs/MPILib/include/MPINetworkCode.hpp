@@ -31,6 +31,7 @@
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/MPINetwork.hpp>
 #include <MPILib/include/MPINodeCode.hpp>
+#include <MPILib/include/MPIExternalNodeCode.hpp>
 #include <MPILib/include/utilities/ProgressBar.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
 #include <MPILib/include/utilities/Log.hpp>
@@ -38,11 +39,24 @@
 namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
-MPINetwork<WeightValue, NodeDistribution>::MPINetwork() {
+MPINetwork<WeightValue, NodeDistribution>::MPINetwork(){
 }
 
 template<class WeightValue, class NodeDistribution>
 MPINetwork<WeightValue, NodeDistribution>::~MPINetwork() {
+}
+
+template<class WeightValue, class NodeDistribution>
+void MPINetwork<WeightValue, NodeDistribution>::addExternalNode() {
+	if (_nodeDistribution.isLocalNode(0)) {
+		_localNodes.insert(std::make_pair(0, _externalNode));
+		LOG(utilities::logDEBUG2) << "External node generated with id: "
+				<< 0;
+	}
+	nodeIdsType_[0] = NEUTRAL;
+
+	//increment the max NodeId to make sure that it is not assigned twice.
+	incrementMaxNodeId();
 }
 
 template<class WeightValue, class NodeDistribution>
@@ -51,11 +65,18 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 		NodeType nodeType) {
 
 	assert(
-			nodeType == EXCITATORY_GAUSSIAN || 
-			nodeType == INHIBITORY_GAUSSIAN || 
-			nodeType == NEUTRAL || 
-			nodeType == EXCITATORY_DIRECT || 
+			nodeType == EXCITATORY_GAUSSIAN ||
+			nodeType == INHIBITORY_GAUSSIAN ||
+			nodeType == NEUTRAL ||
+			nodeType == EXCITATORY_DIRECT ||
 			nodeType == INHIBITORY_DIRECT);
+
+	// Add the external node to the localNode map in the master process
+	if (_nodeDistribution.isMaster()) {
+		if(_localNodes.empty()) {
+			addExternalNode();
+		}
+	}
 
 	NodeId tempNodeId = getMaxNodeId();
 	if (_nodeDistribution.isLocalNode(tempNodeId)) {
@@ -85,6 +106,13 @@ MPINode<WeightValue, NodeDistribution>* MPINetwork<WeightValue, NodeDistribution
 }
 
 template<class WeightValue, class NodeDistribution>
+void MPINetwork<WeightValue, NodeDistribution>::defineExternalNodeInputAndOutput(
+		NodeId input, NodeId output, const WeightValue& in_weight, const WeightValue& out_weight) {
+			makeFirstInputOfSecond(input, 0, in_weight);
+			makeFirstInputOfSecond(0,output, out_weight);
+}
+
+template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 		NodeId first, NodeId second, const WeightValue& weight) {
 
@@ -109,7 +137,7 @@ void MPINetwork<WeightValue, NodeDistribution>::makeFirstInputOfSecond(
 			auto tempNode = _localNodes.find(first)->second;
 
 			if ((IsExcitatory(tempNode.getNodeType())  && toEfficacy(weight) < 0)
-					|| (IsInhibitory(tempNode.getNodeType()) 
+					|| (IsInhibitory(tempNode.getNodeType())
 							&& toEfficacy(weight) > 0)) {
 				throw utilities::Exception("Dale's law violated");
 
@@ -162,35 +190,77 @@ void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 }
 
 template<class WeightValue, class NodeDistribution>
+std::vector<ActivityType> MPINetwork<WeightValue, NodeDistribution>::getExternalActivities(){
+	return _externalNode.getPrecursorActivity();
+}
+
+template<class WeightValue, class NodeDistribution>
+void MPINetwork<WeightValue, NodeDistribution>::setExternalActivities(std::vector<ActivityType> activities){
+	_externalNode.setActivities(activities);
+}
+
+template<class WeightValue, class NodeDistribution>
+void MPINetwork<WeightValue, NodeDistribution>::startSimulation() {
+	if (_stateNetwork.isConfigured()) {
+		_stateNetwork.toggleConfigured();
+
+		LOG(utilities::logINFO) << "Starting simulation";
+		// the report time must be taken as a hint if the network time step is larger (MdK: 31/08/2017)
+		long count = (_parameterSimulationRun.getTReport() < _parameterSimulationRun.getTStep()) ? \
+				      static_cast<long>(_parameterSimulationRun.getTEnd()/_parameterSimulationRun.getTStep()) : \
+				      static_cast<long>(_parameterSimulationRun.getTEnd()/_parameterSimulationRun.getTReport());
+	}
+}
+
+template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::evolveSingleStep() {
-	updateSimulationTime();
+	try {
+		LOG(utilities::logDEBUG)
+				<< "****** one evolve step finished ******";
 
-	MPINode<WeightValue, NodeDistribution>::waitAll();
-	for (auto& it : _localNodes)
-		it.second.prepareEvolve();
+		// business as usual: keep evolving, as long as there is nothing to report
+		// or to update
+		updateSimulationTime();
 
-	Time t_current = getCurrentSimulationTime()*_parameterSimulationRun.getTStep();
-	int i=0;
-	//evolve all local nodes
-	for (auto& it : _localNodes){
-		it.second.evolve(t_current);}
+		MPINode<WeightValue, NodeDistribution>::waitAll();
+		for (auto& it : _localNodes)
+			it.second.prepareEvolve();
 
-	/*
-	// now there is something to report or to update
-	if (getCurrentSimulationTime() >= getCurrentReportTime()) {
-		// there is something to report
-		// CheckPercentageAndLog(CurrentSimulationTime());
-		collectReport(report::RATE);
-		updateReportTime();
-		pb++;
+		Time t_current = getCurrentSimulationTime()*_parameterSimulationRun.getTStep();
+		//evolve all local nodes
+		for (auto& it : _localNodes)
+			it.second.evolve(t_current);
+
+		// now there is something to report or to update
+		if (getCurrentSimulationTime() >= getCurrentReportTime()) {
+			// there is something to report
+			// CheckPercentageAndLog(CurrentSimulationTime());
+			collectReport(report::RATE);
+			updateReportTime();
+		}
+
+		// just a rate or also a state?
+		if (getCurrentSimulationTime() >= getCurrentStateTime()) {
+			// a rate as well as a state
+			collectReport(report::STATE);
+			updateStateTime();
+		}
+
+		collectReport(report::STATE);
+	}
+	catch (utilities::IterationNumberException &e) {
+		LOG(utilities::logWARNING) << "NUMBER OF ITERATIONS EXCEEDED\n";
+		_stateNetwork.setResult(NUMBER_ITERATIONS_ERROR);
 	}
 
-	// just a rate or also a state?
-	if (getCurrentSimulationTime() >= getCurrentStateTime()) {
-		// a rate as well as a state
-		collectReport(report::STATE);
-		updateStateTime();
-	}*/
+}
+
+template<class WeightValue, class NodeDistribution>
+void MPINetwork<WeightValue, NodeDistribution>::endSimulation() {
+	clearSimulation();
+	LOG(utilities::logINFO) << "Simulation ended, no problems noticed";
+	LOG(utilities::logINFO) << "End time: "
+			<< getCurrentSimulationTime() << "\n";
 }
 
 //! Envolve the network
@@ -362,6 +432,9 @@ std::map<NodeId, MPINode<WeightValue, NodeDistribution>> MPINetwork<WeightValue,
 template<class WeightValue, class NodeDistribution>
 NodeDistribution MPINetwork<WeightValue, NodeDistribution>::_nodeDistribution;
 
-}					//end namespace MPILib
+template<class WeightValue, class NodeDistribution>
+MPIExternalNode<WeightValue, NodeDistribution> MPINetwork<WeightValue, NodeDistribution>::_externalNode( MPINetwork<WeightValue, NodeDistribution>::_nodeDistribution, MPINetwork<WeightValue,NodeDistribution>::_localNodes);
+
+}
 
 #endif //MPILIB_MPINETWORK_CODE_HPP_

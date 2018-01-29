@@ -30,6 +30,7 @@
 #include <MPILib/include/NetworkState.hpp>
 #include <MPILib/include/report/handler/InactiveReportHandler.hpp>
 #include <MPILib/include/NodeType.hpp>
+#include <MPILib/include/MPIExternalNode.hpp>
 
 namespace MPILib {
 
@@ -43,7 +44,7 @@ namespace MPILib {
    * a single real value that indicates the strength of a connection, or DelayedConnection, a type that determines number of connections; efficacy; delay. NodeDistribution
    * is a type that determines how the network simulation will be parallelized by MPI. At present we use CircularDistribution.
    * It is strongly recommended to look at example programs to see how an MPINetwork is instantiated.
-   * 
+   *
    * Nodes can be added to the network through the MPINetwork.addNode method, which takes two arguments: a reference to an AlgorithmInterface, and a NodeType. The method
    * returns an int, which is a handle to the node that has just been created. The AlgorithmInterface
    * determines which algorithm is run during a simulation on a given node. The network is agnostic with regards to what algorithm runs on which node. When a simulation
@@ -152,6 +153,9 @@ public:
 	void makeFirstInputOfSecond(NodeId first, NodeId second,
 			const WeightValue& weight);
 
+	void defineExternalNodeInputAndOutput(NodeId input, NodeId output,
+		const WeightValue& in_weight, const WeightValue& out_weight);
+
 	/**
 	 * Configure the next simulation
 	 * @param simParam The Simulation Parameter
@@ -167,6 +171,14 @@ public:
 	 * Envolve the network by a single timestep
 	 */
 	void evolveSingleStep();
+
+	std::vector<ActivityType> getExternalActivities();
+
+	void setExternalActivities(std::vector<ActivityType> activities);
+
+	void startSimulation();
+
+	void endSimulation();
 
 	MPINode<WeightValue, NodeDistribution>* getNode(NodeId);
 
@@ -185,6 +197,8 @@ private:
 	void incrementMaxNodeId();
 
 	void collectReport(report::ReportType type);
+
+	void addExternalNode();
 
 	/**
 	 * initialize the log stream
@@ -217,6 +231,8 @@ private:
 	/*Time*/ Index getCurrentReportTime() const;
 	/*Time*/ Index getCurrentSimulationTime() const;
 	/*Time*/ Index getCurrentStateTime() const;
+
+	static MPIExternalNode<WeightValue, NodeDistribution> _externalNode;
 
 	/**
 	 * local nodes of the processor

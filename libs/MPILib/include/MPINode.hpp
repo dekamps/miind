@@ -41,7 +41,7 @@ namespace MPILib {
  * MPI communication is handled by this class. MPINode::receiveData and MPINode::sendOwnData are used to transmit information about its state, and to
  * collate information about its precursor nodes so that this information can be passed on to its AlgorithmInterface instance.
  * Two hooks are provided for designers of AlgorithmInterface classes:
- * MPINode::prepareEvolve calls AlgorithmInterface::prepareEvolve, which allows algorithms to collate input contributions to this particular node, 
+ * MPINode::prepareEvolve calls AlgorithmInterface::prepareEvolve, which allows algorithms to collate input contributions to this particular node,
  * whilst MPINode::evolve calls AlgorithmInterface::evolve. These methods can then be overloaded by the designers of a sub class of AlgorithmInterface,
  * i.e. the designers of algorithms. The separation between prepareEvolve and evolve ensure that synchronous network updating can be implemented.
  * The MPINetwork::addPrecursor and MPI::Network::addSuccesor are used by MPINetwork::addNode.
@@ -148,8 +148,6 @@ public:
 	 * Wait that all communication is finished
 	 */
 	static void waitAll();
-
-	void initNode();
 
 	ActivityType getActivity();
 	std::vector<ActivityType> getPrecurserActivity();
