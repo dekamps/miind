@@ -150,8 +150,8 @@ public:
 	static void waitAll();
 
 	ActivityType getActivity();
-	std::vector<ActivityType> getPrecurserActivity();
-	void setPrecurserActivity(std::vector<ActivityType>);
+	void setExternalPrecurserActivity(ActivityType activity);
+	void setExternalPrecursor(const Weight& weight, NodeType nodeType);
 
 protected:
 
@@ -212,6 +212,11 @@ protected:
 	 * Storage for the state of the precursors, to avoid to much communication.
 	 */
 	std::vector<ActivityType> _precursorActivity;
+
+	bool _hasExternalPrecursor = false;
+	ActivityType _externalPrecursorActivity;
+	Weight _externalPrecursorWeight;
+	NodeType _externalPrecursorType;
 
 	Number _number_iterations = 0;
 	Number _maximum_iterations = 0;

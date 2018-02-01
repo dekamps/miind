@@ -30,7 +30,6 @@
 #include <MPILib/include/NetworkState.hpp>
 #include <MPILib/include/report/handler/InactiveReportHandler.hpp>
 #include <MPILib/include/NodeType.hpp>
-#include <MPILib/include/MPIExternalNode.hpp>
 
 namespace MPILib {
 
@@ -152,10 +151,6 @@ public:
 	 */
 	void makeFirstInputOfSecond(NodeId first, NodeId second,
 			const WeightValue& weight);
-
-	void defineExternalNodeInputAndOutput(NodeId input, NodeId output,
-		const WeightValue& in_weight, const WeightValue& out_weight);
-
 	/**
 	 * Configure the next simulation
 	 * @param simParam The Simulation Parameter
@@ -174,14 +169,14 @@ public:
 
 	std::vector<ActivityType> getExternalActivities();
 
-	void setExternalActivities(std::vector<ActivityType> activities);
+	void setExternalPrecursorActivities(std::vector<ActivityType> activities);
 
-	void startSimulation();
+	long startSimulation();
 
 	void endSimulation();
 
-	MPINode<WeightValue, NodeDistribution>* getNode(NodeId);
-
+  void setNodeExternalSuccessor(NodeId node);
+  void setNodeExternalPrecursor(NodeId node, const WeightValue& weight);
 private:
 
 	/**
@@ -198,7 +193,7 @@ private:
 
 	void collectReport(report::ReportType type);
 
-	void addExternalNode();
+	int addExternalNode();
 
 	/**
 	 * initialize the log stream
@@ -232,8 +227,6 @@ private:
 	/*Time*/ Index getCurrentSimulationTime() const;
 	/*Time*/ Index getCurrentStateTime() const;
 
-	static MPIExternalNode<WeightValue, NodeDistribution> _externalNode;
-
 	/**
 	 * local nodes of the processor
 	 */
@@ -242,6 +235,9 @@ private:
 	 * The actual distribution of the nodes.
 	 */
 	static NodeDistribution _nodeDistribution;
+
+  std::vector<NodeId> _externalReceivers;
+  std::vector<NodeId> _externalSenders;
 
 	/**
 	 * The max Node number assigned so far.

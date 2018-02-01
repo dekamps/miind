@@ -41,7 +41,7 @@ MPINode<Weight, NodeDistribution>::MPINode(
 		_nodeId(nodeId), //
 		_rLocalNodes(localNode), //
 		_rNodeDistribution(nodeDistribution),
-		_name(name){
+		_name(name) {
 }
 
 template<class Weight, class NodeDistribution>
@@ -58,10 +58,19 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 	// MdK: 05/07/2017. removed a while loop. The algorithm is now entirely responsible
 	// for evolution up until the required time. The MPINetwork::evolve method will
 	// now check whether algorithms keep consistent time.
+	//printf("PROC %i evolved node %i before copy.\n", utilities::MPIProxy().getRank(), _nodeId);
+	std::vector<ActivityType> _pActivity(_precursorActivity);
+	std::vector<Weight> _pWeights(_weights);
+	std::vector<NodeType> _pTypes(_precursorTypes);
+	if(_hasExternalPrecursor) {
+		_pActivity.push_back(_externalPrecursorActivity);
+		_pWeights.push_back(_externalPrecursorWeight);
+		_pTypes.push_back(_externalPrecursorType);
+	}
 
 	++_number_iterations;
-	_pAlgorithm->evolveNodeState(_precursorActivity, _weights, time,
-				_precursorTypes);
+	
+	_pAlgorithm->evolveNodeState(_pActivity, _pWeights, time, _pTypes);
 	Time t_ret = _pAlgorithm->getCurrentTime();
 
 	if (fabs(t_ret - time) > MPILib::ALGORITHM_NETWORK_DISCREPANCY ){
@@ -79,7 +88,17 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::prepareEvolve() {
-	_pAlgorithm->prepareEvolve(_precursorActivity, _weights, _precursorTypes);
+
+	std::vector<ActivityType> _pActivity(_precursorActivity);
+	std::vector<Weight> _pWeights(_weights);
+	std::vector<NodeType> _pTypes(_precursorTypes);
+	if(_hasExternalPrecursor) {
+		_pActivity.push_back(_externalPrecursorActivity);
+		_pWeights.push_back(_externalPrecursorWeight);
+		_pTypes.push_back(_externalPrecursorType);
+	}
+
+	_pAlgorithm->prepareEvolve(_pActivity, _pWeights, _pTypes);
 
 }
 
@@ -89,13 +108,8 @@ ActivityType MPINode<Weight, NodeDistribution>::getActivity(){
 }
 
 template<class Weight, class NodeDistribution>
-std::vector<ActivityType> MPINode<Weight, NodeDistribution>::getPrecurserActivity() {
-	return _precursorActivity;
-}
-
-template<class Weight, class NodeDistribution>
-void MPINode<Weight, NodeDistribution>::setPrecurserActivity(std::vector<ActivityType> preAct){
-	_precursorActivity = preAct;
+void MPINode<Weight, NodeDistribution>::setExternalPrecurserActivity(ActivityType activity){
+	_externalPrecursorActivity = activity;
 }
 
 template<class Weight, class NodeDistribution>
@@ -113,6 +127,13 @@ void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 			simParam.getHandler().clone());
 
 	_pHandler->initializeHandler(_nodeId);
+}
+
+template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::setExternalPrecursor(const Weight& weight, NodeType nodeType) {
+			_hasExternalPrecursor = true;
+			_externalPrecursorWeight = weight;
+			_externalPrecursorType = nodeType;
 }
 
 template<class Weight, class NodeDistribution>

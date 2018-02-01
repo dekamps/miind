@@ -25,13 +25,13 @@
 #include <iostream>
 #include <cassert>
 #include <fstream>
+#include <boost/timer/timer.hpp>
 #include <MPILib/include/utilities/Log.hpp>
 #include <MPILib/include/utilities/ParallelException.hpp>
 #include <MPILib/include/utilities/IterationNumberException.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <MPILib/include/MPINetwork.hpp>
 #include <MPILib/include/MPINodeCode.hpp>
-#include <MPILib/include/MPIExternalNodeCode.hpp>
 #include <MPILib/include/utilities/ProgressBar.hpp>
 #include <MPILib/include/utilities/MPIProxy.hpp>
 #include <MPILib/include/utilities/Log.hpp>
@@ -47,19 +47,6 @@ MPINetwork<WeightValue, NodeDistribution>::~MPINetwork() {
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::addExternalNode() {
-	if (_nodeDistribution.isLocalNode(0)) {
-		_localNodes.insert(std::make_pair(0, _externalNode));
-		LOG(utilities::logDEBUG2) << "External node generated with id: "
-				<< 0;
-	}
-	nodeIdsType_[0] = NEUTRAL;
-
-	//increment the max NodeId to make sure that it is not assigned twice.
-	incrementMaxNodeId();
-}
-
-template<class WeightValue, class NodeDistribution>
 int MPINetwork<WeightValue, NodeDistribution>::addNode(
 		const AlgorithmInterface<WeightValue>& alg,
 		NodeType nodeType) {
@@ -70,13 +57,6 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 			nodeType == NEUTRAL ||
 			nodeType == EXCITATORY_DIRECT ||
 			nodeType == INHIBITORY_DIRECT);
-
-	// Add the external node to the localNode map in the master process
-	if (_nodeDistribution.isMaster()) {
-		if(_localNodes.empty()) {
-			addExternalNode();
-		}
-	}
 
 	NodeId tempNodeId = getMaxNodeId();
 	if (_nodeDistribution.isLocalNode(tempNodeId)) {
@@ -98,18 +78,24 @@ int MPINetwork<WeightValue, NodeDistribution>::addNode(
 }
 
 template<class WeightValue, class NodeDistribution>
-MPINode<WeightValue, NodeDistribution>* MPINetwork<WeightValue, NodeDistribution>::getNode(NodeId nid) {
-	if (_localNodes.count(nid) > 0)
-		return &(_localNodes.find(nid)->second);
-	else
-		return 0;
+void MPINetwork<WeightValue, NodeDistribution>::setNodeExternalPrecursor(
+	NodeId node, const WeightValue& weight) {
+	if (_nodeDistribution.isLocalNode(node)) {
+		if (_localNodes.count(node) > 0) {
+			_localNodes.find(node)->second.setExternalPrecursor(weight, NEUTRAL);
+		} else {
+			std::stringstream tempStream;
+			tempStream << "the node " << node
+					<< "does not exist on this node";
+			miind_parallel_fail(tempStream.str());
+		}
+	}
+	_externalReceivers.push_back(node);
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::defineExternalNodeInputAndOutput(
-		NodeId input, NodeId output, const WeightValue& in_weight, const WeightValue& out_weight) {
-			makeFirstInputOfSecond(input, 0, in_weight);
-			makeFirstInputOfSecond(0,output, out_weight);
+void MPINetwork<WeightValue, NodeDistribution>::setNodeExternalSuccessor(NodeId node) {
+	_externalSenders.push_back(node);
 }
 
 template<class WeightValue, class NodeDistribution>
@@ -191,25 +177,71 @@ void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 
 template<class WeightValue, class NodeDistribution>
 std::vector<ActivityType> MPINetwork<WeightValue, NodeDistribution>::getExternalActivities(){
-	return _externalNode.getPrecursorActivity();
+	//printf("PROC %i began updating external activities.\n", utilities::MPIProxy().getRank());
+	std::vector<ActivityType> activities = std::vector<ActivityType>();
+
+	if (_nodeDistribution.isMaster()) {
+		for (auto& id : _externalSenders) {
+			if (_nodeDistribution.isLocalNode(id)) {
+				activities.push_back(_localNodes.find(id)->second.getActivity());
+			} else {
+				ActivityType act;
+				utilities::MPIProxy().irecv(_nodeDistribution.getResponsibleProcessor(id), 99,
+						act);
+
+				activities.push_back(act);
+			}
+		}
+	} else {
+		for (auto& id : _externalSenders) {
+			if (_nodeDistribution.isLocalNode(id)) {
+				utilities::MPIProxy().isend(0, 99, _localNodes.find(id)->second.getActivity());
+			}
+		}
+	}
+
+
+	return activities;
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::setExternalActivities(std::vector<ActivityType> activities){
-	_externalNode.setActivities(activities);
+void MPINetwork<WeightValue, NodeDistribution>::setExternalPrecursorActivities(
+std::vector<ActivityType> activities) {
+
+	//printf("PROC %i began updating external precursor activities.\n", utilities::MPIProxy().getRank());
+
+	if (_nodeDistribution.isMaster()) {
+		int i=0;
+		for (auto& id : _externalReceivers) {
+			if (_nodeDistribution.isLocalNode(id)) {
+				_localNodes.find(id)->second.setExternalPrecurserActivity(activities[i]);
+			} else {
+				utilities::MPIProxy().isend(_nodeDistribution.getResponsibleProcessor(id), 99,
+						activities[i]);
+			}
+			i++;
+		}
+	} else {
+		for (auto& id : _externalReceivers) {
+			if (_nodeDistribution.isLocalNode(id)) {
+				ActivityType act;
+				utilities::MPIProxy().irecv(0, 99, act);
+				_localNodes.find(id)->second.setExternalPrecurserActivity(act);
+			}
+		}
+	}
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::startSimulation() {
+long MPINetwork<WeightValue, NodeDistribution>::startSimulation() {
 	if (_stateNetwork.isConfigured()) {
 		_stateNetwork.toggleConfigured();
 
 		LOG(utilities::logINFO) << "Starting simulation";
 		// the report time must be taken as a hint if the network time step is larger (MdK: 31/08/2017)
-		long count = (_parameterSimulationRun.getTReport() < _parameterSimulationRun.getTStep()) ? \
-				      static_cast<long>(_parameterSimulationRun.getTEnd()/_parameterSimulationRun.getTStep()) : \
-				      static_cast<long>(_parameterSimulationRun.getTEnd()/_parameterSimulationRun.getTReport());
+		return static_cast<long>(_parameterSimulationRun.getTEnd()/_parameterSimulationRun.getTStep());
 	}
+	return 0;
 }
 
 template<class WeightValue, class NodeDistribution>
@@ -221,8 +253,9 @@ void MPINetwork<WeightValue, NodeDistribution>::evolveSingleStep() {
 		// business as usual: keep evolving, as long as there is nothing to report
 		// or to update
 		updateSimulationTime();
-
+		//printf("PROC %i - Waiting\n", MPILib::utilities::MPIProxy().getRank());
 		MPINode<WeightValue, NodeDistribution>::waitAll();
+		//printf("PROC %i - Passed\n", MPILib::utilities::MPIProxy().getRank());
 		for (auto& it : _localNodes)
 			it.second.prepareEvolve();
 
@@ -281,14 +314,17 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 			do {
 				do {
 
+					setExternalPrecursorActivities(std::vector<ActivityType>());
+
 					LOG(utilities::logDEBUG)
 							<< "****** one evolve step finished ******";
 
 					// business as usual: keep evolving, as long as there is nothing to report
 					// or to update
 					updateSimulationTime();
-
+					//printf("PROC %i - Waiting\n", MPILib::utilities::MPIProxy().getRank());
 					MPINode<WeightValue, NodeDistribution>::waitAll();
+					//printf("PROC %i - Passed\n", MPILib::utilities::MPIProxy().getRank());
 					for (auto& it : _localNodes)
 						it.second.prepareEvolve();
 
@@ -296,6 +332,8 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					//evolve all local nodes
 					for (auto& it : _localNodes)
 						it.second.evolve(t_current);
+
+					getExternalActivities();
 
 
  				} while (getCurrentSimulationTime() < getCurrentReportTime()
@@ -431,10 +469,6 @@ std::map<NodeId, MPINode<WeightValue, NodeDistribution>> MPINetwork<WeightValue,
 
 template<class WeightValue, class NodeDistribution>
 NodeDistribution MPINetwork<WeightValue, NodeDistribution>::_nodeDistribution;
-
-template<class WeightValue, class NodeDistribution>
-MPIExternalNode<WeightValue, NodeDistribution> MPINetwork<WeightValue, NodeDistribution>::_externalNode( MPINetwork<WeightValue, NodeDistribution>::_nodeDistribution, MPINetwork<WeightValue,NodeDistribution>::_localNodes);
-
 }
 
 #endif //MPILIB_MPINETWORK_CODE_HPP_
