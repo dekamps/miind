@@ -35,10 +35,33 @@ int sigmoid(double, const double y[], double f[], void *params) {
 	auto p_parameter = (MPILib::WilsonCowanParameter *) params;
 
 	f[0] = (-y[0]
-			+ p_parameter->_rate_maximum
-					/ (1 + exp(-p_parameter->_f_noise * p_parameter->_f_input - p_parameter->_f_bias)))
+			+ ((p_parameter->_rate_maximum - (p_parameter->_f_smoothing*y[0])) *
+					((1.0 / (1 + exp(-p_parameter->_f_noise * (p_parameter->_f_input - p_parameter->_f_bias)))) -
+					(1.0 / (1 + exp(p_parameter->_f_noise * p_parameter->_f_bias)))))
+				)
 			/ p_parameter->_time_membrane;
+	return GSL_SUCCESS;
+}
 
+int sigmoid_tvb(double, const double y[], double f[], void *params) {
+	auto p_parameter = (MPILib::WilsonCowanParameter *) params;
+
+	f[0] = (-y[0]
+			+ ((p_parameter->_rate_maximum - (p_parameter->_f_smoothing*y[0])) *
+					(1.0 / (1 + exp(-p_parameter->_f_noise * (p_parameter->_f_input - p_parameter->_f_bias))))
+				))
+			/ p_parameter->_time_membrane;
+	return GSL_SUCCESS;
+}
+
+int sigmoid_ann(double, const double y[], double f[], void *params) {
+	auto p_parameter = (MPILib::WilsonCowanParameter *) params;
+
+	f[0] = (-y[0]
+			+ p_parameter->_rate_maximum *
+					(1.0 / (1 + exp(-p_parameter->_f_noise * p_parameter->_f_input - p_parameter->_f_bias)))
+				)
+			/ p_parameter->_time_membrane;
 	return GSL_SUCCESS;
 }
 
@@ -64,15 +87,15 @@ using namespace MPILib;
 WilsonCowanAlgorithm::WilsonCowanAlgorithm() :
   MPILib::AlgorithmInterface<double>(), _integrator(0, getInitialState(), 0, 0,
 				NumtoolsLib::Precision(WC_ABSOLUTE_PRECISION,
-						WC_RELATIVE_PRECISION), sigmoid, sigmoidprime) {
+						WC_RELATIVE_PRECISION), sigmoid_tvb, sigmoidprime) {
 
 }
 
 WilsonCowanAlgorithm::WilsonCowanAlgorithm(const WilsonCowanParameter&parameter) :
   MPILib::AlgorithmInterface<double>(), _parameter(parameter), _integrator(0,
-				getInitialState(), 0, 0,
+				std::vector<double>({parameter._f_input}), 0, 0,
 				NumtoolsLib::Precision(WC_ABSOLUTE_PRECISION,
-						WC_RELATIVE_PRECISION), sigmoid, sigmoidprime) {
+						WC_RELATIVE_PRECISION), sigmoid_tvb, sigmoidprime) {
 	_integrator.Parameter() = _parameter;
 }
 
@@ -87,7 +110,7 @@ void WilsonCowanAlgorithm::configure(const SimulationRunParameter& simParam) {
 
 	NumtoolsLib::DVIntegratorStateParameter<WilsonCowanParameter> parameter_dv;
 
-	parameter_dv._vector_state = std::vector<double>(1, 0);
+	parameter_dv._vector_state = std::vector<double>(1, _parameter._f_input);
 	parameter_dv._time_begin = simParam.getTBegin();
 	parameter_dv._time_end = simParam.getTEnd();
 	parameter_dv._time_step = simParam.getTStep();
@@ -151,4 +174,3 @@ std::vector<double> WilsonCowanAlgorithm::getInitialState() const {
 AlgorithmGrid WilsonCowanAlgorithm::getGrid(NodeId, bool) const {
 	return _integrator.State();
 }
-
