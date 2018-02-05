@@ -1,11 +1,11 @@
-project( ${MIIND_LIBRARY_PREFIX}pythonwrapper )
+project( ${MIIND_LIBRARY_PREFIX}pythonmodel )
 
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
-include_directories( ../ )
-include_directories( ../GeomLib )
-include_directories( ../TwoDLib )
+include_directories( ../../ )
+include_directories( ../../GeomLib )
+include_directories( ../../TwoDLib )
 set( LIB_TYPE SHARED )
 
 IF (ENABLE_ROOT)
@@ -21,10 +21,7 @@ IF (ENABLE_ROOT)
    include(${ROOT_USE_FILE})
 
    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-   ROOT_GENERATE_DICTIONARY(G__Event Event.h LINKDEF EventLinkDef.h)
 
-   #---Create a shared library with geneated dictionary (don't want to do that now; maybe not ever)
-   # add_library(Event SHARED Event.cxx G__Event.cxx)
    # target_link_libraries(Event ${ROOT_LIBRARIES})
    add_definitions("-DWANTROOT")
 ENDIF(ENABLE_ROOT)
@@ -36,7 +33,7 @@ INCLUDE_DIRECTORIES(
 )
 
 set( PW_SRC
-test.cpp
+miind_generic.cpp
 )
 
 set( PW_HEADERS
@@ -53,13 +50,13 @@ set ( LIBLIST
     ${Boost_LIBRARIES}
 )
 
-add_library( miindpw ${LIB_TYPE} ${PW_SRC} ${PW_HEADERS})
+add_library( miindpython ${LIB_TYPE} ${PW_SRC} ${PW_HEADERS})
 
-target_link_libraries( miindpw ${LIBLIST} -lpython2.7 -lboost_python)
+target_link_libraries( miindpython ${LIBLIST} -lpython2.7 -lboost_python)
 
 install( FILES ${numtools_HEADERS}
-    DESTINATION include/miind/PWlib )
+    DESTINATION include/miind/PWlib/model )
 
-install( TARGETS miindpw
+install( TARGETS miindpython
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib )

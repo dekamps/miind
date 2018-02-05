@@ -253,9 +253,9 @@ void MPINetwork<WeightValue, NodeDistribution>::evolveSingleStep() {
 		// business as usual: keep evolving, as long as there is nothing to report
 		// or to update
 		updateSimulationTime();
-		//printf("PROC %i - Waiting\n", MPILib::utilities::MPIProxy().getRank());
+
 		MPINode<WeightValue, NodeDistribution>::waitAll();
-		//printf("PROC %i - Passed\n", MPILib::utilities::MPIProxy().getRank());
+
 		for (auto& it : _localNodes)
 			it.second.prepareEvolve();
 
@@ -322,9 +322,9 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					// business as usual: keep evolving, as long as there is nothing to report
 					// or to update
 					updateSimulationTime();
-					//printf("PROC %i - Waiting\n", MPILib::utilities::MPIProxy().getRank());
+
 					MPINode<WeightValue, NodeDistribution>::waitAll();
-					//printf("PROC %i - Passed\n", MPILib::utilities::MPIProxy().getRank());
+
 					for (auto& it : _localNodes)
 						it.second.prepareEvolve();
 

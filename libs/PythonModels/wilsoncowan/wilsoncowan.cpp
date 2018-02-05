@@ -7,7 +7,7 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/RateAlgorithmCode.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
-#include <MPILib/include/report/handler/RootHighThroughputHandler.hpp>
+#include <MPILib/include/report/handler/InactiveReportHandler.hpp>
 #include <MPILib/include/WilsonCowanAlgorithm.hpp>
 #include <MPILib/include/PersistantAlgorithm.hpp>
 #include <MPILib/include/DelayAlgorithmCode.hpp>
@@ -23,7 +23,7 @@ MPILib::Rate External_RateFunction(MPILib::Time t){
 	return 1.0;
 }
 
-class Wrapped {
+class MiindWilsonCowan {
 private:
 	Network network;
 	boost::timer::auto_cpu_timer t;
@@ -35,11 +35,11 @@ private:
 	double _time_step; // ms
 public:
 
-	Wrapped(int num_nodes, long simulation_length, double dt) :
+	MiindWilsonCowan(int num_nodes, long simulation_length, double dt) :
 		_num_nodes(num_nodes), _simulation_length(simulation_length), _time_step(dt){
 	}
 
-	~Wrapped() {
+	~MiindWilsonCowan() {
 		endSimulation();
 	}
 
@@ -132,8 +132,9 @@ public:
 				network.setNodeExternalPrecursor(id, 1);
 			}
 
-			std::string sim_name = "miind_wc_output/wc";
-			MPILib::report::handler::RootHighThroughputHandler handler(sim_name,true);
+			std::string sim_name = "miind_wc";
+			MPILib::report::handler::InactiveReportHandler handler =
+											MPILib::report::handler::InactiveReportHandler();
 
 			SimulationRunParameter par_run( handler,(_simulation_length/_time_step)+1,0,
 											_simulation_length,_time_step,_time_step,sim_name,_time_step);
@@ -143,10 +144,6 @@ public:
 		} catch(std::exception& exc){
 			std::cout << exc.what() << std::endl;
 		}
-	}
-
-	void evolve() {
-		network.evolve();
 	}
 
 	void startSimulation() {
@@ -179,18 +176,19 @@ public:
 	void endSimulation() {
 		network.endSimulation();
 		t.stop();
-		t.report();
+		if(utilities::MPIProxy().getRank() == 0) {
+			t.report();
+		}
 	}
 };
 
-BOOST_PYTHON_MODULE(libmiindpw)
+BOOST_PYTHON_MODULE(libmiindwc)
 {
 	using namespace boost::python;
-	class_<Wrapped>("Wrapped", init<int,long,double>())
-		.def("setInitialValues", &Wrapped::setInitialValues)
-		.def("init", &Wrapped::init)
-		.def("evolve", &Wrapped::evolve)
-		.def("startSimulation", &Wrapped::startSimulation)
-		.def("endSimulation", &Wrapped::endSimulation)
-		.def("evolveSingleStep", &Wrapped::evolveSingleStep);
+	class_<MiindWilsonCowan>("MiindWilsonCowan", init<int,long,double>())
+		.def("setInitialValues", &MiindWilsonCowan::setInitialValues)
+		.def("init", &MiindWilsonCowan::init)
+		.def("startSimulation", &MiindWilsonCowan::startSimulation)
+		.def("endSimulation", &MiindWilsonCowan::endSimulation)
+		.def("evolveSingleStep", &MiindWilsonCowan::evolveSingleStep);
 }
