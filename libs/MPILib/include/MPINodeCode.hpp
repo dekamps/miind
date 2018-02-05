@@ -69,7 +69,7 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 	}
 
 	++_number_iterations;
-	
+
 	_pAlgorithm->evolveNodeState(_pActivity, _pWeights, time, _pTypes);
 	Time t_ret = _pAlgorithm->getCurrentTime();
 

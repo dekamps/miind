@@ -3,14 +3,11 @@
 #include <vector>
 #include <boost/timer/timer.hpp>
 #include <GeomLib.hpp>
-#include <TwoDLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/RateAlgorithmCode.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
 #include <MPILib/include/report/handler/InactiveReportHandler.hpp>
 #include <MPILib/include/WilsonCowanAlgorithm.hpp>
-#include <MPILib/include/PersistantAlgorithm.hpp>
-#include <MPILib/include/DelayAlgorithmCode.hpp>
 #include <MPILib/include/RateFunctorCode.hpp>
 #include <MPILib/include/utilities/ProgressBar.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
@@ -22,7 +19,15 @@ typedef MPILib::MPINetwork<double, MPILib::utilities::CircularDistribution> Netw
 MPILib::Rate External_RateFunction(MPILib::Time t){
 	return 1.0;
 }
-
+/* This class is designed to be used in conjunction with
+ * tvb.simulator.models.Miind_WilsonCowan.py only. Any updates to this shared library
+ * should be communicated to the TVB team and a new .so file should be provided
+ * to be included in the tvb-library source tree (tvb-library/tvb/simulator/models/).
+ *
+ * Note that MPI_init is not called (through boost::mpi::environment or otherwise)
+ * It is expected that, while TVB source doesn't need to know about MPI, the calling
+ * working directory script does (otherwise, why are you calling eg mpiexec/mpirun?)
+ */
 class MiindWilsonCowan {
 private:
 	Network network;
@@ -43,6 +48,8 @@ public:
 		endSimulation();
 	}
 
+	// In general, we won't need to set initial values but we implement it here
+	// so that we can match TVB's Wilson Cowan example.
 	void setInitialValues(boost::python::list E_vals, boost::python::list I_vals) {
 		for(int i=0; i<_num_nodes; i++) {
 			E_Initials.push_back(boost::python::extract<double>(E_vals[i]));
@@ -104,7 +111,6 @@ public:
 				MPILib::Rate RateFunction_Q(MPILib::Time);
 				MPILib::RateFunctor<double> rate_functor_q(External_RateFunction);
 
-				// generating nodes
 				MPILib::NodeId id_E = network.addNode(E_alg, MPILib::EXCITATORY_DIRECT);
 				MPILib::NodeId id_I = network.addNode(I_alg, MPILib::INHIBITORY_DIRECT);
 				MPILib::NodeId id_P = network.addNode(rate_functor_p, MPILib::NEUTRAL);
@@ -122,6 +128,7 @@ public:
 
 			}
 
+			// Set each node to have an external successor (for coupling input from TVB)
 			for(auto& id : E_ids) {
 				network.setNodeExternalSuccessor(id);
 				network.setNodeExternalPrecursor(id, 1);
@@ -146,8 +153,19 @@ public:
 		}
 	}
 
-	void startSimulation() {
+	int startSimulation() {
 		pb = new MPILib::utilities::ProgressBar(network.startSimulation());
+
+		// child processes just loop here - evolve isn't called here to avoid a deadlock
+		// issue - would like to fix.
+		if(utilities::MPIProxy().getRank() > 0)
+			for(int i=0; i<int(_simulation_length/_time_step); i++)
+				evolveSingleStep(boost::python::list());
+
+		// Return the MPI process rank so that the host python program can
+		// end child processes after evolve (otherwise, it'll continue to try to
+	  // generate a new TVB simulation which it already did in rank 0)
+		return utilities::MPIProxy().getRank();
 	}
 
 	boost::python::list evolveSingleStep(boost::python::list c) {
@@ -182,6 +200,8 @@ public:
 	}
 };
 
+// The module name (libmiindwc) must match the name of the generated shared
+// library as defined in the CMakeLists file (libmiindwc.so)
 BOOST_PYTHON_MODULE(libmiindwc)
 {
 	using namespace boost::python;

@@ -1,12 +1,16 @@
-project( ${MIIND_LIBRARY_PREFIX}pythonmodel )
+project( ${MIIND_LIBRARY_PREFIX}pythonmodule )
 
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
-include_directories( ../../ )
-include_directories( ../../GeomLib )
-include_directories( ../../TwoDLib )
+include_directories( ../../../libs/ )
+include_directories( ../../../libs/GeomLib )
+include_directories( ../../../libs/TwoDLib )
 set( LIB_TYPE SHARED )
+
+# TVB does not support MPI - as this Wilson Cowan shared library goes into the TVB source code,
+# stick to MPI disabled. For other TVB-MIIND models, we can use MPI as we like.
+set(ENABLE_MPI OFF)
 
 IF (ENABLE_ROOT)
    # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
@@ -32,8 +36,8 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_BINARY_DIR}/../
 )
 
-set( PW_SRC
-miind_generic.cpp
+set( TVB_WC_SRC
+tvb_wilsoncowan.cpp
 )
 
 set( PW_HEADERS
@@ -50,13 +54,6 @@ set ( LIBLIST
     ${Boost_LIBRARIES}
 )
 
-add_library( miindpython ${LIB_TYPE} ${PW_SRC} ${PW_HEADERS})
+add_library( miindwc ${LIB_TYPE} ${TVB_WC_SRC} ${PW_HEADERS})
 
-target_link_libraries( miindpython ${LIBLIST} -lpython2.7 -lboost_python)
-
-install( FILES ${numtools_HEADERS}
-    DESTINATION include/miind/PWlib/model )
-
-install( TARGETS miindpython
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib )
+target_link_libraries( miindwc ${LIBLIST} -lpython2.7 -lboost_python)

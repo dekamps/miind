@@ -1,11 +1,11 @@
-project( ${MIIND_LIBRARY_PREFIX}pythonmodule )
+project( ${MIIND_LIBRARY_PREFIX}pythonmodel )
 
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
-include_directories( ../../ )
-include_directories( ../../GeomLib )
-include_directories( ../../TwoDLib )
+include_directories( ../../../libs/ )
+include_directories( ../../../libs/GeomLib )
+include_directories( ../../../libs/TwoDLib )
 set( LIB_TYPE SHARED )
 
 IF (ENABLE_ROOT)
@@ -32,8 +32,8 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_BINARY_DIR}/../
 )
 
-set( PW_SRC
-wilsoncowan.cpp
+set( TVB_LIF_SRC
+tvb_lif.cpp
 )
 
 set( PW_HEADERS
@@ -50,13 +50,6 @@ set ( LIBLIST
     ${Boost_LIBRARIES}
 )
 
-add_library( miindwc ${LIB_TYPE} ${PW_SRC} ${PW_HEADERS})
+add_library( miindlif ${LIB_TYPE} ${TVB_LIF_SRC} ${PW_HEADERS})
 
-target_link_libraries( miindwc ${LIBLIST} -lpython2.7 -lboost_python)
-
-install( FILES ${numtools_HEADERS}
-    DESTINATION include/miind/PWlib )
-
-install( TARGETS miindwc
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib )
+target_link_libraries( miindlif ${LIBLIST} -lpython2.7 -lboost_python)

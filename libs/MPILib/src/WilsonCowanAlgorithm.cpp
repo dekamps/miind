@@ -51,6 +51,7 @@ int sigmoid_tvb(double, const double y[], double f[], void *params) {
 					(1.0 / (1 + exp(-p_parameter->_f_noise * (p_parameter->_f_input - p_parameter->_f_bias))))
 				))
 			/ p_parameter->_time_membrane;
+
 	return GSL_SUCCESS;
 }
 
@@ -128,6 +129,8 @@ void WilsonCowanAlgorithm::evolveNodeState(const std::vector<Rate>& nodeVector,
 		const std::vector<double>& weightVector, Time time) {
 
 	double f_inner_product = innerProduct(nodeVector, weightVector);
+
+	//printf("%f, %f, %f, %f, %f\n", nodeVector[0] * weightVector[0], nodeVector[1] * weightVector[1], nodeVector[2] * weightVector[2], nodeVector[3] * weightVector[3], nodeVector[4] * weightVector[4]);
 
 	_integrator.Parameter()._f_input = f_inner_product;
 

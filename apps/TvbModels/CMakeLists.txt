@@ -1,6 +1,2 @@
 ADD_SUBDIRECTORY( wilsoncowan )
-ADD_SUBDIRECTORY( generic )
-
-
-
-
+ADD_SUBDIRECTORY( lif )
