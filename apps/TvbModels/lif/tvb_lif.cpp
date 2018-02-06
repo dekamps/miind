@@ -45,12 +45,11 @@ public:
 	{
 		try {
 
-      std::vector<std::string> vec_mat_0{"lif_0.005_0_0.mat"};
-    	TwoDLib::MeshAlgorithm<DelayedConnection> alg_mesh_0("lif.model",vec_mat_0,0.000770095348827);
-
-      DelayedConnection con_external(6000,0.005,0);
-
 			for(int i=0; i<_num_nodes; i++) {
+				std::vector<std::string> vec_mat_0{"lif_0.005_0_0.mat"};
+	    	TwoDLib::MeshAlgorithm<DelayedConnection> alg_mesh_0("lif.model",vec_mat_0,0.000770095348827);
+
+	      DelayedConnection con_external(6000,0.005,0);
 				// As a basic example, we just implement a single lif node for each region
 				// in TVB's connectivity.
 				MPILib::NodeId id_0 = network.addNode(alg_mesh_0, MPILib::EXCITATORY_DIRECT);
@@ -87,7 +86,7 @@ public:
 		// issue - would like to fix.
 
 		if(utilities::MPIProxy().getRank() > 0)
-			for(int i=0; i<int(_simulation_length/0.000770095348827); i++)
+			for(int i=0; i<int(_simulation_length/0.000770095348827)+1; i++)
 				evolveSingleStep(boost::python::list());
 
 		// Return the MPI process rank so that the host python program can
@@ -105,16 +104,12 @@ public:
 			activity.push_back(ca);
 		}
 
-		network.setExternalPrecursorActivities(activity);
-
-		network.evolveSingleStep();
-
-		(*pb)++;
-
 		boost::python::list out;
-		for(auto& it : network.getExternalActivities()) {
+		for(auto& it : network.evolveSingleStep(activity)) {
 			out.append(it);
 		}
+
+		(*pb)++;
 
 		return out;
 	}

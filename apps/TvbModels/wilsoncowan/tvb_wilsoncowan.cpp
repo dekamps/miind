@@ -176,17 +176,13 @@ public:
 			double ca = boost::python::extract<double>(c[i]);
 			activity.push_back(ca);
 		}
-
-		network.setExternalPrecursorActivities(activity);
-
-		network.evolveSingleStep();
-
-		(*pb)++;
-
+		
 		boost::python::list out;
-		for(auto& it : network.getExternalActivities()) {
+		for(auto& it : network.evolveSingleStep(activity)) {
 			out.append(it);
 		}
+
+		(*pb)++;
 
 		return out;
 	}

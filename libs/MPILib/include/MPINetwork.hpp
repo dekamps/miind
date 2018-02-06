@@ -165,9 +165,9 @@ public:
 	/**
 	 * Envolve the network by a single timestep
 	 */
-	void evolveSingleStep();
+	std::vector<ActivityType> evolveSingleStep(std::vector<ActivityType> activity);
 
-	std::vector<ActivityType> getExternalActivities();
+	void getExternalActivities();
 
 	void setExternalPrecursorActivities(std::vector<ActivityType> activities);
 
@@ -238,7 +238,7 @@ private:
 
   std::vector<NodeId> _externalReceivers;
   std::vector<NodeId> _externalSenders;
-
+  std::vector<ActivityType> _current_activities;
 	/**
 	 * The max Node number assigned so far.
 	 * @attention This number is only handled by the master node. Therefore never access it direct!

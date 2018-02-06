@@ -50,6 +50,7 @@ MPINode<Weight, NodeDistribution>::~MPINode() {
 
 template<class Weight, class NodeDistribution>
 Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
+
 	// A Node will call its Algorithm to update its state up until time 'time'. It will
 	// return the time maintained by the Algorithm. This time may be sligthly different due to
 	// rounding errors. Network::evolve will use this time to check whether Algorithms keep synchronized
@@ -113,6 +114,11 @@ void MPINode<Weight, NodeDistribution>::setExternalPrecurserActivity(ActivityTyp
 }
 
 template<class Weight, class NodeDistribution>
+void MPINode<Weight, NodeDistribution>::recvExternalPrecurserActivity(NodeId id, int tag){
+	utilities::MPIProxy().irecv(id, tag, _externalPrecursorActivity);
+}
+
+template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 		const SimulationRunParameter& simParam) {
 
@@ -154,6 +160,11 @@ void MPINode<Weight, NodeDistribution>::addSuccessor(NodeId nodeId) {
 template<class Weight, class NodeDistribution>
 ActivityType MPINode<Weight, NodeDistribution>::getActivity() const {
 	return _activity;
+}
+
+template<class Weight, class NodeDistribution>
+ActivityType MPINode<Weight, NodeDistribution>::getExternalPrecursorActivity() {
+	return _externalPrecursorActivity;
 }
 
 template<class Weight, class NodeDistribution>

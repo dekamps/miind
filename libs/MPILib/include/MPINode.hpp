@@ -150,7 +150,9 @@ public:
 	static void waitAll();
 
 	ActivityType getActivity();
+	ActivityType getExternalPrecursorActivity();
 	void setExternalPrecurserActivity(ActivityType activity);
+	void recvExternalPrecurserActivity(NodeId id, int tag);
 	void setExternalPrecursor(const Weight& weight, NodeType nodeType);
 
 protected:

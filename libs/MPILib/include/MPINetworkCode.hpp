@@ -176,39 +176,31 @@ void MPINetwork<WeightValue, NodeDistribution>::configureSimulation(
 }
 
 template<class WeightValue, class NodeDistribution>
-std::vector<ActivityType> MPINetwork<WeightValue, NodeDistribution>::getExternalActivities(){
-	//printf("PROC %i began updating external activities.\n", utilities::MPIProxy().getRank());
-	std::vector<ActivityType> activities = std::vector<ActivityType>();
+void MPINetwork<WeightValue, NodeDistribution>::getExternalActivities(){
 
 	if (_nodeDistribution.isMaster()) {
+		int i=0;
 		for (auto& id : _externalSenders) {
 			if (_nodeDistribution.isLocalNode(id)) {
-				activities.push_back(_localNodes.find(id)->second.getActivity());
+				_current_activities[i] = _localNodes.find(id)->second.getActivity();
 			} else {
-				ActivityType act;
-				utilities::MPIProxy().irecv(_nodeDistribution.getResponsibleProcessor(id), 99,
-						act);
-
-				activities.push_back(act);
+				utilities::MPIProxy().irecv(_nodeDistribution.getResponsibleProcessor(id), 999,
+						_current_activities[i]);
 			}
+			i++;
 		}
 	} else {
 		for (auto& id : _externalSenders) {
 			if (_nodeDistribution.isLocalNode(id)) {
-				utilities::MPIProxy().isend(0, 99, _localNodes.find(id)->second.getActivity());
+				utilities::MPIProxy().isend(0, 999, _localNodes.find(id)->second.getActivity());
 			}
 		}
 	}
-
-
-	return activities;
 }
 
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::setExternalPrecursorActivities(
 std::vector<ActivityType> activities) {
-
-	//printf("PROC %i began updating external precursor activities.\n", utilities::MPIProxy().getRank());
 
 	if (_nodeDistribution.isMaster()) {
 		int i=0;
@@ -216,7 +208,7 @@ std::vector<ActivityType> activities) {
 			if (_nodeDistribution.isLocalNode(id)) {
 				_localNodes.find(id)->second.setExternalPrecurserActivity(activities[i]);
 			} else {
-				utilities::MPIProxy().isend(_nodeDistribution.getResponsibleProcessor(id), 99,
+				utilities::MPIProxy().isend(_nodeDistribution.getResponsibleProcessor(id), 999,
 						activities[i]);
 			}
 			i++;
@@ -224,9 +216,7 @@ std::vector<ActivityType> activities) {
 	} else {
 		for (auto& id : _externalReceivers) {
 			if (_nodeDistribution.isLocalNode(id)) {
-				ActivityType act;
-				utilities::MPIProxy().irecv(0, 99, act);
-				_localNodes.find(id)->second.setExternalPrecurserActivity(act);
+				_localNodes.find(id)->second.recvExternalPrecurserActivity(0,999);
 			}
 		}
 	}
@@ -245,7 +235,7 @@ long MPINetwork<WeightValue, NodeDistribution>::startSimulation() {
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::evolveSingleStep() {
+std::vector<ActivityType> MPINetwork<WeightValue, NodeDistribution>::evolveSingleStep(std::vector<ActivityType> activity) {
 	try {
 		LOG(utilities::logDEBUG)
 				<< "****** one evolve step finished ******";
@@ -253,6 +243,10 @@ void MPINetwork<WeightValue, NodeDistribution>::evolveSingleStep() {
 		// business as usual: keep evolving, as long as there is nothing to report
 		// or to update
 		updateSimulationTime();
+
+		// Send activity to each node from process 0 from external systems
+		// such as TVB
+		setExternalPrecursorActivities(activity);
 
 		MPINode<WeightValue, NodeDistribution>::waitAll();
 
@@ -280,10 +274,21 @@ void MPINetwork<WeightValue, NodeDistribution>::evolveSingleStep() {
 		}
 
 		collectReport(report::STATE);
+
+		// Send activity of each node to process 0 to be passed to external systems
+		// such as TVB
+		_current_activities = std::vector<ActivityType>(_externalSenders.size());
+
+		getExternalActivities();
+
+		utilities::MPIProxy().waitAll();
+
+		return _current_activities;
 	}
 	catch (utilities::IterationNumberException &e) {
 		LOG(utilities::logWARNING) << "NUMBER OF ITERATIONS EXCEEDED\n";
 		_stateNetwork.setResult(NUMBER_ITERATIONS_ERROR);
+		return (std::vector<ActivityType>());
 	}
 
 }
@@ -314,8 +319,6 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 			do {
 				do {
 
-					setExternalPrecursorActivities(std::vector<ActivityType>());
-
 					LOG(utilities::logDEBUG)
 							<< "****** one evolve step finished ******";
 
@@ -332,9 +335,6 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 					//evolve all local nodes
 					for (auto& it : _localNodes)
 						it.second.evolve(t_current);
-
-					getExternalActivities();
-
 
  				} while (getCurrentSimulationTime() < getCurrentReportTime()
 						&& getCurrentSimulationTime() < getCurrentStateTime());
