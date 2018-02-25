@@ -1,5 +1,4 @@
 #include <boost/python.hpp>
-#include <boost/mpi/environment.hpp>
 #include <vector>
 #include <boost/timer/timer.hpp>
 #include <GeomLib.hpp>
@@ -12,8 +11,6 @@
 #include <MPILib/include/utilities/ProgressBar.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 #include <MPILib/include/MiindTvbModelAbstract.hpp>
-
-typedef MPILib::MPINetwork<DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 
 /** This class is generically named MiindModel so no code change is required in TVB.
  * We can implement any simulation we desire and once the shared library is generated,
@@ -31,7 +28,7 @@ public:
 	MiindModel(int num_nodes, long simulation_length) :
 		MiindTvbModelAbstract(num_nodes, simulation_length){}
 
-	void init()
+	void init(boost::python::list params)
 	{
 		_time_step = 0.000770095348827;
 		for(int i=0; i<_num_nodes; i++) {
@@ -69,9 +66,9 @@ public:
 BOOST_PYTHON_MODULE(libmiindlif)
 {
 	using namespace boost::python;
-	class_<MiindModel>("MiindModel", init<int,long>())
-		.def("init", &MiindModel::init)
-		.def("startSimulation", &MiindModel::startSimulation)
-		.def("endSimulation", &MiindModel::endSimulation)
-		.def("evolveSingleStep", &MiindModel::evolveSingleStep);
+	define_python_MiindTvbModelAbstract<DelayedConnection, MPILib::utilities::CircularDistribution>();
+
+	class_<MiindModel, bases<MPILib::MiindTvbModelAbstract<DelayedConnection,
+				MPILib::utilities::CircularDistribution>>>("MiindModel", init<int,long>())
+		.def("init", &MiindModel::init);
 }

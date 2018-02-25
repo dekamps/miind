@@ -1,5 +1,4 @@
 #include <boost/python.hpp>
-#include <boost/mpi/environment.hpp>
 #include <vector>
 #include <boost/timer/timer.hpp>
 #include <GeomLib.hpp>
@@ -29,7 +28,7 @@ public:
 		endSimulation();
 	}
 
-	virtual void init();
+	virtual void init(boost::python::list) {};
 
 	int startSimulation() {
 		pb = new utilities::ProgressBar(network.startSimulation());
@@ -81,6 +80,16 @@ protected:
 	double _time_step; // ms
 	int _num_nodes;
 };
+
+template<class Weight, class NodeDistribution>
+void define_python_MiindTvbModelAbstract()
+{
+	using namespace boost::python;
+    class_<MiindTvbModelAbstract<Weight, NodeDistribution>>("MiindTvbModelAbstract", init<int,long>())
+				.def("startSimulation", &MiindTvbModelAbstract<Weight, NodeDistribution>::startSimulation)
+				.def("endSimulation", &MiindTvbModelAbstract<Weight, NodeDistribution>::endSimulation)
+				.def("evolveSingleStep", &MiindTvbModelAbstract<Weight, NodeDistribution>::evolveSingleStep);
+}
 
 }
 

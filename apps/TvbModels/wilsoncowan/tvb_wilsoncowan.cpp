@@ -1,5 +1,4 @@
 #include <boost/python.hpp>
-#include <boost/mpi/environment.hpp>
 #include <vector>
 #include <boost/timer/timer.hpp>
 #include <GeomLib.hpp>
@@ -13,14 +12,13 @@
 #include <MPILib/include/BasicDefinitions.hpp>
 #include <MPILib/include/WilsonCowanParameter.hpp>
 #include <MPILib/include/WilsonCowanAlgorithm.hpp>
-
-typedef MPILib::MPINetwork<double, MPILib::utilities::CircularDistribution> Network;
+#include <MPILib/include/MiindTvbModelAbstract.hpp>
 
 MPILib::Rate External_RateFunction(MPILib::Time t){
 	return 1.0;
 }
 /* This class is designed to be used in conjunction with
- * tvb.simulator.models.Miind_WilsonCowan.py only. Any updates to this shared library
+ * Miind_WilsonCowan.py only. Any updates to this shared library
  * should be communicated to the TVB team and a new .so file should be provided
  * to be included in the tvb-library source tree (tvb-library/tvb/simulator/models/).
  *
@@ -28,25 +26,17 @@ MPILib::Rate External_RateFunction(MPILib::Time t){
  * It is expected that, while TVB source doesn't need to know about MPI, the calling
  * working directory script does (otherwise, why are you calling eg mpiexec/mpirun?)
  */
-class MiindWilsonCowan {
+class MiindWilsonCowan : public MPILib::MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>{
 private:
-	Network network;
-	boost::timer::auto_cpu_timer t;
-	MPILib::utilities::ProgressBar *pb;
 	std::vector<double> E_Initials = std::vector<double> (); // initial excitatory values
 	std::vector<double> I_Initials = std::vector<double> (); // initial inhibitory values
-	long _simulation_length; // ms
-	int _num_nodes;
-	double _time_step; // ms
+
 public:
 
 	MiindWilsonCowan(int num_nodes, long simulation_length, double dt) :
-		_num_nodes(num_nodes), _simulation_length(simulation_length), _time_step(dt){
-	}
-
-	~MiindWilsonCowan() {
-		endSimulation();
-	}
+		MiindTvbModelAbstract(num_nodes, simulation_length) {
+			this->_time_step = dt;
+		}
 
 	// In general, we won't need to set initial values but we implement it here
 	// so that we can match TVB's Wilson Cowan example.
@@ -152,48 +142,6 @@ public:
 			std::cout << exc.what() << std::endl;
 		}
 	}
-
-	int startSimulation() {
-		pb = new MPILib::utilities::ProgressBar(network.startSimulation());
-
-		// child processes just loop here - evolve isn't called here to avoid a deadlock
-		// issue - would like to fix.
-		if(utilities::MPIProxy().getRank() > 0)
-			for(int i=0; i<int(_simulation_length/_time_step); i++)
-				evolveSingleStep(boost::python::list());
-
-		// Return the MPI process rank so that the host python program can
-		// end child processes after evolve (otherwise, it'll continue to try to
-	  // generate a new TVB simulation which it already did in rank 0)
-		return utilities::MPIProxy().getRank();
-	}
-
-	boost::python::list evolveSingleStep(boost::python::list c) {
-		boost::python::ssize_t len = boost::python::len(c);
-		std::vector<double> activity = std::vector<double>();
-
-		for(int i=0; i<len; i++) {
-			double ca = boost::python::extract<double>(c[i]);
-			activity.push_back(ca);
-		}
-		
-		boost::python::list out;
-		for(auto& it : network.evolveSingleStep(activity)) {
-			out.append(it);
-		}
-
-		(*pb)++;
-
-		return out;
-	}
-
-	void endSimulation() {
-		network.endSimulation();
-		t.stop();
-		if(utilities::MPIProxy().getRank() == 0) {
-			t.report();
-		}
-	}
 };
 
 // The module name (libmiindwc) must match the name of the generated shared
@@ -201,10 +149,10 @@ public:
 BOOST_PYTHON_MODULE(libmiindwc)
 {
 	using namespace boost::python;
-	class_<MiindWilsonCowan>("MiindWilsonCowan", init<int,long,double>())
+	define_python_MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>();
+
+	class_<MiindWilsonCowan, bases<MPILib::MiindTvbModelAbstract<double,
+				MPILib::utilities::CircularDistribution>>>("MiindWilsonCowan", init<int,long, double>())
 		.def("setInitialValues", &MiindWilsonCowan::setInitialValues)
-		.def("init", &MiindWilsonCowan::init)
-		.def("startSimulation", &MiindWilsonCowan::startSimulation)
-		.def("endSimulation", &MiindWilsonCowan::endSimulation)
-		.def("evolveSingleStep", &MiindWilsonCowan::evolveSingleStep);
+		.def("init", &MiindWilsonCowan::init);
 }
