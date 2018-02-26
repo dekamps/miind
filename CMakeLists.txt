@@ -20,10 +20,11 @@ set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 # compile flags
 ##############################################################################
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals -fPIC")
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
     
 #for cross compiling remove the -march=native flag!
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -fext-numeric-literals")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -fext-numeric-literals -fPIC")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
 
@@ -63,17 +64,17 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 				OUTPUT_VARIABLE GCC_VERSION)
 	if (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
 		message(STATUS "C++11 activated.")
-		set(CMAKE_CXX_FLAGS "-std=gnu++11 -fext-numeric-literals -fPIC")
+		set(CMAKE_CXX_FLAGS "-std=gnu++11")
 	else ()
 		message(FATAL_ERROR "C++11 needed (Ranged based for). Therefore a gcc compiler with a version higher or equal than 4.7 is needed.")   
 	endif()
 else(CMAKE_COMPILER_IS_GNUCXX)
 	if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")            
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++11 -fext-numeric-literals -fPIC")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++11")
 	endif()
 	if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
 	        message(STATUS "Using Intel compiler.")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c++14 -fext-numeric-literals -fPIC")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c++14")
 	endif()
 
 endif(CMAKE_COMPILER_IS_GNUCXX)

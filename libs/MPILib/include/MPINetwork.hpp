@@ -167,16 +167,36 @@ public:
 	 */
 	std::vector<ActivityType> evolveSingleStep(std::vector<ActivityType> activity);
 
+	/**
+	 * Collect activites from all nodes to pass to external simulation
+	 */
 	void getExternalActivities();
 
+	/**
+	 * Receive activities from external simulation and pass to nodes
+	 */
 	void setExternalPrecursorActivities(std::vector<ActivityType> activities);
 
+	/**
+	 * Start simulation for use with evolveSingleStep
+	 */
 	long startSimulation();
 
+	/**
+	 * End Simulation for use with evolveSingleStep
+	 */
 	void endSimulation();
 
+	/**
+	 * Set Node Successor in external simulation
+	 */
   void setNodeExternalSuccessor(NodeId node);
+
+	/**
+	 * Set Node Precursor in external simulation
+	 */
   void setNodeExternalPrecursor(NodeId node, const WeightValue& weight);
+
 private:
 
 	/**
@@ -192,8 +212,6 @@ private:
 	void incrementMaxNodeId();
 
 	void collectReport(report::ReportType type);
-
-	int addExternalNode();
 
 	/**
 	 * initialize the log stream
@@ -236,8 +254,16 @@ private:
 	 */
 	static NodeDistribution _nodeDistribution;
 
+	/**
+	 * NodeIds of nodes who send and recieve activity to external simulations
+	 */
   std::vector<NodeId> _externalReceivers;
   std::vector<NodeId> _externalSenders;
+
+	/**
+	 * For each timestep, all node activities are stored here before being passed
+	 * to the external simulation.
+	 */
   std::vector<ActivityType> _current_activities;
 	/**
 	 * The max Node number assigned so far.

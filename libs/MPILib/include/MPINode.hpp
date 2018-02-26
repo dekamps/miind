@@ -149,10 +149,26 @@ public:
 	 */
 	static void waitAll();
 
+	/**
+	 * Expose current activity
+	 */
 	ActivityType getActivity();
+
+	/**
+	 * Expose External precursor's activity
+	 */
 	ActivityType getExternalPrecursorActivity();
 	void setExternalPrecurserActivity(ActivityType activity);
+
+	/**
+	 * Receive the activity of external precursor, usually expext to
+	 * recieve from NodeId 0
+	 */
 	void recvExternalPrecurserActivity(NodeId id, int tag);
+
+	/**
+   * Set up the weight and nodetype of the connection from the external precursor
+	 */
 	void setExternalPrecursor(const Weight& weight, NodeType nodeType);
 
 protected:
@@ -215,6 +231,11 @@ protected:
 	 */
 	std::vector<ActivityType> _precursorActivity;
 
+	/**
+	 * The details of the connection and activity of the external precursor into
+	 * this node.
+	 * Flags suck but are marginally better than checking default values!
+	 */
 	bool _hasExternalPrecursor = false;
 	ActivityType _externalPrecursorActivity;
 	Weight _externalPrecursorWeight;
