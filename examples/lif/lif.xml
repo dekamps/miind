@@ -14,7 +14,7 @@
 <Node algorithm="Exc Input" name="Inp" type="NEUTRAL" />
 </Nodes>
 <Connections>
-<Connection In="Inp" Out="LIF E">1   0.005 0</Connection>
+<Connection In="Inp" Out="LIF E">3 0.005 0</Connection>
 </Connections>
 <SimulationIO>
 <SimulationName>lif.dat</SimulationName>
@@ -23,7 +23,7 @@
 <WriteNet>FALSE</WriteNet>
 <CanvasParameter>
 <T_min>0</T_min>
-<T_max>0.3</T_max>
+<T_max>5.0</T_max>
 <F_min>0</F_min>
 <F_max>20</F_max>
 <State_min>0</State_min>
@@ -36,11 +36,11 @@
 <SimulationRunParameter>
 <max_iter>1000000</max_iter>
 <t_begin>0</t_begin>
-<t_end>0.3</t_end>
-<t_report>0.0001</t_report>
-<t_state_report>0.0001</t_state_report>
+<t_end>2.0</t_end>
+<t_report>0.00770095348827</t_report>
+<t_state_report>0.00770095348827</t_state_report>
 <t_step>0.000770095348827</t_step>
-<t_update>0.0001</t_update>
+<t_update>0.00770095348827</t_update>
 <name_log>lif.log</name_log>
 </SimulationRunParameter>
 </Simulation>
