@@ -41,7 +41,7 @@ namespace MPILib {
  * MPI communication is handled by this class. MPINode::receiveData and MPINode::sendOwnData are used to transmit information about its state, and to
  * collate information about its precursor nodes so that this information can be passed on to its AlgorithmInterface instance.
  * Two hooks are provided for designers of AlgorithmInterface classes:
- * MPINode::prepareEvolve calls AlgorithmInterface::prepareEvolve, which allows algorithms to collate input contributions to this particular node, 
+ * MPINode::prepareEvolve calls AlgorithmInterface::prepareEvolve, which allows algorithms to collate input contributions to this particular node,
  * whilst MPINode::evolve calls AlgorithmInterface::evolve. These methods can then be overloaded by the designers of a sub class of AlgorithmInterface,
  * i.e. the designers of algorithms. The separation between prepareEvolve and evolve ensure that synchronous network updating can be implemented.
  * The MPINetwork::addPrecursor and MPI::Network::addSuccesor are used by MPINetwork::addNode.
@@ -149,9 +149,29 @@ public:
 	 */
 	static void waitAll();
 
-	void initNode();
+	/**
+	 * Expose current activity
+	 */
+	ActivityType getActivity();
 
-private:
+	/**
+	 * Expose External precursor's activity
+	 */
+	ActivityType getExternalPrecursorActivity();
+	void setExternalPrecurserActivity(ActivityType activity);
+
+	/**
+	 * Receive the activity of external precursor, usually expext to
+	 * recieve from NodeId 0
+	 */
+	void recvExternalPrecurserActivity(NodeId id, int tag);
+
+	/**
+   * Set up the weight and nodetype of the connection from the external precursor
+	 */
+	void setExternalPrecursor(const Weight& weight, NodeType nodeType);
+
+protected:
 
 	/**
 	 * Store the nodeIds of the Precursors
@@ -210,6 +230,16 @@ private:
 	 * Storage for the state of the precursors, to avoid to much communication.
 	 */
 	std::vector<ActivityType> _precursorActivity;
+
+	/**
+	 * The details of the connection and activity of the external precursor into
+	 * this node.
+	 * Flags suck but are marginally better than checking default values!
+	 */
+	bool _hasExternalPrecursor = false;
+	ActivityType _externalPrecursorActivity;
+	Weight _externalPrecursorWeight;
+	NodeType _externalPrecursorType;
 
 	Number _number_iterations = 0;
 	Number _maximum_iterations = 0;
