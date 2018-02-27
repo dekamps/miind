@@ -11,6 +11,12 @@ ABS_PATH=''
 # path name of the directory that hold the 'miind-git' directory
 MIIND_ROOT=''
 PATH_VARS_DEFINED=False
+# global variable to hold ENABLE_MPI (ON/OFF)
+ENABLE_MPI='OFF'
+# global variable to hold ENABLE_OPENMP (ON/OFF)
+ENABLE_OPENMP='OFF'
+# global variable to hold ENABLE_ROOT (ON/OFF)
+ENABLE_ROOT='ON'
 
 def initialize_global_variables():
     global ABS_PATH
@@ -57,6 +63,15 @@ def filter(lines):
         if '${CMAKE_SOURCE_DIR}' in line:
             hh=string.replace(line,'${CMAKE_SOURCE_DIR}',MIIND_ROOT)
             nw.append(hh)
+	elif '${TOKEN_ENABLE_MPI}' in line:
+	    hh=string.replace(line,'${TOKEN_ENABLE_MPI}',ENABLE_MPI)
+	    nw.append(hh)
+	elif '${TOKEN_ENABLE_OPENMP}' in line:
+	    hh=string.replace(line,'${TOKEN_ENABLE_OPENMP}',ENABLE_OPENMP)
+	    nw.append(hh)
+	elif '${TOKEN_ENABLE_ROOT}' in line:
+	    hh=string.replace(line,'${TOKEN_ENABLE_ROOT}',ENABLE_ROOT)
+	    nw.append(hh)
         else:
             nw.append(line)
     return nw
@@ -65,9 +80,13 @@ def insert_cmake_template(name,full_path_name):
     ''' name is the executable name, full_path is the directory where the cmake template
     needs to be written into.'''
 
+    # If we're rebuilding CMakeLists.txt, then we need to clear CMakeCache to avoid unexpected
+    # behaviour.
+    cachefile = os.path.join(full_path_name, 'CMakeCache.txt')
+    if os.path.exists(cachefile):
+	os.remove(cachefile)
+
     outname = os.path.join(full_path_name, 'CMakeLists.txt')
-    if os.path.exists(outname):
-        return
     template_path = os.path.join(miind_root(),'python','cmake_template')
     with open(template_path) as f:
         lines=f.readlines()
@@ -122,13 +141,28 @@ def move_model_files(xmlfile,dirpath):
     for fi in fls:
         sp.call(['cp',fi,dirpath])
 
-def add_executable(dirname, xmlfiles, modname):
+def add_executable(dirname, xmlfiles, modname, enable_mpi=False, enable_openmp=False, disable_root=False):
+    global ENABLE_MPI
+    global ENABLE_OPENMP
+    global ENABLE_ROOT
 
     ''' Add a user defined executable to the current working directory.
      '''
     global PATH_VARS_DEFINED    
     if not PATH_VARS_DEFINED:
         initialize_global_variables()
+
+    # ROOT enabled by default
+    if disable_root:
+	ENABLE_ROOT = 'OFF'
+
+    # MPI disabled by default
+    if enable_mpi:
+	ENABLE_MPI = 'ON'
+
+    # OPENMP disabled by default
+    if enable_openmp:
+	ENABLE_OPENMP = 'ON'
 
     for xmlfile in xmlfiles:
         progname = check_and_strip_name(xmlfile)
