@@ -1,0 +1,110 @@
+##############################################################################
+# include the header files
+##############################################################################
+
+#############################################################################
+
+cmake_minimum_required(VERSION 2.8)
+FIND_PACKAGE(GSL REQUIRED)
+
+set(MIIND_LIBRARY_PREFIX miind)
+
+include_directories( /home/hugh/dev/miind//libs )
+include_directories( /home/hugh/dev/miind//libs/GeomLib )
+include_directories( /home/hugh/dev/miind//libs/TwoDLib )
+
+include_directories( ${GSL_INCLUDE_DIRS} )
+link_directories( ${GSL_LIBRARY_DIRS} )
+
+OPTION(ENABLE_MPI "MPI Desired" ON)
+OPTION(ENABLE_OPENMP "OpenMP Desired" ON)
+
+##############################################################################
+# find ROOT
+##############################################################################
+OPTION(ENABLE_ROOT "Root Desired" ON)
+
+IF (ENABLE_ROOT)
+   # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
+   #   - ROOT built with classic configure/make use the provided $ROOTSYS/etc/cmake/FindROOT.cmake
+   #   - ROOT built with CMake. Add in CMAKE_PREFIX_PATH the installation prefix for ROOT
+   list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+
+   #---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
+   find_package(ROOT REQUIRED COMPONENTS RIO Net)
+
+   #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
+   include(${ROOT_USE_FILE})
+
+   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+   ROOT_GENERATE_DICTIONARY(G__Event Event.h LINKDEF EventLinkDef.h)
+
+   #---Create a shared library with geneated dictionary (don't want to do that now; maybe not ever)
+   # add_library(Event SHARED Event.cxx G__Event.cxx)
+   # target_link_libraries(Event ${ROOT_LIBRARIES})
+   add_definitions("-DWANTROOT")
+ENDIF(ENABLE_ROOT)
+
+IF(ENABLE_OPENMP)
+  find_package(OpenMP REQUIRED)
+  add_definitions( -DENABLE_OPENMP=1 )
+  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+ENDIF(ENABLE_OPENMP)
+
+IF(ENABLE_MPI)
+  find_package(MPI REQUIRED)
+  add_definitions( -DENABLE_MPI=1 )
+	set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
+	set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
+	include_directories(${MPI_INCLUDE_PATH})
+ENDIF(ENABLE_MPI)
+
+##############################################################################
+# find boost with mpi
+##############################################################################
+IF(ENABLE_MPI)
+        find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer system)
+ELSE(ENABLE_MPI)
+	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer system)
+ENDIF(ENABLE_MPI)
+if( Boost_FOUND )
+   message(STATUS "Boost found setting up directories")
+   message(STATUS "BOOST_ROOT: " ${BOOST_ROOT} )
+   message(STATUS "Boost include directories:" ${Boost_INCLUDE_DIR} )
+   message(STATUS "Boost library directories:" ${Boost_LIBRARY_DIRS} )
+   include_directories( ${Boost_INCLUDE_DIR} )
+   link_directories( ${Boost_LIBRARY_DIR} )
+else ( Boost_FOUND )
+   message(FATAL_ERROR "Boost is mandatory to build the libraries")
+endif( Boost_FOUND )
+
+#############################################################################
+# Libraries
+#############################################################################
+
+if (UNIX)
+   ADD_DEFINITIONS("-fno-strict-aliasing" )
+endif (UNIX)
+set ( LIBLIST
+    ${MIIND_LIBRARY_PREFIX}geom
+    ${MIIND_LIBRARY_PREFIX}mpi
+    ${MIIND_LIBRARY_PREFIX}twod
+    ${MIIND_LIBRARY_PREFIX}numtools
+    ${MPI_LIBRARIES}
+    ${ROOT_LIBRARIES}
+    ${Boost_LIBRARIES}
+    ${gsl_LINK_FLAGS}
+    gsl
+    gslcblas
+)
+
+
+#############################################################################
+# executables
+#############################################################################
+add_definitions("-std=gnu++11 -fext-numeric-literals")
+link_directories(/home/hugh/dev/miind//build/libs/NumtoolsLib /home/hugh/dev/miind//build/libs/GeomLib /home/hugh/dev/miind//build/libs/MPILib /home/hugh/dev/miind//build/libs/TwoDLib)
+
+add_executable( testme testme.cpp)
+target_link_libraries( testme ${LIBLIST} )
