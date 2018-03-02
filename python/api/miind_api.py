@@ -6,66 +6,132 @@ import numpy as np
 import subprocess
 import shutil
 import copy
-import pandas as pd
 import collections
-from xmldict import dict_to_xml, xml_to_dict
-from tools import *
 import hashlib
 from density import Density, Marginal
+
+import xml.etree.ElementTree as ET
 # From MIIND
 import directories
+
+def split_fname(fname, ext):
+    fname = op.split(fname)[1]
+    if not ext.startswith('.'):
+        ext = '.' + ext
+    if fname.endswith(ext):
+        modelname = op.splitext(fname)[0]
+        modelfname = fname
+    else:
+        modelname = fname
+        modelfname = fname + ext
+    return modelname, modelfname
+
+class cd:
+    """Context manager for changing the current working directory"""
+    def __init__(self, newPath):
+        self.newPath = os.path.expanduser(newPath)
+
+    def __enter__(self):
+        self.savedPath = os.getcwd()
+        os.chdir(self.newPath)
+
+    def __exit__(self, etype, value, traceback):
+        os.chdir(self.savedPath)
 
 class MiindSimulation:
     def __init__(self, xml_path, submit_name=None,
                  MIIND_BUILD_PATH=None, **kwargs):
-        xml_path = op.abspath(xml_path)
-        # load current
-        self.params = convert_xml_dict(xml_path)
+        self.parameters = kwargs
+        # If there are kwargs, we either want to create a new xml with these
+        # parameters, or we want to load a previously generated xml
+        # else just load what in xml_path and normal
+        if self.parameters :
+            xml_path_with_sha = xml_path.replace('.xml', self.sha + '.xml')
+            if op.exists(xml_path_with_sha) :
+                self.xml_path = op.abspath(xml_path_with_sha)
+            else :
+                self.xml_path = op.abspath(MiindSimulation.generateNewXmlWithDictionaryParameters(xml_path, kwargs))
+        else :
+            self.xml_path = op.abspath(xml_path)
 
-        # set new params
-        if kwargs:
-            self.set_params(**kwargs)
-            # generate sha based on parameters
-            self.xml_path = xml_path.replace('.xml', self.sha + '.xml')
-            # dump to unique self.xml_path so miind will use new params
-            self.dump_xml()
-        else:
-            self.xml_path = xml_path
+        # check our (maybe new) xml exists
         assert op.exists(self.xml_path)
 
+        # keep track of various names to make analysis easier later
         self.xml_location, self.xml_fname = op.split(self.xml_path)
+
         xml_base_fname, _ = op.splitext(self.xml_fname)
         self.submit_name = submit_name or xml_base_fname
-        self.output_directory = op.join(
-            self.xml_location, self.submit_name, xml_base_fname)
+        self.output_directory = op.join(self.xml_location, self.submit_name, xml_base_fname)
         self.miind_executable = xml_base_fname
-        simpar = self.params['Simulation']
-        self.modelfiles = [m.get('modelfile')
-                           for m in simpar['Algorithms']['Algorithm']
-                           if m.get('modelfile') is not None]
-        simio = simpar['SimulationIO']
-        self.WITH_STATE = simio['WithState']['content']
-        self.simulation_name = simio['SimulationName']['content']
+
+        # grab the names of the model files used and whether we should expect
+        # state files with this simulation run
+        with open(self.xml_path) as xml_file:
+            self.sim=ET.fromstring(xml_file.read())
+
+        self.modelfiles = [m.attrib['modelfile']
+                           for m in self.sim.findall('Algorithms/Algorithm')
+                           if 'modelfile' in m.attrib]
+
+        simio = self.sim.find('SimulationIO')
+        self.WITH_STATE = simio.find('WithState').text == 'TRUE'
+        self.simulation_name = simio.find('SimulationName').text
         self.root_path = op.join(self.output_directory,
                                       self.simulation_name + '_0.root')
 
+        # If there will be state files, we'll get a directory for each
+        # mesh (model file)
         if self.WITH_STATE:
             modnames = [split_fname(mn, '.model')[0] for mn in self.modelfiles]
             self.density = {mn: Density(self, mn) for mn in modnames}
             self.marginal = {mn: Marginal(self, mn) for mn in modnames}
 
+    # By generating a hash of the specific parameters for this simulation,
+    # we can uniquely identify the xml, compiled code, executable and results
+    # directory. Ideally, the user should never care what the actual hash is
+    # and just interface with the files via this api, using the specified
+    # parameters as identification.
     @property
     def sha(self):
-        assert hasattr(self, 'params')
-        par_str = json.dumps(self.params)
-        sha = hashlib.sha1(par_str).hexdigest()
-        return sha
+        return MiindSimulation.generateShaFromDictionaryParameters(self.parameters)
 
     @staticmethod
-    def getShaFromParams(**kwargs):
-        json.dumps(kwargs)
-        sha = hashlib.sha1(par_str).hexdigest()
-        return sha
+    def generateShaFromParameters(**kwargs) :
+        seed_string = ''.join('{}{}'.format(key, val) for key, val in kwargs.items())
+        return hashlib.sha1(seed_string).hexdigest()
+
+    # Unwinding a dictionary into keyword arguments might confuse users
+    # so provide a definitive dictionary param version
+    @staticmethod
+    def generateShaFromDictionaryParameters(dict) :
+        return MiindSimulation.generateShaFromParameters(**dict)
+
+    @staticmethod
+    def generateNewXmlWithParameters(template_xml, **kwargs) :
+        template_xml = op.abspath(template_xml)
+        assert op.exists(template_xml)
+        template_xml_with_sha = template_xml.replace('.xml', MiindSimulation.generateShaFromParameters(**kwargs) + '.xml')
+
+        with open(template_xml) as template :
+            template_sim = ET.fromstring(template.read())
+            for key, value in kwargs.items() :
+                var = template_sim.findall('Variable[@Name=\'' + key + '\']')
+                if not var:
+                    raise(BaseException("Could not find Variable with Name=\'" + key + "\'."))
+                if len(var) > 1 :
+                    raise(BaseException("Found more than one Variable with Name=\'" + key + "\'."))
+                var[0].text = str(value)
+
+            with open(template_xml_with_sha, 'w') as new :
+                new.write(ET.tostring(template_sim))
+        return op.abspath(template_xml_with_sha)
+
+    # Unwinding a dictionary into keyword arguments might confuse users
+    # so provide a definitive dictionary param version
+    @staticmethod
+    def generateNewXmlWithDictionaryParameters(template_xml, dict) :
+        return MiindSimulation.generateNewXmlWithParameters(template_xml, **dict)
 
     @property
     def rates(self):
@@ -119,25 +185,9 @@ class MiindSimulation:
                     return False
         return dict_changed(old_params, self.params) == set()
 
-    def set_params(self, **kwargs):
-        if not hasattr(self, 'params'):
-            self.load_xml()
-        set_params(self.params, **kwargs)
-
-    def dump_xml(self):
-        dump_xml(self.params, self.xml_path)
-
-    def load_xml(self):
-        self.params = convert_xml_dict(self.xml_path)
-
     @property
     def nodes(self):
-        algos = self.params['Simulation']['Algorithms']['Algorithm']
-        nods = copy.deepcopy(self.params['Simulation']['Nodes']['Node'])
-        models = {m.get('name'): m.get('modelfile') for m in algos}
-        for node in nods:
-            node.update({'modelfile': models[node['algorithm']]})
-        return nods
+        raise(BaseException("Not Implemented : MiindSimulation.nodes()"))
 
     def submit(self, overwrite=False, enable_mpi=False, enable_openmp=False, disable_root=False, *args):
         if op.exists(self.output_directory) and overwrite:
@@ -156,7 +206,3 @@ class MiindSimulation:
 
     def run(self):
         subprocess.call('./' + self.miind_executable, cwd=self.output_directory)
-
-if __name__ == '__main__':
-    io = MiindIO(xml_path='cond.xml', submit_name='cond')
-    io.get_marginals()
