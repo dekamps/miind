@@ -143,7 +143,7 @@ class Marginal(General):
         return v, w, bins_v, bins_w
 
     def make_projection_file(self):
-        projection_exe = op.join(self.io.MIIND_APPS, 'Projection', 'Projection')
+        projection_exe = op.join(getMiindAppsPath(), 'Projection', 'Projection')
         out = subprocess.check_output(
           [projection_exe, self.modelfname], cwd=self.io.xml_location)
         vmax, wmax = np.array(out.split('\n')[3].split(' ')[2:], dtype=float)
@@ -204,7 +204,6 @@ class Marginal(General):
                 fig.savefig(figname, res=300, bbox_inches='tight')
                 plt.close(fig)
 
-
 class Density(General):
     def __init__(self, io, modelname):
         super(Density, self).__init__(io, modelname)
@@ -252,12 +251,61 @@ class Density(General):
         vals = (cols - vmin)/(vmax - vmin)
         return vmin, vmax, vals
 
-    def plot_density(self, fname, colorbar=None, cmap='inferno', ax=None,
+    def generateDensityAnimation(self, filename, generate_images=True, time_scale=1.0,
+                            colorbar=None, cmap='inferno'):
+        # Generate the density image files
+        if generate_images:
+            self.generateAllDensityPlotImages(colorbar, cmap, True, '.png')
+
+        try:
+            # grab all the filenames
+            files = glob.glob(op.join(self.path, '*.png'))
+            files.sort()
+
+            # calculate duration of each frame - this is the time between each
+            # image
+            durations = [self.times[0]]
+            for t in range(len(self.times)-1):
+                durations.append((self.times[t+1] - self.times[t])*time_scale)
+
+            # Generate an image list file with the calculated durations
+            with open(op.join(self.path, 'filelist.txt'), 'w') as lst:
+                d = 0
+                for f in files:
+                    lst.write('file \'' + f + '\'\n')
+                    lst.write('duration ' + str(durations[d]) + '\n')
+                    d += 1
+
+            # note ffmpeg must be installed
+            process = ['ffmpeg',
+                '-f', 'concat',
+                '-safe', '0',
+                '-i', op.join(self.path, 'filelist.txt')]
+
+            process.append(self.path + '/' + filename + '.mp4')
+
+            subprocess.call(process)
+        except OSError as e:
+            if e.errno == 2:
+                print "MIIND API Error : generateDensityAnimation() requires ffmpeg to be installed."
+            else:
+                print "MIIND API Error : Unknown Error"
+                print e
+
+    def generateAllDensityPlotImages(self, colorbar=None, cmap='inferno', ext='.png'):
+        for fname in self.fnames:
+            self.plotDensity(fname, colorbar, cmap, None, True, ext)
+
+    # plot the density in file 'fname'. ax may be used to add to an existing
+    # plot axis.
+    def plotDensity(self, fname, colorbar=None, cmap='inferno', ax=None,
                      save=False, ext='.png'):
         if not ext.startswith('.'):
             ext = '.' + ext
+
         if ax is None:
             fig, ax = plt.subplots()
+
         time = get_density_time(fname)
         idx = self.times.index(time)
         md = self.mesh.dimensions()
@@ -275,13 +323,18 @@ class Density(General):
         vmin, vmax, scaled_density = self.colscale(density)
         p.set_array(scaled_density)
         ax.add_collection(p)
+
         if colorbar is not None:
             plt.colorbar(p)
+        
         if save:
             if not op.exists(self.path):
                 os.mkdir(self.path)
+            #calculate max padding required
+            required_padding = len(str(len(self.times)))
+            padding_format_code = '{0:0' + str(required_padding) + 'd}'
             figname = op.join(
-                self.path, '{}_'.format(idx) +
+                self.path, (padding_format_code).format(idx) + '_' +
                 '{}'.format(time)).replace('.', '-')
             plt.gcf().savefig(figname + ext, res=300, bbox_inches='tight')
             plt.close(plt.gcf())

@@ -8,6 +8,7 @@ import numpy as np
 import copy
 from collections import Mapping, OrderedDict
 from xmldict import dict_to_xml, xml_to_dict, _fromstring
+import directories
 
 
 class cd:
@@ -22,6 +23,12 @@ class cd:
     def __exit__(self, etype, value, traceback):
         os.chdir(self.savedPath)
 
+def getMiindBuildPath():
+    return os.path.join(directories.miind_root(), 'build')
+
+def getMiindAppsPath():
+    build_path = getMiindBuildPath()
+    return op.join(build_path, 'apps')
 
 def split_fname(fname, ext):
     fname = op.split(fname)[1]
@@ -34,7 +41,6 @@ def split_fname(fname, ext):
         modelname = fname
         modelfname = fname + ext
     return modelname, modelfname
-
 
 def dict_changed(d1, d2):
     k1, k2 = [set(d.keys()) for d in (d1, d2)]

@@ -8,40 +8,18 @@ import shutil
 import copy
 import collections
 import hashlib
+from tools import *
 from density import Density, Marginal
 
 import xml.etree.ElementTree as ET
 # From MIIND
 import directories
 
-def split_fname(fname, ext):
-    fname = op.split(fname)[1]
-    if not ext.startswith('.'):
-        ext = '.' + ext
-    if fname.endswith(ext):
-        modelname = op.splitext(fname)[0]
-        modelfname = fname
-    else:
-        modelname = fname
-        modelfname = fname + ext
-    return modelname, modelfname
-
-class cd:
-    """Context manager for changing the current working directory"""
-    def __init__(self, newPath):
-        self.newPath = os.path.expanduser(newPath)
-
-    def __enter__(self):
-        self.savedPath = os.getcwd()
-        os.chdir(self.newPath)
-
-    def __exit__(self, etype, value, traceback):
-        os.chdir(self.savedPath)
-
 class MiindSimulation:
-    def __init__(self, xml_path, submit_name=None,
-                 MIIND_BUILD_PATH=None, **kwargs):
+    def __init__(self, xml_path, submit_name=None, **kwargs):
         self.parameters = kwargs
+        # original xml path used by the ui to reference this MiindSimulation
+        self.original_xml_path = xml_path
         # If there are kwargs, we either want to create a new xml with these
         # parameters, or we want to load a previously generated xml
         # else just load what in xml_path and normal
