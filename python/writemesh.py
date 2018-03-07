@@ -2,20 +2,19 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.integrate as integ
-import aexpdevelop   # required for testing purposes
 
 '''All meshes are 2 dimensional. The first dimension is the membrane potential v, in whatever
-units you chose to deliver them. In order for these scripts to work you need to provide a two dimensional vector 
+units you chose to deliver them. In order for these scripts to work you need to provide a two dimensional vector
 field, in a format specified below. The vector field is determined by the model that you want to simulate. For
 a neuronal model called adaptive exponetial and fire the first diemnsion is the membrane potential V, the second one
 is an adaptation parameter. In conductance-based models the first diemnsion is again the membrane potential V,
 the second parameter tracks the state of the conductance. By convention, we will construct a 2D mesh using
 tuples (v,w), where v usually (but not necessarily) labels the membrane potential and w whatever second
 variable is present.'''
- 
+
 
 def CreateIntegralCurveStep(forward, forward_jacobian, I, v_0, w_0, t_end, delta_t, params = None):
-    '''Create a forward integrated integral curve. I is the input 
+    '''Create a forward integrated integral curve. I is the input
     current. (v_0, w_0) the starting point. Start time is t = 0,
     t_end is the end time, delta_t is the step of the time mesh.
     The time mesh and the resulting curve is returned. Mainly for visualization
@@ -34,17 +33,17 @@ def MopUp(t, curve,n, V_min, w_min, v_c, w_c):
         if curve[i,0] <= V_min or curve[i,1] <= w_min:
             last = i
             break
-    t_tot = 0    
+    t_tot = 0
 
     if n > 0:
-        t_tot = (n-1)*t[-1] 
+        t_tot = (n-1)*t[-1]
     if last > 0:
         t_tot += t[last-1]
         return n, t_tot, curve[last-1,0], curve[last-1,1]
     else:
         return n, t_tot, curve[-1,0], curve[-1,1]
 
-def DetermineNegativeTime(reverse, reverse_jacobian, I, t, v, w, V_min, w_min, t_max):    
+def DetermineNegativeTime(reverse, reverse_jacobian, I, t, v, w, V_min, w_min, t_max):
     ''' From a given (v,w), step back until either the line V = V_min,
     or the line  w= W_min is crossed. Do this in repeated steps on a time mesh t, which
     determines the resolution of how this is achieved. The step back is performed in repeated
@@ -52,13 +51,13 @@ def DetermineNegativeTime(reverse, reverse_jacobian, I, t, v, w, V_min, w_min, t
     Return the index of crossing point; the time taken; the crossing point v, w as a four tuple.'''
     v_c = v
     w_c = w
-    
+
     n = 0
     n_max = t_max/t[-1]
 
     while v_c > V_min and w_c > w_min:
         y_0 = list([v_c, w_c])
-        curve = integ.odeint(reverse, y_0, t, args = ([I],), Dfun=reverse_jacobian)    
+        curve = integ.odeint(reverse, y_0, t, args = ([I],), Dfun=reverse_jacobian)
         v_c = curve[-1,0]
         w_c = curve[-1,1]
 
@@ -71,7 +70,7 @@ def DetermineNegativeTime(reverse, reverse_jacobian, I, t, v, w, V_min, w_min, t
 
 def testShowMaximumSpikeValueInstance1():
     ''' This test shows the problem with forward integration into the spike.'''
-    v = V_min  
+    v = V_min
     w = 0.0*w_max
     I = 800
     delta_t = 1e-5
@@ -87,8 +86,8 @@ def testShowReverseIntegration():
     delta_t = 1e-5
     t_estimate = 27
     DisplayIntegralCurve(I,v,w,t_estimate,delta_t)
-    
-    
+
+
 
 
 def ReduceCurve(curve,fact):
@@ -101,7 +100,7 @@ def ReduceCurve(curve,fact):
     cret = np.array([lv,lw])
 
     return cret.transpose()
-    
+
 def WriteOutCurve(f,curve, forward = True):
     if forward:
         vs = curve[:,0]
@@ -145,7 +144,7 @@ def create_results_directories(path):
             raise
 
 
-    return meshname, simdirname, visdirname    
+    return meshname, simdirname, visdirname
 
 def GenerateTestMesh():
     ''' Don't ever change these values. meshtest.py; relies on them.'''

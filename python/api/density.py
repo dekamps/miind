@@ -10,7 +10,6 @@ from shapely.geometry import Polygon
 from descartes.patch import PolygonPatch
 from matplotlib.collections import PatchCollection
 
-
 def replace(value, string, *args):
     for a in args:
         value = value.replace(a, string)
@@ -46,7 +45,7 @@ def calc_mass(mesh, density, coords):
     return masses
 
 
-class General(object):
+class Result(object):
     def __init__(self, io, modelname):
         self.io = io
         self.modelname, self.modelfname = split_fname(modelname, '.model')
@@ -74,7 +73,7 @@ class General(object):
         return self._mesh
 
 
-class Marginal(General):
+class Marginal(Result):
     def __init__(self, io, modelname, vn=100, wn=100):
         super(Marginal, self).__init__(io, modelname)
         self.path = op.join(self.io.output_directory,
@@ -88,13 +87,20 @@ class Marginal(General):
 
     @property
     def density(self):
+        # Get the projection file
         self.read_projection()
+        # If there's no new projection and we've already calculated everything,
+        # just return the existing calculated marginals
         if op.exists(self.data_path) and not self.new_projection:
             load_data = np.load(self.data_path)['data'][()]
             if self.modelname in load_data:
                 return load_data[self.modelname]
-        v = np.zeros((len(self.fnames), self.projection['N_V']))
-        w = np.zeros((len(self.fnames), self.projection['N_W']))
+
+        # Initialise the marginal densities for each frame of the simulation
+        v = np.zeros((len(self.times), self.projection['N_V']))
+        w = np.zeros((len(self.times), self.projection['N_W']))
+
+        # Load in the masses from the densities
         masses, coords_ = [], None
         for ii, fname in enumerate(self.fnames):
             density, coords = read_density(fname)
@@ -105,10 +111,14 @@ class Marginal(General):
             masses.append(calc_mass(self.mesh, density, coords))
         masses = np.vstack(masses)
         assert masses.shape[0] == len(self.fnames)
+
+        # Calculate the merginals for each frame and store in 'data'
         v, w, bins_v, bins_w = self.calc_marginal_density(
             v, w, masses, coords, self.projection)
         data = {'v': v, 'w': w, 'bins_v': bins_v,
                 'bins_w': bins_w, 'times': self.times}
+
+        # Save 'data' into a compressed file
         if op.exists(self.data_path):
             other = np.load(self.data_path)['data'][()]
             other.update({self.modelname: data})
@@ -118,40 +128,52 @@ class Marginal(General):
         np.savez(self.data_path, data=save_data)
         return data
 
+    # Using the projection file, the mass from in each cell of the mesh
+    # (for each frame of the simulation)
+    # can be summed into the two marginal densities
+    # note, v and w are 2D matrices of the marginal density bin values for each
+    # frame of the simulation
     def calc_marginal_density(self, v, w, masses, coords, proj):
-
+        # temp function 'scale' to parse a transition row
+        # in the projection file
         def scale(var, proj, mass):
             bins = [marg.split(',') for marg in proj.split(';')
                     if len(marg) > 0]
             for jj, dd in bins:
                 var[:, int(jj)] += mass * float(dd)
             return var
-        for trans in proj['transitions']:
-            i, j = [int(a) for a in trans['coordinates'].split(',')]
+
+        # Each cell in the mesh has a transition row in the projection file
+        for trans in proj['transitions'].findall('cell'):
+            # Get the coordinates of this cell and its mass each time
+            i, j = [int(a) for a in trans.find('coordinates').text.split(',')]
             cell_mass = masses[:, coords.index((i, j))]
-            if np.all(cell_mass < 1e-15):
-                continue
-            v = scale(v, trans['vbins'], cell_mass)
-            w = scale(w, trans['wbins'], cell_mass)
-        dv = abs(proj['V_max'] - proj['V_min']) / float(proj['N_V'])
-        dw = abs(proj['W_max'] - proj['W_min']) / float(proj['N_W'])
-        for idx in range(v.shape[0]):
-            v[idx] = v[idx] / dv / v[idx].sum()
-            w[idx] = w[idx] / dw / w[idx].sum()
+
+            # Calculate and add the density values for each bin
+            v = scale(v, trans.find('vbins').text, cell_mass)
+            w = scale(w, trans.find('wbins').text, cell_mass)
+
+        # Generate the linspace values for plotting
         bins_v = np.linspace(proj['V_min'], proj['V_max'], proj['N_V'])
         bins_w = np.linspace(proj['W_min'], proj['W_max'], proj['N_W'])
         return v, w, bins_v, bins_w
 
     def make_projection_file(self):
+        # Run the projection app to analyse the model file and get
+        # dimensions
         projection_exe = op.join(getMiindAppsPath(), 'Projection', 'Projection')
         out = subprocess.check_output(
           [projection_exe, self.modelfname], cwd=self.io.xml_location)
+
+        # Parse the output
         vmax, wmax = np.array(out.split('\n')[3].split(' ')[2:], dtype=float)
         vmin, wmin = np.array(out.split('\n')[4].split(' ')[2:], dtype=float)
         # assert that we bound the range
         inc = lambda x: x * 1.01 if x > 0 else x * 0.99
         vmax, wmax = inc(vmax), inc(wmax)
         vmin, wmin = -inc(-vmin) , -inc(-wmin)
+
+        # Run the projection app to generate the .projection file
         cmd = [projection_exe, self.modelfname, vmin, vmax,
                self.vn, wmin, wmax, self.wn]
         subprocess.call([str(c) for c in cmd], cwd=self.io.xml_location)
@@ -159,52 +181,67 @@ class Marginal(General):
     def read_projection(self):
         proj_pathname = op.join(self.io.xml_location, self.projfname)
         self.new_projection = False
+        # Does the pojection file exist? If not, generate it.
         if not op.exists(proj_pathname):
             print('No projection file found, generating...')
             self.make_projection_file()
             self.new_projection = True
+
+        # If we don't have projection data loaded, load it!
         if not hasattr(self, 'projection'):
-            self._proj = xml_to_dict(ET.parse(proj_pathname).getroot(),
-                                      text_content=None)['Projection']
-        if (self._proj['W_limit']['N_W'] != self.wn or
-            self._proj['V_limit']['N_V'] != self.vn):
+            with open(proj_pathname) as proj_file:
+                self._proj = ET.fromstring(proj_file.read())
+
+        # Has the projection file changed since we last loaded? If so, reload.
+        if (int(self._proj.find('W_limit/N_W').text) != self.wn or
+            int(self._proj.find('V_limit/N_V').text) != self.vn):
             print('New N in bins, generating projection file...')
             self.make_projection_file()
-            self._proj = xml_to_dict(ET.parse(proj_pathname).getroot(),
-                                      text_content=None)['Projection']
+            with open(proj_pathname) as proj_file:
+                self._proj = ET.fromstring(proj_file.read())
             self.new_projection = True
+
         self.projection =  {
-            'transitions': self._proj['transitions']['cell'],
-            'V_min': self._proj['V_limit']['V_min'],
-            'V_max': self._proj['V_limit']['V_max'],
-            'N_V': self._proj['V_limit']['N_V'],
-            'W_min': self._proj['W_limit']['W_min'],
-            'W_max': self._proj['W_limit']['W_max'],
-            'N_W': self._proj['W_limit']['N_W'],
+            'transitions': self._proj.find('transitions'),
+            'V_min': float(self._proj.find('V_limit/V_min').text),
+            'V_max': float(self._proj.find('V_limit/V_max').text),
+            'N_V': int(self._proj.find('V_limit/N_V').text),
+            'W_min': float(self._proj.find('W_limit/W_min').text),
+            'W_max': float(self._proj.find('W_limit/W_max').text),
+            'N_W': int(self._proj.find('W_limit/N_W').text),
         }
 
-    def plot(self):
+    def plotV(self, time, ax=None):
+        if not ax:
+            fig, ax = plt.subplots()
+            ax.plot(self['bins_v'], self['v'][self['times'].index(time), :])
+            fig.show()
+        else:
+            ax.plot(self['bins_v'], self['v'][self['times'].index(time), :])
+
+    def plotW(self, time, ax=None):
+        if not ax:
+            fig, ax = plt.subplots()
+            ax.plot(self['bins_w'], self['w'][self['times'].index(time), :])
+            fig.show()
+        else:
+            ax.plot(self['bins_w'], self['w'][self['times'].index(time), :])
+
+    def generatePlotImages(self, image_size=300):
         if not op.exists(self.path):
             os.mkdir(self.path)
         for ii in range(len(self['times'])):
             fig, axs = plt.subplots(1, 2)
-            params = {
-                'ax': axs,
-                'dens': [self['v'], self['w']],
-                'bins': [self['bins_v'], self['bins_w']]
-            }
-            params = [{k: v[i] for k, v in params.items()}
-                      for i in range(len(params['ax']))]
             plt.suptitle('time = {}'.format(self['times'][ii]))
-            for p in params:
-                p['ax'].plot(p['bins'], p['dens'][ii, :])
-                figname = op.join(self.path,
-                                  '{}_'.format(ii) +
-                                  '{}.png'.format(self['times'][ii]))
-                fig.savefig(figname, res=300, bbox_inches='tight')
-                plt.close(fig)
+            self.plotV(self['times'][ii], axs[0])
+            self.plotW(self['times'][ii], axs[1])
+            figname = op.join(self.path,
+                              '{}_'.format(ii) +
+                              '{}.png'.format(self['times'][ii]))
+            fig.savefig(figname, res=image_size, bbox_inches='tight')
+            plt.close(fig)
 
-class Density(General):
+class Density(Result):
     def __init__(self, io, modelname):
         super(Density, self).__init__(io, modelname)
         self.path = op.join(self.io.output_directory,
@@ -251,11 +288,11 @@ class Density(General):
         vals = (cols - vmin)/(vmax - vmin)
         return vmin, vmax, vals
 
-    def generateDensityAnimation(self, filename, generate_images=True, time_scale=1.0,
+    def generateDensityAnimation(self, filename, image_size=300, generate_images=True, time_scale=1.0,
                             colorbar=None, cmap='inferno'):
         # Generate the density image files
         if generate_images:
-            self.generateAllDensityPlotImages(colorbar, cmap, True, '.png')
+            self.generateAllDensityPlotImages(image_size, colorbar, cmap, '.png')
 
         try:
             # grab all the filenames
@@ -282,7 +319,7 @@ class Density(General):
                 '-safe', '0',
                 '-i', op.join(self.path, 'filelist.txt')]
 
-            process.append(self.path + '/' + filename + '.mp4')
+            process.append(filename + '.mp4')
 
             subprocess.call(process)
         except OSError as e:
@@ -292,13 +329,13 @@ class Density(General):
                 print "MIIND API Error : Unknown Error"
                 print e
 
-    def generateAllDensityPlotImages(self, colorbar=None, cmap='inferno', ext='.png'):
+    def generateAllDensityPlotImages(self, image_size=300, colorbar=None, cmap='inferno', ext='.png'):
         for fname in self.fnames:
-            self.plotDensity(fname, colorbar, cmap, None, True, ext)
+            self.plotDensity(fname, image_size, colorbar, cmap, None, True, ext)
 
     # plot the density in file 'fname'. ax may be used to add to an existing
     # plot axis.
-    def plotDensity(self, fname, colorbar=None, cmap='inferno', ax=None,
+    def plotDensity(self, fname, image_size=300, colorbar=None, cmap='inferno', ax=None,
                      save=False, ext='.png'):
         if not ext.startswith('.'):
             ext = '.' + ext
@@ -326,7 +363,7 @@ class Density(General):
 
         if colorbar is not None:
             plt.colorbar(p)
-        
+
         if save:
             if not op.exists(self.path):
                 os.mkdir(self.path)
@@ -336,5 +373,5 @@ class Density(General):
             figname = op.join(
                 self.path, (padding_format_code).format(idx) + '_' +
                 '{}'.format(time)).replace('.', '-')
-            plt.gcf().savefig(figname + ext, res=300, bbox_inches='tight')
+            plt.gcf().savefig(figname + ext, res=image_size, bbox_inches='tight')
             plt.close(plt.gcf())

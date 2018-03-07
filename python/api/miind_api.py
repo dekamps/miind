@@ -9,7 +9,10 @@ import copy
 import collections
 import hashlib
 from tools import *
+from mesh_tools import ModelGenerator
 from density import Density, Marginal
+from LifMeshGenerator import LifMeshGenerator
+import matplotlib.pyplot as plt
 
 import xml.etree.ElementTree as ET
 # From MIIND
@@ -55,15 +58,15 @@ class MiindSimulation:
         simio = self.sim.find('SimulationIO')
         self.WITH_STATE = simio.find('WithState').text == 'TRUE'
         self.simulation_name = simio.find('SimulationName').text
-        self.root_path = op.join(self.output_directory,
-                                      self.simulation_name + '_0.root')
 
-        # If there will be state files, we'll get a directory for each
-        # mesh (model file)
-        if self.WITH_STATE:
-            modnames = [split_fname(mn, '.model')[0] for mn in self.modelfiles]
-            self.density = {mn: Density(self, mn) for mn in modnames}
-            self.marginal = {mn: Marginal(self, mn) for mn in modnames}
+        # If run using, MPI, there are multiple root files.
+        self.root_paths = []
+        root_index = 0
+        while(op.exists(op.join(self.output_directory,
+                                      self.simulation_name + '_' + str(root_index) + '.root'))):
+            self.root_paths.append(op.join(self.output_directory,
+                                      self.simulation_name + '_' + str(root_index) + '.root'))
+            root_index += 1
 
     # By generating a hash of the specific parameters for this simulation,
     # we can uniquely identify the xml, compiled code, executable and results
@@ -115,64 +118,93 @@ class MiindSimulation:
     def rates(self):
         if hasattr(self, '_rates'):
             return self._rates
+
+        # If rates data has already been saved, use it.
         fnameout = op.join(self.output_directory,
                                  self.simulation_name + '_rates.npz')
         if op.exists(fnameout):
             return np.load(fnameout)['data'][()]
-        f = ROOT.TFile(self.root_path)
-        keys = [key.GetName() for key in list(f.GetListOfKeys())]
-        graphs = {key: f.Get(key) for key in keys
-                  if isinstance(f.Get(key), ROOT.TGraph)}
+
         _rates = {}
-        for key, g in graphs.iteritems():
-            x, y, N = g.GetX(), g.GetY(), g.GetN()
-            x.SetSize(N)
-            y.SetSize(N)
-            xa = np.array(x, copy=True)
-            ya = np.array(y, copy=True)
-            times = xa.flatten()[2::2]
-            if not 'times' in _rates:
-                _rates['times'] = times
-            else:
-                assert not any(_rates['times'] - times > 1e-15)
-            # TODO HACK TODO why every other here??? bug in miind??
-            _rates[int(key.split('_')[-1])] = ya.flatten()[2::2]
-        print 'Extracted %i rates from root file' % len(_rates.keys())
+        # Load rate data from each root file
+        for fn in self.root_paths:
+            f = ROOT.TFile(fn)
+            keys = [key.GetName() for key in list(f.GetListOfKeys())
+                if 'rate_' in key.GetName()]
+
+            for key in keys:
+                graph = f.Get(key)
+
+                if not isinstance(f.Get(key), ROOT.TGraph):
+                    continue
+
+                x,y,N = graph.GetX(), graph.GetY(), graph.GetN()
+                # Nasty format in ROOT means we need to array copy here
+                x.SetSize(N)
+                y.SetSize(N)
+                xa = np.array(x, copy=True)
+                ya = np.array(y, copy=True)
+                times = xa.flatten()[2::2]
+
+                # All rate graphs should have the same times in them so just
+                # write once
+                if not 'times' in _rates:
+                    _rates['times'] = times
+                else:
+                    assert not any(_rates['times'] - times > 1e-15)
+
+                # load the values for this node's rate
+                _rates[int(key.split('_')[-1])] = ya.flatten()[2::2]
+
+        print 'Extracted %i rates from root file' % (len(_rates.keys())-1)
+
         self._rates = _rates
+        # save the data in a compressed file
         np.savez(fnameout, data=_rates)
         return _rates
 
+    def plotRate(self, node=0, ax=None):
+        if not ax:
+            fig, ax = plt.subplots()
+            ax.plot(self.rates['times'], self.rates[node])
+            fig.show()
+        else:
+            ax.plot(self.rates['times'], self.rates[node])
+
+    # Check if this particular simulation has been run previously
     @property
-    def run_exists(self):
-        '''
-        checks if this particular
-        '''
+    def runCompleted(self):
         xmlpath = op.join(self.output_directory, self.xml_fname)
         modelfiles = [op.join(self.output_directory, m)
                       for m in self.modelfiles]
+        # Has the xml file been copied to this results directory?
         if not op.exists(xmlpath):
             return False
-        old_params = convert_xml_dict(xmlpath)
-        if not op.exists(self.root_path):
+
+        # Has at least one root file been generated?
+        if not op.exists(self.root_paths[0]):
             return False
+
+        # If STATE was TRUE, is there a folder which holds the densities?
         if self.WITH_STATE:
             for p in modelfiles:
                 if not op.exists(p + '_mesh'):
                     return False
                 if len(os.listdir(p + '_mesh')) == 0:
                     return False
-        return dict_changed(old_params, self.params) == set()
+
+        return True
 
     @property
     def nodes(self):
         raise(BaseException("Not Implemented : MiindSimulation.nodes()"))
 
-    def submit(self, overwrite=False, enable_mpi=False, enable_openmp=False, disable_root=False, *args):
+    def submit(self, overwrite=False, enable_mpi=False, enable_openmp=False, enable_root=True, *args):
         if op.exists(self.output_directory) and overwrite:
             shutil.rmtree(self.output_directory)
         with cd(self.xml_location):
             directories.add_executable(self.submit_name, [self.xml_path], '',
-            enable_mpi, enable_openmp, disable_root)
+            enable_mpi, enable_openmp, enable_root)
         fnames = os.listdir(self.output_directory)
         if 'CMakeLists.txt' in fnames:
             subprocess.call(['cmake .'] +
@@ -184,3 +216,7 @@ class MiindSimulation:
 
     def run(self):
         subprocess.call('./' + self.miind_executable, cwd=self.output_directory)
+
+    def run_mpi(self, cores):
+        subprocess.call(['mpiexec', '--bind-to', 'core', '-n', str(cores),
+                        self.miind_executable], cwd=self.output_directory)
