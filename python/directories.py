@@ -22,7 +22,7 @@ def initialize_global_variables():
     global ABS_PATH
 
     filename = inspect.getframeinfo(inspect.currentframe()).filename
-    path = os.path.dirname(os.path.abspath(filename))    
+    path = os.path.dirname(os.path.abspath(filename))
     ABS_PATH=path
     global MIIND_ROOT
     MIIND_ROOT =  ABS_PATH[0:-6]
@@ -121,13 +121,13 @@ def create_cpp_file(name, dir_path, prog_name, mod_name):
         for f in mod_name:
             sp.call(['cp',f,dir_path])
     return
-            
+
 
 def move_model_files(xmlfile,dirpath):
     '''Collect the model files, and the matrix files that are mentioned in the XML file,
     and move them to directory dirpath.'''
     mns =  codegen.model_name(xmlfile)
-    mans = codegen.matrix_names(xmlfile)    
+    mans = codegen.matrix_names(xmlfile)
 
     for model in mns:
         if not os.path.exists(model):
@@ -141,19 +141,19 @@ def move_model_files(xmlfile,dirpath):
     for fi in fls:
         sp.call(['cp',fi,dirpath])
 
-def add_executable(dirname, xmlfiles, modname, enable_mpi=False, enable_openmp=False, disable_root=False):
+def add_executable(dirname, xmlfiles, modname, enable_mpi=False, enable_openmp=False, enable_root=True):
     global ENABLE_MPI
     global ENABLE_OPENMP
     global ENABLE_ROOT
 
     ''' Add a user defined executable to the current working directory.
      '''
-    global PATH_VARS_DEFINED    
+    global PATH_VARS_DEFINED
     if not PATH_VARS_DEFINED:
         initialize_global_variables()
 
     # ROOT enabled by default
-    if disable_root:
+    if not enable_root:
 	ENABLE_ROOT = 'OFF'
 
     # MPI disabled by default
