@@ -184,7 +184,12 @@ if __name__ == "__main__":
                                     float(command[2]), float(command[3]))
 
       if command_name in ['generate-matrix']:
-          api.ModelGenerator.buildMatrixFileFromModel(command[1], float(command[2]))
+          if len(command) == 3:
+              api.ModelGenerator.buildMatrixFileFromModel(command[1], float(command[2]))
+          if len(command) == 4:
+              api.ModelGenerator.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[3])
+          if len(command) == 5:
+              api.ModelGenerator.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[3], num_mc_points=int(command[4]))
 
       if command_name in ['exit', 'quit', 'close']:
           break
