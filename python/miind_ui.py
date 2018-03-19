@@ -190,6 +190,8 @@ if __name__ == "__main__":
               api.ModelGenerator.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[3])
           if len(command) == 5:
               api.ModelGenerator.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[3], num_mc_points=int(command[4]))
+          if len(command) == 6:
+              api.ModelGenerator.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[3], num_mc_points=int(command[4]), spike_shift_w=float(command[5]))
 
       if command_name in ['exit', 'quit', 'close']:
           break
