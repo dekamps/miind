@@ -303,7 +303,7 @@ class Density(Result):
             # image
             durations = [self.times[0]]
             for t in range(len(self.times)-1):
-                durations.append((self.times[t+1] - self.times[t])*time_scale)
+                durations.append(((self.times[t+1] - self.times[t])*time_scale)/1000.0)
 
             # Generate an image list file with the calculated durations
             with open(op.join(self.path, 'filelist.txt'), 'w') as lst:
