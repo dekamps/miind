@@ -67,6 +67,15 @@ namespace TwoDLib {
 		static double get_overlap_area(const Triangle& t1, const Triangle& t2);
 		static double sign (Point p1, Point p2, Point p3);
 		static bool pointInTriangle(const Point& pt, const Triangle& t);
+		static int orientation(Point p, Point q, Point r);
+		static vector<Point> convexHull(const vector<Point>& points);
+
+		void print() {
+			printf("Tri : %f,%f | %f,%f | %f,%f\n",
+			_vec_points[0][0], _vec_points[0][1],
+			_vec_points[1][0], _vec_points[1][1],
+			_vec_points[2][0], _vec_points[2][1]);
+		}
 
 	private:
 
