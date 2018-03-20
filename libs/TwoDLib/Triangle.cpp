@@ -20,6 +20,7 @@
 #include "Triangle.hpp"
 #include "TwoDLibException.hpp"
 #include <unordered_set>
+#include <cmath>
 
 using namespace std;
 using namespace TwoDLib;
@@ -66,17 +67,17 @@ double Triangle::get_overlap_area(const Triangle& t1, const Triangle& t2) {
 
 	// if any points in t2 are within t1 :
 	for(int i=0; i<3; i++) {
-		if(t1.pointInTriangle(t2._vec_points[i], t1))
+		if(Triangle::pointInTriangle(t2._vec_points[i], t1))
 			overlap_poly.insert(t2._vec_points[i]);
 	}
 	// If all points of t2 are in t1, just return t2's area.
 	if(overlap_poly.size() == 3)
-		return t2.SignedArea();
+		return std::abs(t2.SignedArea());
 
 	// if points in t1 are in t2, include those
 	int t1_in_t2 = 0;
 	for(int i=0; i<3; i++) {
-		if(t2.pointInTriangle(t1._vec_points[i], t2)){
+		if(Triangle::pointInTriangle(t1._vec_points[i], t2)){
 			t1_in_t2++;
 			overlap_poly.insert(t1._vec_points[i]);
 		}
@@ -84,7 +85,7 @@ double Triangle::get_overlap_area(const Triangle& t1, const Triangle& t2) {
 
 	// If all point of t1 are in t2, just return t1's area.
 	if(t1_in_t2 == 3)
-		return t1.SignedArea();
+		return std::abs(t1.SignedArea());
 
 	for(int i=0; i<3; i++) {
 		for(int j=0; j<3; j++) {
@@ -107,19 +108,77 @@ double Triangle::get_overlap_area(const Triangle& t1, const Triangle& t2) {
   if(overlap_poly.size() > 2) {
     vector<Point> vec_overlap_poly = vector<Point>(overlap_poly.begin(), overlap_poly.end());
 
-  	for(int i=0; i<static_cast<unsigned int>(vec_overlap_poly.size() - 2); i++){
-      triangles.push_back(Triangle(vec_overlap_poly[0], vec_overlap_poly[i+1], vec_overlap_poly[i+2]));
+    vector<Point> vec_ordered_overlap = convexHull(vec_overlap_poly);
+
+    printf("%i %i\n", vec_ordered_overlap.size(),  vec_overlap_poly.size());
+    assert(vec_ordered_overlap.size() == vec_overlap_poly.size());
+
+  	for(int i=0; i<static_cast<unsigned int>(vec_ordered_overlap.size() - 2); i++){
+      triangles.push_back(Triangle(vec_ordered_overlap[0], vec_ordered_overlap[i+1], vec_ordered_overlap[i+2]));
   	}
 
-
   	for(Triangle t : triangles) {
-      //printf("%f,%f - %f,%f - %f,%f : %f\n", t._vec_points[0][0], t._vec_points[0][1], t._vec_points[1][0], t._vec_points[1][1],
-      //                          t._vec_points[2][0], t._vec_points[2][1], t.SignedArea());
-      area += t.SignedArea();
+      // printf("%f,%f - %f,%f - %f,%f : %f\n", t._vec_points[0][0], t._vec_points[0][1], t._vec_points[1][0], t._vec_points[1][1],
+      //                           t._vec_points[2][0], t._vec_points[2][1], t.SignedArea());
+      area += std::abs(t.SignedArea());
   	}
   }
 
 	return area;
+}
+
+int Triangle::orientation(Point p, Point q, Point r)
+{
+    int val = (q[1] - p[1]) * (r[0] - q[0]) -
+              (q[0] - p[0]) * (r[1] - q[1]);
+
+    if (val == 0) return 0;  // colinear
+    return (val > 0)? 1: 2; // clock or counterclock wise
+}
+
+// Prints convex hull of a set of n points.
+vector<Point> Triangle::convexHull(const vector<Point>& points)
+{
+    // Initialize Result
+    vector<Point> hull;
+
+    // Find the leftmost point
+    int l = 0;
+    for (int i = 1; i < static_cast<unsigned int>(points.size()); i++)
+        if (points[i][0] < points[l][0])
+            l = i;
+
+    // Start from leftmost point, keep moving counterclockwise
+    // until reach the start point again.  This loop runs O(h)
+    // times where h is number of points in result or output.
+    int p = l, q;
+    do
+    {
+        // Add current point to result
+        hull.push_back(points[p]);
+
+        // Search for a point 'q' such that orientation(p, x,
+        // q) is counterclockwise for all points 'x'. The idea
+        // is to keep track of last visited most counterclock-
+        // wise point in q. If any point 'i' is more counterclock-
+        // wise than q, then update q.
+        q = (p+1)%(static_cast<unsigned int>(points.size()));
+        for (int i = 0; i < static_cast<unsigned int>(points.size()); i++)
+        {
+           // If i is more counterclockwise than current q, then
+           // update q
+           if (orientation(points[p], points[i], points[q]) == 2)
+               q = i;
+        }
+
+        // Now q is the most counterclockwise with respect to p
+        // Set p as q for next iteration, so that q is added to
+        // result 'hull'
+        p = q;
+
+    } while (p != l);  // While we don't come to first point
+
+    return hull;
 }
 
 double Triangle::sign (Point p1, Point p2, Point p3)
@@ -131,9 +190,9 @@ bool Triangle::pointInTriangle (const Point& pt, const Triangle& t)
 {
     bool b1, b2, b3;
 
-    b1 = sign(pt, t._vec_points[0], t._vec_points[1]) <= 0;
-    b2 = sign(pt, t._vec_points[1], t._vec_points[2]) <= 0;
-    b3 = sign(pt, t._vec_points[2], t._vec_points[0]) <= 0;
+    b1 = sign(pt, t._vec_points[0], t._vec_points[1]) < 0;
+    b2 = sign(pt, t._vec_points[1], t._vec_points[2]) < 0;
+    b3 = sign(pt, t._vec_points[2], t._vec_points[0]) < 0;
 
     return ((b1 == b2) && (b2 == b3));
 }

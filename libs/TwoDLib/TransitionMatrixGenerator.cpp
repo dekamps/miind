@@ -125,24 +125,42 @@ void TransitionMatrixGenerator::ProcessTranslatedPoints(const vector<Point>& vec
 
 void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsigned int cell_no, double v, double w)
 {
-
 	const Quadrilateral& quad = _tree.MeshRef().Quad(strip_no,cell_no);
 	Point p(v,w);
 
 	std::vector<Point> ps = quad.Points();
-	Quadrilateral quad_trans = Quadrilateral(ps[0]+p, ps[1]+p, ps[2]+p, ps[3]+p);
+	Quadrilateral quad_trans = Quadrilateral((ps[0]+p)*1000.0, (ps[1]+p)*1000.0, (ps[2]+p)*1000.0, (ps[3]+p)*1000.0);
 
+	double total_area = 0.0;
 	for (MPILib::Index i = 0; i < _tree.MeshRef().NrQuadrilateralStrips(); i++){
 	  for (MPILib::Index j = 0; j < _tree.MeshRef().NrCellsInStrip(i); j++ ){
-			double area = Quadrilateral::get_overlap_area(quad_trans, _tree.MeshRef().Quad(i,j));
+			std::vector<Point> ps = _tree.MeshRef().Quad(i,j).Points();
+			Quadrilateral quad_scaled = Quadrilateral((ps[0])*1000.0, (ps[1])*1000.0, (ps[2])*1000.0, (ps[3])*1000.0);
+			double area = Quadrilateral::get_overlap_area(quad_trans, quad_scaled);
 
+			total_area += (std::abs(area))/(std::abs(quad_trans.SignedArea()));
 			if (std::abs(area) > 0) {
 				Hit h;
 				h._cell = Coordinates(i,j);
-				h._count = (int)(_N*area/quad.SignedArea());
+				h._count = (int)(_N*(std::abs(area))/(std::abs(quad_trans.SignedArea())));
 				_hit_list.push_back(h);
 			}
 		}
+	}
+
+	printf("Total : %f\n", total_area);
+
+	int c = 0;
+	for(Hit h : _hit_list){
+		c += h._count;
+	}
+
+	if(c != _N){
+		int diff = c - _N;
+		if(std::abs(diff) == 1)
+			_hit_list.front()._count -= diff;
+		//else
+
 	}
 	// scale_distance determines the maximum search radius
 	// double dist = scale_distance*DetermineDistance(quad);
