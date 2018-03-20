@@ -62,6 +62,12 @@ namespace TwoDLib {
 
 		static const unsigned int _nr_points;
 
+		static int get_line_intersection(double p0_x, double p0_y, double p1_x, double p1_y,
+		    double p2_x, double p2_y, double p3_x, double p3_y, double *i_x, double *i_y);
+		static double get_overlap_area(const Triangle& t1, const Triangle& t2);
+		static double sign (Point p1, Point p2, Point p3);
+		static bool pointInTriangle(const Point& pt, const Triangle& t);
+
 	private:
 
 		friend class TriangleGenerator;
