@@ -38,7 +38,18 @@ bool Quadrilateral::SanityCheck() const
 	return true;
 }
 
+double Quadrilateral::get_overlap_area(const Quadrilateral& q1, const Quadrilateral& q2) {
+	std::pair<Triangle,Triangle> q1_ts = q1.Split();
+	std::pair<Triangle,Triangle> q2_ts = q2.Split();
 
+	double area = 0;
+	area += Triangle::get_overlap_area(std::get<0>(q1_ts), std::get<0>(q2_ts));
+	area += Triangle::get_overlap_area(std::get<0>(q1_ts), std::get<1>(q2_ts));
+	area += Triangle::get_overlap_area(std::get<1>(q1_ts), std::get<0>(q2_ts));
+	area += Triangle::get_overlap_area(std::get<1>(q1_ts), std::get<1>(q2_ts));
+
+	return area;
+}
 
 // Adapted from http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/1201356#1201356
 // Returns 1 if the lines intersect, otherwise 0. In addition, if the lines
@@ -253,4 +264,3 @@ pair<Triangle,Triangle> Quadrilateral::Split() const
 	}
 
 }
-

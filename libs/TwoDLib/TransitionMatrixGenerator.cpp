@@ -22,6 +22,7 @@
 #include "QuadGenerator.hpp"
 #include "TransitionMatrixGenerator.hpp"
 #include "TwoDLibException.hpp"
+#include <cmath>
 
 using namespace TwoDLib;
 
@@ -127,14 +128,29 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 
 	const Quadrilateral& quad = _tree.MeshRef().Quad(strip_no,cell_no);
 	Point p(v,w);
-	// scale_distance determines the maximum search radius
-	double dist = scale_distance*DetermineDistance(quad);
-	vector<Point> vec_point(_N);
-	QuadGenerator gen(quad, _uni);
-	gen.Generate(&vec_point);
-	ApplyTranslation(&vec_point,p);
-	ProcessTranslatedPoints(vec_point);
 
+	std::vector<Point> ps = quad.Points();
+	Quadrilateral quad_trans = Quadrilateral(ps[0]+p, ps[1]+p, ps[2]+p, ps[3]+p);
+
+	for (MPILib::Index i = 0; i < _tree.MeshRef().NrQuadrilateralStrips(); i++){
+	  for (MPILib::Index j = 0; j < _tree.MeshRef().NrCellsInStrip(i); j++ ){
+			double area = Quadrilateral::get_overlap_area(quad_trans, _tree.MeshRef().Quad(i,j));
+
+			if (std::abs(area) > 0) {
+				Hit h;
+				h._cell = Coordinates(i,j);
+				h._count = (int)(_N*area/quad.SignedArea());
+				_hit_list.push_back(h);
+			}
+		}
+	}
+	// scale_distance determines the maximum search radius
+	// double dist = scale_distance*DetermineDistance(quad);
+	// vector<Point> vec_point(_N);
+	// QuadGenerator gen(quad, _uni);
+	// gen.Generate(&vec_point);
+	// ApplyTranslation(&vec_point,p);
+	// ProcessTranslatedPoints(vec_point);
 }
 
 
@@ -228,4 +244,3 @@ TransitionMatrixGenerator::SearchResult TransitionMatrixGenerator::CheckFiducial
 
 	return Lost;
 }
-
