@@ -21,6 +21,7 @@
 #include "TwoDLibException.hpp"
 #include <unordered_set>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 using namespace TwoDLib;
@@ -95,8 +96,8 @@ double Triangle::get_overlap_area(const Triangle& t1, const Triangle& t2) {
 			if(get_line_intersection(t1._vec_points[i][0], t1._vec_points[i][1], t1._vec_points[i_mod][0], t1._vec_points[i_mod][1],
 																t2._vec_points[j][0], t2._vec_points[j][1], t2._vec_points[j_mod][0], t2._vec_points[j_mod][1],
 																&x,&y)) {
-      //  printf("%f,%f - %f,%f | %f,%f - %f,%f : %f %f\n", t1._vec_points[i][0], t1._vec_points[i][1], t1._vec_points[i_mod][0], t1._vec_points[i_mod][1],
-  			//													t2._vec_points[j][0], t2._vec_points[j][1], t2._vec_points[j_mod][0], t2._vec_points[j_mod][1], x,y);
+        // printf("%f,%f - %f,%f | %f,%f - %f,%f : %f %f\n", t1._vec_points[i][0], t1._vec_points[i][1], t1._vec_points[i_mod][0], t1._vec_points[i_mod][1],
+  			// 													t2._vec_points[j][0], t2._vec_points[j][1], t2._vec_points[j_mod][0], t2._vec_points[j_mod][1], x,y);
 				overlap_poly.insert(Point(x,y));
 			}
 		}
@@ -108,20 +109,19 @@ double Triangle::get_overlap_area(const Triangle& t1, const Triangle& t2) {
   if(overlap_poly.size() > 2) {
     vector<Point> vec_overlap_poly = vector<Point>(overlap_poly.begin(), overlap_poly.end());
 
-    vector<Point> vec_ordered_overlap = convexHull(vec_overlap_poly);
+    vector<Point> vec_ordered_overlap = vector<Point>(vec_overlap_poly);
+    if(vec_overlap_poly.size() > 3)
+      vector<Point> vec_ordered_overlap = convexHull(vec_overlap_poly);
 
-    printf("%i %i\n", vec_ordered_overlap.size(),  vec_overlap_poly.size());
-    assert(vec_ordered_overlap.size() == vec_overlap_poly.size());
+    if(vec_ordered_overlap.size() > 2) {
+    	for(int i=0; i<static_cast<unsigned int>(vec_ordered_overlap.size() - 2); i++){
+        triangles.push_back(Triangle(vec_ordered_overlap[0], vec_ordered_overlap[i+1], vec_ordered_overlap[i+2]));
+    	}
 
-  	for(int i=0; i<static_cast<unsigned int>(vec_ordered_overlap.size() - 2); i++){
-      triangles.push_back(Triangle(vec_ordered_overlap[0], vec_ordered_overlap[i+1], vec_ordered_overlap[i+2]));
-  	}
-
-  	for(Triangle t : triangles) {
-      // printf("%f,%f - %f,%f - %f,%f : %f\n", t._vec_points[0][0], t._vec_points[0][1], t._vec_points[1][0], t._vec_points[1][1],
-      //                           t._vec_points[2][0], t._vec_points[2][1], t.SignedArea());
-      area += std::abs(t.SignedArea());
-  	}
+    	for(Triangle t : triangles) {
+        area += std::abs(t.SignedArea());
+    	}
+    }
   }
 
 	return area;
@@ -148,6 +148,7 @@ vector<Point> Triangle::convexHull(const vector<Point>& points)
         if (points[i][0] < points[l][0])
             l = i;
 
+    vector<int> picked = vector<int>();
     // Start from leftmost point, keep moving counterclockwise
     // until reach the start point again.  This loop runs O(h)
     // times where h is number of points in result or output.
@@ -156,6 +157,7 @@ vector<Point> Triangle::convexHull(const vector<Point>& points)
     {
         // Add current point to result
         hull.push_back(points[p]);
+        picked.push_back(p);
 
         // Search for a point 'q' such that orientation(p, x,
         // q) is counterclockwise for all points 'x'. The idea
@@ -167,7 +169,7 @@ vector<Point> Triangle::convexHull(const vector<Point>& points)
         {
            // If i is more counterclockwise than current q, then
            // update q
-           if (orientation(points[p], points[i], points[q]) == 2)
+           if (orientation(points[p], points[i], points[q]) == 2 && find(picked.begin(), picked.end(), i) == picked.end())
                q = i;
         }
 
