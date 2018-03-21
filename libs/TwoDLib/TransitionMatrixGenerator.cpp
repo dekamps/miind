@@ -148,20 +148,25 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 		}
 	}
 
-	printf("Total : %f\n", total_area);
+	if (total_area != 1.0) {
+		for(int i=0; i<_hit_list.size(); i++){
+				_hit_list[i]._count = (int)((double)_hit_list[i]._count/total_area);
+			}
+	}
 
+	// rectify rounding errors
 	int c = 0;
 	for(Hit h : _hit_list){
 		c += h._count;
 	}
 
+
+
 	if(c != _N){
 		int diff = c - _N;
-		if(std::abs(diff) == 1)
-			_hit_list.front()._count -= diff;
-		//else
-
+		_hit_list.front()._count -= diff;
 	}
+
 	// scale_distance determines the maximum search radius
 	// double dist = scale_distance*DetermineDistance(quad);
 	// vector<Point> vec_point(_N);
