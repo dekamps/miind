@@ -26,6 +26,9 @@ class cd:
 def getMiindBuildPath():
     return os.path.join(directories.miind_root(), 'build')
 
+def getMiindPythonPath():
+    return os.path.join(directories.miind_root(), 'python')
+
 def getMiindAppsPath():
     build_path = getMiindBuildPath()
     return op.join(build_path, 'apps')
