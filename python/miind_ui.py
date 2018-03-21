@@ -4,69 +4,148 @@ import argparse
 import codegen
 import sys
 import os
+import os.path as op
 import directories
 import jobs
 import api
 import matplotlib.pyplot as plt
+import directories
+
+def getMiindPythonPath():
+    return os.path.join(directories.miind_root(), 'python')
+
+def sim(command):
+    command_name = command[0]
+    name = 'sim'
+
+    if command_name in [name]:
+        if len(command) == 1:
+            if not current_sim:
+                print 'No simulation currently defined.'
+                print ''
+                sim(['sim?'])
+            print 'Original XML File : {}'.format(current_sim.original_xml_path)
+            print 'Project Name : {}'.format(current_sim.submit_name)
+            print 'Parameters : {}'.format(current_sim.parameters)
+            print 'Generated XML File : {}'.format(current_sim.xml_fname)
+            print 'Output Directory : {}'.format(current_sim.output_directory)
+        if len(command) == 2:
+            current_sim = api.MiindSimulation(command[1])
+        if len(command) == 3:
+            current_sim = api.MiindSimulation(command[1], command[2])
+        if len(command) > 3:
+            comm_dict = {}
+            for comm in command[3:]:
+                kv = comm.split('=')
+                comm_dict[kv[0]] = kv[1]
+            current_sim = api.MiindSimulation(command[1], command[2], **comm_dict)
+
+    if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
+        print 'sim : Provide information on the current simulation.'
+        print 'sim [XML filename] : Use this XML file for the current simulation. The default project name is the same as the XML filename.'
+        print 'sim [XML filename] [Project name] : Use this XML file for the current simulation and set a different project name.'
+        print 'sim [XML filename] [Project name] [Parameter 1] [Parameter 2] ... : Use this XML file as a template with this project name to generate a new xml file (if not already generated) in which the Variable objects are set using the given Parameters.'
+
+def models(command, current_sim):
+    command_name = command[0]
+    name = 'models'
+
+    if command_name in [name]:
+        if not current_sim:
+            print 'No simulation currently defined. Please call command \'sim\'.'
+
+        print 'Model files used in ' + current_sim.submit_name + ' :\n'
+        for mf in current_sim.modelfiles:
+            print mf
+
+    if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
+        print 'models : List all model files used by the current simulation.'
+
+def _settings(command):
+    command_name = command[0]
+    name = 'settings'
+
+    if command_name in [name]:
+        if len(command) == 1:
+            print 'Current Settings :\n'
+            for k,v in settings.iteritems():
+                print k + ' = ' + str(v)
+
+        if len(command) > 1 and len(command) != 4:
+            print "settings command expects [ENABLE_MPI] [ENABLE_OPENMP] [ENABLE_ROOT]."
+
+        settings['mpi_enabled'] = (command[1] in ['True', 'true', 'TRUE'])
+        settings['openmp_enabled'] = (command[2] in ['True', 'true', 'TRUE'])
+        settings['root_enabled'] = (command[3] in ['True', 'true', 'TRUE'])
+
+        with open(settingsfilename, 'w') as settingsfile:
+            for k,v in settings.iteritems():
+                settingsfile.write(k + '=' + str(v) + '\n')
+
+    if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
+        print 'settings : List the current settings. Settings are stored in \'miind_ui_settings\' in the MIIND python directory.'
+        print 'settings [ENABLE_MPI] [ENABLE_OPENMP] [ENABLE_ROOT] : Expects \'True\' or \'False\' for each of the three settings. Settings are persistent.'
+
+
+def submit(command, current_sim):
+    command_name = command[0]
+    name = 'submit'
+
+    if command_name in [name]:
+        if not current_sim:
+            print 'No simulation currently defined. Please call command \'sim\'.'
+
+        if len(command) == 1:
+            current_sim.submit(False,
+                  settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'])
+        if len(command) == 2:
+            current_sim.submit(command[1] in ['True', 'true', 'TRUE'],
+                  settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'])
+        if len(command) >= 3:
+            current_sim.submit(command[1] in ['True', 'true', 'TRUE'],
+                  settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'], *command[2:])
+
+    if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
+        print 'submit : Generate and compile the code from the current simulation xml file. Ensure you have the correct settings (call \'settings\').'
+        print 'submit '
 
 if __name__ == "__main__":
   current_sim = None
   current_density = None
   current_marginal = None
-  mpi_enabled = False
-  openmp_enabled = False
-  root_enabled = True
+
+  settings = {}
+  settings['mpi_enabled'] = False
+  settings['openmp_enabled'] = False
+  settings['root_enabled'] = True
+
+  settingsfilename = op.join(getMiindPythonPath(), 'miind_ui_settings')
+  if not op.exists(settingsfilename):
+      with open(settingsfilename, 'w') as settingsfile:
+          for k,v in settings.iteritems():
+              settingsfile.write(k + '=' + str(v) + '\n')
+  else:
+      with open(settingsfilename, 'r') as settingsfile:
+          for line in settingsfile:
+              tokens = line.split('=')
+              settings[tokens[0].strip()] = (tokens[1].strip() == 'True')
+
   while True:
       command_string = raw_input('> ')
       command = command_string.split(' ')
       command_name = command[0]
       #try:
-      if command_name in ['sim']:
-          if len(command) == 1:
-              if not current_sim:
-                  print 'No simulation currently defined.'
-              print 'Original XML File : {}'.format(current_sim.original_xml_path)
-              print 'Project Name : {}'.format(current_sim.submit_name)
-              print 'Parameters : {}'.format(current_sim.parameters)
-              print 'Generated XML File : {}'.format(current_sim.xml_fname)
-              print 'Output Directory : {}'.format(current_sim.output_directory)
-          if len(command) == 2:
-              current_sim = api.MiindSimulation(command[1])
-          if len(command) == 3:
-              current_sim = api.MiindSimulation(command[1], command[2])
-          if len(command) > 3:
-              comm_dict = {}
-              for comm in command[3:]:
-                  kv = comm.split('=')
-                  comm_dict[kv[0]] = kv[1]
-              current_sim = api.MiindSimulation(command[1], command[2], **comm_dict)
 
-      if command_name in ['list-model-files']:
-          if not current_sim:
-              print 'No simulation currently defined.'
+      sim(command)
 
-          for mf in current_sim.modelfiles:
-              print mf
+      models(command, current_sim)
 
-      if command_name in ['set-submit-parameters']:
-          if len(command) != 4:
-              print "set-submit-parameters expects [ENABLE_MPI] [ENABLE_OPENMP] [ENABLE_ROOT]."
+      _settings(command)
 
-          mpi_enabled = (command[1] in ['True', 'true', 'TRUE'])
-          openmp_enabled = (command[2] in ['True', 'true', 'TRUE'])
-          root_enabled = (command[3] in ['True', 'true', 'TRUE'])
+      submit(command, current_sim)
 
-      if command_name in ['submit']:
-          if not current_sim:
-              print 'No simulation currently defined.'
 
-          if len(command) == 1:
-              current_sim.submit(False, mpi_enabled, openmp_enabled, root_enabled)
-          if len(command) == 2:
-              current_sim.submit(command[1] in ['True', 'true', 'TRUE'], mpi_enabled, openmp_enabled, root_enabled)
-          if len(command) >= 3:
-              current_sim.submit(command[1] in ['True', 'true', 'TRUE'],
-                    mpi_enabled, openmp_enabled, root_enabled, *command[2:])
+
 
       if command_name in ['run']:
           if not current_sim:
