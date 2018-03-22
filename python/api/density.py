@@ -16,8 +16,8 @@ def replace(value, string, *args):
     return value
 
 
-def find_density_fnames(modelfname, directory):
-    fnames = glob.glob(op.join(directory, modelfname + '_mesh', 'mesh*'))
+def find_density_fnames(modelfname, nodeindex, directory):
+    fnames = glob.glob(op.join(directory, modelfname + '_mesh', 'mesh_' + str(nodeindex) + '*'))
     if len(fnames) == 0:
         raise ValueError('No density output found for {}'.format(modelfname))
 
@@ -38,7 +38,6 @@ def get_density_time(path):
     fname = op.split(path)[-1]
     return float(fname.split('_')[2])
 
-
 def calc_mass(mesh, density, coords):
     masses = [mesh.cells[i][j].area * dens
               for (i, j), dens in zip(coords, density)]
@@ -46,16 +45,18 @@ def calc_mass(mesh, density, coords):
 
 
 class Result(object):
-    def __init__(self, io, modelname):
+    def __init__(self, io, nodename):
         self.io = io
-        self.modelname, self.modelfname = split_fname(modelname, '.model')
+        self.nodename = nodename
+        self.nodeindex, model = self.io.getModelFilenameAndIndexFromNode(nodename)
+        self.modelname, self.modelfname = split_fname(model, '.model')
         self.modelpath = op.join(self.io.xml_location, self.modelfname)
 
     @property
     def fnames(self):
         if not hasattr(self, '_fnames'):
             self._fnames, self._times = find_density_fnames(
-                self.modelfname, self.io.output_directory)
+                self.modelfname, self.nodeindex, self.io.output_directory)
         return self._fnames
 
     @property
@@ -74,10 +75,10 @@ class Result(object):
 
 
 class Marginal(Result):
-    def __init__(self, io, modelname, vn=100, wn=100):
-        super(Marginal, self).__init__(io, modelname)
+    def __init__(self, io, nodename, vn=100, wn=100):
+        super(Marginal, self).__init__(io, nodename)
         self.path = op.join(self.io.output_directory,
-                            self.modelname + '_marginal_density')
+                            self.nodename + '_marginal_density')
         self.data_path = op.join(self.io.output_directory, 'marginal_density.npz')
         self.projfname = self.modelpath.replace('.model', '.projection')
         self.vn, self.wn = vn, wn
@@ -241,11 +242,51 @@ class Marginal(Result):
             fig.savefig(figname, res=image_size, bbox_inches='tight')
             plt.close(fig)
 
+    def generateMarginalAnimation(self, filename, image_size=300, generate_images=True, time_scale=1.0):
+        # Generate the density image files
+        if generate_images:
+            self.generatePlotImages(image_size)
+
+        try:
+            # grab all the filenames
+            files = glob.glob(op.join(self.path, '*.png'))
+            files.sort()
+
+            # calculate duration of each frame - this is the time between each
+            # image
+            durations = [((self.times[0])*time_scale)/1000.0]
+            for t in range(len(self.times)-1):
+                durations.append(((self.times[t+1] - self.times[t])*time_scale)/1000.0)
+
+            # Generate an image list file with the calculated durations
+            with open(op.join(self.path, 'filelist.txt'), 'w') as lst:
+                d = 0
+                for f in files:
+                    lst.write('file \'' + f + '\'\n')
+                    lst.write('duration ' + str(durations[d]) + '\n')
+                    d += 1
+
+            # note ffmpeg must be installed
+            process = ['ffmpeg',
+                '-f', 'concat',
+                '-safe', '0',
+                '-i', op.join(self.path, 'filelist.txt')]
+
+            process.append(filename + '.mp4')
+
+            subprocess.call(process)
+        except OSError as e:
+            if e.errno == 2:
+                print "MIIND API Error : generateMarginalAnimation() requires ffmpeg to be installed."
+            else:
+                print "MIIND API Error : Unknown Error"
+                print e
+
 class Density(Result):
-    def __init__(self, io, modelname):
-        super(Density, self).__init__(io, modelname)
+    def __init__(self, io, nodename):
+        super(Density, self).__init__(io, nodename)
         self.path = op.join(self.io.output_directory,
-                            self.modelname + '_density')
+                            self.nodename + '_density')
 
     @property
     def polygons(self):
@@ -301,7 +342,7 @@ class Density(Result):
 
             # calculate duration of each frame - this is the time between each
             # image
-            durations = [self.times[0]]
+            durations = [((self.times[0])*time_scale)/1000.0]
             for t in range(len(self.times)-1):
                 durations.append(((self.times[t+1] - self.times[t])*time_scale)/1000.0)
 
@@ -333,6 +374,14 @@ class Density(Result):
         for fname in self.fnames:
             self.plotDensity(fname, image_size, colorbar, cmap, None, True, ext)
 
+    def findDensityFileFromTime(self, time):
+        for fname in self.fnames:
+            path, filename = op.split(fname)
+            tokens = filename.split('_')
+            if tokens[2] == time:
+                return fname
+        return None
+
     # plot the density in file 'fname'. ax may be used to add to an existing
     # plot axis.
     def plotDensity(self, fname, image_size=300, colorbar=None, cmap='inferno', ax=None,
@@ -349,8 +398,9 @@ class Density(Result):
         poly_coords = list(self.polygons.keys())
         ax.set_xlim(md[0])
         ax.set_ylim(md[1])
-        aspect = (md[0][1] - md[0][0]) / (md[1][1] - md[1][0])
-        ax.set_aspect(aspect)
+        #aspect = (md[0][1] - md[0][0]) / (md[1][1] - md[1][0])
+        #ax.set_aspect(aspect)
+        ax.set_aspect('auto')
         p = PatchCollection(self.patches, cmap=cmap)
         density, coords = read_density(fname)
         sort_idx = sorted(range(len(coords)), key=coords.__getitem__)

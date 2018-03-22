@@ -73,6 +73,7 @@ void WriteOutLost(const string& fn, const TwoDLib::TransitionMatrixGenerator& ge
 	for(const TwoDLib::Point& p: v)
 		ofst << p[0] << "\t" << p[1] << "\n";
 
+	std::cout << "Generated " << fn << std::endl;
 }
 
 void Write
@@ -99,6 +100,7 @@ void Write
 			ofst << double(ithit->_count)/it->_number << ";";
 		}
 		ofst << "\n";
+		std::cout << "Generated " << fn << std::endl;
 	}
 }
 	void GenerateElements

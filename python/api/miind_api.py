@@ -52,8 +52,29 @@ class MiindSimulation:
             self.sim=ET.fromstring(xml_file.read())
 
         self.modelfiles = [m.attrib['modelfile']
-                           for m in self.sim.findall('Algorithms/Algorithm')
-                           if 'modelfile' in m.attrib]
+                        for m in self.sim.findall('Algorithms/Algorithm')
+                        if 'modelfile' in m.attrib]
+
+        # Get the names of each Node instance. We know that MIIND indexes each node in order
+        # of definition in the xml file and uses that number to index the firing rate results so
+        # we can enumerate this list to get the index of each node.
+        self.nodenames = [m.attrib['name']
+                        for m in self.sim.findall('Nodes/Node')
+                        if 'name' in m.attrib]
+
+        # MIIND also indexes the density files in order of node definition in the xml file,
+        # however, the index excludes non-Mesh nodes.
+        mesh_algos = [(m.attrib['name'], m.attrib['modelfile'])
+                        for m in self.sim.findall('Algorithms/Algorithm')
+                        if 'modelfile' in m.attrib]
+
+        node_algos = [(m.attrib['name'], m.attrib['algorithm'])
+                        for m in self.sim.findall('Nodes/Node')]
+
+        self.meshnodenames = [(nn,f) for (nn, a) in node_algos for (m, f) in mesh_algos if a == m ]
+
+        # Hold the Variable names, useful for the UI to know.
+        self.variablenames = [m.attrib['Name'] for m in self.sim.findall('Variable') if 'Name' in m.attrib]
 
         simio = self.sim.find('SimulationIO')
         self.WITH_STATE = simio.find('WithState').text == 'TRUE'
@@ -151,7 +172,7 @@ class MiindSimulation:
                 if not 'times' in _rates:
                     _rates['times'] = times
                 else:
-                    assert not any(_rates['times'] - times > 1e-15)
+                    assert not any(_rates['times'] - times > 1e-5)
 
                 # load the values for this node's rate
                 _rates[int(key.split('_')[-1])] = ya.flatten()[2::2]
@@ -163,13 +184,34 @@ class MiindSimulation:
         np.savez(fnameout, data=_rates)
         return _rates
 
-    def plotRate(self, node=0, ax=None):
+    def getModelFilenameAndIndexFromNode(self, nodename):
+        if nodename.isdigit():
+            (i,m) = self.meshnodenames[int(nodename)]
+            return i,m
+        else:
+            for index, (name, modelfile) in enumerate(self.meshnodenames):
+                if name == nodename:
+                    return index, modelfile
+        return None, None
+
+    def getIndexFromNode(self, nodename):
+        if nodename.isdigit():
+            return int(nodename)
+        else:
+            for index, name in enumerate(self.nodenames):
+                if name == nodename:
+                    return index
+        return None
+
+    def plotRate(self, node, ax=None):
+        node_index = self.getIndexFromNode(node)
         if not ax:
             fig, ax = plt.subplots()
-            ax.plot(self.rates['times'], self.rates[node])
+            plt.title(node)
+            ax.plot(self.rates['times'], self.rates[node_index])
             fig.show()
         else:
-            ax.plot(self.rates['times'], self.rates[node])
+            ax.plot(self.rates['times'], self.rates[node_index])
 
     # Check if this particular simulation has been run previously
     @property
