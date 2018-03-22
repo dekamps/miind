@@ -1,4 +1,4 @@
-import matplotlib 
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import sys
@@ -29,7 +29,7 @@ def write_fid(bn, quadlist):
             f.write('</wline>')
             f.write('</Quadrilateral>\n')
         f.write('</Fiducial>\n')
-    
+
 def read_file(fn):
     f=open(fn)
     lines=f.readlines()
@@ -71,7 +71,7 @@ def read_fiducial(fn):
         if child.tag != "Quadrilateral":
             raise ValueError
         babys = [baby for baby in child]
-        
+
         vs = [ float(x) for x in  babys[0].text.split() ]
         ws = [ float(x) for x in  babys[1].text.split() ]
 
@@ -83,15 +83,14 @@ def read_fiducial(fn):
 def extract_base(fn):
     return fn.split('.')[0].split('_')[0]
 
-if __name__ == "__main__":
-
-    if len(sys.argv) != 2:
+def main(args):
+    if len(args) != 2:
         print 'Usage: \' python lost.py <filename>.lost \' '
         raise SystemExit()
-        
+
     fig = plt.figure()
-    ax = plot_lost(sys.argv[1])
-    bn = extract_base(sys.argv[1])
+    ax = plot_lost(args[1])
+    bn = extract_base(args[1])
     l=read_fiducial(bn + '.fid')
     for patch in l:
         add_fiducial(ax,patch)
@@ -112,7 +111,7 @@ if __name__ == "__main__":
             patch = [ point for point in curr_points]
             quads.append(patch)
             add_fiducial(ax,patch)
-    
+
             del curr_points[:]
             curr_points.append(coords)
             plt.plot(coords[0],coords[1],'r+')
@@ -122,3 +121,6 @@ if __name__ == "__main__":
 
 
     plt.show()
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
