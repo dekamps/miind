@@ -83,6 +83,31 @@ def read_fiducial(fn):
 def extract_base(fn):
     return fn.split('.')[0].split('_')[0]
 
+def zoom_fun(event, ax, base_scale=1.5):
+    # get the current x and y limits
+    cur_xlim = ax.get_xlim()
+    cur_ylim = ax.get_ylim()
+    cur_xrange = (cur_xlim[1] - cur_xlim[0])*.5
+    cur_yrange = (cur_ylim[1] - cur_ylim[0])*.5
+    xdata = event.xdata # get event x location
+    ydata = event.ydata # get event y location
+    if event.button == 'up':
+        # deal with zoom in
+        scale_factor = 1/base_scale
+    elif event.button == 'down':
+        # deal with zoom out
+        scale_factor = base_scale
+    else:
+        # deal with something that should never happen
+        scale_factor = 1
+        print event.button
+    # set new limits
+    ax.set_xlim([xdata - cur_xrange*scale_factor,
+                 xdata + cur_xrange*scale_factor])
+    ax.set_ylim([ydata - cur_yrange*scale_factor,
+                 ydata + cur_yrange*scale_factor])
+    plt.draw() # force re-draw
+
 def main(args):
     if len(args) != 2:
         print 'Usage: \' python lost.py <filename>.lost \' '
@@ -94,6 +119,24 @@ def main(args):
     l=read_fiducial(bn + '.fid')
     for patch in l:
         add_fiducial(ax,patch)
+
+    def onkey(event, ax, fid_fname, quads):
+        zoom_fun(event, ax)
+        if event.key == 'd':
+            print('Deleting previous Fiducial.')
+            del quads[-1]
+            write_fid(fid_fname, quads)
+            ax.patches[-1].remove()
+            plt.draw()
+        elif event.key == 'c':
+            print('Clearing canvas and redrawing fiducials.')
+            plt.cla()
+            for patch in read_fiducial(fid_fname):
+                add_fiducial(ax, patch)
+            plt.draw()
+        else:
+            print('Key "{}" not recognized.'.format(event.key))
+            return
 
     def onclick(event):
         global bn, cid
