@@ -128,14 +128,50 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 	const Quadrilateral& quad = _tree.MeshRef().Quad(strip_no,cell_no);
 	Point p(v,w);
 
+
+
 	std::vector<Point> ps = quad.Points();
 	Quadrilateral quad_trans = Quadrilateral((ps[0]+p)*1000.0, (ps[1]+p)*1000.0, (ps[2]+p)*1000.0, (ps[3]+p)*1000.0);
+
+	std::vector<Point> trans_points = quad_trans.Points();
+	double search_min_x = trans_points[0][0];
+	double search_max_x = trans_points[0][0];
+	double search_min_y = trans_points[0][1];
+	double search_max_y = trans_points[0][1];
+
+	for (Point p : trans_points) {
+		if (p[0] < search_min_x)
+			search_min_x = p[0];
+		if (p[0] > search_max_x)
+			search_max_x = p[0];
+		if (p[1] < search_min_y)
+			search_min_y = p[1];
+		if (p[1] > search_max_y)
+			search_max_y = p[1];
+	}
+
+	double width_x = (search_max_x - search_min_x);
+	double width_y = (search_max_y - search_min_y);
+	search_min_x = search_min_x - width_x;
+	search_max_x = search_max_x + width_x;
+	search_min_y = search_min_y - width_y;
+	search_max_y = search_max_y + width_y;
 
 	double total_area = 0.0;
 	for (MPILib::Index i = 0; i < _tree.MeshRef().NrQuadrilateralStrips(); i++){
 	  for (MPILib::Index j = 0; j < _tree.MeshRef().NrCellsInStrip(i); j++ ){
+
 			std::vector<Point> ps = _tree.MeshRef().Quad(i,j).Points();
 			Quadrilateral quad_scaled = Quadrilateral((ps[0])*1000.0, (ps[1])*1000.0, (ps[2])*1000.0, (ps[3])*1000.0);
+			std::vector<Point> ps_scaled = quad_scaled.Points();
+			bool point_inside = false;
+			for(Point p : ps_scaled){
+				point_inside |= p[0] > search_min_x && p[0] < search_max_x && p[1] > search_min_y && p[1] < search_max_y;
+			}
+
+			if(!point_inside)
+				continue;
+
 			double area = Quadrilateral::get_overlap_area(quad_trans, quad_scaled);
 
 			total_area += (std::abs(area))/(std::abs(quad_trans.SignedArea()));
