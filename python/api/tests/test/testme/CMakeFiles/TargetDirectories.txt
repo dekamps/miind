@@ -1,4 +1,0 @@
-/home/hugh/dev/miind/python/api/tests/test/testme/CMakeFiles/edit_cache.dir
-/home/hugh/dev/miind/python/api/tests/test/testme/CMakeFiles/rebuild_cache.dir
-/home/hugh/dev/miind/python/api/tests/test/testme/CMakeFiles/testme.dir
-/home/hugh/dev/miind/python/api/tests/test/testme/CMakeFiles/G__Event.dir
