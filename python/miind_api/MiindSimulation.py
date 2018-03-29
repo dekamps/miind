@@ -237,7 +237,7 @@ class MiindSimulation:
 
     @property
     def nodes(self):
-        raise(BaseException("Not Implemented : MiindSimulation.nodes()"))
+        return self.nodenames
 
     def submit(self, overwrite=False, enable_mpi=False, enable_openmp=False, enable_root=True, *args):
         if op.exists(self.output_directory) and overwrite:
