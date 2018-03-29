@@ -7,6 +7,8 @@ import xml.etree.ElementTree as ET
 from shapely.geometry import Polygon
 from descartes.patch import PolygonPatch
 from collections import OrderedDict as odict
+import matplotlib.pyplot as plt
+from matplotlib.collections import PatchCollection
 
 from tools import *
 
@@ -57,6 +59,9 @@ class MeshTools:
     @staticmethod
     def plotMesh(filename, ax=None):
         mesh = meshmod.Mesh(filename)
+        # Mesh puts an empty cell (used for the stationary strip) by default
+        # remove it before displaying
+        mesh.cells.pop(0)
 
         polygons = odict(
             ((i, j),
@@ -79,4 +84,6 @@ class MeshTools:
         ax.add_collection(p)
         ax.set_xlim(md[0])
         ax.set_ylim(md[1])
+
+        plt.show(block=False)
         return ax

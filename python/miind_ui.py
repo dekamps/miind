@@ -7,7 +7,7 @@ import os
 import os.path as op
 import directories
 import jobs
-import api
+import miind_api as api
 import matplotlib.pyplot as plt
 import directories
 
@@ -328,7 +328,7 @@ def generateModel(command):
 
     if command_name in [name]:
         if len(command) == 4:
-            api.ModelGenerator.buildModelFileFromMesh(command[1],
+            api.MeshTools.buildModelFileFromMesh(command[1],
                                   float(command[2]), float(command[3]))
         else:
             print name + ' expects three parameters.'
@@ -344,7 +344,7 @@ def generateEmptyFid(command):
 
     if command_name in [name] + alts:
         if len(command) == 2:
-            api.ModelGenerator.generateStubFidFile(command[1])
+            api.MeshTools.generateStubFidFile(command[1])
         else:
             print name + ' expects one parameter.'
             generateEmptyFid(name+'?')
@@ -359,11 +359,11 @@ def generateMatrix(command):
 
     if command_name in [name]:
         if len(command) == 4:
-            api.ModelGenerator.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]))
+            api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]))
         elif len(command) == 5:
-            api.ModelGenerator.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]), spike_shift_w=float(command[4]))
+            api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]), spike_shift_w=float(command[4]))
         elif len(command) == 6:
-            api.ModelGenerator.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]), spike_shift_w=float(command[4]), reset_shift_w=float(command[5]))
+            api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]), spike_shift_w=float(command[4]), reset_shift_w=float(command[5]))
         else:
             print name + ' expects three, four or five parameters.'
             generateMatrix(name+'?')
@@ -379,7 +379,7 @@ def lost(command):
 
     if command_name in [name]:
         if len(command) == 2:
-            api.ModelGenerator.lost(command[1])
+            api.MeshTools.lost(command[1])
         else:
             print name + ' expects one parameter.'
             lost(name+'?')
@@ -393,7 +393,7 @@ def drawMesh(command):
 
     if command_name in [name]:
         if len(command) == 2:
-            api.ModelGenerator.plotMesh(command[1])
+            api.MeshTools.plotMesh(command[1])
         else:
             print name + ' expects one parameter.'
             lost(name+'?')

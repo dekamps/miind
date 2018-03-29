@@ -1,6 +1,6 @@
-import MiindSimulation
-import Result
-import Density
-import Marginal
-import MeshTools
-import LifMeshGenerator
+from MiindSimulation import MiindSimulation
+from Result import Result
+from Density import Density
+from Marginal import Marginal
+from MeshTools import MeshTools
+from LifMeshGenerator import LifMeshGenerator

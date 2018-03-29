@@ -4,10 +4,10 @@ from pprint import pprint
 import json
 import os
 import os.path as op
+import glob
 import numpy as np
 import copy
 from collections import Mapping, OrderedDict
-from xmldict import dict_to_xml, xml_to_dict, _fromstring
 import directories
 
 
@@ -50,7 +50,6 @@ def replace(value, string, *args):
         value = value.replace(a, string)
     return value
 
-
 def find_density_fnames(modelfname, nodeindex, directory):
     fnames = glob.glob(op.join(directory, modelfname + '_mesh', 'mesh_' + str(nodeindex) + '*'))
     if len(fnames) == 0:
@@ -60,14 +59,12 @@ def find_density_fnames(modelfname, nodeindex, directory):
     times = [get_density_time(f) for f in fnames]
     return fnames, times
 
-
 def read_density(filename):
     f = open(filename, 'r')
     line = f.readline().split()
     data = [float(x) for x in line[2::3]]
     coords = [(int(i), int(j)) for i, j in zip(line[::3], line[1::3])]
     return data, coords
-
 
 def get_density_time(path):
     fname = op.split(path)[-1]
