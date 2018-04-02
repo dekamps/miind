@@ -6,6 +6,8 @@ import ast
 import xml.etree.ElementTree as ET
 from matplotlib.path import Path
 
+global fig
+global bn
 
 curr_points = []
 quads = []
@@ -40,7 +42,7 @@ def read_file(fn):
     return x, y
 
 def plot_lost(fn):
-
+    global fig
     ax = fig.add_subplot(111)
     x,y = read_file(fn)
     plt.plot(x,y,'.')
@@ -113,6 +115,8 @@ def main(args):
         print 'Usage: \' python lost.py <filename>.lost \' '
         raise SystemExit()
 
+    global fig
+    global bn
     fig = plt.figure()
     ax = plot_lost(args[1])
     bn = extract_base(args[1])

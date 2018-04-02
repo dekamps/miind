@@ -66,7 +66,7 @@ bool Ode2DSystem::CheckConsistency() const {
 			ost_err << "In total there are: " << _mesh.NrQuadrilateralStrips() << " strips." << std::endl;
 			throw TwoDLib::TwoDLibException(ost_err.str());
 		}
-	}	
+	}
 
 	for (const Redistribution& r: _vec_reset){
 		if ( r._from[0] >= _mesh.NrQuadrilateralStrips() ){
@@ -77,7 +77,7 @@ bool Ode2DSystem::CheckConsistency() const {
 			ost_err << "reset. Nr cells in strip r._from[0]: " <<  _mesh.NrCellsInStrip(r._from[0] ) << ", from: " << r._from[1];
 			throw TwoDLib::TwoDLibException(ost_err.str());
 		}
-	}	
+	}
 
 	return true;
 }
@@ -168,6 +168,7 @@ void Ode2DSystem::UpdateMap()
 
 void Ode2DSystem::RemapReversal(){
 	std::for_each(_vec_reversal.begin(),_vec_reversal.end(),_reversal);
+	std::for_each(_vec_reversal.begin(),_vec_reversal.end(),_clean);
 }
 
 void Ode2DSystem::RedistributeProbability()
@@ -190,4 +191,3 @@ double Ode2DSystem::AvgV() const
 
 	return av;
 }
-
