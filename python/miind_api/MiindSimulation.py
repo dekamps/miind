@@ -239,6 +239,21 @@ class MiindSimulation:
     def nodes(self):
         return self.nodenames
 
+    def submit_shared_lib(self, overwrite=False, enable_mpi=False, enable_openmp=False, enable_root=True, *args):
+        if op.exists(self.output_directory) and overwrite:
+            shutil.rmtree(self.output_directory)
+        with cd(self.xml_location):
+            directories.add_shared_library(self.submit_name, [self.xml_path], '',
+            enable_mpi, enable_openmp, enable_root)
+        fnames = os.listdir(self.output_directory)
+        if 'CMakeLists.txt' in fnames:
+            subprocess.call(['cmake .'] +
+                             [a for a in args],
+                             cwd=self.output_directory, shell=True)
+            subprocess.call(['make'], cwd=self.output_directory)
+            shutil.copyfile(self.xml_path, op.join(self.output_directory,
+                                                        self.xml_fname))
+
     def submit(self, overwrite=False, enable_mpi=False, enable_openmp=False, enable_root=True, *args):
         if op.exists(self.output_directory) and overwrite:
             shutil.rmtree(self.output_directory)
