@@ -23,68 +23,86 @@ def generate_preamble(outfile):
 
     return
 
-def generate_closing(outfile):
-    outfile.write('\tnetwork.configureSimulation(par_run);\n')
-    outfile.write('\tnetwork.evolve();\n')
-    outfile.write('\t} catch(std::exception& exc){\n')
-    outfile.write('\t\tstd::cout << exc.what() << std::endl;\n')
-
-    outfile.write('#ifdef ENABLE_MPI\n')
-    outfile.write('\t//Abort the MPI environment in the correct way :\n')
-    outfile.write('\tenv.abort(1);\n')
-    outfile.write('#endif\n')
-    outfile.write('\t}\n\n')
-
-    outfile.write('\tMPILib::utilities::MPIProxy().barrier();\n')
-    outfile.write('\tt.stop();\n')
-    outfile.write('\tif (MPILib::utilities::MPIProxy().getRank() == 0) {\n')
-    outfile.write('\n\t\tstd::cout << \"Overall time spend\\n\";\n')
-    outfile.write('\t\tt.report();\n')
-    outfile.write('\t}\n')
-
-    outfile.write('\treturn 0;\n}\n')
-
-    for t in  algorithms.RATEFUNCTIONS:
-        outfile.write(t)
-
-    return
-
-
-def define_network_type(outfile, type):
+def define_network_type(type):
     if type ==  "DelayedConnection":
         s = "MPILib::" + type
     else:
         s = "double"
     return 'typedef MPILib::MPINetwork<' + s + ', MPILib::utilities::CircularDistribution> Network;\n'
 
+def abstract_type(type):
+    if type ==  "DelayedConnection":
+        s = "MPILib::" + type
+    else:
+        s = "double"
+    return 'MPILib::MiindTvbModelAbstract<' + s + ', MPILib::utilities::CircularDistribution>'
+
+def define_abstract_type(type):
+    if type ==  "DelayedConnection":
+        s = "MPILib::" + type
+    else:
+        s = "double"
+    return 'define_python_MiindTvbModelAbstract<' + s + ', MPILib::utilities::CircularDistribution>();\n'
+
+
+def generate_closing(outfile, typ, tree):
+    outfile.write('\t}\n')
+    outfile.write('\t\n')
+    outfile.write('\tstd::string sim_name = \"miind\";\n')
+    outfile.write('\treport::handler::InactiveReportHandler handler = report::handler::InactiveReportHandler();\n')
+    outfile.write('\t\n')
+    outfile.write('\tSimulationRunParameter par_run( handler,(_simulation_length/_time_step)+1,0,\n')
+    outfile.write('\t\t\t_simulation_length,_time_step,_time_step,sim_name,_time_step);\n')
+    outfile.write('\t\n')
+    outfile.write('\tnetwork.configureSimulation(par_run);\n')
+    outfile.write('\t}\n')
+    outfile.write('};\n\n')
+
+    for t in  algorithms.RATEFUNCTIONS:
+        outfile.write(t)
+
+    outfile.write('\n\n')
+    variable_list = tree.findall('Variable')
+    outfile.write('BOOST_PYTHON_MODULE(libmiindlif)\n')
+    outfile.write('{\n')
+    outfile.write('\tusing namespace boost::python;\n')
+    outfile.write('\t' + define_abstract_type(typ))
+    outfile.write('\tclass_<MiindModel, bases<' + abstract_type(typ) + '>>("MiindModel", init<int,long>())\n')
+
+    if len(variable_list) > 0:
+        var_types = variables.parse_variable_types(variable_list)
+        outfile.write('\t.def(init<int,long' + var_types + '>())\n')
+    outfile.write('\t.def("init", &MiindModel::init);\n')
+    outfile.write('}\n')
+
 def parse_xml(infile, outfile):
     tree=ET.fromstring(infile.read())
     m=tree.find('WeightType')
     s = m.text
-    return define_network_type(outfile,s), tree
-
-def variables(outfile, tree):
-    variable_list = tree.findall('Variable')
-    variables.parse_variables(variable_list, outfile)
-
+    return define_network_type(s), tree
 
 def constructor_override(outfile,tree):
-    outfile.write('\tMiindModel(int num_nodes, long simulation_length \n')
-    variable_list = tree.findall('Variable')
-    variables.parse_variables_as_parameters(variable_list,outfile)
-    outfile.write('):\n')
-    outfile.write('\t\tMiindTvbModelAbstract(num_nodes, simulation_length)\n')
-    variables.parse_variables_as_constructor_defaults(variable_list, outfile)
-    outfile.write('{}')
-
-def generate_opening(outfile):
-    outfile.write('class MiindModel : public MPILib::MiindTvbModelAbstract<DelayedConnection, MPILib::utilities::CircularDistribution> {\n')
-    outfile.write('public:\n\n')
-    outfile.write('\tMiindModel(int num_nodes, long simulation_length) :\n')
+    outfile.write('\tMiindModel(int num_nodes, long simulation_length ):\n')
     outfile.write('\t\tMiindTvbModelAbstract(num_nodes, simulation_length){}\n\n')
+
+    variable_list = tree.findall('Variable')
+    if len(variable_list) > 0:
+        outfile.write('\tMiindModel(int num_nodes, long simulation_length \n')
+        variables.parse_variables_as_parameters(variable_list,outfile)
+        outfile.write('):\n')
+        outfile.write('\t\tMiindTvbModelAbstract(num_nodes, simulation_length)\n')
+        variables.parse_variables_as_constructor_defaults(variable_list, outfile)
+        outfile.write('{}\n\n')
+
+def generate_opening(outfile, tree, typ):
+    outfile.write('class MiindModel : public ' + abstract_type(typ) + ' {\n')
+    outfile.write('public:\n\n')
+    constructor_override(outfile, tree)
+    outfile.write('\n')
     outfile.write('\tvoid init(boost::python::list params)\n')
     outfile.write('\t{\n')
-    outfile.write('\t\t_time_step = ' + + ';\n')
+    t_step = tree.find('SimulationRunParameter/t_step')
+    outfile.write('\t\t_time_step = ' + t_step.text + ';\n')
     outfile.write('\t\tfor(int i=0; i<_num_nodes; i++) {\n')
 
 
@@ -123,7 +141,7 @@ def generate_outputfile(infile, outfile):
 
     alg_list = algies[0].findall('Algorithm')
     weighttype = tree.find('WeightType')
-    generate_opening(outfile)
+    generate_opening(outfile, tree, weighttype.text)
     outfile.write('\t// generating algorithms\n')
     algorithms.parse_algorithms(alg_list,weighttype,outfile)
     node_list = tree.findall('Nodes/Node')
@@ -132,11 +150,6 @@ def generate_outputfile(infile, outfile):
     outfile.write('\t// generating connections\n')
     connection_list = tree.findall('Connections/Connection')
     connections.parse_connections(connection_list,weighttype,outfile)
-    outfile.write('\t// generation simulation parameter\n')
-    simhand = tree.find('SimulationIO')
-    simulation.parse_simulation(simhand,outfile)
-    simpar = tree.find('SimulationRunParameter')
-    simulation.parse_parameter(simpar,outfile)
-    generate_closing(outfile)
+    generate_closing(outfile, weighttype.text, tree)
     algorithms.reset_algorithms()
     nodes.reset_nodes()

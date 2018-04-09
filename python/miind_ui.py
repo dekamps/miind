@@ -32,8 +32,9 @@ def _help(command):
         print 'sim                      : Set the current simulation from an xml file or generate a new xml file.'
         print 'models                   : List all model files used by the current simulation.'
         print 'settings                 : Set certain persistent parameters to match your MIIND installation (ENABLE MPI, OPENMP, ROOT).'
-        print 'submit                   : Generate and build(make) the code from the current simulation.'
+        print 'submit                   : Generate and build (make) the code from the current simulation.'
         print 'run                      : Run the current submitted simulation.'
+        print 'build-shared-lib         : Generate and build (make) a shared library for use with python from the current simulation.'
         print ''
         print '***** Commands for Analysing and Presenting Completed Simulations *****'
         print ''
@@ -175,6 +176,27 @@ def run(command, current_sim):
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print name + ' : Run the current simulation. The simulation must have previously been \'submitted\'.'
         print name + ' [Number of cores] : Run the current simulation using mpiexec with the given number of cores. MPI must be enabled in MIIND.'
+
+def buildSharedLib(command, current_sim):
+    command_name = command[0]
+    name = 'build-shared-lib'
+    alts = ['bsl']
+
+    if command_name in [name] + alts:
+        if not current_sim:
+            print 'No simulation currently defined. Please call command \'sim\'.'
+
+        if len(command) == 1:
+            current_sim.submit_shared_lib(True,
+                  settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'])
+        if len(command) >= 2:
+            current_sim.submit_shared_lib(True,
+                  settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'], *command[1:])
+
+    if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
+        print name + ' : Generate and \'make\' a shared library for use with python from the current simulation xml file. Ensure you have the correct settings (call \'settings\').'
+        print name + ' [make argument 1] [make argument 2] ... : Generate and \'make (with the provided additional arguments)\' a shared library for use with python from the current simulation xml file.'
+        print 'Alternative command names : ' + ' '.join(alts)
 
 def rate(command, current_sim):
     command_name = command[0]
@@ -379,7 +401,7 @@ def lost(command):
 
     if command_name in [name]:
         if len(command) == 2:
-            api.MeshTools.lost(command[1])
+            api.MeshTools.plotLost(command[1])
         else:
             print name + ' expects one parameter.'
             lost(name+'?')
@@ -451,6 +473,8 @@ if __name__ == "__main__":
       submit(command, current_sim)
 
       run(command, current_sim)
+
+      buildSharedLib(command, current_sim)
 
       rate(command, current_sim)
 

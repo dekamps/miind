@@ -146,7 +146,7 @@ def main(args):
         global bn, cid
         if event.dblclick:
             write_fid(bn,quads)
-            raise SystemExit
+            raise SystemExit()
 
         inv = ax.transData.inverted()
         coords = inv.transform( (event.x, event.y) )

@@ -36,10 +36,6 @@ class MeshTools:
         return basename + '.fid'
 
     @staticmethod
-    def lost(filename):
-        lost.main(['lost.py', filename])
-
-    @staticmethod
     def buildMatrixFileFromModel(basename, spike_shift_v, fidfile=None, num_mc_points=10,
                                     spike_shift_w=0, reset_shift_w=0):
         if not fidfile:
@@ -87,3 +83,30 @@ class MeshTools:
 
         plt.show(block=False)
         return ax
+
+    @staticmethod
+    def plotLost(lost_path, **kwargs):
+        from lost_tools import (add_fiducial, extract_base,
+                                    plot_lost, read_fiducial,
+                                    onclick, zoom_fun, onkey)
+        backend = matplotlib.get_backend().lower()
+        if backend not in ['qt4agg']:
+            print('Warning: backend not recognized as working with "lost.py", ' +
+                  'if you do not encounter any issues with your current backend ' +
+                  '{}, please add it to this list.'.format(backend))
+        curr_points = []
+        fig = plt.figure()
+        ax = plot_lost(lost_path)
+        fid_fname = extract_base(lost_path) + '.fid'
+        patches = read_fiducial(fid_fname)
+        quads = copy.deepcopy(patches)
+        for patch in patches:
+            add_fiducial(ax, patch)
+
+        fig.canvas.mpl_connect('button_press_event',
+                               lambda event: onclick(event, ax, fid_fname,
+                                                     curr_points, quads))
+        fig.canvas.mpl_connect('scroll_event', lambda event: zoom_fun(event, ax))
+        fig.canvas.mpl_connect('key_press_event',
+                               lambda event: onkey(event, ax, fid_fname, quads))
+        plt.show()
