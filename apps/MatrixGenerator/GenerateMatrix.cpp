@@ -173,9 +173,9 @@ void Write
 					l._origin = TwoDLib::Coordinates(i,j);
 					l._destination_list = gen.HitList();
 
-					TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
+					//TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
 
-					transitions.push_back(lcor);
+					transitions.push_back(l);
 				}
 			}
 		}

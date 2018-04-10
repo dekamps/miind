@@ -176,6 +176,14 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 			if(all_points_right || all_points_left || all_points_above || all_points_below)
 				continue;
 
+			all_points_right = true;
+			for(Point p : ps_scaled){
+				all_points_right &= p[0] > -35.0*1000.0;
+			}
+
+			if(all_points_right)
+				continue;
+
 			double area = Quadrilateral::get_overlap_area(quad_trans, quad_scaled);
 
 			if((std::abs(area))/(std::abs(quad_trans.SignedArea())) < 0.00001)
