@@ -104,6 +104,16 @@ def insert_cmake_template_lib(name, full_path_name):
         for line in replace:
             fout.write(line)
 
+        libbase = MIIND_ROOT + '/build/libs'
+        numdir  = libbase + '/NumtoolsLib'
+        geomdir = libbase + '/GeomLib'
+        mpidir  = libbase + '/MPILib'
+        twodir  = libbase + '/TwoDLib'
+        fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ')\n')
+        fout.write('\nadd_library( miindlif ${LIB_TYPE} ${TVB_LIF_SRC} ${PW_HEADERS})\n')
+        fout.write('target_link_libraries( miindlif ${LIBLIST} -lpython2.7 -lboost_python)\n')
+
+
 def insert_cmake_template(name,full_path_name):
     ''' name is the executable name, full_path is the directory where the cmake template
     needs to be written into.'''
