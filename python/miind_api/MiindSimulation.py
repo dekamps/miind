@@ -169,8 +169,6 @@ class MiindSimulation:
                 # write once
                 if not 'times' in _rates:
                     _rates['times'] = times
-                else:
-                    assert not any(_rates['times'] - times > 1e-5)
 
                 # load the values for this node's rate
                 _rates[int(key.split('_')[-1])] = ya.flatten()[2::2]
@@ -206,10 +204,10 @@ class MiindSimulation:
         if not ax:
             fig, ax = plt.subplots()
             plt.title(node)
-            ax.plot(self.rates['times'], self.rates[node_index])
+            ax.plot(self.rates['times'], self.rates[node_index][0:len(self.rates['times'])])
             fig.show()
         else:
-            ax.plot(self.rates['times'], self.rates[node_index])
+            ax.plot(self.rates['times'], self.rates[node_index][0:len(self.rates['times'])])
 
     # Check if this particular simulation has been run previously
     @property
