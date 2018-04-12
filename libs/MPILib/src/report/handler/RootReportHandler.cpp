@@ -20,7 +20,7 @@
 #ifdef WIN32
 // All these warnings relate to ROOT source code
 #pragma warning(disable: 4267 4305 4800 4996)
-#endif 
+#endif
 
 #include <algorithm>
 #include <sstream>
@@ -95,9 +95,12 @@ void RootReportHandler::writeReport(const Report& report) {
 	if (_bOnCanvas)
 		_canvas.Render(STATE,report._id,_spCurrentStateGraph.get());
 
-	if (report._type == STATE && isConnectedToAlgorithm()
-			&& (this->isStateWriteMandatory())){
-		_spCurrentStateGraph->Write();
+	if (isConnectedToAlgorithm() && (this->isStateWriteMandatory())){
+				if (report._type == STATE)
+					_spCurrentStateGraph->Write();
+
+				if (report._type == RATE)
+					_spCurrentRateGraph->Write();
 	}
 	// always log ReportValue elements
 	_valueHandler.addReport(report);
