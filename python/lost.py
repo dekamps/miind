@@ -170,4 +170,4 @@ def main(args):
     plt.show()
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main(sys.argv)
