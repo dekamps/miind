@@ -142,7 +142,8 @@ class MiindSimulation:
         fnameout = op.join(self.output_directory,
                                  self.simulation_name + '_rates.npz')
         if op.exists(fnameout):
-            return np.load(fnameout)['data'][()]
+            self._rates = np.load(fnameout)['data'][()]
+            return self._rates
 
         _rates = {}
         # Load rate data from each root file
