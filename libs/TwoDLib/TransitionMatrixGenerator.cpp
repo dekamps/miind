@@ -125,6 +125,9 @@ void TransitionMatrixGenerator::ProcessTranslatedPoints(const vector<Point>& vec
 
 void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsigned int cell_no, double v, double w)
 {
+	const unsigned int num_ex_strips = 3;
+	unsigned int exempted_strips[num_ex_strips] = {1,329,442};
+
 	const Quadrilateral& quad = _tree.MeshRef().Quad(strip_no,cell_no);
 	Point p(v,w);
 
@@ -148,15 +151,16 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 			search_max_y = p[1];
 	}
 
-	double width_x = (search_max_x - search_min_x)*0.1;
-	double width_y = (search_max_y - search_min_y)*0.1;
-	search_min_x = search_min_x - width_x;
-	search_max_x = search_max_x + width_x;
-	search_min_y = search_min_y - width_y;
-	search_max_y = search_max_y + width_y;
-
 	double total_area = 0.0;
 	for (MPILib::Index i = 0; i < _tree.MeshRef().NrQuadrilateralStrips(); i++){
+
+		bool skip = false;
+		for (unsigned int u = 0; u<num_ex_strips; u++)
+			skip |= (i == exempted_strips[u]);
+
+		if(skip)
+			continue;
+
 	  for (MPILib::Index j = 0; j < _tree.MeshRef().NrCellsInStrip(i); j++ ){
 
 			std::vector<Point> ps = _tree.MeshRef().Quad(i,j).Points();

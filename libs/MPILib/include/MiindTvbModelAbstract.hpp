@@ -6,10 +6,10 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/RateAlgorithmCode.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>
-#include <MPILib/include/report/handler/InactiveReportHandler.hpp>
 #include <MPILib/include/DelayAlgorithmCode.hpp>
 #include <MPILib/include/utilities/ProgressBar.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
+#include <MPILib/include/report/handler/AbstractReportHandler.hpp>
 
 #ifndef MPILIB_MIINDTVBMODELABSTRACT_HPP_
 #define MPILIB_MIINDTVBMODELABSTRACT_HPP_
@@ -74,6 +74,7 @@ public:
 
 protected:
 	MPINetwork<Weight, NodeDistribution> network;
+	report::handler::AbstractReportHandler *report_handler;
 	boost::timer::auto_cpu_timer t;
 	utilities::ProgressBar *pb;
 	long _simulation_length; // ms
