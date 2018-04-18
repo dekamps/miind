@@ -49,7 +49,7 @@ def _help(command):
         print 'generate-model           : Generate a model file from existing mesh, rev and stat files.'
         print 'generate-empty-fid       : Generate a stub .fid file.'
         print 'generate-matrix          : Generate a matrix file from existing model and fid files.'
-        print 'fix-lost                 : Open the fiducial tool for capturing lost points.'
+        print 'lost                     : Open the fiducial tool for capturing lost points.'
         print 'generate-lif-mesh        : Example to illustrate a mesh generation script to build a LIF neuron mesh.'
         print 'draw-mesh                : Draw the mesh described in an existing .mesh file.'
         print ''
@@ -83,14 +83,32 @@ def sim(command, current_sim):
                     print '   ' + name
         if len(command) == 2:
             current_sim = api.MiindSimulation(command[1])
+
+            settings['sim'] = current_sim.xml_fname
+
+            with open(settingsfilename, 'w') as settingsfile:
+                for k,v in settings.iteritems():
+                    settingsfile.write(k + '=' + str(v) + '\n')
         if len(command) == 3:
             current_sim = api.MiindSimulation(command[1], command[2])
+
+            settings['sim'] = current_sim.xml_fname
+
+            with open(settingsfilename, 'w') as settingsfile:
+                for k,v in settings.iteritems():
+                    settingsfile.write(k + '=' + str(v) + '\n')
         if len(command) > 3:
             comm_dict = {}
             for comm in command[3:]:
                 kv = comm.split('=')
                 comm_dict[kv[0]] = kv[1]
             current_sim = api.MiindSimulation(command[1], command[2], **comm_dict)
+
+            settings['sim'] = current_sim.xml_fname
+
+            with open(settingsfilename, 'w') as settingsfile:
+                for k,v in settings.iteritems():
+                    settingsfile.write(k + '=' + str(v) + '\n')
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print name + ' : Provide information on the current simulation.'
@@ -397,7 +415,7 @@ def generateMatrix(command):
 
 def lost(command):
     command_name = command[0]
-    name = 'fix-lost'
+    name = 'lost'
 
     if command_name in [name]:
         if len(command) == 2:
@@ -438,15 +456,54 @@ def isQuitCommand(command):
 
     return False
 
+def checkCommands(command, current_sim):
+    _help(command)
+
+    current_sim = sim(command, current_sim)
+
+    models(command, current_sim)
+
+    _settings(command)
+
+    submit(command, current_sim)
+
+    run(command, current_sim)
+
+    buildSharedLib(command, current_sim)
+
+    rate(command, current_sim)
+
+    densityMovie(command, current_sim)
+
+    plotDensity(command, current_sim)
+
+    marginalMovie(command, current_sim)
+
+    plotMarginals(command, current_sim)
+
+    generateLifMesh(command)
+
+    generateModel(command)
+
+    generateEmptyFid(command)
+
+    generateMatrix(command)
+
+    drawMesh(command)
+
+    lost(command)
+
+    return current_sim
+
 if __name__ == "__main__":
-  current_sim = None
 
   settings = {}
+  settings['sim'] = 'NOT_SET'
   settings['mpi_enabled'] = False
   settings['openmp_enabled'] = False
   settings['root_enabled'] = True
 
-  settingsfilename = op.join(getMiindPythonPath(), 'miind_ui_settings')
+  settingsfilename = 'miind_settings'
   if not op.exists(settingsfilename):
       with open(settingsfilename, 'w') as settingsfile:
           for k,v in settings.iteritems():
@@ -455,52 +512,30 @@ if __name__ == "__main__":
       with open(settingsfilename, 'r') as settingsfile:
           for line in settingsfile:
               tokens = line.split('=')
-              settings[tokens[0].strip()] = (tokens[1].strip() == 'True')
+              # Expect sim to be a filename, otherwise expect a boolean
+              if tokens[0].strip() == 'sim':
+                   if tokens[1].strip() == 'NOT_SET':
+                       settings['sim'] = None
+                   else:
+                       settings['sim'] = tokens[1].strip()
+              else:
+                  settings[tokens[0].strip()] = (tokens[1].strip() == 'True')
 
-  while True:
-      command_string = raw_input('> ')
-      command = command_string.split(' ')
-      command_name = command[0]
-    #   try:
-      _help(command)
+  current_sim = settings['sim']
 
-      current_sim = sim(command, current_sim)
+  if len(sys.argv) > 1:
+      command = sys.argv[1:]
+      checkCommands(command, current_sim)
+  else:
+      while True:
+          command_string = raw_input('> ')
+          command = command_string.split(' ')
+          try:
+              current_sim = checkCommands(command, current_sim)
 
-      models(command, current_sim)
+              if isQuitCommand(command):
+                break
 
-      _settings(command)
-
-      submit(command, current_sim)
-
-      run(command, current_sim)
-
-      buildSharedLib(command, current_sim)
-
-      rate(command, current_sim)
-
-      densityMovie(command, current_sim)
-
-      plotDensity(command, current_sim)
-
-      marginalMovie(command, current_sim)
-
-      plotMarginals(command, current_sim)
-
-      generateLifMesh(command)
-
-      generateModel(command)
-
-      generateEmptyFid(command)
-
-      generateMatrix(command)
-
-      drawMesh(command)
-
-      lost(command)
-
-      if isQuitCommand(command):
-        break
-
-    #   except BaseException as e:
-    #       print e
-    #       continue
+          except BaseException as e:
+              print e
+              continue

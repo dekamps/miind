@@ -8,6 +8,7 @@ from shapely.geometry import Polygon
 from descartes.patch import PolygonPatch
 from collections import OrderedDict as odict
 import matplotlib.pyplot as plt
+import matplotlib
 from matplotlib.collections import PatchCollection
 
 from tools import *
@@ -86,11 +87,24 @@ class MeshTools:
 
     @staticmethod
     def plotLost(lost_path, **kwargs):
-        from lost_tools import (add_fiducial, extract_base,
+        print 'Points indicate locations of lost mass in the transition matrix. (No points = No mass loss)'
+        print 'Click four locations to draw a quad to surround an area of points.'
+        print 'Continue adding quads until all points are covered.'
+        print 'This does not need to be accurate and you should ensure that quads cover ares of possible loss as well as where points are located.'
+        print '(Think about the mesh and where there are gaps).'
+        print 'Smaller quads decrease the search time for the Matrix Generator.'
+        print '\n'
+        print 'Left Click to place points.'
+        print 'Mouse Wheel to zoom in and out.'
+        print '\'d\' to delete the quad currently under the mouse pointer.'
+        print '\'c\' to clear all quads.'
+        print 'Enter or Double-Click to write the created quads to the Fiducial file and quit.'
+        print '\n\n'
+        from tools_lost import (add_fiducial, extract_base,
                                     plot_lost, read_fiducial,
                                     onclick, zoom_fun, onkey)
         backend = matplotlib.get_backend().lower()
-        if backend not in ['qt4agg']:
+        if backend not in ['qt4agg', 'qt5agg']:
             print('Warning: backend not recognized as working with "lost.py", ' +
                   'if you do not encounter any issues with your current backend ' +
                   '{}, please add it to this list.'.format(backend))

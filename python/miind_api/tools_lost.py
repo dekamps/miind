@@ -106,7 +106,7 @@ def zoom_fun(event, ax, base_scale=1.5):
 def onclick(event, ax, fid_fname, curr_points, quads):
     if event.dblclick:
         write_fid(fid_fname, quads)
-        raise SystemExit
+        plt.close()
 
     inv = ax.transData.inverted()
     coords = inv.transform((event.x, event.y))
@@ -126,6 +126,7 @@ def onclick(event, ax, fid_fname, curr_points, quads):
 
 
 def onkey(event, ax, fid_fname, quads):
+    print event.key
     if event.key == 'd':
         print('Deleting previous Fiducial.')
         del quads[-1]
@@ -138,6 +139,9 @@ def onkey(event, ax, fid_fname, quads):
         for patch in read_fiducial(fid_fname):
             add_fiducial(ax, patch)
         plt.draw()
+    elif event.key == 'return':
+        write_fid(fid_fname, quads)
+        plt.close()
     else:
         print('Key "{}" not recognized.'.format(event.key))
         return
