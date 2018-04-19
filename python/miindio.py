@@ -85,6 +85,7 @@ def sim(command, current_sim):
             current_sim = api.MiindSimulation(command[1])
 
             settings['sim'] = current_sim.xml_fname
+            settings['sim_project'] = current_sim.submit_name
 
             with open(settingsfilename, 'w') as settingsfile:
                 for k,v in settings.iteritems():
@@ -93,6 +94,7 @@ def sim(command, current_sim):
             current_sim = api.MiindSimulation(command[1], command[2])
 
             settings['sim'] = current_sim.xml_fname
+            settings['sim_project'] = current_sim.submit_name
 
             with open(settingsfilename, 'w') as settingsfile:
                 for k,v in settings.iteritems():
@@ -105,6 +107,7 @@ def sim(command, current_sim):
             current_sim = api.MiindSimulation(command[1], command[2], **comm_dict)
 
             settings['sim'] = current_sim.xml_fname
+            settings['sim_project'] = current_sim.submit_name
 
             with open(settingsfilename, 'w') as settingsfile:
                 for k,v in settings.iteritems():
@@ -499,6 +502,7 @@ if __name__ == "__main__":
 
   settings = {}
   settings['sim'] = 'NOT_SET'
+  settings['sim_project'] = 'NOT_SET'
   settings['mpi_enabled'] = False
   settings['openmp_enabled'] = False
   settings['root_enabled'] = True
@@ -518,10 +522,18 @@ if __name__ == "__main__":
                        settings['sim'] = None
                    else:
                        settings['sim'] = tokens[1].strip()
+              elif tokens[0].strip() == 'sim_project':
+                   if tokens[1].strip() == 'NOT_SET':
+                       settings['sim_project'] = None
+                   else:
+                       settings['sim_project'] = tokens[1].strip()
               else:
                   settings[tokens[0].strip()] = (tokens[1].strip() == 'True')
 
-  current_sim = settings['sim']
+  if settings['sim'] != 'NOT_SET':
+      current_sim = api.MiindSimulation(settings['sim'], settings['sim_project'])
+  else:
+      current_sim = None
 
   if len(sys.argv) > 1:
       command = sys.argv[1:]
