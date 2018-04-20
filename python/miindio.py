@@ -11,6 +11,9 @@ import miind_api as api
 import matplotlib.pyplot as plt
 import directories
 
+cwdfilename = 'miind_cwd'
+settingsfilename = op.expanduser('~/.miind_settings')
+
 def getMiindPythonPath():
     return os.path.join(directories.miind_root(), 'python')
 
@@ -81,23 +84,24 @@ def sim(command, current_sim):
                     print '   ' + name + ' (Mesh Node)'
                 else:
                     print '   ' + name
+            print ''
         if len(command) == 2:
             current_sim = api.MiindSimulation(command[1])
 
-            settings['sim'] = current_sim.xml_fname
-            settings['sim_project'] = current_sim.submit_name
+            cwd_settings['sim'] = current_sim.xml_fname
+            cwd_settings['sim_project'] = current_sim.submit_name
 
-            with open(settingsfilename, 'w') as settingsfile:
-                for k,v in settings.iteritems():
+            with open(cwdfilename, 'w') as settingsfile:
+                for k,v in cwd_settings.iteritems():
                     settingsfile.write(k + '=' + str(v) + '\n')
         if len(command) == 3:
             current_sim = api.MiindSimulation(command[1], command[2])
 
-            settings['sim'] = current_sim.xml_fname
-            settings['sim_project'] = current_sim.submit_name
+            cwd_settings['sim'] = current_sim.xml_fname
+            cwd_settings['sim_project'] = current_sim.submit_name
 
-            with open(settingsfilename, 'w') as settingsfile:
-                for k,v in settings.iteritems():
+            with open(cwdfilename, 'w') as settingsfile:
+                for k,v in cwd_settings.iteritems():
                     settingsfile.write(k + '=' + str(v) + '\n')
         if len(command) > 3:
             comm_dict = {}
@@ -106,11 +110,11 @@ def sim(command, current_sim):
                 comm_dict[kv[0]] = kv[1]
             current_sim = api.MiindSimulation(command[1], command[2], **comm_dict)
 
-            settings['sim'] = current_sim.xml_fname
-            settings['sim_project'] = current_sim.submit_name
+            cwd_settings['sim'] = current_sim.xml_fname
+            cwd_settings['sim_project'] = current_sim.submit_name
 
-            with open(settingsfilename, 'w') as settingsfile:
-                for k,v in settings.iteritems():
+            with open(cwdfilename, 'w') as settingsfile:
+                for k,v in cwd_settings.iteritems():
                     settingsfile.write(k + '=' + str(v) + '\n')
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
@@ -501,38 +505,63 @@ def checkCommands(command, current_sim):
 if __name__ == "__main__":
 
   settings = {}
-  settings['sim'] = 'NOT_SET'
-  settings['sim_project'] = 'NOT_SET'
-  settings['mpi_enabled'] = False
-  settings['openmp_enabled'] = False
+  settings['mpi_enabled'] = True
+  settings['openmp_enabled'] = True
   settings['root_enabled'] = True
 
-  settingsfilename = 'miind_settings'
+  cwd_settings = {}
+  cwd_settings['sim'] = 'NOT_SET'
+  cwd_settings['sim_project'] = 'NOT_SET'
+
   if not op.exists(settingsfilename):
+      print 'Settings file ('+ settingsfilename +') not found.'
+      print 'Please provide information about your MIIND build (Default = True).\n'
+      mpi_answer = raw_input('MPI Enabled (True/False) > ')
+      omp_answer = raw_input('OPEN_MP Enabled (True/False) > ')
+      root_answer = raw_input('ROOT Enabled (True/False) > ')
       with open(settingsfilename, 'w') as settingsfile:
+          settings['mpi_enabled'] = mpi_answer in ['True', 'true', 'T', 't', '']
+          settings['openmp_enabled'] = omp_answer in ['True', 'true', 'T', 't', '']
+          settings['root_enabled'] = root_answer in ['True', 'true', 'T', 't', '']
           for k,v in settings.iteritems():
               settingsfile.write(k + '=' + str(v) + '\n')
   else:
       with open(settingsfilename, 'r') as settingsfile:
           for line in settingsfile:
               tokens = line.split('=')
+              settings[tokens[0].strip()] = (tokens[1].strip() == 'True')
+
+  if not op.exists(cwdfilename):
+      with open(cwdfilename, 'w') as cwdsettingsfile:
+          for k,v in cwd_settings.iteritems():
+              cwdsettingsfile.write(k + '=' + str(v) + '\n')
+  else:
+      with open(cwdfilename, 'r') as cwdsettingsfile:
+          for line in cwdsettingsfile:
+              tokens = line.split('=')
               # Expect sim to be a filename, otherwise expect a boolean
               if tokens[0].strip() == 'sim':
                    if tokens[1].strip() == 'NOT_SET':
-                       settings['sim'] = None
+                       cwd_settings['sim'] = None
                    else:
-                       settings['sim'] = tokens[1].strip()
+                       cwd_settings['sim'] = tokens[1].strip()
               elif tokens[0].strip() == 'sim_project':
                    if tokens[1].strip() == 'NOT_SET':
-                       settings['sim_project'] = None
+                       cwd_settings['sim_project'] = None
                    else:
-                       settings['sim_project'] = tokens[1].strip()
-              else:
-                  settings[tokens[0].strip()] = (tokens[1].strip() == 'True')
+                       cwd_settings['sim_project'] = tokens[1].strip()
 
-  if settings['sim'] != 'NOT_SET':
-      current_sim = api.MiindSimulation(settings['sim'], settings['sim_project'])
+  current_sim = None
+  if cwd_settings['sim'] != None:
+      if cwd_settings['sim'] != 'NOT_SET':
+          current_sim = api.MiindSimulation(cwd_settings['sim'], cwd_settings['sim_project'])
+          print '**** Current Simulation Details ****\n'
+          sim(['sim'], current_sim)
+      else:
+          print '\nWARNING : No Simulation currently set. Please call \'sim\' to set it. \n'
+          current_sim = None
   else:
+      print '\nWARNING : No Simulation currently set. Please call \'sim\' to set it. \n'
       current_sim = None
 
   if len(sys.argv) > 1:

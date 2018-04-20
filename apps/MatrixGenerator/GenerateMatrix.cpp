@@ -95,8 +95,8 @@ void Write
 		ofst << it->_origin[0]  << ",";
 		ofst << it->_origin[1]  << ";";
 		for (auto ithit = it->_destination_list.begin(); ithit !=it-> _destination_list.end(); ithit++ ){
-			if(double(ithit->_count)/it->_number == 0)
-				continue;
+			// if(double(ithit->_count)/it->_number == 0)
+			// 	continue;
 			ofst << ithit->_cell[0] << ",";
 			ofst << ithit->_cell[1] << ":";
 			ofst << double(ithit->_count)/it->_number << ";";
@@ -173,9 +173,9 @@ void Write
 					l._origin = TwoDLib::Coordinates(i,j);
 					l._destination_list = gen.HitList();
 
-					//TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
+					TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
 
-					transitions.push_back(l);
+					transitions.push_back(lcor);
 				}
 			}
 		}
