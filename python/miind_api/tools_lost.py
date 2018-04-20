@@ -126,7 +126,6 @@ def onclick(event, ax, fid_fname, curr_points, quads):
 
 
 def onkey(event, ax, fid_fname, quads):
-    print event.key
     if event.key == 'd':
         print('Deleting previous Fiducial.')
         del quads[-1]

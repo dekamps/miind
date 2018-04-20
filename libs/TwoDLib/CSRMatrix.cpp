@@ -64,6 +64,26 @@ _coordinates(0)
 			_coordinates.push_back(Coordinates(i,j));
 
 	Initialize(mat);
+
+ // vector<double>      V = vector<double>(_val.size(),0.);
+ // unsigned int nr_rows = _ia.size() - 1;
+ // double max_v = 0.0;
+ //
+ // for (MPILib::Index i = 0; i < nr_rows; i++){
+ //  MPILib::Index i_r =_sys.Map(_coordinates[i][0],_coordinates[i][1]);
+ //  for( MPILib::Index j = _ia[i]; j < _ia[i+1]; j++){
+ // 		int j_m = _sys.Map(_coordinates[_ja[j]][0],_coordinates[_ja[j]][1]);
+ // 		V[i_r] += _val[j];
+ // 	}
+ // 				V[i_r] -= 1.0;
+ //
+ //  if (V[i_r] > 1.0) {
+ // 	 if (V[i_r] > max_v)
+ // 	 	max_v = V[i_r];
+ // 	 //printf("%i %i : %f \n", _coordinates[i][0], _coordinates[i][1], V[i_r]);
+ //  }
+ // }
+ // printf("Max Transition Sum : %f\n", max_v);
 }
 
 void CSRMatrix::Validate(const TransitionMatrix& mat){
@@ -84,9 +104,9 @@ void CSRMatrix::Validate(const TransitionMatrix& mat){
 	for (auto& line: lines)
 		if (line._from[0] == 0) count++;
 
-	if ( count != m.NrCellsInStrip(0) )	
+	if ( count != m.NrCellsInStrip(0) )
 	   throw TwoDLib::TwoDLibException("There is a stationary point in your mesh file, but no entries in the mat file that lead away from it.");
-      
+
 }
 
 void CSRMatrix::CSR(const vector<vector<MPILib::Index> >& vec_mat, const vector<vector<double> >& mat_vals){
@@ -123,7 +143,7 @@ void CSRMatrix::MVMapped
 {
 	unsigned int nr_rows = _ia.size() - 1;
 
-#pragma omp parallel for 
+#pragma omp parallel for
 
 	for (MPILib::Index i = 0; i < nr_rows; i++){
 	  MPILib::Index i_r =_sys.Map(_coordinates[i][0],_coordinates[i][1]);

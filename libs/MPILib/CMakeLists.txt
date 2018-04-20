@@ -64,12 +64,12 @@ set ( LIBLIST
     ${MPI_LIBRARIES} 
     ${MIIND_LIBRARY_PREFIX}numtools
     ${gsl_LINK_FLAGS} 
-	gsl    
+	gsl
 )
 
 add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${MPI_SRCS} ${MPI_HEADER})
 
-target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} )
+target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} -lpython2.7 -lboost_python)
 
 #############################################################################
 # Cmake generated header files

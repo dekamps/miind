@@ -87,7 +87,7 @@ class MeshTools:
 
     @staticmethod
     def plotLost(lost_path, **kwargs):
-        print 'Points indicate locations of lost mass in the transition matrix. (No points = No mass loss)'
+        print '\nPoints indicate locations of lost mass in the transition matrix. (No points = No mass loss)'
         print 'Click four locations to draw a quad to surround an area of points.'
         print 'Continue adding quads until all points are covered.'
         print 'This does not need to be accurate and you should ensure that quads cover ares of possible loss as well as where points are located.'
@@ -98,8 +98,8 @@ class MeshTools:
         print 'Mouse Wheel to zoom in and out.'
         print '\'d\' to delete the quad currently under the mouse pointer.'
         print '\'c\' to clear all quads.'
-        print 'Enter or Double-Click to write the created quads to the Fiducial file and quit.'
-        print '\n\n'
+        print 'Double-Click to write the created quads to the Fiducial file and quit.'
+        print '\n'
         from tools_lost import (add_fiducial, extract_base,
                                     plot_lost, read_fiducial,
                                     onclick, zoom_fun, onkey)
