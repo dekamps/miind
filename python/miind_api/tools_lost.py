@@ -104,6 +104,11 @@ def zoom_fun(event, ax, base_scale=1.5):
 
 
 def onclick(event, ax, fid_fname, curr_points, quads):
+
+    toolbar = plt.get_current_fig_manager().toolbar
+    if toolbar.mode!='':
+        return
+    
     if event.dblclick:
         write_fid(fid_fname, quads)
         plt.close()

@@ -16,7 +16,7 @@ from tools import *
 import mesh as meshmod
 
 class Marginal(Result):
-    def __init__(self, io, nodename, vn=100, wn=100):
+    def __init__(self, io, nodename, vn=500, wn=500):
         super(Marginal, self).__init__(io, nodename)
         self.path = op.join(self.io.output_directory,
                             self.nodename + '_marginal_density')
@@ -177,9 +177,9 @@ class Marginal(Result):
             plt.suptitle('time = {}'.format(self['times'][ii]))
             self.plotV(self['times'][ii], axs[0])
             self.plotW(self['times'][ii], axs[1])
-            figname = op.join(self.path,
-                              '{}_'.format(ii) +
-                              '{}.png'.format(self['times'][ii]))
+            required_padding = len(str(len(self.times)))
+            padding_format_code = '{0:0' + str(required_padding) + 'd}'
+            figname = op.join(self.path, (padding_format_code).format(idx) )
             fig.savefig(figname, res=image_size, bbox_inches='tight')
             plt.close(fig)
 
@@ -193,25 +193,14 @@ class Marginal(Result):
             files = glob.glob(op.join(self.path, '*.png'))
             files.sort()
 
-            # calculate duration of each frame - this is the time between each
-            # image
-            durations = [((self.times[0])*time_scale)/1000.0]
-            for t in range(len(self.times)-1):
-                durations.append(((self.times[t+1] - self.times[t])*time_scale)/1000.0)
-
-            # Generate an image list file with the calculated durations
-            with open(op.join(self.path, 'filelist.txt'), 'w') as lst:
-                d = 0
-                for f in files:
-                    lst.write('file \'' + f + '\'\n')
-                    lst.write('duration ' + str(durations[d]) + '\n')
-                    d += 1
 
             # note ffmpeg must be installed
+            # example : ffmpeg -r 1000 -f image2 -pattern_type glob -i "*.png" test.mp4
             process = ['ffmpeg',
-                '-f', 'concat',
-                '-safe', '0',
-                '-i', op.join(self.path, 'filelist.txt')]
+                '-r', str(int((1.0 / time_scale) * (len(files) / self.times[-1]))),
+                '-f', 'image2',
+                '-pattern_type', 'glob',
+                '-i', op.join(self.path, '*.png')]
 
             process.append(filename + '.mp4')
 

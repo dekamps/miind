@@ -73,7 +73,6 @@ void WriteOutLost(const string& fn, const TwoDLib::TransitionMatrixGenerator& ge
 	for(const TwoDLib::Point& p: v)
 		ofst << p[0] << "\t" << p[1] << "\n";
 
-	std::cout << "Generated " << fn << std::endl;
 }
 
 void Write
@@ -95,15 +94,15 @@ void Write
 		ofst << it->_origin[0]  << ",";
 		ofst << it->_origin[1]  << ";";
 		for (auto ithit = it->_destination_list.begin(); ithit !=it-> _destination_list.end(); ithit++ ){
-			// if(double(ithit->_count)/it->_number == 0)
-			// 	continue;
+			if (double(ithit->_count)/it->_number == 0)
+				continue;
+				
 			ofst << ithit->_cell[0] << ",";
 			ofst << ithit->_cell[1] << ":";
 			ofst << double(ithit->_count)/it->_number << ";";
 		}
 		ofst << "\n";
 	}
-	std::cout << "Generated " << fn << std::endl;
 }
 	void GenerateElements
 	(
@@ -173,9 +172,9 @@ void Write
 					l._origin = TwoDLib::Coordinates(i,j);
 					l._destination_list = gen.HitList();
 
-					TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
+					//TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
 
-					transitions.push_back(lcor);
+					transitions.push_back(l);
 				}
 			}
 		}

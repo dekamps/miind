@@ -4,7 +4,9 @@ import subprocess
 import time
 import xml.etree.ElementTree as ET
 
-from shapely.geometry import Polygon
+#from shapely.geometry import Polygon
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 from descartes.patch import PolygonPatch
 from collections import OrderedDict as odict
 import matplotlib.pyplot as plt
@@ -82,7 +84,18 @@ class MeshTools:
         ax.set_xlim(md[0])
         ax.set_ylim(md[1])
 
-        plt.show(block=False)
+        def onclick(event):
+            toolbar = plt.get_current_fig_manager().toolbar
+            if (event.button is not 1) or (event.ydata is None) or (event.xdata is None) or toolbar.mode!='':
+                return
+            point = Point(event.xdata, event.ydata)
+            for poly_key, poly_val in polygons.iteritems():
+                if poly_val.contains(point):
+                    print 'Clicked Cell ' + str(poly_key[0]) + ', ' + str(poly_key[1])
+
+        cid = fig.canvas.mpl_connect('button_press_event', onclick)
+
+        plt.show()
         return ax
 
     @staticmethod

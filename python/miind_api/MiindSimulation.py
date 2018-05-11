@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
 
 from tools import *
+from Density import Density
+from Marginal import Marginal
 
 # From MIIND
 import directories
@@ -73,6 +75,12 @@ class MiindSimulation:
 
         # Hold the Variable names, useful for the UI to know.
         self.variablenames = [m.attrib['Name'] for m in self.sim.findall('Variable') if 'Name' in m.attrib]
+
+        # Loading a Density or Marginal object is *expensive* so allow each
+        # one to register/cache itself here for reuse.
+
+        self.density_cache = {}
+        self.marginal_cache = {}
 
         simio = self.sim.find('SimulationIO')
         self.WITH_STATE = simio.find('WithState').text == 'TRUE'
@@ -190,6 +198,18 @@ class MiindSimulation:
                 if name == nodename:
                     return index, modelfile
         return None, None
+
+    def getDensityByNodeName(self, nodename):
+        if nodename not in self.density_cache:
+            self.density_cache[nodename] = Density(self, nodename)
+
+        return self.density_cache[nodename]
+
+    def getMarginalByNodeName(self, nodename):
+        if nodename not in self.marginal_cache:
+            self.marginal_cache[nodename] = Marginal(self, nodename)
+
+        return self.marginal_cache[nodename]
 
     def getIndexFromNode(self, nodename):
         if nodename.isdigit():

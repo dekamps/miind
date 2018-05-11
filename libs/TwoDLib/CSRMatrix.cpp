@@ -65,25 +65,25 @@ _coordinates(0)
 
 	Initialize(mat);
 
- // vector<double>      V = vector<double>(_val.size(),0.);
- // unsigned int nr_rows = _ia.size() - 1;
- // double max_v = 0.0;
- //
- // for (MPILib::Index i = 0; i < nr_rows; i++){
- //  MPILib::Index i_r =_sys.Map(_coordinates[i][0],_coordinates[i][1]);
- //  for( MPILib::Index j = _ia[i]; j < _ia[i+1]; j++){
- // 		int j_m = _sys.Map(_coordinates[_ja[j]][0],_coordinates[_ja[j]][1]);
- // 		V[i_r] += _val[j];
- // 	}
- // 				V[i_r] -= 1.0;
- //
- //  if (V[i_r] > 1.0) {
- // 	 if (V[i_r] > max_v)
- // 	 	max_v = V[i_r];
- // 	 //printf("%i %i : %f \n", _coordinates[i][0], _coordinates[i][1], V[i_r]);
- //  }
- // }
- // printf("Max Transition Sum : %f\n", max_v);
+ vector<double>      V = vector<double>(_val.size(),0.);
+ unsigned int nr_rows = _ia.size() - 1;
+ double max_v = 0.0;
+
+ for (MPILib::Index i = 0; i < nr_rows; i++){
+  MPILib::Index i_r =_sys.Map(_coordinates[i][0],_coordinates[i][1]);
+  for( MPILib::Index j = _ia[i]; j < _ia[i+1]; j++){
+ 		int j_m = _sys.Map(_coordinates[_ja[j]][0],_coordinates[_ja[j]][1]);
+ 		V[i_r] += _val[j];
+ 	}
+ 				V[i_r] -= 1.0;
+
+  if (V[i_r] > 1.0) {
+ 	 if (V[i_r] > max_v)
+ 	 	max_v = V[i_r];
+ 	 //printf("%i %i : %f \n", _coordinates[i][0], _coordinates[i][1], V[i_r]);
+  }
+ }
+ printf("Max Transition Sum : %f\n", max_v);
 }
 
 void CSRMatrix::Validate(const TransitionMatrix& mat){
