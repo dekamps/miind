@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+#import matplotlib
+#matplotlib.use('Agg')
+
 import argparse
 import codegen
 import sys
@@ -13,6 +16,7 @@ import directories
 
 cwdfilename = 'miind_cwd'
 settingsfilename = op.expanduser('~/.miind_settings')
+debug = False
 
 def getMiindPythonPath():
     return os.path.join(directories.miind_root(), 'python')
@@ -25,6 +29,9 @@ def _help(command):
     if command_name in [name] + alts:
         print ''
         print 'MIIND UI'
+        print ''
+        print '(To debug errors, call miindio.py -debug for the full python stack trace.)'
+        print ''
         print 'For more information on any command type the command name and a \'?\' [eg. sim?]'
         print ''
         print 'help                     : Get this help menu.'
@@ -253,7 +260,7 @@ def densityMovie(command, current_sim):
 
         if len(command) == 5:
             print 'Warning : This take a *long* time to complete and use *large* amounts of disk space.'
-            current_density = api.Density(current_sim, command[1])
+            current_density = current_sim.getDensityByNodeName(command[1])
             current_density.generateDensityAnimation(command[4], int(command[2]),
                                       True,
                                       float(command[3]))
@@ -276,7 +283,7 @@ def plotDensity(command, current_sim):
             print 'No simulation currently defined. Please call command \'sim\'.'
 
         if len(command) == 3:
-            current_density = api.Density(current_sim, command[1])
+            current_density = current_sim.getDensityByNodeName(command[1])
             filename = current_density.findDensityFileFromTime(command[2])
             print 'Plotting ' + filename + '.'
 
@@ -301,13 +308,14 @@ def marginalMovie(command, current_sim):
             print 'No simulation currently defined. Please call command \'sim\'.'
 
         if len(command) == 5:
-            current_marginal = api.Marginal(current_sim, command[1])
+            current_marginal = current_sim.getMarginalByNodeName(command[1])
             current_marginal.generateMarginalAnimation(command[4], int(command[2]),
                                       True,
                                       float(command[3]))
         elif len(command) == 7:
-            current_marginal = api.Marginal(current_sim, command[1],
-                                     int(command[2]), int(command[3]))
+            current_marginal = current_sim.getMarginalByNodeName(command[1])
+            current_marginal.vn = int(command[2])
+            current_marginal.wn = int(command[3])
             current_marginal.generateMarginalAnimation(command[6], int(command[4]),
                                       True,
                                       float(command[5]))
@@ -331,14 +339,15 @@ def plotMarginals(command, current_sim):
             print 'No simulation currently defined. Please call command \'sim\'.'
 
         if len(command) == 3:
-            current_marginal = api.Marginal(current_sim, command[1])
+            current_marginal = current_sim.getMarginalByNodeName(command[1])
             fig, axis = plt.subplots(1,2)
             current_marginal.plotV(float(command[2]), axis[0])
             current_marginal.plotW(float(command[2]), axis[1])
             plt.show(block=False)
         elif len(command) == 5:
-            current_marginal = api.Marginal(current_sim, command[1],
-                                     int(command[2]), int(command[3]))
+            current_marginal = current_sim.getMarginalByNodeName(command[1])
+            current_marginal.vn = int(command[2])
+            current_marginal.wn = int(command[3])
             fig, axis = plt.subplots(1,2)
             current_marginal.plotV(float(command[4]), axis[0])
             current_marginal.plotW(float(command[4]), axis[1])
@@ -564,19 +573,28 @@ if __name__ == "__main__":
       print '\nWARNING : No Simulation currently set. Please call \'sim\' to set it. \n'
       current_sim = None
 
-  if len(sys.argv) > 1:
+  if len(sys.argv) > 1 and sys.argv[1] != '-debug':
       command = sys.argv[1:]
       checkCommands(command, current_sim)
   else:
+      debug = len(sys.argv) > 1 and sys.argv[1] == '-debug'
+
       while True:
           command_string = raw_input('> ')
           command = command_string.split(' ')
-          try:
+          if debug:
               current_sim = checkCommands(command, current_sim)
 
               if isQuitCommand(command):
                 break
+          else:
+              try:
+                  current_sim = checkCommands(command, current_sim)
 
-          except BaseException as e:
-              print e
-              continue
+                  if isQuitCommand(command):
+                    break
+
+              except BaseException as e:
+                  print e
+                  print 'For a more meaningful error (!), re-run miindio.py with argument -debug and call this command to get the full python stack trace.'
+                  continue

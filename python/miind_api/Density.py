@@ -5,9 +5,11 @@ import glob
 import subprocess
 import time
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 from collections import OrderedDict as odict
-from shapely.geometry import Polygon
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 from descartes.patch import PolygonPatch
 from matplotlib.collections import PatchCollection
 
@@ -73,25 +75,11 @@ class Density(Result):
             files = glob.glob(op.join(self.path, '*.png'))
             files.sort()
 
-            # calculate duration of each frame - this is the time between each
-            # image
-            durations = [((self.times[0])*time_scale)/1000.0]
-            for t in range(len(self.times)-1):
-                durations.append(((self.times[t+1] - self.times[t])*time_scale)/1000.0)
-
-            # Generate an image list file with the calculated durations
-            with open(op.join(self.path, 'filelist.txt'), 'w') as lst:
-                d = 0
-                for f in files:
-                    lst.write('file \'' + f + '\'\n')
-                    lst.write('duration ' + str(durations[d]) + '\n')
-                    d += 1
-
             # note ffmpeg must be installed
             process = ['ffmpeg',
-                '-f', 'concat',
-                '-safe', '0',
-                '-i', op.join(self.path, 'filelist.txt')]
+                '-r', str(int((1.0 / time_scale) * (len(files)/self.times[-1]))),
+                '-pattern_type', 'glob',
+                '-i', op.join(self.path, '*.png')]
 
             process.append(filename + '.mp4')
 
@@ -104,8 +92,50 @@ class Density(Result):
                 print e
 
     def generateAllDensityPlotImages(self, image_size=300, colorbar=None, cmap='inferno', ext='.png'):
-        for fname in self.fnames:
-            self.plotDensity(fname, image_size, colorbar, cmap, None, True, ext)
+        if not ext.startswith('.'):
+            ext = '.' + ext
+
+        fig, ax = plt.subplots()
+
+        times = [get_density_time(fn) for fn in self.fnames]
+        idxs = [self.times.index(t) for t in times]
+
+        md = self.mesh.dimensions()
+        poly_coords = list(self.polygons.keys())
+        ax.set_xlim(md[0])
+        ax.set_ylim(md[1])
+
+        ax.set_aspect('auto')
+        p = PatchCollection(self.patches, cmap=cmap)
+        ax.add_collection(p)
+
+        if colorbar is not None:
+            plt.colorbar(p)
+
+        def animate(f):
+            density, coords = read_density(self.fnames[f])
+            sort_idx = sorted(range(len(coords)), key=coords.__getitem__)
+            coords = [coords[i] for i in sort_idx]
+            density = [density[i] for i in sort_idx]
+            assert coords == poly_coords
+            vmin, vmax, scaled_density = self.colscale(density)
+            p.set_array(scaled_density)
+
+            if not op.exists(self.path):
+                os.mkdir(self.path)
+            #calculate max padding required
+            required_padding = len(str(len(self.times)))
+            padding_format_code = '{0:0' + str(required_padding) + 'd}'
+            figname = op.join(
+                self.path, (padding_format_code).format(idx))
+            plt.gcf().savefig(figname + ext, res=image_size, bbox_inches='tight')
+
+            return p,
+
+        ani = animation.FuncAnimation(fig, animate, frames=len(self.fnames), interval=1, blit=True, repeat=False)
+
+        plt.show()
+
 
     def findDensityFileFromTime(self, time):
         for fname in self.fnames:
