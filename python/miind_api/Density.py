@@ -169,7 +169,7 @@ class Density(Result):
         sort_idx = sorted(range(len(coords)), key=coords.__getitem__)
         coords = [coords[i] for i in sort_idx]
         density = [density[i] for i in sort_idx]
-        assert coords == poly_coords
+        
         vmin, vmax, scaled_density = self.colscale(density)
         p.set_array(scaled_density)
         ax.add_collection(p)

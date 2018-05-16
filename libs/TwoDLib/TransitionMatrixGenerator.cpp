@@ -125,8 +125,8 @@ void TransitionMatrixGenerator::ProcessTranslatedPoints(const vector<Point>& vec
 
 void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsigned int cell_no, double v, double w)
 {
-	const unsigned int num_ex_strips = 3;
-	unsigned int exempted_strips[num_ex_strips] = {1,241,354};
+	const unsigned int num_ex_strips = 0;
+	unsigned int exempted_strips[num_ex_strips] = {};
 
 	const Quadrilateral& quad = _tree.MeshRef().Quad(strip_no,cell_no);
 	Point p(v,w);

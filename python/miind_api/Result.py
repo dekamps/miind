@@ -23,9 +23,8 @@ class Result(object):
 
     @property
     def fnames(self):
-        if not hasattr(self, '_fnames'):
-            self._fnames, self._times = find_density_fnames(
-                self.modelfname, self.nodeindex, self.io.output_directory)
+        self._fnames, self._times = find_density_fnames(
+            self.modelfname, self.nodeindex, self.io.output_directory)
         return self._fnames
 
     @property
