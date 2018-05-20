@@ -95,12 +95,9 @@ void RootReportHandler::writeReport(const Report& report) {
 	if (_bOnCanvas)
 		_canvas.Render(STATE,report._id,_spCurrentStateGraph.get());
 
-	if (isConnectedToAlgorithm() && (this->isStateWriteMandatory())){
-				if (report._type == STATE)
-					_spCurrentStateGraph->Write();
-
-				if (report._type == RATE)
-					_spCurrentRateGraph->Write();
+	if (report._type == STATE && isConnectedToAlgorithm()
+			&& (this->isStateWriteMandatory())){
+		_spCurrentStateGraph->Write();
 	}
 	// always log ReportValue elements
 	_valueHandler.addReport(report);

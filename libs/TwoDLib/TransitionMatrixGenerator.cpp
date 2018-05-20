@@ -125,9 +125,20 @@ void TransitionMatrixGenerator::ProcessTranslatedPoints(const vector<Point>& vec
 
 void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsigned int cell_no, double v, double w)
 {
-	const unsigned int num_ex_strips = 0;
-	unsigned int exempted_strips[num_ex_strips] = {};
+	const Quadrilateral& quad = _tree.MeshRef().Quad(strip_no,cell_no);
+	Point p(v,w);
 
+	// scale_distance determines the maximum search radius
+	double dist = scale_distance*DetermineDistance(quad);
+	vector<Point> vec_point(_N);
+	QuadGenerator gen(quad, _uni);
+	gen.Generate(&vec_point);
+	ApplyTranslation(&vec_point,p);
+	ProcessTranslatedPoints(vec_point);
+}
+
+void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned int strip_no, unsigned int cell_no, double v, double w)
+{
 	const Quadrilateral& quad = _tree.MeshRef().Quad(strip_no,cell_no);
 	Point p(v,w);
 
@@ -154,13 +165,6 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 	double total_area = 0.0;
 	for (MPILib::Index i = 0; i < _tree.MeshRef().NrQuadrilateralStrips(); i++){
 
-		bool skip = false;
-		for (unsigned int u = 0; u<num_ex_strips; u++)
-			skip |= (i == exempted_strips[u]);
-
-		if(skip)
-			continue;
-
 	  for (MPILib::Index j = 0; j < _tree.MeshRef().NrCellsInStrip(i); j++ ){
 
 			std::vector<Point> ps = _tree.MeshRef().Quad(i,j).Points();
@@ -178,14 +182,6 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 			}
 
 			if(all_points_right || all_points_left || all_points_above || all_points_below)
-				continue;
-
-			all_points_right = true;
-			for(Point p : ps_scaled){
-				all_points_right &= p[0] > -35.0*1000.0;
-			}
-
-			if(all_points_right)
 				continue;
 
 			double area = Quadrilateral::get_overlap_area(quad_trans, quad_scaled);
@@ -227,13 +223,6 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 		_hit_list.front()._count -= diff;
 	}
 
-	// scale_distance determines the maximum search radius
-	// double dist = scale_distance*DetermineDistance(quad);
-	// vector<Point> vec_point(_N);
-	// QuadGenerator gen(quad, _uni);
-	// gen.Generate(&vec_point);
-	// ApplyTranslation(&vec_point,p);
-	// ProcessTranslatedPoints(vec_point);
 }
 
 
