@@ -178,7 +178,7 @@ namespace TwoDLib {
 		// the integration time step, stored in the MasterParameter, is gauged with respect to the
 		// network time step.
 		MPILib::Number n_ode = static_cast<MPILib::Number>(std::floor(t_step/_h));
-		MasterParameter par(n_ode);
+		MasterParameter par((n_ode > 1) ? n_ode : 1);
 
 		// vec_mat will go out of scope; MasterOMP will convert the matrices
 		// internally and we don't want to keep two versions.
@@ -265,8 +265,8 @@ namespace TwoDLib {
 
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
+	      _sys.Evolve();
 				_sys.RemapReversal();
-	      _sys.Evolve();        
 	    }
 
 	    // master equation

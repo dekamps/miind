@@ -76,6 +76,15 @@ namespace TwoDLib {
 			  double    	//!< translation in the w direction
 	  	  );
 
+    //! Specify which transitions must be generated
+	  void GenerateTransitionUsingQuadTranslation
+	  	  (
+			  unsigned int,	//!< strip no
+			  unsigned int,	//!< cell no
+			  double,		//!< translation in the v direction
+			  double    	//!< translation in the w direction
+	  	  );
+
 	  //! After a simulation, the generator must be reset
 	  void Reset(unsigned int N = 10);
 
