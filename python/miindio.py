@@ -44,7 +44,7 @@ def _help(command):
         print 'settings                 : Set certain persistent parameters to match your MIIND installation (ENABLE MPI, OPENMP, ROOT).'
         print 'submit                   : Generate and build (make) the code from the current simulation.'
         print 'run                      : Run the current submitted simulation.'
-        print 'build-shared-lib         : Generate and build (make) a shared library for use with python from the current simulation.'
+        print 'submit-python            : Generate and build (make) a shared library for use with python from the current simulation.'
         print ''
         print '***** Commands for Analysing and Presenting Completed Simulations *****'
         print ''
@@ -211,8 +211,8 @@ def run(command, current_sim):
 
 def buildSharedLib(command, current_sim):
     command_name = command[0]
-    name = 'build-shared-lib'
-    alts = ['bsl']
+    name = 'submit-python'
+    alts = []
 
     if command_name in [name] + alts:
         if not current_sim:
@@ -418,8 +418,8 @@ def generateMatrix(command):
             api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]))
         elif len(command) == 5:
             api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]), spike_shift_w=float(command[4]))
-        elif len(command) == 6:
-            api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]), spike_shift_w=float(command[4]), reset_shift_w=float(command[5]))
+        elif len(command) == 7:
+            api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]), spike_shift_w=float(command[4]), reset_shift_w=float(command[5]), use_area_calculation=(command[6] in ['True', 'true', 'TRUE']))
         else:
             print name + ' expects three, four or five parameters.'
             generateMatrix(name+'?')
@@ -427,7 +427,7 @@ def generateMatrix(command):
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print name + ' [Basename] [Spike V-efficacy] [Number of points] : Generate a Basename.mat file (and Basename.lost file) with the given spike shift in the V direction using a Monte Carlo method with the given number of points per cell. Expects a valid Basename.model and Basename.fid file in the current working directory.'
         print name + ' [Basename] [Spike V-efficacy] [Number of points] [Spike W-efficacy] : Generate a Basename.mat file (and Basename.lost file) with the given spike shift in the V and W directions.'
-        print name + ' [Basename] [Spike V-efficacy] [Number of points] [Spike W-efficacy] [Reset W shift]: Generate a Basename.mat file (and Basename.lost file) with the given spike shift in the V and W directions and given W shift during reset.'
+        print name + ' [Basename] [Spike V-efficacy] [Number of points] [Spike W-efficacy] [Reset W shift] [Use Area Calculation (True/False)]: Generate a Basename.mat file (and Basename.lost file) with the given spike shift in the V and W directions and given W shift during reset.'
 
 def lost(command):
     command_name = command[0]

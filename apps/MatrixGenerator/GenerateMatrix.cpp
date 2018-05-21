@@ -115,7 +115,8 @@ void Write
 			double tr_reset,
 			MPILib::Number nr_points,
 			MPILib::Index l_min,
-			MPILib::Index l_max
+			MPILib::Index l_max,
+		  TwoDLib::UserTranslationMode mode
 	){
 	    std::vector<TwoDLib::TransitionList> transitions;
 
@@ -167,7 +168,12 @@ void Write
 
 					gen.Reset(nr_points);
 					TwoDLib::Translation tr = translation_list[i][j];
-					gen.GenerateTransition(i,j,tr._v,tr._w);
+					
+					if(mode == TwoDLib::AreaCalculation)
+						gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w);
+					else
+						gen.GenerateTransition(i,j,tr._v,tr._w);
+
 					l._number = gen.N();
 					l._origin = TwoDLib::Coordinates(i,j);
 					l._destination_list = gen.HitList();
@@ -210,7 +216,8 @@ void Write
 		std::unique_ptr<TwoDLib::TranslationObject>& p_to,
 		double tr_reset,
 		unsigned int l_min,
-		unsigned int l_max
+		unsigned int l_max,
+		TwoDLib::UserTranslationMode mode
 		)
 	{
 		std::cout << "Setup" << std::endl;
@@ -256,7 +263,7 @@ void Write
 
 		p_to->GenerateTranslationList(mesh);
 
-		GenerateElements(base_name, mesh,fid,theta,V_reset, p_to, tr_reset, nr_points, l_min,l_max);
+		GenerateElements(base_name, mesh,fid,theta,V_reset, p_to, tr_reset, nr_points, l_min,l_max, mode);
 	}
 
 	void PrepareMatrixGeneration(int argc, char** argv, TwoDLib::UserTranslationMode mode){
@@ -293,7 +300,7 @@ void Write
 		// in that case we probably should make it integral part of the TranslationObject. For now
 		// we use it separately, as it is used differently by GenerateElements.
 		double tr_reset = 0.;
-		if (mode == TwoDLib::TranslationArguments){
+		if (mode == TwoDLib::TranslationArguments || mode == TwoDLib::AreaCalculation){
 			std::istringstream istrv(argv[4]);
 			double tr_v;
 			istrv >> tr_v;
@@ -340,7 +347,7 @@ void Write
 			}
 		}
 
-		SetupObjects(base_name,nr_points,p_to,tr_reset,l_min,l_max);
+		SetupObjects(base_name,nr_points,p_to,tr_reset,l_min,l_max, mode);
 	}
 }
 

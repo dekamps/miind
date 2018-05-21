@@ -40,20 +40,32 @@ class MeshTools:
 
     @staticmethod
     def buildMatrixFileFromModel(basename, spike_shift_v, fidfile=None, num_mc_points=10,
-                                    spike_shift_w=0, reset_shift_w=0):
+                                    spike_shift_w=0, reset_shift_w=0, use_area_calculation=False):
         if not fidfile:
             fidfile = ModelGenerator.generateStubFidFile(basename)
 
         matrix_generator_exe = op.join(getMiindAppsPath(), 'MatrixGenerator', 'MatrixGenerator')
-        subprocess.call([
-          matrix_generator_exe,
-          basename + '.model',
-          fidfile,
-          str(num_mc_points),
-          str(spike_shift_v),
-          str(spike_shift_w),
-          str(reset_shift_w)
-          ])
+        if not use_area_calculation:
+            subprocess.call([
+              matrix_generator_exe,
+              basename + '.model',
+              fidfile,
+              str(num_mc_points),
+              str(spike_shift_v),
+              str(spike_shift_w),
+              str(reset_shift_w)
+              ])
+        else:
+            subprocess.call([
+              matrix_generator_exe,
+              basename + '.model',
+              fidfile,
+              str(num_mc_points),
+              str(spike_shift_v),
+              str(spike_shift_w),
+              str(reset_shift_w),
+              '-use_area_calculation'
+              ])
 
     @staticmethod
     def plotMesh(filename, ax=None):
