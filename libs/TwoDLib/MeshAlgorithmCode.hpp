@@ -234,7 +234,7 @@ namespace TwoDLib {
 			std::ofstream ofst_rate("rate_" + id, std::ofstream::app);
 			ofst_rate.precision(10);
 			ofst_rate << _t_cur << "\t" << _sys.F() << std::endl;
-			ofst_rate.close()
+			ofst_rate.close();
 		}
 		return MPILib::AlgorithmGrid(array_state,array_interpretation);
 	}
