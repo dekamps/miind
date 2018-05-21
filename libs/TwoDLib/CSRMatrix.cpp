@@ -86,7 +86,7 @@ _coordinates(0)
 //   }
 //  }
 //  printf("Max Transition Sum : %f\n", max_v);
-// }
+}
 
 void CSRMatrix::Validate(const TransitionMatrix& mat){
 	// At this stage, the _coordinates list, which has been constructed from the TransitionMatrix
