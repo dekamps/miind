@@ -143,50 +143,28 @@ class MiindSimulation:
 
     @property
     def rates(self):
-        if hasattr(self, '_rates'):
-            return self._rates
-
-        # If rates data has already been saved, use it.
-        fnameout = op.join(self.output_directory,
-                                 self.simulation_name + '_rates.npz')
-        if op.exists(fnameout):
-            self._rates = np.load(fnameout)['data'][()]
-            return self._rates
-
         _rates = {}
-        # Load rate data from each root file
-        for fn in self.root_paths:
-            f = ROOT.TFile(fn)
-            keys = [key.GetName() for key in list(f.GetListOfKeys())
-                if 'rate_' in key.GetName()]
 
-            for key in keys:
-                graph = f.Get(key)
+        with open(self.output_directory + "rate_" + i) as rate_file:
+            for line in rate_file:
+                tokens = line.split('\t')
+                _rates['times'] = _rates['times'] + [float(tokens[0])]
 
-                if not isinstance(f.Get(key), ROOT.TGraph):
-                    continue
+        for i in range(len(self.nodenames)):
+            with open(self.output_directory + "rate_" + i) as rate_file:
+                for line in rate_file:
+                    # If the simulation is still running, it's possible that
+                    # len(times) might not match len(rates) so
+                    # make sure we don't hit trouble when we want to draw the rate.
+                    if len(_rates['times']) == len(_rates[i]):
+                        break
 
-                x,y,N = graph.GetX(), graph.GetY(), graph.GetN()
-                # Nasty format in ROOT means we need to array copy here
-                x.SetSize(N)
-                y.SetSize(N)
-                xa = np.array(x, copy=True)
-                ya = np.array(y, copy=True)
-                times = xa.flatten()[2::2]
+                    tokens = line.split('\t')
+                    _rates[i] = _rates[i] + [float(tokens[1])]
 
-                # All rate graphs should have the same times in them so just
-                # write once
-                if not 'times' in _rates:
-                    _rates['times'] = times
-
-                # load the values for this node's rate
-                _rates[int(key.split('_')[-1])] = ya.flatten()[2::2]
-
-        print 'Extracted %i rates from root file' % (len(_rates.keys())-1)
+        print 'Extracted %i rates' % (len(_rates.keys())-1)
 
         self._rates = _rates
-        # save the data in a compressed file
-        np.savez(fnameout, data=_rates)
         return _rates
 
     def getModelFilenameAndIndexFromNode(self, nodename):
