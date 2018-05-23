@@ -421,7 +421,7 @@ def generateMatrix(command):
         elif len(command) == 7:
             api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]), spike_shift_w=float(command[4]), reset_shift_w=float(command[5]), use_area_calculation=(command[6] in ['True', 'true', 'TRUE']))
         else:
-            print name + ' expects three, four or five parameters.'
+            print name + ' expects three, four or six parameters.'
             generateMatrix(name+'?')
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:

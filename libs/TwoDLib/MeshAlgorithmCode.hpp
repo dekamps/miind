@@ -231,7 +231,9 @@ namespace TwoDLib {
 
 			// Output to a rate file as well. This might be slow, but we can observe
 			// the rate as the simulation progresses rather than wait for root.
-			std::ofstream ofst_rate("rate_" + id, std::ofstream::app);
+			std::ostringstream ost2;
+			ost2 << "rate_" << id ;
+			std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
 			ofst_rate.precision(10);
 			ofst_rate << _t_cur << "\t" << _sys.F() << std::endl;
 			ofst_rate.close();
