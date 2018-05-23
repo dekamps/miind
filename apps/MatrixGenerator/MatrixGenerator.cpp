@@ -21,7 +21,7 @@ using namespace std;
 
 TwoDLib::UserTranslationMode InterpretArguments(int argc, char** argv){
 
-	if (argc != 5 && argc != 7  && argc != 9)
+	if (argc != 5 && argc != 7 && argc != 8 && argc != 9 && argc != 10)
 		throw TwoDLib::TwoDLibException("Incorrect number of arguments. Usage is either: ./MatrixGenerator <basename>.model <basename>.fid n_points tr_v tr_w tr_reset [n_min] [n_max] [-use_area_calculation], or ./MatrixGenerator <basename>.model <basename>.fid n_points <basename>.jmp [n_min] [n_max].");
 	// if argv[4] is the jump file, then argc must be 5 or 7
 
