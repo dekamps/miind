@@ -143,7 +143,7 @@ void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned 
 	Point p(v,w);
 
 	std::vector<Point> ps = quad.Points();
-	Quadrilateral quad_trans = Quadrilateral((ps[0]+p)*1000.0, (ps[1]+p)*1000.0, (ps[2]+p)*1000.0, (ps[3]+p)*1000.0);
+	Quadrilateral quad_trans = Quadrilateral((ps[0]+p), (ps[1]+p), (ps[2]+p), (ps[3]+p));
 
 	std::vector<Point> trans_points = quad_trans.Points();
 	double search_min_x = trans_points[0][0];
@@ -168,7 +168,7 @@ void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned 
 	  for (MPILib::Index j = 0; j < _tree.MeshRef().NrCellsInStrip(i); j++ ){
 
 			std::vector<Point> ps = _tree.MeshRef().Quad(i,j).Points();
-			Quadrilateral quad_scaled = Quadrilateral((ps[0])*1000.0, (ps[1])*1000.0, (ps[2])*1000.0, (ps[3])*1000.0);
+			Quadrilateral quad_scaled = Quadrilateral((ps[0]), (ps[1]), (ps[2]), (ps[3]));
 			std::vector<Point> ps_scaled = quad_scaled.Points();
 			bool all_points_right = true;
 			bool all_points_left = true;
@@ -199,40 +199,30 @@ void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned 
 		}
 	}
 
-	// If the cell falls entirely outside the mesh or there is lost mass
-	// greater than 5%,
-	// perform the monte carlo point search
-	if(_hit_list.size() == 0 || total_area < 0.95) {
-		_hit_list.clear();
-		double rectify_mc_count = _N / 100;
-		double dist = scale_distance*DetermineDistance(quad);
-		vector<Point> vec_point(100);
-		QuadGenerator gen(quad, _uni);
-		gen.Generate(&vec_point);
-		ApplyTranslation(&vec_point,p);
-		ProcessTranslatedPoints(vec_point);
-
-		// If we asked for like 10000 points or something, we don't want to
-		// for Monte carlo with that many points even for just these edge Cells.
-		// Always use 100 points and rectify to however many were required.
-		for(int i=0; i<_hit_list.size(); i++){
-				_hit_list[i]._count = (int)(_hit_list[i]._count * rectify_mc_count);
-		}
-
-		return;
+	if(_hit_list.size() == 0) {
+		Hit h;
+		h._cell = Coordinates(strip_no,cell_no);
+		h._count = _N;
+		_hit_list.push_back(h);
 	}
 
-  // To avoid calling monte carlo on all rounding errors below 1
-	// we only check for lost mass below 95% then perform this
-	// rectification step for all other cases.
-	// If we missed some area ( like if we overlapped outside the mesh )
-	// then the total area won't equal 1 and we should scale all
-	// transitions to sum to 1.
 	if (total_area != 1.0) {
 		for(int i=0; i<_hit_list.size(); i++){
 				_hit_list[i]._count = (int)((double)_hit_list[i]._count/total_area);
 			}
 	}
+
+	// rectify rounding errors
+	int c = 0;
+	for(Hit h : _hit_list){
+		c += h._count;
+	}
+
+	if(c != _N){
+		int diff = c - _N;
+		_hit_list.front()._count -= diff;
+	}
+
 }
 
 
