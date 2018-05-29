@@ -168,7 +168,7 @@ void Write
 
 					gen.Reset(nr_points);
 					TwoDLib::Translation tr = translation_list[i][j];
-					
+
 					if(mode == TwoDLib::AreaCalculation)
 						gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w);
 					else
@@ -178,9 +178,13 @@ void Write
 					l._origin = TwoDLib::Coordinates(i,j);
 					l._destination_list = gen.HitList();
 
-					TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
+					if(mode == TwoDLib::AreaCalculation) {
+						transitions.push_back(l);
+					} else {
+						TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
+						transitions.push_back(lcor);
+					}
 
-					transitions.push_back(lcor);
 				}
 			}
 		}
