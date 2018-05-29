@@ -169,10 +169,14 @@ void Write
 					gen.Reset(nr_points);
 					TwoDLib::Translation tr = translation_list[i][j];
 
-					if(mode == TwoDLib::AreaCalculation)
-						gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w,above);
-					else
+					if(mode == TwoDLib::AreaCalculation){
+						vector<TwoDLib::Coordinates> cells = below;
+						cells.insert(cells.begin(), ths.begin(), ths.end());
+						gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w,cells);
+					}
+					else {
 						gen.GenerateTransition(i,j,tr._v,tr._w);
+					}
 
 					l._number = gen.N();
 					l._origin = TwoDLib::Coordinates(i,j);

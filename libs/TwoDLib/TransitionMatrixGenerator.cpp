@@ -138,7 +138,7 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 	ProcessTranslatedPoints(vec_point);
 }
 
-void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned int strip_no, unsigned int cell_no, double v, double w, std::vector<Coordinates> above)
+void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned int strip_no, unsigned int cell_no, double v, double w, std::vector<Coordinates> cells)
 {
 	const Quadrilateral& quad = _tree.MeshRef().Quad(strip_no,cell_no);
 	Point p(v,w);
@@ -164,43 +164,38 @@ void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned 
 	}
 
 	double total_area = 0.0;
-	for (MPILib::Index i = 0; i < _tree.MeshRef().NrQuadrilateralStrips(); i++){
+	for (MPILib::Index c = 0; c < cells.size(); c++){
+	  MPILib::Index i = cells[c][0];
+		MPILib::Index j = cells[c][1];
 
-	  for (MPILib::Index j = 0; j < _tree.MeshRef().NrCellsInStrip(i); j++ ){
+		std::vector<Point> ps = _tree.MeshRef().Quad(i,j).Points();
+		Quadrilateral quad_scaled = Quadrilateral((ps[0]), (ps[1]), (ps[2]), (ps[3]));
+		std::vector<Point> ps_scaled = quad_scaled.Points();
+		bool all_points_right = true;
+		bool all_points_left = true;
+		bool all_points_above = true;
+		bool all_points_below = true;
+		for(Point p : ps_scaled){
+			all_points_right &= p[0] > search_max_x;
+			all_points_left &= p[0] < search_min_x;
+			all_points_above &= p[1] > search_max_y;
+			all_points_below &= p[1] < search_min_y;
+		}
 
-			Coordinates c(i,j);
-			if (std::find(above.begin(),above.end(),c) != above.end())
-				continue;
+		if(all_points_right || all_points_left || all_points_above || all_points_below)
+			continue;
 
-			std::vector<Point> ps = _tree.MeshRef().Quad(i,j).Points();
-			Quadrilateral quad_scaled = Quadrilateral((ps[0]), (ps[1]), (ps[2]), (ps[3]));
-			std::vector<Point> ps_scaled = quad_scaled.Points();
-			bool all_points_right = true;
-			bool all_points_left = true;
-			bool all_points_above = true;
-			bool all_points_below = true;
-			for(Point p : ps_scaled){
-				all_points_right &= p[0] > search_max_x;
-				all_points_left &= p[0] < search_min_x;
-				all_points_above &= p[1] > search_max_y;
-				all_points_below &= p[1] < search_min_y;
-			}
+		double area = Quadrilateral::get_overlap_area(quad_trans, quad_scaled);
 
-			if(all_points_right || all_points_left || all_points_above || all_points_below)
-				continue;
+		if((std::abs(area))/(std::abs(quad_trans.SignedArea())) < 0.00001)
+			continue;
 
-			double area = Quadrilateral::get_overlap_area(quad_trans, quad_scaled);
-
-			if((std::abs(area))/(std::abs(quad_trans.SignedArea())) < 0.00001)
-				continue;
-
-			total_area += (std::abs(area))/(std::abs(quad_trans.SignedArea()));
-			if (std::abs(area) > 0) {
-				Hit h;
-				h._cell = Coordinates(i,j);
-				h._count = (int)(_N*(std::abs(area))/(std::abs(quad_trans.SignedArea())));
-				_hit_list.push_back(h);
-			}
+		total_area += (std::abs(area))/(std::abs(quad_trans.SignedArea()));
+		if (std::abs(area) > 0) {
+			Hit h;
+			h._cell = Coordinates(i,j);
+			h._count = (int)(_N*(std::abs(area))/(std::abs(quad_trans.SignedArea())));
+			_hit_list.push_back(h);
 		}
 	}
 
