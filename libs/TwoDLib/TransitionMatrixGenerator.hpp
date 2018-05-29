@@ -82,7 +82,8 @@ namespace TwoDLib {
 			  unsigned int,	//!< strip no
 			  unsigned int,	//!< cell no
 			  double,		//!< translation in the v direction
-			  double    	//!< translation in the w direction
+			  double,    	//!< translation in the w direction
+        std::vector<Coordinates>  //!< above threshold cells
 	  	  );
 
 	  //! After a simulation, the generator must be reset

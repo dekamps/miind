@@ -18,6 +18,7 @@
 #include <iostream>
 #include <cmath>
 #include <limits>
+#include <algorithm>
 #include "MPILib/include/TypeDefinitions.hpp"
 #include "QuadGenerator.hpp"
 #include "TransitionMatrixGenerator.hpp"
@@ -137,7 +138,7 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 	ProcessTranslatedPoints(vec_point);
 }
 
-void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned int strip_no, unsigned int cell_no, double v, double w)
+void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned int strip_no, unsigned int cell_no, double v, double w, std::vector<Coordinates> above)
 {
 	const Quadrilateral& quad = _tree.MeshRef().Quad(strip_no,cell_no);
 	Point p(v,w);
@@ -166,6 +167,10 @@ void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned 
 	for (MPILib::Index i = 0; i < _tree.MeshRef().NrQuadrilateralStrips(); i++){
 
 	  for (MPILib::Index j = 0; j < _tree.MeshRef().NrCellsInStrip(i); j++ ){
+
+			Coordinates c(i,j);
+			if (std::find(above.begin(),above.end(),c) != above.end())
+				continue;
 
 			std::vector<Point> ps = _tree.MeshRef().Quad(i,j).Points();
 			Quadrilateral quad_scaled = Quadrilateral((ps[0]), (ps[1]), (ps[2]), (ps[3]));
