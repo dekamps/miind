@@ -170,7 +170,7 @@ void Write
 					TwoDLib::Translation tr = translation_list[i][j];
 
 					if(mode == TwoDLib::AreaCalculation)
-						gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w);
+						gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w,above);
 					else
 						gen.GenerateTransition(i,j,tr._v,tr._w);
 
