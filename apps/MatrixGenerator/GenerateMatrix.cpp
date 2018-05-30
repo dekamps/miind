@@ -171,7 +171,7 @@ void Write
 
 					if(mode == TwoDLib::AreaCalculation){
 						vector<TwoDLib::Coordinates> cells = below;
-						cells.insert(cells.begin(), ths.begin(), ths.end());
+						cells.insert(cells.end(), ths.begin(), ths.end());
 						gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w,cells);
 					}
 					else {
