@@ -62,8 +62,9 @@ void TwoDLib::ConstructResetMapping
 		    auto itmin = it-1;
 		    double w_min =  mesh.Quad(itmin->operator[](0),itmin->operator[](1)).Centroid()[1];
 		    double w_max =  mesh.Quad(it->operator[](0),it->operator[](1)).Centroid()[1];
-		    double f1 = (w_trans - w_min)/(w_max - w_min);
-		    double f2 = (w_max - w_trans)/(w_max - w_min);
+
+		    double f1 = (w_max - w_trans)/(w_max - w_min);
+		    double f2 = 1.0 - f1;
 		    ost << c[0] << "," << c[1] << "\t" << itmin->operator[](0) << "," << itmin->operator[](1) << "\t" << f1 << "\n";
 		    ost << c[0] << "," << c[1] << "\t" << it->operator[](0)    << "," << it->operator[](1)    << "\t" << f2 << "\n";
 		  }
