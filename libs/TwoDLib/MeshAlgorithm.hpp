@@ -35,7 +35,7 @@ namespace TwoDLib {
  * This class simulates the evolution of a neural population density function on a 2D grid.
  */
 
-	template <class WeightValue>
+	template <class WeightValue, class Solver=TwoDLib::MasterOdeint>
 	class MeshAlgorithm : public MPILib::AlgorithmInterface<WeightValue>  {
 
 	public:
@@ -130,6 +130,21 @@ namespace TwoDLib {
 		 */
 		void InitializeDensity(MPILib::Index i, MPILib::Index j){_sys.Initialize(i,j);}
 
+		/**
+		 * Grant access to the underlying Ode2DSystem
+		 */
+		const Ode2DSystem& Sys() const {return _sys; }
+
+		/**
+		 *
+		 */
+		std::vector<TwoDLib::Redistribution> ReversalMap() const { return _vec_rev; }
+
+		/**
+		 *
+		 */
+		std::vector<TwoDLib::Redistribution> ResetMap() const { return _vec_res; }
+
 	private:
 
 
@@ -166,7 +181,7 @@ namespace TwoDLib {
 
 		MPILib::Time 						_dt;     // mesh time step
 		TwoDLib::Ode2DSystem 				_sys;
-		std::unique_ptr<TwoDLib::MasterOdeint>	_p_master;
+		std::unique_ptr<Solver>         	_p_master;
 		MPILib::Number						_n_evolve;
 		MPILib::Number						_n_steps;
 

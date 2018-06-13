@@ -25,6 +25,7 @@
 #include <numeric>
 #include <vector>
 #include "MPILib/include/TypeDefinitions.hpp"
+#include "MPILib/include/ProbabilityQueue.hpp"
 #include "Mesh.hpp"
 #include "modulo.hpp"
 #include "Redistribution.hpp"
@@ -49,9 +50,10 @@ namespace TwoDLib {
 		//! Standard Constructor
 		Ode2DSystem
 		(
-			const Mesh&, 					    //!< Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
-			const std::vector<Redistribution>&, //!< A mapping from strip end to reversal bin
-			const std::vector<Redistribution>&  //!< A mapping from threshold to reset bin
+			const Mesh&, 					        //!< Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
+			const std::vector<Redistribution>&,     //!< A mapping from strip end to reversal bin
+			const std::vector<Redistribution>&,     //!< A mapping from threshold to reset bin
+			const MPILib::Time& tau_refactive = 0   //!< absolute refractive period
 		);
 
 
@@ -89,6 +91,9 @@ namespace TwoDLib {
 		//! allow inspection of the Mesh object
 		const Mesh& MeshObject() const { return _mesh; }
 
+		//! absolute refractive period
+		MPILib::Time Tau_ref() const { return _tau_refractive; }
+
 		friend class Master;
 	    friend class MasterOMP;
 	    friend class MasterOdeint;
@@ -120,7 +125,10 @@ namespace TwoDLib {
 		//! Implement the remapping of probability mass that hits threshold
 		class Reset {
 		public:
-			Reset(Ode2DSystem& sys, vector<double>& vec_mass):_sys(sys),_vec_mass(vec_mass){}
+			Reset(Ode2DSystem& sys, vector<double>& vec_mass):
+				_sys(sys),
+				_vec_mass(vec_mass)
+			{}
 
 			void operator()(const Redistribution& map){
 				double from =  map._alpha*_vec_mass[_sys.Map(map._from[0],map._from[1])];
@@ -129,8 +137,61 @@ namespace TwoDLib {
 			}
 
 		private:
+
 			Ode2DSystem&	_sys;
 			vector<double>& _vec_mass;
+		};
+
+		//! Implement a reset method that observes a refractive period
+		class ResetRefractive {
+		public:
+
+			ResetRefractive
+			(
+				Ode2DSystem&                  sys,
+				vector<double>&               vec_mass,
+				const MPILib::Number&         it,
+				MPILib::Time                  tau_refractive,
+				const vector<Redistribution>& vec_reset
+			):
+			_it(it),
+			_t_step(sys.MeshObject().TimeStep()),
+			_tau_refractive(tau_refractive),
+			_vec_reset(vec_reset),
+			_vec_queue(vec_reset.size(),sys.MeshObject().TimeStep()),
+			_sys(sys),
+			_vec_mass(vec_mass)
+			{
+			}
+
+			void operator()(const Redistribution& map)
+			{
+				MPILib::Time t = _it*_t_step;
+				double from =  map._alpha*_vec_mass[_sys.Map(map._from[0],map._from[1])];
+				_sys._f += from;
+
+				MPILib::Index i = &map - &_vec_reset[0];
+				MPILib::populist::StampedProbability prob;
+				prob._prob = from;
+				prob._time = t + _tau_refractive;
+				_vec_queue[i].push(prob);
+
+				from = _vec_queue[i].CollectAndRemove(t);
+				_vec_mass[_sys.Map(map._to[0],map._to[1])] += from;
+			}
+
+		private:
+
+			const MPILib::Number&                      _it;
+			MPILib::Time                               _t_step;
+			MPILib::Time                               _tau_refractive;
+
+			const vector<Redistribution>&              _vec_reset;
+			vector<MPILib::populist::ProbabilityQueue> _vec_queue;
+
+			Ode2DSystem&	                           _sys;
+			vector<double>&                            _vec_mass;
+
 		};
 
 		//! Implement cleaning of the probability that was at threshold. TODO: this is mildly inefficient,
@@ -159,13 +220,14 @@ namespace TwoDLib {
 		vector< vector<MPILib::Index> > InitializeMap() const;
 		void                  UpdateMap();
 
+
 		const Mesh&           _mesh;
 		vector<MPILib::Index> _vec_length;
 		vector<MPILib::Index> _vec_cumulative;
 		vector<double>	      _vec_mass;
 		vector<double>		  _vec_area;
 
-		unsigned int	_t;
+		unsigned int	_it;
 		double			_f;
 
 		vector<vector<MPILib::Index> > _map;
@@ -174,7 +236,10 @@ namespace TwoDLib {
 		vector<Redistribution> _vec_reset;
 		Reversal               _reversal;
 		Reset                  _reset;
+		ResetRefractive        _reset_refractive;
 		Clean				   _clean;
+
+		MPILib::Time           _tau_refractive;
 	};
 
 }

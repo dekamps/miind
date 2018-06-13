@@ -46,8 +46,8 @@ namespace {
 
 namespace TwoDLib {
 
-	template <class WeightValue>
-	pugi::xml_node MeshAlgorithm<WeightValue>::CreateRootNode(const string& model_name){
+	template <class WeightValue, class Solver>
+	pugi::xml_node MeshAlgorithm<WeightValue,Solver>::CreateRootNode(const string& model_name){
 
 		// document
 		pugi::xml_parse_result result = _doc.load_file(model_name.c_str());
@@ -58,8 +58,8 @@ namespace TwoDLib {
 		return root;
 	}
 
-	template <class WeightValue>
-	Mesh MeshAlgorithm<WeightValue>::CreateMeshObject(){
+	template <class WeightValue, class Solver>
+	Mesh MeshAlgorithm<WeightValue,Solver>::CreateMeshObject(){
 		// mesh
 		pugi::xml_node mesh_node = _root.first_child();
 
@@ -78,8 +78,8 @@ namespace TwoDLib {
 	}
 
 
-	template <class WeightValue>
-	std::vector<TwoDLib::Redistribution> MeshAlgorithm<WeightValue>::Mapping(const string& type)
+	template <class WeightValue, class Solver>
+	std::vector<TwoDLib::Redistribution> MeshAlgorithm<WeightValue,Solver>::Mapping(const string& type)
 	{
 		Pred pred(type);
 		pugi::xml_node rev_node = _root.find_child(pred);
@@ -95,8 +95,8 @@ namespace TwoDLib {
 		return vec_rev;
 	}
 
-	template <class WeightValue>
-	MeshAlgorithm<WeightValue>::MeshAlgorithm
+	template <class WeightValue, class Solver>
+	MeshAlgorithm<WeightValue,Solver>::MeshAlgorithm
 	(
 		const std::string& model_name,
 		const std::vector<std::string>& mat_names,
@@ -117,7 +117,7 @@ namespace TwoDLib {
 	_vec_res(this->Mapping("Reset")),
 	_vec_map(0),
 	_dt(_mesh.TimeStep()),
-	_sys(_mesh,_vec_rev,_vec_res),
+	_sys(_mesh,_vec_rev,_vec_res,tau_refractive),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystem::AvgV : &TwoDLib::Ode2DSystem::F)
@@ -128,8 +128,8 @@ namespace TwoDLib {
 			_sys.Initialize(0,0);
 	}
 
-	template <class WeightValue>
-	MeshAlgorithm<WeightValue>::MeshAlgorithm(const MeshAlgorithm<WeightValue>& rhs):
+	template <class WeightValue, class Solver>
+	MeshAlgorithm<WeightValue,Solver>::MeshAlgorithm(const MeshAlgorithm<WeightValue,Solver>& rhs):
 	_tolerance(rhs._tolerance),
 	_model_name(rhs._model_name),
 	_mat_names(rhs._mat_names),
@@ -142,7 +142,7 @@ namespace TwoDLib {
 	_vec_res(rhs._vec_res),
 	_vec_map(0),
 	_dt(_mesh.TimeStep()),
-	_sys(_mesh,_vec_rev,_vec_res),
+	_sys(_mesh,_vec_rev,_vec_res,rhs._sys.Tau_ref()),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction)
@@ -153,8 +153,8 @@ namespace TwoDLib {
 			_sys.Initialize(0,0);
 	}
 
-	template <class WeightValue>
-	std::vector<TwoDLib::TransitionMatrix> MeshAlgorithm<WeightValue>::InitializeMatrices(const std::vector<std::string>& mat_names)
+	template <class WeightValue, class Solver>
+	std::vector<TwoDLib::TransitionMatrix> MeshAlgorithm<WeightValue,Solver>::InitializeMatrices(const std::vector<std::string>& mat_names)
 	{
 		std::vector<TwoDLib::TransitionMatrix> vec_mat;
 
@@ -164,14 +164,14 @@ namespace TwoDLib {
 		return vec_mat;
 	}
 
-	template <class WeightValue>
-	MeshAlgorithm<WeightValue>* MeshAlgorithm<WeightValue>::clone() const
+	template <class WeightValue,class Solver>
+	MeshAlgorithm<WeightValue,Solver>* MeshAlgorithm<WeightValue,Solver>::clone() const
 	{
-	  return new MeshAlgorithm<WeightValue>(*this);
+	  return new MeshAlgorithm<WeightValue,Solver>(*this);
 	}
 
-	template <class WeightValue>
-	void MeshAlgorithm<WeightValue>::configure(const MPILib::SimulationRunParameter& par_run)
+	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::configure(const MPILib::SimulationRunParameter& par_run)
 	{
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
@@ -186,7 +186,7 @@ namespace TwoDLib {
 		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
 
 		try {
-			std::unique_ptr<TwoDLib::MasterOdeint> p_master(new MasterOdeint(_sys,vec_mat, par));
+			std::unique_ptr<Solver> p_master(new Solver(_sys,vec_mat, par));
 			_p_master = std::move(p_master);
 		}
 		// TODO: investigate the following
@@ -204,8 +204,8 @@ namespace TwoDLib {
 			throw TwoDLib::TwoDLibException("No initialization of the mass array has taken place. Call Initialize before configure.");
 	}
 
-	template <class WeightValue>
-	MPILib::AlgorithmGrid MeshAlgorithm<WeightValue>::getGrid(MPILib::NodeId id, bool b_state) const
+	template <class WeightValue,class Solver>
+	MPILib::AlgorithmGrid MeshAlgorithm<WeightValue,Solver>::getGrid(MPILib::NodeId id, bool b_state) const
 	{
 		// An empty grid will lead to crashes
 		vector<double> array_interpretation {0.};
@@ -233,8 +233,8 @@ namespace TwoDLib {
 		return MPILib::AlgorithmGrid(array_state,array_interpretation);
 	}
 
-	template <class WeightValue>
-	void MeshAlgorithm<WeightValue>::evolveNodeState
+	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::evolveNodeState
 	(
 		const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<WeightValue>& weightVector,
@@ -281,8 +281,8 @@ namespace TwoDLib {
  	    _n_evolve++;
 	}
 
-	template <class WeightValue>
-	void MeshAlgorithm<WeightValue>::FillMap(const std::vector<WeightValue>& vec_weights)
+	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::FillMap(const std::vector<WeightValue>& vec_weights)
 	{
  		// this function will only be called once;
 		_vec_map = std::vector<MPILib::Index>(vec_weights.size(),std::numeric_limits<MPILib::Index>::max());
@@ -306,8 +306,8 @@ namespace TwoDLib {
 
 	}
 
-	template <class WeightValue>
-	void MeshAlgorithm<WeightValue>::prepareEvolve
+	template <class WeightValue,class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::prepareEvolve
 	(
 		const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<WeightValue>& weightVector,
