@@ -34,6 +34,7 @@ Redistribution.cpp
 TriangleGenerator.cpp
 LineSegment.cpp												  		 		     
 Ode2DSystem.cpp   
+Ode2DSystemGroup.cpp   
 Stat.cpp   
 Uniform.cpp 
 )
@@ -53,6 +54,7 @@ Cell.hpp
 Master.hpp   
 MasterOdeint.hpp   
 Ode2DSystem.hpp   
+Ode2DSystemGroup.hpp   
 TransitionList.hpp  
 Uniform.hpp
 CheckSystem.hpp																  	       			 

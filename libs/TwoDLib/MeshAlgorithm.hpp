@@ -23,7 +23,7 @@
 #include <vector>
 #include <MPILib/include/AlgorithmInterface.hpp>
 #include "MasterOdeint.hpp"
-#include "Ode2DSystem.hpp"
+#include "Ode2DSystemGroup.hpp"
 #include "pugixml.hpp"
 
 
@@ -42,11 +42,11 @@ namespace TwoDLib {
 
 		MeshAlgorithm
 		(
-			const std::string&, 		    	 //!< model file name
-			const std::vector<std::string>&,     //!< collection of transition matrix files
-			MPILib::Time,                        //!< default time step for Master equation
-			MPILib::Time tau_refractive = 0,     //!< absolute refractive period
-			const string& ratemethod = ""        //!< firing rate computation; by default the mass flux across threshold
+			const std::string&, 	                //!< model file name
+			const std::vector<std::string>&,        //!< vector of transition matrix files
+			MPILib::Time,                           //!< default time step for Master equation
+			MPILib::Time tau_refractive = 0,        //!< absolute refractive period
+			const string& ratemethod = ""           //!< firing rate computation; by default the mass flux across threshold
 		);
 
 		MeshAlgorithm(const MeshAlgorithm&);
@@ -161,16 +161,17 @@ namespace TwoDLib {
 		std::vector<TwoDLib::Redistribution> _vec_res;
 
 		// map incoming rates onto the order used by MasterOMP
-		std::vector<unsigned int> _vec_map;
-		std::vector<MPILib::Rate> _vec_rates; // this is fed to the apply step of MasterOMP
+		std::vector<MPILib::Index>              _vec_map;
+		std::vector<std::vector<MPILib::Rate> > _vec_rates; // this is fed to the apply step of MasterOMP.
 
 		MPILib::Time 						_dt;     // mesh time step
-		TwoDLib::Ode2DSystem 				_sys;
+		TwoDLib::Ode2DSystemGroup 			_sys;
+
 		std::unique_ptr<TwoDLib::MasterOdeint>	_p_master;
 		MPILib::Number						_n_evolve;
 		MPILib::Number						_n_steps;
 
-		double (TwoDLib::Ode2DSystem::*_sysfunction) () const;
+		const vector<double>& (TwoDLib::Ode2DSystemGroup::*_sysfunction) () const;
 	};
 }
 

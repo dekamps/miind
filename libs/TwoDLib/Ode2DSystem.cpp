@@ -82,7 +82,7 @@ bool Ode2DSystem::CheckConsistency() const {
 	return true;
 }
 
-vector<unsigned int> Ode2DSystem::InitializeCumulative(const Mesh& m) const
+vector<MPILib::Index> Ode2DSystem::InitializeCumulative(const Mesh& m) const
 {
 	unsigned int sum = 0;
 	vector<unsigned int> vec_ret;

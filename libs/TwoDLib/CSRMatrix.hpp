@@ -20,7 +20,7 @@
 #define _CODE_LIBS_TWODLIB_CSRMATRIX_INCLUDE_GUARD
 
 #include <MPILib/include/TypeDefinitions.hpp>
-#include "Ode2DSystem.hpp"
+#include "Ode2DSystemGroup.hpp"
 #include "TransitionMatrix.hpp"
 
 
@@ -30,37 +30,55 @@ namespace TwoDLib {
 	class CSRMatrix {
 	public:
 
-		//! It is assumed that the Mesh and Config file used to produce the Ode2DSystem
+		//! It is assumed that the Mesh and Config file used to produce the Ode2DSystemGroup
 		//! are the same that were used to produce the TransitionMatrix
 		CSRMatrix
 		(
-			const TransitionMatrix&,  //!< TransitionMatrix as read in from a .mat file
-			const Ode2DSystem&        //!< Ode2DSystem that this matrix will operate on
+			const TransitionMatrix&  tmat, 		 //!< TransitionMatrix as read in from a .mat file
+			const Ode2DSystemGroup&  system,     //!< Ode2DSystemGroup that this matrix will operate on
+			MPILib::Index            mesh_index  //!< Index of the Mesh in the Ode2DSystemGroup that this CSRMatrix
 		);
 
 
-		//! out += Mv; ranges assert checked
-		void MV(vector<double>& out, const vector<double>& v);
+		//! out += Mv; ranges assert checked, this does not take into account the mapping by the Ode2DSystemGroup
+		void MV
+			(
+				vector<double>& 		out_result, //!< The result of M v_in
+				const vector<double>&   v_in        //!< v_in: vector to be multiplied by the TransitionMatrix m
+			);
 
 		//! Performs a matrix-vector multiplication, taking into account the current density mapping
-		void MVMapped(vector<double>&, const vector<double>&, double) const;
+		void MVMapped
+			(
+				vector<double>&        dydt, 		//!< Reference to the derivative array
+				const vector<double>&  density,     //!< Reference to density array
+				double				   rate         //!< Firing rate that should be applied to the derivatibe
+			) const;
 
 		//! Each matrix corresponds to a well defined jump
 		double Efficacy() const {return _efficacy; }
 
+		//! Expose underlying arrays
+		const std::vector<double>& Val() const {return _val;}
+		const std::vector<unsigned int> Ia() const {return _ia;}
+		const std::vector<unsigned int> Ja() const {return _ja;}
+
 	private:
 
-		void Initialize(const TransitionMatrix&);
+		void Initialize(const TransitionMatrix&, MPILib::Index);
 		void Validate(const TransitionMatrix&);
-	  void CSR(const vector<vector<MPILib::Index> >&, const vector<vector<double> >&);
 
-		const Ode2DSystem& _sys;
+		void CSR(const vector<vector<MPILib::Index> >&, const vector<vector<double> >&);
+
+		const Ode2DSystemGroup& _sys;
 		const double       _efficacy; // efficacy used in the generation of the TransitionMatrix
 
 		std::vector<double>       _val;
 		std::vector<unsigned int> _ia;
 		std::vector<unsigned int> _ja;
-		std::vector<Coordinates>  _coordinates;
+
+		MPILib::Index _mesh_index;  // index of the Mesh on the Ode2DSystemGroup that this CSRMatrix is responsible for
+		MPILib::Index _i_offset;    // offset of the part of the mass array that this CSRMatrix is responsible for
 
 	};
 }

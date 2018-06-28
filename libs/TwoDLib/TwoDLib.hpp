@@ -29,6 +29,7 @@
 #include "Mesh.hpp"
 #include "MeshAlgorithmCode.hpp"
 #include "Ode2DSystem.hpp"
+#include "Ode2DSystemGroup.hpp"
 #include "pugixml.hpp"
 #include "QuadGenerator.hpp"
 #include "Redistribution.hpp"

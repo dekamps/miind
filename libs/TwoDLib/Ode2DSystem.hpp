@@ -56,11 +56,11 @@ namespace TwoDLib {
 
 
 		//! Place all initial density in a cell with coordinates (i,j)
-		void Initialize(unsigned int, unsigned int);
+		void Initialize(MPILib::Index, MPILib::Index);
 
 		//! Map coordinates to a position in the density array. Map(0,0) may be defined or not, this depends on the Mesh and whether Mesh::InsertStationary
 		//! was called. The safe way to use Map is in a loop that uses Mesh::NrCellsInStrip and Mesh::NrQuadrilateralStrips.
-		unsigned int Map(unsigned int i, unsigned int j) const {return _map[i][j];}
+		unsigned int Map(MPILib::Index i, MPILib::Index j) const {return _map[i][j];}
 
 		//! Shift the density
 		void Evolve();
@@ -176,6 +176,5 @@ namespace TwoDLib {
 		Reset                  _reset;
 		Clean				   _clean;
 	};
-
 }
 #endif // include guard

@@ -119,3 +119,4 @@ BOOST_AUTO_TEST_CASE(ModelFile){
 
 	Mesh mesh("life21da341-bd4a-4077-93c2-4d11804d0882.model");
 }
+

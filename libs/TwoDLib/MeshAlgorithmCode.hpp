@@ -117,15 +117,16 @@ namespace TwoDLib {
 	_vec_res(this->Mapping("Reset")),
 	_vec_map(0),
 	_dt(_mesh.TimeStep()),
-	_sys(_mesh,_vec_rev,_vec_res),
+	_sys(std::vector<Mesh>{_mesh},std::vector<std::vector<Redistribution> >{_vec_rev},std::vector<std::vector<Redistribution> >{_vec_res}),
 	_n_evolve(0),
 	_n_steps(0),
-	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystem::AvgV : &TwoDLib::Ode2DSystem::F)
+	// AvgV method is for Fitzhugh-Nagumo, and other methods that don't have a threshold crossing
+	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystemGroup::AvgV : &TwoDLib::Ode2DSystemGroup::F)
 	// master parameter can only be calculated on configuration
 	{
 		// default initialization is (0,0); if there is no strip 0, it's down to the user
 		if (_mesh.NrCellsInStrip(0) > 0 )
-			_sys.Initialize(0,0);
+			_sys.Initialize(0,0,0);
 	}
 
 	template <class WeightValue>
@@ -142,7 +143,7 @@ namespace TwoDLib {
 	_vec_res(rhs._vec_res),
 	_vec_map(0),
 	_dt(_mesh.TimeStep()),
-	_sys(_mesh,_vec_rev,_vec_res),
+	_sys(std::vector<Mesh>{_mesh},std::vector<std::vector<Redistribution> >{_vec_rev},std::vector<std::vector<Redistribution> >{_vec_res}),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction)
@@ -150,7 +151,7 @@ namespace TwoDLib {
 	{
 		// default initialization is (0,0); if there is no strip 0, it's down to the user
 		if (_mesh.NrCellsInStrip(0) > 0 )
-			_sys.Initialize(0,0);
+			_sys.Initialize(0,0,0);
 	}
 
 	template <class WeightValue>
@@ -186,7 +187,7 @@ namespace TwoDLib {
 		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
 
 		try {
-			std::unique_ptr<TwoDLib::MasterOdeint> p_master(new MasterOdeint(_sys,vec_mat, par));
+			std::unique_ptr<TwoDLib::MasterOdeint> p_master(new MasterOdeint(_sys,std::vector<std::vector<TransitionMatrix > >{vec_mat}, par));
 			_p_master = std::move(p_master);
 		}
 		// TODO: investigate the following
@@ -228,7 +229,8 @@ namespace TwoDLib {
 				boost::filesystem::create_directory(dirname);
 			}
 			std::ofstream ofst(dirname + "/" + fn);
-			_sys.Dump(ofst);
+			std::vector<std::ostream*> vec_str{&ofst};
+			_sys.Dump(vec_str);
 		}
 		return MPILib::AlgorithmGrid(array_state,array_interpretation);
 	}
@@ -273,10 +275,11 @@ namespace TwoDLib {
 	    // master equation
 	    _p_master->Apply(_n_steps*_dt,_vec_rates,_vec_map);
 
+	    // threshold
 	    _sys.RedistributeProbability();
 
  	    _t_cur += _n_steps*_dt;
- 	    _rate = (_sys.*_sysfunction)();
+ 	    _rate = (_sys.*_sysfunction)()[0];
 
  	    _n_evolve++;
 	}
@@ -284,12 +287,19 @@ namespace TwoDLib {
 	template <class WeightValue>
 	void MeshAlgorithm<WeightValue>::FillMap(const std::vector<WeightValue>& vec_weights)
 	{
+		// The order in which they weight matrices appear in the vec_weights vector is not related
+		// to the order in which the matrices are stored in the master equation solver.
+		// the former is determined by the order in which the connections to the node that this
+		// algorithm belongs to. The latter is determined by the order in which the user presents the TransitionMatrix
+		// objects to the Master object. For the user there is no obvious way to keep this in synchrony, so
+		// we allow any order, and use the synaptic efficacy of a connection to find the corresponding matrix.
+
  		// this function will only be called once;
 		_vec_map = std::vector<MPILib::Index>(vec_weights.size(),std::numeric_limits<MPILib::Index>::max());
 
  		for(MPILib::Index i_weight = 0; i_weight < _vec_map.size(); i_weight++){
-			for (MPILib::Index i_mat = 0; i_mat < _p_master->NrMatrix(); i_mat++){
-				if ( fabs( _p_master->Efficacy(i_mat) - vec_weights[i_weight]._efficacy) < _tolerance ){
+			for (MPILib::Index i_mat = 0; i_mat < _p_master->NrMatrices(0); i_mat++){
+				if ( fabs( _p_master->Efficacy(0,i_mat) - vec_weights[i_weight]._efficacy) < _tolerance ){
 					if (_vec_map[i_weight] == std::numeric_limits<MPILib::Index>::max())
 						_vec_map[i_weight] = i_mat;
 					else {
@@ -302,7 +312,8 @@ namespace TwoDLib {
 			}
 		}
 
- 		_vec_rates = std::vector<double>(vec_weights.size(),0.);
+ 		_vec_rates = std::vector< std::vector<MPILib::Efficacy> >(0); // MeshAlgorithm really only uses the first array, i.e. the rates it receives in prepareEvole
+ 		_vec_rates.push_back( std::vector<MPILib::Efficacy>(vec_weights.size(),0.) );
 
 	}
 
@@ -320,7 +331,7 @@ namespace TwoDLib {
 
 		assert(nodeVector.size() == weightVector.size());
 		for (MPILib::Index i = 0; i < nodeVector.size(); i++)
-			_vec_rates[i] = nodeVector[i]*weightVector[i]._number_of_connections;
+			_vec_rates[0][i] = nodeVector[i]*weightVector[i]._number_of_connections;
 	}
 }
 

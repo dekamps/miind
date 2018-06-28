@@ -20,11 +20,19 @@
 #include <numeric>
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
+#include "MPILib/include/BasicDefinitions.hpp"
 #include "MPILib/include/utilities/Log.hpp"
 #include "TransitionMatrix.hpp"
 #include "TwoDLibException.hpp"
 
 using namespace TwoDLib;
+
+TransitionMatrix::TransitionMatrix():
+_vec_line(0),
+_tr_v(0),
+_tr_w(0)
+{
+}
 
 TransitionMatrix::TransitionMatrix(const std::string& fn)
 {
@@ -84,5 +92,5 @@ bool TransitionMatrix::SelfTest(double precision) const
 	}
 
 	return true;
-
 }
+

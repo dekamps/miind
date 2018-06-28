@@ -22,96 +22,80 @@
 #include <boost/numeric/odeint.hpp>
 #include "CSRMatrix.hpp"
 #include "TransitionMatrix.hpp"
-#include "Ode2DSystem.hpp"
+#include "Ode2DSystemGroup.hpp"
 #include "MasterParameter.hpp"
 
 typedef boost::numeric::odeint::runge_kutta_cash_karp54< std::vector<double> > error_stepper_type;
 
 namespace TwoDLib {
 
+	// Solver for the Poisson Master equation, using BOOST::Odeint as backend
+
 	class MasterOdeint {
 	public:
 
 		MasterOdeint
 		(
-			Ode2DSystem&,
-			const vector<TransitionMatrix>&,
-			const MasterParameter&
+			Ode2DSystemGroup&  sys,                                     //!< The systemgroup keeps track of the density and the mapping that is updated using evolution
+			const std::vector< vector<TransitionMatrix> >& vec_vec_mat, //!< TransitionMatrix matrix. First index labels the Mesh that covered by a vector of TransitionMatrix elements, second index labels the different TransitionMatrix objects operating on this mesh, which differ in the efficacy they represent
+			const MasterParameter& par                                  //!< Parmeter for configuring the numerical solver
 		);
 
 		MasterOdeint(const MasterOdeint&);
 
-		void Apply(double, const vector<double>&, const vector<MPILib::Index>&);
+		//! Communicate the firing rates to the sparse matrix implementation
+		void Apply
+			(
+				double                                   time_step,      //!< mesh time step
+				const std::vector<std::vector<double> >& rate_matrix,	 //!< rate matrix
+				const vector<MPILib::Index>&	         weight_order    //!< reference to the mapping from NodeId to weight order
+			);
 
-		unsigned int NrMatrix() const { return _vec_csr.size(); }
+		//! Number of meshes
+		MPILib::Number  NrMeshes() const { return _vec_vec_csr.size(); }
 
-		double Efficacy(unsigned int i) const { assert(i < _vec_csr.size()); return _vec_csr[i].Efficacy(); }
+		//! Number of weight matrices associated with Mesh i
+		MPILib::Number  NrMatrices(MPILib::Index i) const { return _vec_vec_csr[i].size(); }
 
-	    void operator()(const vector<double>&, vector<double>&, const double t = 0);
+		//! Efficacy associated with matrix matrix_index from Mesh mesh_index
+		double Efficacy
+		(
+				MPILib::Index mesh_index,	//!< Index labeling mesh
+				MPILib::Index matrix_index
+		) const {return _vec_vec_csr[mesh_index][matrix_index].Efficacy(); }
+
+		//! Solution step
+		void operator()
+				(
+					const vector<double>&,
+					vector<double>&,
+					const double t = 0
+				);
 
 	private:
 
 		MasterOdeint& operator=(const MasterOdeint&);
-		std::vector<CSRMatrix> InitializeCSR(const std::vector<TransitionMatrix>&, const Ode2DSystem&);
 
-		//! Auxilliary struct to calculate the derivative for forward Euler
-		struct Derivative {
+		std::vector<std::vector<CSRMatrix> >
+			InitializeCSR
+			(
+				const std::vector< std::vector<TransitionMatrix> >&,
+				const Ode2DSystemGroup&
+			);
 
-			Derivative(vector<double>& dydt, const Ode2DSystem& sys, double& rate ):_dydt(dydt),_sys(sys),_rate(rate){}
+		Ode2DSystemGroup& _sys;
 
-			void operator()(const TransitionMatrix::TransferLine& line) {
-				for(const TransitionMatrix::Redistribution& r: line._vec_to_line){
-					double from = _rate*r._fraction*_sys._vec_mass[_sys.Map(line._from[0],line._from[1])];
-					_dydt[_sys.Map(r._to[0],r._to[1])] += from;
-					}
-				_dydt[_sys.Map(line._from[0],line._from[1])] -= _rate*_sys._vec_mass[_sys.Map(line._from[0],line._from[1])];
-			}
-			vector<double>&    _dydt;
-			const Ode2DSystem&  _sys;
-			const double&      _rate;
-		};
-
-		//! Auxilliary struct for forward Euler
-		struct Add {
-			Add(double h):_h(h){}
-
-			double operator()(double mass, double dydt){
-				mass += _h*dydt;
-				return mass;
-			}
-
-			double _h;
-		};
-
-		//! Auxilliary struct for initialization
-		struct Init {
-			Init(double rate):_rate(rate){}
-
-			const double _rate;
-
-			double operator()(double mass){
-				return 0.;
-			}
-		};
-
-
-		Ode2DSystem& _sys;
-
-		const vector<TransitionMatrix>& _vec_mat; // After initialization, the original object is allowed to go out of scope; it will not be referred anymore
-		const vector<CSRMatrix> _vec_csr;
+		const std::vector< std::vector<TransitionMatrix> >& _vec_vec_mat; // After initialization, the original object is allowed to go out of scope; it will not be referred anymore
+		const std::vector< std::vector<CSRMatrix> >         _vec_vec_csr;
 
 		const MasterParameter	_par;
 		vector<double>			_dydt;
 		double					_rate;
 	
-		Derivative				_derivative;
-	    Add 					_add;
-		double					_h;
-		Init                    _init;
 
 
-		const vector<MPILib::Index>* _p_vec_map;     // place holder for current mapping, needed in operator()
-		const vector<double>*        _p_vec_rates;   // place holder for rate vector
+		const std::vector<MPILib::Index>*              _p_vec_map;     // place holder for current mapping, needed in operator()
+		const std::vector<std::vector<MPILib::Rate> >* _p_vec_rates;   // place holder for rate vector
 
 	};
 }
