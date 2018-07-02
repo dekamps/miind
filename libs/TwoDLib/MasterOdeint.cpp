@@ -23,6 +23,7 @@
 
 #include "MasterOdeint.hpp"
 
+
  using namespace TwoDLib;
 
  MasterOdeint::MasterOdeint
@@ -66,12 +67,12 @@ _p_vec_rates(rhs._p_vec_rates) // nor the rates object. integrate and variations
 	 _p_vec_map   = &vec_map;
 	 _p_vec_rates = &rates;
 
-	 typedef boost::numeric::odeint::runge_kutta_cash_karp54< vector<double> > error_stepper_type;
+	 typedef boost::numeric::odeint::runge_kutta_cash_karp54< vector<double>, double, vector<double>, double> error_stepper_type;
 	 typedef boost::numeric::odeint::controlled_runge_kutta< error_stepper_type > controlled_stepper_type;
 	 controlled_stepper_type controlled_stepper;
 
 	 boost::numeric::odeint::integrate_adaptive(boost::numeric::odeint::make_controlled< error_stepper_type >( 1.0e-6 , 1.0e-6 ),
-			 *this , _sys._vec_mass , 0.0 , t_step , 1e-4 );
+			 std::ref(*this) , _sys._vec_mass , 0.0 , t_step , 1e-4 );
 
  }
 
@@ -91,7 +92,7 @@ std::vector<std::vector<CSRMatrix> > MasterOdeint::InitializeCSR(const std::vect
 
  void MasterOdeint::operator()(const vector<double>& vec_mass, vector<double>& dydt, const double)
 {
-	 const std::vector<MPILib::Index>& vec_map      = *_p_vec_map;
+	 const std::vector<MPILib::Index>& vec_map            = *_p_vec_map;
 	 const std::vector<std::vector<MPILib::Rate> >& rates = *_p_vec_rates;
 
 
@@ -101,10 +102,9 @@ std::vector<std::vector<CSRMatrix> > MasterOdeint::InitializeCSR(const std::vect
 
 	MPILib::Number nr_meshes = _p_vec_rates->size();
 	for (MPILib::Index i_mesh = 0; i_mesh < nr_meshes; i_mesh++){
-		for (unsigned int irate = 0; irate < rates.size(); irate++){
+		for (unsigned int irate = 0; irate < rates[i_mesh].size(); irate++){
 		// do NOT map the rate
 			_rate = rates[i_mesh][irate];
-
 			// it is only the matrices that need to be mapped
 			_vec_vec_csr[i_mesh][vec_map[irate]].MVMapped
 			(

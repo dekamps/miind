@@ -81,7 +81,6 @@ void CSRMatrix::Validate(const TransitionMatrix& mat){
 	// check for consistency in strip 0; if not the same number of stationary points, there
 	// is an inconsistency between the config file of the Mesh and that of the TransitionMatrix
 
-
 	for (auto& line: lines)
 		if (line._from[0] == 0) count++;
 
@@ -129,7 +128,7 @@ void CSRMatrix::MVMapped
 	for (MPILib::Index i = 0; i < nr_rows; i++){
 	  MPILib::Index i_r =_sys.Map(i+_i_offset);
 	  for( MPILib::Index j = _ia[i]; j < _ia[i+1]; j++){
-			 int j_m = _sys.Map(i+_i_offset);
+			 int j_m = _sys.Map(_ja[j]+_i_offset);
 			 dydt[i_r] += rate*_val[j]*vec_mass[j_m];
 		 }
 	         dydt[i_r] -= rate*vec_mass[i_r];

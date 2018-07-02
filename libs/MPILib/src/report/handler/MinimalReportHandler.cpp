@@ -31,7 +31,7 @@ MinimalReportHandler::MinimalReportHandler
 	bool place_holder,
 	const CanvasParameter&
 ):
-AbstractReportHandler(result_name)
+AbstractReportHandler(result_name,report_state)
 {
 	_ofst.close();
 	_ofst.clear();

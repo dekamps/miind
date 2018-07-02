@@ -30,7 +30,6 @@ typedef boost::numeric::odeint::runge_kutta_cash_karp54< std::vector<double> > e
 namespace TwoDLib {
 
 	// Solver for the Poisson Master equation, using BOOST::Odeint as backend
-
 	class MasterOdeint {
 	public:
 
@@ -92,7 +91,6 @@ namespace TwoDLib {
 		vector<double>			_dydt;
 		double					_rate;
 	
-
 
 		const std::vector<MPILib::Index>*              _p_vec_map;     // place holder for current mapping, needed in operator()
 		const std::vector<std::vector<MPILib::Rate> >* _p_vec_rates;   // place holder for rate vector

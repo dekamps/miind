@@ -35,7 +35,7 @@ namespace TwoDLib {
  * This class simulates the evolution of a neural population density function on a 2D grid.
  */
 
-	template <class WeightValue>
+	template <class WeightValue, class Solver=TwoDLib::MasterOdeint>
 	class MeshAlgorithm : public MPILib::AlgorithmInterface<WeightValue>  {
 
 	public:
@@ -111,7 +111,7 @@ namespace TwoDLib {
 		/**
 		 * Provides a reference to the Mesh
 		 */
-		const Mesh MeshReference() const { return _mesh; }
+		const Mesh MeshReference() const { return _mesh_vec[0]; }
 
 		/**
 		 * By default, to find a matrix associated to an efficacy, MeshAlgorithm tests whether the efficacy quoted
@@ -156,7 +156,8 @@ namespace TwoDLib {
 		pugi::xml_node     _root;
 
 		// mesh and mappings
-		TwoDLib::Mesh _mesh;
+		std::vector<TwoDLib::Mesh> _mesh_vec;          // we have to create a vector, even if MeshAlgorithm manages only one Mesh, because
+		                                               // there needs to be a place for Ode2DSystemGroup to store a vector of Mesh
 		std::vector<TwoDLib::Redistribution> _vec_rev;
 		std::vector<TwoDLib::Redistribution> _vec_res;
 
@@ -167,9 +168,9 @@ namespace TwoDLib {
 		MPILib::Time 						_dt;     // mesh time step
 		TwoDLib::Ode2DSystemGroup 			_sys;
 
-		std::unique_ptr<TwoDLib::MasterOdeint>	_p_master;
-		MPILib::Number						_n_evolve;
-		MPILib::Number						_n_steps;
+		std::unique_ptr<Solver>	_p_master;
+		MPILib::Number			_n_evolve;
+		MPILib::Number			_n_steps;
 
 		const vector<double>& (TwoDLib::Ode2DSystemGroup::*_sysfunction) () const;
 	};

@@ -72,6 +72,7 @@ configure_file( aexp0cfa5d69-a740-4474-b8b6-b39870e2f5ef.mesh ${CMAKE_CURRENT_BI
 configure_file( aexpoverview.mesh ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 configure_file( condee2a5ff4-0087-4d69-bae3-c0a223d03693.mesh ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 configure_file( condee2a5ff4-0087-4d69-bae3-c0a223d03693.mat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file( condee2a5ff4-0087-4d69-bae3-c0a223d03693.stat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 configure_file( condee2a5ff4-0087-4d69-bae3-c0a223d03693.res ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 configure_file( condee2a5ff4-0087-4d69-bae3-c0a223d03693.config ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 configure_file( life21da341-bd4a-4077-93c2-4d11804d0882.model ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
