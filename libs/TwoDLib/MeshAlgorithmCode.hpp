@@ -168,7 +168,7 @@ namespace TwoDLib {
 	template <class WeightValue, class Solver>
 	MeshAlgorithm<WeightValue,Solver>* MeshAlgorithm<WeightValue,Solver>::clone() const
 	{
-	  return new MeshAlgorithm<WeightValue>(*this);
+	  return new MeshAlgorithm<WeightValue,Solver>(*this);
 	}
 
 	template <class WeightValue, class Solver>
