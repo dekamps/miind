@@ -27,6 +27,7 @@ CSRTest.cpp
 LineSegmentTest.cpp			
 Ode2DSystemTest.cpp			
 Ode2DSystemGroupTest.cpp			
+FixtureOde2DSystemGroup.cpp
 TransitionMatrixTest.cpp
 FidTest.cpp				
 MasterTest.cpp				

@@ -67,7 +67,7 @@ namespace TwoDLib {
 		~Mesh(){}
 
 		//!< number of strips in the grid
-		unsigned int NrQuadrilateralStrips() const { return _vec_vec_quad.size(); }
+		unsigned int NrStrips() const { return _vec_vec_quad.size(); }
 
 		//!< number of cells in strip i
 		unsigned int NrCellsInStrip(unsigned int i) const { assert( i < _vec_vec_quad.size()); return _vec_vec_quad[i].size();}
@@ -128,6 +128,7 @@ namespace TwoDLib {
 		};
 
 		static const int							_dimension; // we work with two dimensional points
+
 		vector<Block>                    			_vec_block;
 		vector<vector<Quadrilateral> >   			_vec_vec_quad;
 		vector<vector<QuadGenerator> >	            _vec_vec_gen;

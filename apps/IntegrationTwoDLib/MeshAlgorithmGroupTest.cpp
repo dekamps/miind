@@ -21,6 +21,17 @@
 #include <fstream>
 #include <TwoDLib.hpp>
 
+void CalculateDerivative
+(
+	const std::vector<double>&              mass,
+	vector<double>&                         dydt,
+	const std::vector<TwoDLib::CSRMatrix>&  vecmat
+)
+{
+	for(MPILib::Index imesh = 0; imesh < vecmat.size(); imesh++)
+		vecmat[imesh].MVMapped(dydt,mass,1000.);
+}
+
 int main(int argc, char** argv)
 {
   TwoDLib::Mesh mesh1("condee2a5ff4-0087-4d69-bae3-c0a223d03693.model");
@@ -39,16 +50,30 @@ int main(int argc, char** argv)
   std::vector<std::vector<TwoDLib::Redistribution> > vec_res{ vec_res1, vec_res2 };
   
   TwoDLib::Ode2DSystemGroup group(mesh_vec,vec_rev,vec_res);
-  group.Initialize(0,100,0);
-  group.Initialize(1,50,0);
- 
-  MPILib::Number n_iter = 10; // this is sufficient for one threshold crossing in mesh 1
+  group.Initialize(0,0,0);
+  group.Initialize(1,0,0);
+
+  TwoDLib::TransitionMatrix mat1("condee2a5ff4-0087-4d69-bae3-c0a223d03693_0_0.05_0_0_.mat");
+  TwoDLib::TransitionMatrix mat2("condee2a5ff4-0087-4d69-bae3-c0a223d03693_0_0.05_0_0_.mat");
+
+  TwoDLib::CSRMatrix csrmat1(mat1,group,0);
+  TwoDLib::CSRMatrix csrmat2(mat2,group,1);
+
+//  std::vector<TwoDLib::CSRMatrix> vecmat{csrmat1, csrmat2};
+
+  // create a vector for the derivative
+  std::vector<double> dydt(group.Mass().size());
+  csrmat1.MVMapped(dydt,group.Mass(),1000.);
+
+  /*
+  MPILib::Number n_iter = 100;
   for (int i = 0; i < n_iter; i++){
     group.Evolve();
+    CalculateDerivative(group.Mass(),dydt,vecmat);
     group.RedistributeProbability();
     group.RemapReversal();
   }
-
+*/
   std::ofstream ofst1("dens1.dat");
   std::ofstream ofst2("dens2.dat");
 

@@ -21,13 +21,51 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include "FixtureOde2DSystemGroup.hpp"
 
 
 using namespace std;
 using namespace TwoDLib;
 
-BOOST_AUTO_TEST_CASE(CSRMatrixTest)
+BOOST_FIXTURE_TEST_CASE(CSRMatrixTest, FixtureOde2DSystemGroup)
 {
+	// generate transition matrix for mesh 1
+	std::ofstream ofst1("mat1.mat");
+	ofst1 << "0.1 0.0\n"; // this jump size is immaterial and will not be used
+	ofst1 << "10;0,0;1,0:1.0;\n";
+	ofst1 << "10;0,1;1,1:1.0;\n";
+	ofst1 << "10;1,0;2,0:0.4;2,1:0.6;\n";
+	ofst1.close();
+
+	std::ofstream ofst2("mat2.mat");
+	ofst2 << "0.1 0.0\n"; // this jump size is immaterial and will not be used
+	ofst2 << "10;0,0;1,0:0.3;1,1:0.3;1,2:0.4\n";
+	ofst2 << "10;1,0;2,0:0.4;2,1:0.6;\n";
+	ofst2.close();
+
+	TransitionMatrix mat1("mat1.mat");
+	TransitionMatrix mat2("mat2.mat");
+
+	std::vector<std::vector<Redistribution> > vec_dummy;
+	std::vector<Mesh> vec_mesh {_mesh1, _mesh2 };
+	Ode2DSystemGroup group(vec_mesh,vec_dummy,vec_dummy);
+	group.Initialize(0,0,0);
+	group.Initialize(1,0,0);
+
+	CSRMatrix csr1(mat1,group,0);
+	CSRMatrix csr2(mat2,group,1);
+
+	std::vector<double> dydt(group.Mass().size(),0.0);
+	csr1.MVMapped(dydt,group.Mass(),1000.);
+	csr2.MVMapped(dydt,group.Mass(),800.);
+
+	BOOST_CHECK( dydt[0] == -1000.);
+	BOOST_CHECK( dydt[2] ==  1000.);
+    BOOST_CHECK( dydt[7] == -800.);
+    BOOST_CHECK( dydt[8] ==  240.);
+    BOOST_CHECK( dydt[9] ==  240.);
+    BOOST_CHECK( dydt[10] ==  320.);
+
 }
 
 

@@ -122,9 +122,9 @@ namespace TwoDLib {
 			}
 
 		private:
-			MPILib::Index     _m;
 			Ode2DSystemGroup& _sys;
 			vector<double>&   _vec_mass;
+			MPILib::Index     _m;
 		};
 
 		//! Implement the remapping of probability mass that hits threshold
@@ -140,9 +140,9 @@ namespace TwoDLib {
 
 		private:
 
-			MPILib::Index       _m;
 			Ode2DSystemGroup&	_sys;
 			vector<double>&     _vec_mass;
+			MPILib::Index       _m;
 		};
 
 		//! Implement cleaning of the probability that was at threshold. TODO: this is mildly inefficient,
@@ -160,9 +160,9 @@ namespace TwoDLib {
 
 		private:
 
-			MPILib::Index       _m;
 			Ode2DSystemGroup&	_sys;
 			vector<double>&	    _vec_mass;
+			MPILib::Index       _m;
 		};
 
 		vector<MPILib::Index> InitializeLength(const Mesh&) const;
@@ -171,6 +171,7 @@ namespace TwoDLib {
 		std::vector<std::vector<MPILib::Index> > InitializeCumulatives(const std::vector<Mesh>&);
 		std::vector<MPILib::Number> MeshOffset(const std::vector<Mesh>&) const;
 
+		bool				  CheckConsistency() const;
 		std::vector<Reset>    InitializeReset();
 		std::vector<Reversal> InitializeReversal();
 		std::vector<Clean>    InitializeClean();

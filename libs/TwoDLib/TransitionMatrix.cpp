@@ -46,11 +46,13 @@ TransitionMatrix::TransitionMatrix(const std::string& fn)
 	boost::char_separator<char> sepsc(";");
 	boost::char_separator<char> sepc(",");
 	boost::char_separator<char> sepco(":");
-	string dummy;
+
 	ifst >> _tr_v >> _tr_w;
 
+	string dummy;
 	while (ifst){
 		ifst >> dummy;
+
 		if( ifst.eof() ) break; // this is necessary or the last line will appear twice; that messes up the master equation calculation
 	    boost::tokenizer< boost::char_separator<char> > tokens(dummy, sepsc);
 	    std::vector<std::string> v(tokens.begin(), tokens.end());
@@ -61,7 +63,6 @@ TransitionMatrix::TransitionMatrix(const std::string& fn)
 	    std::vector<std::string> vto(tokento.begin(),tokento.end());
 	    if (vto.size() < 2)
 		throw TwoDLib::TwoDLibException("Error in line parsing from matrix files. Not enough tokens. Offending line: " + v[1]);
-		
 	    TransferLine line;
 	    line._from = Coordinates(boost::lexical_cast<unsigned int>(vto[0]),boost::lexical_cast<unsigned int>(vto[1]));
  	    for(auto it = v.begin() + 2; it != v.end(); it++){

@@ -21,54 +21,17 @@
 #include <boost/test/unit_test.hpp>
 #include <fstream>
 #include <TwoDLib.hpp>
+#include "FixtureOde2DSystemGroup.hpp"
 
 using namespace std;
 using namespace TwoDLib;
 
-BOOST_AUTO_TEST_CASE(SystemGroupConstructionTest){
-	// create two simple meshes
-	std::ofstream strmesh1("mesh1.mesh");
-	strmesh1 << "0.0\n";
-	strmesh1 << "1.0\n";
-	strmesh1 << "0.0 1.0 2.0\n";
-	strmesh1 << "1.0 1.0 1.0\n";
-	strmesh1 << "0.0 1.0 2.0 3.0\n";
-	strmesh1 << "2.0 2.0 2.0 2.0\n";
-	strmesh1 << "0.0 1.0 2.0 3.0\n";
-	strmesh1 << "3.0 3.0 3.0 3.0\n";
-	strmesh1 << "closed\n";
-	strmesh1 << "end\n";
-	strmesh1.close();
-	// create two simple meshes
-	std::ofstream strmesh2("mesh2.mesh");
-	strmesh2 << "0.0\n";
-	strmesh2 << "1.0\n";
-	strmesh2 << "0.0 1.0 2.0 3.0\n";
-	strmesh2 << "1.0 1.0 1.0 1.0\n";
-	strmesh2 << "0.0 1.0 2.0 3.0\n";
-	strmesh2 << "2.0 2.0 2.0 2.0\n";
-	strmesh2 << "0.0 1.0 2.0\n";
-	strmesh2 << "3.0 3.0 3.0\n";
-	strmesh2 << "closed\n";
-	strmesh2 << "end\n";
-	strmesh2.close();
 
-	Mesh mesh1("mesh1.mesh");
-	vector<double> vstat1{ 0., 1., 1., 0.};
-	vector<double> wstat1{ 0., 0., 1., 1.};
-	vector<double> vstat2{ 1., 2., 2., 1.};
-	vector<double> wstat2{ 0., 0., 1., 1.};
-	Quadrilateral stat1(vstat1,wstat1);
-	Quadrilateral stat2(vstat2,wstat2);
-	mesh1.InsertStationary(stat1);
-	mesh1.InsertStationary(stat2);
-
-	Mesh mesh2("mesh2.mesh");
-	mesh2.InsertStationary(stat1);
+BOOST_FIXTURE_TEST_CASE(SystemGroupConstructionTest,FixtureOde2DSystemGroup){
 
 	std::vector<Redistribution> vec_dummy;
 	std::vector<std::vector<Redistribution> > vec_vec_dummy;
-	std::vector<Mesh> vec_mesh  {mesh1, mesh2};
+	std::vector<Mesh> vec_mesh  {_mesh1,_mesh2};
 	Ode2DSystemGroup sys(vec_mesh,vec_vec_dummy,vec_vec_dummy);
 	BOOST_CHECK( sys.Map(0)  == 0 );
 	BOOST_CHECK( sys.Map(1)  == 1 );
@@ -102,23 +65,12 @@ BOOST_AUTO_TEST_CASE(SystemGroupConstructionTest){
 
 }
 
-BOOST_AUTO_TEST_CASE(GroupMapTest){
-	Mesh mesh1("mesh1.mesh");
-	vector<double> vstat1{ 0., 1., 1., 0.};
-	vector<double> wstat1{ 0., 0., 1., 1.};
-	vector<double> vstat2{ 1., 2., 2., 1.};
-	vector<double> wstat2{ 0., 0., 1., 1.};
-	Quadrilateral stat1(vstat1,wstat1);
-	Quadrilateral stat2(vstat2,wstat2);
-	mesh1.InsertStationary(stat1);
-	mesh1.InsertStationary(stat2);
+BOOST_FIXTURE_TEST_CASE(GroupMapTest, FixtureOde2DSystemGroup){
 
-	Mesh mesh2("mesh2.mesh");
-	mesh2.InsertStationary(stat1);
 
 	std::vector<Redistribution> vec_dummy;
 	std::vector<std::vector<Redistribution> > vec_vec_dummy;
-	std::vector<Mesh> vec_mesh  {mesh1, mesh2};
+	std::vector<Mesh> vec_mesh  {_mesh1, _mesh2};
 	Ode2DSystemGroup sys(vec_mesh,vec_vec_dummy,vec_vec_dummy);
 
 	BOOST_CHECK( sys.Map(0,0,0) == 0);
@@ -163,23 +115,24 @@ BOOST_AUTO_TEST_CASE(ConductanceMapTest){
 	std::vector<Mesh> vec_mesh{mesh};
 	Ode2DSystemGroup sys(vec_mesh,vec_vec_dummy,vec_vec_dummy);
 
-	std::cout << sys.Map(0) << std::endl;
-	std::cout << sys.Map(1) << std::endl;
-	std::cout << sys.Map(2) << std::endl;
-	std::cout << sys.Map(3) << std::endl;
+	BOOST_CHECK( sys.Map(0) == 0);
+	BOOST_CHECK( sys.Map(1) == 1);
+	BOOST_CHECK( sys.Map(2) == 2);
+	BOOST_CHECK( sys.Map(3) == 3);
 
 	sys.Evolve();
 
-	std::cout << sys.Map(0) << std::endl;
-	std::cout << sys.Map(1) << std::endl;
-	std::cout << sys.Map(2) << std::endl;
-	std::cout << sys.Map(3) << std::endl;
+
+	BOOST_CHECK( sys.Map(0) == 0);
+	BOOST_CHECK( sys.Map(1) == 700);
+	BOOST_CHECK( sys.Map(2) == 1);
+	BOOST_CHECK( sys.Map(3) == 2);
 
 	sys.Evolve();
 
-	std::cout << sys.Map(0) << std::endl;
-	std::cout << sys.Map(1) << std::endl;
-	std::cout << sys.Map(2) << std::endl;
-	std::cout << sys.Map(3) << std::endl;
+	BOOST_CHECK( sys.Map(0) == 0);
+	BOOST_CHECK( sys.Map(1) == 699);
+	BOOST_CHECK( sys.Map(2) == 700);
+	BOOST_CHECK( sys.Map(3) == 1);
 
 }

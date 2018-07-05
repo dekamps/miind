@@ -81,8 +81,9 @@ _reversal(InitializeReversal()),
 _reset(InitializeReset()),
 _clean(InitializeClean())
 {
-	assert(m.TimeStep() != 0.0);
-//	this->CheckConsistency();
+	for(const auto& m: _mesh_list)
+		assert(m.TimeStep() != 0.0);
+	this->CheckConsistency();
 }
 
 std::vector<MPILib::Number> Ode2DSystemGroup::MeshOffset(const std::vector<Mesh>& l) const
@@ -90,7 +91,7 @@ std::vector<MPILib::Number> Ode2DSystemGroup::MeshOffset(const std::vector<Mesh>
 	std::vector<MPILib::Number> vec_ret{0}; // first offset is 0
 	for (const Mesh& m: l){
 		MPILib::Number n_cell = 0;
-		for (MPILib::Index i = 0; i < m.NrQuadrilateralStrips(); i++)
+		for (MPILib::Index i = 0; i < m.NrStrips(); i++)
 			for( MPILib::Index j = 0; j < m.NrCellsInStrip(i); j++)
 				n_cell++;
 		vec_ret.push_back(n_cell);
@@ -105,7 +106,7 @@ std::vector<MPILib::Index> Ode2DSystemGroup::InitializeCumulative(const Mesh& m)
 	unsigned int sum = 0;
 	vector<unsigned int> vec_ret;
 	vec_ret.push_back(0);
-	for(unsigned int i = 0; i < m.NrQuadrilateralStrips(); i++){
+	for(unsigned int i = 0; i < m.NrStrips(); i++){
 		sum += m.NrCellsInStrip(i);
 		vec_ret.push_back(sum);
 	}
@@ -132,7 +133,7 @@ vector<double> Ode2DSystemGroup::InitializeMass() const
 std::vector<MPILib::Index> Ode2DSystemGroup::InitializeLength(const Mesh& m) const
 {
 	std::vector<MPILib::Index> vec_ret;
-	for(unsigned int i = 0; i < m.NrQuadrilateralStrips();i++)
+	for(unsigned int i = 0; i < m.NrStrips();i++)
 		vec_ret.push_back(m.NrCellsInStrip(i));
 	return vec_ret;
 }
@@ -151,7 +152,7 @@ vector<double> Ode2DSystemGroup::InitializeArea(const std::vector<Mesh>& vec) co
 {
 	vector<double> vec_ret;
 	for (const Mesh& m: _mesh_list){
-		for (unsigned int i = 0; i < m.NrQuadrilateralStrips(); i++)
+		for (unsigned int i = 0; i < m.NrStrips(); i++)
 			for (unsigned int j = 0; j < m.NrCellsInStrip(i); j++ )
 				vec_ret.push_back(m.Quad(i,j).SignedArea());
 	}
@@ -169,7 +170,7 @@ std::vector< std::vector< std::vector<MPILib::Index> > > Ode2DSystemGroup::Initi
 
 	for(const Mesh& mesh: _mesh_list){
 		std::vector<std::vector<MPILib::Index> > vec_mesh;
-		for (MPILib::Index i = 0; i < mesh.NrQuadrilateralStrips();i++){
+		for (MPILib::Index i = 0; i < mesh.NrStrips();i++){
 			std::vector<MPILib::Index> vec_strip;
 			for (MPILib::Index j = 0; j < mesh.NrCellsInStrip(i); j++){
 				vec_strip.push_back(count++);
@@ -186,7 +187,7 @@ std::vector<MPILib::Index> Ode2DSystemGroup::InitializeLinearMap()
 	std::vector<MPILib::Index> vec_ret;
 	MPILib::Index counter = 0;
 	for( const Mesh& mesh: _mesh_list){
-		for (MPILib::Index i = 0; i < mesh.NrQuadrilateralStrips(); i++)
+		for (MPILib::Index i = 0; i < mesh.NrStrips(); i++)
 			for (MPILib::Index j = 0; j < mesh.NrCellsInStrip(i); j++)
 				vec_ret.push_back(counter++);
 	}
@@ -199,14 +200,14 @@ void Ode2DSystemGroup::Dump(const std::vector<std::ostream*>& vecost, int mode) 
 	for(MPILib::Index m = 0; m < _mesh_list.size(); m++){
 		vecost[m]->precision(10);
 		if (mode == 0) {
-			for (unsigned int i = 0; i < _mesh_list[m].NrQuadrilateralStrips(); i++)
+			for (unsigned int i = 0; i < _mesh_list[m].NrStrips(); i++)
 				for (unsigned int j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++ )
 					// a division by _vec_area[this->Map(i,j)] is wrong
 					// the fabs is required since we don't care about the sign of the area and
 					// must write out a positive density
 					(*vecost[m]) << i << "\t" << j << "\t" << " " << fabs(_vec_mass[this->Map(m,i,j)]/_mesh_list[m].Quad(i,j).SignedArea()) << "\t";
 		} else {
-			for (unsigned int i = 0; i < _mesh_list[m].NrQuadrilateralStrips(); i++)
+			for (unsigned int i = 0; i < _mesh_list[m].NrStrips(); i++)
 				for (unsigned int j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++ )
 					(*vecost[m]) << i << "\t" << j << "\t" << " " << _vec_mass[this->Map(m,i,j)] << "\t";
 		}
@@ -227,7 +228,7 @@ void Ode2DSystemGroup::UpdateMap()
 	for (MPILib::Index m = 0; m < _mesh_list.size(); m++){ // we need the index for mapping, so no range-based loop
 		for(MPILib::Index i_stat = 0; i_stat < _mesh_list[m].NrCellsInStrip(0); i_stat++)
 			_linear_map[counter++] = i_stat + _vec_mesh_offset[m]; // the stationary strip needs to be handled separately
-		for (MPILib::Index i = 1; i < _mesh_list[m].NrQuadrilateralStrips(); i++){
+		for (MPILib::Index i = 1; i < _mesh_list[m].NrStrips(); i++){
 			// yes! i = 1. strip 0 is not supposed to have dynamics
 			for (MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++ ){
 				MPILib::Index ind = _vec_cumulative[m][i] + modulo(j-_t,_vec_length[m][i]) + _vec_mesh_offset[m];
@@ -259,7 +260,7 @@ const std::vector<double>& Ode2DSystemGroup::AvgV() const
 	// Rate calculation for non-threshold crossing models such as Fitzhugh-Nagumo
 	for(MPILib::Index m = 0; m < _mesh_list.size(); m++){
 		double av = 0.;
-		for(MPILib::Index i = 0; i < _mesh_list[m].NrQuadrilateralStrips(); i++){
+		for(MPILib::Index i = 0; i < _mesh_list[m].NrStrips(); i++){
 			for(MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++){
 				double V = _mesh_list[m].Quad(i,j).Centroid()[0];
 				av += V*_vec_mass[this->Map(m,i,j)];
@@ -270,3 +271,48 @@ const std::vector<double>& Ode2DSystemGroup::AvgV() const
 	return _avs;
 }
 
+bool Ode2DSystemGroup::CheckConsistency() const {
+
+	std::ostringstream ost_err;
+	ost_err << "Mesh inconsistent with mapping: ";
+	// it is allowed to have no reversal and reset mappings
+	if (_vec_reversal.size() == 0 && _vec_reset.size() == 0)
+		return true;
+	else // but if you have them, they must match the mesh list
+	{
+		if (_vec_reset.size() != _mesh_list.size() ){
+			ost_err << "Reset mapping vector size does not match mesh list size";
+			return false;
+		}
+		if (_vec_reversal.size() != _mesh_list.size() ){
+			ost_err << "Reversal mapping vector size does not match mesh list size";
+			return false;
+		}
+	}
+
+	for (MPILib::Index m = 0; m < _mesh_list.size(); m++ ){
+		for (const Redistribution& r: _vec_reversal[m]){
+			if ( r._from[0] >= _mesh_list[m].NrStrips() ){
+				ost_err << "reversal. NrStrips: " << _mesh_list[m].NrStrips() << ", from: " << r._from[0];
+				throw TwoDLib::TwoDLibException(ost_err.str());
+			}
+			if ( r._from[1] >= _mesh_list[m].NrCellsInStrip(r._from[0] ) ){
+				ost_err << "reversal. Nr cells in strip from: " <<  _mesh_list[m].NrCellsInStrip(r._from[0] ) << ",from: " << r._from[0] << "\n";
+				ost_err << "In total there are: " << _mesh_list[m].NrStrips() << " strips." << std::endl;
+				throw TwoDLib::TwoDLibException(ost_err.str());
+			}
+		}
+
+		for (const Redistribution& r: _vec_reset[m]){
+			if ( r._from[0] >= _mesh_list[m].NrStrips() ){
+				ost_err << "reset. NrStrips: " << _mesh_list[m].NrStrips() << ", from: " << r._from[0] << std::endl;
+				throw TwoDLib::TwoDLibException(ost_err.str());
+			}
+			if ( r._from[1] >= _mesh_list[m].NrCellsInStrip(r._from[0] ) ){
+				ost_err << "reset. Nr cells in strip r._from[0]: " <<  _mesh_list[m].NrCellsInStrip(r._from[0] ) << ", from: " << r._from[1];
+				throw TwoDLib::TwoDLibException(ost_err.str());
+			}
+		}
+	}
+	return true;
+}

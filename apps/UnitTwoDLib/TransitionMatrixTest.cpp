@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(TransitionMatrixUblasTest)
     using namespace boost::numeric::ublas;
 
     MPILib::Number n_cells = 1;
-    for (MPILib::Index i = 0; i < mesh.NrQuadrilateralStrips(); i++)
+    for (MPILib::Index i = 0; i < mesh.NrStrips(); i++)
     	for(MPILib::Index j = 0; j < mesh.NrCellsInStrip(i); j++)
     		++n_cells;
 

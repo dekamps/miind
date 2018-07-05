@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(MeshTest)
 	// Use aexpoverview.mesh for detailed debugging. It is small enough
 	// to see every cell. Use cond.mesh for large scale testing.
 	Mesh mesh("condee2a5ff4-0087-4d69-bae3-c0a223d03693.mesh");
-	unsigned int nr_strip = mesh.NrQuadrilateralStrips();
+	unsigned int nr_strip = mesh.NrStrips();
 
 	BOOST_REQUIRE(nr_strip == 199);
 	unsigned int nr_cells = mesh.NrCellsInStrip(88);
