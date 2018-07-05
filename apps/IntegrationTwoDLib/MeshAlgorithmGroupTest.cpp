@@ -19,17 +19,38 @@
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
 #include <fstream>
+#include <boost/timer/timer.hpp>
 #include <TwoDLib.hpp>
 
 void CalculateDerivative
 (
 	const std::vector<double>&              mass,
 	vector<double>&                         dydt,
-	const std::vector<TwoDLib::CSRMatrix>&  vecmat
+	const std::vector<TwoDLib::CSRMatrix>&  vecmat,
+	const vector<double>&                   vecrates
 )
 {
 	for(MPILib::Index imesh = 0; imesh < vecmat.size(); imesh++)
-		vecmat[imesh].MVMapped(dydt,mass,1000.);
+		vecmat[imesh].MVMapped(dydt,mass,vecrates[imesh]);
+}
+
+void ClearDerivative(vector<double>& dydt)
+{
+	MPILib::Number n_dydt = dydt.size();
+	for (MPILib::Index ideriv = 0; ideriv < n_dydt; ideriv++)
+		dydt[ideriv] = 0.;
+}
+
+void AddDerivative
+(
+	std::vector<double>& mass,
+	const std::vector<double>& dydt,
+	double h
+)
+{
+	MPILib::Number n_mass = mass.size();
+	for(MPILib::Index i = 0; i < n_mass; i++)
+		mass[i] += h*dydt[i];
 }
 
 int main(int argc, char** argv)
@@ -59,21 +80,37 @@ int main(int argc, char** argv)
   TwoDLib::CSRMatrix csrmat1(mat1,group,0);
   TwoDLib::CSRMatrix csrmat2(mat2,group,1);
 
-//  std::vector<TwoDLib::CSRMatrix> vecmat{csrmat1, csrmat2};
+  std::vector<TwoDLib::CSRMatrix> vecmat{csrmat1, csrmat2};
 
   // create a vector for the derivative
   std::vector<double> dydt(group.Mass().size());
-  csrmat1.MVMapped(dydt,group.Mass(),1000.);
 
-  /*
-  MPILib::Number n_iter = 100;
-  for (int i = 0; i < n_iter; i++){
+  // Some parameters to mess around with are here
+  MPILib::Time t_sim=1.0;
+  MPILib::Number n_steps = static_cast<MPILib::Number>(floor(t_sim/mesh1.TimeStep()));
+  TwoDLib::MasterParameter par(10);
+  double h = 1./par._N_steps*mesh1.TimeStep();
+  vector<double> vecrates{800.,1000.};
+
+	boost::timer::auto_cpu_timer t;
+  for (MPILib::Index i = 0; i < n_steps; i++){
     group.Evolve();
-    CalculateDerivative(group.Mass(),dydt,vecmat);
+
+    for (MPILib::Index i_part = 0; i_part < par._N_steps; i_part++ ){
+    	ClearDerivative(dydt);
+    	CalculateDerivative(group.Mass(),dydt,vecmat,vecrates);
+    	AddDerivative(group.Mass(),dydt,h);
+    }
     group.RedistributeProbability();
     group.RemapReversal();
+
+    if (i%100 == 0) std::cout << mesh1.TimeStep()*i << " " << group.F()[0] << " " << group.F()[1] <<  std::endl;
+
   }
-*/
+  t.stop();
+  std::cout << "Overall time spend\n";
+  t.report();
+
   std::ofstream ofst1("dens1.dat");
   std::ofstream ofst2("dens2.dat");
 

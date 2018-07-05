@@ -105,6 +105,8 @@ namespace TwoDLib {
 
 	    friend void CheckSystem(const Ode2DSystemGroup&, const TransitionMatrix&, const std::vector<Redistribution>&, const std::vector<Redistribution>&, double);
 
+	    vector<double>& Mass() { return _vec_mass; }
+
 	private:
 
 		//! Copy constructor
