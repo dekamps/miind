@@ -28,6 +28,7 @@ struct FixtureOde2DSystemGroup {
 	bool _mesh_create;
 	TwoDLib::Mesh _mesh1;
 	TwoDLib::Mesh _mesh2;
+	TwoDLib::Mesh _mesh3;
 };
 
 #endif // _FIXTUREODE2DSYSTEMGROUP

@@ -21,22 +21,36 @@
 #include <fstream>
 #include <boost/timer/timer.hpp>
 #include <TwoDLib.hpp>
+#include <MPILib/include/utilities/Exception.hpp>
 
 void CalculateDerivative
 (
-	const std::vector<double>&              mass,
+	TwoDLib::Ode2DSystemGroup&				sys,
 	vector<double>&                         dydt,
 	const std::vector<TwoDLib::CSRMatrix>&  vecmat,
 	const vector<double>&                   vecrates
 )
 {
-	for(MPILib::Index imesh = 0; imesh < vecmat.size(); imesh++)
-		vecmat[imesh].MVMapped(dydt,mass,vecrates[imesh]);
+
+#pragma omp parallel for 
+
+	for(MPILib::Index imesh = 0; imesh < vecmat.size(); imesh++){
+		unsigned int nr_rows = vecmat[imesh].Ia().size() - 1;
+		for (MPILib::Index i = 0; i < nr_rows; i++){
+			MPILib::Index i_r = sys.Map(i+sys.Offsets()[imesh]);
+			for( MPILib::Index j = vecmat[imesh].Ia()[i]; j < vecmat[imesh].Ia()[i+1]; j++){
+				 int j_m = sys.Map(vecmat[imesh].Ja()[j]+sys.Offsets()[imesh]);
+				 dydt[i_r] += vecrates[imesh]*vecmat[imesh].Val()[j]*sys.Mass()[j_m];
+			}
+		    dydt[i_r] -= vecrates[imesh]*sys.Mass()[i_r];
+		}
+	}
 }
 
 void ClearDerivative(vector<double>& dydt)
 {
 	MPILib::Number n_dydt = dydt.size();
+#pragma omp parallel for
 	for (MPILib::Index ideriv = 0; ideriv < n_dydt; ideriv++)
 		dydt[ideriv] = 0.;
 }
@@ -49,38 +63,73 @@ void AddDerivative
 )
 {
 	MPILib::Number n_mass = mass.size();
+#pragma omp parallel for
 	for(MPILib::Index i = 0; i < n_mass; i++)
 		mass[i] += h*dydt[i];
 }
 
+bool TestEquality(const TwoDLib::Mesh& mesh, const TwoDLib::Ode2DSystemGroup& group, MPILib::Number nmesh ){
+	std::vector<double> vals(nmesh,0.0);
+
+	for (MPILib::Index i = 0; i < mesh.NrStrips(); i++)
+		for (MPILib::Index j = 0; j < mesh.NrCellsInStrip(i); j++){
+			for (MPILib::Number m = 0; m < nmesh; m++)
+			{
+				vals[m] = group.Mass()[group.Map(m,i,j)];
+			}
+			double val = vals[0];
+			for (MPILib::Number m = 0; m < nmesh; m++)
+				if (vals[m] != val){
+					std::cout << "Difference in: " << i << " " << j << " for mesh: " << m <<std::endl;
+					exit(0);
+				}
+		}
+	return true;
+}
+
+
 int main(int argc, char** argv)
 {
+  try {
+  std::cout << "Start. " << std::endl;
   TwoDLib::Mesh mesh1("condee2a5ff4-0087-4d69-bae3-c0a223d03693.model");
   TwoDLib::Mesh mesh2("condee2a5ff4-0087-4d69-bae3-c0a223d03693.model");
+  TwoDLib::Mesh mesh3("condee2a5ff4-0087-4d69-bae3-c0a223d03693.model");
 
   std::ifstream ifstrev("condee2a5ff4-0087-4d69-bae3-c0a223d03693.rev");
   std::vector<TwoDLib::Redistribution> vec_rev1 = TwoDLib::ReMapping(ifstrev);
   std::vector<TwoDLib::Redistribution> vec_rev2 = vec_rev1;
+  std::vector<TwoDLib::Redistribution> vec_rev3 = vec_rev1;
   
   std::ifstream ifstres("condee2a5ff4-0087-4d69-bae3-c0a223d03693.res");
   std::vector<TwoDLib::Redistribution> vec_res1 = TwoDLib::ReMapping(ifstres);
   std::vector<TwoDLib::Redistribution> vec_res2 = vec_res1;
+  std::vector<TwoDLib::Redistribution> vec_res3 = vec_res1;
 
-  std::vector<TwoDLib::Mesh> mesh_vec{ mesh1, mesh2 };
-  std::vector<std::vector<TwoDLib::Redistribution> > vec_rev{ vec_rev1, vec_rev2 };
-  std::vector<std::vector<TwoDLib::Redistribution> > vec_res{ vec_res1, vec_res2 };
-  
+  std::vector<TwoDLib::Mesh> mesh_vec{ mesh1, mesh2, mesh3 };
+  std::vector<std::vector<TwoDLib::Redistribution> > vec_rev{ vec_rev1, vec_rev2, vec_rev3 };
+  std::vector<std::vector<TwoDLib::Redistribution> > vec_res{ vec_res1, vec_res2, vec_res3 };
+
+  std::cout << "Building group. " << std::endl;  
   TwoDLib::Ode2DSystemGroup group(mesh_vec,vec_rev,vec_res);
   group.Initialize(0,0,0);
   group.Initialize(1,0,0);
+  group.Initialize(2,0,0);
 
+  std::cout << "Building matrices." << std::endl;
   TwoDLib::TransitionMatrix mat1("condee2a5ff4-0087-4d69-bae3-c0a223d03693_0_0.05_0_0_.mat");
   TwoDLib::TransitionMatrix mat2("condee2a5ff4-0087-4d69-bae3-c0a223d03693_0_0.05_0_0_.mat");
+  TwoDLib::TransitionMatrix mat3("condee2a5ff4-0087-4d69-bae3-c0a223d03693_0_0.05_0_0_.mat");
 
+  std::cout << "Filling CSR." << std::endl;
   TwoDLib::CSRMatrix csrmat1(mat1,group,0);
   TwoDLib::CSRMatrix csrmat2(mat2,group,1);
+  TwoDLib::CSRMatrix csrmat3(mat3,group,2);
 
-  std::vector<TwoDLib::CSRMatrix> vecmat{csrmat1, csrmat2};
+
+  std::cout << "Creating matrix vector." << std::endl;
+
+  std::vector<TwoDLib::CSRMatrix> vecmat{csrmat1, csrmat2, csrmat3};
 
   // create a vector for the derivative
   std::vector<double> dydt(group.Mass().size());
@@ -90,22 +139,25 @@ int main(int argc, char** argv)
   MPILib::Number n_steps = static_cast<MPILib::Number>(floor(t_sim/mesh1.TimeStep()));
   TwoDLib::MasterParameter par(10);
   double h = 1./par._N_steps*mesh1.TimeStep();
-  vector<double> vecrates{800.,1000.};
+
+  std::cout << "Defining rates" << std::endl;
+  vector<double> vecrates{800., 900., 1000.};
 
 	boost::timer::auto_cpu_timer t;
+  std::cout << "Starting loop." << std::endl;
   for (MPILib::Index i = 0; i < n_steps; i++){
     group.Evolve();
 
     for (MPILib::Index i_part = 0; i_part < par._N_steps; i_part++ ){
     	ClearDerivative(dydt);
-    	CalculateDerivative(group.Mass(),dydt,vecmat,vecrates);
+    	CalculateDerivative(group,dydt,vecmat,vecrates);
     	AddDerivative(group.Mass(),dydt,h);
     }
+
     group.RedistributeProbability();
     group.RemapReversal();
 
-    if (i%100 == 0) std::cout << mesh1.TimeStep()*i << " " << group.F()[0] << " " << group.F()[1] <<  std::endl;
-
+    if (i%100 == 0) std::cout << mesh1.TimeStep()*i << " " << group.F()[0] << " " << group.F()[1] <<  " " << group.F()[2] <<  std::endl;
   }
   t.stop();
   std::cout << "Overall time spend\n";
@@ -113,8 +165,13 @@ int main(int argc, char** argv)
 
   std::ofstream ofst1("dens1.dat");
   std::ofstream ofst2("dens2.dat");
+  std::ofstream ofst3("dens3.dat");
 
-  std::vector<std::ostream*> vec_stream{ &ofst1, &ofst2 };
+  std::vector<std::ostream*> vec_stream{ &ofst1, &ofst2, &ofst3 };
   group.Dump(vec_stream);
+}
+catch(...){
+    std::cout << "Oops" << std::endl;
+}
   return 0;
 }

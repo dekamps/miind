@@ -70,7 +70,7 @@ BOOST_FIXTURE_TEST_CASE(GroupMapTest, FixtureOde2DSystemGroup){
 
 	std::vector<Redistribution> vec_dummy;
 	std::vector<std::vector<Redistribution> > vec_vec_dummy;
-	std::vector<Mesh> vec_mesh  {_mesh1, _mesh2};
+	std::vector<Mesh> vec_mesh  {_mesh1, _mesh2, _mesh3};
 	Ode2DSystemGroup sys(vec_mesh,vec_vec_dummy,vec_vec_dummy);
 
 	BOOST_CHECK( sys.Map(0,0,0) == 0);
@@ -86,6 +86,15 @@ BOOST_FIXTURE_TEST_CASE(GroupMapTest, FixtureOde2DSystemGroup){
 	BOOST_CHECK( sys.Map(1,1,2) == 10);
 	BOOST_CHECK( sys.Map(1,2,0) == 11);
 	BOOST_CHECK( sys.Map(1,2,1) == 12);
+    BOOST_CHECK( sys.Map(2,0,0) == 13);
+    BOOST_CHECK( sys.Map(2,0,1) == 14);
+    BOOST_CHECK( sys.Map(2,1,0) == 15);
+    BOOST_CHECK( sys.Map(2,1,1) == 16);
+    BOOST_CHECK( sys.Map(2,2,0) == 17);
+    BOOST_CHECK( sys.Map(2,2,1) == 18);
+    BOOST_CHECK( sys.Map(2,2,2) == 19);
+
+
 	sys.Evolve();
 	BOOST_CHECK( sys.Map(0,0,0) == 0);
 	BOOST_CHECK( sys.Map(0,0,1) == 1);
@@ -100,6 +109,14 @@ BOOST_FIXTURE_TEST_CASE(GroupMapTest, FixtureOde2DSystemGroup){
 	BOOST_CHECK( sys.Map(1,1,2) == 9);
 	BOOST_CHECK( sys.Map(1,2,0) == 12);
 	BOOST_CHECK( sys.Map(1,2,1) == 11);
+	BOOST_CHECK( sys.Map(2,0,0) == 13);
+	BOOST_CHECK( sys.Map(2,0,1) == 14);
+	BOOST_CHECK( sys.Map(2,1,0) == 16);
+	BOOST_CHECK( sys.Map(2,1,1) == 15);
+	BOOST_CHECK( sys.Map(2,2,0) == 19);
+	BOOST_CHECK( sys.Map(2,2,1) == 17);
+	BOOST_CHECK( sys.Map(2,2,2) == 18);
+
 }
 
 BOOST_AUTO_TEST_CASE(ConductanceMapTest){
@@ -134,5 +151,5 @@ BOOST_AUTO_TEST_CASE(ConductanceMapTest){
 	BOOST_CHECK( sys.Map(1) == 699);
 	BOOST_CHECK( sys.Map(2) == 700);
 	BOOST_CHECK( sys.Map(3) == 1);
-
 }
+

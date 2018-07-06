@@ -62,8 +62,8 @@ namespace TwoDLib {
 
 		//! Expose underlying arrays
 		const std::vector<double>& Val() const {return _val;}
-		const std::vector<unsigned int> Ia() const {return _ia;}
-		const std::vector<unsigned int> Ja() const {return _ja;}
+		const std::vector<unsigned int>& Ia() const {return _ia;}
+		const std::vector<unsigned int>& Ja() const {return _ja;}
 
 	private:
 

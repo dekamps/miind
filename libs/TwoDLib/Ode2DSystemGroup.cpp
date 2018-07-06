@@ -94,7 +94,7 @@ std::vector<MPILib::Number> Ode2DSystemGroup::MeshOffset(const std::vector<Mesh>
 		for (MPILib::Index i = 0; i < m.NrStrips(); i++)
 			for( MPILib::Index j = 0; j < m.NrCellsInStrip(i); j++)
 				n_cell++;
-		vec_ret.push_back(n_cell);
+		vec_ret.push_back(n_cell + vec_ret.back());
 	}
 
 	return vec_ret;
@@ -240,6 +240,7 @@ void Ode2DSystemGroup::UpdateMap()
 }
 
 void Ode2DSystemGroup::RemapReversal(){
+
 	for(MPILib::Index m = 0; m < _mesh_list.size(); m++)
 		std::for_each(_vec_reversal[m].begin(),_vec_reversal[m].end(),_reversal[m]);
 }

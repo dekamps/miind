@@ -37,7 +37,8 @@ bool FixtureOde2DSystemGroup::CreateMeshFile()
 FixtureOde2DSystemGroup::FixtureOde2DSystemGroup():
 _mesh_create(this->CreateMeshFile()),
 _mesh1("mesh1.mesh"),
-_mesh2("mesh2.mesh")
+_mesh2("mesh2.mesh"),
+_mesh3("mesh1.mesh")
 {
 	vector<double> vstat1{ 0., 1., 1., 0.};
 	vector<double> wstat1{ 0., 0., 1., 1.};
@@ -49,6 +50,9 @@ _mesh2("mesh2.mesh")
 	_mesh1.InsertStationary(stat2);
 
 	_mesh2.InsertStationary(stat1);
+
+	_mesh3.InsertStationary(stat1);
+	_mesh3.InsertStationary(stat2);
 }
 
 FixtureOde2DSystemGroup::~FixtureOde2DSystemGroup()
