@@ -111,7 +111,7 @@ namespace TwoDLib {
 		/**
 		 * Provides a reference to the Mesh
 		 */
-		const Mesh MeshReference() const { return _mesh_vec[0]; }
+		const Mesh& MeshReference() const { return _mesh_vec[0]; }
 
 		/**
 		 * By default, to find a matrix associated to an efficacy, MeshAlgorithm tests whether the efficacy quoted

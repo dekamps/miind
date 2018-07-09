@@ -22,51 +22,8 @@
 #include <boost/timer/timer.hpp>
 #include <TwoDLib.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
+#include "Euler.hpp"
 
-void CalculateDerivative
-(
-	TwoDLib::Ode2DSystemGroup&				sys,
-	vector<double>&                         dydt,
-	const std::vector<TwoDLib::CSRMatrix>&  vecmat,
-	const vector<double>&                   vecrates
-)
-{
-
-#pragma omp parallel for 
-
-	for(MPILib::Index imesh = 0; imesh < vecmat.size(); imesh++){
-		unsigned int nr_rows = vecmat[imesh].Ia().size() - 1;
-		for (MPILib::Index i = 0; i < nr_rows; i++){
-			MPILib::Index i_r = sys.Map(i+sys.Offsets()[imesh]);
-			for( MPILib::Index j = vecmat[imesh].Ia()[i]; j < vecmat[imesh].Ia()[i+1]; j++){
-				 int j_m = sys.Map(vecmat[imesh].Ja()[j]+sys.Offsets()[imesh]);
-				 dydt[i_r] += vecrates[imesh]*vecmat[imesh].Val()[j]*sys.Mass()[j_m];
-			}
-		    dydt[i_r] -= vecrates[imesh]*sys.Mass()[i_r];
-		}
-	}
-}
-
-void ClearDerivative(vector<double>& dydt)
-{
-	MPILib::Number n_dydt = dydt.size();
-#pragma omp parallel for
-	for (MPILib::Index ideriv = 0; ideriv < n_dydt; ideriv++)
-		dydt[ideriv] = 0.;
-}
-
-void AddDerivative
-(
-	std::vector<double>& mass,
-	const std::vector<double>& dydt,
-	double h
-)
-{
-	MPILib::Number n_mass = mass.size();
-#pragma omp parallel for
-	for(MPILib::Index i = 0; i < n_mass; i++)
-		mass[i] += h*dydt[i];
-}
 
 bool TestEquality(const TwoDLib::Mesh& mesh, const TwoDLib::Ode2DSystemGroup& group, MPILib::Number nmesh ){
 	std::vector<double> vals(nmesh,0.0);
@@ -130,6 +87,7 @@ int main(int argc, char** argv)
   std::cout << "Creating matrix vector." << std::endl;
 
   std::vector<TwoDLib::CSRMatrix> vecmat{csrmat1, csrmat2, csrmat3};
+ 
 
   // create a vector for the derivative
   std::vector<double> dydt(group.Mass().size());
@@ -142,8 +100,8 @@ int main(int argc, char** argv)
 
   std::cout << "Defining rates" << std::endl;
   vector<double> vecrates{800., 900., 1000.};
-
-	boost::timer::auto_cpu_timer t;
+ 
+  boost::timer::auto_cpu_timer t;
   std::cout << "Starting loop." << std::endl;
   for (MPILib::Index i = 0; i < n_steps; i++){
     group.Evolve();

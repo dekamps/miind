@@ -65,6 +65,8 @@ namespace TwoDLib {
 		const std::vector<unsigned int>& Ia() const {return _ia;}
 		const std::vector<unsigned int>& Ja() const {return _ja;}
 
+		//! Which mesh is this matrix relating to?
+		MPILib::Index MeshIndex() const {return _mesh_index; }
 	private:
 
 		void Initialize(const TransitionMatrix&, MPILib::Index);

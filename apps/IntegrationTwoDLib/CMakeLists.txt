@@ -52,6 +52,9 @@ set ( LIBLIST
 
 configure_file( condee2a5ff4-0087-4d69-bae3-c0a223d03693.model ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 configure_file( aexp97b7e1e7-b88c-4ff8-8e86-7e1e092f4d9a.model ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file( rinzel.model ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file( rinzel_-0.1_0_0_0_.mat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file( rinzel_0.1_0_0_0_.mat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 configure_file( condee2a5ff4-0087-4d69-bae3-c0a223d03693.res ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 configure_file( condee2a5ff4-0087-4d69-bae3-c0a223d03693.rev ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 configure_file( condee2a5ff4-0087-4d69-bae3-c0a223d03693_0_0.05_0_0_.mat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
@@ -61,7 +64,7 @@ configure_file( aexp97b7e1e7-b88c-4ff8-8e86-7e1e092f4d9a_1_0_0_0_.mat ${CMAKE_CU
 #############################################################################
 # executables
 #############################################################################
-add_executable(MeshAlgorithmGroupTest MeshAlgorithmGroupTest.cpp)
+add_executable(MeshAlgorithmGroupTest Euler.cpp MeshAlgorithmGroupTest.cpp)
 target_link_libraries(MeshAlgorithmGroupTest ${LIBLIST})
 
 add_executable(MasterGroupTest MasterGroupTest.cpp)
@@ -72,4 +75,8 @@ target_link_libraries(cond ${LIBLIST})
 
 add_executable(aexp  aexp_brette.cpp)
 target_link_libraries(aexp ${LIBLIST})
+
+add_executable(rinzel  Euler.cpp rinzel.cpp)
+target_link_libraries(rinzel ${LIBLIST})
+
 
