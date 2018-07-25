@@ -38,17 +38,29 @@ _vec_length(InitializeLength(m)),
 _vec_cumulative(InitializeCumulative(m)),
 _vec_mass(InitializeMass()),
 _vec_area(InitializeArea(m)),
+_vec_refract_mass(vector<double>(vec_reset.size())),
 _t(0),
 _f(0),
 _map(InitializeMap()),
 _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
 _reversal(*this,_vec_mass),
-_reset(*this,_vec_mass),
+_reset(*this,_vec_mass,_vec_refract_mass),
+_refract(*this,_vec_mass,_vec_refract_mass),
 _clean(*this,_vec_mass)
 {
 	assert(m.TimeStep() != 0.0);
 	this->CheckConsistency();
+
+	_vec_refractory = vector<Redistribution>(_vec_reset.size());
+	for (int i=0; i<_vec_reset.size(); i++){
+		_vec_refractory[i]._from[0] = i;
+		_vec_refractory[i]._from[1] = i;
+		_vec_refractory[i]._to[0] = _vec_reset[i]._to[0];
+		_vec_refractory[i]._to[1] = _vec_reset[i]._to[1];
+		_vec_reset[i]._to[0] = i;
+		_vec_reset[i]._to[1] = i;
+	}
 
 }
 
@@ -175,6 +187,7 @@ void Ode2DSystem::RedistributeProbability()
 {
 	std::for_each(_vec_reset.begin(),_vec_reset.end(),_reset);
  	std::for_each(_vec_reset.begin(),_vec_reset.end(),_clean);
+	std::for_each(_vec_refractory.begin(),_vec_refractory.end(),_refract);
 
 	_f /= _mesh.TimeStep();
 }
