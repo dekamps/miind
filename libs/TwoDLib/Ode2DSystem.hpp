@@ -120,10 +120,25 @@ namespace TwoDLib {
 		//! Implement the remapping of probability mass that hits threshold
 		class Reset {
 		public:
-			Reset(Ode2DSystem& sys, vector<double>& vec_mass):_sys(sys),_vec_mass(vec_mass){}
+			Reset(Ode2DSystem& sys, vector<double>& vec_mass, vector<double>& vec_refract):_sys(sys),_vec_mass(vec_mass),_vec_refract_mass(vec_refract){}
 
 			void operator()(const Redistribution& map){
-				double from =  map._alpha*_vec_mass[_sys.Map(map._from[0],map._from[1])];
+				_vec_refract_mass[map._to[0]] += map._alpha*_vec_mass[_sys.Map(map._from[0],map._from[1])];
+			}
+
+		private:
+			Ode2DSystem&	_sys;
+			vector<double>& _vec_mass;
+			vector<double>& _vec_refract_mass;
+		};
+
+		class Refract {
+		public:
+			Refract(Ode2DSystem& sys, vector<double>& vec_mass, vector<double>& vec_refract):_sys(sys),_vec_mass(vec_mass),_vec_refract_mass(vec_refract){}
+
+			void operator()(const Redistribution& map){
+				double from = _vec_refract_mass[map._from[0]]*0.22;
+				_vec_refract_mass[map._from[0]] -= from;
 				_vec_mass[_sys.Map(map._to[0],map._to[1])] += from;
 				_sys._f += from;
 			}
@@ -131,6 +146,7 @@ namespace TwoDLib {
 		private:
 			Ode2DSystem&	_sys;
 			vector<double>& _vec_mass;
+			vector<double>& _vec_refract_mass;
 		};
 
 		//! Implement cleaning of the probability that was at threshold. TODO: this is mildly inefficient,
@@ -163,6 +179,7 @@ namespace TwoDLib {
 		vector<MPILib::Index> _vec_length;
 		vector<MPILib::Index> _vec_cumulative;
 		vector<double>	      _vec_mass;
+		vector<double>				_vec_refract_mass;
 		vector<double>		  _vec_area;
 
 		unsigned int	_t;
@@ -172,8 +189,10 @@ namespace TwoDLib {
 
 		vector<Redistribution> _vec_reversal;
 		vector<Redistribution> _vec_reset;
+		vector<Redistribution> _vec_refractory;
 		Reversal               _reversal;
 		Reset                  _reset;
+		Refract								 _refract;
 		Clean				   _clean;
 	};
 
