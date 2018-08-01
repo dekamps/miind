@@ -24,6 +24,7 @@
 #include <iostream>
 #include <numeric>
 #include <vector>
+#include <math.h>
 #include "MPILib/include/TypeDefinitions.hpp"
 #include "Mesh.hpp"
 #include "modulo.hpp"
@@ -78,7 +79,16 @@ namespace TwoDLib {
 		double F() const {return _f;}
 
 		//! total probability mass in the system, should not be too far away from 1.0
-		double P() const { return std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0); }
+		double P() const {
+			double p = 0.0;
+			p = std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0);
+			for (int i=0; i<_vec_refract_mass.size(); i++){
+				for (int j=0; j<5; j++){
+					p += _vec_refract_mass[i][j];
+				}
+			}
+			return p;
+		}
 
 		//! average membrane potential
 		double AvgV() const ;
@@ -120,33 +130,38 @@ namespace TwoDLib {
 		//! Implement the remapping of probability mass that hits threshold
 		class Reset {
 		public:
-			Reset(Ode2DSystem& sys, vector<double>& vec_mass, vector<double>& vec_refract):_sys(sys),_vec_mass(vec_mass),_vec_refract_mass(vec_refract){}
+			Reset(Ode2DSystem& sys, vector<double>& vec_mass, vector<double*>& vec_refract):_sys(sys),_vec_mass(vec_mass),_vec_refract_mass(vec_refract){}
 
 			void operator()(const Redistribution& map){
-				_vec_refract_mass[map._to[0]] += map._alpha*_vec_mass[_sys.Map(map._from[0],map._from[1])];
+				_vec_refract_mass[map._to[0]][0] = map._alpha*_vec_mass[_sys.Map(map._from[0],map._from[1])];
 			}
 
 		private:
 			Ode2DSystem&	_sys;
 			vector<double>& _vec_mass;
-			vector<double>& _vec_refract_mass;
+			vector<double*>& _vec_refract_mass;
 		};
 
 		class Refract {
 		public:
-			Refract(Ode2DSystem& sys, vector<double>& vec_mass, vector<double>& vec_refract):_sys(sys),_vec_mass(vec_mass),_vec_refract_mass(vec_refract){}
+			Refract(Ode2DSystem& sys, vector<double>& vec_mass, vector<double*>& vec_refract):_sys(sys),_vec_mass(vec_mass),_vec_refract_mass(vec_refract){}
 
 			void operator()(const Redistribution& map){
-				double from = _vec_refract_mass[map._from[0]]*0.22;
-				_vec_refract_mass[map._from[0]] -= from;
+				double from = _vec_refract_mass[map._from[0]][4];
+				double sum = _vec_refract_mass[map._from[0]][4];
+				for (int i=4; i>0; i--){
+					_vec_refract_mass[map._from[0]][i] = _vec_refract_mass[map._from[0]][i-1];
+					sum += _vec_refract_mass[map._from[0]][i-1];
+				}
+				_vec_refract_mass[map._from[0]][0] = 0.0;
 				_vec_mass[_sys.Map(map._to[0],map._to[1])] += from;
-				_sys._f += from;
+				_sys._f += sum / 5;
 			}
 
 		private:
 			Ode2DSystem&	_sys;
 			vector<double>& _vec_mass;
-			vector<double>& _vec_refract_mass;
+			vector<double*>& _vec_refract_mass;
 		};
 
 		//! Implement cleaning of the probability that was at threshold. TODO: this is mildly inefficient,
@@ -179,7 +194,7 @@ namespace TwoDLib {
 		vector<MPILib::Index> _vec_length;
 		vector<MPILib::Index> _vec_cumulative;
 		vector<double>	      _vec_mass;
-		vector<double>				_vec_refract_mass;
+		vector<double*>				_vec_refract_mass;
 		vector<double>		  _vec_area;
 
 		unsigned int	_t;
