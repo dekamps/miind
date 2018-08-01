@@ -38,7 +38,7 @@ _vec_length(InitializeLength(m)),
 _vec_cumulative(InitializeCumulative(m)),
 _vec_mass(InitializeMass()),
 _vec_area(InitializeArea(m)),
-_vec_refract_mass(vector<double>(vec_reset.size())),
+_vec_refract_mass(vector<double*>(vec_reset.size())),
 _t(0),
 _f(0),
 _map(InitializeMap()),
@@ -49,6 +49,12 @@ _reset(*this,_vec_mass,_vec_refract_mass),
 _refract(*this,_vec_mass,_vec_refract_mass),
 _clean(*this,_vec_mass)
 {
+	for (int i=0; i<_vec_refract_mass.size(); i++) {
+		_vec_refract_mass[i] = new double[5];
+		for (int j=0; j<5; j++)
+			_vec_refract_mass[i][j] = 0.0;
+	}
+
 	assert(m.TimeStep() != 0.0);
 	this->CheckConsistency();
 
