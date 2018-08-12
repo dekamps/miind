@@ -37,6 +37,7 @@ set(MPI_SRCS
     src/report/handler/RootCanvasNoMPI.cpp
     src/report/handler/RootReportHandler.cpp
     src/report/handler/ValueHandlerHandler.cpp
+    src/report/handler/CsvReportHandler.cpp
     
     src/report/Report.cpp
     

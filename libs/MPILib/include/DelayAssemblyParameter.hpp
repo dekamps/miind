@@ -35,10 +35,11 @@ struct DelayAssemblyParameter {
 	 * @param rate initial firing rate of the population
 	 * @param th_exc excitatory threshold to switch delay activation on
 	 * @param  th_inh inhibitory threshold to switch delay off
+     * @param  slope amount of firing rate change allowed per time step
 	 */
 
-  DelayAssemblyParameter(Time time_membrane,Rate rate, Rate th_exc, Rate th_inh):
-    _time_membrane(time_membrane), _rate(rate),_th_exc(th_exc), _th_inh(th_inh){
+  DelayAssemblyParameter(Time time_membrane,Rate rate, Rate th_exc, Rate th_inh, Rate slope):
+    _time_membrane(time_membrane), _rate(rate), _th_exc(th_exc), _th_inh(th_inh), _slope(slope){
 	}
 
 	/**
@@ -47,25 +48,30 @@ struct DelayAssemblyParameter {
 	virtual ~DelayAssemblyParameter() {
 	}
 
-	/**
+    /**
 	 * membrane time constant; no decay by default
 	 */
         Time _time_membrane = std::numeric_limits<Time>::max();
 
-	/**
+    /**
 	 * current firing rate
 	 */
-	Rate _rate = 0;
+        Rate _rate = 0;
 
-        /**
+    /**
 	 * activation level for switching on the assembly
 	 */
         Rate _th_exc = 1.0;
 
-        /**
+    /**
 	 * activation level for switching off the assembly
 	 */
         Rate _th_inh = 2.0;
+
+    /**
+     * amount of change per time step of firing rate
+     */
+        Rate _slope = 0.1;
 
      };
 
