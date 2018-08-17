@@ -21,6 +21,7 @@
 #endif 
 #include <algorithm>
 #include <numeric>
+#include <fstream>
 
 #include "MasterOMP.hpp"
 
@@ -51,6 +52,7 @@ _init(_rate)
 	const vector<MPILib::Index>&               vec_vec_map
 )
  {
+
 	 MPILib::Number n_mesh = vec_vec_rates.size();
 	 // the time step t_step is split into single solution steps _h, equal to 1/N_steps
 	 for (unsigned int j = 0; j < _par._N_steps; j++){
@@ -62,7 +64,6 @@ _init(_rate)
 			 for (unsigned int irate = 0; irate < vec_vec_rates[mesh_index].size(); irate++){
 				 // do NOT map the rate
 				 _rate = vec_vec_rates[mesh_index][irate];
-
 				 // it is only the matrices that need to be mapped
 				 _vec_vec_csr[mesh_index][vec_vec_map[irate]].MVMapped
 				 (
@@ -72,6 +73,7 @@ _init(_rate)
 				 );
 			 }
 		 }
+
 #pragma omp parallel for
 		 for (MPILib::Index imass = 0; imass < _sys._vec_mass.size(); imass++)
 			 _sys._vec_mass[imass] += _add._h*t_step*_dydt[imass]; // the mult

@@ -42,8 +42,8 @@ int main(int argc, char** argv)
   group.Initialize(0,0,0);
   group.Initialize(1,0,0);
  
-  TwoDLib::TransitionMatrix mat1("condee2a5ff4-0087-4d69-bae3-c0a223d03693.mat");
-  TwoDLib::TransitionMatrix mat2("condee2a5ff4-0087-4d69-bae3-c0a223d03693.mat");
+  TwoDLib::TransitionMatrix mat1("condee2a5ff4-0087-4d69-bae3-c0a223d03693_0_0.05_0_0_.mat");
+  TwoDLib::TransitionMatrix mat2("condee2a5ff4-0087-4d69-bae3-c0a223d03693_0_0.05_0_0_.mat");
 
   // this vector is required for the concatenation. It should not be used to create the Master equation
   // which is vector of different synaptic efficacies.

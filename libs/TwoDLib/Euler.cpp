@@ -20,7 +20,7 @@
 #endif
 #include "Euler.hpp"
 
-void ClearDerivative(std::vector<double>& dydt)
+void TwoDLib::ClearDerivative(std::vector<MPILib::Mass>& dydt)
 {
   MPILib::Number n_dydt = dydt.size();
 #pragma omp parallel for
@@ -29,41 +29,39 @@ void ClearDerivative(std::vector<double>& dydt)
 }
 
 
-void AddDerivative
+void TwoDLib::AddDerivative
 (
- std::vector<double>& mass,
- const std::vector<double>& dydt,
- double h
+ std::vector<MPILib::Mass>& mass,
+ const std::vector<MPILib::Mass>& dydt,
+ MPILib::Time h
  )
 {
   MPILib::Number n_mass = mass.size();
 #pragma omp parallel for
-  for(MPILib::Index i = 0; i < n_mass; i++)
+  for(MPILib::Index i = 0; i < n_mass; i++){
     mass[i] += h*dydt[i];
+  }
 }
 
 
-void CalculateDerivative
+void TwoDLib::CalculateDerivative
 (
  TwoDLib::Ode2DSystemGroup&              sys,
- vector<double>&                         dydt,
+ vector<MPILib::Mass>&                   dydt,
  const std::vector<TwoDLib::CSRMatrix>&  vecmat,
  const std::vector<MPILib::Rate>&        vecrates
  )
 {
 
-#pragma omp parallel for
-
-  for(MPILib::Index imat = 0; imat < vecmat.size(); imat++){  
-    unsigned int nr_rows = vecmat[imat].Ia().size() - 1;
-    for (MPILib::Index i = 0; i < nr_rows; i++){
-      MPILib::Index mesh_index = vecmat[imat].MeshIndex();
-      MPILib::Index i_r = sys.Map(i+sys.Offsets()[mesh_index]);
-      for( MPILib::Index j = vecmat[imat].Ia()[i]; j < vecmat[imat].Ia()[i+1]; j++){
-	int j_m = sys.Map(vecmat[imat].Ja()[j]+sys.Offsets()[mesh_index]);
-	dydt[i_r] += vecrates[imat]*vecmat[imat].Val()[j]*sys.Mass()[j_m];
-      }
-      dydt[i_r] -= vecrates[imat]*sys.Mass()[i_r];
-    }
-  }
+	for (MPILib::Index irate = 0; irate < vecmat.size(); irate++){
+			 // do NOT map the rate
+		MPILib::Rate rate = vecrates[irate];
+			 // it is only the matrices that need to be mapped
+		vecmat[irate].MVMapped
+		(
+			dydt,
+			sys.Mass(),
+			rate
+		);
+	}
 }

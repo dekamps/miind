@@ -54,19 +54,23 @@ namespace TwoDLib {
 			(
 				vector<double>&        dydt, 		//!< Reference to the derivative array
 				const vector<double>&  density,     //!< Reference to density array
-				double				   rate         //!< Firing rate that should be applied to the derivatibe
+				double				   rate         //!< Firing rate that should be applied to the derivative
 			) const;
 
 		//! Each matrix corresponds to a well defined jump
 		double Efficacy() const {return _efficacy; }
 
-		//! Expose underlying arrays
+		//! Expose underlying arrays Val
 		const std::vector<double>& Val() const {return _val;}
+		//! Expose underlying arrays Ia
 		const std::vector<unsigned int>& Ia() const {return _ia;}
+		//! Expose underlying arrays Ja
 		const std::vector<unsigned int>& Ja() const {return _ja;}
 
 		//! Which mesh is this matrix relating to?
 		MPILib::Index MeshIndex() const {return _mesh_index; }
+
+
 	private:
 
 		void Initialize(const TransitionMatrix&, MPILib::Index);

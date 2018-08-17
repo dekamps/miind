@@ -36,3 +36,4 @@ double Distribution::NextSampleValue()
 {
 	return _generator.NextSampleValue();
 }
+

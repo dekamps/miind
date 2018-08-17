@@ -64,7 +64,7 @@ configure_file( aexp97b7e1e7-b88c-4ff8-8e86-7e1e092f4d9a_1_0_0_0_.mat ${CMAKE_CU
 #############################################################################
 # executables
 #############################################################################
-add_executable(MeshAlgorithmGroupTest Euler.cpp MeshAlgorithmGroupTest.cpp)
+add_executable(MeshAlgorithmGroupTest MeshAlgorithmGroupTest.cpp)
 target_link_libraries(MeshAlgorithmGroupTest ${LIBLIST})
 
 add_executable(MasterGroupTest MasterGroupTest.cpp)
@@ -76,7 +76,7 @@ target_link_libraries(cond ${LIBLIST})
 add_executable(aexp  aexp_brette.cpp)
 target_link_libraries(aexp ${LIBLIST})
 
-add_executable(rinzel  Euler.cpp rinzel.cpp)
+add_executable(rinzel  rinzel.cpp)
 target_link_libraries(rinzel ${LIBLIST})
 
 

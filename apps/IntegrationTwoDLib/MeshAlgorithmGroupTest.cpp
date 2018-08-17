@@ -22,7 +22,7 @@
 #include <boost/timer/timer.hpp>
 #include <TwoDLib.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
-#include "Euler.hpp"
+
 
 
 bool TestEquality(const TwoDLib::Mesh& mesh, const TwoDLib::Ode2DSystemGroup& group, MPILib::Number nmesh ){
@@ -107,9 +107,9 @@ int main(int argc, char** argv)
     group.Evolve();
 
     for (MPILib::Index i_part = 0; i_part < par._N_steps; i_part++ ){
-    	ClearDerivative(dydt);
-    	CalculateDerivative(group,dydt,vecmat,vecrates);
-    	AddDerivative(group.Mass(),dydt,h);
+      TwoDLib::ClearDerivative(dydt);
+      TwoDLib::CalculateDerivative(group,dydt,vecmat,vecrates);
+      TwoDLib::AddDerivative(group.Mass(),dydt,h);
     }
 
     group.RedistributeProbability();

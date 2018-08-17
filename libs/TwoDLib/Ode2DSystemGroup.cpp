@@ -71,8 +71,8 @@ _vec_cumulative(InitializeCumulatives(mesh_list)),
 _vec_mass(InitializeMass()),
 _vec_area(InitializeArea(mesh_list)),
 _t(0),
-_fs(std::vector<double>(mesh_list.size(),0.0)),
-_avs(std::vector<double>(mesh_list.size(),0.0)),
+_fs(std::vector<MPILib::Rate>(mesh_list.size(),0.0)),
+_avs(std::vector<MPILib::Potential>(mesh_list.size(),0.0)),
 _map(InitializeMap()),
 _linear_map(InitializeLinearMap()),
 _vec_reversal(vec_reversal),
@@ -121,13 +121,13 @@ std::vector<std::vector<MPILib::Index> > Ode2DSystemGroup::InitializeCumulatives
 	return vec_ret;
 }
 
-vector<double> Ode2DSystemGroup::InitializeMass() const
+vector<MPILib::Potential> Ode2DSystemGroup::InitializeMass() const
 {
 	MPILib::Number n_cells = 0;
 	for(const std::vector<MPILib::Index>& v: _vec_cumulative)
 		n_cells += v.back();
 
-	return vector<double>(n_cells,0.0);
+	return vector<MPILib::Potential>(n_cells,0.0);
 }
 
 std::vector<MPILib::Index> Ode2DSystemGroup::InitializeLength(const Mesh& m) const
@@ -148,9 +148,9 @@ std::vector< std::vector<MPILib::Index> > Ode2DSystemGroup::InitializeLengths(co
 }
 
 
-vector<double> Ode2DSystemGroup::InitializeArea(const std::vector<Mesh>& vec) const
+vector<MPILib::Potential> Ode2DSystemGroup::InitializeArea(const std::vector<Mesh>& vec) const
 {
-	vector<double> vec_ret;
+	vector<MPILib::Potential> vec_ret;
 	for (const Mesh& m: _mesh_list){
 		for (unsigned int i = 0; i < m.NrStrips(); i++)
 			for (unsigned int j = 0; j < m.NrCellsInStrip(i); j++ )
@@ -217,7 +217,7 @@ void Ode2DSystemGroup::Dump(const std::vector<std::ostream*>& vecost, int mode) 
 void Ode2DSystemGroup::Evolve()
 {
 	_t += 1;
-	for (double& f: _fs)
+	for (MPILib::Rate& f: _fs)
 		f = 0.;
 	this->UpdateMap();
 }
@@ -251,23 +251,23 @@ void Ode2DSystemGroup::RedistributeProbability()
 		std::for_each(_vec_reset[m].begin(),_vec_reset[m].end(),_reset[m]);
 		std::for_each(_vec_reset[m].begin(),_vec_reset[m].end(),_clean[m]);
 	}
-	double t_step = _mesh_list[0].TimeStep(); // they all should have the same time step
-	for (double& f: _fs)
+	MPILib::Time t_step = _mesh_list[0].TimeStep(); // they all should have the same time step
+	for (MPILib::Rate& f: _fs)
 		f /= t_step;
 }
 
-const std::vector<double>& Ode2DSystemGroup::AvgV() const
+const std::vector<MPILib::Potential>& Ode2DSystemGroup::AvgV() const
 {
 	// Rate calculation for non-threshold crossing models such as Fitzhugh-Nagumo
 	for(MPILib::Index m = 0; m < _mesh_list.size(); m++){
-		double av = 0.;
+		MPILib::Potential av = 0.;
 		for(MPILib::Index i = 0; i < _mesh_list[m].NrStrips(); i++){
 			for(MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++){
-				double V = _mesh_list[m].Quad(i,j).Centroid()[0];
+				MPILib::Potential V = _mesh_list[m].Quad(i,j).Centroid()[0];
 				av += V*_vec_mass[this->Map(m,i,j)];
 			}
 		}
-		const_cast<double&>(_avs[m]) = av;
+		const_cast<MPILib::Potential&>(_avs[m]) = av;
 	}
 	return _avs;
 }

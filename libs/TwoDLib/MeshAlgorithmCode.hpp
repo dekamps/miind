@@ -23,6 +23,7 @@
 #include <MPILib/include/utilities/Log.hpp>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include "MeshAlgorithm.hpp"
 #include "Stat.hpp"
 #include "TwoDLibException.hpp"
@@ -279,7 +280,6 @@ namespace TwoDLib {
 
  	    _t_cur += _n_steps*_dt;
  	    _rate = (_sys.*_sysfunction)()[0];
-
  	    _n_evolve++;
 	}
 
@@ -329,8 +329,9 @@ namespace TwoDLib {
 		// take into account the number of connections
 
 		assert(nodeVector.size() == weightVector.size());
-		for (MPILib::Index i = 0; i < nodeVector.size(); i++)
+		for (MPILib::Index i = 0; i < nodeVector.size(); i++){
 			_vec_rates[0][i] = nodeVector[i]*weightVector[i]._number_of_connections;
+		}
 	}
 }
 

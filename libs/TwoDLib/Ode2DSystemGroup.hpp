@@ -82,16 +82,16 @@ namespace TwoDLib {
 		void RemapReversal();
 
 		//! Return the instantaneous firing rate
-		const vector<double>& F() const {return _fs;}
+		const vector<MPILib::Rate>& F() const {return _fs;}
 
 		//! total probability mass in the system, should not be too far away from 1.0
-		double P() const { return std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0); }
+		MPILib::Mass P() const { return std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0); }
 
 		//! average membrane potential, used for non-threshold crossing models such as Fitzhugh-Nagumo
-		const vector<double>& AvgV() const ;
+		const vector<MPILib::Potential>& AvgV() const ;
 
 		//! allow direct inspection of the mass array; client must still convert this to a density
-		const vector<double>& Mass() const { return _vec_mass; }
+		const vector<MPILib::Mass>& Mass() const { return _vec_mass; }
 
 		//! allow inspection of the Mesh objects
 		const std::vector<Mesh>& MeshObjects() const { return _mesh_list; }
@@ -105,7 +105,7 @@ namespace TwoDLib {
 
 	    friend void CheckSystem(const Ode2DSystemGroup&, const TransitionMatrix&, const std::vector<Redistribution>&, const std::vector<Redistribution>&, double);
 
-	    vector<double>& Mass() { return _vec_mass; }
+	    vector<MPILib::Mass>& Mass() { return _vec_mass; }
 
 	private:
 
@@ -116,7 +116,7 @@ namespace TwoDLib {
 		class Reversal {
 		public:
 
-			Reversal(Ode2DSystemGroup& sys, vector<double>& vec_mass, MPILib::Index m):_sys(sys),_vec_mass(vec_mass),_m(m){}
+			Reversal(Ode2DSystemGroup& sys, vector<MPILib::Mass>& vec_mass, MPILib::Index m):_sys(sys),_vec_mass(vec_mass),_m(m){}
 
 			void operator()(const Redistribution& map){
 				_vec_mass[_sys.Map(_m,map._to[0],map._to[1])] += _vec_mass[_sys.Map(_m,map._from[0],map._from[1])];
@@ -124,27 +124,27 @@ namespace TwoDLib {
 			}
 
 		private:
-			Ode2DSystemGroup& _sys;
-			vector<double>&   _vec_mass;
-			MPILib::Index     _m;
+			Ode2DSystemGroup& 		_sys;
+			vector<MPILib::Mass>&   _vec_mass;
+			MPILib::Index     		_m;
 		};
 
 		//! Implement the remapping of probability mass that hits threshold
 		class Reset {
 		public:
-			Reset(Ode2DSystemGroup& sys, vector<double>& vec_mass,MPILib::Index m):_sys(sys),_vec_mass(vec_mass),_m(m){}
+			Reset(Ode2DSystemGroup& sys, vector<MPILib::Mass>& vec_mass,MPILib::Index m):_sys(sys),_vec_mass(vec_mass),_m(m){}
 
 			void operator()(const Redistribution& map){
-				double from =  map._alpha*_vec_mass[_sys.Map(_m,map._from[0],map._from[1])];
+				MPILib::Mass from =  map._alpha*_vec_mass[_sys.Map(_m,map._from[0],map._from[1])];
 				_vec_mass[_sys.Map(_m,map._to[0],map._to[1])] += from;
 				_sys._fs[_m] += from;
 			}
 
 		private:
 
-			Ode2DSystemGroup&	_sys;
-			vector<double>&     _vec_mass;
-			MPILib::Index       _m;
+			Ode2DSystemGroup&		_sys;
+			vector<MPILib::Mass>&  	_vec_mass;
+			MPILib::Index       	_m;
 		};
 
 		//! Implement cleaning of the probability that was at threshold. TODO: this is mildly inefficient,
@@ -153,7 +153,7 @@ namespace TwoDLib {
 		class Clean {
 		public:
 
-			Clean(Ode2DSystemGroup& sys, vector<double>& vec_mass, MPILib::Index m):_sys(sys),_vec_mass(vec_mass),_m(m){
+			Clean(Ode2DSystemGroup& sys, vector<MPILib::Mass>& vec_mass, MPILib::Index m):_sys(sys),_vec_mass(vec_mass),_m(m){
 			}
 
 			void operator()(const Redistribution& map){
@@ -162,9 +162,9 @@ namespace TwoDLib {
 
 		private:
 
-			Ode2DSystemGroup&	_sys;
-			vector<double>&	    _vec_mass;
-			MPILib::Index       _m;
+			Ode2DSystemGroup&		_sys;
+			vector<MPILib::Mass>&	_vec_mass;
+			MPILib::Index       	_m;
 		};
 
 		vector<MPILib::Index> InitializeLength(const Mesh&) const;
@@ -178,8 +178,8 @@ namespace TwoDLib {
 		std::vector<Reversal> InitializeReversal();
 		std::vector<Clean>    InitializeClean();
 
-		vector<double>        InitializeArea(const std::vector<Mesh>&) const;
-		vector<double>        InitializeMass() const;
+		vector<MPILib::Potential>  	InitializeArea(const std::vector<Mesh>&) const;
+		vector<MPILib::Mass>        InitializeMass() const;
 
 		std::vector< std::vector< std::vector<MPILib::Index> > > InitializeMap() const;
 		std::vector< MPILib::Index> InitializeLinearMap();
@@ -191,12 +191,12 @@ namespace TwoDLib {
 		std::vector<std::vector<MPILib::Index> > _vec_length;
 		std::vector<std::vector<MPILib::Index> > _vec_cumulative;
 
-		vector<double>	      _vec_mass;
-		vector<double>		  _vec_area;
+		vector<MPILib::Mass>	     	_vec_mass;
+		vector<MPILib::Potential>		_vec_area;
 
-		unsigned int				_t;
-		std::vector<double>			_fs;
-		std::vector<double>         _avs;
+		unsigned int					_t;
+		std::vector<MPILib::Mass>		_fs;
+		std::vector<MPILib::Potential>	_avs;
 
 		std::vector< std::vector<std::vector<MPILib::Index> > > _map;
 		std::vector< MPILib::Index> _linear_map;

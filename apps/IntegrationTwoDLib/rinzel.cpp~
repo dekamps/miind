@@ -109,7 +109,7 @@ int main(int argc, char *argv[]){
 	std::vector<double> dydt(group.Mass().size());
 
 	// Euler step parameter
-	TwoDLib::MasterParameter par(1000);
+	TwoDLib::MasterParameter par(500);
 	double h = 1./par._N_steps*mesh1.TimeStep();
 
 	// generating connections

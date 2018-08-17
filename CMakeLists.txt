@@ -30,8 +30,8 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 # cmake options
 ##############################################################################
 
-OPTION(ENABLE_OPENMP "Enable OpenMP" OFF)
-OPTION(ENABLE_TESTING "Compile tests" ON)
+OPTION(ENABLE_OPENMP "Enable OpenMP" ON)
+OPTION(ENABLE_TESTING "Compile tests" OFF)
 OPTION(ENABLE_ROOT "Root Desired" OFF)
 OPTION(ENABLE_MEMORY_TEST "Generate memory test" OFF)
 OPTION(ENABLE_MPI "Enable mpi" FALSE)

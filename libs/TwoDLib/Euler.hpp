@@ -18,25 +18,28 @@
 #ifndef _EULER_HPP
 #define _EULER_HPP
 #include <vector>
-#include <TwoDLib.hpp>
-
 #include <MPILib/include/MPINetworkCode.hpp>
+#include "CSRMatrix.hpp"
+#include "Ode2DSystemGroup.hpp"
 
-void ClearDerivative(std::vector<double>& dydt);
-void AddDerivative
-(
- std::vector<double>& mass,
- const std::vector<double>& dydt,
- double h
- );
+namespace TwoDLib {
+
+	void ClearDerivative(std::vector<double>& dydt);
+	void AddDerivative
+	(
+			std::vector<MPILib::Mass>& mass,
+			const std::vector<MPILib::Mass>& dydt,
+			MPILib::Time h
+	);
 
 
 void CalculateDerivative
-(
- TwoDLib::Ode2DSystemGroup&                             sys,
- vector<double>&                                        dydt,
- const std::vector< std::vector<TwoDLib::CSRMatrix> >&  vecmat,
- const std::vector<std::vector<double> >&               vecrates
- );
+	(
+			TwoDLib::Ode2DSystemGroup&              sys,
+			vector<MPILib::Mass>&		            dydt,
+			const std::vector<TwoDLib::CSRMatrix>&  vecmat,
+			const std::vector<MPILib::Rate>& 		vecrates
+	);
 
+}
 #endif

@@ -21,6 +21,7 @@
 #include "kd.h"
 #include "CSRMatrix.hpp"
 #include "CheckSystem.hpp"
+#include "Euler.hpp"
 #include "Fid.hpp"
 #include "InputCombination.hpp"
 #include "LineSegment.hpp"

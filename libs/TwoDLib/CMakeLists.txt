@@ -29,6 +29,7 @@ Quadrilateral.cpp
 Triangle.cpp
 kd.cpp
 Fid.cpp		   				      			  
+Euler.cpp
 MeshTree.cpp   
 Redistribution.cpp  
 TriangleGenerator.cpp
@@ -50,6 +51,7 @@ LineSegment.hpp
 MeshTree.hpp   
 Stat.hpp   
 TwoDLib.hpp
+Euler.hpp
 Cell.hpp														   		  
 Master.hpp   
 MasterOdeint.hpp   

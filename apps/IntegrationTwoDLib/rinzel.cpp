@@ -129,9 +129,9 @@ int main(int argc, char *argv[]){
 	  vec_input[3] = con_1_3_0._number_of_connections*vec_rates[3];
 
 	  for (MPILib::Index i_part = 0; i_part < par._N_steps; i_part++ ){
-	    ClearDerivative(dydt);
-            CalculateDerivative(group,dydt,vecmat,vec_input);
-	    AddDerivative(group.Mass(),dydt,h);
+	    TwoDLib::ClearDerivative(dydt);
+	    TwoDLib::CalculateDerivative(group,dydt,vecmat,vec_input);
+	    TwoDLib::AddDerivative(group.Mass(),dydt,h);
 	  }
 
 	  group.RedistributeProbability();

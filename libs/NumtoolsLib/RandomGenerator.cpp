@@ -21,7 +21,7 @@
 
 using namespace NumtoolsLib;
 
-RandomGenerator NumtoolsLib::GLOBAL_RANDOM_GENERATOR;
+//RandomGenerator NumtoolsLib::GLOBAL_RANDOM_GENERATOR;
 
 RandomGenerator::RandomGenerator(long l_seed):
 _initial_seed(l_seed),
