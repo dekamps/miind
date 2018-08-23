@@ -60,7 +60,7 @@ namespace TwoDLib {
 	}
 
 	template <class WeightValue, class Solver>
-	Mesh MeshAlgorithm<WeightValue,Solver>::CreateMeshObject(){
+	std::vector<TwoDLib::Mesh> MeshAlgorithm<WeightValue,Solver>::CreateMeshObject(){
 		// mesh
 		pugi::xml_node mesh_node = _root.first_child();
 
@@ -74,8 +74,8 @@ namespace TwoDLib {
 
 		// MatrixGenerator should already have inserted the stationary bin and there is no need
 		// to reexamine the stat file
-
-		return mesh;
+ 		std::vector<TwoDLib::Mesh> vec_mesh{ mesh };
+		return vec_mesh;
 	}
 
 
@@ -113,12 +113,12 @@ namespace TwoDLib {
 	_rate(0.0),
 	_t_cur(0.0),
 	_root(CreateRootNode(model_name)),
-	_mesh_vec(std::vector<TwoDLib::Mesh>{CreateMeshObject()}),
-	_vec_rev(this->Mapping("Reversal")),
-	_vec_res(this->Mapping("Reset")),
+	_mesh_vec(CreateMeshObject()),
+	_vec_vec_rev(std::vector<std::vector<Redistribution> >{this->Mapping("Reversal")}),
+	_vec_vec_res(std::vector<std::vector<Redistribution> >{this->Mapping("Reset")}),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_sys(std::vector<Mesh>{_mesh_vec[0]},std::vector<std::vector<Redistribution> >{_vec_rev},std::vector<std::vector<Redistribution> >{_vec_res}),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res),
 	_n_evolve(0),
 	_n_steps(0),
 	// AvgV method is for Fitzhugh-Nagumo, and other methods that don't have a threshold crossing
@@ -140,11 +140,11 @@ namespace TwoDLib {
 	_rate(rhs._rate),
 	_t_cur(rhs._t_cur),
 	_mesh_vec(rhs._mesh_vec),
-	_vec_rev(rhs._vec_rev),
-	_vec_res(rhs._vec_res),
+	_vec_vec_rev(rhs._vec_vec_rev),
+	_vec_vec_res(rhs._vec_vec_res),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_sys(_mesh_vec,std::vector<std::vector<Redistribution> >{_vec_rev},std::vector<std::vector<Redistribution> >{_vec_res}),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction)

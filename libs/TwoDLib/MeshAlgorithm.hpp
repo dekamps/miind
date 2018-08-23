@@ -93,6 +93,7 @@ namespace TwoDLib {
 		 * @param time Time point of the algorithm
 		 * @param typeVector Vector of the NodeTypes of the precursors
 		 */
+		using MPILib::AlgorithmInterface<WeightValue>::evolveNodeState;
 		virtual void evolveNodeState(const std::vector<MPILib::Rate>& nodeVector,
 				const std::vector<WeightValue>& weightVector, MPILib::Time time,
 				const std::vector<MPILib::NodeType>& typeVector);
@@ -130,12 +131,16 @@ namespace TwoDLib {
 		 */
 		void InitializeDensity(MPILib::Index i, MPILib::Index j){_sys.Initialize(0,i,j);}
 
+	   	const Ode2DSystemGroup& Sys() const { return _sys; }
+
+		const std::vector<TwoDLib::Redistribution>& MapReversal() const { return  _vec_vec_rev[0]; }
+		const std::vector<TwoDLib::Redistribution>& MapReset()    const { return  _vec_vec_res[0]; }
 	private:
 
 
 		// initialization routines
 		pugi::xml_node                          CreateRootNode(const std::string&);
-		Mesh                                    CreateMeshObject();
+		std::vector<TwoDLib::Mesh>              CreateMeshObject();
 		std::vector<TwoDLib::Redistribution>    Mapping(const std::string&);
 		std::vector<TwoDLib::TransitionMatrix>  InitializeMatrices(const std::vector<std::string>&);
 		void                                    FillMap(const std::vector<WeightValue>& weightVector);
@@ -158,8 +163,8 @@ namespace TwoDLib {
 		// mesh and mappings
 		std::vector<TwoDLib::Mesh> _mesh_vec;          // we have to create a vector, even if MeshAlgorithm manages only one Mesh, because
 		                                               // there needs to be a place for Ode2DSystemGroup to store a vector of Mesh
-		std::vector<TwoDLib::Redistribution> _vec_rev;
-		std::vector<TwoDLib::Redistribution> _vec_res;
+		std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_rev;
+		std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_res;
 
 		// map incoming rates onto the order used by MasterOMP
 		std::vector<MPILib::Index>              _vec_map;

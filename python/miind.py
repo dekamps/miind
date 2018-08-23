@@ -22,36 +22,6 @@ def parse_rate_functors(algorithms):
      return s
 
 
-def generate_xml_functions():
-     ''' Boiler plate code to generate XML functions that can load mesh and mappings from a model file'''
-
-     
-     s = 'vector<TwoDLib::Redistribution> RetrieveMappingFromXML(const std::string& type, pugi::xml_node root)\n' + \
-     '{\n' +  \
-     '\tPred pred(type);\n' + \
-     '\tpugi::xml_node rev_node = root.find_child(pred);\n\n' + \
-     '\tif (rev_node.name() != std::string(\"Mapping\") ||\n' + \
-     '\t\trev_node.attribute("type").value() != type)\n' + \
-     '\t\tthrow TwoDLib::TwoDLibException(\"Couldn\'t find mapping in model file\");\n\n' + \
-     '\tstd::ostringstream ostrev;\n' + \
-     '\trev_node.print(ostrev);\n' + \
-     '\tstd::istringstream istrev(ostrev.str());\n' + \
-     '\tvector<TwoDLib::Redistribution> vec_rev = TwoDLib::ReMapping(istrev);\n' + \
-     '\treturn vec_rev;\n' + \
-     '}\n\n' + \
-     'TwoDLib::Mesh RetrieveMeshFromXML(pugi::xml_node root)\n' + \
-     '{\n' +  \
-     '\tpugi::xml_node mesh_node = root.first_child();\n\n' + \
-     '\tif (mesh_node.name() != std::string(\"Mesh") )\n' + \
-     '\t\tthrow TwoDLib::TwoDLibException(\"Couldn\'t find mesh in model file\");\n\n' + \
-     '\tstd::ostringstream ostmesh;\n' + \
-     '\tmesh_node.print(ostmesh);\n' + \
-     '\tstd::istringstream istmesh(ostmesh.str());\n' + \
-     '\tTwoDLib::Mesh mesh(istmesh);\n' + \
-     '\treturn mesh;\n' + \
-     '}\n\n'
-     
-     return s
 
 
 def generate_fill_in_rate_function():
@@ -169,7 +139,6 @@ def generate_preamble(fn, variables, nodes, algorithms, connections):
 
     # the rate functor functions need to be declared before the main program
     function_declarations = parse_rate_functors(algorithms)
-    xml_functions = generate_xml_functions()
     log_function = generate_log_function()
     variable_declarations = generate_variable_declarations(variables)
     functor_table = generate_functor_table(nodes,algorithms)
@@ -191,7 +160,6 @@ def generate_preamble(fn, variables, nodes, algorithms, connections):
         f.write(fill_in_function)
         f.write(apply_network_function)
         f.write(function_declarations)
-        f.write(xml_functions)
         f.write(log_function)
         f.write('\nint main(int argc, char *argv[]){\n')
         f.write(variable_declarations)
@@ -287,9 +255,9 @@ def generate_mesh_algorithm_group(fn,nodes,algorithms):
                # according to pugixml doc, load_file destroys the old tree, soo this should be save
                f.write('\tpugi::xml_parse_result result' + str(i) + ' = doc.load_file(\"' + model +'\");\n')
                f.write('\tpugi::xml_node  root' + str(i) + ' = doc.first_child();\n\n')
-               f.write('\tTwoDLib::Mesh mesh' + str(i) +' = RetrieveMeshFromXML(root' + str(i) + ');\n')
-               f.write('\tstd::vector<TwoDLib::Redistribution> vec_rev' + str(i) + ' = RetrieveMappingFromXML("Reversal",root' + str(i) + ');\n')
-               f.write('\tstd::vector<TwoDLib::Redistribution> vec_res' + str(i) + ' = RetrieveMappingFromXML("Reset",root' + str(i) + ');\n\n')
+               f.write('\tTwoDLib::Mesh mesh' + str(i) +' = TwoDLib::RetrieveMeshFromXML(root' + str(i) + ');\n')
+               f.write('\tstd::vector<TwoDLib::Redistribution> vec_rev' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(i) + ');\n')
+               f.write('\tstd::vector<TwoDLib::Redistribution> vec_res' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reset",root' + str(i) + ');\n\n')
                f.write('\tvec_vec_mesh.push_back(mesh'+str(i)+');\n')
                f.write('\tvec_vec_rev.push_back(vec_rev'+str(i)+');\n')
                f.write('\tvec_vec_res.push_back(vec_res'+str(i)+');\n')

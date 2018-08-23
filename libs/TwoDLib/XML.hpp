@@ -14,32 +14,49 @@
 // DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-#ifndef _CODE_LIBS_2DLIB_INCLUDE_GUARD
-#define _CODE_LIBS_2DLIB_INCLUDE_GUARD
+///*
+#ifndef _CODE_LIBS_TWODLIB_XML_INCLUDE_GUARD
+#define _CODE_LIBS_TWODLIB_XML_INCLUDE_GUARD
 
-#include "kd.h"
-#include "CSRMatrix.hpp"
-#include "CheckSystem.hpp"
-#include "Euler.hpp"
-#include "Fid.hpp"
-#include "InputCombination.hpp"
-#include "LineSegment.hpp"
-#include "Master.hpp"
-#include "MasterOMP.hpp"
-#include "Mesh.hpp"
-#include "MeshAlgorithmCode.hpp"
-#include "Ode2DSystem.hpp"
-#include "Ode2DSystemGroup.hpp"
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
 #include "pugixml.hpp"
-#include "QuadGenerator.hpp"
-#include "Redistribution.hpp"
-#include "Stat.hpp"
-#include "TransitionList.hpp"
-#include "TransitionMatrix.hpp"
-#include "TriangleGenerator.hpp"
-#include "TwoDLibException.hpp"
-#include "Uniform.hpp"
-#include "XML.hpp"
+#include "Mesh.hpp"
 
-#endif
+namespace TwoDLib {
+
+
+inline vector<TwoDLib::Redistribution> RetrieveMappingFromXML(const std::string& type, pugi::xml_node root)
+{
+	Pred pred(type);
+	pugi::xml_node rev_node = root.find_child(pred);
+
+	if (rev_node.name() != std::string("Mapping") ||
+		rev_node.attribute("type").value() != type)
+			throw TwoDLib::TwoDLibException("Couldn't find mapping in model file");
+
+	std::ostringstream ostrev;
+	rev_node.print(ostrev);
+	std::istringstream istrev(ostrev.str());
+	vector<TwoDLib::Redistribution> vec_rev = TwoDLib::ReMapping(istrev);
+	return vec_rev;
+}
+
+inline TwoDLib::Mesh RetrieveMeshFromXML(pugi::xml_node root)
+{
+	pugi::xml_node mesh_node = root.first_child();
+
+	if (mesh_node.name() != std::string("Mesh") )
+		throw TwoDLib::TwoDLibException("Couldn't find mesh in model file");
+
+	std::ostringstream ostmesh;
+	mesh_node.print(ostmesh);
+	std::istringstream istmesh(ostmesh.str());
+	TwoDLib::Mesh mesh(istmesh);
+	return mesh;
+}
+
+}
+#endif // include guard

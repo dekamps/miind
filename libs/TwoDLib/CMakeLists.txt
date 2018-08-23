@@ -77,6 +77,7 @@ FiducialElement.hpp
 MeshAlgorithm.hpp		       
 Quadrilateral.hpp  
 TriangleGenerator.hpp
+XML.hpp
 )
 
 
