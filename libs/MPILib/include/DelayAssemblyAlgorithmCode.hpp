@@ -32,6 +32,8 @@ namespace MPILib {
     _t_current(0.0),
     _r_current(0.0)
     {
+        _last_activation = -std::numeric_limits<Time>::max();
+        _change_factor = _par._slope;
     }
 
     template <class WeightType>
@@ -57,20 +59,43 @@ namespace MPILib {
     }
 
     template <class WeightType>
-	void DelayAssemblyAlgorithm<WeightType>::evolveNodeState(const std::vector<Rate>& nodeVector,
-			const std::vector<WeightType>& weightVector, Time time){
-    	_t_current = time;
+    void DelayAssemblyAlgorithm<WeightType>::evolveNodeState(const std::vector<Rate>& nodeVector,
+            const std::vector<WeightType>& weightVector, Time time){
+        _t_current = time;
 
-    	GeomLib::MuSigmaScalarProduct<WeightType> prod;
-    	// don't use the membrane time constant; not interested in diffusion approximation
-    	GeomLib::MuSigma ms = prod.Evaluate(nodeVector,weightVector,1.0);
+        GeomLib::MuSigmaScalarProduct<WeightType> prod;
+        // don't use the membrane time constant; not interested in diffusion approximation
+        GeomLib::MuSigma ms = prod.Evaluate(nodeVector, weightVector, 1.0);
 
-    	if (ms._mu > _par._th_exc)
-    		_r_current = _par._rate;
+        if (ms._mu > _par._th_exc){
+            _last_activation = _t_current;
+        };
 
-    	if (ms._mu < _par._th_inh)
-    		_r_current = 0.0;
+        if (ms._mu < _par._th_inh){
+            if (_r_current - _change_factor > 0.0){
+                _r_current -= _change_factor;
+            }
+            else{
+                _r_current = 0.0;
+            };
+        };
 
+        if (_t_current - _last_activation > _par._time_membrane){
+            if (_r_current - _change_factor > 0.0){
+                _r_current -= _change_factor;
+            }
+            else{
+                _r_current = 0.0;
+            };
+        }
+        else{
+            if (_r_current + _change_factor < _par._rate){
+                _r_current += _change_factor;
+            }
+            else{
+                _r_current = _par._rate;
+            };
+        };
     }
 
 } /* end namespace MPILib */
