@@ -99,13 +99,21 @@ namespace TwoDLib {
 		//! See what part of the mass array each Mesh is responsible for: the offsets are given as a function of mesh index
 		const std::vector<MPILib::Index>& Offsets() const {return _vec_mesh_offset; }
 
+		//! Provide access to the mass array
+	    vector<MPILib::Mass>& Mass() { return _vec_mass; }
+
+	    //! Provide read access to the Reversal map
+		const std::vector<std::vector<Redistribution> >& MapReversal() const { return  _vec_reversal;}
+
+	    //! Provide read access to the Reversal map
+		const std::vector<std::vector<Redistribution> >& MapReset()    const { return  _vec_reset;}
+
 		friend class Master;
 	    friend class MasterOMP;
 	    friend class MasterOdeint;
 
 	    friend void CheckSystem(const Ode2DSystemGroup&, const TransitionMatrix&, const std::vector<Redistribution>&, const std::vector<Redistribution>&, double);
 
-	    vector<MPILib::Mass>& Mass() { return _vec_mass; }
 
 	private:
 

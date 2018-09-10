@@ -86,7 +86,7 @@ _clean(InitializeClean())
 	this->CheckConsistency();
 }
 
-std::vector<MPILib::Number> Ode2DSystemGroup::MeshOffset(const std::vector<Mesh>& l) const
+std::vector<MPILib::Number> Ode2DSystemGroup::ã(const std::vector<Mesh>& l) const
 {
 	std::vector<MPILib::Number> vec_ret{0}; // first offset is 0
 	for (const Mesh& m: l){
