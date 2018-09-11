@@ -86,7 +86,7 @@ def sim(command, current_sim):
             for name in current_sim.variablenames:
                 print '   ' + name
             print 'Nodes :'
-            for name in current_sim.nodenames:
+            for (name,_) in current_sim.nodenames:
                 if name in [n for (n,m) in current_sim.meshnodenames]:
                     print '   ' + name + ' (Mesh Node)'
                 else:
