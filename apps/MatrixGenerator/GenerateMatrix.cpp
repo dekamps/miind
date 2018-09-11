@@ -147,62 +147,62 @@ void Write
 
 		TwoDLib::TransitionList l;
 
-		std::vector<TwoDLib::Coordinates> strays;
-
-		MPILib::Index min_strip, max_strip;
-		if (l_min == 0 && l_max == 0){
-			min_strip = 0;
-			max_strip = mesh.NrQuadrilateralStrips();
-		} else {
-			min_strip = l_min;
-			max_strip = l_max;
-		}
-
-		for( MPILib::Index i = min_strip; i <  max_strip; i++){
-			std::cout << i << " " << mesh.NrCellsInStrip(i) << std::endl;
-			for (MPILib::Index j = 0; j <  mesh.NrCellsInStrip(i); j++){
-
-				// Only generate if the origin is in BELOW, or in EQUAL
-				TwoDLib::Coordinates c(i,j);
-				if (std::find(above.begin(),above.end(),c) == above.end() ){
-
-					gen.Reset(nr_points);
-					TwoDLib::Translation tr = translation_list[i][j];
-
-					if(mode == TwoDLib::AreaCalculation){
-						vector<TwoDLib::Coordinates> cells = below;
-						cells.insert(cells.end(), ths.begin(), ths.end());
-						gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w,cells);
-					}
-					else {
-						gen.GenerateTransition(i,j,tr._v,tr._w);
-					}
-
-					l._number = gen.N();
-					l._origin = TwoDLib::Coordinates(i,j);
-					l._destination_list = gen.HitList();
-
-					if(mode == TwoDLib::AreaCalculation) {
-						transitions.push_back(l);
-					} else {
-						TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
-						transitions.push_back(lcor);
-					}
-
-				}
-			}
-		}
-
-		std::cout << "Finished. Writing out" << std::endl;
-		std::ostringstream ostfn;
-		ostfn.precision(10);
-
-		ostfn << "_" << efficacy._v << "_" << efficacy._w << "_" << l_min << "_" << l_max << "_";
-		std::string mat_name = base_name + ostfn.str() + ".mat";
-		vector<TwoDLib::Coordinates> resets  = mesh.findV(V_reset,TwoDLib::Mesh::EQUAL);
-
-		std::cout << "There are " << ths.size() << " reset bins." << std::endl;
-		Write(mat_name,transitions,efficacy,l_min,l_max);
+		// std::vector<TwoDLib::Coordinates> strays;
+		//
+		// MPILib::Index min_strip, max_strip;
+		// if (l_min == 0 && l_max == 0){
+		// 	min_strip = 0;
+		// 	max_strip = mesh.NrQuadrilateralStrips();
+		// } else {
+		// 	min_strip = l_min;
+		// 	max_strip = l_max;
+		// }
+		//
+		// for( MPILib::Index i = min_strip; i <  max_strip; i++){
+		// 	std::cout << i << " " << mesh.NrCellsInStrip(i) << std::endl;
+		// 	for (MPILib::Index j = 0; j <  mesh.NrCellsInStrip(i); j++){
+		//
+		// 		// Only generate if the origin is in BELOW, or in EQUAL
+		// 		TwoDLib::Coordinates c(i,j);
+		// 		if (std::find(above.begin(),above.end(),c) == above.end() ){
+		//
+		// 			gen.Reset(nr_points);
+		// 			TwoDLib::Translation tr = translation_list[i][j];
+		//
+		// 			if(mode == TwoDLib::AreaCalculation || mode == TwoDLib::JumpFile){
+		// 				vector<TwoDLib::Coordinates> cells = below;
+		// 				cells.insert(cells.end(), ths.begin(), ths.end());
+		// 				gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w,cells);
+		// 			}
+		// 			else {
+		// 				gen.GenerateTransition(i,j,tr._v,tr._w);
+		// 			}
+		//
+		// 			l._number = gen.N();
+		// 			l._origin = TwoDLib::Coordinates(i,j);
+		// 			l._destination_list = gen.HitList();
+		//
+		// 			if(mode == TwoDLib::AreaCalculation || mode == TwoDLib::JumpFile) {
+		// 				transitions.push_back(l);
+		// 			} else {
+		// 				TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
+		// 				transitions.push_back(lcor);
+		// 			}
+		//
+		// 		}
+		// 	}
+		// }
+		//
+		// std::cout << "Finished. Writing out" << std::endl;
+		// std::ostringstream ostfn;
+		// ostfn.precision(10);
+		//
+		// ostfn << "_" << efficacy._v << "_" << efficacy._w << "_" << l_min << "_" << l_max << "_";
+		// std::string mat_name = base_name + ostfn.str() + ".mat";
+		// vector<TwoDLib::Coordinates> resets  = mesh.findV(V_reset,TwoDLib::Mesh::EQUAL);
+		//
+		// std::cout << "There are " << ths.size() << " reset bins." << std::endl;
+		// Write(mat_name,transitions,efficacy,l_min,l_max);
 
 
 		// the reset mapping is the same for all ranges
@@ -214,7 +214,7 @@ void Write
 		FixModelFile(base_name);
 
 		// Give an account of lost points
-		WriteOutLost(base_name + ostfn.str() + string(".lost"), gen);
+		// WriteOutLost(base_name + ostfn.str() + string(".lost"), gen);
 	}
 
 	void SetupObjects

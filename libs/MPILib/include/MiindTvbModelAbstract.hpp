@@ -72,6 +72,10 @@ public:
 			t.report();
 	}
 
+	double getTimeStep() {
+		return _time_step;
+	}
+
 protected:
 	MPINetwork<Weight, NodeDistribution> network;
 	report::handler::AbstractReportHandler *report_handler;
@@ -89,7 +93,8 @@ void define_python_MiindTvbModelAbstract()
     class_<MiindTvbModelAbstract<Weight, NodeDistribution>>("MiindTvbModelAbstract", init<int,long>())
 				.def("startSimulation", &MiindTvbModelAbstract<Weight, NodeDistribution>::startSimulation)
 				.def("endSimulation", &MiindTvbModelAbstract<Weight, NodeDistribution>::endSimulation)
-				.def("evolveSingleStep", &MiindTvbModelAbstract<Weight, NodeDistribution>::evolveSingleStep);
+				.def("evolveSingleStep", &MiindTvbModelAbstract<Weight, NodeDistribution>::evolveSingleStep)
+				.def("getTimeStep", &MiindTvbModelAbstract<Weight, NodeDistribution>::getTimeStep);
 }
 
 }

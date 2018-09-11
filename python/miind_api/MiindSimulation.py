@@ -58,7 +58,7 @@ class MiindSimulation:
         # Get the names of each Node instance. We know that MIIND indexes each node in order
         # of definition in the xml file and uses that number to index the firing rate results so
         # we can enumerate this list to get the index of each node.
-        self.nodenames = [m.attrib['name']
+        self.nodenames = [(m.attrib['name'], None)
                         for m in self.sim.findall('Nodes/Node')
                         if 'name' in m.attrib]
 
@@ -72,6 +72,11 @@ class MiindSimulation:
                         for m in self.sim.findall('Nodes/Node')]
 
         self.meshnodenames = [(nn,f) for (nn, a) in node_algos for (m, f) in mesh_algos if a == m ]
+
+        for i in range(len(self.nodenames)):
+            for j in range(len(self.meshnodenames)):
+                if self.nodenames[i][0] == self.meshnodenames[j][0]:
+                    self.nodenames[i] = self.meshnodenames[j]
 
         # Hold the Variable names, useful for the UI to know.
         self.variablenames = [m.attrib['Name'] for m in self.sim.findall('Variable') if 'Name' in m.attrib]
@@ -174,7 +179,7 @@ class MiindSimulation:
             (i,m) = self.meshnodenames[int(nodename)]
             return i,m
         else:
-            for index, (name, modelfile) in enumerate(self.meshnodenames):
+            for index, (name, modelfile) in enumerate(self.nodenames):
                 if name == nodename:
                     return index, modelfile
         return None, None
@@ -195,7 +200,7 @@ class MiindSimulation:
         if nodename.isdigit():
             return int(nodename)
         else:
-            for index, name in enumerate(self.nodenames):
+            for index, (name,_) in enumerate(self.nodenames):
                 if name == nodename:
                     return index
         return None

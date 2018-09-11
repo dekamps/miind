@@ -49,9 +49,14 @@ _reset(*this,_vec_mass,_vec_refract_mass),
 _refract(*this,_vec_mass,_vec_refract_mass),
 _clean(*this,_vec_mass)
 {
+	_refraction_time = 0.005;
+	_num_refraction_steps = (unsigned int) (_refraction_time / m.TimeStep());
+
+	printf("steps : %f\n", m.TimeStep());
+
 	for (int i=0; i<_vec_refract_mass.size(); i++) {
-		_vec_refract_mass[i] = new double[5];
-		for (int j=0; j<5; j++)
+		_vec_refract_mass[i] = new double[_num_refraction_steps];
+		for (int j=0; j<_num_refraction_steps; j++)
 			_vec_refract_mass[i][j] = 0.0;
 	}
 
@@ -169,6 +174,47 @@ void Ode2DSystem::Dump(std::ostream& ost, int mode) const
 
 void Ode2DSystem::Evolve()
 {
+
+	// double sum = 0.0;
+	// double pwr = 2;
+	// for (int i=0; i<_vec_mass.size(); i++){
+	// 	bool skip = false;
+	// 	for (int j=0; j<_vec_reset.size(); j++){
+	// 		if( i == Map(_vec_refractory[j]._to[0], _vec_refractory[j]._to[1]))
+	// 		{
+	// 			skip = true;
+	// 			break;
+	// 		}
+	// 	}
+	// 	if(!skip)
+	// 		_vec_mass[i] = std::pow(_vec_mass[i],pwr);
+	// 	sum += _vec_mass[i];
+	// }
+	//
+	//
+	//
+	// for (int i=0; i<_vec_refract_mass.size(); i++){
+	// 	for(int j=0; j<5; j++){
+	// 			//_vec_refract_mass[i][j] = std::pow(_vec_refract_mass[i][j] ,pwr);
+	// 			sum += _vec_refract_mass[i][j];
+	// 	}
+	// }
+	//
+	// // normalise
+	//
+	// double mult = 1.0 / sum;
+	//
+	// for (int i=0; i<_vec_mass.size(); i++){
+	// 		_vec_mass[i] *=  mult;
+	// }
+	//
+	// for (int i=0; i<_vec_refract_mass.size(); i++){
+	// 	for(int j=0; j<5; j++){
+	// 			_vec_refract_mass[i][j] *=  mult;
+	// 	}
+	// }
+
+
 	_t += 1;
 	_f = 0;
 	this->UpdateMap();

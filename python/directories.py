@@ -110,8 +110,8 @@ def insert_cmake_template_lib(name, full_path_name):
         mpidir  = libbase + '/MPILib'
         twodir  = libbase + '/TwoDLib'
         fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ')\n')
-        fout.write('\nadd_library( miindlif ${LIB_TYPE} ${TVB_LIF_SRC} ${PW_HEADERS})\n')
-        fout.write('target_link_libraries( miindlif ${LIBLIST} -lpython2.7 -lboost_python)\n')
+        fout.write('\nadd_library( '+ name + ' ${LIB_TYPE} ${TVB_LIF_SRC} ${PW_HEADERS})\n')
+        fout.write('target_link_libraries( ' + name + ' ${LIBLIST} -lpython2.7 -lboost_python)\n')
 
 
 def insert_cmake_template(name,full_path_name):

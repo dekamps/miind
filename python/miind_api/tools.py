@@ -53,7 +53,7 @@ def replace(value, string, *args):
 def find_density_fnames(modelfname, nodeindex, directory):
     fnames = glob.glob(op.join(directory, modelfname + '_mesh', 'mesh_' + str(nodeindex) + '*'))
     if len(fnames) == 0:
-        raise ValueError('No density output found for {}'.format(modelfname))
+        raise ValueError('No density output found for {} (Node Index : {})'.format(modelfname, nodeindex))
 
     fnames = sorted(fnames, key=get_density_time)
     times = [get_density_time(f) for f in fnames]

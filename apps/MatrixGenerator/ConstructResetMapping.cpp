@@ -41,8 +41,11 @@ void TwoDLib::ConstructResetMapping
 	// loop over all threshold bins
 	for ( const Coordinates& c: ths){
 
+		double c_w = mesh.Quad(c[0],c[1]).Centroid()[1];
+		double d_w = (c_w / 0.6) * tr_w;
+
 		// determine the translated reset point
-		double w_trans = mesh.Quad(c[0],c[1]).Centroid()[1] + tr_w;
+		double w_trans = c_w + tr_w;
 
 		// find the first element that has a w value larger than the translated point
 		auto it = std::find_if(ressort.begin(),ressort.end(),[w_trans,&mesh](const Coordinates& c)
@@ -53,7 +56,7 @@ void TwoDLib::ConstructResetMapping
 		// if that is not found mass should be added to the largest element
 		if (it == ressort.end()){
 		  ost << c[0] << "," << c[1] << "\t" << ressort.back()[0] << "," << ressort.back()[1] << "\t1.0\n";
-		  
+
 		} else
 		  if (it == ressort.begin())
 		    ost << c[0] << "," << c[1] << "\t" << ressort[0][0] << "," << ressort[0][1] << "\t1.0\n";
@@ -62,8 +65,8 @@ void TwoDLib::ConstructResetMapping
 		    auto itmin = it-1;
 		    double w_min =  mesh.Quad(itmin->operator[](0),itmin->operator[](1)).Centroid()[1];
 		    double w_max =  mesh.Quad(it->operator[](0),it->operator[](1)).Centroid()[1];
-		    double f1 = (w_trans - w_min)/(w_max - w_min);
-		    double f2 = (w_max - w_trans)/(w_max - w_min);
+		    double f1 = (w_max - w_trans)/(w_max - w_min);
+		    double f2 = 1.0 - f1;
 		    ost << c[0] << "," << c[1] << "\t" << itmin->operator[](0) << "," << itmin->operator[](1) << "\t" << f1 << "\n";
 		    ost << c[0] << "," << c[1] << "\t" << it->operator[](0)    << "," << it->operator[](1)    << "\t" << f2 << "\n";
 		  }
