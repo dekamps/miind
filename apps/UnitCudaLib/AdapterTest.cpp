@@ -22,7 +22,7 @@
 #include <iostream>
 #include "FixtureAdapter.hpp"
 #include <boost/timer/timer.hpp>
-/*
+
 BOOST_FIXTURE_TEST_CASE(AdapterTest,FixtureAdapter)
 {
        // Carries out a single evolve. Mass should be in in bin (100,1)
@@ -89,7 +89,6 @@ BOOST_FIXTURE_TEST_CASE(CSRAdapter,FixtureAdapter)
        std::vector<std::ostream*> vec_stream { &dumpdata };
        group_adapter.Dump(vec_stream);
 }
-*/
 
 BOOST_AUTO_TEST_CASE(GroupTest)
 {

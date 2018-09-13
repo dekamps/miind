@@ -25,6 +25,7 @@
 namespace TwoDLib {
 
 	void ClearDerivative(std::vector<double>& dydt);
+
 	void AddDerivative
 	(
 			std::vector<MPILib::Mass>& mass,

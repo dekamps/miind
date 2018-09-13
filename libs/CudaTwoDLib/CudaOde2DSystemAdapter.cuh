@@ -57,7 +57,7 @@ namespace CudaTwoDLib {
 
                 void RemapReversal();        
 
-                void RemapReset();
+                void RedistributeProbability();     
   
                 void MapFinish();
 

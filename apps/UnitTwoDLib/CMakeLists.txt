@@ -23,6 +23,7 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 
 set (UNIT_TWOD_SRC 
 2DUnit.cpp				
+AdapterTest.cpp
 CSRTest.cpp
 LineSegmentTest.cpp			
 Ode2DSystemTest.cpp			

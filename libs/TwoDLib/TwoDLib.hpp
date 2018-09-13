@@ -19,6 +19,7 @@
 #define _CODE_LIBS_2DLIB_INCLUDE_GUARD
 
 #include "kd.h"
+#include "CSRAdapter.hpp"
 #include "CSRMatrix.hpp"
 #include "CheckSystem.hpp"
 #include "Euler.hpp"

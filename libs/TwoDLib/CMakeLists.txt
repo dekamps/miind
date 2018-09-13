@@ -14,6 +14,7 @@ INCLUDE_DIRECTORIES(
 )
 				
 set( TWOD_SRC
+CSRAdapter.cpp
 CSRMatrix.cpp			
 Master.cpp			
 TransitionMatrix.cpp	 

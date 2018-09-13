@@ -241,7 +241,7 @@ def generate_model_files(nodes,algorithms):
 
      return modelfiles, timestep
 
-def generate_mesh_algorithm_group(fn,nodes,algorithms):
+def generate_mesh_algorithm_group(fn,nodes,algorithms,cuda):
      '''Colate al MeshAlgorithmGroup instances and generate the C++ code to instantiate the group'''
 
      modelfiles, timestep = generate_model_files(nodes,algorithms)
@@ -261,8 +261,13 @@ def generate_mesh_algorithm_group(fn,nodes,algorithms):
                f.write('\tvec_vec_mesh.push_back(mesh'+str(i)+');\n')
                f.write('\tvec_vec_rev.push_back(vec_rev'+str(i)+');\n')
                f.write('\tvec_vec_res.push_back(vec_res'+str(i)+');\n')
-                  
-          f.write('\tTwoDLib::Ode2DSystemGroup group(vec_vec_mesh,vec_vec_rev, vec_vec_res);\n\n')
+          
+          if (cuda):
+               # in cuda, the group actions are performed by an adapter. To maintain identical code, the adpater is called group
+               f.write('\tTwoDLib::Ode2DSystemGroup group_ode(vec_vec_mesh,vec_vec_rev, vec_vec_res);\n\n')
+               f.write('\tCudaTwoDLib::CudaOde2DSystemAdapter group(group__ode);\n\n')
+          else:
+               f.write('\tTwoDLib::Ode2DSystemGroup group(vec_vec_mesh,vec_vec_rev, vec_vec_res);\n\n')
      
           f.write('\tTwoDLib::MasterParameter par(' + 'static_cast<MPILib::Number>(ceil(mesh0.TimeStep()/' + str(timestep) + ')));\n\n')
           f.write('\tconst MPILib::Time h = 1./par._N_steps*mesh0.TimeStep();\n')
@@ -359,7 +364,7 @@ def construct_CSR_map(nodes,algorithms,connections):
      return csrlist
 
                                                                       
-def generate_connectivity(fn, nodes, algorithms, connections):
+def generate_connectivity(fn, nodes, algorithms, connections,cuda):
      '''Write out the CSR matrix lists and vectors into the C++ file.'''
      map = construct_CSR_map(nodes,algorithms,connections)
      nodemap=node_name_to_node_id(nodes)
@@ -375,8 +380,13 @@ def generate_connectivity(fn, nodes, algorithms, connections):
           f.write('\t\tTwoDLib::CSRMatrix(mat_' + str(nodemap[el[0]]) + '_' + str(nodemap[el[3]])+ '_' + str(el[4]) + ', group,' +  str(magmap[el[0]]) + ') \\\n')
           f.write('\t};\n')
           f.write('\tstd::vector<MPILib::Rate> vec_magin_rates(vecmat.size(),0.);\n\n')
+          f.write('\n')
+          if cuda:
+               f.write('\tCudaTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);')
+          else:
+               f.write('\tTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);')
 
-def generate_simulation_loop(fn):
+def generate_simulation_loop(fn,cuda):
      '''Write the simulation loop into the C++ file.'''
      with open(fn,'a') as f:
           f.write('\tMPILib::Time time = 0;\n')
@@ -386,11 +396,13 @@ def generate_simulation_loop(fn):
           f.write('\n\t\tgroup.Evolve();\n')
           f.write('\t\tgroup.RemapReversal();\n')
           f.write('\t\tfor (MPILib::Index i_part = 0; i_part < par._N_steps; i_part++ ){\n')
-          f.write('\t\t\tTwoDLib::ClearDerivative(dydt);\n')
-          f.write('\t\t\tTwoDLib::CalculateDerivative(group,dydt,vecmat,vec_magin_rates);\n')
-          f.write('\t\t\tTwoDLib::AddDerivative(group.Mass(),dydt,h);\n')
+          f.write('\t\t\tcsr_adapter.ClearDerivative();\n')
+          f.write('\t\t\tcsr_adapter.CalculateDerivative(vec_magin_rates);\n')
+          f.write('\t\t\tcsr_adapter.AddDerivative();\n')
           f.write('\t\t}\n')
           f.write('\t\tgroup.RedistributeProbability();\n')
+          if cuda:
+               f.write('\t\tgroup.MapFinish();\n')
           f.write('\t\tFillInRates(group, functor_list, mag_id_to_node_id, vec_activity_rates, time);\n')
           f.write('\t\tif (i_loop%n_report == 0) LogData(log,time,vec_activity_rates);\n')
           f.write('\t}\n')
@@ -411,7 +423,7 @@ def generate_initialization(fn,nodes,algorithms):
      
      
 
-def create_cpp_file(xmlfile, dirpath, progname, modname):
+def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
     '''Write the C++ file specified by xmlfile into dirpath as progname.'''
     root=parse(xmlfile)
     variables, nodes, algorithms, connections, parameter, io=process_tree(root)
@@ -419,12 +431,12 @@ def create_cpp_file(xmlfile, dirpath, progname, modname):
 
     fn=os.path.join(dirpath, progname)+'.cpp'
     generate_preamble(fn, variables, nodes, algorithms,connections)
-    generate_mesh_algorithm_group(fn,nodes,algorithms)
-    generate_connectivity(fn,nodes,algorithms,connections)
+    generate_mesh_algorithm_group(fn,nodes,algorithms,cuda)
+    generate_connectivity(fn,nodes,algorithms,connections,cuda)
     generate_simulation_parameter(fn,parameter)
     generate_simulation_io(fn,io)
     generate_initialization(fn,nodes,algorithms)
-    generate_simulation_loop(fn)
+    generate_simulation_loop(fn,cuda)
     generate_closing(fn)
 
 def sanity_check(algorithms):
@@ -446,7 +458,7 @@ def mesh_algorithm_group(root):
 
     return False
 
-def produce_mesh_algorithm_version(dirname, filename, modname, root):
+def produce_mesh_algorithm_version(dirname, filename, modname, root, cuda):
     '''Entry point for the vector version of a MIIND C++ file. Filename is file name of the XML file, dirname is the user-specified directory hierarchy
     where the C++ file will be generated and the simulation will be stored. The simulation file will be placed in directory <dirname>/<xml_file_name>.'''
 
@@ -457,7 +469,7 @@ def produce_mesh_algorithm_version(dirname, filename, modname, root):
         progname = directories.check_and_strip_name(xmlfile)
         dirpath = directories.create_dir(os.path.join(dirname, progname))
         directories.insert_cmake_template(progname,dirpath)
-        create_cpp_file(xmlfile, dirpath, progname, modname)
+        create_cpp_file(xmlfile, dirpath, progname, modname, cuda)
         directories.move_model_files(xmlfile,dirpath)
 
 
@@ -467,7 +479,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Generate C++ from XML descriptions.')
     parser.add_argument('--d', help = 'Provide a packaging directory.',nargs = '?')
-    parser.add_argument('-c', '--cuda', action="store_true", dest="directory", help="if specified, cuda will be generated")
+    parser.add_argument('-c', '--cuda', action="store_true", dest="cuda", help="if specified, cuda will be generated")
     parser.add_argument('-m','--m', help = 'A list of model and matrix files that will be copied to every executable directory.''', nargs='+')
     parser.add_argument('xml file', metavar='XML File', nargs = '*', help = 'Will create an entry in the build tree for each XML file, provided the XML file is valid.')
     args = parser.parse_args()
@@ -476,12 +488,13 @@ if __name__ == "__main__":
     filename = vars(args)['xml file']
     dirname  = vars(args)['d']
     modname  = vars(args)['m']
+
     
     fn = filename[0]
     root=parse(fn)
     if mesh_algorithm_group(root) == True:
         # Run the MeshAlgorithm version
-        produce_mesh_algorithm_version(dirname, filename, modname, root)
+        produce_mesh_algorithm_version(dirname, filename, modname, root, vars(args)['cuda'])
     else:
         # Simply run the old script
         if dirname == None:

@@ -175,7 +175,7 @@ void CudaOde2DSystemAdapter::FillResetMap
   }
 } 
 
-void CudaOde2DSystemAdapter::RemapReset()
+void CudaOde2DSystemAdapter::RedistributeProbability()
 {
     for (inttype m = 0; m < _mesh_size; m++){
         fptype* f = _fs+m;
