@@ -7,7 +7,7 @@ public:
 
    CudaAlgorithm
    (
-    const TwoDLib::Ode2DSystem&, 
+    const TwoDLib::Ode2DSystemGroup&, 
     const TwoDLib::TransitionMatrix& mat,
     const std::vector<TwoDLib::Redistribution>& vec_reversal,
     const std::vector<TwoDLib::Redistribution>& vec_reset
@@ -17,7 +17,7 @@ public:
 
 private:
 
-   const TwoDLib::Ode2DSystem& _sys;
+   const TwoDLib::Ode2DSystemGroup& _sys;
    unsigned int _step;
    unsigned int _nr_steps;
    float  _t_step;
@@ -57,7 +57,7 @@ public:
 
 CudaAlgorithm::CudaAlgorithm
 (
- const TwoDLib::Ode2DSystem& sys, 
+ const TwoDLib::Ode2DSystemGroup& sys, 
  const TwoDLib::TransitionMatrix& mat,
  const std::vector<TwoDLib::Redistribution>& map_reversal,
  const std::vector<TwoDLib::Redistribution>& map_reset
