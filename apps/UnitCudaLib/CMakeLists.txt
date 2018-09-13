@@ -23,6 +23,10 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 
 set (UNIT_CUDA_SRC 
     CudaEmulationTest.cpp
+    CudaUnit.cpp
+    AdapterTest.cpp
+    FixtureAdapter.cpp
+    MatrixTest.cpp
 )
 
 #############################################################################
@@ -36,6 +40,7 @@ set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}geom
     ${MIIND_LIBRARY_PREFIX}mpi      
     ${MIIND_LIBRARY_PREFIX}twod      
+    ${MIIND_LIBRARY_PREFIX}cudatwod      
     ${MPI_LIBRARIES} 
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
