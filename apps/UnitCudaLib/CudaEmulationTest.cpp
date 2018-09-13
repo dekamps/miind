@@ -251,7 +251,7 @@ int main()
   CudaAlgorithm cualg(sys,mat,alg.MapReversal(),alg.MapReset());
   unsigned int N = alg.Sys().Mass().size();
   
-  float t_step = alg.Sys().MeshObjects().TimeStep();  
+  float t_step = alg.Sys().MeshObjects()[0].TimeStep();  
   // simulation end time 
   float t_end = 1.0;
   // divide the mesh steps to arrive at integration
@@ -271,7 +271,7 @@ int main()
      MapReset   (cualg._n_reset   ,cualg._res_from,cualg._res_to,cualg._res_alpha,cualg._mass,cualg._map, &response);
      std::cout << response/t_step << std::endl;
   }
-  Dump(std::string("mesh"),alg.Sys().MeshObject(),cualg._mass,cualg._map);
+  Dump(std::string("mesh"),alg.Sys().MeshObject()[0],cualg._mass,cualg._map);
 
   std::cout << cualg._mass[0] << " " << sum(cualg._mass,N) << std::endl;
  
