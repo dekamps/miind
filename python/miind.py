@@ -28,13 +28,19 @@ def generate_fill_in_rate_function(cuda):
      '''Create the C++ function to read the firing rates, both external and from the MeshAlgorithmGroup into the input firing rate array.'''
 
      template_argument = 'MPILib::Rate'
+     if cuda == True:
+          group_argument = '\tconst CudaTwoDLib::CudaOde2DSystemAdapter& group,\n'
+     else:
+          group_argument = '\tconst TwoDLib::Ode2DSystemGroup& group,\n'
+
+
      s = ''    
      s += 'typedef MPILib::Rate (*function_pointer)(MPILib::Time);\n'
      s += 'typedef std::pair<MPILib::Index, function_pointer> function_association;\n'
      s += 'typedef std::vector<function_association> function_list;\n\n' \
      + 'void FillInRates\n' \
      + '(\n' \
-     + '\tconst TwoDLib::Ode2DSystemGroup& group,\n' \
+     + group_argument \
      + '\tconst function_list& functor_list,\n' \
      + '\tconst std::vector<MPILib::Index>& mag_id_to_node_id,\n' \
      + '\tstd::vector<' + template_argument +'>& vec_activity_rates,\n' \
@@ -66,7 +72,7 @@ def generate_apply_network_function(nodes,algorithms,connections,cuda):
      s = '' 
      s += 'void ApplyNetwork\n'
      s += '(\n'
-     s += '\tconst std::vector<' + template_argument + '>& vec_node_rates,\n'
+     s += '\tconst std::vector<MPILib::Rate>& vec_node_rates,\n'
      s += '\tstd::vector<' + template_argument + '>& vec_mag_rates\n'
      s += '){\n'
 
@@ -187,7 +193,7 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, cuda):
         f.write('\tconst MPILib::Number n_populations = ' + str(len(nodes)) + ';\n\n')
         f.write(functor_table)
         f.write(mag_table)
-        f.write('\tstd::vector<' + template_argument + '> vec_activity_rates(n_populations,0.0);\n')
+        f.write('\tstd::vector<MPILib::Rate> vec_activity_rates(n_populations,0.0);\n')
 
 
         f.write('\n')
@@ -392,10 +398,14 @@ def generate_connectivity(fn, nodes, algorithms, connections,cuda):
           for el in map:
                f.write('\tTwoDLib::TransitionMatrix mat_' + str(nodemap[el[0]]) + '_' + str(nodemap[el[3]]) + '_' + str(el[4]) + '(\"' + el[1] + '\");\n')  
           f.write('\tconst std::vector<TwoDLib::CSRMatrix> vecmat {\\\n')
+
           if cuda == True:
+               template_argument = 'fptype'
                group = ', group_ode,'
           else:
                group = ', group,'
+               template_argument = 'MPILib::Rate'
+
           for el in map[:-1]:
                f.write('\t\tTwoDLib::CSRMatrix(mat_' + str(nodemap[el[0]]) + '_' + str(nodemap[el[3]])+ '_' + str(el[4]) + group +  str(magmap[el[0]]) + '), \\\n')
           el = map[-1]
