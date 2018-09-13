@@ -80,9 +80,9 @@ BOOST_FIXTURE_TEST_CASE(CSRAdapter,FixtureAdapter)
                   csr_adapter.CalculateDerivative(vecrates);
                   csr_adapter.AddDerivative();
                 }
-           group_adapter.RemapReset();
+           group_adapter.RedistributeProbability();
            group_adapter.MapFinish();
-           std::cout << group_adapter.Fs()[0] <<  std::endl;
+           std::cout << group_adapter.F()[0] <<  std::endl;
         }
 
        std::ofstream dumpdata("adaptersimulation.data");
@@ -133,10 +133,10 @@ BOOST_AUTO_TEST_CASE(GroupTest)
                   csr_adapter.CalculateDerivative(vecrates);
                   csr_adapter.AddDerivative();
                 }
-           group_adapter.RemapReset();
+           group_adapter.RedistributeProbability();
            group_adapter.MapFinish();
          
-           fs << group_adapter.Fs()[0] << " " <<  group_adapter.Fs()[1] <<  " " << group_adapter.Fs()[2] << '\n';
+           fs << group_adapter.F()[0] << " " <<  group_adapter.F()[1] <<  " " << group_adapter.F()[2] << '\n';
         }
 
 

@@ -118,6 +118,7 @@ namespace CudaTwoDLib {
 
         // firing rates
         fptype* _fs;
+        //technically this modifies the object, but the client shouldn't modify the frequencies
         mutable std::vector<fptype> _host_fs;
 
 	};
