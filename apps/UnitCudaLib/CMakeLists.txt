@@ -11,6 +11,7 @@ INCLUDE_DIRECTORIES(
 include_directories( ../../libs/MPILib )
 include_directories( ../../libs/NumtoolsLib )
 include_directories( ../../libs/TwoDLib )
+include_directories( ../../libs/CudaTwoDLib )
 
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
