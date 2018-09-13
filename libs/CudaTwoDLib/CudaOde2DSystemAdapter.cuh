@@ -118,7 +118,7 @@ namespace CudaTwoDLib {
 
         // firing rates
         fptype* _fs;
-        std::vector<fptype> _host_fs;
+        mutable std::vector<fptype> _host_fs;
 
 	};
 }
