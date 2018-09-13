@@ -66,7 +66,7 @@ CudaAlgorithm::CudaAlgorithm
 _sys(sys),
 _step(0),
 _nr_steps(0),
-_t_step(sys.MeshObject().TimeStep()),
+_t_step(sys.MeshObjects()[0].TimeStep()),
 _mat(mat,sys),
 _mass(0),
 _derivative(0),
@@ -94,7 +94,7 @@ _nnz(0)
    _first  = (unsigned int*)malloc(N*sizeof(unsigned int));
    _length = (unsigned int*)malloc(N*sizeof(unsigned int));
    _map    = (unsigned int*)malloc(N*sizeof(unsigned int));
-
+ 
    unsigned int counter = 0;
    const TwoDLib::Mesh& mesh = sys.MeshObject();
    for (unsigned int i = 0; i < mesh.NrStrips(); i++){
@@ -116,8 +116,8 @@ _nnz(0)
    counter = 0;
    for( auto r: map_reversal)
    {
-     _rev_from[counter]  =  sys.Map(r._from[0],r._from[1]);
-     _rev_to[counter]    =  sys.Map(r._to[0],r._to[1]);
+     _rev_from[counter]  =  sys.Map(0,r._from[0],r._from[1]);
+     _rev_to[counter]    =  sys.Map(0,r._to[0],r._to[1]);
      _rev_alpha[counter] =  r._alpha;
 
      counter++;
@@ -132,8 +132,8 @@ _nnz(0)
    counter = 0;
    for( auto r: map_reset)
      {
-       _res_from[counter]  =  sys.Map(r._from[0],r._from[1]);
-       _res_to[counter]    =  sys.Map(r._to[0],r._to[1]);
+       _res_from[counter]  =  sys.Map(0,r._from[0],r._from[1]);
+       _res_to[counter]    =  sys.Map(o,r._to[0],r._to[1]);
        _res_alpha[counter] =  r._alpha;
 
        counter++;
@@ -271,7 +271,7 @@ int main()
      MapReset   (cualg._n_reset   ,cualg._res_from,cualg._res_to,cualg._res_alpha,cualg._mass,cualg._map, &response);
      std::cout << response/t_step << std::endl;
   }
-  Dump(std::string("mesh"),alg.Sys().MeshObject()[0],cualg._mass,cualg._map);
+  Dump(std::string("mesh"),alg.Sys().MeshObjects()[0],cualg._mass,cualg._map);
 
   std::cout << cualg._mass[0] << " " << sum(cualg._mass,N) << std::endl;
  
