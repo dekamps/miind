@@ -96,7 +96,7 @@ _nnz(0)
    _map    = (unsigned int*)malloc(N*sizeof(unsigned int));
  
    unsigned int counter = 0;
-   const TwoDLib::Mesh& mesh = sys.MeshObject();
+   const TwoDLib::Mesh& mesh = sys.MeshObjects()[0];
    for (unsigned int i = 0; i < mesh.NrStrips(); i++){
      unsigned int first = counter;
      for (unsigned int j = 0; j < mesh.NrCellsInStrip(i); j++){
@@ -133,7 +133,7 @@ _nnz(0)
    for( auto r: map_reset)
      {
        _res_from[counter]  =  sys.Map(0,r._from[0],r._from[1]);
-       _res_to[counter]    =  sys.Map(o,r._to[0],r._to[1]);
+       _res_to[counter]    =  sys.Map(0,r._to[0],r._to[1]);
        _res_alpha[counter] =  r._alpha;
 
        counter++;
