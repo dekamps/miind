@@ -52,7 +52,7 @@ BOOST_FIXTURE_TEST_CASE(AdapterReset,FixtureAdapter)
        for( int i = 0; i < 41; i++)
        {
            group_adapter.Evolve();
-           group_adapter.RemapReset();
+           group_adapter.RedistributeProbability();
            group_adapter.MapFinish();
        }
        std::ofstream dumpdata("adapterreset.data");
