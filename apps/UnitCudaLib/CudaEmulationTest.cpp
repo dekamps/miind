@@ -248,7 +248,7 @@ int main()
   TwoDLib::MeshAlgorithm<MPILib::DelayedConnection> alg(strmod,vecmat,t_int_step);
   const TwoDLib::Ode2DSystemGroup& sys = alg.Sys();
 
-  CudaAlgorithm cualg(sys,mat,alg.ReversalMap(),alg.ResetMap());
+  CudaAlgorithm cualg(sys,mat,alg.MapReversal(),alg.MapReset());
   unsigned int N = alg.Sys().Mass().size();
   
   float t_step = alg.Sys().MeshObjects().TimeStep();  
