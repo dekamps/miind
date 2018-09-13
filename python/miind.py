@@ -373,15 +373,19 @@ def generate_connectivity(fn, nodes, algorithms, connections,cuda):
           for el in map:
                f.write('\tTwoDLib::TransitionMatrix mat_' + str(nodemap[el[0]]) + '_' + str(nodemap[el[3]]) + '_' + str(el[4]) + '(\"' + el[1] + '\");\n')  
           f.write('\tconst std::vector<TwoDLib::CSRMatrix> vecmat {\\\n')
+          if cuda == True:
+               group = ', group_ode,'
+          else:
+               group = ', group,'
           for el in map[:-1]:
-               f.write('\t\tTwoDLib::CSRMatrix(mat_' + str(nodemap[el[0]]) + '_' + str(nodemap[el[3]])+ '_' + str(el[4]) + ', group,' +  str(magmap[el[0]]) + '), \\\n')
+               f.write('\t\tTwoDLib::CSRMatrix(mat_' + str(nodemap[el[0]]) + '_' + str(nodemap[el[3]])+ '_' + str(el[4]) + group +  str(magmap[el[0]]) + '), \\\n')
           el = map[-1]
-          f.write('\t\tTwoDLib::CSRMatrix(mat_' + str(nodemap[el[0]]) + '_' + str(nodemap[el[3]])+ '_' + str(el[4]) + ', group,' +  str(magmap[el[0]]) + ') \\\n')
+          f.write('\t\tTwoDLib::CSRMatrix(mat_' + str(nodemap[el[0]]) + '_' + str(nodemap[el[3]])+ '_' + str(el[4]) + group +  str(magmap[el[0]]) + ') \\\n')
           f.write('\t};\n')
           f.write('\tstd::vector<MPILib::Rate> vec_magin_rates(vecmat.size(),0.);\n\n')
           f.write('\n')
           if cuda:
-               f.write('\tCudaTwoDLib::CSRAdapter csr_adapter(group_ode,vecmat,h);')
+               f.write('\tCudaTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);')
           else:
                f.write('\tTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);')
 
