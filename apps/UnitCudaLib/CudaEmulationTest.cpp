@@ -97,7 +97,7 @@ _nnz(0)
 
    unsigned int counter = 0;
    const TwoDLib::Mesh& mesh = sys.MeshObject();
-   for (unsigned int i = 0; i < mesh.NrQuadrilateralStrips(); i++){
+   for (unsigned int i = 0; i < mesh.NrStrips(); i++){
      unsigned int first = counter;
      for (unsigned int j = 0; j < mesh.NrCellsInStrip(i); j++){
        _first[counter]  = first;
@@ -229,7 +229,7 @@ float sum(float* f, unsigned int N)
 void Dump(const std::string& fn, const TwoDLib::Mesh& mesh, float* mass, unsigned int* map){
     std::ofstream ofst(fn);
     unsigned int count = 0;
-    for (unsigned int i = 0; i < mesh.NrQuadrilateralStrips(); i++)
+    for (unsigned int i = 0; i < mesh.NrStrips(); i++)
         for(unsigned int j = 0; j < mesh.NrCellsInStrip(i); j++){
             ofst << i << '\t' << j << '\t' << mass[map[count++]]/fabs(mesh.Quad(i,j).SignedArea()) << '\t';
         }
@@ -251,7 +251,7 @@ int main()
   CudaAlgorithm cualg(sys,mat,alg.ReversalMap(),alg.ResetMap());
   unsigned int N = alg.Sys().Mass().size();
   
-  float t_step = alg.Sys().MeshObject().TimeStep();  
+  float t_step = alg.Sys().MeshObject()s.TimeStep();  
   // simulation end time 
   float t_end = 1.0;
   // divide the mesh steps to arrive at integration
