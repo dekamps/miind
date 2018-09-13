@@ -64,7 +64,7 @@ namespace CudaTwoDLib {
 
                 friend class CSRAdapter;
 
-                const std::vector<fptype>& F();
+                const std::vector<fptype>& F() const;
 	private:
 
                CudaOde2DSystemAdapter(const CudaOde2DSystemAdapter&);
