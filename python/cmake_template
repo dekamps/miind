@@ -12,6 +12,7 @@ set(MIIND_LIBRARY_PREFIX miind)
 include_directories( ${CMAKE_SOURCE_DIR}/libs )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/GeomLib )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/TwoDLib )
+include_directories( ${CMAKE_SOURCE_DIR}/libs/CudaTwoDLib )
 
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )

@@ -152,6 +152,7 @@ def generate_preamble(fn, variables, nodes, algorithms, connections):
         f.write('#include <boost/timer/timer.hpp>\n')
         f.write('#include <GeomLib.hpp>\n')
         f.write('#include <TwoDLib.hpp>\n')
+        f.write('#include <CudaTwoDLib.hpp>\n')
         f.write('#include <MPILib/include/RateAlgorithmCode.hpp>\n')
         f.write('#include <MPILib/include/SimulationRunParameter.hpp>\n')
         f.write('#include <MPILib/include/DelayAlgorithmCode.hpp>\n')
