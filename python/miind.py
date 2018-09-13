@@ -74,7 +74,7 @@ def generate_apply_network_function(nodes,algorithms,connections,cuda):
      s = '' 
      s += 'void ApplyNetwork\n'
      s += '(\n'
-     s += '\tconst std::vector<MPILib::Rate>& vec_node_rates,\n'
+     s += '\tconst std::vector<' + template_argument + '>& vec_node_rates,\n'
      s += '\tstd::vector<' + template_argument + '>& vec_mag_rates\n'
      s += '){\n'
 
@@ -184,7 +184,7 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, cuda):
         f.write('#include <MPILib/include/SimulationRunParameter.hpp>\n')
         f.write('#include <MPILib/include/DelayAlgorithmCode.hpp>\n')
         f.write('#include <MPILib/include/RateFunctorCode.hpp>\n\n')
-
+        if cuda == True: f.write('typedef CudaTwoDLib::fptype fptype;\n')
         f.write(fill_in_function)
         f.write(apply_network_function)
         f.write(function_declarations)
