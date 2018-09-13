@@ -27,10 +27,7 @@ def parse_rate_functors(algorithms):
 def generate_fill_in_rate_function(cuda):
      '''Create the C++ function to read the firing rates, both external and from the MeshAlgorithmGroup into the input firing rate array.'''
 
-     if cuda == True:
-          template_argument = 'fptype'
-     else:
-          template_argument = 'MPILib::Rate'
+     template_argument = 'MPILib::Rate'
      s = ''    
      s += 'typedef MPILib::Rate (*function_pointer)(MPILib::Time);\n'
      s += 'typedef std::pair<MPILib::Index, function_pointer> function_association;\n'
