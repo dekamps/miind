@@ -140,7 +140,7 @@ void CudaOde2DSystemAdapter::Dump(const std::vector<std::ostream*>& vec_stream, 
      _group.Dump(vec_stream, mode);
 }
 
-const std::vector<fptype>& CudaOde2DSystemAdapter::Fs()
+const std::vector<fptype>& CudaOde2DSystemAdapter::F()
 {
      checkCudaErrors(cudaMemcpy(&_host_fs[0],_fs,_mesh_size*sizeof(fptype),cudaMemcpyDeviceToHost));
      for (auto& rate: _host_fs) 

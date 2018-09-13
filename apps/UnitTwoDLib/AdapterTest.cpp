@@ -56,8 +56,7 @@ TwoDLib::CSRAdapter csr_adapter(group,vecmat,1e-5);
 std::vector<MPILib::Rate> vecrates { 800., 900., 1000. };
 std::ofstream fs("fs.dat");
 
-std::cout << "zopastart" << std::endl;
- for( int i = 0; i < 10000; i++)
+ for( int i = 0; i < 10; i++)
    {
      group.Evolve();
      group.RemapReversal();
