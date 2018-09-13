@@ -27,11 +27,13 @@ def parse_rate_functors(algorithms):
 def generate_fill_in_rate_function(cuda):
      '''Create the C++ function to read the firing rates, both external and from the MeshAlgorithmGroup into the input firing rate array.'''
 
-     template_argument = 'MPILib::Rate'
      if cuda == True:
           group_argument = '\tconst CudaTwoDLib::CudaOde2DSystemAdapter& group,\n'
+          template_argument = 'fptype'
+
      else:
           group_argument = '\tconst TwoDLib::Ode2DSystemGroup& group,\n'
+          template_argument = 'MPILib::Rate'
 
 
      s = ''    
@@ -193,7 +195,7 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, cuda):
         f.write('\tconst MPILib::Number n_populations = ' + str(len(nodes)) + ';\n\n')
         f.write(functor_table)
         f.write(mag_table)
-        f.write('\tstd::vector<MPILib::Rate> vec_activity_rates(n_populations,0.0);\n')
+        f.write('\tstd::vector<' + template_argument + '> vec_activity_rates(n_populations,0.0);\n')
 
 
         f.write('\n')
@@ -411,7 +413,7 @@ def generate_connectivity(fn, nodes, algorithms, connections,cuda):
           el = map[-1]
           f.write('\t\tTwoDLib::CSRMatrix(mat_' + str(nodemap[el[0]]) + '_' + str(nodemap[el[3]])+ '_' + str(el[4]) + group +  str(magmap[el[0]]) + ') \\\n')
           f.write('\t};\n')
-          f.write('\tstd::vector<MPILib::Rate> vec_magin_rates(vecmat.size(),0.);\n\n')
+          f.write('\tstd::vector<' + template_argument + '> vec_magin_rates(vecmat.size(),0.);\n\n')
           f.write('\n')
           if cuda:
                f.write('\tCudaTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);')
