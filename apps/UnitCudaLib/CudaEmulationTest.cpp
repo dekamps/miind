@@ -67,7 +67,7 @@ _sys(sys),
 _step(0),
 _nr_steps(0),
 _t_step(sys.MeshObjects()[0].TimeStep()),
-_mat(mat,sys),
+_mat(mat,sys,0),
 _mass(0),
 _derivative(0),
 _nnz(0)
