@@ -246,12 +246,12 @@ int main()
   // but an argument must be provided
   double t_int_step = 1e-5;
   TwoDLib::MeshAlgorithm<MPILib::DelayedConnection> alg(strmod,vecmat,t_int_step);
-  const TwoDLib::Ode2DSystem& sys = alg.Sys();
+  const TwoDLib::Ode2DSystemGroup& sys = alg.Sys();
 
   CudaAlgorithm cualg(sys,mat,alg.ReversalMap(),alg.ResetMap());
   unsigned int N = alg.Sys().Mass().size();
   
-  float t_step = alg.Sys().MeshObject()s.TimeStep();  
+  float t_step = alg.Sys().MeshObjects().TimeStep();  
   // simulation end time 
   float t_end = 1.0;
   // divide the mesh steps to arrive at integration
