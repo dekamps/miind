@@ -133,7 +133,7 @@ def generate_mag_table(nodes,algorithms):
 
 
 
-def generate_preamble(fn, variables, nodes, algorithms, connections):
+def generate_preamble(fn, variables, nodes, algorithms, connections, cuda):
     '''Generates the function declarations, required for RateFunctors etc in the C++ file. fn is the file name where the C++
     is to be written. variable, nodes and algorithms are XML elements.'''
 
@@ -152,7 +152,7 @@ def generate_preamble(fn, variables, nodes, algorithms, connections):
         f.write('#include <boost/timer/timer.hpp>\n')
         f.write('#include <GeomLib.hpp>\n')
         f.write('#include <TwoDLib.hpp>\n')
-        f.write('#include <CudaTwoDLib.hpp>\n')
+        if cuda == True: f.write('#include <CudaTwoDLib.hpp>\n')
         f.write('#include <MPILib/include/RateAlgorithmCode.hpp>\n')
         f.write('#include <MPILib/include/SimulationRunParameter.hpp>\n')
         f.write('#include <MPILib/include/DelayAlgorithmCode.hpp>\n')
@@ -266,15 +266,13 @@ def generate_mesh_algorithm_group(fn,nodes,algorithms,cuda):
           if (cuda):
                # in cuda, the group actions are performed by an adapter. To maintain identical code, the adpater is called group
                f.write('\tTwoDLib::Ode2DSystemGroup group_ode(vec_vec_mesh,vec_vec_rev, vec_vec_res);\n\n')
-               f.write('\tCudaTwoDLib::CudaOde2DSystemAdapter group(group__ode);\n\n')
+               f.write('\tCudaTwoDLib::CudaOde2DSystemAdapter group(group_ode);\n\n')
           else:
                f.write('\tTwoDLib::Ode2DSystemGroup group(vec_vec_mesh,vec_vec_rev, vec_vec_res);\n\n')
      
           f.write('\tTwoDLib::MasterParameter par(' + 'static_cast<MPILib::Number>(ceil(mesh0.TimeStep()/' + str(timestep) + ')));\n\n')
           f.write('\tconst MPILib::Time h = 1./par._N_steps*mesh0.TimeStep();\n')
           
-          f.write('\t// create a vector for the derivative\n')                                                                                                                      
-          f.write('\tstd::vector<double> dydt(group.Mass().size());\n\n') 
 
 
 def node_name_to_node_id(nodes):
@@ -383,7 +381,7 @@ def generate_connectivity(fn, nodes, algorithms, connections,cuda):
           f.write('\tstd::vector<MPILib::Rate> vec_magin_rates(vecmat.size(),0.);\n\n')
           f.write('\n')
           if cuda:
-               f.write('\tCudaTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);')
+               f.write('\tCudaTwoDLib::CSRAdapter csr_adapter(group_ode,vecmat,h);')
           else:
                f.write('\tTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);')
 
@@ -431,7 +429,7 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
     if sanity_check(algorithms) == False: raise NameError('An algorithm incompatible with MeshAlgorithmGroup was used')
 
     fn=os.path.join(dirpath, progname)+'.cpp'
-    generate_preamble(fn, variables, nodes, algorithms,connections)
+    generate_preamble(fn, variables, nodes, algorithms,connections,cuda)
     generate_mesh_algorithm_group(fn,nodes,algorithms,cuda)
     generate_connectivity(fn,nodes,algorithms,connections,cuda)
     generate_simulation_parameter(fn,parameter)
