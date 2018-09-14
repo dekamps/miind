@@ -88,6 +88,7 @@ def insert_cmake_template(name,full_path_name):
         geomdir = libbase + '/GeomLib'
         mpidir  = libbase + '/MPILib'
         twodir  = libbase + '/TwoDLib'
+        cudatwodir  = libbase + '/CudaTwoDLib'
         fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ')\n')
         fout.write('\nadd_executable( ' + name + ' ' + name + '.cpp)\n')
         fout.write('target_link_libraries( ' + name  + ' ${LIBLIST} )\n')
