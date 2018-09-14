@@ -86,7 +86,6 @@ endif (UNIX)
 set ( LIBLIST       
     ${MIIND_LIBRARY_PREFIX}geom
     ${MIIND_LIBRARY_PREFIX}twod           
-    ${MIIND_LIBRARY_PREFIX}cudatwod           
     ${MIIND_LIBRARY_PREFIX}numtools
     ${MIIND_LIBRARY_PREFIX}mpi           
     ${MPI_LIBRARIES} 
@@ -96,6 +95,10 @@ set ( LIBLIST
     gsl
     gslcblas
 )
+
+if (CUDA_FOUND)
+   list(APPEND LIBLIST ${MIIND_LIBRARY_PREFIX}cudatwod)
+endif(CUDA_FOUND)
 
 
 #############################################################################

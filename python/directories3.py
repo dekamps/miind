@@ -64,7 +64,7 @@ def filter(lines):
             nw.append(line)
     return nw
 
-def insert_cmake_template(name,full_path_name):
+def insert_cmake_template(name,full_path_name,cuda):
     ''' name is the executable name, full_path is the directory where the cmake template
     needs to be written into.'''
 
@@ -88,7 +88,10 @@ def insert_cmake_template(name,full_path_name):
         geomdir = libbase + '/GeomLib'
         mpidir  = libbase + '/MPILib'
         twodir  = libbase + '/TwoDLib'
-        cudatwodir  = libbase + '/CudaTwoDLib'
+        if cuda == True:
+            cudatwodir  = libbase + '/CudaTwoDLib'
+        else:
+            cudatwodir = ''
         fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ')\n')
         fout.write('\nadd_executable( ' + name + ' ' + name + '.cpp)\n')
         fout.write('target_link_libraries( ' + name  + ' ${LIBLIST} )\n')

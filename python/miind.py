@@ -502,7 +502,7 @@ def produce_mesh_algorithm_version(dirname, filename, modname, root, cuda):
     for xmlfile in filename:
         progname = directories.check_and_strip_name(xmlfile)
         dirpath = directories.create_dir(os.path.join(dirname, progname))
-        directories.insert_cmake_template(progname,dirpath)
+        directories.insert_cmake_template(progname,dirpath,cuda)
         create_cpp_file(xmlfile, dirpath, progname, modname, cuda)
         directories.move_model_files(xmlfile,dirpath)
 
