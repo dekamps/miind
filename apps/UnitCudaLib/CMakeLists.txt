@@ -23,7 +23,6 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 #############################################################################
 
 set (UNIT_CUDA_SRC 
-    CudaEmulationTest.cpp
     CudaUnit.cpp
     AdapterTest.cpp
     FixtureAdapter.cpp
@@ -63,4 +62,6 @@ configure_file(condee2a5ff4-0087-4d69-bae3-c0a223d03693_0_0.05_0_0_.mat ${CMAKE_
 #############################################################################
 add_executable(UnitCudaLib ${UNIT_CUDA_SRC})
 target_link_libraries(UnitCudaLib ${LIBLIST})
+add_executable(CudaEmulationTest CudaEmulationTest.cpp)
+target_link_libraries(CudaEmulationTest ${LIBLIST})
 
