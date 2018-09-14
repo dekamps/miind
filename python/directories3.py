@@ -82,6 +82,9 @@ def insert_cmake_template(name,full_path_name,cuda):
         for line in replace:
             fout.write(line)
 
+        if cuda == True:
+            fout.write('find_package(CUDA REQUIRED)\n')
+
         # add  the miind libraries explicitly
         libbase = MIIND_ROOT + '/build/libs'
         numdir  = libbase + '/NumtoolsLib'
