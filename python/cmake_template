@@ -6,6 +6,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 FIND_PACKAGE(GSL REQUIRED)
+FIND_PACKAGE(CUDA QUIET)
 
 set(MIIND_LIBRARY_PREFIX miind)
 
@@ -96,9 +97,11 @@ set ( LIBLIST
     gslcblas
 )
 
-if (CUDA_FOUND)
+if (ENABLE_CUDA)
+   if (NOT APPLE)
    list(APPEND LIBLIST ${MIIND_LIBRARY_PREFIX}cudatwod)
-endif(CUDA_FOUND)
+   endif (NOT APPLE)
+endif(ENABLE_CUDA)
 
 
 #############################################################################

@@ -79,11 +79,14 @@ def insert_cmake_template(name,full_path_name,cuda):
     replace = filter(lines)
 
     with open(outname,'w') as fout:
+        if cuda == True:
+            fout.write('OPTION(ENABLE_CUDA \"CUDA Desired\" ON)\n')
+        else:
+            fout.write('OPTION(ENABLE_CUDA \"CUDA Desired\" OFF)\n')
+
         for line in replace:
             fout.write(line)
 
-        if cuda == True:
-            fout.write('find_package(CUDA REQUIRED)\n')
 
         # add  the miind libraries explicitly
         libbase = MIIND_ROOT + '/build/libs'
@@ -91,12 +94,18 @@ def insert_cmake_template(name,full_path_name,cuda):
         geomdir = libbase + '/GeomLib'
         mpidir  = libbase + '/MPILib'
         twodir  = libbase + '/TwoDLib'
+
         if cuda == True:
-            cudatwodir  = libbase + '/CudaTwoDLib'
+            cudatwodir = libbase + '/CudaTwoDLib'
         else:
             cudatwodir = ''
+
         fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ')\n')
-        fout.write('\nadd_executable( ' + name + ' ' + name + '.cpp)\n')
+
+        if cuda == True:
+            fout.write('\ncuda_add_executable( ' + name + ' ' + name + '.cu)\n')
+        else:
+            fout.write('\nadd_executable( ' + name + ' ' + name + '.cpp)\n')
         fout.write('target_link_libraries( ' + name  + ' ${LIBLIST} )\n')
 
 

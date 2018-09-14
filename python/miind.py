@@ -21,9 +21,6 @@ def parse_rate_functors(algorithms):
              s += '}\n\n'
      return s
 
-
-
-
 def generate_fill_in_rate_function(cuda):
      '''Create the C++ function to read the firing rates, both external and from the MeshAlgorithmGroup into the input firing rate array.'''
 
@@ -462,8 +459,11 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
     root=parse(xmlfile)
     variables, nodes, algorithms, connections, parameter, io=process_tree(root)
     if sanity_check(algorithms) == False: raise NameError('An algorithm incompatible with MeshAlgorithmGroup was used')
+    if cuda == True:
+         fn=os.path.join(dirpath, progname)+'.cu'
+    else:
+         fn=os.path.join(dirpath, progname)+'.cpp'
 
-    fn=os.path.join(dirpath, progname)+'.cpp'
     generate_preamble(fn, variables, nodes, algorithms,connections,cuda)
     generate_mesh_algorithm_group(fn,nodes,algorithms,cuda)
     generate_connectivity(fn,nodes,algorithms,connections,cuda)
