@@ -287,12 +287,6 @@ def generate_mesh_algorithm_group(fn,nodes,algorithms,cuda):
                f.write('\tvec_vec_rev.push_back(vec_rev'+str(i)+');\n')
                f.write('\tvec_vec_res.push_back(vec_res'+str(i)+');\n')
           
-          if (cuda):
-               # in cuda, the group actions are performed by an adapter. To maintain identical code, the adpater is called group
-               f.write('\tTwoDLib::Ode2DSystemGroup group_ode(vec_vec_mesh,vec_vec_rev, vec_vec_res);\n\n')
-               f.write('\tCudaTwoDLib::CudaOde2DSystemAdapter group(group_ode);\n\n')
-          else:
-               f.write('\tTwoDLib::Ode2DSystemGroup group(vec_vec_mesh,vec_vec_rev, vec_vec_res);\n\n')
      
           f.write('\tTwoDLib::MasterParameter par(' + 'static_cast<MPILib::Number>(ceil(mesh0.TimeStep()/' + str(timestep) + ')));\n\n')
           f.write('\tconst MPILib::Time h = 1./par._N_steps*mesh0.TimeStep();\n')
@@ -446,15 +440,22 @@ def generate_simulation_io(fn,io):
 
 def generate_initialization(fn,nodes,algorithms,cuda):
      '''Create C++ obejcts to be used inside the loop and initialize the Ode2DSystemGroup.'''
-     if cuda == True:
-          group = 'group_ode'
-     else:
-          group = 'group'
      with open(fn,'a') as f:
+
+          if (cuda):
+               group = 'group_ode'
+               # in cuda, the group actions are performed by an adapter. To maintain identical code, the adpater is called group
+          else:
+               group = 'group'
+
+
+          f.write('\tTwoDLib::Ode2DSystemGroup ' + group + '(vec_vec_mesh,vec_vec_rev, vec_vec_res);\n\n')
           f.write('\tMPILib::Index i_mesh = 0;\n')
           f.write('\tfor( auto id : mag_id_to_node_id)\n')
           f.write('\t\t' + group + '.Initialize(i_mesh++,0,0);\n')
+          if cuda: f.write('\tCudaTwoDLib::CudaOde2DSystemAdapter group(group_ode);\n\n')
           f.write('\n\n')
+
      
      
 
