@@ -444,12 +444,16 @@ def generate_simulation_io(fn,io):
      with open(fn,'a') as f:
           f.write('\tstd::ofstream log("' + logname[0].text + '");\n')
 
-def generate_initialization(fn,nodes,algorithms):
+def generate_initialization(fn,nodes,algorithms,cuda):
      '''Create C++ obejcts to be used inside the loop and initialize the Ode2DSystemGroup.'''
+     if cuda == True:
+          group = 'group_ode'
+     else:
+          group = 'group'
      with open(fn,'a') as f:
           f.write('\tMPILib::Index i_mesh = 0;\n')
           f.write('\tfor( auto id : mag_id_to_node_id)\n')
-          f.write('\t\tgroup.Initialize(i_mesh++,0,0);\n')
+          f.write('\t\t' + group + '.Initialize(i_mesh++,0,0);\n')
           f.write('\n\n')
      
      
@@ -466,10 +470,10 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
 
     generate_preamble(fn, variables, nodes, algorithms,connections,cuda)
     generate_mesh_algorithm_group(fn,nodes,algorithms,cuda)
+    generate_initialization(fn,nodes,algorithms,cuda)
     generate_connectivity(fn,nodes,algorithms,connections,cuda)
     generate_simulation_parameter(fn,parameter)
     generate_simulation_io(fn,io)
-    generate_initialization(fn,nodes,algorithms)
     generate_simulation_loop(fn,cuda)
     generate_closing(fn)
 

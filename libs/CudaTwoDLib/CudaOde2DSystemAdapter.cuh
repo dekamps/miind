@@ -50,7 +50,6 @@ namespace CudaTwoDLib {
 
 		~CudaOde2DSystemAdapter();
 
-		void Initialize(inttype, inttype, inttype);
 
                 void Evolve();
 

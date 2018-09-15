@@ -205,7 +205,7 @@ void Ode2DSystemGroup::Dump(const std::vector<std::ostream*>& vecost, int mode) 
 					// a division by _vec_area[this->Map(i,j)] is wrong
 					// the fabs is required since we don't care about the sign of the area and
 					// must write out a positive density
-					(*vecost[m]) << i << "\t" << j << "\t" << " " << fabs(_vec_mass[this->Map(m,i,j)]/_mesh_list[m].Quad(i,j).SignedArea()) << "\t";
+					(*vecost[m]) << i << "\t" << j << "\t" << " " << std::abs(_vec_mass[this->Map(m,i,j)]/_mesh_list[m].Quad(i,j).SignedArea()) << "\t";
 		} else {
 			for (unsigned int i = 0; i < _mesh_list[m].NrStrips(); i++)
 				for (unsigned int j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++ )

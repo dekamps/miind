@@ -61,11 +61,6 @@ _host_fs(group.MeshObjects().size(),0)
     this->FillResetMap(group.MeshObjects(),group.MapReset());
 }
 
-void CudaOde2DSystemAdapter::Initialize(inttype m, inttype i, inttype j)
-{
-    _group.Initialize(m,i,j);
-}
-
 void CudaOde2DSystemAdapter::TransferMapData()
 {
 
