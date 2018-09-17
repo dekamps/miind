@@ -122,7 +122,7 @@ def generate_log_function(cuda):
      s += '{\n'
      s += '\tMPILib::Index i_pop = 0;\n'
      s += '\tfor(auto rate: vec_rates)\n'
-     s += '\t\ts << i_pop++ << "\\t" << t << "\\t" << rate << std::endl;\n'
+     s += '\t\ts << i_pop++ << "\\t" << t << "\\t" << rate << \"\\n\";\n'
      s += '}\n'
      s += '\n'
      return s
@@ -188,7 +188,6 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, cuda):
         f.write(log_function)
         f.write('\nint main(int argc, char *argv[]){\n')
         f.write(variable_declarations)
-        f.write('\tboost::timer::auto_cpu_timer timer;\n')
         f.write('\tconst MPILib::Number n_populations = ' + str(len(nodes)) + ';\n\n')
         f.write(functor_table)
         f.write(mag_table)
@@ -415,6 +414,7 @@ def generate_simulation_loop(fn,cuda):
      '''Write the simulation loop into the C++ file.'''
      with open(fn,'a') as f:
           f.write('\tMPILib::Time time = 0;\n')
+          f.write('\tboost::timer::auto_cpu_timer timer;\n')
           f.write('\tfor(MPILib::Index i_loop = 0; i_loop < n_iter; i_loop++){\n')
           f.write('\t\ttime = t_step*i_loop;\n')
           f.write('\t\tApplyNetwork(vec_activity_rates,vec_magin_rates);\n')
