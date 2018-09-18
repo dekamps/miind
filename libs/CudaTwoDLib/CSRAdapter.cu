@@ -109,7 +109,8 @@ _nia(std::vector<inttype>(vecmat.size())),
 _ia(std::vector<inttype*>(vecmat.size())),
 _nja(std::vector<inttype>(vecmat.size())),
 _ja(std::vector<inttype*>(vecmat.size())),
-_offsets(std::vector<inttype>(vecmat.size())),
+_offsets(this->Offsets(vecmat)),
+_nr_rows(this->NrRows()),
 _blockSize(256),
 _numBlocks( (_group._n + _blockSize - 1) / _blockSize)
 {
@@ -162,7 +163,7 @@ std::vector<inttype> CSRAdapter::NrRows(const std::vector<TwoDlib::CSRMatrix>& v
 }
 
 
-std::vector<inttype> CSRAdapter::Offsets(const std::vector<TwoDLib::CSRMAtrix>& vecmat) const
+std::vector<inttype> CSRAdapter::Offsets(const std::vector<TwoDLib::CSRMatrix>& vecmat) const
 {
 	std::vector<inttype> vecret;
 	for (inttype m = 0; m < vecmat.size(); m++)
@@ -175,7 +176,7 @@ void CSRAdapter::CalculateDerivative(const std::vector<fptype>& vecrates)
     for(inttype m = 0; m < _nr_m; m++)
     {
         // be careful to use this block size
-        inttype numBlocks = (nrrows + _blockSize - 1)/_blockSize;     
+        inttype numBlocks = (_nr_rows[m] + _blockSize - 1)/_blockSize;     
         CudaCalculateDerivative<<<numBlocks,_blockSize,0,_streams[m]>>>(_nr_rows[m],vecrates[m],_dydt,_group._mass,_val[m],_ia[m],_ja[m],_group._map,_offsets[m]);
     }
     

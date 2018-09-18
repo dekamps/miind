@@ -74,7 +74,6 @@ namespace TwoDLib {
 		MPILib::Index Offset() const { return _i_offset; }
 
 		//! Number of rows corresponding this this matrix
-
 		MPILib::Index NrRows() const { return _ia.size() - 1; }
 
 	private:
