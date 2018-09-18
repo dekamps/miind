@@ -4,16 +4,16 @@ import numpy as np
 
 class LifMeshGenerator:
     def __init__(self, basename):
-        self.tau             = 10e-3     # membrane time constant in s
-        self.V_threshold     = 1.0     # threshold in V
+        self.tau             = 0.01     # membrane time constant in s
+        self.V_threshold     = -35.0     # threshold in V
         self.epsilon         = 0.001     # padding as fraction of the threshold potential
         self.labda           = 0.0001      # fiducial bin size
-        self.V_rest          = 0.0     # reversal/rest potential (also the reset potential)
-        self.V_min           = -1.0       # guaranteed minimum value of the grid
-        self.V_max           = 1.01     # guaranteed maximum value of the grid
-        self.N_grid          = 100       # number of points in the interval [V_res, self.V_threshold); e.g if self.V_min = self.V_threshold, the grid holds double this number of bins
+        self.V_rest          = -57.5     # reversal/rest potential (also the reset potential)
+        self.V_min           = -70.0       # guaranteed minimum value of the grid
+        self.V_max           = -34.99     # guaranteed maximum value of the grid
+        self.N_grid          = 150       # number of points in the interval [V_res, self.V_threshold); e.g if self.V_min = self.V_threshold, the grid holds double this number of bins
         self.dt              = 0.001     # timestep for each bin
-        self.strip_w         = 0.005     # arbitrary value for strip wiself.dth
+        self.strip_w         = 0.005     # arbitrary value for strip width
         self.basename        = basename
 
     def generateLifMesh(self):
@@ -28,7 +28,8 @@ class LifMeshGenerator:
             meshfile.write('{}\n'.format(self.dt))
 
             ts = self.dt * np.arange(self.N_grid)
-            pos_vs = self.V_rest + (self.V_max-self.V_rest)*np.exp(-ts/self.tau)
+            pos_vs = self.V_rest + (self.V_threshold-self.V_rest)*np.exp(-ts/self.tau)
+            pos_vs = np.insert(pos_vs, 0, self.V_max)
             neg_vs = self.V_rest + (self.V_min-self.V_rest)*np.exp(-ts/self.tau)
 
             if len(neg_vs) > 0:

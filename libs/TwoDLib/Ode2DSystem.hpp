@@ -83,7 +83,7 @@ namespace TwoDLib {
 			double p = 0.0;
 			p = std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0);
 			for (int i=0; i<_vec_refract_mass.size(); i++){
-				for (int j=0; j<5; j++){
+				for (int j=0; j<_num_refraction_steps; j++){
 					p += _vec_refract_mass[i][j];
 				}
 			}
@@ -134,6 +134,13 @@ namespace TwoDLib {
 
 			void operator()(const Redistribution& map){
 				_vec_refract_mass[map._to[0]][0] = map._alpha*_vec_mass[_sys.Map(map._from[0],map._from[1])];
+				double sum = 0.0;
+				for(int i=0; i<_sys._num_refraction_steps; i++) {
+					sum += _vec_refract_mass[map._to[0]][i];
+				}
+				for(int i=0; i<_sys._num_refraction_steps; i++) {
+					_vec_refract_mass[map._to[0]][i] = sum / _sys._num_refraction_steps;
+				}
 			}
 
 		private:
@@ -147,15 +154,15 @@ namespace TwoDLib {
 			Refract(Ode2DSystem& sys, vector<double>& vec_mass, vector<double*>& vec_refract):_sys(sys),_vec_mass(vec_mass),_vec_refract_mass(vec_refract){}
 
 			void operator()(const Redistribution& map){
-				double from = _vec_refract_mass[map._from[0]][4];
-				double sum = _vec_refract_mass[map._from[0]][4];
-				for (int i=4; i>0; i--){
+				double from = _vec_refract_mass[map._from[0]][_sys._num_refraction_steps-1];
+				double sum = _vec_refract_mass[map._from[0]][_sys._num_refraction_steps-1];
+				for (int i=_sys._num_refraction_steps-1; i>0; i--){
 					_vec_refract_mass[map._from[0]][i] = _vec_refract_mass[map._from[0]][i-1];
 					sum += _vec_refract_mass[map._from[0]][i-1];
 				}
 				_vec_refract_mass[map._from[0]][0] = 0.0;
 				_vec_mass[_sys.Map(map._to[0],map._to[1])] += from;
-				_sys._f += sum / 5;
+				_sys._f += from;
 			}
 
 		private:
@@ -209,6 +216,9 @@ namespace TwoDLib {
 		Reset                  _reset;
 		Refract								 _refract;
 		Clean				   _clean;
+
+		double _refraction_time;
+		unsigned int _num_refraction_steps;
 	};
 
 }
