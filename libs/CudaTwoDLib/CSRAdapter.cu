@@ -154,7 +154,7 @@ void CSRAdapter::ClearDerivative()
   CudaClearDerivative<<<_numBlocks,_blockSize>>>(n,_dydt,_group._mass);
 }
 
-std::vector<inttype> CSRAdapter::NrRows(const std::vector<TwoDlib::CSRMatrix>& vecmat) const
+std::vector<inttype> CSRAdapter::NrRows(const std::vector<TwoDLib::CSRMatrix>& vecmat) const
 {
 	std::vector<inttype> vecret;
 	for (inttype m = 0; m < vecmat.size(); m++)
