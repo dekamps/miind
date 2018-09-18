@@ -128,7 +128,6 @@ class Density(Result):
             padding_format_code = '{0:0' + str(required_padding) + 'd}'
             figname = op.join(
                 self.path, (padding_format_code).format(f))
-
             plt.gcf().savefig(figname + ext, res=image_size, bbox_inches='tight')
 
             return p,

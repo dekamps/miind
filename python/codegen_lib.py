@@ -60,7 +60,9 @@ def generate_closing(outfile, typ, tree):
     outfile.write('\tSimulationRunParameter par_run( *report_handler,(_simulation_length/_time_step)+1,0,\n')
     name=tree.find('SimulationRunParameter/name_log')
     log_name = name.text
-    outfile.write('\t\t\t_simulation_length,_time_step,_time_step,\"' + log_name + '\",_time_step);\n')
+    report_t_step = tree.find('SimulationRunParameter/t_report')
+    report_state_t_step = tree.find('SimulationRunParameter/t_state_report')
+    outfile.write('\t\t\t_simulation_length,' + report_t_step.text + ',_time_step,\"' + log_name + '\",'+ report_state_t_step.text + ');\n')
     outfile.write('\t\n')
     outfile.write('\tnetwork.configureSimulation(par_run);\n')
     outfile.write('\t}\n')
@@ -71,7 +73,7 @@ def generate_closing(outfile, typ, tree):
 
     outfile.write('\n\n')
     variable_list = tree.findall('Variable')
-    outfile.write('BOOST_PYTHON_MODULE(libmiindlif)\n')
+    outfile.write('BOOST_PYTHON_MODULE(lib' + name_str + ')\n')
     outfile.write('{\n')
     outfile.write('\tusing namespace boost::python;\n')
     outfile.write('\t' + define_abstract_type(typ))
@@ -90,10 +92,13 @@ def parse_xml(infile, outfile):
     return define_network_type(s), tree
 
 def constructor_override(outfile,tree):
+
+    variable_list = tree.findall('Variable')
+    variables.parse_variables(variable_list,outfile)
+
     outfile.write('\tMiindModel(int num_nodes, long simulation_length ):\n')
     outfile.write('\t\tMiindTvbModelAbstract(num_nodes, simulation_length){}\n\n')
 
-    variable_list = tree.findall('Variable')
     if len(variable_list) > 0:
         outfile.write('\tMiindModel(int num_nodes, long simulation_length \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
