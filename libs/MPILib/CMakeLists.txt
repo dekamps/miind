@@ -7,6 +7,7 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_SOURCE_DIR}/../
    ${CMAKE_CURRENT_BINARY_DIR}/../
 )
+set( LIB_TYPE SHARED )
 
 include_directories(include)
 
@@ -51,6 +52,10 @@ set(MPI_SRCS
     
     src/NetworkState.cpp
     src/SimulationRunParameter.cpp
+)
+
+set(MPI_HEADER 
+    include/ProbabilityQueue.hpp
 )
 
 #############################################################################

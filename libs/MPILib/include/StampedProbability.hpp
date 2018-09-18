@@ -25,7 +25,7 @@ namespace MPILib {
 namespace populist {
 
 /**
- * @brief A time stamped measure of probability
+ * @brief A time stamped quantity of probability mass
  */
 struct StampedProbability {
 

@@ -4,7 +4,7 @@ project( ${MIIND_LIBRARY_PREFIX}twod )
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
-set( LIB_TYPE STATIC )
+set( LIB_TYPE SHARED )
 
 
 #one below that MPILib is included in the paths they are needed for the camke config files
