@@ -127,7 +127,8 @@ class Density(Result):
             required_padding = len(str(len(self.times)))
             padding_format_code = '{0:0' + str(required_padding) + 'd}'
             figname = op.join(
-                self.path, (padding_format_code).format(idx))
+                self.path, (padding_format_code).format(f))
+
             plt.gcf().savefig(figname + ext, res=image_size, bbox_inches='tight')
 
             return p,
@@ -169,7 +170,7 @@ class Density(Result):
         sort_idx = sorted(range(len(coords)), key=coords.__getitem__)
         coords = [coords[i] for i in sort_idx]
         density = [density[i] for i in sort_idx]
-        
+
         vmin, vmax, scaled_density = self.colscale(density)
         p.set_array(scaled_density)
         ax.add_collection(p)
