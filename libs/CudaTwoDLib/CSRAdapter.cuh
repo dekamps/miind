@@ -67,6 +67,9 @@ namespace CudaTwoDLib {
               void CreateStreams();
               void DeleteStreams();
 
+	          std::vector<inttype> Offsets(const std::vector<TwoDLib::CSRMatrix>&) const;
+	          std::vector<inttype> NrRows(const std::vector<TwoDLib::CSRMatrix>&) const;
+	          
 	      CudaOde2DSystemAdapter& _group;
               fptype                  _euler_timestep;
               inttype                 _nr_iterations;
@@ -78,6 +81,9 @@ namespace CudaTwoDLib {
               std::vector<inttype*>  _ia;
               std::vector<inttype>   _nja;
               std::vector<inttype*>  _ja;
+              
+              std::vector<inttype> _offsets;
+              std::vector<inttype> _nr_rows;
             
               fptype* _dydt;
 

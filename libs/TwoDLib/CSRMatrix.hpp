@@ -70,6 +70,12 @@ namespace TwoDLib {
 		//! Which mesh is this matrix relating to?
 		MPILib::Index MeshIndex() const {return _mesh_index; }
 
+		//! Which offset of the mass array does this correspond to
+		MPILib::Index Offset() const { return _i_offset; }
+
+		//! Number of rows corresponding this this matrix
+
+		MPILib::Index NrRows() const { return _ia.size() - 1; }
 
 	private:
 

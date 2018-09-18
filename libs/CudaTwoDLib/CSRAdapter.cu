@@ -40,34 +40,30 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 void CSRAdapter::FillMatrixMaps(const std::vector<TwoDLib::CSRMatrix>& vecmat)
 {
-   inttype m = 0;
-   for(const auto& mat: vecmat)
+   for(inttype m = 0; m < vecmat.size(); m++)
    {
-       _nval[m] = mat.Val().size();
+       _nval[m] = vecmat[m].Val().size();
        checkCudaErrors(cudaMalloc((fptype**)&_val[m],_nval[m]*sizeof(fptype)));
        // dont't depend on Val() being of fptype
        std::vector<fptype> vecval;
-       for (fptype val: mat.Val())
+       for (fptype val: vecmat[m].Val())
            vecval.push_back(val);
        checkCudaErrors(cudaMemcpy(_val[m],&vecval[0],sizeof(fptype)*_nval[m],cudaMemcpyHostToDevice));
        
-       _nia[m] = mat.Ia().size();
+       _nia[m] = vecmat[m].Ia().size();
        checkCudaErrors(cudaMalloc((inttype**)&_ia[m],_nia[m]*sizeof(inttype)));
        std::vector<inttype> vecia;
-       for(inttype ia: mat.Ia())
+       for(inttype ia: vecmat[m].Ia())
            vecia.push_back(ia);
        checkCudaErrors(cudaMemcpy(_ia[m],&vecia[0],sizeof(inttype)*_nia[m],cudaMemcpyHostToDevice));
 
 
-       _nja[m] = mat.Ja().size();
+       _nja[m] = vecmat[m].Ja().size();
        checkCudaErrors(cudaMalloc((inttype**)&_ja[m],_nja[m]*sizeof(inttype)));
        std::vector<inttype> vecja;
-       for(inttype ja: mat.Ja())
+       for(inttype ja: vecmat[m].Ja())
            vecja.push_back(ja);
        checkCudaErrors(cudaMemcpy(_ja[m],&vecja[0],sizeof(inttype)*_nja[m],cudaMemcpyHostToDevice));
-
-
-      m++;
    } 
 }
 
@@ -113,6 +109,7 @@ _nia(std::vector<inttype>(vecmat.size())),
 _ia(std::vector<inttype*>(vecmat.size())),
 _nja(std::vector<inttype>(vecmat.size())),
 _ja(std::vector<inttype*>(vecmat.size())),
+_offsets(std::vector<inttype>(vecmat.size())),
 _blockSize(256),
 _numBlocks( (_group._n + _blockSize - 1) / _blockSize)
 {
@@ -156,16 +153,32 @@ void CSRAdapter::ClearDerivative()
   CudaClearDerivative<<<_numBlocks,_blockSize>>>(n,_dydt,_group._mass);
 }
 
+std::vector<inttype> CSRAdapter::NrRows(const std::vector<TwoDlib::CSRMatrix>& vecmat) const
+{
+	std::vector<inttype> vecret;
+	for (inttype m = 0; m < vecmat.size(); m++)
+		vecret.push_back(vecmat[m].NrRows());
+	return vecret;
+}
+
+
+std::vector<inttype> CSRAdapter::Offsets(const std::vector<TwoDLib::CSRMAtrix>& vecmat) const
+{
+	std::vector<inttype> vecret;
+	for (inttype m = 0; m < vecmat.size(); m++)
+		vecret.push_back(vecmat[m].Offset());
+	return vecret;
+}
+
 void CSRAdapter::CalculateDerivative(const std::vector<fptype>& vecrates)
 {
     for(inttype m = 0; m < _nr_m; m++)
     {
-        inttype nrrows = _group._offsets[m+1]-_group._offsets[m];
-        inttype offset = _group._offsets[m];
         // be careful to use this block size
         inttype numBlocks = (nrrows + _blockSize - 1)/_blockSize;     
-        CudaCalculateDerivative<<<numBlocks,_blockSize,0,_streams[m]>>>(nrrows,vecrates[m],_dydt,_group._mass,_val[m],_ia[m],_ja[m],_group._map,offset);
+        CudaCalculateDerivative<<<numBlocks,_blockSize,0,_streams[m]>>>(_nr_rows[m],vecrates[m],_dydt,_group._mass,_val[m],_ia[m],_ja[m],_group._map,_offsets[m]);
     }
+    
     for (inttype m = 0; m < _nr_m; m++)
         cudaStreamSynchronize(_streams[m]); 
 }
