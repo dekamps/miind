@@ -110,7 +110,7 @@ _ia(std::vector<inttype*>(vecmat.size())),
 _nja(std::vector<inttype>(vecmat.size())),
 _ja(std::vector<inttype*>(vecmat.size())),
 _offsets(this->Offsets(vecmat)),
-_nr_rows(this->NrRows()),
+_nr_rows(this->NrRows(vecmat)),
 _blockSize(256),
 _numBlocks( (_group._n + _blockSize - 1) / _blockSize)
 {
