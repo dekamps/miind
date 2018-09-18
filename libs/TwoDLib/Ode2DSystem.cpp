@@ -31,48 +31,27 @@ Ode2DSystem::Ode2DSystem
 (
 	const Mesh& m,
 	const vector<Redistribution>&  vec_reversal,
-	const vector<Redistribution>&  vec_reset
+	const vector<Redistribution>&  vec_reset,
+	const MPILib::Time& tau_refractive
 ):
 _mesh(m),
 _vec_length(InitializeLength(m)),
 _vec_cumulative(InitializeCumulative(m)),
 _vec_mass(InitializeMass()),
 _vec_area(InitializeArea(m)),
-_vec_refract_mass(vector<double*>(vec_reset.size())),
-_t(0),
+_it(0),
 _f(0),
 _map(InitializeMap()),
 _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
 _reversal(*this,_vec_mass),
-_reset(*this,_vec_mass,_vec_refract_mass),
-_refract(*this,_vec_mass,_vec_refract_mass),
-_clean(*this,_vec_mass)
+_reset(*this,_vec_mass),
+_reset_refractive(*this,_vec_mass,_it,tau_refractive,_vec_reset),
+_clean(*this,_vec_mass),
+_tau_refractive(tau_refractive)
 {
-	_refraction_time = 0.005;
-	_num_refraction_steps = (unsigned int) (_refraction_time / m.TimeStep());
-
-	printf("steps : %f\n", m.TimeStep());
-
-	for (int i=0; i<_vec_refract_mass.size(); i++) {
-		_vec_refract_mass[i] = new double[_num_refraction_steps];
-		for (int j=0; j<_num_refraction_steps; j++)
-			_vec_refract_mass[i][j] = 0.0;
-	}
-
 	assert(m.TimeStep() != 0.0);
 	this->CheckConsistency();
-
-	_vec_refractory = vector<Redistribution>(_vec_reset.size());
-	for (int i=0; i<_vec_reset.size(); i++){
-		_vec_refractory[i]._from[0] = i;
-		_vec_refractory[i]._from[1] = i;
-		_vec_refractory[i]._to[0] = _vec_reset[i]._to[0];
-		_vec_refractory[i]._to[1] = _vec_reset[i]._to[1];
-		_vec_reset[i]._to[0] = i;
-		_vec_reset[i]._to[1] = i;
-	}
-
 }
 
 bool Ode2DSystem::CheckConsistency() const {
@@ -101,7 +80,6 @@ bool Ode2DSystem::CheckConsistency() const {
 			throw TwoDLib::TwoDLibException(ost_err.str());
 		}
 	}
-
 	return true;
 }
 
@@ -174,48 +152,7 @@ void Ode2DSystem::Dump(std::ostream& ost, int mode) const
 
 void Ode2DSystem::Evolve()
 {
-
-	// double sum = 0.0;
-	// double pwr = 2;
-	// for (int i=0; i<_vec_mass.size(); i++){
-	// 	bool skip = false;
-	// 	for (int j=0; j<_vec_reset.size(); j++){
-	// 		if( i == Map(_vec_refractory[j]._to[0], _vec_refractory[j]._to[1]))
-	// 		{
-	// 			skip = true;
-	// 			break;
-	// 		}
-	// 	}
-	// 	if(!skip)
-	// 		_vec_mass[i] = std::pow(_vec_mass[i],pwr);
-	// 	sum += _vec_mass[i];
-	// }
-	//
-	//
-	//
-	// for (int i=0; i<_vec_refract_mass.size(); i++){
-	// 	for(int j=0; j<5; j++){
-	// 			//_vec_refract_mass[i][j] = std::pow(_vec_refract_mass[i][j] ,pwr);
-	// 			sum += _vec_refract_mass[i][j];
-	// 	}
-	// }
-	//
-	// // normalise
-	//
-	// double mult = 1.0 / sum;
-	//
-	// for (int i=0; i<_vec_mass.size(); i++){
-	// 		_vec_mass[i] *=  mult;
-	// }
-	//
-	// for (int i=0; i<_vec_refract_mass.size(); i++){
-	// 	for(int j=0; j<5; j++){
-	// 			_vec_refract_mass[i][j] *=  mult;
-	// 	}
-	// }
-
-
-	_t += 1;
+	_it += 1;
 	_f = 0;
 	this->UpdateMap();
 }
@@ -225,21 +162,25 @@ void Ode2DSystem::UpdateMap()
 	for (MPILib::Index i = 1; i < _mesh.NrQuadrilateralStrips(); i++){
 		// yes! i = 1. strip 0 is not supposed to have dynamics
 		for (MPILib::Index j = 0; j < _mesh.NrCellsInStrip(i); j++ ){
-			_map[i][j] =_vec_cumulative[i] + modulo(j-_t,_vec_length[i]);
+			_map[i][j] =_vec_cumulative[i] + modulo(j-_it,_vec_length[i]);
 		}
 	}
 }
 
 void Ode2DSystem::RemapReversal(){
 	std::for_each(_vec_reversal.begin(),_vec_reversal.end(),_reversal);
-	std::for_each(_vec_reversal.begin(),_vec_reversal.end(),_clean);
 }
 
 void Ode2DSystem::RedistributeProbability()
 {
-	std::for_each(_vec_reset.begin(),_vec_reset.end(),_reset);
+	if (_tau_refractive == 0.)
+		for(auto& m: _vec_reset)
+			_reset(m);
+	else
+		for(auto& m: _vec_reset)
+			_reset_refractive(m);
+
  	std::for_each(_vec_reset.begin(),_vec_reset.end(),_clean);
-	std::for_each(_vec_refractory.begin(),_vec_refractory.end(),_refract);
 
 	_f /= _mesh.TimeStep();
 }

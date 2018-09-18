@@ -24,9 +24,8 @@ namespace NumtoolsLib {
 
   inline int modulo(int a, int b){
 	  int r = a%b;
-	  return r< 0? r + b : r;
+	  return r < 0? r + b : r;
   }
-
 } // include guard
 
 #endif

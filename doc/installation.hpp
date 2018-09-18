@@ -3,7 +3,7 @@
 
 \section sec_tpd Third Party Dependencies
 
-It is necessary to install <a href="http://cern.root.ch">ROOT</a>. ROOT is a powerful analysis platform that has similar capabilities as MATLAB,
+It is recommended, but no longer necessary,  to install <a href="http://cern.root.ch">ROOT</a>. ROOT is a powerful analysis platform that has similar capabilities as MATLAB,
 but is optimized for high end performance. Under Unix systems, this is straightforward.
 For almost all UNIX-like distributions there is a binary. This can be installed in a directory of your choice. If you
 have <i>sudo</i> or <i>root</i> permission, you can opt to have ROOT installed under <i>/usr/local</i>, thereby making the framework
@@ -11,8 +11,8 @@ available to all users. It is also possible to install the package locally. Rega
 <i>/usr/local</i>, the top of the ROOT directory structure is always a directory called 'root'.
 
 Alternatively, you can compile the package from source, using the <i>configure</i> script} in the top directory of the download. There is a comprehensive
-description on how to do this: https://root.cern.ch/building-root.  Make sure you have all the prerequisites installed that are listed at https://root.cern.ch/build-prer\
-equisites.
+description on how to do this: https://root.cern.ch/building-root.  Make 
+sure you have all the prerequisites installed that are listed at https://root.cern.ch/build-prerequisites.
 
 Make sure that the version you use is configured with \verbatim --enable-python, --enable-table, --enable-mathmore \endverbatim. You
 can use Python to inspect the simulation results, and convert them to numpy objects if you feel the need.
@@ -22,12 +22,16 @@ Whether you install ROOT locally or system-wide, make sure that the script <i>ro
 You have to do this every time before you use													       
 ROOT, so it is worth to include in a <i>.bashrc</i> file or equivalent.
 
+
+If ROOT is not installed, it will produce ASCII files containing the firing rate.
 													       
 You will also need:
 													       
 - The GNU Scientific Library, GSL for short
 																				    
 - A recent (> 1.48) version of BOOST.
+
+- FFTW3, the developer files.
 
 section sec_procedure Procedure
 Whether you down load the tar file or checkout the code from the repository, you will have a top directory called 'miind-git'. This is the <B> MIIND_ROOT</B>.
@@ -65,15 +69,17 @@ make doc
 
 \section sec_ubuntu A Clean Ubuntu Install
 
-We start with a clean Ubuntu 14-04 machine. Install the following packages with <i>sudo apt-get install</i>:
+We start with a clean Ubuntu 16-04 machine. Install the following packages with <i>sudo apt-get install</i>:
 \verbatim
- g++ (this should be at least g++ 4.8, which you should get by default.)
+ g++ (this should be at least g++ 5.4.0, which you should get by default.)
  python-scipy
  cmake-curses-gui
  libboost-all-dev
- libgsl0-dev
-  git
+ libgsl-dev
+ libfftw3-dev
+ git
 \endverbatim
+If you don't use ROOT, this is all you need.
 
 Do not use a Ubuntu package for ROOT! It does exist, but misses a few libraries that MIIND depends on.
   Go to the ROOT web site: http://root.cern.ch, go to <i>Download</i> and click on the most recent version. Download the Ubuntu binary
