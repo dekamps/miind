@@ -12,12 +12,13 @@ __global__ void CudaCalculateDerivative(inttype N, fptype rate, fptype* derivati
 
     for (int i = index; i < N; i+= stride ){
       int i_r = map[i+offset];
+      fptype dr = 0.;
       for(unsigned int j = ia[i]; j < ia[i+1]; j++){
           int j_m = map[ja[j]+offset];
-          derivative[i_r] += val[j]*mass[j_m];
+          dr += val[j]*mass[j_m];
       }
-      dydt[i_r]  = -mass[i_r]; // keep this inside this block, as a different rate per matrix must be applied
-      derivative[i_r] *= rate;
+      dr -= mass[i_r];
+      derivative[i_r] += rate*dr;
     }
 }
 
@@ -75,6 +76,6 @@ __global__ void CudaClearDerivative(inttype N, fptype* dydt, fptype* mass){
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
     for (int i = index; i < N; i+= stride)
-        dydt[i]  = 0.;
+        dydt[i]  = 0.; 
 }        
  
