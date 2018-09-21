@@ -59,6 +59,7 @@ def _help(command):
         print 'generate-model           : Generate a model file from existing mesh, rev and stat files.'
         print 'generate-empty-fid       : Generate a stub .fid file.'
         print 'generate-matrix          : Generate a matrix file from existing model and fid files.'
+        print 'regenerate-reset         : Regenerate the reset mapping for an existing model.'
         print 'lost                     : Open the fiducial tool for capturing lost points.'
         print 'generate-lif-mesh        : Example to illustrate a mesh generation script to build a LIF neuron mesh.'
         print 'draw-mesh                : Draw the mesh described in an existing .mesh file.'
@@ -415,10 +416,13 @@ def generateMatrix(command):
 
     if command_name in [name]:
         if len(command) == 4:
-            api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]))
+            if (len(command[3].split('.')) > 1):
+                api.MeshTools.buildMatrixFileFromModel(command[1], 0.0, fidfile=command[1] + '.fid', num_mc_points=int(command[2]), jump_file=command[3])
+            else:
+                api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]))
         elif len(command) == 5:
             api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]), spike_shift_w=float(command[4]))
-        elif len(command) == 7:
+        elif len(command) == 6:
             api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]), spike_shift_w=float(command[4]), reset_shift_w=float(command[5]), use_area_calculation=(command[6] in ['True', 'true', 'TRUE']))
         else:
             print name + ' expects three, four or six parameters.'
@@ -426,8 +430,24 @@ def generateMatrix(command):
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print name + ' [Basename] [Spike V-efficacy] [Number of points] : Generate a Basename.mat file (and Basename.lost file) with the given spike shift in the V direction using a Monte Carlo method with the given number of points per cell. Expects a valid Basename.model and Basename.fid file in the current working directory.'
+        print name + ' [Basename] [Number of points] [Jump File Name] : Generate a Basename.mat file (and Basename.lost file) using the given jump file.'
         print name + ' [Basename] [Spike V-efficacy] [Number of points] [Spike W-efficacy] : Generate a Basename.mat file (and Basename.lost file) with the given spike shift in the V and W directions.'
         print name + ' [Basename] [Spike V-efficacy] [Number of points] [Spike W-efficacy] [Reset W shift] [Use Area Calculation (True/False)]: Generate a Basename.mat file (and Basename.lost file) with the given spike shift in the V and W directions and given W shift during reset.'
+
+def regenerateModelReset(command):
+    command_name = command[0]
+    name = 'regenerate-reset'
+
+    if command_name in [name]:
+
+        if len(command) == 3:
+            api.MeshTools.buildMatrixFileFromModel(command[1], 0.0, reset_shift_w=float(command[2]), mode='reset')
+        else:
+            print name + ' expects two parameters.'
+            generateMatrix(name+'?')
+
+    if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
+        print name + ' [Basename] [Reset W shift] : Regenerate the reset mapping for Basename.model.'
 
 def lost(command):
     command_name = command[0]
@@ -504,6 +524,8 @@ def checkCommands(command, current_sim):
     generateEmptyFid(command)
 
     generateMatrix(command)
+
+    regenerateModelReset(command)
 
     drawMesh(command)
 

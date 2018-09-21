@@ -40,14 +40,63 @@ class MeshTools:
 
     @staticmethod
     def buildMatrixFileFromModel(basename, spike_shift_v, fidfile=None, num_mc_points=10,
-                                    spike_shift_w=0, reset_shift_w=0, use_area_calculation=False):
-        if not fidfile:
-            fidfile = ModelGenerator.generateStubFidFile(basename)
-
+                                    spike_shift_w=0, reset_shift_w=0, use_area_calculation=False,
+                                    jump_file=None, mode=None):
         matrix_generator_exe = op.join(getMiindAppsPath(), 'MatrixGenerator', 'MatrixGenerator')
-        if not use_area_calculation:
+
+        if not fidfile:
+            fidfile = MeshTools.generateStubFidFile(basename)
+
+        if (mode == 'reset'):
+            # We must make sure that the current reset mapping is deleted
+            model = None
+
+            with open(basename + '.model') as xml_file:
+                model=ET.fromstring(xml_file.read())
+                mappings = model.findall('Mapping')
+                for mapping in mappings:
+                    if mapping.attrib['type'] == 'Reset':
+                        model.remove(mapping)
+
+            if model not None:
+                with open(basename + '.model', 'w') as xml_file:
+                    xml_file.write(ET.tostring(model))
+                    print 'Deleted old reset mapping.'
+
             subprocess.call([
               matrix_generator_exe,
+              'reset',
+              basename + '.model',
+              fidfile,
+              str(num_mc_points),
+              # The v shift parameter must be >0 but it isn't relevant to the reset
+              # dynamics, so just make it 0.1.
+              str(0.1),
+              str(spike_shift_w),
+              str(reset_shift_w),
+              '-use_area_calculation'
+              ])
+            return
+
+        if spike_shift_v == 0.0 and spike_shift_w == 0.0:
+            print 'Spike shift magnitude must be > 0.'
+            return
+
+        if jump_file:
+            subprocess.call([
+              matrix_generator_exe,
+              'jump',
+              basename + '.model',
+              fidfile,
+              str(num_mc_points),
+              jump_file,
+              '0.0',
+              '0.0'
+              ])
+        elif not use_area_calculation:
+            subprocess.call([
+              matrix_generator_exe,
+              'mc',
               basename + '.model',
               fidfile,
               str(num_mc_points),
@@ -58,6 +107,7 @@ class MeshTools:
         else:
             subprocess.call([
               matrix_generator_exe,
+              'area',
               basename + '.model',
               fidfile,
               str(num_mc_points),

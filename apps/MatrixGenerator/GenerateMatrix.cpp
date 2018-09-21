@@ -104,6 +104,42 @@ void Write
 		ofst << "\n";
 	}
 }
+
+void GenerateResetTransitionsOnly(
+	const string& base_name,
+	const TwoDLib::Mesh& mesh,
+	const TwoDLib::Fid& fid,
+	double V_th,
+	double V_reset,
+	std::unique_ptr<TwoDLib::TranslationObject>& p_to,
+	double tr_reset,
+	MPILib::Number nr_points,
+	MPILib::Index l_min,
+	MPILib::Index l_max,
+	TwoDLib::UserTranslationMode mode
+) {
+	vector<TwoDLib::Coordinates> ths   = mesh.findV(V_th,TwoDLib::Mesh::EQUAL);
+	vector<TwoDLib::Coordinates> above = mesh.findV(V_th,TwoDLib::Mesh::ABOVE);
+	vector<TwoDLib::Coordinates> below = mesh.findV(V_th,TwoDLib::Mesh::BELOW);
+	vector<TwoDLib::Coordinates> thres = mesh.findV(V_reset,TwoDLib::Mesh::EQUAL);
+
+	std::cout << "threshold:\t" << V_th  << std::endl;
+	std::cout << "reset:\t\t"   << V_reset << std::endl;
+
+	TwoDLib::MeshTree tree(mesh);
+	TwoDLib::Uniform uni(123456);
+
+	std::vector<TwoDLib::FiducialElement> list = fid.Generate(mesh);
+	TwoDLib::TransitionMatrixGenerator gen(tree,uni,nr_points,list);
+
+	// the reset mapping is the same for all ranges
+	std::ofstream ofst(base_name + string(".res"));
+	TwoDLib::ConstructResetMapping(ofst, mesh, ths, thres, tr_reset, &gen);
+	ofst.close(); // needed; FixModelFile will reopen this file
+
+	// the model file now needs to be fixed, to include the reset mapping
+	FixModelFile(base_name);
+}
 	void GenerateElements
 	(
 			const string& base_name,
@@ -147,62 +183,62 @@ void Write
 
 		TwoDLib::TransitionList l;
 
-		// std::vector<TwoDLib::Coordinates> strays;
-		//
-		// MPILib::Index min_strip, max_strip;
-		// if (l_min == 0 && l_max == 0){
-		// 	min_strip = 0;
-		// 	max_strip = mesh.NrQuadrilateralStrips();
-		// } else {
-		// 	min_strip = l_min;
-		// 	max_strip = l_max;
-		// }
-		//
-		// for( MPILib::Index i = min_strip; i <  max_strip; i++){
-		// 	std::cout << i << " " << mesh.NrCellsInStrip(i) << std::endl;
-		// 	for (MPILib::Index j = 0; j <  mesh.NrCellsInStrip(i); j++){
-		//
-		// 		// Only generate if the origin is in BELOW, or in EQUAL
-		// 		TwoDLib::Coordinates c(i,j);
-		// 		if (std::find(above.begin(),above.end(),c) == above.end() ){
-		//
-		// 			gen.Reset(nr_points);
-		// 			TwoDLib::Translation tr = translation_list[i][j];
-		//
-		// 			if(mode == TwoDLib::AreaCalculation || mode == TwoDLib::JumpFile){
-		// 				vector<TwoDLib::Coordinates> cells = below;
-		// 				cells.insert(cells.end(), ths.begin(), ths.end());
-		// 				gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w,cells);
-		// 			}
-		// 			else {
-		// 				gen.GenerateTransition(i,j,tr._v,tr._w);
-		// 			}
-		//
-		// 			l._number = gen.N();
-		// 			l._origin = TwoDLib::Coordinates(i,j);
-		// 			l._destination_list = gen.HitList();
-		//
-		// 			if(mode == TwoDLib::AreaCalculation || mode == TwoDLib::JumpFile) {
-		// 				transitions.push_back(l);
-		// 			} else {
-		// 				TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
-		// 				transitions.push_back(lcor);
-		// 			}
-		//
-		// 		}
-		// 	}
-		// }
-		//
-		// std::cout << "Finished. Writing out" << std::endl;
-		// std::ostringstream ostfn;
-		// ostfn.precision(10);
-		//
-		// ostfn << "_" << efficacy._v << "_" << efficacy._w << "_" << l_min << "_" << l_max << "_";
-		// std::string mat_name = base_name + ostfn.str() + ".mat";
-		// vector<TwoDLib::Coordinates> resets  = mesh.findV(V_reset,TwoDLib::Mesh::EQUAL);
-		//
-		// std::cout << "There are " << ths.size() << " reset bins." << std::endl;
-		// Write(mat_name,transitions,efficacy,l_min,l_max);
+		std::vector<TwoDLib::Coordinates> strays;
+
+		MPILib::Index min_strip, max_strip;
+		if (l_min == 0 && l_max == 0){
+			min_strip = 0;
+			max_strip = mesh.NrQuadrilateralStrips();
+		} else {
+			min_strip = l_min;
+			max_strip = l_max;
+		}
+
+		for( MPILib::Index i = min_strip; i <  max_strip; i++){
+			std::cout << i << " " << mesh.NrCellsInStrip(i) << std::endl;
+			for (MPILib::Index j = 0; j <  mesh.NrCellsInStrip(i); j++){
+
+				// Only generate if the origin is in BELOW, or in EQUAL
+				TwoDLib::Coordinates c(i,j);
+				if (std::find(above.begin(),above.end(),c) == above.end() ){
+
+					gen.Reset(nr_points);
+					TwoDLib::Translation tr = translation_list[i][j];
+
+					if(mode == TwoDLib::AreaCalculation || mode == TwoDLib::JumpFile){
+						vector<TwoDLib::Coordinates> cells = below;
+						cells.insert(cells.end(), ths.begin(), ths.end());
+						gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w,cells);
+					}
+					else {
+						gen.GenerateTransition(i,j,tr._v,tr._w);
+					}
+
+					l._number = gen.N();
+					l._origin = TwoDLib::Coordinates(i,j);
+					l._destination_list = gen.HitList();
+
+					if(mode == TwoDLib::AreaCalculation || mode == TwoDLib::JumpFile) {
+						transitions.push_back(l);
+					} else {
+						TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
+						transitions.push_back(lcor);
+					}
+
+				}
+			}
+		}
+
+		std::cout << "Finished. Writing out" << std::endl;
+		std::ostringstream ostfn;
+		ostfn.precision(10);
+
+		ostfn << "_" << efficacy._v << "_" << efficacy._w << "_" << l_min << "_" << l_max << "_";
+		std::string mat_name = base_name + ostfn.str() + ".mat";
+		vector<TwoDLib::Coordinates> resets  = mesh.findV(V_reset,TwoDLib::Mesh::EQUAL);
+
+		std::cout << "There are " << ths.size() << " reset bins." << std::endl;
+		Write(mat_name,transitions,efficacy,l_min,l_max);
 
 
 		// the reset mapping is the same for all ranges
@@ -214,7 +250,7 @@ void Write
 		FixModelFile(base_name);
 
 		// Give an account of lost points
-		// WriteOutLost(base_name + ostfn.str() + string(".lost"), gen);
+		WriteOutLost(base_name + ostfn.str() + string(".lost"), gen);
 	}
 
 	void SetupObjects
@@ -271,14 +307,18 @@ void Write
 
 		p_to->GenerateTranslationList(mesh);
 
-		GenerateElements(base_name, mesh,fid,theta,V_reset, p_to, tr_reset, nr_points, l_min,l_max, mode);
+		if (mode == TwoDLib::ResetOnly)
+			GenerateResetTransitionsOnly(base_name, mesh,fid,theta,V_reset, p_to, tr_reset, nr_points, l_min,l_max, mode);
+		else
+			GenerateElements(base_name, mesh,fid,theta,V_reset, p_to, tr_reset, nr_points, l_min,l_max, mode);
+
 	}
 
 	void PrepareMatrixGeneration(int argc, char** argv, TwoDLib::UserTranslationMode mode){
 		std::cout << "Generate transition matrix" << std::endl;
 		// this bit is common: model file, fid file, nr of translation points
 
-		std::string model_name(argv[1]);
+		std::string model_name(argv[2]);
 		std::vector<string> elem;
 		TwoDLib::split(model_name,'.',elem);
 		std::string base_name(elem[0]);
@@ -286,13 +326,13 @@ void Write
 			throw TwoDLib::TwoDLibException("Model extension not .model");
 
 
-		std::string fid_name(argv[2]);
+		std::string fid_name(argv[3]);
 		elem.clear();
 		TwoDLib::split(fid_name,'.',elem);
 		if (elem.size() < 2 || elem[1] != string("fid"))
 			throw TwoDLib::TwoDLibException("Fiducial extension not .fid");
 
-		std::istringstream istp(argv[3]);
+		std::istringstream istp(argv[4]);
 		unsigned int nr_points;
 		istp >> nr_points;
 
@@ -308,24 +348,24 @@ void Write
 		// in that case we probably should make it integral part of the TranslationObject. For now
 		// we use it separately, as it is used differently by GenerateElements.
 		double tr_reset = 0.;
-		if (mode == TwoDLib::TranslationArguments || mode == TwoDLib::AreaCalculation){
-			std::istringstream istrv(argv[4]);
+		if (mode == TwoDLib::TranslationArguments || mode == TwoDLib::AreaCalculation || mode == TwoDLib::ResetOnly){
+			std::istringstream istrv(argv[5]);
 			double tr_v;
 			istrv >> tr_v;
 
-			std::istringstream istrw(argv[5]);
+			std::istringstream istrw(argv[6]);
 			double tr_w;
 			istrw >> tr_w;
 
-			std::istringstream istre(argv[6]);
+			std::istringstream istre(argv[7]);
 			// already declared and initialized above
 			istre >> tr_reset;
 
 			p_to = std::unique_ptr<TwoDLib::TranslationObject>{new TwoDLib::TranslationObject(tr_v, tr_w)};
 
-			if (argc == 9){
-				std::istringstream ist_min(argv[7]);
-				std::istringstream ist_max(argv[8]);
+			if (argc == 10){
+				std::istringstream ist_min(argv[8]);
+				std::istringstream ist_max(argv[9]);
 				ist_min >> l_min;
 				ist_max >> l_max;
 			}
@@ -337,14 +377,14 @@ void Write
 
 			std::cout << "Range: " << l_min << " " << l_max << std::endl;
 		} else {
-			std::ifstream ifst(argv[4]);
+			std::ifstream ifst(argv[5]);
 			if (!ifst)
 				throw TwoDLib::TwoDLibException("Could not open the jump file.");
 			else
 				p_to = std::unique_ptr<TwoDLib::TranslationObject>{ new TwoDLib::TranslationObject(ifst)};
-			if (argc == 7){
-				std::istringstream ist_min(argv[5]);
-				std::istringstream ist_max(argv[6]);
+			if (argc == 8){
+				std::istringstream ist_min(argv[6]);
+				std::istringstream ist_max(argv[7]);
 				ist_min >> l_min;
 				ist_max >> l_max;
 			}
