@@ -21,29 +21,20 @@ using namespace std;
 
 TwoDLib::UserTranslationMode InterpretArguments(int argc, char** argv){
 
-	if (argc != 5 && argc != 7 && argc != 8 && argc != 9 && argc != 10)
-		throw TwoDLib::TwoDLibException("Incorrect number of arguments. Usage is either: ./MatrixGenerator <basename>.model <basename>.fid n_points tr_v tr_w tr_reset [n_min] [n_max] [-use_area_calculation], or ./MatrixGenerator <basename>.model <basename>.fid n_points <basename>.jmp [n_min] [n_max].");
+	if (argc < 5)
+		throw TwoDLib::TwoDLibException("Incorrect number of arguments. Usage is either: ./MatrixGenerator <mode> <basename>.model <basename>.fid n_points tr_v tr_w tr_reset [n_min] [n_max] [-use_area_calculation], or ./MatrixGenerator <mode> <basename>.model <basename>.fid n_points <basename>.jmp [n_min] [n_max].");
 	// if argv[4] is the jump file, then argc must be 5 or 7
 
-	std::string translation(argv[4]);
-	std::vector<string> elem;
-	TwoDLib::split(translation,'.',elem);
-	if (elem.size() < 2 || elem[1] != string("jmp")){
-		// then it must be a number
-		// still here?, then argc should be 7 or 9 and the mode is TranslationArguments
-		if (argc == 7 || argc == 9)
-			return TwoDLib::TranslationArguments;
-		if (argc == 8 || argc == 10)
-			return TwoDLib::AreaCalculation;
-		else
-			throw TwoDLib::TwoDLibException("You should have 7 or 9 arguments without a jump file.");
-	} else {
-		// ok, so this is a jump file. the number of arguments should be 5 or 7
-		if (argc == 5 || argc == 7)
-			return TwoDLib::JumpFile;
-		else
-			throw TwoDLib::TwoDLibException("You should have 5 or 7 arguments with a jump file.");
-	}
+	std::string mode(argv[1]);
+	if (mode == string("jump"))
+		return TwoDLib::JumpFile;
+	if (mode == string("area"))
+		return TwoDLib::AreaCalculation;
+	if (mode == string("mc"))
+		return TwoDLib::TranslationArguments;
+	if (mode == string("reset"))
+		return TwoDLib::ResetOnly;
+
 }
 
 int main(int argc, char** argv){

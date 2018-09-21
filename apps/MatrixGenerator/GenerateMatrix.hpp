@@ -21,7 +21,7 @@
 
 namespace TwoDLib {
 
-enum UserTranslationMode {TranslationArguments, JumpFile, AreaCalculation};
+enum UserTranslationMode {TranslationArguments, JumpFile, AreaCalculation, ResetOnly};
 
 void GenerateMatrix(int argc, char** argv, UserTranslationMode);
 
