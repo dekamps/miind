@@ -58,7 +58,7 @@ class MeshTools:
                     if mapping.attrib['type'] == 'Reset':
                         model.remove(mapping)
 
-            if model not None:
+            if model is not None:
                 with open(basename + '.model', 'w') as xml_file:
                     xml_file.write(ET.tostring(model))
                     print 'Deleted old reset mapping.'
