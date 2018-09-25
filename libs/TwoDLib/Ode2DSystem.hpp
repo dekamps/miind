@@ -81,7 +81,10 @@ namespace TwoDLib {
 		double F() const {return _f;}
 
 		//! total probability mass in the system, should not be too far away from 1.0
-		double P() const { return std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0); }
+		double P() const {
+			return std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0)
+			+ _reset_refractive.getTotalProbInRefract();
+		}
 
 		//! average membrane potential
 		double AvgV() const ;
@@ -179,6 +182,14 @@ namespace TwoDLib {
 
 				from = _vec_queue[i].CollectAndRemove(t);
 				_vec_mass[_sys.Map(map._to[0],map._to[1])] += from;
+			}
+
+			double getTotalProbInRefract() const{
+				double total = 0.0;
+				for (MPILib::populist::ProbabilityQueue q : _vec_queue){
+					total += q.TotalProbability();
+				}
+				return total;
 			}
 
 		private:
