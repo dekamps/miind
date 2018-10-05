@@ -161,13 +161,13 @@ def _settings(command):
         if len(command) > 1 and len(command) != 4:
             print "settings command expects [ENABLE_MPI] [ENABLE_OPENMP] [ENABLE_ROOT]."
 
-        settings['mpi_enabled'] = (command[1] in ['True', 'true', 'TRUE'])
-        settings['openmp_enabled'] = (command[2] in ['True', 'true', 'TRUE'])
-        settings['root_enabled'] = (command[3] in ['True', 'true', 'TRUE'])
+            settings['mpi_enabled'] = (command[1] in ['True', 'true', 'TRUE'])
+            settings['openmp_enabled'] = (command[2] in ['True', 'true', 'TRUE'])
+            settings['root_enabled'] = (command[3] in ['True', 'true', 'TRUE'])
 
-        with open(settingsfilename, 'w') as settingsfile:
-            for k,v in settings.iteritems():
-                settingsfile.write(k + '=' + str(v) + '\n')
+            with open(settingsfilename, 'w') as settingsfile:
+                for k,v in settings.iteritems():
+                    settingsfile.write(k + '=' + str(v) + '\n')
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print name + ' : List the current settings. Settings are stored in \'miind_ui_settings\' in the MIIND python directory.'
@@ -417,12 +417,12 @@ def generateMatrix(command):
     if command_name in [name]:
         if len(command) == 4:
             if (len(command[3].split('.')) > 1):
-                api.MeshTools.buildMatrixFileFromModel(command[1], 0.0, fidfile=command[1] + '.fid', num_mc_points=int(command[2]), jump_file=command[3])
+                api.MeshTools.buildMatrixFileFromModel(command[1], 0.1, fidfile=command[1] + '.fid', num_mc_points=int(command[2]), jump_file=command[3])
             else:
                 api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]))
         elif len(command) == 5:
             api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]), spike_shift_w=float(command[4]))
-        elif len(command) == 6:
+        elif len(command) == 7:
             api.MeshTools.buildMatrixFileFromModel(command[1], float(command[2]), fidfile=command[1] + '.fid', num_mc_points=int(command[3]), spike_shift_w=float(command[4]), reset_shift_w=float(command[5]), use_area_calculation=(command[6] in ['True', 'true', 'TRUE']))
         else:
             print name + ' expects three, four or six parameters.'
