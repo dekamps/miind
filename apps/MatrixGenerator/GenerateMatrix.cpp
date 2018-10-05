@@ -253,6 +253,90 @@ void GenerateResetTransitionsOnly(
 		WriteOutLost(base_name + ostfn.str() + string(".lost"), gen);
 	}
 
+	void GenerateElementsForTransform
+	(
+			const string& base_name,
+			const TwoDLib::Mesh& mesh,
+			const TwoDLib::Mesh& mesh_transform,
+			double V_th,
+			double V_reset,
+			std::unique_ptr<TwoDLib::TranslationObject>& p_to,
+			double tr_reset,
+			MPILib::Number nr_points,
+			MPILib::Index l_min,
+			MPILib::Index l_max,
+			TwoDLib::UserTranslationMode mode
+	){
+	    std::vector<TwoDLib::TransitionList> transitions;
+
+	    const std::vector< std::vector<TwoDLib::Translation> >& translation_list = p_to->TranslationList();
+	    const TwoDLib::Translation efficacy = p_to->Efficacy();
+
+			vector<TwoDLib::Coordinates> ths   = mesh.findV(V_th,TwoDLib::Mesh::EQUAL);
+			vector<TwoDLib::Coordinates> above = mesh.findV(V_th,TwoDLib::Mesh::ABOVE);
+			vector<TwoDLib::Coordinates> below = mesh.findV(V_th,TwoDLib::Mesh::BELOW);
+			vector<TwoDLib::Coordinates> thres = mesh.findV(V_reset,TwoDLib::Mesh::EQUAL);
+
+			//add stationary points to below, or they will be ignored
+			below.push_back(TwoDLib::Coordinates(0,0));
+
+			TwoDLib::MeshTree tree_transform(mesh_transform);
+
+			TwoDLib::MeshTree tree(mesh);
+			TwoDLib::Uniform uni(123456);
+
+			std::vector<TwoDLib::FiducialElement> list;
+			TwoDLib::TransitionMatrixGenerator gen(tree,uni,nr_points,list);
+
+			TwoDLib::TransitionList l;
+
+			std::vector<TwoDLib::Coordinates> strays;
+
+			MPILib::Index min_strip, max_strip;
+			if (l_min == 0 && l_max == 0){
+				min_strip = 0;
+				max_strip = mesh.NrQuadrilateralStrips();
+			} else {
+				min_strip = l_min;
+				max_strip = l_max;
+			}
+
+			for( MPILib::Index i = min_strip; i <  max_strip; i++){
+				std::cout << i << " " << mesh.NrCellsInStrip(i) << std::endl;
+				for (MPILib::Index j = 0; j <  mesh.NrCellsInStrip(i); j++){
+
+					// Only generate if the origin is in BELOW, or in EQUAL
+					TwoDLib::Coordinates c(i,j);
+					if (std::find(above.begin(),above.end(),c) == above.end() ){
+
+						gen.Reset(nr_points);
+						TwoDLib::Translation tr = translation_list[i][j];
+
+						vector<TwoDLib::Coordinates> cells = below;
+						cells.insert(cells.end(), ths.begin(), ths.end());
+						gen.GenerateTransformUsingQuadTranslation(i,j,tree_transform,cells);
+
+						l._number = gen.N();
+						l._origin = TwoDLib::Coordinates(i,j);
+						l._destination_list = gen.HitList();
+
+						transitions.push_back(l);
+					}
+				}
+			}
+
+			std::cout << "Finished. Writing out" << std::endl;
+			std::ostringstream ostfn;
+			ostfn.precision(10);
+
+			ostfn << "_" << efficacy._v << "_" << efficacy._w << "_" << l_min << "_" << l_max << "_";
+			std::string mat_name = base_name + ostfn.str() + ".tmat";
+			vector<TwoDLib::Coordinates> resets  = mesh.findV(V_reset,TwoDLib::Mesh::EQUAL);
+
+			std::cout << "There are " << ths.size() << " reset bins." << std::endl;
+			Write(mat_name,transitions,efficacy,l_min,l_max);
+	}
+
 	void SetupObjects
 	(
 		const std::string& base_name,
@@ -285,8 +369,6 @@ void GenerateResetTransitionsOnly(
 
 		std::cout << "There are: " << mesh.NrQuadrilateralStrips() << " strips" << std::endl;
 
-		TwoDLib::Fid fid((base_name + std::string(".fid")).c_str());
-
 		pugi::xml_node rev_node = doc.first_child().child("Mapping");
 		std::ostringstream o_rev;
 		rev_node.print(o_rev," ");
@@ -304,6 +386,27 @@ void GenerateResetTransitionsOnly(
 		ivr >> V_reset;
 
 		// make sure the TranslationObject is filled, consistent with mesh
+
+		if (mode == TwoDLib::Transform){
+			pugi::xml_document doc;
+
+			pugi::xml_parse_result result = doc.load_file((base_name + std::string("_transform") + std::string(".model")).c_str());
+			if (!result)
+				throw TwoDLib::TwoDLibException("Couldn't use stream for Model.");
+
+			std::cout << "Translation3" << std::endl;
+			pugi::xml_node mesh_node = doc.first_child().child("Mesh");
+			std::ostringstream o_mesh;
+			mesh_node.print(o_mesh," ");
+			std::istringstream i_mesh(o_mesh.str());
+			std::cout << "Translation4" << std::endl;
+			TwoDLib::Mesh mesh_transform(i_mesh);
+
+			GenerateElementsForTransform(base_name, mesh, mesh_transform, theta,V_reset, p_to, tr_reset, nr_points, l_min,l_max, mode);
+			return;
+		}
+
+		TwoDLib::Fid fid((base_name + std::string(".fid")).c_str());
 
 		p_to->GenerateTranslationList(mesh);
 
@@ -348,7 +451,7 @@ void GenerateResetTransitionsOnly(
 		// in that case we probably should make it integral part of the TranslationObject. For now
 		// we use it separately, as it is used differently by GenerateElements.
 		double tr_reset = 0.;
-		if (mode == TwoDLib::TranslationArguments || mode == TwoDLib::AreaCalculation || mode == TwoDLib::ResetOnly){
+		if (mode == TwoDLib::TranslationArguments || mode == TwoDLib::AreaCalculation || mode == TwoDLib::ResetOnly || mode == TwoDLib::Transform ){
 			std::istringstream istrv(argv[5]);
 			double tr_v;
 			istrv >> tr_v;

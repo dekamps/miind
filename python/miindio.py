@@ -410,6 +410,20 @@ def generateEmptyFid(command):
         print name + ' [Basename] : Generate an empty stub Basename.fid.'
         print 'Alternative command names : ' + ' '.join(alts)
 
+def generateTransform(command):
+    command_name = command[0]
+    name = 'generate-transform'
+
+    if command_name in [name]:
+        if len(command) == 3:
+                api.MeshTools.buildTransformFileFromModel(command[1], num_mc_points=int(command[2]))
+        else:
+            print name + ' expects two parameters.'
+            generateMatrix(name+'?')
+
+    if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
+        print name + ' [Basename] [Number of points] : Generate a Basename.tmat file. Expects two model files - Basename.model and Basename_transform.model.'
+
 def generateMatrix(command):
     command_name = command[0]
     name = 'generate-matrix'
@@ -524,6 +538,8 @@ def checkCommands(command, current_sim):
     generateEmptyFid(command)
 
     generateMatrix(command)
+
+    generateTransform(command)
 
     regenerateModelReset(command)
 

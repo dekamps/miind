@@ -236,7 +236,9 @@ namespace TwoDLib {
 		const Mesh&           _mesh;
 		vector<MPILib::Index> _vec_length;
 		vector<MPILib::Index> _vec_cumulative;
+	public:
 		vector<double>	      _vec_mass;
+	private:
 		vector<double>		  _vec_area;
 
 		unsigned int	_it;

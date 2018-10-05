@@ -154,7 +154,6 @@ void Ode2DSystem::Evolve()
 {
 	_it += 1;
 	_f = 0;
-	this->UpdateMap();
 }
 
 void Ode2DSystem::UpdateMap()

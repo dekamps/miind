@@ -39,6 +39,22 @@ class MeshTools:
         return basename + '.fid'
 
     @staticmethod
+    def buildTransformFileFromModel(basename, num_mc_points=100000):
+        matrix_generator_exe = op.join(getMiindAppsPath(), 'MatrixGenerator', 'MatrixGenerator')
+
+        subprocess.call([
+          matrix_generator_exe,
+          'transform',
+          basename + '.model',
+          basename + '.fid',
+          str(num_mc_points),
+          str(0.0),
+          str(0.0),
+          str(0.0)
+          ])
+
+
+    @staticmethod
     def buildMatrixFileFromModel(basename, spike_shift_v, fidfile=None, num_mc_points=10,
                                     spike_shift_w=0, reset_shift_w=0, use_area_calculation=False,
                                     jump_file=None, mode=None):
