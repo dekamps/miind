@@ -185,6 +185,9 @@ namespace TwoDLib {
 		// internally and we don't want to keep two versions.
 		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
 
+		_transformMatrix = TransitionMatrix("grid_0_0_0_0_.tmat");
+		_csr_transform = new CSRMatrix(_transformMatrix, _sys);
+
 		try {
 			std::unique_ptr<Solver> p_master(new Solver(_sys,vec_mat, par));
 			_p_master = std::move(p_master);
@@ -275,8 +278,10 @@ namespace TwoDLib {
 
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
-	      _sys.Evolve();
-				_sys.RemapReversal();
+				_sys.Evolve();
+				vector<double> ns = vector<double>(_sys._vec_mass.size());
+	      _csr_transform->MV(ns,_sys._vec_mass);
+				_sys._vec_mass = ns;
 	    }
 
 	    // master equation

@@ -161,6 +161,9 @@ namespace TwoDLib {
 		const std::vector<std::string> _mat_names;   // it is useful to store the names, but not the matrices, as they will be converted internally by the MasterOMP object
         const std::string              _rate_method;
 
+		TransitionMatrix 							_transformMatrix;
+		CSRMatrix*										_csr_transform;
+
 		// report quantities
 		MPILib::Time _h;
 		MPILib::Rate _rate;

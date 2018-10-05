@@ -86,6 +86,13 @@ namespace TwoDLib {
         std::vector<Coordinates>  //!< above threshold cells
 	  	  );
 
+    void GenerateTransformUsingQuadTranslation
+    (
+      unsigned int,
+      unsigned int,
+      const TwoDLib::MeshTree&,
+      std::vector<Coordinates> );
+
 	  //! After a simulation, the generator must be reset
 	  void Reset(unsigned int N = 10);
 

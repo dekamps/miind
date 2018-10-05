@@ -225,6 +225,93 @@ void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned 
 
 }
 
+void TransitionMatrixGenerator::GenerateTransformUsingQuadTranslation(unsigned int strip_no, unsigned int cell_no, const TwoDLib::MeshTree& trans_tree, std::vector<Coordinates> cells)
+{
+	const Quadrilateral& quad = trans_tree.MeshRef().Quad(strip_no,cell_no);
+	Point p(0.0,0.0);
+
+	std::vector<Point> ps = quad.Points();
+	Quadrilateral quad_trans = Quadrilateral((ps[0]+p), (ps[1]+p), (ps[2]+p), (ps[3]+p));
+
+	std::vector<Point> trans_points = quad_trans.Points();
+	double search_min_x = trans_points[0][0];
+	double search_max_x = trans_points[0][0];
+	double search_min_y = trans_points[0][1];
+	double search_max_y = trans_points[0][1];
+
+	for (Point p : trans_points) {
+		if (p[0] < search_min_x)
+			search_min_x = p[0];
+		if (p[0] > search_max_x)
+			search_max_x = p[0];
+		if (p[1] < search_min_y)
+			search_min_y = p[1];
+		if (p[1] > search_max_y)
+			search_max_y = p[1];
+	}
+
+	double total_area = 0.0;
+	for (MPILib::Index c = 0; c < cells.size(); c++){
+	  MPILib::Index i = cells[c][0];
+		MPILib::Index j = cells[c][1];
+
+		std::vector<Point> ps = _tree.MeshRef().Quad(i,j).Points();
+		Quadrilateral quad_scaled = Quadrilateral((ps[0]), (ps[1]), (ps[2]), (ps[3]));
+		std::vector<Point> ps_scaled = quad_scaled.Points();
+		bool all_points_right = true;
+		bool all_points_left = true;
+		bool all_points_above = true;
+		bool all_points_below = true;
+		for(Point p : ps_scaled){
+			all_points_right &= p[0] > search_max_x;
+			all_points_left &= p[0] < search_min_x;
+			all_points_above &= p[1] > search_max_y;
+			all_points_below &= p[1] < search_min_y;
+		}
+
+		if(all_points_right || all_points_left || all_points_above || all_points_below)
+			continue;
+
+		double area = Quadrilateral::get_overlap_area(quad_trans, quad_scaled);
+
+		if((std::abs(area))/(std::abs(quad_trans.SignedArea())) < 0.00001)
+			continue;
+
+		total_area += (std::abs(area))/(std::abs(quad_trans.SignedArea()));
+		if (std::abs(area) > 0) {
+			Hit h;
+			h._cell = Coordinates(i,j);
+			h._count = (int)(_N*(std::abs(area))/(std::abs(quad_trans.SignedArea())));
+			_hit_list.push_back(h);
+		}
+	}
+
+	if(_hit_list.size() == 0) {
+		Hit h;
+		h._cell = Coordinates(strip_no,cell_no);
+		h._count = _N;
+		_hit_list.push_back(h);
+	}
+
+	if (total_area != 1.0) {
+		for(int i=0; i<_hit_list.size(); i++){
+				_hit_list[i]._count = (int)((double)_hit_list[i]._count/total_area);
+			}
+	}
+
+	// rectify rounding errors
+	int c = 0;
+	for(Hit h : _hit_list){
+		c += h._count;
+	}
+
+	if(c != _N){
+		int diff = c - _N;
+		_hit_list.front()._count -= diff;
+	}
+
+}
+
 
 void TransitionMatrixGenerator::Reset(unsigned int n)
 {
