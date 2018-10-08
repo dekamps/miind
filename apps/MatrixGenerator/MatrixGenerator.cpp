@@ -36,6 +36,8 @@ TwoDLib::UserTranslationMode InterpretArguments(int argc, char** argv){
 		return TwoDLib::ResetOnly;
 	if (mode == string("transform"))
 		return TwoDLib::Transform;
+	if (mode == string("resettransform"))
+		return TwoDLib::TransformResetOnly;
 
 }
 

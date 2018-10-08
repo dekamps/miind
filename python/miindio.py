@@ -463,6 +463,21 @@ def regenerateModelReset(command):
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print name + ' [Basename] [Reset W shift] : Regenerate the reset mapping for Basename.model.'
 
+def regenerateModelResetTransform(command):
+    command_name = command[0]
+    name = 'regenerate-transform-reset'
+
+    if command_name in [name]:
+
+        if len(command) == 3:
+            api.MeshTools.buildTransformFileFromModel(command[1], reset_shift_w=float(command[2]), mode='resettransform')
+        else:
+            print name + ' expects two parameters.'
+            generateMatrix(name+'?')
+
+    if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
+        print name + ' [Basename] [Reset W shift] : Regenerate the reset mapping for Basename.model.'
+
 def lost(command):
     command_name = command[0]
     name = 'lost'
@@ -542,6 +557,8 @@ def checkCommands(command, current_sim):
     generateTransform(command)
 
     regenerateModelReset(command)
+
+    regenerateModelResetTransform(command)
 
     drawMesh(command)
 
