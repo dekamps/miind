@@ -31,6 +31,7 @@ namespace TwoDLib {
 		double,
 		TransitionMatrixGenerator*
 	);
+
 }
 
 #endif // include guard

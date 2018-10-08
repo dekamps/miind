@@ -39,18 +39,33 @@ class MeshTools:
         return basename + '.fid'
 
     @staticmethod
-    def buildTransformFileFromModel(basename, num_mc_points=100000):
+    def buildTransformFileFromModel(basename, num_mc_points=100000, reset_shift_w=0, mode='transform'):
         matrix_generator_exe = op.join(getMiindAppsPath(), 'MatrixGenerator', 'MatrixGenerator')
+
+        if (mode == 'resettransform'):
+            model = None
+
+            with open(basename + '.model') as xml_file:
+                model=ET.fromstring(xml_file.read())
+                mappings = model.findall('Mapping')
+                for mapping in mappings:
+                    if mapping.attrib['type'] == 'Reset':
+                        model.remove(mapping)
+
+            if model is not None:
+                with open(basename + '.model', 'w') as xml_file:
+                    xml_file.write(ET.tostring(model))
+                    print 'Deleted old reset mapping.'
 
         subprocess.call([
           matrix_generator_exe,
-          'transform',
+          mode,
           basename + '.model',
           basename + '.fid',
           str(num_mc_points),
           str(0.0),
           str(0.0),
-          str(0.0)
+          str(reset_shift_w)
           ])
 
 

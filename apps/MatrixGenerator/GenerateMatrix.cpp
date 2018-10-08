@@ -253,6 +253,43 @@ void GenerateResetTransitionsOnly(
 		WriteOutLost(base_name + ostfn.str() + string(".lost"), gen);
 	}
 
+	void GenerateResetTransitionsOnlyUsingTransform(
+		const string& base_name,
+		const TwoDLib::Mesh& mesh,
+		const TwoDLib::Mesh& mesh_transform,
+		double V_th,
+		double V_reset,
+		std::unique_ptr<TwoDLib::TranslationObject>& p_to,
+		double tr_reset,
+		MPILib::Number nr_points,
+		MPILib::Index l_min,
+		MPILib::Index l_max,
+		TwoDLib::UserTranslationMode mode
+	) {
+		vector<TwoDLib::Coordinates> ths   = mesh.findV(V_th,TwoDLib::Mesh::EQUAL);
+		vector<TwoDLib::Coordinates> transform_above = mesh_transform.findV(V_th,TwoDLib::Mesh::ABOVE);
+		vector<TwoDLib::Coordinates> above = mesh.findV(V_th,TwoDLib::Mesh::ABOVE);
+		vector<TwoDLib::Coordinates> below = mesh.findV(V_th,TwoDLib::Mesh::BELOW);
+		vector<TwoDLib::Coordinates> thres = mesh.findV(V_reset,TwoDLib::Mesh::EQUAL);
+
+		std::cout << "threshold:\t" << V_th  << std::endl;
+		std::cout << "reset:\t\t"   << V_reset << std::endl;
+
+		TwoDLib::MeshTree tree(mesh);
+		TwoDLib::Uniform uni(123456);
+
+		std::vector<TwoDLib::FiducialElement> list;
+		TwoDLib::TransitionMatrixGenerator gen(tree,uni,nr_points,list);
+
+		// the reset mapping is the same for all ranges
+		std::ofstream ofst(base_name + string(".res"));
+		TwoDLib::ConstructResetMapping(ofst, mesh, transform_above, thres, tr_reset, &gen);
+		ofst.close(); // needed; FixModelFile will reopen this file
+
+		// the model file now needs to be fixed, to include the reset mapping
+		FixModelFile(base_name);
+	}
+
 	void GenerateElementsForTransform
 	(
 			const string& base_name,
@@ -337,6 +374,8 @@ void GenerateResetTransitionsOnly(
 			Write(mat_name,transitions,efficacy,l_min,l_max);
 	}
 
+
+
 	void SetupObjects
 	(
 		const std::string& base_name,
@@ -394,15 +433,31 @@ void GenerateResetTransitionsOnly(
 			if (!result)
 				throw TwoDLib::TwoDLibException("Couldn't use stream for Model.");
 
-			std::cout << "Translation3" << std::endl;
 			pugi::xml_node mesh_node = doc.first_child().child("Mesh");
 			std::ostringstream o_mesh;
 			mesh_node.print(o_mesh," ");
 			std::istringstream i_mesh(o_mesh.str());
-			std::cout << "Translation4" << std::endl;
 			TwoDLib::Mesh mesh_transform(i_mesh);
 
 			GenerateElementsForTransform(base_name, mesh, mesh_transform, theta,V_reset, p_to, tr_reset, nr_points, l_min,l_max, mode);
+			return;
+		}
+
+		if(mode == TwoDLib::TransformResetOnly){
+
+			pugi::xml_document doc;
+
+			pugi::xml_parse_result result = doc.load_file((base_name + std::string("_transform") + std::string(".model")).c_str());
+			if (!result)
+				throw TwoDLib::TwoDLibException("Couldn't use stream for Model.");
+
+			pugi::xml_node mesh_node = doc.first_child().child("Mesh");
+			std::ostringstream o_mesh;
+			mesh_node.print(o_mesh," ");
+			std::istringstream i_mesh(o_mesh.str());
+			TwoDLib::Mesh mesh_transform(i_mesh);
+
+			GenerateResetTransitionsOnlyUsingTransform(base_name, mesh,mesh_transform,theta,V_reset, p_to, tr_reset, nr_points, l_min,l_max, mode);
 			return;
 		}
 
@@ -451,7 +506,7 @@ void GenerateResetTransitionsOnly(
 		// in that case we probably should make it integral part of the TranslationObject. For now
 		// we use it separately, as it is used differently by GenerateElements.
 		double tr_reset = 0.;
-		if (mode == TwoDLib::TranslationArguments || mode == TwoDLib::AreaCalculation || mode == TwoDLib::ResetOnly || mode == TwoDLib::Transform ){
+		if (mode == TwoDLib::TranslationArguments || mode == TwoDLib::AreaCalculation || mode == TwoDLib::ResetOnly || mode == TwoDLib::Transform || mode == TwoDLib::TransformResetOnly){
 			std::istringstream istrv(argv[5]);
 			double tr_v;
 			istrv >> tr_v;
