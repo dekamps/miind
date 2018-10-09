@@ -210,10 +210,11 @@ class MiindSimulation:
         if not ax:
             fig, ax = plt.subplots()
             plt.title(node)
-            ax.plot(self.rates['times'], self.rates[node_index][0:len(self.rates['times'])])
+            rate_length = min(len(self.rates['times']), len(self.rates[node_index]))
+            ax.plot(self.rates['times'][0:rate_length], self.rates[node_index][0:rate_length])
             fig.show()
         else:
-            ax.plot(self.rates['times'], self.rates[node_index][0:len(self.rates['times'])])
+            ax.plot(self.rates['times'][0:rate_length], self.rates[node_index][0:rate_length])
 
     # Check if this particular simulation has been run previously
     @property
