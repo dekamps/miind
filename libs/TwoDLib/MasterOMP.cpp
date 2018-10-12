@@ -43,12 +43,39 @@ _init(_rate)
  {
  }
 
+ void MasterOMP::ApplyInteresting(double t_step, const vector<double>& rates, const vector<MPILib::Index>& vec_map)
+ {
+ // the time step t_step is split into single solution steps _h, equal to 1/N_steps
+	 for (unsigned int j = 0; j < _par._N_steps; j++){
+
+#pragma omp parallel for
+		 for(unsigned int id = 0; id < _dydt.size(); id++)
+			 _dydt[id] = 0.;
+
+		 for (unsigned int irate = 0; irate < rates.size(); irate++){
+			 // do NOT map the rate
+			 _rate = rates[irate];
+
+			 // it is only the matrices that need to be mapped
+			 _vec_csr[vec_map[irate]].MVMapped
+			 (
+			    _dydt,
+			 	_sys._vec_mass,
+			 	_rate
+			 );
+		 }
+
+#pragma omp parallel for
+		 for (MPILib::Index imass = 0; imass < _sys._vec_mass.size(); imass++)
+			 _sys._vec_mass[imass] += _add._h*t_step*_dydt[imass]; // the mult
+	 }
+ }
+
  void MasterOMP::Apply(double t_step, const vector<double>& rates, const vector<MPILib::Index>& vec_map)
  {
-   vector<double> mask = vector<double>(100);
-   mask[50] = 1.0;
+   vector<double> mask = vector<double>(251);
+   mask[125] = 1.0;
 
-	 // the time step t_step is split into single solution steps _h, equal to 1/N_steps
 	 for (unsigned int j = 0; j < floor(rates[0] * 0.001); j++){
      _vec_csr[vec_map[0]].MVCellMask
      (
@@ -66,12 +93,12 @@ _init(_rate)
    vector<double> dydt = vector<double>(_sys._vec_mass.size());
 
    unsigned int stat = _sys.Map(0,0);
-   unsigned int des = _sys.Map(72,70);
+   unsigned int des = _sys.Map(79,70);
    _sys._vec_mass[des] += _sys._vec_mass[stat];
    _sys._vec_mass[stat] = 0.0;
 
    for (MPILib::Index j = 0; j < _sys._map[1].size(); j++) {
-#pragma omp parallel for
+     //#pragma omp parallel for
      for (MPILib::Index i = 1; i < _sys._map.size(); i++) {
        MPILib::Index idx = _sys.Map(i,j);
 

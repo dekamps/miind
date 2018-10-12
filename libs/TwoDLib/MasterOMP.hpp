@@ -39,6 +39,7 @@ namespace TwoDLib {
 		);
 
 		void Apply(double, const vector<double>&, const vector<MPILib::Index>&);
+		void ApplyInteresting(double, const vector<double>&, const vector<MPILib::Index>&);
 
 		unsigned int NrMatrix() const { return _vec_csr.size(); }
 
@@ -101,7 +102,7 @@ namespace TwoDLib {
 		const MasterParameter	_par;
 		vector<double>			_dydt;
 		double					_rate;
-	
+
 		Derivative				_derivative;
 	    Add 					_add;
 		double					_h;
