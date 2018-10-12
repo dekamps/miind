@@ -156,3 +156,49 @@ void CSRMatrix::MVMapped
 	         dydt[i_r] -= rate*vec_mass[i_r];
 	}
 }
+
+void CSRMatrix::MVCellMask
+(
+	vector<double>&       dydt
+) const
+{
+	double stays = 0.76;
+	double goes = 0.24;
+
+	unsigned int nr_rows = _ia.size() - 1;
+
+	vector<double> dydt_new = vector<double>(dydt);
+
+	for (MPILib::Index i = 0; i < dydt.size()-1; i++){
+		double mass = dydt[i];
+		dydt_new[i] += mass*stays;
+		dydt_new[i+1] += mass*goes;
+		dydt_new[i] -= mass;
+	}
+
+	dydt = vector<double>(dydt_new);
+
+}
+
+void CSRMatrix::MVCellMaskInhib
+(
+	vector<double>&       dydt
+) const
+{
+	double stays = 0.76;
+	double goes = 0.24;
+
+	unsigned int nr_rows = _ia.size() - 1;
+
+	vector<double> dydt_new = vector<double>(dydt);
+
+	for (MPILib::Index i = 1; i < dydt.size(); i++){
+		double mass = dydt[i];
+		dydt_new[i] += mass*stays;
+		dydt_new[i-1] += mass*goes;
+		dydt_new[i] -= mass;
+	}
+
+	dydt = vector<double>(dydt_new);
+
+}

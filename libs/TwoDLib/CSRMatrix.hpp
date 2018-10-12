@@ -45,6 +45,9 @@ namespace TwoDLib {
 		//! Performs a matrix-vector multiplication, taking into account the current density mapping
 		void MVMapped(vector<double>&, const vector<double>&, double) const;
 
+		void MVCellMask(vector<double>&) const;
+		void MVCellMaskInhib(vector<double>&) const;
+
 		//! Each matrix corresponds to a well defined jump
 		double Efficacy() const {return _efficacy; }
 

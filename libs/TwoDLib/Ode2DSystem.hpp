@@ -244,8 +244,9 @@ namespace TwoDLib {
 		unsigned int	_it;
 		double			_f;
 
+public:
 		vector<vector<MPILib::Index> > _map;
-
+private:
 		vector<Redistribution> _vec_reversal;
 		vector<Redistribution> _vec_reset;
 		Reversal               _reversal;
