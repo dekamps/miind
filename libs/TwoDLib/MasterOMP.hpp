@@ -98,6 +98,8 @@ namespace TwoDLib {
 
 		const vector<TransitionMatrix>& _vec_mat; // After initialization, the original object is allowed to go out of scope; it will not be referred anymore
 		const vector<CSRMatrix> _vec_csr;
+		vector<double> 			_mask;
+		vector<double>			_mask_swap;
 
 		const MasterParameter	_par;
 		vector<double>			_dydt;
