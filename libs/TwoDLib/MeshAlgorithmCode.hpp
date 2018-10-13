@@ -148,9 +148,9 @@ namespace TwoDLib {
 	_sysfunction(rhs._sysfunction)
 	// master parameter can only be calculated on configuration
 	{
+		_mass_swap = vector<double>(_sys._vec_mass.size());
 		// default initialization is (0,0); if there is no strip 0, it's down to the user
-		if (_mesh.NrCellsInStrip(0) > 0 )
-			_sys.Initialize(0,0);
+		_sys.Initialize(78,70);
 	}
 
 	template <class WeightValue, class Solver>
@@ -279,9 +279,12 @@ namespace TwoDLib {
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 				_sys.Evolve();
-				vector<double> ns = vector<double>(_sys._vec_mass.size());
-	      _csr_transform->MV(ns,_sys._vec_mass);
-				_sys._vec_mass = ns;
+#pragma omp parallel for
+				 for(unsigned int id = 0; id < _mass_swap.size(); id++)
+					 _mass_swap[id] = 0.;
+
+	      _csr_transform->MV(_mass_swap,_sys._vec_mass);
+				_sys._vec_mass = _mass_swap;
 	    }
 
 	    // master equation

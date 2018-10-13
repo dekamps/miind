@@ -163,6 +163,7 @@ namespace TwoDLib {
 
 		TransitionMatrix 							_transformMatrix;
 		CSRMatrix*										_csr_transform;
+		vector<double>								_mass_swap;
 
 		// report quantities
 		MPILib::Time _h;
