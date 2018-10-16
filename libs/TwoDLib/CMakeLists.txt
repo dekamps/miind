@@ -14,6 +14,7 @@ INCLUDE_DIRECTORIES(
 )
 				
 set( TWOD_SRC
+display.cpp
 CSRMatrix.cpp			
 Master.cpp			
 TransitionMatrix.cpp	 
@@ -39,6 +40,7 @@ Uniform.cpp
 )
 
 set( TWOD_HEADERS
+display.hpp
 Bin.hpp
 InputCombination.hpp		
 MeshAlgorithmCode.hpp		

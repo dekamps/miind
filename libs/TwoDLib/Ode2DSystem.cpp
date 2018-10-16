@@ -148,6 +148,7 @@ void Ode2DSystem::Dump(std::ostream& ost, int mode) const
 			for (unsigned int j = 0; j < _mesh.NrCellsInStrip(i); j++ )
 				ost << i << "\t" << j << "\t" << " " << _vec_mass[this->Map(i,j)] << "\t";
 		}
+
 }
 
 void Ode2DSystem::Evolve()

@@ -25,7 +25,7 @@
 #include "MasterOdeint.hpp"
 #include "Ode2DSystem.hpp"
 #include "pugixml.hpp"
-
+#include "display.hpp"
 
 namespace TwoDLib {
 

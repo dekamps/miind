@@ -197,6 +197,7 @@ void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned 
 			h._count = (int)(_N*(std::abs(area))/(std::abs(quad_trans.SignedArea())));
 			_hit_list.push_back(h);
 		}
+
 	}
 
 	if(_hit_list.size() == 0) {
@@ -218,6 +219,10 @@ void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned 
 		c += h._count;
 	}
 
+	// This can create an off by one error in the count (although this is preferable
+  // to mass loss) if the count is low. Eg count==100 => transition off by 0.01
+	// For this reason, only use this technique
+	// with large counts
 	if(c != _N){
 		int diff = c - _N;
 		_hit_list.front()._count -= diff;

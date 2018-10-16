@@ -94,6 +94,8 @@ ENDIF(ENABLE_OPENMP)
 # Libraries
 #############################################################################
 
+set(GLUT_LIBRARY "-lGL -lGLU -lglut")
+
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
@@ -108,10 +110,11 @@ set ( LIBLIST
     ${gsl_LINK_FLAGS}
     gsl
     gslcblas
+    ${GLUT_LIBRARY}
 )
 
 
 #############################################################################
 # executables
 #############################################################################
-add_definitions("-std=gnu++11 -fext-numeric-literals")
+add_definitions("-std=gnu++11 -fext-numeric-literals ${GLUT_LIBRARY}")

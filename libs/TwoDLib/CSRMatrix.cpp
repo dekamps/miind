@@ -163,8 +163,8 @@ void CSRMatrix::MVCellMask
 	vector<double>&       dydt_new
 ) const
 {
-	double stays = 0.73;
-	double goes = 0.27;
+	double stays = 0.7223;
+	double goes = 0.2777;
 
 	unsigned int nr_rows = _ia.size() - 1;
 
@@ -183,8 +183,8 @@ void CSRMatrix::MVCellMaskInhib
 	vector<double>&       dydt_new
 ) const
 {
-	double stays = 0.73;
-	double goes = 0.27;
+	double stays = 0.7223;
+	double goes = 0.2777;
 
 	unsigned int nr_rows = _ia.size() - 1;
 

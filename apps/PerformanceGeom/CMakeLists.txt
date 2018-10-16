@@ -68,7 +68,7 @@ set ( LIBLIST
     ${gsl_LINK_FLAGS} 
     gsl
     gslcblas
-
+    ${GLUT_LIBRARY}
 )
 
 

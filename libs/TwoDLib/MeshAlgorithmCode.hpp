@@ -26,6 +26,7 @@
 #include "MeshAlgorithm.hpp"
 #include "Stat.hpp"
 #include "TwoDLibException.hpp"
+#include "display.hpp"
 
 namespace {
 
@@ -151,6 +152,9 @@ namespace TwoDLib {
 		_mass_swap = vector<double>(_sys._vec_mass.size());
 		// default initialization is (0,0); if there is no strip 0, it's down to the user
 		_sys.Initialize(78,70);
+
+		Display::getInstance()->addOdeSystem(&_sys);
+
 	}
 
 	template <class WeightValue, class Solver>
