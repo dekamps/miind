@@ -25,7 +25,9 @@ def generate_preamble(outfile):
 
 def generate_closing(outfile):
     outfile.write('\tnetwork.configureSimulation(par_run);\n')
-    outfile.write('\tnetwork.evolve();\n')
+    # outfile.write('\tnetwork.evolve();\n')
+    outfile.write('\tTwoDLib::Display::getInstance()->setNetwork(&network);\n')
+    outfile.write('\tTwoDLib::Display::getInstance()->animate(argc,argv);\n\n')
     outfile.write('\t} catch(std::exception& exc){\n')
     outfile.write('\t\tstd::cout << exc.what() << std::endl;\n')
 
@@ -66,6 +68,7 @@ def parse_xml(infile, outfile):
 def generate_opening(outfile):
     outfile.write('int main(int argc, char *argv[]){\n\tNetwork network;\n')
     outfile.write('\tboost::timer::auto_cpu_timer t;\n\n')
+
     outfile.write('#ifdef ENABLE_MPI\n')
     outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
     outfile.write('\tboost::mpi::environment env(argc, argv);\n')

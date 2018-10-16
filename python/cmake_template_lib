@@ -86,6 +86,8 @@ TOKEN_SOURCE_FILE
 set( PW_HEADERS
 )
 
+set(GLUT_LIBRARY "-lGL -lGLU -lglut")
+
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
@@ -101,5 +103,6 @@ set ( LIBLIST
     ${gsl_LINK_FLAGS}
     gsl
     gslcblas
+    ${GLUT_LIBRARY}
 )
 add_definitions("-std=gnu++11 -fext-numeric-literals")

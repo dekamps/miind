@@ -54,7 +54,7 @@ def generate_closing(outfile, typ, tree):
     outfile.write('#ifdef ENABLE_ROOT_REPORTER\n')
     outfile.write('\treport_handler = new MPILib::report::handler::RootReportHandler(sim_name,true);\n')
     outfile.write('#else\n')
-    outfile.write('\ttreport_handler = new MPILib::report::handler::InactiveReportHandler();\n')
+    outfile.write('\treport_handler = new MPILib::report::handler::InactiveReportHandler();\n')
     outfile.write('#endif\n')
     outfile.write('\t\n')
     outfile.write('\tSimulationRunParameter par_run( *report_handler,(_simulation_length/_time_step)+1,0,\n')

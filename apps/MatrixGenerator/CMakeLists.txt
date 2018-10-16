@@ -33,6 +33,7 @@ set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}numtools
     ${gsl_LINK_FLAGS} 
     gsl
+    ${GLUT_LIBRARY}
 )
 
 

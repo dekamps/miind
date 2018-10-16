@@ -226,7 +226,6 @@ template<class WeightValue, class NodeDistribution>
 long MPINetwork<WeightValue, NodeDistribution>::startSimulation() {
 	if (_stateNetwork.isConfigured()) {
 		_stateNetwork.toggleConfigured();
-
 		LOG(utilities::logINFO) << "Starting simulation";
 		// the report time must be taken as a hint if the network time step is larger (MdK: 31/08/2017)
 		return static_cast<long>(_parameterSimulationRun.getTEnd()/_parameterSimulationRun.getTStep());
