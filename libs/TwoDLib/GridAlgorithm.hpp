@@ -26,10 +26,12 @@ namespace TwoDLib {
     GridAlgorithm
 		(
 			const std::string&, 		    	 //!< model file name
-			const std::vector<std::string>&,     //!< collection of transition matrix files
+			const std::string&,     //!< Transform matrix
 			MPILib::Time,                        //!< default time step for Master equation
 			MPILib::Time tau_refractive = 0,     //!< absolute refractive period
-			const string& ratemethod = ""        //!< firing rate computation; by default the mass flux across threshold
+			const string& ratemethod = "",        //!< firing rate computation; by default the mass flux across threshold
+			MPILib::Index start_strip,
+			MPILib::Index start_cell
 		);
 
 		GridAlgorithm(const GridAlgorithm&);
@@ -40,6 +42,17 @@ namespace TwoDLib {
 		 * Algorithm instance. Clients use the naked pointer at their own risk.
 		 */
 		virtual GridAlgorithm* clone() const;
+
+	private:
+
+		TransitionMatrix 							_transformMatrix;
+		CSRMatrix*										_csr_transform;
+		vector<double>								_mass_swap;
+
+		std::string _transform_matrix;
+
+		MPILib::Index _start_strip;
+		MPILib::Index _start_cell;
   };
 }
 

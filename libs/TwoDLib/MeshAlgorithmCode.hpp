@@ -149,11 +149,9 @@ namespace TwoDLib {
 	_sysfunction(rhs._sysfunction)
 	// master parameter can only be calculated on configuration
 	{
-		_mass_swap = vector<double>(_sys._vec_mass.size());
 		// default initialization is (0,0); if there is no strip 0, it's down to the user
-		_sys.Initialize(78,70);
-
-		Display::getInstance()->addOdeSystem(&_sys);
+		if (_mesh.NrCellsInStrip(0) > 0 )
+			_sys.Initialize(0,0);
 
 	}
 
@@ -188,10 +186,7 @@ namespace TwoDLib {
 		// vec_mat will go out of scope; MasterOMP will convert the matrices
 		// internally and we don't want to keep two versions.
 		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
-
-		_transformMatrix = TransitionMatrix("grid_0_0_0_0_.tmat");
-		_csr_transform = new CSRMatrix(_transformMatrix, _sys);
-
+		
 		try {
 			std::unique_ptr<Solver> p_master(new Solver(_sys,vec_mat, par));
 			_p_master = std::move(p_master);
