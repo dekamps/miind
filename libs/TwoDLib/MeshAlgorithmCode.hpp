@@ -186,7 +186,7 @@ namespace TwoDLib {
 		// vec_mat will go out of scope; MasterOMP will convert the matrices
 		// internally and we don't want to keep two versions.
 		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
-		
+
 		try {
 			std::unique_ptr<Solver> p_master(new Solver(_sys,vec_mat, par));
 			_p_master = std::move(p_master);
@@ -278,12 +278,6 @@ namespace TwoDLib {
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 				_sys.Evolve();
-#pragma omp parallel for
-				 for(unsigned int id = 0; id < _mass_swap.size(); id++)
-					 _mass_swap[id] = 0.;
-
-	      _csr_transform->MV(_mass_swap,_sys._vec_mass);
-				_sys._vec_mass = _mass_swap;
 	    }
 
 	    // master equation

@@ -39,8 +39,6 @@ namespace TwoDLib {
 		);
 
 		void Apply(double, const vector<double>&, const vector<MPILib::Index>&);
-		void ApplyInteresting(double, const vector<double>&, const vector<MPILib::Index>&);
-
 		unsigned int NrMatrix() const { return _vec_csr.size(); }
 
 		double Efficacy(unsigned int i) const { assert(i < _vec_csr.size()); return _vec_csr[i].Efficacy(); }

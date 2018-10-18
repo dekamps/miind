@@ -155,6 +155,12 @@ void Ode2DSystem::Evolve()
 {
 	_it += 1;
 	_f = 0;
+	UpdateMap();
+}
+
+void Ode2DSystem::EvolveWithoutMeshUpdate(){
+	_it += 1;
+	_f = 0;
 }
 
 void Ode2DSystem::UpdateMap()
