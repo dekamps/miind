@@ -5,7 +5,8 @@ ALGORITHMS = { 'RateAlgorithm'   : {'Connection' : 'double', 'Parameter': '' },
                'RateAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter' : ''},
                'OUAlgorithm'     : {'Connection' : 'DelayedConnection', 'Parameter' : 'NeuronParameter'},
                'GeomAlgorithmDC' : {'Connection' : 'DelayedConnection', 'Parameter' : 'GeomParameter'},
-               'MeshAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter': ''} }
+               'MeshAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter': ''},
+               'GridAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter': ''} }
 
 ALGORITHM_NAMES = {}
 
@@ -239,6 +240,43 @@ def parse_mesh_algorithm(alg, i, weighttype):
 
     return s
 
+
+def parse_grid_algorithm(alg, i, weighttype):
+    s = ''
+    if alg.attrib['type'] != 'GridAlgorithm':
+        raise ValueError
+
+
+    s += '\tstd::vector<std::string> '
+    vec_name = 'vec_mat_' + str(i)
+    s += vec_name + '{\"'
+
+    matfilelist = alg.findall('MatrixFile')
+    # don't use i below
+    for k, fl in enumerate(matfilelist):
+        if k > 0:
+            s +='\",\"'
+        s += fl.text
+    s += '\"};\n'
+
+    timestep = alg.find('TimeStep')
+
+    cpp_name = 'alg_mesh_' + str(i)
+    s += '\tTwoDLib::GridAlgorithm<DelayedConnection> ' + cpp_name + '(\"'
+    s += alg.attrib['modelfile'] + '\",' + vec_name + ',' + timestep.text
+    if 'tau_refractive' in alg.keys():
+        s += ', '  + alg.attrib['tau_refractive']
+    else:
+        s += ', 0.0'
+    if 'ratemethod' in alg.keys():
+        s += ', '  + "\"" + alg.attrib['ratemethod'] + "\""
+    s += ');\n'
+
+
+    Register(alg.attrib['name'], cpp_name)
+
+    return s
+
 def parse_ou_algorithm(alg, i,  weighttype):
     s = ''
 
@@ -401,6 +439,11 @@ def parse_algorithm(alg,i,weighttype):
             return parse_mesh_algorithm(alg,i,weighttype)
         else:
             raise NameError('Wrong conection type for MeshAlgorithm')
+    if algname =='GridAlgorithm':
+        if weighttype.text == 'DelayedConnection':
+            return parse_grid_algorithm(alg,i,weighttype)
+        else:
+            raise NameError('Wrong conection type for GridAlgorithm')
     else:
         raise NameError('Wrong algorithm name')
     return ''
