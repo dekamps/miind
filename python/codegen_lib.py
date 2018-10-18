@@ -1,4 +1,4 @@
-import os
+#import os
 import sys
 import include
 import algorithms
@@ -128,7 +128,7 @@ def model_name(fn):
 
     modelnames = []
     for a in ma:
-        if a.attrib['type'] == 'MeshAlgorithm':
+        if a.attrib['type'] == 'MeshAlgorithm' or a.attrib['type'] == 'GridAlgorithm':
             modelnames.append(a.attrib['modelfile'])
     return modelnames
 

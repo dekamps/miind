@@ -40,6 +40,7 @@ Uniform.cpp
 )
 
 set( TWOD_HEADERS
+GridAlgorithmCode.hpp
 display.hpp
 Bin.hpp
 InputCombination.hpp		
