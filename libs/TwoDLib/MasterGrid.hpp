@@ -34,10 +34,14 @@ namespace TwoDLib {
 		MasterGrid
 		(
 			Ode2DSystem&,
+			double,
 			unsigned int
 		);
 
 		void Apply(double, const vector<double>&);
+
+		void MVCellMask(vector<double>&,vector<double>&,double,double) const;
+		void MVCellMaskInhib(vector<double>&,vector<double>&,double,double) const;
 
 	private:
 
@@ -46,9 +50,9 @@ namespace TwoDLib {
 
 		Ode2DSystem& _sys;
 
-		const CSRMatrix     _csr;
 		vector<double> 			_mask;
 		vector<double>			_mask_swap;
+		double _cell_width;
 
 		vector<double>			_dydt;
 	};

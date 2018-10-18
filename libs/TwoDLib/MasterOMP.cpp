@@ -45,7 +45,7 @@ _mask_swap(101,0.)
  {
  }
 
- void MasterOMP::ApplyInteresting(double t_step, const vector<double>& rates, const vector<MPILib::Index>& vec_map)
+ void MasterOMP::Apply(double t_step, const vector<double>& rates, const vector<MPILib::Index>& vec_map)
  {
  // the time step t_step is split into single solution steps _h, equal to 1/N_steps
 	 for (unsigned int j = 0; j < _par._N_steps; j++){
@@ -71,69 +71,6 @@ _mask_swap(101,0.)
 		 for (MPILib::Index imass = 0; imass < _sys._vec_mass.size(); imass++)
 			 _sys._vec_mass[imass] += _add._h*t_step*_dydt[imass]; // the mult
 	 }
- }
-
- void MasterOMP::Apply(double t_step, const vector<double>& rates, const vector<MPILib::Index>& vec_map)
- {
-#pragma omp parallel for
-	 for (MPILib::Index i = 0; i < _dydt.size(); i++)
-		_dydt[i] = 0.0;
-
-#pragma omp parallel for
-	 for (MPILib::Index i = 0; i < _mask_swap.size(); i++) {
-     _mask[i] = 0.0;
-     _mask_swap[i] = 0.0;
-   }
-
-   _mask[(unsigned int)floor(_mask.size()/2)] = 1.0;
-   _mask_swap[(unsigned int)floor(_mask.size()/2)] = 1.0;
-
-	 for (unsigned int j = 0; j < floor(rates[0] * 0.001); j++){
-     _vec_csr[vec_map[0]].MVCellMask
-     (
-        _mask, _mask_swap
-     );
-#pragma omp parallel for
-       for (MPILib::Index i = 0; i < _mask_swap.size(); i++){
-     		_mask[i] = _mask_swap[i];
-       }
-   }
-
-   for (unsigned int j = 0; j < floor(rates[1] * 0.001); j++){
-     _vec_csr[vec_map[0]].MVCellMaskInhib
-     (
-        _mask, _mask_swap
-     );
-#pragma omp parallel for
-       for (MPILib::Index i = 0; i < _mask_swap.size(); i++){
-     		_mask[i] = _mask_swap[i];
-       }
-   }
-
-
-#pragma omp parallel for
-   for (MPILib::Index j = 0; j < _sys._map[1].size(); j++) {
-     for (MPILib::Index i = 0; i < _sys._map.size(); i++) {
-       MPILib::Index idx = _sys.Map(i,j);
-
-       for (MPILib::Index k = 0; k < _mask.size(); k++){
-         int des_i = i + (k-floor(_mask.size()/2));
-
-         if ( des_i < 1 )
-          des_i = 1;
-         if ( des_i > _sys._map.size()-1 )
-          des_i = _sys._map.size()-1;
-
-         unsigned int idx_dest = _sys.Map(des_i, j);
-         _dydt[idx_dest] += _sys._vec_mass[idx] * _mask[k];
-       }
-     }
-   }
-
-#pragma omp parallel for
-	 for (MPILib::Index imass = 0; imass < _sys._vec_mass.size(); imass++)
-		 _sys._vec_mass[imass] = _dydt[imass];
-
  }
 
  std::vector<CSRMatrix> MasterOMP::InitializeCSR(const std::vector<TransitionMatrix>& vec_mat, const Ode2DSystem& sys)

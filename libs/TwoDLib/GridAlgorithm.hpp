@@ -10,6 +10,7 @@
 #include "pugixml.hpp"
 #include "display.hpp"
 #include "MeshAlgorithm.hpp"
+#include "MasterGrid.hpp"
 
 namespace TwoDLib {
 
@@ -19,7 +20,7 @@ namespace TwoDLib {
  * This class simulates the evolution of a neural population density function on a 2D grid.
  */
 
-	template <class WeightValue, class Solver=TwoDLib::MasterOMP>
+	template <class WeightValue, class Solver=TwoDLib::MasterGrid>
 	class GridAlgorithm : public MeshAlgorithm<WeightValue,Solver>  {
 
 	public:
@@ -28,10 +29,10 @@ namespace TwoDLib {
 			const std::string&, 		    	 //!< model file name
 			const std::string&,     //!< Transform matrix
 			MPILib::Time,                        //!< default time step for Master equation
-			MPILib::Time tau_refractive = 0,     //!< absolute refractive period
-			const string& ratemethod = "",        //!< firing rate computation; by default the mass flux across threshold
 			MPILib::Index start_strip,
-			MPILib::Index start_cell
+			MPILib::Index start_cell,
+			MPILib::Time tau_refractive = 0,     //!< absolute refractive period
+			const string& ratemethod = ""       //!< firing rate computation; by default the mass flux across threshold
 		);
 
 		GridAlgorithm(const GridAlgorithm&);
@@ -48,6 +49,7 @@ namespace TwoDLib {
 		TransitionMatrix 							_transformMatrix;
 		CSRMatrix*										_csr_transform;
 		vector<double>								_mass_swap;
+		vector<double>								_efficacy_map;
 
 		std::string _transform_matrix;
 

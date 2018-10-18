@@ -246,24 +246,15 @@ def parse_grid_algorithm(alg, i, weighttype):
     if alg.attrib['type'] != 'GridAlgorithm':
         raise ValueError
 
-
-    s += '\tstd::vector<std::string> '
-    vec_name = 'vec_mat_' + str(i)
-    s += vec_name + '{\"'
-
-    matfilelist = alg.findall('MatrixFile')
-    # don't use i below
-    for k, fl in enumerate(matfilelist):
-        if k > 0:
-            s +='\",\"'
-        s += fl.text
-    s += '\"};\n'
-
     timestep = alg.find('TimeStep')
 
     cpp_name = 'alg_mesh_' + str(i)
     s += '\tTwoDLib::GridAlgorithm<DelayedConnection> ' + cpp_name + '(\"'
-    s += alg.attrib['modelfile'] + '\",' + vec_name + ',' + timestep.text
+    s += alg.attrib['modelfile'] + '\",'
+    s += ',\"' + alg.attrib['transformfile'] + '\",'
+    s += timestep.text + ','
+    s += alg.attrib['start_strip'] + "," + alg.attrib['start_cell']
+
     if 'tau_refractive' in alg.keys():
         s += ', '  + alg.attrib['tau_refractive']
     else:

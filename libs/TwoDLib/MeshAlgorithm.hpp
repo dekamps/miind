@@ -145,7 +145,7 @@ namespace TwoDLib {
 		 */
 		std::vector<TwoDLib::Redistribution> ResetMap() const { return _vec_res; }
 
-	private:
+	protected:
 
 
 		// initialization routines

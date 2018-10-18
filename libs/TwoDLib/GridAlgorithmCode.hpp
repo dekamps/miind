@@ -18,10 +18,10 @@ namespace TwoDLib {
 		const std::string& model_name,
 		const std::string& transform_matrix,
 		MPILib::Time h,
-		MPILib::Time tau_refractive,
-		const std::string&  rate_method,
 		MPILib::Index start_strip,
-		MPILib::Index start_cell
+		MPILib::Index start_cell,
+		MPILib::Time tau_refractive,
+		const std::string&  rate_method
 	):MeshAlgorithm<WeightValue,Solver>(model_name, std::vector<std::string>() ,h,tau_refractive,rate_method),
 	_start_strip(start_strip),
 	_start_cell(start_cell),
@@ -54,17 +54,23 @@ namespace TwoDLib {
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
 
-		// the integration time step, stored in the MasterParameter, is gauged with respect to the
-		// network time step.
-		MPILib::Number n_ode = static_cast<MPILib::Number>(std::floor(t_step/_h));
-		MasterParameter par((n_ode > 1) ? n_ode : 1);
+		Quadrilateral q = _sys.MeshObject().Quad(1,0);
+		std::vector<Point> ps = q.Points();
 
-		// vec_mat will go out of scope; MasterOMP will convert the matrices
-		// internally and we don't want to keep two versions.
-		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
+		double cell_min = q.Centroid()[0];
+		double cell_max = q.Centroid()[0];
+
+		for (int p=0; p<ps.size(); p++){
+			if (ps[p][0] < cell_min)
+				cell_min = ps[p][0];
+			if (ps[p][0] > cell_max)
+				cell_max = ps[p][0];
+		}
+
+		double cell_width = cell_max - cell_min; //check the width of cell 1,0 - they should all be the same!
 
 		try {
-			std::unique_ptr<Solver> p_master(new Solver(_sys,vec_mat, par));
+			std::unique_ptr<Solver> p_master(new Solver(_sys,cell_width,101));
 			_p_master = std::move(p_master);
 		}
 		// TODO: investigate the following
@@ -116,7 +122,7 @@ namespace TwoDLib {
 
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
-				_sys.Evolve();
+				_sys.EvolveWithoutMeshUpdate();
 #pragma omp parallel for
 				 for(unsigned int id = 0; id < _mass_swap.size(); id++)
 					 _mass_swap[id] = 0.;
@@ -126,7 +132,7 @@ namespace TwoDLib {
 	    }
 
 	    // master equation
-	    _p_master->Apply(_n_steps*_dt,_vec_rates,_vec_map);
+	    _p_master->Apply(_n_steps*_dt,_vec_rates,_efficacy_map);
 
 	    _sys.RedistributeProbability();
 
@@ -139,6 +145,13 @@ namespace TwoDLib {
 	template <class WeightValue, class Solver>
 	void GridAlgorithm<WeightValue,Solver>::FillMap(const std::vector<WeightValue>& vec_weights)
 	{
+		// this function will only be called once;
+		_efficacy_map = std::vector<double>(vec_weights.size());
+
+ 		for(MPILib::Index i_weight = 0; i_weight < _efficacy_map.size(); i_weight++){
+			_efficacy_map[i_weight] = vec_weights[i_weight]._efficacy;
+		}
+
  		_vec_rates = std::vector<double>(vec_weights.size(),0.);
 	}
 
