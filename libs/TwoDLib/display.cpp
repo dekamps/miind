@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <iomanip>
+#include <sstream>
 #include <experimental/filesystem>
 
 #include "display.hpp"
@@ -69,15 +71,77 @@ void Display::display(void) {
 	double sim_time = num_frames * m.TimeStep();
 
 	glColor3f( 1.0, 1.0, 1.0 );
-  glRasterPos2f(-1.0, -1.0);
+  glRasterPos2f(0.0, 0.9);
   int len, i;
 	std::string t = std::string("Real Time (s) : ") + std::to_string( (int)floor((float)time_elapsed.count()/1000) )
 	 + std::string("      Sim Time (s) : ") + std::to_string( sim_time );
 	const char* c_string = t.c_str();
   len = (int)strlen( c_string );
   for (i = 0; i < len; i++) {
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c_string[i]);
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
   }
+
+	double nice_min_h = (double)floor(mesh_min_h * 1) / 1.0;
+	double nice_max_h = (double)ceil(mesh_max_h * 1) / 1.0;
+
+	double nice_min_v = (double)floor(mesh_min_v * 0.01) / 0.01;
+	double nice_max_v = (double)ceil(mesh_max_v * 0.01) / 0.01;
+
+	double pos = 0;
+	while(pos < nice_max_h){
+		glColor3f( 1.0, 1.0, 1.0 );
+	  glRasterPos2f(-1.0, 2*((pos - (mesh_min_h + ((mesh_max_h - mesh_min_h)/2.0)))/(mesh_max_h - mesh_min_h)));
+		std::stringstream stream;
+		stream << std::fixed << std:: setprecision(1) << pos;
+		t = stream.str();
+		c_string = t.c_str();
+	  len = (int)strlen( c_string );
+	  for (i = 0; i < len; i++) {
+	    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+	  }
+		pos +=  (nice_max_h - nice_min_h) / 10;
+	}
+	pos = 0;
+	while(pos > nice_min_h){
+		glColor3f( 1.0, 1.0, 1.0 );
+	  glRasterPos2f(-1.0, 2*((pos - (mesh_min_h + ((mesh_max_h - mesh_min_h)/2.0)))/(mesh_max_h - mesh_min_h)));
+		std::stringstream stream;
+		stream << std::fixed << std:: setprecision(1) << pos;
+		t = stream.str();
+		c_string = t.c_str();
+	  len = (int)strlen( c_string );
+	  for (i = 0; i < len; i++) {
+	    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+	  }
+		pos -= (nice_max_h - nice_min_h) / 10;
+	}
+
+	pos = 0;
+	while(pos < nice_max_v){
+		glRasterPos2f(2*((pos - (mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v)), -1.0);
+		std::stringstream stream2;
+		stream2 << std::fixed << std:: setprecision(1) << pos;
+		t = stream2.str();
+		c_string = t.c_str();
+		len = (int)strlen( c_string );
+		for (i = 0; i < len; i++) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+		}
+		pos += (nice_max_v - nice_min_v) / 10;
+	}
+	pos = 0;
+	while(pos > nice_min_v){
+		glRasterPos2f(2*((pos - (mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v)), -1.0);
+		std::stringstream stream2;
+		stream2 << std::fixed << std:: setprecision(1) << pos;
+		t = stream2.str();
+		c_string = t.c_str();
+		len = (int)strlen( c_string );
+		for (i = 0; i < len; i++) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+		}
+		pos -= (nice_max_v - nice_min_v) / 10;
+	}
 
 	// **** used for 3D ****
 	// glPopMatrix();
