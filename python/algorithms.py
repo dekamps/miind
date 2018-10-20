@@ -251,7 +251,7 @@ def parse_grid_algorithm(alg, i, weighttype):
     cpp_name = 'alg_mesh_' + str(i)
     s += '\tTwoDLib::GridAlgorithm<DelayedConnection> ' + cpp_name + '(\"'
     s += alg.attrib['modelfile'] + '\",'
-    s += ',\"' + alg.attrib['transformfile'] + '\",'
+    s += '\"' + alg.attrib['transformfile'] + '\",'
     s += timestep.text + ','
     s += alg.attrib['start_strip'] + "," + alg.attrib['start_cell']
 

@@ -89,6 +89,19 @@ def model_name(fn):
             modelnames.append(a.attrib['modelfile'])
     return modelnames
 
+def matrix_transform_name(fn):
+    '''Identifies matrix transform files mentioned in an XML file. For example used in placing the right model file in
+    the same directory as an XML file.'''
+    infile = open(fn)
+    tree=ET.fromstring(infile.read())
+    ma = tree.findall('Algorithms/Algorithm')
+
+    tmatnames = []
+    for a in ma:
+        if a.attrib['type'] == 'GridAlgorithm':
+            tmatnames.append(a.attrib['transformfile'])
+    return tmatnames
+
 def matrix_names(fn):
     '''Find the file names of all MatrixFiles, mentioned in an XML file.'''
     infile = open(fn)

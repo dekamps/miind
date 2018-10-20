@@ -179,16 +179,21 @@ def move_model_files(xmlfile,dirpath):
     and move them to directory dirpath.'''
     mns =  codegen.model_name(xmlfile)
     mans = codegen.matrix_names(xmlfile)
+    tms = codegen.matrix_transform_name(xmlfile)
 
     for model in mns:
         if not os.path.exists(model):
             print 'Please put the file: ', model, 'in the same directory as the xml file.'
 
+    for tmat in tms:
+        if not os.path.exists(tmat):
+            print 'Please put the file: ', tmat, 'in the same directory as the xml file.'
+
     for mat in mans:
         if not os.path.exists(mat):
             print 'Please put the file: ', mat, 'in the same directory as the xml file.'
 
-    fls = mans + mns
+    fls = mans + mns + tms
     for fi in fls:
         sp.call(['cp',fi,dirpath])
 

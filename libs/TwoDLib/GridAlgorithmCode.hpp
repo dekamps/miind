@@ -12,8 +12,8 @@
 
 namespace TwoDLib {
 
-	template <class WeightValue, class Solver>
-	GridAlgorithm<WeightValue,Solver>::GridAlgorithm
+	template <class WeightValue>
+	GridAlgorithm<WeightValue>::GridAlgorithm
 	(
 		const std::string& model_name,
 		const std::string& transform_matrix,
@@ -22,34 +22,70 @@ namespace TwoDLib {
 		MPILib::Index start_cell,
 		MPILib::Time tau_refractive,
 		const std::string&  rate_method
-	):MeshAlgorithm<WeightValue,Solver>(model_name, std::vector<std::string>() ,h,tau_refractive,rate_method),
+	):
+	_model_name(model_name),
+	_rate_method(rate_method),
+	_rate(0.0),
+	_t_cur(0.0),
+	_root(CreateRootNode(model_name)),
+	_mesh(CreateMeshObject()),
+	_vec_rev(Mapping("Reversal")),
+	_vec_res(Mapping("Reset")),
+	_dt(_mesh.TimeStep()),
+	_sys(_mesh,_vec_rev,_vec_res,tau_refractive),
+	_n_evolve(0),
+	_n_steps(0),
+	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystem::AvgV : &TwoDLib::Ode2DSystem::F),
 	_start_strip(start_strip),
 	_start_cell(start_cell),
 	_transform_matrix(transform_matrix)
 	{
 		_mass_swap = vector<double>(_sys._vec_mass.size());
+
 		// default initialization is (0,0); if there is no strip 0, it's down to the user
+		_sys.Initialize(_start_strip,_start_cell);
+
+	}
+
+	template <class WeightValue>
+	GridAlgorithm<WeightValue>::GridAlgorithm(const GridAlgorithm<WeightValue>& rhs):
+	_model_name(rhs._model_name),
+	_rate_method(rhs._rate_method),
+	_rate(rhs._rate),
+	_t_cur(rhs._t_cur),
+	_mesh(rhs._mesh),
+	_root(rhs._root),
+	_vec_rev(rhs._vec_rev),
+	_vec_res(rhs._vec_res),
+	_dt(_mesh.TimeStep()),
+	_sys(_mesh,_vec_rev,_vec_res,rhs._sys.Tau_ref()),
+	_n_evolve(0),
+	_n_steps(0),
+	_sysfunction(rhs._sysfunction),
+	_start_strip(rhs._start_strip),
+	_start_cell(rhs._start_cell),
+	_transform_matrix(rhs._transform_matrix)
+	{
+		_mass_swap = vector<double>(_sys._vec_mass.size());
+
 		_sys.Initialize(_start_strip,_start_cell);
 
 		Display::getInstance()->addOdeSystem(&_sys);
 	}
 
-	template <class WeightValue, class Solver>
-	GridAlgorithm<WeightValue,Solver>::GridAlgorithm(const GridAlgorithm<WeightValue,Solver>& rhs):
-  MeshAlgorithm<WeightValue,Solver>(rhs)
-	{}
-
-  template <class WeightValue,class Solver>
-	GridAlgorithm<WeightValue,Solver>* GridAlgorithm<WeightValue,Solver>::clone() const
+  template <class WeightValue>
+	GridAlgorithm<WeightValue>* GridAlgorithm<WeightValue>::clone() const
 	{
-	  return new GridAlgorithm<WeightValue,Solver>(*this);
+	  return new GridAlgorithm<WeightValue>(*this);
 	}
 
-	template <class WeightValue, class Solver>
-	void GridAlgorithm<WeightValue,Solver>::configure(const MPILib::SimulationRunParameter& par_run)
+	template <class WeightValue>
+	void GridAlgorithm<WeightValue>::configure(const MPILib::SimulationRunParameter& par_run)
 	{
 		_transformMatrix = TransitionMatrix(_transform_matrix);
 		_csr_transform = new CSRMatrix(_transformMatrix, _sys);
+
+		Display::getInstance()->addOdeSystem(&_sys);
 
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
@@ -70,7 +106,7 @@ namespace TwoDLib {
 		double cell_width = cell_max - cell_min; //check the width of cell 1,0 - they should all be the same!
 
 		try {
-			std::unique_ptr<Solver> p_master(new Solver(_sys,cell_width,101));
+			std::unique_ptr<MasterGrid> p_master(new MasterGrid(_sys,cell_width,101));
 			_p_master = std::move(p_master);
 		}
 		// TODO: investigate the following
@@ -89,8 +125,56 @@ namespace TwoDLib {
 
 	}
 
-	template <class WeightValue, class Solver>
-	void GridAlgorithm<WeightValue,Solver>::evolveNodeState
+	template <class WeightValue>
+	std::vector<TwoDLib::Redistribution> GridAlgorithm<WeightValue>::Mapping(const string& type)
+	{
+		Pred pred(type);
+		pugi::xml_node rev_node = _root.find_child(pred);
+
+		if (rev_node.name() != std::string("Mapping") ||
+		    rev_node.attribute("type").value() != type)
+			throw TwoDLibException("Couldn't find mapping in model file");
+
+		std::ostringstream ostrev;
+		rev_node.print(ostrev);
+		std::istringstream istrev(ostrev.str());
+		vector<TwoDLib::Redistribution> vec_rev = TwoDLib::ReMapping(istrev);
+		return vec_rev;
+	}
+
+	template <class WeightValue>
+	Mesh GridAlgorithm<WeightValue>::CreateMeshObject(){
+		// mesh
+		pugi::xml_node mesh_node = _root.first_child();
+
+		if (mesh_node.name() != std::string("Mesh") )
+		  throw TwoDLib::TwoDLibException("Couldn't find mesh node in model file");
+		std::ostringstream ostmesh;
+		mesh_node.print(ostmesh);
+		std::istringstream istmesh(ostmesh.str());
+
+		TwoDLib::Mesh mesh(istmesh);
+
+		// MatrixGenerator should already have inserted the stationary bin and there is no need
+		// to reexamine the stat file
+
+		return mesh;
+	}
+
+	template <class WeightValue>
+	pugi::xml_node GridAlgorithm<WeightValue>::CreateRootNode(const string& model_name){
+
+		// document
+		pugi::xml_parse_result result = _doc.load_file(model_name.c_str());
+		pugi::xml_node  root = _doc.first_child();
+
+		if (result.status != pugi::status_ok)
+		  throw TwoDLib::TwoDLibException("Can't open .model file.");
+		return root;
+	}
+
+	template <class WeightValue>
+	void GridAlgorithm<WeightValue>::evolveNodeState
 	(
 		const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<WeightValue>& weightVector,
@@ -122,12 +206,14 @@ namespace TwoDLib {
 
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
+
 				_sys.EvolveWithoutMeshUpdate();
 #pragma omp parallel for
 				 for(unsigned int id = 0; id < _mass_swap.size(); id++)
-					 _mass_swap[id] = 0.;
+					  _mass_swap[id] = 0.;
 
-	      _csr_transform->MV(_mass_swap,_sys._vec_mass);
+			 	_csr_transform->MV(_mass_swap,_sys._vec_mass);
+
 				_sys._vec_mass = _mass_swap;
 	    }
 
@@ -142,8 +228,8 @@ namespace TwoDLib {
  	    _n_evolve++;
 	}
 
-	template <class WeightValue, class Solver>
-	void GridAlgorithm<WeightValue,Solver>::FillMap(const std::vector<WeightValue>& vec_weights)
+	template <class WeightValue>
+	void GridAlgorithm<WeightValue>::FillMap(const std::vector<WeightValue>& vec_weights)
 	{
 		// this function will only be called once;
 		_efficacy_map = std::vector<double>(vec_weights.size());
@@ -153,6 +239,61 @@ namespace TwoDLib {
 		}
 
  		_vec_rates = std::vector<double>(vec_weights.size(),0.);
+	}
+
+	template <class WeightValue>
+	MPILib::AlgorithmGrid GridAlgorithm<WeightValue>::getGrid(MPILib::NodeId id, bool b_state) const
+	{
+		// An empty grid will lead to crashes
+		vector<double> array_interpretation {0.};
+		vector<double> array_state {0.};
+
+		if (b_state){
+			std::ostringstream ost;
+			ost << id  << "_" << _t_cur;
+			ost << "_" << _sys.P();
+			string fn("mesh_" + ost.str());
+
+			std::string model_path = _model_name;
+			boost::filesystem::path path(model_path);
+
+			// MdK 27/01/2017. grid file is now created in the cwd of the program and
+			// not in the directory where the mesh resides.
+			const std::string dirname = path.filename().string() + "_mesh";
+
+			if (! boost::filesystem::exists(dirname) ){
+				boost::filesystem::create_directory(dirname);
+			}
+			std::ofstream ofst(dirname + "/" + fn);
+			_sys.Dump(ofst);
+
+			// Output to a rate file as well. This might be slow, but we can observe
+			// the rate as the simulation progresses rather than wait for root.
+			std::ostringstream ost2;
+			ost2 << "rate_" << id ;
+			std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
+			ofst_rate.precision(10);
+			ofst_rate << _t_cur << "\t" << _sys.F() << std::endl;
+			ofst_rate.close();
+		}
+		return MPILib::AlgorithmGrid(array_state,array_interpretation);
+	}
+
+	template <class WeightValue>
+	void GridAlgorithm<WeightValue>::prepareEvolve
+	(
+		const std::vector<MPILib::Rate>& nodeVector,
+		const std::vector<WeightValue>& weightVector,
+		const std::vector<MPILib::NodeType>& typeVector
+	)
+	{
+		if (_efficacy_map.size() == 0)
+			FillMap(weightVector);
+		// take into account the number of connections
+
+		assert(nodeVector.size() == weightVector.size());
+		for (MPILib::Index i = 0; i < nodeVector.size(); i++)
+			_vec_rates[i] = nodeVector[i]*weightVector[i]._number_of_connections;
 	}
 
 
