@@ -47,8 +47,6 @@ _cell_width(cell_width)
   double goes
  ) const
  {
- 	unsigned int nr_rows = _ia.size() - 1;
-
  	for (MPILib::Index i = 0; i < dydt.size()-1; i++){
  		double mass = dydt[i];
  		dydt_new[i] += mass*stays;
@@ -66,7 +64,6 @@ _cell_width(cell_width)
   double goes
  ) const
  {
- 	unsigned int nr_rows = _ia.size() - 1;
 
  	for (MPILib::Index i = 1; i < dydt.size(); i++){
  		double mass = dydt[i];
@@ -77,7 +74,7 @@ _cell_width(cell_width)
 
  }
 
- void MasterOMP::Apply(double t_step, const vector<double>& rates, vector<double>& efficacy_map)
+ void MasterGrid::Apply(double t_step, const vector<double>& rates, vector<double>& efficacy_map)
  {
 #pragma omp parallel for
 	 for (MPILib::Index i = 0; i < _dydt.size(); i++)
@@ -92,21 +89,22 @@ _cell_width(cell_width)
    _mask[(unsigned int)floor(_mask.size()/2)] = 1.0;
    _mask_swap[(unsigned int)floor(_mask.size()/2)] = 1.0;
 
-  for (MPILib::Index rate = 0; rate < rates.size(); rate++)
-  {
-    double goes = _cell_width/efficacy_map[rate];
-    double stays = 1.0 - goes;
+   for (MPILib::Index rate = 0; rate < rates.size(); rate++)
+   {
+     double goes = fabs(efficacy_map[rate]/_cell_width);
+     double stays = 1.0 - goes;
 
-    for (unsigned int j = 0; j < floor(rates[rate] * 0.001); j++){
-      if ( rates[rate] > 0 )
-        MVCellMask(_mask, _mask_swap, stays, goes );
-      else
-        MVCellMaskInhib(_mask, _mask_swap, stays, goes );
+     for(MPILib::Index j =0; j < (floor(rates[rate] * t_step)); j++){
+       if ( efficacy_map[rate] > 0 )
+         MVCellMask(_mask, _mask_swap, stays, goes);
+       else
+         MVCellMaskInhib(_mask, _mask_swap, stays, goes);
 #pragma omp parallel for
-      for (MPILib::Index i = 0; i < _mask_swap.size(); i++)
-    		_mask[i] = _mask_swap[i];
-    }
-  }
+       for (MPILib::Index i = 0; i < _mask_swap.size(); i++){
+         _mask[i] = _mask_swap[i];
+       }
+     }
+   }
 
 #pragma omp parallel for
    for (MPILib::Index j = 0; j < _sys._map[1].size(); j++) {

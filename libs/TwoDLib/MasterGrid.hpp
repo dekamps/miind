@@ -19,6 +19,7 @@
 #define _CODE_LIBS_TWODLIB_MASTERGRID_INCLUDE_GUARD
 
 #include <string>
+#include <boost/numeric/odeint.hpp>
 #include "CSRMatrix.hpp"
 #include "TransitionMatrix.hpp"
 #include "Ode2DSystem.hpp"
@@ -38,14 +39,13 @@ namespace TwoDLib {
 			unsigned int
 		);
 
-		void Apply(double, const vector<double>&);
+		void Apply(double, const vector<double>&, vector<double>&);
 
 		void MVCellMask(vector<double>&,vector<double>&,double,double) const;
 		void MVCellMaskInhib(vector<double>&,vector<double>&,double,double) const;
 
 	private:
 
-		MasterGrid(const MasterGrid&);
 		MasterGrid& operator=(const MasterGrid&);
 
 		Ode2DSystem& _sys;
