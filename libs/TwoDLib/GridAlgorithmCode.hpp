@@ -70,7 +70,7 @@ namespace TwoDLib {
 
 		_sys.Initialize(_start_strip,_start_cell);
 
-		Display::getInstance()->addOdeSystem(&_sys);
+		// Display::getInstance()->addOdeSystem(&_sys);
 	}
 
   template <class WeightValue>
@@ -226,6 +226,8 @@ namespace TwoDLib {
  	    _rate = (_sys.*_sysfunction)();
 
  	    _n_evolve++;
+
+			Display::getInstance()->updateDisplay();
 	}
 
 	template <class WeightValue>
@@ -249,24 +251,6 @@ namespace TwoDLib {
 		vector<double> array_state {0.};
 
 		if (b_state){
-			std::ostringstream ost;
-			ost << id  << "_" << _t_cur;
-			ost << "_" << _sys.P();
-			string fn("mesh_" + ost.str());
-
-			std::string model_path = _model_name;
-			boost::filesystem::path path(model_path);
-
-			// MdK 27/01/2017. grid file is now created in the cwd of the program and
-			// not in the directory where the mesh resides.
-			const std::string dirname = path.filename().string() + "_mesh";
-
-			if (! boost::filesystem::exists(dirname) ){
-				boost::filesystem::create_directory(dirname);
-			}
-			std::ofstream ofst(dirname + "/" + fn);
-			_sys.Dump(ofst);
-
 			// Output to a rate file as well. This might be slow, but we can observe
 			// the rate as the simulation progresses rather than wait for root.
 			std::ostringstream ost2;
