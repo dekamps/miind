@@ -4,7 +4,7 @@
 #define LINUX // This #define is used in glew.c so it does not require installation
 #include "include/GL/glew.h"
 // The application does require glut to be installed
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 
 #include <string>
 #include <chrono>
@@ -22,9 +22,11 @@ class Display{
 public:
 
   static Display* getInstance() {
-    if (!disp)
+    if (!disp) {
       disp = new Display();
-
+      disp->animate();
+    }
+    
     return disp;
   }
 
@@ -33,7 +35,7 @@ public:
   void init() const;
   void update();
   void shutdown() const;
-  void animate(int argc, char** argv) const;
+  void animate() const;
   void processDraw(void);
 
   static void stat_display(void) {
@@ -44,6 +46,9 @@ public:
   }
   static void stat_update(void){
     disp->update();
+  }
+  static void stat_shutdown(void){
+    disp->shutdown();
   }
 
   void addOdeSystem(Ode2DSystem* sys) {
@@ -74,10 +79,7 @@ public:
   	}
   }
 
-  void setNetwork(Network* net) {
-    network = net;
-  }
-
+  void updateDisplay();
 private:
 
   static Display* disp;
@@ -97,7 +99,6 @@ private:
 	double mesh_max_h;
 
   vector<Ode2DSystem*> _systems;
-  Network* network;
 };
 
 }

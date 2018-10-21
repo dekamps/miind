@@ -14,13 +14,7 @@ import numpy as np
 from scipy.integrate import odeint
 import math
 
-def v_prime():
-    return 1.0
-
-def h_prime():
-    return 1.0
-
-def prime(y, t):
+def rybak(y, t):
     g_nap = 0.25; #mS
     g_na = 30;
     g_k = 1;
@@ -50,7 +44,24 @@ def prime(y, t):
 
     return [v_prime, h_prime]
 
-def generate(timestep, basename, threshold_v, reset_v, reset_shift_h, grid_v_min, grid_v_max, grid_h_min, grid_h_max, grid_v_res, grid_h_res):
+def adEx(y,t):
+    C = 200
+    g_l = 10
+    E_l = -70.0
+    v_t = -50.0
+    tau = 2.0
+    alpha = 2.0
+    tau_w = 30.0
+
+    v = y[0];
+    w = y[1];
+
+    v_prime = (-g_l*(v - E_l) + g_l*tau*np.exp((v - v_t)/tau) - w) / C
+    w_prime = (alpha*(v-E_l) - w) / tau_w
+
+    return [v_prime, w_prime]
+
+def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid_v_min, grid_v_max, grid_h_min, grid_h_max, grid_v_res, grid_h_res,efficacy_orientation='v'):
 
     with open(basename + '.rev', 'w') as rev_file:
         rev_file.write('<Mapping Type="Reversal">\n')
@@ -74,10 +85,16 @@ def generate(timestep, basename, threshold_v, reset_v, reset_shift_h, grid_v_min
                 x1 = (i*(grid_v_max-grid_v_min))+grid_v_min
                 y1 = (j*(grid_h_max-grid_h_min))+grid_h_min
 
-                svs_1.append(x1)
-                sus_1.append(y1)
-                svs_2.append(x1 + ((1.0/grid_v_res)*(grid_v_max-grid_v_min)))
-                sus_2.append(y1)
+                if (efficacy_orientation == 'v'):
+                    svs_1.append(x1)
+                    sus_1.append(y1)
+                    svs_2.append(x1 + ((1.0/grid_v_res)*(grid_v_max-grid_v_min)))
+                    sus_2.append(y1)
+                else:
+                    sus_1.append(x1)
+                    svs_1.append(y1)
+                    sus_2.append(x1 + ((1.0/grid_v_res)*(grid_v_max-grid_v_min)))
+                    svs_2.append(y1)
 
             for s in svs_1:
                 mesh_file.write('{}\t'.format(s))
@@ -127,8 +144,8 @@ def generate(timestep, basename, threshold_v, reset_v, reset_shift_h, grid_v_min
 
                 tspan = np.linspace(0, timestep,2)
 
-                t_1 = odeint(prime, [x1,y1], tspan, atol=1e-3, rtol=1e-3)
-                t_2 = odeint(prime, [x1 + ((1.0/grid_v_res)*(grid_v_max-grid_v_min)),y1], tspan, atol=1e-3, rtol=1e-3)
+                t_1 = odeint(func, [x1,y1], tspan, atol=1e-3, rtol=1e-3)
+                t_2 = odeint(func, [x1 + ((1.0/grid_v_res)*(grid_v_max-grid_v_min)),y1], tspan, atol=1e-3, rtol=1e-3)
 
                 t_x1 = t_1[1][0]
                 t_y1 = t_1[1][1]
@@ -149,10 +166,16 @@ def generate(timestep, basename, threshold_v, reset_v, reset_shift_h, grid_v_min
                 if (abs(t_y1 - t_y2) < 0.00001):
                     t_y2 - t_y1 + 0.00001
 
-                svs_1.append(t_x1)
-                sus_1.append(t_y1)
-                svs_2.append(t_x2)
-                sus_2.append(t_y2)
+                if (efficacy_orientation == 'v'):
+                    svs_1.append(t_x1)
+                    sus_1.append(t_y1)
+                    svs_2.append(t_x2)
+                    sus_2.append(t_y2)
+                else:
+                    sus_1.append(t_x1)
+                    svs_1.append(t_y1)
+                    sus_2.append(t_x2)
+                    svs_2.append(t_y2)
 
             for s in svs_1:
                 mesh_file.write('{}\t'.format(s))
@@ -227,4 +250,5 @@ def generate(timestep, basename, threshold_v, reset_v, reset_shift_h, grid_v_min
     if os.path.exists(filename):
         os.remove(filename)
 
-generate(1, 'grid', -10, -56, -0.004, -90, 0, -0.4, 1.0, 250, 100)
+# generate(rybak, 1, 'grid', -10, -56, -0.004, -90, 0, -0.4, 1.0, 250, 100)
+generate(adEx, 1, 'adex', -10, -58, 0.0, -90, 0, -200, 200, 100, 200)

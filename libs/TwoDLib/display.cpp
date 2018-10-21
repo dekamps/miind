@@ -174,12 +174,13 @@ void Display::init() const {
 	// **** used for 3D ****
 	//gluPerspective(45, 1, 2, 10);
 	//glEnable(GL_DEPTH_TEST);
-	glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
-	if (network)
-		network->startSimulation();
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void Display::update() {
+}
+
+void Display::updateDisplay() {
 	num_frames++;
 	int time;
 	time = glutGet(GLUT_ELAPSED_TIME);
@@ -187,18 +188,19 @@ void Display::update() {
 	lastTime = time;
 	//Sleep(50);
 	glutPostRedisplay();
-	if(network)
-		network->evolveSingleStep(vector<MPILib::ActivityType>());
+	glutMainLoopEvent();
 }
 
 void Display::shutdown() const {
-	if (network)
-		network->endSimulation();
+	// Nice new line if we quit early.
+	std::cout << "\n";
 }
 
-void Display::animate(int argc, char** argv) const{
+void Display::animate() const{
 
-	glutInit(&argc, argv);
+	char* arv[] = {"Miind"};
+	int count = 1;
+	glutInit(&count, arv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(500, 500);
 	glutInitWindowPosition(0, 0);
@@ -206,10 +208,9 @@ void Display::animate(int argc, char** argv) const{
 	glutDisplayFunc(Display::stat_display);
 	glutReshapeFunc(Display::stat_scene);
 	glutIdleFunc(Display::stat_update);
+	atexit(Display::stat_shutdown);
 
 	init();
-	glutMainLoop();
-	shutdown();
 }
 
 void Display::processDraw(void) {
