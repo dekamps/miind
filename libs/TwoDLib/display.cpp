@@ -14,6 +14,7 @@ using namespace std::chrono;
 Display* Display::disp = 0;
 
 Display::Display(){
+	close_display = false;
 	lastTime = 0;
 	delta = 0;
 	num_frames = 0;
@@ -21,6 +22,13 @@ Display::Display(){
     system_clock::now().time_since_epoch());
 	rotator = 0.0f;
 	_systems = vector<Ode2DSystem*>();
+}
+
+Display::~Display(){
+	if (glutGetWindow()){
+		glutDestroyWindow(glutGetWindow());
+	}
+	glutExit();
 }
 
 // The OpenGL display function, called as fast as possible.
@@ -196,6 +204,7 @@ void Display::updateDisplay() {
 }
 
 void Display::shutdown() const {
+	glutExit();
 	// Nice new line if we quit early.
 	std::cout << "\n";
 }
@@ -214,13 +223,21 @@ void Display::animate() const{
 	glutIdleFunc(Display::stat_update);
 	atexit(Display::stat_shutdown);
 
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
+
 	init();
 }
 
 void Display::stat_runthreaded() {
 	Display::getInstance()->animate();
-	while(1)
+	while(!Display::getInstance()->close_display){
+		if(!glutGetWindow()){
+			glutExit();
+			break;
+		}
+
 		Display::getInstance()->updateDisplay();
+	}
 }
 
 void Display::processDraw(void) {
