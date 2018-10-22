@@ -80,15 +80,24 @@ public:
   }
 
   void updateDisplay();
+
+  void closeDisplay() {
+    close_display = true;
+    glutExit();
+  }
+
 private:
 
   static Display* disp;
 
   Display();
+  ~Display();
 
   int lastTime;
   int delta;
   float rotator;
+
+  bool close_display;
 
   int num_frames;
   std::chrono::milliseconds start_time;

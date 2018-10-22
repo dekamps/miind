@@ -109,6 +109,10 @@ def constructor_override(outfile,tree):
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{}\n\n')
 
+    outfile.write('\t~MiindModel(){\n')
+    outfile.write('\tTwoDLib::Display::getInstance()->closeDisplay();\n')
+    outfile.write('\t}\n\n')
+
 def generate_opening(outfile, tree, typ):
     outfile.write('class MiindModel : public ' + abstract_type(typ) + ' {\n')
     outfile.write('public:\n\n')
