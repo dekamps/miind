@@ -70,7 +70,7 @@ namespace TwoDLib {
 
 		_sys.Initialize(_start_strip,_start_cell);
 
-		// Display::getInstance()->addOdeSystem(&_sys);
+		Display::getInstance()->addOdeSystem(&_sys);
 	}
 
   template <class WeightValue>
@@ -85,7 +85,7 @@ namespace TwoDLib {
 		_transformMatrix = TransitionMatrix(_transform_matrix);
 		_csr_transform = new CSRMatrix(_transformMatrix, _sys);
 
-		Display::getInstance()->addOdeSystem(&_sys);
+		//Display::getInstance()->addOdeSystem(&_sys);
 
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
@@ -227,7 +227,7 @@ namespace TwoDLib {
 
  	    _n_evolve++;
 
-			Display::getInstance()->updateDisplay();
+			//Display::getInstance()->updateDisplay();
 	}
 
 	template <class WeightValue>

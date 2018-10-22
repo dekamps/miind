@@ -67,7 +67,6 @@ namespace TwoDLib {
 
 		std::vector<TwoDLib::Redistribution> ResetMap() const { return _vec_res; }
 
-
 	private:
 
 		const std::string _model_name;

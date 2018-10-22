@@ -25,6 +25,8 @@ Display::Display(){
 
 // The OpenGL display function, called as fast as possible.
 void Display::display(void) {
+	if (_systems.size() == 0)
+		return;
 
 	milliseconds real_time = duration_cast< milliseconds >(
     system_clock::now().time_since_epoch());
@@ -213,6 +215,12 @@ void Display::animate() const{
 	atexit(Display::stat_shutdown);
 
 	init();
+}
+
+void Display::stat_runthreaded() {
+	Display::getInstance()->animate();
+	while(1)
+		Display::getInstance()->updateDisplay();
 }
 
 void Display::processDraw(void) {
