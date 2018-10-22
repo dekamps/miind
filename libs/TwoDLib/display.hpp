@@ -26,7 +26,7 @@ public:
       disp = new Display();
       disp->animate();
     }
-    
+
     return disp;
   }
 
