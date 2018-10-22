@@ -24,7 +24,6 @@ public:
   static Display* getInstance() {
     if (!disp) {
       disp = new Display();
-      disp->animate();
     }
 
     return disp;
@@ -50,6 +49,7 @@ public:
   static void stat_shutdown(void){
     disp->shutdown();
   }
+  static void stat_runthreaded(void);
 
   void addOdeSystem(Ode2DSystem* sys) {
     _systems.push_back(sys);
