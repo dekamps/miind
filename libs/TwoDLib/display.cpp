@@ -3,7 +3,6 @@
 #include <vector>
 #include <iomanip>
 #include <sstream>
-#include <experimental/filesystem>
 
 #include "display.hpp"
 #include "include/glm/glm.hpp"
@@ -26,6 +25,13 @@ Display::Display(){
 
 // The OpenGL display function, called as fast as possible.
 void Display::display(void) {
+
+	milliseconds real_time = duration_cast< milliseconds >(
+    system_clock::now().time_since_epoch());
+	milliseconds time_elapsed = real_time - start_time;
+
+	// if (time_elapsed.count() % 10 != 0)
+	// 	return;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -64,17 +70,13 @@ void Display::display(void) {
 
 	// Print real time and sim time
 
-	milliseconds real_time = duration_cast< milliseconds >(
-    system_clock::now().time_since_epoch());
-	milliseconds time_elapsed = real_time - start_time;
-
 	double sim_time = num_frames * m.TimeStep();
 
 	glColor3f( 1.0, 1.0, 1.0 );
   glRasterPos2f(0.0, 0.9);
   int len, i;
 	std::string t = std::string("Real Time (s) : ") + std::to_string( (int)floor((float)time_elapsed.count()/1000) )
-	 + std::string("      Sim Time (s) : ") + std::to_string( sim_time );
+	 + std::string("      Sim Time (s) : ") + std::to_string( sim_time / _systems.size() );
 	const char* c_string = t.c_str();
   len = (int)strlen( c_string );
   for (i = 0; i < len; i++) {

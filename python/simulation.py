@@ -78,7 +78,7 @@ def parse_simulation(tree,outfile):
     if screen.text == 'TRUE':
         s = parse_canvas_handler(tree)
         # s += '\tMPILib::report::handler::InactiveReportHandler handler;\n'
-        s += '\tMPILib::report::handler::MinimalReportHandler handler(\"'
+        s += '\tMPILib::report::handler::RootReportHandler handler(\"'
         s += name_str + '\",'
         s += state_bool + ','
         s += 'true, par_canvas);\n'
@@ -86,7 +86,7 @@ def parse_simulation(tree,outfile):
         s += add_nodes(tree)
     else:
         # s  = '\tMPILib::report::handler::InactiveReportHandler handler;\n'
-        s  = '\tMPILib::report::handler::MinimalReportHandler handler(\"'
+        s  = '\tMPILib::report::handler::RootReportHandler handler(\"'
         s += name_str   + '\",'
         s += state_bool + ');\n\n'
 
