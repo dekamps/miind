@@ -65,6 +65,8 @@ def generate_closing(outfile, typ, tree):
     outfile.write('\t\t\t_simulation_length,' + report_t_step.text + ',_time_step,\"' + log_name + '\",'+ report_state_t_step.text + ');\n')
     outfile.write('\t\n')
     outfile.write('\tnetwork.configureSimulation(par_run);\n')
+    outfile.write('\tclose_display = false;\n')
+    outfile.write('\tTwoDLib::Display::getInstance()->AssignCloseDisplayPointer(&close_display);\n')
     outfile.write('\tstd::thread t1(TwoDLib::Display::stat_runthreaded);\n')
     outfile.write('\tt1.detach();\n')
     outfile.write('\t}\n')
@@ -84,7 +86,8 @@ def generate_closing(outfile, typ, tree):
     if len(variable_list) > 0:
         var_types = variables.parse_variable_types(variable_list)
         outfile.write('\t.def(init<int,long' + var_types + '>())\n')
-    outfile.write('\t.def("init", &MiindModel::init);\n')
+    outfile.write('\t.def("init", &MiindModel::init)\n')
+    outfile.write('\t.def("endSim", &MiindModel::endSim);\n')
     outfile.write('}\n')
 
 def parse_xml(infile, outfile):
@@ -93,7 +96,7 @@ def parse_xml(infile, outfile):
     s = m.text
     return define_network_type(s), tree
 
-def constructor_override(outfile,tree):
+def constructor_override(outfile,tree,typ):
 
     variable_list = tree.findall('Variable')
     variables.parse_variables(variable_list,outfile)
@@ -109,14 +112,16 @@ def constructor_override(outfile,tree):
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{}\n\n')
 
-    outfile.write('\t~MiindModel(){\n')
-    outfile.write('\tTwoDLib::Display::getInstance()->closeDisplay();\n')
+    outfile.write('\tvoid endSim(){\n')
+    outfile.write('\tclose_display = true;\n')
+    # outfile.write('\t' + abstract_type(typ) + '::endSimulation();\n')
     outfile.write('\t}\n\n')
 
 def generate_opening(outfile, tree, typ):
     outfile.write('class MiindModel : public ' + abstract_type(typ) + ' {\n')
     outfile.write('public:\n\n')
-    constructor_override(outfile, tree)
+    outfile.write('\tbool close_display;\n')
+    constructor_override(outfile, tree,typ)
     outfile.write('\n')
     outfile.write('\tvoid init(boost::python::list params)\n')
     outfile.write('\t{\n')

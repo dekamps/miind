@@ -25,6 +25,8 @@ def generate_preamble(outfile):
 
 def generate_closing(outfile):
     outfile.write('\tnetwork.configureSimulation(par_run);\n')
+    outfile.write('\tbool close_display = false;\n')
+    outfile.write('\tTwoDLib::Display::getInstance()->AssignCloseDisplayPointer(&close_display);\n')
     outfile.write('\tstd::thread t1(TwoDLib::Display::stat_runthreaded);\n')
     outfile.write('\tt1.detach();\n')
     outfile.write('\tnetwork.evolve();\n')

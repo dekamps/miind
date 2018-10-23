@@ -81,9 +81,8 @@ public:
 
   void updateDisplay();
 
-  void closeDisplay() {
-    close_display = true;
-    glutExit();
+  void AssignCloseDisplayPointer(bool* cd) {
+    disp->close_display = cd;
   }
 
 private:
@@ -93,11 +92,11 @@ private:
   Display();
   ~Display();
 
+  bool *close_display;
+
   int lastTime;
   int delta;
   float rotator;
-
-  bool close_display;
 
   int num_frames;
   std::chrono::milliseconds start_time;

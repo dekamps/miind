@@ -14,7 +14,6 @@ using namespace std::chrono;
 Display* Display::disp = 0;
 
 Display::Display(){
-	close_display = false;
 	lastTime = 0;
 	delta = 0;
 	num_frames = 0;
@@ -26,6 +25,7 @@ Display::Display(){
 
 Display::~Display(){
 	if (glutGetWindow()){
+		Display::getInstance()->updateDisplay();
 		glutDestroyWindow(glutGetWindow());
 	}
 	glutExit();
@@ -230,7 +230,7 @@ void Display::animate() const{
 
 void Display::stat_runthreaded() {
 	Display::getInstance()->animate();
-	while(!Display::getInstance()->close_display){
+	while((Display::getInstance()->close_display) && !(*Display::getInstance()->close_display)){
 		if(!glutGetWindow()){
 			glutExit();
 			break;
