@@ -204,6 +204,7 @@ namespace TwoDLib {
 			  ; // else is fine
 		}
 
+			Display::getInstance()->LockMutex();
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 
@@ -226,6 +227,8 @@ namespace TwoDLib {
  	    _rate = (_sys.*_sysfunction)();
 
  	    _n_evolve++;
+
+			Display::getInstance()->UnlockMutex();
 
 			//Display::getInstance()->updateDisplay();
 	}

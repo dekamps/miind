@@ -13,6 +13,7 @@
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/DelayedConnection.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
+#include <mutex>
 
 typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 
@@ -85,6 +86,20 @@ public:
     disp->close_display = cd;
   }
 
+  void AssignMutexPointer(std::mutex* mu){
+    disp->read_mutex = mu;
+  }
+
+  void LockMutex() {
+    	if (read_mutex)
+    		read_mutex->lock();
+  }
+
+  void UnlockMutex() {
+    	if (read_mutex)
+    		read_mutex->unlock();
+  }
+
 private:
 
   static Display* disp;
@@ -93,6 +108,7 @@ private:
   ~Display();
 
   bool *close_display;
+  std::mutex* read_mutex;
 
   int lastTime;
   int delta;

@@ -56,16 +56,23 @@ void Display::display(void) {
 
 	Mesh m = _systems[0]->MeshObject();
 
+	LockMutex();
+
 	double max = 0.0;
 	for (int i=0; i<_systems[0]->Mass().size(); i++)
-		if (max < _systems[0]->Mass()[i])
-			max = _systems[0]->Mass()[i];
+		if (max < log10(_systems[0]->Mass()[i] + 0.000006))
+			max = log10(_systems[0]->Mass()[i] + 0.000006);
+
+	double min = 1.0;
+	for (int i=0; i<_systems[0]->Mass().size(); i++)
+		if (log10(_systems[0]->Mass()[i] + 0.000006) < min)
+			min = log10(_systems[0]->Mass()[i] + 0.000006);
 
 	for(unsigned int i = 0; i<m.NrQuadrilateralStrips(); i++){
 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
 			Quadrilateral q = m.Quad(i,j);
 			unsigned int idx = _systems[0]->Map(i,j);
-			double mass = _systems[0]->Mass()[idx] / max;
+			double mass = (log10(_systems[0]->Mass()[idx] + 0.000006) - min) / (max-min);
 			vector<Point> ps = q.Points();
 
 			glColor3f(mass, 0, 0);
@@ -75,6 +82,9 @@ void Display::display(void) {
 			glVertex2f(2*(ps[3][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[3][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
 		}
 	}
+
+
+	UnlockMutex();
 
 	glEnd();
 
