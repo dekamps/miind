@@ -218,9 +218,9 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
     api.MeshTools.buildTransformFileFromModel(basename, 100000)
     api.MeshTools.buildTransformFileFromModel(basename, reset_shift_w=reset_shift_h, mode='resettransform')
 
-    filename = basename + '.mesh'
-    if os.path.exists(filename):
-        os.remove(filename)
+    # filename = basename + '.mesh'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
 
     filename = basename + '.rev'
     if os.path.exists(filename):
@@ -234,9 +234,9 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
     if os.path.exists(filename):
         os.remove(filename)
 
-    filename = basename + '_transform.mesh'
-    if os.path.exists(filename):
-        os.remove(filename)
+    # filename = basename + '_transform.mesh'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
 
     filename = basename + '_transform.rev'
     if os.path.exists(filename):
@@ -250,5 +250,5 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
     if os.path.exists(filename):
         os.remove(filename)
 
-# generate(rybak, 1, 'grid', -10, -56, -0.004, -90, 0, -0.4, 1.0, 250, 100)
-generate(adEx, 1, 'adex', -10, -58, 0.0, -90, 0, -200, 200, 100, 200)
+generate(rybak, 1, 'grid', -10, -56, -0.004, -80, -40, -0.4, 1.0, 300, 200)
+#generate(adEx, 1, 'adex', -10, -58, 0.0, -90, -40, -20, 60, 300, 100)
