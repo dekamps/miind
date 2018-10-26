@@ -65,10 +65,15 @@ def generate_closing(outfile, typ, tree):
     outfile.write('\t\t\t_simulation_length,' + report_t_step.text + ',_time_step,\"' + log_name + '\",'+ report_state_t_step.text + ');\n')
     outfile.write('\t\n')
     outfile.write('\tnetwork.configureSimulation(par_run);\n')
-    outfile.write('\tclose_display = false;\n')
+
+    outfile.write('\tbool close_display = false;\n')
     outfile.write('\tTwoDLib::Display::getInstance()->AssignCloseDisplayPointer(&close_display);\n')
+    outfile.write('\tTwoDLib::Display::getInstance()->AssignNetworkPointer(&network);\n')
+
     outfile.write('\tstd::thread t1(TwoDLib::Display::stat_runthreaded);\n')
     outfile.write('\tt1.detach();\n')
+
+
     outfile.write('\t}\n')
     outfile.write('};\n\n')
 

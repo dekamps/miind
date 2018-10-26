@@ -242,7 +242,9 @@ private:
 
 	/*Time*/ Index getEndTime() const;
 	/*Time*/ Index getCurrentReportTime() const;
+public:
 	/*Time*/ Index getCurrentSimulationTime() const;
+private:
 	/*Time*/ Index getCurrentStateTime() const;
 
 	/**
