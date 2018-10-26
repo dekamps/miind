@@ -70,7 +70,7 @@ namespace TwoDLib {
 
 		_sys.Initialize(_start_strip,_start_cell);
 
-		Display::getInstance()->addOdeSystem(&_sys);
+		_display_index = Display::getInstance()->addOdeSystem(&_sys, &_display_mutex);
 	}
 
   template <class WeightValue>
@@ -204,7 +204,7 @@ namespace TwoDLib {
 			  ; // else is fine
 		}
 
-			Display::getInstance()->LockMutex();
+			Display::getInstance()->LockMutex(_display_index);
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 
@@ -228,7 +228,7 @@ namespace TwoDLib {
 
  	    _n_evolve++;
 
-			Display::getInstance()->UnlockMutex();
+			Display::getInstance()->UnlockMutex(_display_index);
 
 			//Display::getInstance()->updateDisplay();
 	}

@@ -87,6 +87,11 @@ namespace TwoDLib {
 
 		TwoDLib::Ode2DSystem _sys;
 
+		// If the OpenGL display is being used, track the index of this node and
+		// provide a mutex to lock on
+		unsigned int _display_index;
+		std::mutex _display_mutex;
+
 		std::unique_ptr<MasterGrid>   _p_master;
 		MPILib::Number _n_evolve;
 		MPILib::Number _n_steps;
