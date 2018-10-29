@@ -23,7 +23,7 @@ def generate_preamble(outfile):
 
     return
 
-def generate_closing(outfile, steps):
+def generate_closing(outfile, steps, type):
     outfile.write('\tnetwork.configureSimulation(par_run);\n')
 
     outfile.write('\tbool close_display = false;\n')
@@ -34,6 +34,11 @@ def generate_closing(outfile, steps):
     # outfile.write('\tt1.detach();\n')
     # outfile.write('\tnetwork.evolve();\n')
 
+    if type ==  "DelayedConnection":
+        s = "MPILib::" + type
+    else:
+        s = "double"
+
     outfile.write('\t\tTwoDLib::Display::getInstance()->animate(true);\n')
     outfile.write('\tnetwork.startSimulation();\n')
     outfile.write('\tMPILib::utilities::ProgressBar *pb = new MPILib::utilities::ProgressBar(' + steps + ');\n')
@@ -41,6 +46,7 @@ def generate_closing(outfile, steps):
     outfile.write('\twhile(count < ' + steps + ') {\n')
     outfile.write('\t\tnetwork.evolveSingleStep(std::vector<MPILib::ActivityType>());\n')
     outfile.write('\t\tTwoDLib::Display::getInstance()->updateDisplay();\n')
+    outfile.write('\t\tTwoDLib::GridReport<' + s + '>::getInstance()->report();\n')
     outfile.write('\t\t(*pb)++;\n')
     outfile.write('\t\tcount++;\n')
     outfile.write('\t}\n')
@@ -162,6 +168,9 @@ def generate_outputfile(infile, outfile):
     t_end   = tree.find('SimulationRunParameter/t_end')
     t_step = tree.find('SimulationRunParameter/t_step')
 
-    generate_closing(outfile, '(' + t_end.text + ' - ' + t_begin.text + ') / ' + t_step.text )
+    m=tree.find('WeightType')
+    s = m.text
+
+    generate_closing(outfile, '(' + t_end.text + ' - ' + t_begin.text + ') / ' + t_step.text , s )
     algorithms.reset_algorithms()
     nodes.reset_nodes()

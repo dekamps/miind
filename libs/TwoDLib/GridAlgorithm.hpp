@@ -92,6 +92,9 @@ namespace TwoDLib {
 		unsigned int _display_index;
 		std::mutex _display_mutex;
 
+		unsigned int _report_index;
+		std::mutex _report_mutex;
+
 		std::unique_ptr<MasterGrid>   _p_master;
 		MPILib::Number _n_evolve;
 		MPILib::Number _n_steps;
