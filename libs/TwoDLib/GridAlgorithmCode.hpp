@@ -94,25 +94,19 @@ namespace TwoDLib {
 		Display::getInstance()->addOdeSystem(_node_id, &_sys, &_display_mutex);
 		GridReport<WeightValue>::getInstance()->registerObject(this);
 
-		//Display::getInstance()->addOdeSystem(&_sys);
-
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
 
-		Quadrilateral q = _sys.MeshObject().Quad(1,0);
-		std::vector<Point> ps = q.Points();
+		Quadrilateral q1 = _sys.MeshObject().Quad(1,0);
+		Quadrilateral q2 = _sys.MeshObject().Quad(1,1);
 
-		double cell_min = q.Centroid()[0];
-		double cell_max = q.Centroid()[0];
+		double cell_h_dist = std::fabs(q2.Centroid()[0] - q1.Centroid()[0]);
+		double cell_v_dist = std::fabs(q2.Centroid()[1] - q1.Centroid()[1]);
 
-		for (int p=0; p<ps.size(); p++){
-			if (ps[p][0] < cell_min)
-				cell_min = ps[p][0];
-			if (ps[p][0] > cell_max)
-				cell_max = ps[p][0];
-		}
+		// one of these distances should be close to zero, so pick the other one
+		// we do this because we don't know if this is a v- or h- efficacy
 
-		double cell_width = cell_max - cell_min; //check the width of cell 1,0 - they should all be the same!
+		double cell_width = std::max(cell_h_dist, cell_v_dist);
 
 		try {
 			std::unique_ptr<MasterGrid> p_master(new MasterGrid(_sys,cell_width,101));
