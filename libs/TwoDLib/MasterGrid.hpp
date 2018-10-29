@@ -41,8 +41,8 @@ namespace TwoDLib {
 
 		void Apply(double, const vector<double>&, vector<double>&);
 
-		void MVCellMask(vector<double>&,vector<double>&,double,double) const;
-		void MVCellMaskInhib(vector<double>&,vector<double>&,double,double) const;
+		void MVCellMask(vector<double>&,vector<double>&,double,double, unsigned int) const;
+		void MVCellMaskInhib(vector<double>&,vector<double>&,double,double, unsigned int) const;
 
 	private:
 

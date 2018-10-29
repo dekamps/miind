@@ -44,14 +44,15 @@ _cell_width(cell_width)
  	vector<double>&       dydt,
  	vector<double>&       dydt_new,
   double stays,
-  double goes
+  double goes,
+  unsigned int offset
  ) const
  {
- 	for (MPILib::Index i = 0; i < dydt.size()-1; i++){
+ 	for (MPILib::Index i = 0; i < dydt.size()-1-offset; i++){
  		double mass = dydt[i];
- 		dydt_new[i] += mass*stays;
- 		dydt_new[i+1] += mass*goes;
- 		dydt_new[i] -= mass;
+ 		dydt_new[i+offset] += mass*stays;
+ 		dydt_new[i+offset+1] += mass*goes;
+ 		dydt_new[i+offset] -= mass;
  	}
 
  }
@@ -61,15 +62,16 @@ _cell_width(cell_width)
  	vector<double>&       dydt,
  	vector<double>&       dydt_new,
   double stays,
-  double goes
+  double goes,
+  unsigned int offset
  ) const
  {
 
- 	for (MPILib::Index i = 1; i < dydt.size(); i++){
+ 	for (MPILib::Index i = 1+offset; i < dydt.size(); i++){
  		double mass = dydt[i];
- 		dydt_new[i] += mass*stays;
- 		dydt_new[i-1] += mass*goes;
- 		dydt_new[i] -= mass;
+ 		dydt_new[i-offset] += mass*stays;
+ 		dydt_new[i-1-offset] += mass*goes;
+ 		dydt_new[i-offset] -= mass;
  	}
 
  }
@@ -91,14 +93,15 @@ _cell_width(cell_width)
 
    for (MPILib::Index rate = 0; rate < rates.size(); rate++)
    {
-     double goes = fabs(efficacy_map[rate]/_cell_width);
+     unsigned int offset = (unsigned int)abs(efficacy_map[rate]/_cell_width);
+     double goes = fabs(efficacy_map[rate] / _cell_width) - offset;
      double stays = 1.0 - goes;
 
      for(MPILib::Index j =0; j < (floor(rates[rate] * t_step)); j++){
        if ( efficacy_map[rate] > 0 )
-         MVCellMask(_mask, _mask_swap, stays, goes);
+         MVCellMask(_mask, _mask_swap, stays, goes, offset);
        else
-         MVCellMaskInhib(_mask, _mask_swap, stays, goes);
+         MVCellMaskInhib(_mask, _mask_swap, stays, goes, offset);
 #pragma omp parallel for
        for (MPILib::Index i = 0; i < _mask_swap.size(); i++){
          _mask[i] = _mask_swap[i];
