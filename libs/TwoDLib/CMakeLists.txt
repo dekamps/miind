@@ -43,6 +43,7 @@ Uniform.cpp
 set( TWOD_HEADERS
 display.hpp
 GridAlgorithmCode.hpp
+GridReport.hpp
 Bin.hpp
 InputCombination.hpp
 MeshAlgorithmCode.hpp
