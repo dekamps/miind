@@ -128,7 +128,7 @@ void CSRMatrix::MV(vector<double>& out, const vector<double>& in){
 	assert( out.size() + 1 == _ia.size());
 
 	MPILib::Index nr_rows = _ia.size() - 1;
-	for (MPILib::Index i = 0; i < nr_rows; i++){
+	for (MPILib::Index i = 0; i < nr_rows ; i++){
 	  for(MPILib::Index j = _ia[i]; j < _ia[i+1]; j++){
 			out[i] += _val[j]*in[_ja[j]];
 		}
