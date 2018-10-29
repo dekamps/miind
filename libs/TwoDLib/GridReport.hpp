@@ -2,7 +2,6 @@
 #define _CODE_LIBS_TWODLIB_GRIDREPORT_INCLUDE_GUARD
 
 #include <string>
-#include <MPILib/include/ReportRegister.hpp>
 #include "GridAlgorithm.hpp"
 
 namespace TwoDLib {
@@ -12,7 +11,12 @@ class GridReport {
 
 public:
 
-  static ReportRegister<GridAlgorithm<WeightValue>>* getInstance() {
+  GridReport():
+  _obs(vector<GridAlgorithm<WeightValue>*>()) {
+
+  }
+
+  static GridReport<WeightValue>* getInstance() {
     if (!reg) {
       reg = new GridReport<WeightValue>();
     }
@@ -20,26 +24,30 @@ public:
     return reg;
   }
 
-  void reportFiringRate() {
-    for (int i=0; i<ReportRegister<GridAlgorithm<WeightValue>>::_obs.size(); i++)
-      ReportRegister<GridAlgorithm<WeightValue>>::_obs[i]._system->getGrid(i, true);
+  void registerObject(GridAlgorithm<WeightValue>* obj) {
+    _obs.push_back(obj);
   }
 
-  void reportDensity() {
-    for (int i=0; i<ReportRegister<GridAlgorithm<WeightValue>>::_obs.size(); i++)
-      ReportRegister<GridAlgorithm<WeightValue>>::_obs[i]._system->getGrid(i, true);
+  void reportFiringRate() const {
+    for (int i=0; i<_obs.size(); i++)
+      _obs[i]->reportFiringRate();
+  }
+
+  void reportDensity() const {
+    for (int i=0; i<_obs.size(); i++)
+      _obs[i]->reportDensity();
   }
 
 
 private:
-  _obs = vector<ReportObject<System>>();
+  vector<GridAlgorithm<WeightValue>*> _obs;
 
-  static ReportRegister<GridAlgorithm<WeightValue>>* reg;
+  static GridReport<WeightValue>* reg;
 
 };
 
 template <class WeightValue>
-ReportRegister<GridAlgorithm<WeightValue>>* GridReport<WeightValue>::reg;
+GridReport<WeightValue>* GridReport<WeightValue>::reg;
 
 }
 

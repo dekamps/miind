@@ -109,6 +109,13 @@ public:
 	virtual Rate getCurrentRate() const = 0;
 
 	/**
+	 * Provide the algorithm with an identifier for self-identification in
+	 * singleton reporters - by default this does nothing so not to
+	 * annoy the compiler.
+	**/
+	virtual void assignNodeId( NodeId ) {}
+
+	/**
 	 * Stores the algorithm state in a Algorithm Grid
 	 * @param NodeId, id of the node that needs to return the grid
 	 * @param b_state, return the entire state if true, a reduced grid with just the firing rate info if false

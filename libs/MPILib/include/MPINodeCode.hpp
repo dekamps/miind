@@ -42,6 +42,7 @@ MPINode<Weight, NodeDistribution>::MPINode(
 		_rLocalNodes(localNode), //
 		_rNodeDistribution(nodeDistribution),
 		_name(name) {
+			_pAlgorithm->assignNodeId(_nodeId);
 }
 
 template<class Weight, class NodeDistribution>

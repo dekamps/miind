@@ -20,7 +20,7 @@ Display::Display(){
 	lastTime = 0;
 	write_frames = false;
 	start_time = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-	_dws = vector<DisplayWindow>();
+	_dws = std::map<MPILib::NodeId, DisplayWindow>();
 	// When using OpenMP, all cores are reserved for simulation. For displaying,
 	// we need to set aside a thread/core otherwise display gets interleaved and
 	// is super slow.
@@ -37,7 +37,7 @@ Display::~Display(){
 	glutExit();
 }
 
-unsigned int Display::addOdeSystem(Ode2DSystem* sys, std::mutex *mu) {
+unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystem* sys, std::mutex *mu) {
 	unsigned int index = _dws.size();
 
 	DisplayWindow window;
@@ -74,7 +74,9 @@ unsigned int Display::addOdeSystem(Ode2DSystem* sys, std::mutex *mu) {
 	window.mesh_min_h = mesh_min_h;
 	window.mesh_max_h = mesh_max_h;
 
-	_dws.push_back(window);
+	std::map<MPILib::NodeId,DisplayWindow>::iterator it = _dws.find(nid);
+	if(it == _dws.end())
+		_dws.insert(std::make_pair(nid, window));
 
 	return index;
 }
@@ -89,9 +91,9 @@ void Display::display(void) {
 	milliseconds time_elapsed = real_time - start_time;
 
 	int window_index = 0;
-	for(int n=0; n<_dws.size(); n++) {
-		if (_dws[n]._window_index == glutGetWindow())
-			window_index = n;
+	for (std::map<MPILib::NodeId, DisplayWindow>::iterator iter = Display::getInstance()->_dws.begin(); iter != Display::getInstance()->_dws.end(); ++iter){
+		if (iter->second._window_index == glutGetWindow())
+			window_index = iter->first;
 	}
 
 	// if (time_elapsed.count() % 10 != 0)
@@ -318,8 +320,8 @@ void Display::updateDisplay() {
 	time = glutGet(GLUT_ELAPSED_TIME);
 	lastTime = time;
 	//Sleep(50);
-	for(int i=0; i<_dws.size(); i++){
-		glutSetWindow(_dws[i]._window_index);
+	for (std::map<MPILib::NodeId, DisplayWindow>::iterator iter = Display::getInstance()->_dws.begin(); iter != Display::getInstance()->_dws.end(); ++iter){
+		glutSetWindow(iter->second._window_index);
 		glutPostRedisplay();
 	}
 
@@ -331,8 +333,10 @@ void Display::shutdown() const {
 	glutExit();
 
 	// just in case - unlock all mutexes.
-	for (int i=0; i<_dws.size(); i++)
-		disp->UnlockMutex(i);
+	for (std::map<MPILib::NodeId, DisplayWindow>::iterator iter = Display::getInstance()->_dws.begin(); iter != Display::getInstance()->_dws.end(); ++iter){
+		disp->UnlockMutex(iter->first);
+	}
+
 
 	// Nice new line if we quit early.
 	std::cout << "\n";
@@ -349,8 +353,8 @@ void Display::animate(bool _write_frames) const{
 	glutInitWindowSize(500, 500);
 	glutInitWindowPosition(0, 0);
 
-	for (int i=0; i<_dws.size(); i++){
-		Display::getInstance()->_dws[i]._window_index = glutCreateWindow("Miind2D");
+	for (std::map<MPILib::NodeId, DisplayWindow>::iterator iter = Display::getInstance()->_dws.begin(); iter != Display::getInstance()->_dws.end(); ++iter){
+		iter->second._window_index = glutCreateWindow("Miind2D");
 		glutDisplayFunc(Display::stat_display);
 		glutReshapeFunc(Display::stat_scene);
 		glutIdleFunc(Display::stat_update);

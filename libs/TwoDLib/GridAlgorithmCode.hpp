@@ -71,8 +71,6 @@ namespace TwoDLib {
 
 		_sys.Initialize(_start_strip,_start_cell);
 
-		_display_index = Display::getInstance()->addOdeSystem(&_sys, &_display_mutex);
-		_report_index = GridReport<WeightValue>::getInstance()->registerObject(this, &_report_mutex);
 	}
 
   template <class WeightValue>
@@ -82,10 +80,19 @@ namespace TwoDLib {
 	}
 
 	template <class WeightValue>
+	void GridAlgorithm<WeightValue>::assignNodeId( MPILib::NodeId nid ) {
+		_node_id = nid;
+	}
+
+	template <class WeightValue>
 	void GridAlgorithm<WeightValue>::configure(const MPILib::SimulationRunParameter& par_run)
 	{
 		_transformMatrix = TransitionMatrix(_transform_matrix);
 		_csr_transform = new CSRMatrix(_transformMatrix, _sys);
+
+
+		Display::getInstance()->addOdeSystem(_node_id, &_sys, &_display_mutex);
+		GridReport<WeightValue>::getInstance()->registerObject(this);
 
 		//Display::getInstance()->addOdeSystem(&_sys);
 
@@ -206,8 +213,7 @@ namespace TwoDLib {
 			  ; // else is fine
 		}
 
-			Display::getInstance()->LockMutex(_display_index);
-			GridReport<WeightValue>::getInstance()->lockMutex(_report_index);
+			Display::getInstance()->LockMutex(_node_id);
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 
@@ -231,8 +237,7 @@ namespace TwoDLib {
 
  	    _n_evolve++;
 
-			GridReport<WeightValue>::getInstance()->unlockMutex(_report_index);
-			Display::getInstance()->UnlockMutex(_display_index);
+			Display::getInstance()->UnlockMutex(_node_id);
 
 			//Display::getInstance()->updateDisplay();
 	}
@@ -257,36 +262,38 @@ namespace TwoDLib {
 		vector<double> array_interpretation {0.};
 		vector<double> array_state {0.};
 
-		if (b_state){
-			std::ostringstream ost;
-			ost << id  << "_" << _t_cur;
-			ost << "_" << _sys.P();
-			string fn("mesh_" + ost.str());
-
-			std::string model_path = _model_name;
-			boost::filesystem::path path(model_path);
-
-			// MdK 27/01/2017. grid file is now created in the cwd of the program and
-			// not in the directory where the mesh resides.
-			const std::string dirname = path.filename().string() + "_mesh";
-
-			if (! boost::filesystem::exists(dirname) ){
-				boost::filesystem::create_directory(dirname);
-			}
-			std::ofstream ofst(dirname + "/" + fn);
-			_sys.Dump(ofst);
-			
-		}
 		return MPILib::AlgorithmGrid(array_state,array_interpretation);
 	}
 
 	template <class WeightValue>
-	void GridAlgorithm<WeightValue>::reportFiringRate(MPILib::NodeId id) const
+	void GridAlgorithm<WeightValue>::reportDensity() const
+	{
+		std::ostringstream ost;
+		ost << _node_id  << "_" << _t_cur;
+		ost << "_" << _sys.P();
+		string fn("mesh_" + ost.str());
+
+		std::string model_path = _model_name;
+		boost::filesystem::path path(model_path);
+
+		// MdK 27/01/2017. grid file is now created in the cwd of the program and
+		// not in the directory where the mesh resides.
+		const std::string dirname = path.filename().string() + "_mesh";
+
+		if (! boost::filesystem::exists(dirname) ){
+			boost::filesystem::create_directory(dirname);
+		}
+		std::ofstream ofst(dirname + "/" + fn);
+		_sys.Dump(ofst);
+	}
+
+	template <class WeightValue>
+	void GridAlgorithm<WeightValue>::reportFiringRate() const
 	{
 		// Output to a rate file as well. This might be slow, but we can observe
 		// the rate as the simulation progresses rather than wait for root.
 		std::ostringstream ost2;
-		ost2 << "rate_" << id ;
+		ost2 << "rate_" << _node_id ;
 		std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
 		ofst_rate.precision(10);
 		ofst_rate << _t_cur << "\t" << _sys.F() << std::endl;

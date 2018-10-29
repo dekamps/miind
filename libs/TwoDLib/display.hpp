@@ -14,6 +14,7 @@
 #include <MPILib/include/DelayedConnection.hpp>
 #include <MPILib/include/utilities/CircularDistribution.hpp>
 #include <mutex>
+#include <map>
 
 typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 
@@ -66,7 +67,7 @@ public:
   }
   static void stat_runthreaded(void);
 
-  unsigned int addOdeSystem(Ode2DSystem* sys, std::mutex *mu);
+  unsigned int addOdeSystem(MPILib::NodeId nid, Ode2DSystem* sys, std::mutex *mu);
 
   void updateDisplay();
 
@@ -105,7 +106,7 @@ private:
 
   std::chrono::milliseconds start_time;
 
-  vector<DisplayWindow> _dws;
+  std::map<MPILib::NodeId, DisplayWindow> _dws;
 };
 
 }

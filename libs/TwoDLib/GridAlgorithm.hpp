@@ -49,7 +49,12 @@ namespace TwoDLib {
 
 	  virtual MPILib::Rate getCurrentRate() const {return _rate;}
 
+		virtual void assignNodeId( MPILib::NodeId );
+
 	  virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId, bool b_state = true) const;
+
+		virtual void reportDensity() const;
+		virtual void reportFiringRate() const;
 
 		virtual void prepareEvolve(const std::vector<MPILib::Rate>& nodeVector,
 				const std::vector<WeightValue>& weightVector,
@@ -92,8 +97,7 @@ namespace TwoDLib {
 		unsigned int _display_index;
 		std::mutex _display_mutex;
 
-		unsigned int _report_index;
-		std::mutex _report_mutex;
+		MPILib::NodeId _node_id;
 
 		std::unique_ptr<MasterGrid>   _p_master;
 		MPILib::Number _n_evolve;
