@@ -103,7 +103,7 @@ namespace TwoDLib {
 		const MasterParameter	_par;
 		vector<double>			_dydt;
 		double					_rate;
-	
+
 		Derivative				_derivative;
 	    Add 					_add;
 		double					_h;
