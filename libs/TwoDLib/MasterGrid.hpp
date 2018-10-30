@@ -39,10 +39,22 @@ namespace TwoDLib {
 			unsigned int
 		);
 
-		void Apply(double, const vector<double>&, vector<double>&);
+		void ApplyDodgy(double, const vector<double>&, vector<double>&);
 
 		void MVCellMask(vector<double>&,vector<double>&,double,double, unsigned int) const;
 		void MVCellMaskInhib(vector<double>&,vector<double>&,double,double, unsigned int) const;
+
+		void MVGrid(
+			vector<double>&       dydt,
+			const vector<double>& vec_mass,
+			double                rate,
+		  double stays,
+		  double goes,
+		  unsigned int offset) const;
+
+		void Apply(double t_step, const vector<double>& rates, vector<double>& efficacy_map);
+
+		void operator()(const vector<double>&, vector<double>&, const double t = 0);
 
 	private:
 
@@ -55,6 +67,9 @@ namespace TwoDLib {
 		double _cell_width;
 
 		vector<double>			_dydt;
+
+		const vector<double>* _p_vec_eff;
+		const vector<double>* _p_vec_rates;
 	};
 }
 
