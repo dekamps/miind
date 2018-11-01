@@ -97,7 +97,7 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
     grid_d2_min = grid_h_min;
     grid_d2_max = grid_h_max;
 
-    if (efficacy_orientation != 'v'):
+    if (efficacy_orientation == 'v'):
         grid_d1_res = grid_v_res;
         grid_d1_min = grid_h_min;
         grid_d1_max = grid_h_max;
@@ -125,7 +125,7 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
             sus_2 = [];
 
             for j in np.array(range(grid_d2_res+1)) * (1.0/grid_d2_res):
-                if (efficacy_orientation == 'v'):
+                if (efficacy_orientation != 'v'):
                     x1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
                     y1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
 
@@ -134,7 +134,6 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
                     svs_2.append(x1 + ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)))
                     sus_2.append(y1)
 
-                    print ('{} : {} : {} : {}'.format(x1,y1,x1 + ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)),y1))
                 else:
                     y1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
                     x1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
@@ -144,7 +143,6 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
                     svs_2.append(x1)
                     sus_2.append(y1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)))
 
-                    print ('{} : {} : {} : {}'.format(x1,y1,x1,y1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min))))
 
             for s in svs_1:
                 mesh_file.write('{}\t'.format(s))
@@ -177,7 +175,7 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
         count = 0
         ten_percent = (int)(grid_d1_res / 10)
 
-        for i in np.array(range(grid_d1_res)) * (1.0/grid_d1_res):
+        for i in np.array(range(grid_d1_res+1)) * (1.0/grid_d1_res):
             svs_1 = [];
             sus_1 = [];
             svs_2 = [];
@@ -190,32 +188,28 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
 
             for j in np.array(range(grid_d2_res+1)) * (1.0/grid_d2_res):
 
-                if (efficacy_orientation == 'v'):
+                if (efficacy_orientation != 'v'):
                     x1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
                     y1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
 
                     tspan = np.linspace(0, timestep,2)
 
-                    t_1 = odeint(func, [x1,y1], tspan, atol=1e-8, rtol=1e-8)
-                    t_2 = odeint(func, [x1 + ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)),y1], tspan, atol=1e-8, rtol=1e-8)
+                    t_1 = odeint(func, [x1,y1], tspan, atol=1e-4, rtol=1e-4)
+                    t_2 = odeint(func, [x1 + ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)),y1], tspan, atol=1e-4, rtol=1e-4)
 
-                    print ('{} : {} : {} : {} : {} : {} : {}'.format(x1,y1,x1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)), t_2[1][0], t_2[1][1], t_1[1][0], t_1[1][1]))
                 else:
                     y1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
                     x1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
 
                     tspan = np.linspace(0, timestep,2)
 
-                    t_1 = odeint(func, [x1,y1], tspan, atol=1e-8, rtol=1e-8)
-                    t_2 = odeint(func, [x1,y1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min))], tspan, atol=1e-8, rtol=1e-8)
+                    t_1 = odeint(func, [x1,y1], tspan, atol=1e-4, rtol=1e-4)
+                    t_2 = odeint(func, [x1,y1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min))], tspan, atol=1e-4, rtol=1e-4)
 
-                    print ('{} : {} : {} : {} : {} : {} : {}'.format(x1,y1,y1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)), t_2[1][0], t_2[1][1], t_1[1][0], t_1[1][1]))
-
-
-                t_x1 = t_1[0][0]
-                t_y1 = t_1[0][1]
-                t_x2 = t_2[0][0]
-                t_y2 = t_2[0][1]
+                t_x1 = t_1[1][0]
+                t_y1 = t_1[1][1]
+                t_x2 = t_2[1][0]
+                t_y2 = t_2[1][1]
 
                 if (math.isnan(t_x1) or math.isnan(t_y1)):
                     t_x1 = x1 + (grid_d1_max-grid_d1_min)
@@ -225,11 +219,6 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
                     t_x2 = x1 + (grid_d1_max-grid_d1_min) + 1
                     t_y2 = y1
 
-                if (abs(t_x1 - t_x2) < 0.00001):
-                    t_x2 = t_x1 + 0.00001
-
-                if (abs(t_y1 - t_y2) < 0.00001):
-                    t_y2 - t_y1 + 0.00001
 
                 svs_1.append(t_x1)
                 sus_1.append(t_y1)
@@ -237,16 +226,16 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
                 sus_2.append(t_y2)
 
             for s in svs_1:
-                mesh_file.write('{:.5f}\t'.format(s))
+                mesh_file.write('{}\t'.format(s))
             mesh_file.write('\n')
             for s in sus_1:
-                mesh_file.write('{:.5f}\t'.format(s))
+                mesh_file.write('{}\t'.format(s))
             mesh_file.write('\n')
             for s in svs_2:
-                mesh_file.write('{:.5f}\t'.format(s))
+                mesh_file.write('{}\t'.format(s))
             mesh_file.write('\n')
             for s in sus_2:
-                mesh_file.write('{:.5f}\t'.format(s))
+                mesh_file.write('{}\t'.format(s))
             mesh_file.write('\n')
             mesh_file.write('closed\n')
         mesh_file.write('end\n')
@@ -311,4 +300,4 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
 
 # generate(rybak, 1, 'grid', -10, -56, -0.004, -80, -40, -0.4, 1.0, 300, 200)
 # generate(adEx, 1, 'adex', -10, -58, 0.0, -90, -40, -20, 60, 300, 100)
-generate(cond, 5e-3, 'cond', -55.0e-3, -65e-3, 0.0, -66.0e-3, -55.0e-3, 0.0, 0.8, 25, 100, efficacy_orientation='w')
+generate(cond, 1e-1, 'cond', -55.0e-3, -65e-3, 0.0, -66.0e-3, -55.0e-3, 0.0, 4.0, 500, 500, efficacy_orientation='w')
