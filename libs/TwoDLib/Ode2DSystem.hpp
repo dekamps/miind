@@ -76,6 +76,8 @@ namespace TwoDLib {
 		//! Redistribute probability that has moved through threshold. Run this after the Master equation
 		void RedistributeProbability();
 
+		void RedistributeProbability(MPILib::Number);
+
 		//! Remap probability that has run from the end of a strip. Run this after evolution
 		void RemapReversal();
 
@@ -85,7 +87,7 @@ namespace TwoDLib {
 		//! total probability mass in the system, should not be too far away from 1.0
 		double P() const {
 			return std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0)
-			+ _reset_refractive.getTotalProbInRefract();
+			+ _reset_refractive.getTotalProbInRefract() + _next_reset.getTotalProbInRefract();
 		}
 
 		//! average membrane potential
@@ -229,7 +231,7 @@ namespace TwoDLib {
 			{
 			}
 
-			void operator()(const Redistribution& map)
+			void operator()(const Redistribution& map, MPILib::Number n_steps)
 			{
 				MPILib::Time t = _it*_t_step;
 				double from =  map._alpha*_vec_mass[_sys.Map(map._from[0],map._from[1])];
@@ -238,7 +240,8 @@ namespace TwoDLib {
 				MPILib::Index i = &map - &_vec_reset[0];
 				MPILib::populist::StampedProbability prob;
 				prob._prob = from;
-				prob._time = t + _tau_refractive + _t_step;
+				prob._time = t + _tau_refractive + (_t_step * n_steps);
+
 				_vec_queue[i].push(prob);
 
 				from = _vec_queue[i].CollectAndRemove(t);

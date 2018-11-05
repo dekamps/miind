@@ -285,6 +285,7 @@ void GenerateResetTransitionsOnly(
 	) {
 		vector<TwoDLib::Coordinates> ths   = mesh.findV(V_th,TwoDLib::Mesh::EQUAL);
 		vector<TwoDLib::Coordinates> transform_above = mesh_transform.findV(V_th,TwoDLib::Mesh::ABOVE);
+		vector<TwoDLib::Coordinates> transform_ths = mesh_transform.findV(V_th,TwoDLib::Mesh::EQUAL);
 		vector<TwoDLib::Coordinates> above = mesh.findV(V_th,TwoDLib::Mesh::ABOVE);
 		vector<TwoDLib::Coordinates> below = mesh.findV(V_th,TwoDLib::Mesh::BELOW);
 		vector<TwoDLib::Coordinates> thres = mesh.findV(V_reset,TwoDLib::Mesh::EQUAL);
@@ -300,8 +301,13 @@ void GenerateResetTransitionsOnly(
 
 		// the reset mapping is the same for all ranges
 		std::ofstream ofst(base_name + string(".res"));
-		TwoDLib::ConstructResetMapping("Reset", ofst, mesh, above, thres, tr_reset, &gen);
-		TwoDLib::ConstructResetMapping("NextReset", ofst, mesh, transform_above, thres, tr_reset, &gen);
+		vector<TwoDLib::Coordinates> cells = above;
+		cells.insert(cells.end(), ths.begin(), ths.end());
+		TwoDLib::ConstructResetMapping("Reset", ofst, mesh, cells, thres, tr_reset, &gen);
+
+		cells = transform_above;
+		cells.insert(cells.end(), transform_ths.begin(), transform_ths.end());
+		TwoDLib::ConstructResetMapping("NextReset", ofst, mesh, cells, thres, tr_reset, &gen);
 		ofst.close(); // needed; FixModelFile will reopen this file
 
 		// the model file now needs to be fixed, to include the reset mapping
@@ -362,9 +368,7 @@ void GenerateResetTransitionsOnly(
 
 					// Only generate if the origin is in BELOW, or in EQUAL
 					TwoDLib::Coordinates c(i,j);
-					if (std::find(above.begin(),above.end(),c) == above.end() ){
-
-						gen.Reset(nr_points);
+					gen.Reset(nr_points);
 						TwoDLib::Translation tr = translation_list[i][j];
 
 						vector<TwoDLib::Coordinates> cells = below;
@@ -377,7 +381,6 @@ void GenerateResetTransitionsOnly(
 
 						transitions.push_back(l);
 					}
-				}
 			}
 
 			std::cout << "Finished. Writing out" << std::endl;

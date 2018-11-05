@@ -200,13 +200,33 @@ void Ode2DSystem::RedistributeProbability()
 		for(auto& m: _vec_reset)
 			_reset_refractive(m);
 
-	for(auto& m: _vec_next_reset)
-		_next_reset(m);
+	std::for_each(_vec_reset.begin(),_vec_reset.end(),_clean);
 
- 	std::for_each(_vec_reset.begin(),_vec_reset.end(),_clean);
+	for(auto& m: _vec_next_reset)
+		_next_reset(m,1);
+
 	std::for_each(_vec_next_reset.begin(),_vec_next_reset.end(),_clean);
 
 	_f /= _mesh.TimeStep();
+}
+
+void Ode2DSystem::RedistributeProbability(MPILib::Number steps)
+{
+	if (_tau_refractive == 0.)
+		for(auto& m: _vec_reset)
+			_reset(m);
+	else
+		for(auto& m: _vec_reset)
+			_reset_refractive(m);
+
+	std::for_each(_vec_reset.begin(),_vec_reset.end(),_clean);
+
+	for(auto& m: _vec_next_reset)
+		_next_reset(m,steps);
+
+	std::for_each(_vec_next_reset.begin(),_vec_next_reset.end(),_clean);
+
+	_f /= (_mesh.TimeStep()*steps);
 }
 
 double Ode2DSystem::AvgV() const
