@@ -87,6 +87,7 @@ namespace TwoDLib {
 
 		std::vector<TwoDLib::Redistribution> _vec_rev;
 		std::vector<TwoDLib::Redistribution> _vec_res;
+		std::vector<TwoDLib::Redistribution> _vec_next_res;
 
 		MPILib::Time _dt;
 
