@@ -64,10 +64,10 @@ def adEx(y,t):
 def cond(y,t):
     param_dict={
 
-    'tau_m':   20,
+    'tau_m':   20e-3,
     'E_r': -65e-3,
     'E_e':  0e-3,
-    'tau_s':  5,
+    'tau_s':  5e-3,
     'g_max': 0.8,
     'V_min':-66.0e-3,
     'V_max':  -55.0e-3,
@@ -116,7 +116,7 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
 
     with open(basename + '.mesh', 'w') as mesh_file:
         mesh_file.write('ignore\n')
-        mesh_file.write('{}\n'.format(timestep/1000.0))
+        mesh_file.write('{}\n'.format(timestep))
 
         for i in np.array(range(grid_d1_res+1)) * (1.0/grid_d1_res):
             svs_1 = [];
@@ -169,7 +169,7 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
 
     with open(basename + '_transform.mesh', 'w') as mesh_file:
         mesh_file.write('ignore\n')
-        mesh_file.write('{}\n'.format(timestep/1000.0))
+        mesh_file.write('{}\n'.format(timestep))
 
         progress = 0
         count = 0
@@ -194,8 +194,8 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
 
                     tspan = np.linspace(0, timestep,2)
 
-                    t_1 = odeint(func, [x1,y1], tspan, atol=1e-4, rtol=1e-4)
-                    t_2 = odeint(func, [x1 + ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)),y1], tspan, atol=1e-4, rtol=1e-4)
+                    t_1 = odeint(func, [x1,y1], tspan, atol=1e-12, rtol=1e-12)
+                    t_2 = odeint(func, [x1 + ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)),y1], tspan, atol=1e-12, rtol=1e-12)
 
                 else:
                     y1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
@@ -203,8 +203,8 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
 
                     tspan = np.linspace(0, timestep,2)
 
-                    t_1 = odeint(func, [x1,y1], tspan, atol=1e-4, rtol=1e-4)
-                    t_2 = odeint(func, [x1,y1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min))], tspan, atol=1e-4, rtol=1e-4)
+                    t_1 = odeint(func, [x1,y1], tspan, atol=1e-12, rtol=1e-12)
+                    t_2 = odeint(func, [x1,y1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min))], tspan, atol=1e-12, rtol=1e-12)
 
                 t_x1 = t_1[1][0]
                 t_y1 = t_1[1][1]
@@ -300,4 +300,4 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
 
 # generate(rybak, 1, 'grid', -10, -56, -0.004, -80, -40, -0.4, 1.0, 300, 200)
 # generate(adEx, 1, 'adex', -10, -58, 0.0, -90, -40, -20, 60, 300, 100)
-generate(cond, 1e-1, 'cond', -55.0e-3, -65e-3, 0.0, -66.0e-3, -55.0e-3, 0.0, 4.0, 500, 500, efficacy_orientation='w')
+generate(cond, 1e-06, 'cond', -55.0e-3, -65e-3, 0.0, -66.0e-3, -50.0e-3, -0.3, 1.0, 300, 300, efficacy_orientation='w')
