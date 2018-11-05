@@ -21,6 +21,7 @@
 
 void TwoDLib::ConstructResetMapping
 (
+	std::string mapping_tag,
 	std::ostream& ost,
 	const TwoDLib::Mesh& mesh,
 	const vector<TwoDLib::Coordinates>& ths,
@@ -29,7 +30,7 @@ void TwoDLib::ConstructResetMapping
 	TransitionMatrixGenerator* pgen
 ){
 
-	ost << "<Mapping type=\"Reset\">\n";
+	ost << "<Mapping type=\"" << mapping_tag <<"\">\n";
 	// can't assume sorting
 	vector<Coordinates> ressort = thres;
 	std::sort(ressort.begin(),ressort.end(),[&mesh](const Coordinates& c1, const Coordinates& c2)

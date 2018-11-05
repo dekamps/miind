@@ -39,11 +39,11 @@ void FixModelFile(const string& basename){
 		throw TwoDLib::TwoDLibException("Can't parse model file");
 
 	// see if there is a reset mapping already; if yes, the rest is not necessary
-	for (pugi::xml_node mapping = model.child("Mapping"); mapping; mapping = mapping.next_sibling("Mapping"))
-	{
-	    if (mapping.attribute("type").value() == string("Reset") )
-	    	return;
-	}
+	// for (pugi::xml_node mapping = model.child("Mapping"); mapping; mapping = mapping.next_sibling("Mapping"))
+	// {
+	//     if (mapping.attribute("type").value() == string("Reset") )
+	//     	return;
+	// }
 
 	// get reset mapping
 	pugi::xml_document doc_reset;
@@ -52,13 +52,30 @@ void FixModelFile(const string& basename){
 	if (!result)
 		throw TwoDLib::TwoDLibException("Couldn't parse reset XML file");
 
-	std::string str_reset(doc_reset.first_child().first_child().value());
+	std::string str_reset;
+	std::string str_reset_next;
 
+	pugi::xml_node res_mapping = doc_reset.child("Mapping");
+
+	for (pugi::xml_node mapping = doc_reset.child("Mapping"); mapping; mapping = mapping.next_sibling("Mapping"))
+	{
+	    if (mapping.attribute("type").value() == string("Reset") )
+			{
+					str_reset = std::string(mapping.child_value());
+			}
+			if (mapping.attribute("type").value() == string("NextReset") ){
+				str_reset_next = std::string(mapping.child_value());
+			}
+	}
 
 	// insert a reset mapping node in the document before the threshold node
 	pugi::xml_node node_rev = model.append_child("Mapping");
 	node_rev.append_attribute("type") = "Reset";
 	node_rev.append_child(pugi::node_pcdata).set_value(str_reset.c_str());
+
+	pugi::xml_node node_next_rev = model.append_child("Mapping");
+	node_next_rev.append_attribute("type") = "NextReset";
+	node_next_rev.append_child(pugi::node_pcdata).set_value(str_reset_next.c_str());
 
 	std::ofstream ofst(str_model);
 	if (!ofst)
@@ -134,7 +151,7 @@ void GenerateResetTransitionsOnly(
 
 	// the reset mapping is the same for all ranges
 	std::ofstream ofst(base_name + string(".res"));
-	TwoDLib::ConstructResetMapping(ofst, mesh, ths, thres, tr_reset, &gen);
+	TwoDLib::ConstructResetMapping("Reset", ofst, mesh, ths, thres, tr_reset, &gen);
 	ofst.close(); // needed; FixModelFile will reopen this file
 
 	// the model file now needs to be fixed, to include the reset mapping
@@ -243,7 +260,7 @@ void GenerateResetTransitionsOnly(
 
 		// the reset mapping is the same for all ranges
 		std::ofstream ofst(base_name + string(".res"));
-		TwoDLib::ConstructResetMapping(ofst, mesh, ths, thres, tr_reset, &gen);
+		TwoDLib::ConstructResetMapping("Reset", ofst, mesh, ths, thres, tr_reset, &gen);
 		ofst.close(); // needed; FixModelFile will reopen this file
 
 		// the model file now needs to be fixed, to include the reset mapping
@@ -283,7 +300,8 @@ void GenerateResetTransitionsOnly(
 
 		// the reset mapping is the same for all ranges
 		std::ofstream ofst(base_name + string(".res"));
-		TwoDLib::ConstructResetMapping(ofst, mesh, transform_above, thres, tr_reset, &gen);
+		TwoDLib::ConstructResetMapping("Reset", ofst, mesh, above, thres, tr_reset, &gen);
+		TwoDLib::ConstructResetMapping("NextReset", ofst, mesh, transform_above, thres, tr_reset, &gen);
 		ofst.close(); // needed; FixModelFile will reopen this file
 
 		// the model file now needs to be fixed, to include the reset mapping
