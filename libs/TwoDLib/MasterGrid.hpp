@@ -52,6 +52,14 @@ namespace TwoDLib {
 		  double goes,
 		  unsigned int offset) const;
 
+			void MVGridMapped(
+				vector<double>&       dydt,
+				const vector<double>& vec_mass,
+				double                rate,
+			  double stays,
+			  double goes,
+			  unsigned int offset) const;
+
 		void Apply(double t_step, const vector<double>& rates, vector<double>& efficacy_map);
 
 		void operator()(const vector<double>&, vector<double>&, const double t = 0);

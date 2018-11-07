@@ -90,12 +90,15 @@ def cond(y,t):
 def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid_v_min, grid_v_max, grid_h_min, grid_h_max, grid_v_res, grid_h_res,efficacy_orientation='v'):
 
     grid_d1_res = grid_v_res;
-    grid_d1_min = grid_v_min;
-    grid_d1_max = grid_v_max;
+    grid_d1_min = reset_v;
+    grid_d1_max = threshold_v;
 
     grid_d2_res = grid_h_res;
     grid_d2_min = grid_h_min;
     grid_d2_max = grid_h_max;
+
+    buffer_v = 5;
+    buffer_h = 20;
 
     if (efficacy_orientation == 'v'):
         grid_d1_res = grid_v_res;
@@ -103,8 +106,8 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
         grid_d1_max = grid_h_max;
 
         grid_d2_res = grid_h_res;
-        grid_d2_min = grid_v_min;
-        grid_d2_max = grid_v_max;
+        grid_d2_min = reset_v;
+        grid_d2_max = threshold_v;
 
     with open(basename + '.rev', 'w') as rev_file:
         rev_file.write('<Mapping Type="Reversal">\n')
@@ -118,13 +121,13 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
         mesh_file.write('ignore\n')
         mesh_file.write('{}\n'.format(timestep))
 
-        for i in np.array(range(grid_d1_res+1)) * (1.0/grid_d1_res):
+        for i in (np.array(range(grid_d1_res+(buffer_v*2)))-buffer_v) * (1.0/(grid_d1_res)):
             svs_1 = [];
             sus_1 = [];
             svs_2 = [];
             sus_2 = [];
 
-            for j in np.array(range(grid_d2_res+1)) * (1.0/grid_d2_res):
+            for j in (np.array(range(grid_d2_res+(buffer_h*2)))-buffer_h) * (1.0/(grid_d2_res)):
                 if (efficacy_orientation != 'v'):
                     x1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
                     y1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
@@ -173,9 +176,26 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
 
         progress = 0
         count = 0
-        ten_percent = (int)(grid_d1_res / 10)
+        ten_percent = (int)((grid_d1_res+(2*buffer_v)) / 10)
 
-        for i in np.array(range(grid_d1_res+1)) * (1.0/grid_d1_res):
+        tspan = np.linspace(0, 0.001,101)
+
+        t_1 = odeint(func, [-0.065, 0.02], tspan, atol=1e-12, rtol=1e-12)
+        t_2 = odeint(func, [-0.065, 0.0], tspan, atol=1e-12, rtol=1e-12)
+        t_3 = odeint(func, [-0.0648, 0.0], tspan, atol=1e-12, rtol=1e-12)
+        t_4 = odeint(func, [-0.0648, 0.02], tspan, atol=1e-12, rtol=1e-12)
+
+        print t_1
+        print t_2
+        print t_3
+        print t_4
+        plt.plot(t_1[:,0], t_1[:,1])
+        plt.plot(t_2[:,0], t_2[:,1])
+        plt.plot(t_3[:,0], t_3[:,1])
+        plt.plot(t_4[:,0], t_4[:,1])
+        plt.show()
+
+        for i in (np.array(range(grid_d1_res+(buffer_v*2)))-buffer_v) * (1.0/(grid_d1_res)):
             svs_1 = [];
             sus_1 = [];
             svs_2 = [];
@@ -186,13 +206,13 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
                 print('{} % complete.'.format(progress))
                 progress += 10
 
-            for j in np.array(range(grid_d2_res+1)) * (1.0/grid_d2_res):
+            for j in (np.array(range(grid_d2_res+(buffer_h*2)))-buffer_h) * (1.0/(grid_d2_res)):
 
                 if (efficacy_orientation != 'v'):
                     x1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
                     y1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
 
-                    tspan = np.linspace(0, timestep,2)
+                    tspan = np.linspace(0, timestep, 101)
 
                     t_1 = odeint(func, [x1,y1], tspan, atol=1e-12, rtol=1e-12)
                     t_2 = odeint(func, [x1 + ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)),y1], tspan, atol=1e-12, rtol=1e-12)
@@ -201,15 +221,15 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
                     y1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
                     x1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
 
-                    tspan = np.linspace(0, timestep,2)
+                    tspan = np.linspace(0, timestep,101)
 
                     t_1 = odeint(func, [x1,y1], tspan, atol=1e-12, rtol=1e-12)
                     t_2 = odeint(func, [x1,y1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min))], tspan, atol=1e-12, rtol=1e-12)
 
-                t_x1 = t_1[1][0]
-                t_y1 = t_1[1][1]
-                t_x2 = t_2[1][0]
-                t_y2 = t_2[1][1]
+                t_x1 = t_1[-1][0]
+                t_y1 = t_1[-1][1]
+                t_x2 = t_2[-1][0]
+                t_y2 = t_2[-1][1]
 
                 if (math.isnan(t_x1) or math.isnan(t_y1)):
                     t_x1 = x1 + (grid_d1_max-grid_d1_min)
@@ -240,7 +260,7 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
             mesh_file.write('closed\n')
         mesh_file.write('end\n')
 
-    api.MeshTools.buildModelFileFromMesh(basename, reset_v, threshold_v)
+    api.MeshTools.buildModelFileFromMesh(basename, reset_v+0.00000000001, threshold_v+0.00000000001)
     api.MeshTools.buildModelFileFromMesh(basename + '_transform', reset_v, threshold_v)
 
     mod_file = open(basename + '.model', 'r')
@@ -263,36 +283,36 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
             mod_file.write(lines[l])
     mod_file.close()
 
-    api.MeshTools.buildTransformFileFromModel(basename, 100000)
+    api.MeshTools.buildTransformFileFromModel(basename, 1000000000)
     api.MeshTools.buildTransformFileFromModel(basename, reset_shift_w=reset_shift_h, mode='resettransform')
 
     # filename = basename + '.mesh'
     # if os.path.exists(filename):
     #     os.remove(filename)
 
-    filename = basename + '.rev'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '.stat'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '.res'
-    if os.path.exists(filename):
-        os.remove(filename)
+    # filename = basename + '.rev'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '.stat'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '.res'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
 
     # filename = basename + '_transform.mesh'
     # if os.path.exists(filename):
     #     os.remove(filename)
 
-    filename = basename + '_transform.rev'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '_transform.stat'
-    if os.path.exists(filename):
-        os.remove(filename)
+    # filename = basename + '_transform.rev'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '_transform.stat'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
 
     # filename = basename + '_transform.model'
     # if os.path.exists(filename):
@@ -300,4 +320,4 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
 
 # generate(rybak, 1, 'grid', -10, -56, -0.004, -80, -40, -0.4, 1.0, 300, 200)
 # generate(adEx, 1, 'adex', -10, -58, 0.0, -90, -40, -20, 60, 300, 100)
-generate(cond, 1e-06, 'cond', -55.0e-3, -65e-3, 0.0, -66.0e-3, -50.0e-3, -0.3, 1.0, 300, 300, efficacy_orientation='w')
+generate(cond, 1e-05, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, 0, 1.0, 30, 300, efficacy_orientation='w')
