@@ -303,11 +303,11 @@ void GenerateResetTransitionsOnly(
 		std::ofstream ofst(base_name + string(".res"));
 		vector<TwoDLib::Coordinates> cells = above;
 		cells.insert(cells.end(), ths.begin(), ths.end());
-		TwoDLib::ConstructResetMapping("Reset", ofst, mesh, cells, thres, tr_reset, &gen);
+		TwoDLib::ConstructResetMapping("Reset", ofst, mesh, above, thres, tr_reset, &gen);
 
-		cells = transform_above;
-		cells.insert(cells.end(), transform_ths.begin(), transform_ths.end());
-		TwoDLib::ConstructResetMapping("NextReset", ofst, mesh, cells, thres, tr_reset, &gen);
+		// cells = transform_above;
+		// cells.insert(cells.end(), transform_ths.begin(), transform_ths.end());
+		// TwoDLib::ConstructResetMapping("NextReset", ofst, mesh, cells, thres, tr_reset, &gen);
 		ofst.close(); // needed; FixModelFile will reopen this file
 
 		// the model file now needs to be fixed, to include the reset mapping
@@ -373,6 +373,7 @@ void GenerateResetTransitionsOnly(
 
 						vector<TwoDLib::Coordinates> cells = below;
 						cells.insert(cells.end(), ths.begin(), ths.end());
+						cells.insert(cells.end(), above.begin(), above.end());
 						gen.GenerateTransformUsingQuadTranslation(i,j,tree_transform,cells);
 
 						l._number = gen.N();

@@ -101,6 +101,34 @@ _cell_width(cell_width)
  	}
  }
 
+ void MasterGrid::MVGridMapped
+ (
+ 	vector<double>&       dydt,
+ 	const vector<double>& vec_mass,
+ 	double                rate,
+   double stays,
+   double goes,
+   unsigned int offset
+ ) const
+ {
+
+   int offset_1 = -offset;
+   int offset_2 = -(offset+1);
+   if(rate < 0) {
+     offset_1 = (offset + 1);
+     offset_2 = offset;
+   }
+ #pragma omp parallel for
+ 	for (MPILib::Index i = 0; i < _sys.MeshObject().NrQuadrilateralStrips(); i++){
+    for (MPILib::Index j = offset+1; j < _sys.MeshObject().NrCellsInStrip(i)-offset+1; j++){
+      MPILib::Index i_r =_sys.Map(i,j);
+      dydt[i_r] += rate*stays*vec_mass[i_r+offset_1];
+      dydt[i_r] += rate*goes*vec_mass[i_r+offset_2];
+      dydt[i_r] -= rate*vec_mass[i_r];
+    }
+ 	}
+ }
+
  void MasterGrid::Apply(double t_step, const vector<double>& rates, vector<double>& efficacy_map) {
    _p_vec_eff   = &efficacy_map;
 	 _p_vec_rates = &rates;
@@ -132,7 +160,7 @@ _cell_width(cell_width)
     double stays = 1.0 - goes;
 
     // it is only the matrices that need to be mapped
-    MVGrid
+    MVGridMapped
    (
        dydt,
      vec_mass,
