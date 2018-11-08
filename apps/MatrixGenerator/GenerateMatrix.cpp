@@ -303,7 +303,7 @@ void GenerateResetTransitionsOnly(
 		std::ofstream ofst(base_name + string(".res"));
 		vector<TwoDLib::Coordinates> cells = above;
 		cells.insert(cells.end(), ths.begin(), ths.end());
-		TwoDLib::ConstructResetMapping("Reset", ofst, mesh, above, thres, tr_reset, &gen);
+		TwoDLib::ConstructResetMapping("Reset", ofst, mesh, cells, thres, tr_reset, &gen);
 
 		// cells = transform_above;
 		// cells.insert(cells.end(), transform_ths.begin(), transform_ths.end());

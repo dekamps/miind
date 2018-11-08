@@ -97,8 +97,8 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
     grid_d2_min = grid_h_min;
     grid_d2_max = grid_h_max;
 
-    buffer_v = 5;
-    buffer_h = 20;
+    buffer_v = int(grid_v_res*0.05)+5;
+    buffer_h = int(grid_h_res*0.05)+5;
 
     if (efficacy_orientation == 'v'):
         grid_d1_res = grid_v_res;
@@ -178,23 +178,6 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
         count = 0
         ten_percent = (int)((grid_d1_res+(2*buffer_v)) / 10)
 
-        tspan = np.linspace(0, 0.001,101)
-
-        t_1 = odeint(func, [-0.065, 0.02], tspan, atol=1e-12, rtol=1e-12)
-        t_2 = odeint(func, [-0.065, 0.0], tspan, atol=1e-12, rtol=1e-12)
-        t_3 = odeint(func, [-0.0648, 0.0], tspan, atol=1e-12, rtol=1e-12)
-        t_4 = odeint(func, [-0.0648, 0.02], tspan, atol=1e-12, rtol=1e-12)
-
-        print t_1
-        print t_2
-        print t_3
-        print t_4
-        plt.plot(t_1[:,0], t_1[:,1])
-        plt.plot(t_2[:,0], t_2[:,1])
-        plt.plot(t_3[:,0], t_3[:,1])
-        plt.plot(t_4[:,0], t_4[:,1])
-        plt.show()
-
         for i in (np.array(range(grid_d1_res+(buffer_v*2)))-buffer_v) * (1.0/(grid_d1_res)):
             svs_1 = [];
             sus_1 = [];
@@ -209,6 +192,7 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
             for j in (np.array(range(grid_d2_res+(buffer_h*2)))-buffer_h) * (1.0/(grid_d2_res)):
 
                 if (efficacy_orientation != 'v'):
+
                     x1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
                     y1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
 
@@ -230,15 +214,6 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
                 t_y1 = t_1[-1][1]
                 t_x2 = t_2[-1][0]
                 t_y2 = t_2[-1][1]
-
-                if (math.isnan(t_x1) or math.isnan(t_y1)):
-                    t_x1 = x1 + (grid_d1_max-grid_d1_min)
-                    t_y1 = y1
-
-                if (math.isnan(t_x2) or math.isnan(t_y2)):
-                    t_x2 = x1 + (grid_d1_max-grid_d1_min) + 1
-                    t_y2 = y1
-
 
                 svs_1.append(t_x1)
                 sus_1.append(t_y1)
@@ -320,4 +295,4 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
 
 # generate(rybak, 1, 'grid', -10, -56, -0.004, -80, -40, -0.4, 1.0, 300, 200)
 # generate(adEx, 1, 'adex', -10, -58, 0.0, -90, -40, -20, 60, 300, 100)
-generate(cond, 1e-05, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, 0, 1.0, 30, 300, efficacy_orientation='w')
+generate(cond, 1e-05, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, 0, 1.0, 1000, 1000, efficacy_orientation='w')
