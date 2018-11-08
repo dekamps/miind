@@ -77,7 +77,7 @@ TransitionMatrixGenerator::SearchResult TransitionMatrixGenerator::LocatePoint(c
 		return res;
 
 	// It wasn't in the fiducial element
-	for (MPILib::Index i = 0; i < _tree.MeshRef().NrQuadrilateralStrips(); i++)
+	for (MPILib::Index i = 0; i < _tree.MeshRef().NrStrips(); i++)
 	  for (MPILib::Index j = 0; j < _tree.MeshRef().NrCellsInStrip(i); j++ ){
 			if (_tree.MeshRef().Quad(i,j).IsInside(pt_translated) ){
 				*pc = Coordinates(i,j);

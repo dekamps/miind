@@ -224,12 +224,24 @@ def parse_mesh_algorithm(alg, i, weighttype):
     timestep = alg.find('TimeStep')
 
     cpp_name = 'alg_mesh_' + str(i)
-    s += '\tTwoDLib::MeshAlgorithm<DelayedConnection> ' + cpp_name + '(\"'
+
+
+    if 'solver' in alg.attrib.keys():
+        # solver type must be provided without TwoDLib::
+        s += '\tTwoDLib::MeshAlgorithm<DelayedConnection,TwoDLib::' + alg.attrib['solver'] + '> ' + cpp_name + '(\"'
+    else:
+
+        s += '\tTwoDLib::MeshAlgorithm<DelayedConnection> ' + cpp_name + '(\"'
     s += alg.attrib['modelfile'] + '\",' + vec_name + ',' + timestep.text 
+    if 'tau_refractive' in alg.keys():
+        s += ', '  + alg.attrib['tau_refractive']
+    else:
+        s += ', 0.0'
     if 'ratemethod' in alg.keys():
         s += ', '  + "\"" + alg.attrib['ratemethod'] + "\""    
     s += ');\n'
 
+    
     Register(alg.attrib['name'], cpp_name)
 
     return s

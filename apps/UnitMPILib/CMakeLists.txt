@@ -24,6 +24,7 @@ set (UNIT_MPI_SRC
     UnitMPILib.cpp
     DelayAssemblyTest.cpp
     HebbianAlgorithmTest.cpp
+    ProbabilityQueueTest.cpp
     RateFunctorTest.cpp
 )
 

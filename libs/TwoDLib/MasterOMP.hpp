@@ -21,7 +21,7 @@
 #include <string>
 #include "CSRMatrix.hpp"
 #include "TransitionMatrix.hpp"
-#include "Ode2DSystem.hpp"
+#include "Ode2DSystemGroup.hpp"
 #include "MasterParameter.hpp"
 
 namespace TwoDLib {
@@ -33,40 +33,62 @@ namespace TwoDLib {
 
 		MasterOMP
 		(
-			Ode2DSystem&,
-			const vector<TransitionMatrix>&,  //! vector of all TransitionMatrix instances that determine the input to this population
+			Ode2DSystemGroup&,
+			const std::vector<std::vector<TransitionMatrix> >&,  //! vector of all TransitionMatrix instances that determine the input to this population
 			const MasterParameter&
 		);
 
-		void Apply(double, const vector<double>&, const vector<MPILib::Index>&);
 
-		unsigned int NrMatrix() const { return _vec_csr.size(); }
+		//! Number of meshes
+		MPILib::Number  NrMeshes() const { return _vec_vec_csr.size(); }
 
-		double Efficacy(unsigned int i) const { assert(i < _vec_csr.size()); return _vec_csr[i].Efficacy(); }
+		//! Number of weight matrices associated with Mesh i
+		MPILib::Number  NrMatrices(MPILib::Index i) const { return _vec_vec_csr[i].size(); }
+
+		//! Efficacy associated with matrix matrix_index from Mesh mesh_index
+		double Efficacy
+		(
+				MPILib::Index mesh_index,	//!< Index labeling mesh
+				MPILib::Index matrix_index
+		) const {return _vec_vec_csr[mesh_index][matrix_index].Efficacy(); }
+
+
+		void Apply
+			(
+				double                                         time_step,      //!< mesh time step
+				const std::vector<std::vector<MPILib::Rate> >& rate_matrix,	//!< rate matrix
+				const vector<MPILib::Index>&	               weight_order    //!< reference to the mapping from NodeId to weight order
+			);
 
 	private:
 
 		MasterOMP(const MasterOMP&);
 		MasterOMP& operator=(const MasterOMP&);
-		std::vector<CSRMatrix> InitializeCSR(const std::vector<TransitionMatrix>&, const Ode2DSystem&);
+
+		std::vector< std::vector<CSRMatrix> >
+			InitializeCSR
+			(
+				const std::vector<std::vector<TransitionMatrix> >&  vec_vec_mat,
+				const Ode2DSystemGroup&                             sys
+			);
 
 
 
 		//! Auxilliary struct to calculate the derivative for forward Euler
 		struct Derivative {
 
-			Derivative(vector<double>& dydt, const Ode2DSystem& sys, double& rate ):_dydt(dydt),_sys(sys),_rate(rate){}
+			Derivative(vector<double>& dydt, const Ode2DSystemGroup& sys, double& rate ):_dydt(dydt),_sys(sys),_rate(rate){}
 
-			void operator()(const TransitionMatrix::TransferLine& line) {
+			void operator()(const TransitionMatrix::TransferLine& line, MPILib::Index mesh_index) {
 				for(const TransitionMatrix::Redistribution& r: line._vec_to_line){
-					double from = _rate*r._fraction*_sys._vec_mass[_sys.Map(line._from[0],line._from[1])];
-					_dydt[_sys.Map(r._to[0],r._to[1])] += from;
+					double from = _rate*r._fraction*_sys._vec_mass[_sys.Map(mesh_index,line._from[0],line._from[1])];
+					_dydt[_sys.Map(mesh_index,r._to[0],r._to[1])] += from;
 					}
-				_dydt[_sys.Map(line._from[0],line._from[1])] -= _rate*_sys._vec_mass[_sys.Map(line._from[0],line._from[1])];
+				_dydt[_sys.Map(mesh_index,line._from[0],line._from[1])] -= _rate*_sys._vec_mass[_sys.Map(mesh_index,line._from[0],line._from[1])];
 			}
-			vector<double>&    _dydt;
-			const Ode2DSystem&  _sys;
-			const double&      _rate;
+			vector<double>&          _dydt;
+			const Ode2DSystemGroup&  _sys;
+			const double&            _rate;
 		};
 
 		//! Auxilliary struct for forward Euler
@@ -93,10 +115,10 @@ namespace TwoDLib {
 		};
 
 
-		Ode2DSystem& _sys;
+		Ode2DSystemGroup& _sys;
 
-		const vector<TransitionMatrix>& _vec_mat; // After initialization, the original object is allowed to go out of scope; it will not be referred anymore
-		const vector<CSRMatrix> _vec_csr;
+		const std::vector<std::vector<TransitionMatrix> >& _vec_vec_mat; // After initialization, the original object is allowed to go out of scope; it will not be referred anymore
+		const std::vector<std::vector<CSRMatrix> >         _vec_vec_csr;
 
 		const MasterParameter	_par;
 		vector<double>			_dydt;

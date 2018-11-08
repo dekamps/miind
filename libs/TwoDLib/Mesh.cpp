@@ -259,8 +259,9 @@ bool Mesh::CheckAreas() const {
 
 	for (unsigned int i = 0; i < _vec_vec_quad.size(); i++)
 		for (unsigned int j = 0; j < _vec_vec_quad[i].size(); j++)
-			if (_vec_vec_quad[i][j].SignedArea() == 0)
+			if (_vec_vec_quad[i][j].SignedArea() == 0){
 				return false;
+			}
 	return true;
 }
 

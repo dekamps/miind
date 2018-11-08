@@ -57,20 +57,20 @@ bool Ode2DSystem::CheckConsistency() const {
 	std::ostringstream ost_err;
 	ost_err << "Mesh inconsistent with mapping: ";
 	for (const Redistribution& r: _vec_reversal){
-		if ( r._from[0] >= _mesh.NrQuadrilateralStrips() ){
-			ost_err << "reversal. NrStrips: " << _mesh.NrQuadrilateralStrips() << ", from: " << r._from[0];
+		if ( r._from[0] >= _mesh.NrStrips() ){
+			ost_err << "reversal. NrStrips: " << _mesh.NrStrips() << ", from: " << r._from[0];
 			throw TwoDLib::TwoDLibException(ost_err.str());
 		}
 		if ( r._from[1] >= _mesh.NrCellsInStrip(r._from[0] ) ){
 			ost_err << "reversal. Nr cells in strip from: " <<  _mesh.NrCellsInStrip(r._from[0] ) << ",from: " << r._from[0] << "\n";
-			ost_err << "In total there are: " << _mesh.NrQuadrilateralStrips() << " strips." << std::endl;
+			ost_err << "In total there are: " << _mesh.NrStrips() << " strips." << std::endl;
 			throw TwoDLib::TwoDLibException(ost_err.str());
 		}
 	}	
 
 	for (const Redistribution& r: _vec_reset){
-		if ( r._from[0] >= _mesh.NrQuadrilateralStrips() ){
-			ost_err << "reset. NrStrips: " << _mesh.NrQuadrilateralStrips() << ", from: " << r._from[0] << std::endl;
+		if ( r._from[0] >= _mesh.NrStrips() ){
+			ost_err << "reset. NrStrips: " << _mesh.NrStrips() << ", from: " << r._from[0] << std::endl;
 			throw TwoDLib::TwoDLibException(ost_err.str());
 		}
 		if ( r._from[1] >= _mesh.NrCellsInStrip(r._from[0] ) ){
@@ -82,12 +82,12 @@ bool Ode2DSystem::CheckConsistency() const {
 	return true;
 }
 
-vector<unsigned int> Ode2DSystem::InitializeCumulative(const Mesh& m) const
+vector<MPILib::Index> Ode2DSystem::InitializeCumulative(const Mesh& m) const
 {
 	unsigned int sum = 0;
 	vector<unsigned int> vec_ret;
 	vec_ret.push_back(0);
-	for(unsigned int i = 0; i < m.NrQuadrilateralStrips(); i++){
+	for(unsigned int i = 0; i < m.NrStrips(); i++){
 		sum += m.NrCellsInStrip(i);
 		vec_ret.push_back(sum);
 	}
@@ -102,7 +102,7 @@ vector<double> Ode2DSystem::InitializeMass() const
 vector<unsigned int> Ode2DSystem::InitializeLength(const Mesh& m) const
 {
 	vector<unsigned int> vec_ret;
-	for(unsigned int i = 0; i < m.NrQuadrilateralStrips();i++)
+	for(unsigned int i = 0; i < m.NrStrips();i++)
 		vec_ret.push_back(m.NrCellsInStrip(i));
 	return vec_ret;
 }
@@ -110,7 +110,7 @@ vector<unsigned int> Ode2DSystem::InitializeLength(const Mesh& m) const
 vector<double> Ode2DSystem::InitializeArea(const Mesh& m) const
 {
 	vector<double> vec_ret;
-	for (unsigned int i = 0; i < m.NrQuadrilateralStrips(); i++)
+	for (unsigned int i = 0; i < m.NrStrips(); i++)
 		for (unsigned int j = 0; j < m.NrCellsInStrip(i); j++ )
 			vec_ret.push_back(m.Quad(i,j).SignedArea());
 	return vec_ret;
@@ -122,7 +122,7 @@ std::vector< std::vector<MPILib::Index> > Ode2DSystem::InitializeMap() const
 {
 	std::vector<std::vector<MPILib::Index> > vec_map;
 	MPILib::Index count = 0;
-	for (MPILib::Index i = 0; i < _mesh.NrQuadrilateralStrips();i++){
+	for (MPILib::Index i = 0; i < _mesh.NrStrips();i++){
 		std::vector<MPILib::Index> vec_strip;
 		for (MPILib::Index j = 0; j < _mesh.NrCellsInStrip(i); j++){
 			vec_strip.push_back(count++);
@@ -136,14 +136,14 @@ void Ode2DSystem::Dump(std::ostream& ost, int mode) const
 {
 	ost.precision(10);
 	if (mode == 0) {
-	for (unsigned int i = 0; i < _mesh.NrQuadrilateralStrips(); i++)
+	for (unsigned int i = 0; i < _mesh.NrStrips(); i++)
 		for (unsigned int j = 0; j < _mesh.NrCellsInStrip(i); j++ )
 			// a division by _vec_area[this->Map(i,j)] is wrong
 			// the fabs is required since we don't care about the sign of the area and
 			// must write out a positive density
 			ost << i << "\t" << j << "\t" << " " << fabs(_vec_mass[this->Map(i,j)]/_mesh.Quad(i,j).SignedArea()) << "\t";
 	} else {
-		for (unsigned int i = 0; i < _mesh.NrQuadrilateralStrips(); i++)
+		for (unsigned int i = 0; i < _mesh.NrStrips(); i++)
 			for (unsigned int j = 0; j < _mesh.NrCellsInStrip(i); j++ )
 				ost << i << "\t" << j << "\t" << " " << _vec_mass[this->Map(i,j)] << "\t";
 		}
@@ -158,7 +158,7 @@ void Ode2DSystem::Evolve()
 
 void Ode2DSystem::UpdateMap()
 {
-	for (MPILib::Index i = 1; i < _mesh.NrQuadrilateralStrips(); i++){
+	for (MPILib::Index i = 1; i < _mesh.NrStrips(); i++){
 		// yes! i = 1. strip 0 is not supposed to have dynamics
 		for (MPILib::Index j = 0; j < _mesh.NrCellsInStrip(i); j++ ){
 			_map[i][j] =_vec_cumulative[i] + modulo(j-_t,_vec_length[i]);
@@ -181,7 +181,7 @@ void Ode2DSystem::RedistributeProbability()
 double Ode2DSystem::AvgV() const
 {
 	double av = 0.;
-	for(MPILib::Index i = 0; i < _mesh.NrQuadrilateralStrips(); i++){
+	for(MPILib::Index i = 0; i < _mesh.NrStrips(); i++){
 		for(MPILib::Index j = 0; j < _mesh.NrCellsInStrip(i); j++){
 			double V = _mesh.Quad(i,j).Centroid()[0];
 			av += V*_vec_mass[this->Map(i,j)];

@@ -24,10 +24,8 @@
 #include "Quadrilateral.hpp"
 #include "TwoDLibException.hpp"
 
-using namespace NumtoolsLib;
-using namespace std;
 using namespace TwoDLib;
-
+using NumtoolsLib::modulo;
 const unsigned int Quadrilateral::_nr_points = 4;
 
 bool Quadrilateral::SanityCheck() const

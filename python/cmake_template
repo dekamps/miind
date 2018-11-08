@@ -6,12 +6,14 @@
 
 cmake_minimum_required(VERSION 2.8)
 FIND_PACKAGE(GSL REQUIRED)
+FIND_PACKAGE(CUDA QUIET)
 
 set(MIIND_LIBRARY_PREFIX miind)
 
 include_directories( ${CMAKE_SOURCE_DIR}/libs )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/GeomLib )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/TwoDLib )
+include_directories( ${CMAKE_SOURCE_DIR}/libs/CudaTwoDLib )
 
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
@@ -22,6 +24,7 @@ OPTION(ENABLE_OPENMP "OpenMP Desired" ${TOKEN_ENABLE_OPENMP})
 ##############################################################################
 # find ROOT
 ##############################################################################
+
 OPTION(ENABLE_ROOT "Root Desired" ${TOKEN_ENABLE_ROOT})
 
 IF (ENABLE_ROOT)
@@ -79,6 +82,17 @@ else ( Boost_FOUND )
    message(FATAL_ERROR "Boost is mandatory to build the libraries")
 endif( Boost_FOUND )
 
+##############################################################################
+# allow OpenMP to be enabled
+##############################################################################
+
+IF(ENABLE_OPENMP)
+    find_package(OpenMP REQUIRED)
+    add_definitions( -DENABLE_OPENMP=1 )
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+ENDIF(ENABLE_OPENMP)
+
 #############################################################################
 # Libraries
 #############################################################################
@@ -88,9 +102,9 @@ if (UNIX)
 endif (UNIX)
 set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}geom
-    ${MIIND_LIBRARY_PREFIX}mpi
     ${MIIND_LIBRARY_PREFIX}twod
     ${MIIND_LIBRARY_PREFIX}numtools
+    ${MIIND_LIBRARY_PREFIX}mpi
     ${MPI_LIBRARIES}
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
@@ -99,8 +113,19 @@ set ( LIBLIST
     gslcblas
 )
 
+if (ENABLE_CUDA)
+   if (NOT APPLE)
+   list(APPEND LIBLIST ${MIIND_LIBRARY_PREFIX}cudatwod)
+   endif (NOT APPLE)
+endif(ENABLE_CUDA)
+
 
 #############################################################################
 # executables
 #############################################################################
-add_definitions("-std=gnu++11 -fext-numeric-literals")
+ #   add the flags for C++11
+if(CMAKE_COMPILER_IS_GNUCXX)
+add_definitions("-std=c++14 -fext-numeric-literals")
+else(CMAKE_COMPILER_IS_GNUCXX)
+add_definitions("-std=c++14")
+endif(CMAKE_COMPILER_IS_GNUCXX)

@@ -35,13 +35,14 @@ class xml_file:
 
 
     def get_text_attribute(self, xml_tag, split):
-        '''Returns a list of text vlues for a given tag. The number of elements in the list is equal to the number of times the
+        '''Returns a list of text values for a given tag and dictionary values. In a tag such as <Variable Name="harry">42</Variable>, the dictory value is Name:harry.
+        Tags with a name not equal to "harry" will be considered different and would not be returned. The number of elements in the list is equal to the number of times the
         tags occur in the text regardless of where they occur. If split == True then each text is split in white spaces. For example, if <expression>a b c</expression>
         and later <expression>p q r</expression> occurs, and no others, then  [[ a, b, c], [p, q, r]] will be returned.'''
 
         root = self.tree.getroot()
         gen=root.iter(xml_tag.name)
-        hits = [l for l in gen if l.attrib == xml_tag.dict]
+        hits = [l for l in gen  if l.attrib == xml_tag.dict]
 
         if split == True:
             return [ x.text.split() for x in hits]
@@ -77,7 +78,9 @@ class xml_file:
 
 
     def replace_xml_tag(self, xml_tag, value, position = -1, order = -1, split = True):
-        '''It is assumed that there are one or more instances of this tag. No instances results in a no-op. This function replaces the text value of a text by
+        '''It is assumed that there are one or more instances of this tag. Tags with different dictionary values, are considered to be different. For example,
+        <Variable Name="zopa">42</Variable> will only lead to replacement of Variable tags with the name "zopa", but no others. 
+        No instances results in a no-op. This function replaces the text value of a text by
         a desired value. This value can be numerical or a string. If there is only one version of the text, order parameter need
         not be set. If there are more you must use the order parameter to indicate which tag - in order of appearance - should be modified.
         By default the tag text is split by white space. If  such a split results in more than one item, you must use the position
@@ -87,7 +90,7 @@ class xml_file:
         if len(text_list) == 0:
             return
             
-        
+
         if len(text_list) > 1 and order == -1:
             raise ValueError('There are multiple instances of this tag and you need to specify which one to replace with the order parameter')
     

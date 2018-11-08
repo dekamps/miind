@@ -36,7 +36,7 @@ std::pair< TwoDLib::Point, TwoDLib::Point> Analyse(const TwoDLib::Mesh& mesh){
   TwoDLib::Point ll( std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
   TwoDLib::Point ur(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
 
-  for( unsigned int i = 0; i < mesh.NrQuadrilateralStrips(); i++ )
+  for( unsigned int i = 0; i < mesh.NrStrips(); i++ )
     for (unsigned int j = 0; j < mesh.NrCellsInStrip(i); j++ ){
       const TwoDLib::Quadrilateral& quad = mesh.Quad(i,j);
       for (const TwoDLib::Point& p: quad.Points()){
@@ -78,7 +78,7 @@ void CalculateProjections
  ){
   TwoDLib::Uniform uni(123456);
   ofst << "<transitions>\n";
-  for( unsigned int i = 0; i < mesh.NrQuadrilateralStrips(); i++ )
+  for( unsigned int i = 0; i < mesh.NrStrips(); i++ )
     for (unsigned int j = 0; j < mesh.NrCellsInStrip(i); j++ ){
       const TwoDLib::Quadrilateral& quad = mesh.Quad(i,j);
       TwoDLib::QuadGenerator gen(quad,uni);
@@ -97,13 +97,13 @@ void CalculateProjections
       	  	  ofst << i << "," << j;
       	  ofst << "</coordinates>";
       	  ofst << "<vbins>";
-      	  for (int i = 0; i < nv; i++){
+      	  for (unsigned int i = 0; i < nv; i++){
       		  if (vec_v[i] > 0.)
       			  ofst << i << "," << vec_v[i]/N_POINTS << ";";
       	  }
       	  ofst << "</vbins>";
       	  ofst << "<wbins>";
-      	  for (int i = 0; i < nw; i++){
+      	  for (unsigned int i = 0; i < nw; i++){
       	  if (vec_w[i] > 0.)
       		  ofst << i << "," << vec_w[i]/N_POINTS << ";";
       	  }
@@ -238,7 +238,7 @@ int main(int argc, char** argv){
 
       // print some info about the mesh
       const TwoDLib::Mesh mesh(argv[1]);
-      std::cout << "There are: " << mesh.NrQuadrilateralStrips() << " strips in the mesh." << std::endl;
+      std::cout << "There are: " << mesh.NrStrips() << " strips in the mesh." << std::endl;
       
       // in particular, the bounding box
       std::pair<TwoDLib::Point,TwoDLib::Point> point_pair = Analyse(mesh);

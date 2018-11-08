@@ -63,7 +63,7 @@ void TwoDLib::Bind(int argc,char** argv){
 
 	std::cout << "Reading mesh" << std::endl;
 	TwoDLib::Mesh mesh(base_name + ".mesh");
-	std::cout << "There are " << mesh.NrQuadrilateralStrips() << " strips." << std::endl;
+	std::cout << "There are " << mesh.NrStrips() << " strips." << std::endl;
 	std::cout << "Reading stat file" << std::endl;
 	TwoDLib::Stat stat(base_name + ".stat");
 

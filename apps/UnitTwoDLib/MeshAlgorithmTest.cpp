@@ -24,12 +24,18 @@
 
 BOOST_AUTO_TEST_CASE(MeshAlgorithmTest){
 
-	std::string mesh_name = "life21da341-bd4a-4077-93c2-4d11804d0882.model";
+	std::string model_name = "life21da341-bd4a-4077-93c2-4d11804d0882.model";
 	std::vector<std::string> mat_names;
 	mat_names.push_back("life21da341-bd4a-4077-93c2-4d11804d0882_0.03_0_0_0_.mat");
 
 
 	double h = 1e-4;
-	TwoDLib::MeshAlgorithm<MPILib::DelayedConnection> alg(mesh_name,mat_names,h);
+	TwoDLib::MeshAlgorithm<MPILib::DelayedConnection>
+		alg
+		(
+			model_name,
+			std::vector<std::string>{mat_names},
+			h
+		);
 }
 

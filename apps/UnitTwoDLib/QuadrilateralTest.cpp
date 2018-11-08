@@ -58,24 +58,6 @@ BOOST_AUTO_TEST_CASE(CellCreationTest)
 	BOOST_REQUIRE( quad2.SignedArea() == -1);
 	BOOST_REQUIRE( quad2.IsClockwise() ==  1);
 
-	vec_v[0] = 0.;
-	vec_v[1] = 1.;
-	vec_v[2] = 0.;
-	vec_v[3] = 1.;
-
-	vec_w[0] = 0.;
-	vec_w[1] = 1.;
-	vec_w[2] = 1.;
-	vec_w[3] = 0.;
-
-	bool b_catch = false;
-
-	try {
-		Quadrilateral quad3(vec_v,vec_w);
-    } catch (TwoDLibException&) {
-        b_catch = true;
-    }
-    BOOST_REQUIRE(b_catch);
 }
 
 BOOST_AUTO_TEST_CASE(InsideClockWise){

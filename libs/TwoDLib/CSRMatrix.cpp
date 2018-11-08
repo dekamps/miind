@@ -27,43 +27,52 @@
 #include "TwoDLibException.hpp"
 using namespace TwoDLib;
 
-void CSRMatrix::Initialize(const TransitionMatrix& mat){
+void CSRMatrix::Initialize(const TransitionMatrix& mat, MPILib::Index mesh_index){
 
 	std::vector<Redistribution> vec_dummy;
-
 	const std::vector<TransitionMatrix::TransferLine>& matrix = mat.Matrix();
 
-	// this must be number of cells, not size of matrix
-	vector< vector<MPILib::Index> > vec_mat(_sys.Mass().size());
-	vector< vector<double> > mat_vals(_sys.Mass().size());
+	// calculate the number of cells that this matrix is responsible for (equal to number of cells in Mesh mesh_index)
+	const Mesh& m = _sys.MeshObjects()[mesh_index];
+	MPILib::Number counter = 0;
+	for(MPILib::Index i = 0; i < m.NrStrips(); i++)
+		for(MPILib::Index j = 0; j < m.NrCellsInStrip(i); j++)
+			counter++;
 
+	vector< vector<MPILib::Index> > vec_mat(counter);
+	vector< vector<double> > mat_vals(counter);
 
 	Validate(mat);
 
 	// transpose
+
 	for (auto& line: matrix){
 		for (auto& r: line._vec_to_line){
-			vec_mat[_sys.Map(r._to[0],r._to[1])].push_back(_sys.Map(line._from[0],line._from[1]));
-			mat_vals[_sys.Map(r._to[0],r._to[1])].push_back(r._fraction);
+			// Map produces the index relative to the full matrix, it needs to be reduced to the row index within the current submatrix
+			vec_mat[_sys.Map(mesh_index,r._to[0],r._to[1]) - _i_offset].push_back(_sys.Map(mesh_index, line._from[0],line._from[1]) - _i_offset);
+			mat_vals[_sys.Map(mesh_index,r._to[0],r._to[1]) - _i_offset].push_back(r._fraction);
 		}
 	}
     // csr for mat
-	CSR(vec_mat,mat_vals);
+
+    CSR(vec_mat,mat_vals);
 }
 
-CSRMatrix::CSRMatrix(const TransitionMatrix& mat,const Ode2DSystem& sys):
+CSRMatrix::CSRMatrix
+(
+	const TransitionMatrix& mat,
+	const Ode2DSystemGroup& sys,
+	MPILib::Index           mesh_index
+):
 _sys(sys),
 _efficacy(mat.Efficacy()),
 _val(0),
 _ia(0),
 _ja(0),
-_coordinates(0)
+_mesh_index(mesh_index),
+_i_offset(sys.Offsets()[mesh_index])
 {
-  for (MPILib::Index i = 0; i < sys.MeshObject().NrQuadrilateralStrips();i++)
-    for(MPILib::Index j = 0; j < sys.MeshObject().NrCellsInStrip(i);j++)
-			_coordinates.push_back(Coordinates(i,j));
-
-	Initialize(mat);
+	Initialize(mat,mesh_index);
 }
 
 void CSRMatrix::Validate(const TransitionMatrix& mat){
@@ -72,7 +81,7 @@ void CSRMatrix::Validate(const TransitionMatrix& mat){
 	// originate from not inserting stationary bins into the Mesh object after it has been read from
 	// file. The Stat file used to construct the TransitionMatrix contains these stationary bins
 
-	const Mesh& m = _sys.MeshObject();
+	const Mesh& m = _sys.MeshObjects()[_mesh_index];
 
 	const std::vector<TransitionMatrix::TransferLine>& lines = mat.Matrix();
 
@@ -80,9 +89,22 @@ void CSRMatrix::Validate(const TransitionMatrix& mat){
 	// check for consistency in strip 0; if not the same number of stationary points, there
 	// is an inconsistency between the config file of the Mesh and that of the TransitionMatrix
 
-
-	for (auto& line: lines)
+	for (auto& line: lines){
 		if (line._from[0] == 0) count++;
+
+		if (line._from[0] >= m.NrStrips() )
+				throw TwoDLib::TwoDLibException("Non existing strip number in matrix: " + std::to_string(line._from[0]));
+		if (line._from[1] >= m.NrCellsInStrip(line._from[0]) )
+			throw TwoDLib::TwoDLibException("Non existing cell number in strip " + std::to_string(line._from[0])  + " cell: " + std::to_string(line._from[1]));
+
+		for (auto& r: line._vec_to_line){
+			if ( r._to[1] >= m.NrCellsInStrip(r._to[0]) )
+				throw TwoDLib::TwoDLibException("Non existing cell number in strip " + std::to_string(r._to[0])  + " cell: " + std::to_string(r._to[1]));
+			if (r._to[0] >= m.NrStrips() )
+				throw TwoDLib::TwoDLibException("Non existing strip number in matrix: " + std::to_string(r._to[0]));
+
+		}
+	}
 
 	if ( count != m.NrCellsInStrip(0) )	
 	   throw TwoDLib::TwoDLibException("There is a stationary point in your mesh file, but no entries in the mat file that lead away from it.");
@@ -126,11 +148,11 @@ void CSRMatrix::MVMapped
 #pragma omp parallel for 
 
 	for (MPILib::Index i = 0; i < nr_rows; i++){
-	  MPILib::Index i_r =_sys.Map(_coordinates[i][0],_coordinates[i][1]);
-	  for( MPILib::Index j = _ia[i]; j < _ia[i+1]; j++){
-			 int j_m = _sys.Map(_coordinates[_ja[j]][0],_coordinates[_ja[j]][1]);
+		MPILib::Index i_r =_sys.Map(i+_i_offset);
+		for( MPILib::Index j = _ia[i]; j < _ia[i+1]; j++){
+			 int j_m = _sys.Map(_ja[j]+_i_offset);
 			 dydt[i_r] += rate*_val[j]*vec_mass[j_m];
-		 }
-	         dydt[i_r] -= rate*vec_mass[i_r];
+		}
+	    dydt[i_r] -= rate*vec_mass[i_r];
 	}
 }

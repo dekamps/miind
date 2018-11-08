@@ -23,6 +23,7 @@
 #include <MPILib/include/utilities/Log.hpp>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include "MeshAlgorithm.hpp"
 #include "Stat.hpp"
 #include "TwoDLibException.hpp"
@@ -46,8 +47,8 @@ namespace {
 
 namespace TwoDLib {
 
-	template <class WeightValue>
-	pugi::xml_node MeshAlgorithm<WeightValue>::CreateRootNode(const string& model_name){
+	template <class WeightValue,class Solver>
+	pugi::xml_node MeshAlgorithm<WeightValue,Solver>::CreateRootNode(const string& model_name){
 
 		// document
 		pugi::xml_parse_result result = _doc.load_file(model_name.c_str());
@@ -58,8 +59,8 @@ namespace TwoDLib {
 		return root;
 	}
 
-	template <class WeightValue>
-	Mesh MeshAlgorithm<WeightValue>::CreateMeshObject(){
+	template <class WeightValue, class Solver>
+	std::vector<TwoDLib::Mesh> MeshAlgorithm<WeightValue,Solver>::CreateMeshObject(){
 		// mesh
 		pugi::xml_node mesh_node = _root.first_child();
 
@@ -73,13 +74,13 @@ namespace TwoDLib {
 
 		// MatrixGenerator should already have inserted the stationary bin and there is no need
 		// to reexamine the stat file
-
-		return mesh;
+ 		std::vector<TwoDLib::Mesh> vec_mesh{ mesh };
+		return vec_mesh;
 	}
 
 
-	template <class WeightValue>
-	std::vector<TwoDLib::Redistribution> MeshAlgorithm<WeightValue>::Mapping(const string& type)
+	template <class WeightValue, class Solver>
+	std::vector<TwoDLib::Redistribution> MeshAlgorithm<WeightValue,Solver>::Mapping(const string& type)
 	{
 		Pred pred(type);
 		pugi::xml_node rev_node = _root.find_child(pred);
@@ -95,12 +96,13 @@ namespace TwoDLib {
 		return vec_rev;
 	}
 
-	template <class WeightValue>
-	MeshAlgorithm<WeightValue>::MeshAlgorithm
+	template <class WeightValue, class Solver>
+	MeshAlgorithm<WeightValue,Solver>::MeshAlgorithm
 	(
 		const std::string& model_name,
 		const std::vector<std::string>& mat_names,
 		MPILib::Time h,
+		MPILib::Time tau_refractive,
 		const std::string&  rate_method
 	):
 	_tolerance(1e-7),
@@ -111,24 +113,25 @@ namespace TwoDLib {
 	_rate(0.0),
 	_t_cur(0.0),
 	_root(CreateRootNode(model_name)),
-	_mesh(CreateMeshObject()),
-	_vec_rev(this->Mapping("Reversal")),
-	_vec_res(this->Mapping("Reset")),
+	_mesh_vec(CreateMeshObject()),
+	_vec_vec_rev(std::vector<std::vector<Redistribution> >{this->Mapping("Reversal")}),
+	_vec_vec_res(std::vector<std::vector<Redistribution> >{this->Mapping("Reset")}),
 	_vec_map(0),
-	_dt(_mesh.TimeStep()),
-	_sys(_mesh,_vec_rev,_vec_res),
+	_dt(_mesh_vec[0].TimeStep()),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res),
 	_n_evolve(0),
 	_n_steps(0),
-	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystem::AvgV : &TwoDLib::Ode2DSystem::F)
+	// AvgV method is for Fitzhugh-Nagumo, and other methods that don't have a threshold crossing
+	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystemGroup::AvgV : &TwoDLib::Ode2DSystemGroup::F)
 	// master parameter can only be calculated on configuration
 	{
 		// default initialization is (0,0); if there is no strip 0, it's down to the user
-		if (_mesh.NrCellsInStrip(0) > 0 )
-			_sys.Initialize(0,0);
+		if (_mesh_vec[0].NrCellsInStrip(0) > 0 )
+			_sys.Initialize(0,0,0);
 	}
 
-	template <class WeightValue>
-	MeshAlgorithm<WeightValue>::MeshAlgorithm(const MeshAlgorithm<WeightValue>& rhs):
+	template <class WeightValue, class Solver>
+	MeshAlgorithm<WeightValue,Solver>::MeshAlgorithm(const MeshAlgorithm<WeightValue,Solver>& rhs):
 	_tolerance(rhs._tolerance),
 	_model_name(rhs._model_name),
 	_mat_names(rhs._mat_names),
@@ -136,24 +139,24 @@ namespace TwoDLib {
 	_h(rhs._h),
 	_rate(rhs._rate),
 	_t_cur(rhs._t_cur),
-	_mesh(rhs._mesh),
-	_vec_rev(rhs._vec_rev),
-	_vec_res(rhs._vec_res),
+	_mesh_vec(rhs._mesh_vec),
+	_vec_vec_rev(rhs._vec_vec_rev),
+	_vec_vec_res(rhs._vec_vec_res),
 	_vec_map(0),
-	_dt(_mesh.TimeStep()),
-	_sys(_mesh,_vec_rev,_vec_res),
+	_dt(_mesh_vec[0].TimeStep()),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction)
 	// master parameter can only be calculated on configuration
 	{
 		// default initialization is (0,0); if there is no strip 0, it's down to the user
-		if (_mesh.NrCellsInStrip(0) > 0 )
-			_sys.Initialize(0,0);
+		if (_mesh_vec[0].NrCellsInStrip(0) > 0 )
+			_sys.Initialize(0,0,0);
 	}
 
-	template <class WeightValue>
-	std::vector<TwoDLib::TransitionMatrix> MeshAlgorithm<WeightValue>::InitializeMatrices(const std::vector<std::string>& mat_names)
+	template <class WeightValue, class Solver>
+	std::vector<TwoDLib::TransitionMatrix> MeshAlgorithm<WeightValue,Solver>::InitializeMatrices(const std::vector<std::string>& mat_names)
 	{
 		std::vector<TwoDLib::TransitionMatrix> vec_mat;
 
@@ -163,14 +166,14 @@ namespace TwoDLib {
 		return vec_mat;
 	}
 
-	template <class WeightValue>
-	MeshAlgorithm<WeightValue>* MeshAlgorithm<WeightValue>::clone() const
+	template <class WeightValue, class Solver>
+	MeshAlgorithm<WeightValue,Solver>* MeshAlgorithm<WeightValue,Solver>::clone() const
 	{
-	  return new MeshAlgorithm<WeightValue>(*this);
+	  return new MeshAlgorithm<WeightValue,Solver>(*this);
 	}
 
-	template <class WeightValue>
-	void MeshAlgorithm<WeightValue>::configure(const MPILib::SimulationRunParameter& par_run)
+	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::configure(const MPILib::SimulationRunParameter& par_run)
 	{
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
@@ -185,11 +188,11 @@ namespace TwoDLib {
 		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
 
 		try {
-			std::unique_ptr<TwoDLib::MasterOdeint> p_master(new MasterOdeint(_sys,vec_mat, par));
+			std::unique_ptr<Solver> p_master(new Solver(_sys,std::vector<std::vector<TransitionMatrix > >{vec_mat}, par));
 			_p_master = std::move(p_master);
 		}
 		// TODO: investigate the following
-		// for some reason, the exception is usually not caught by the main program, which is why we write its message to cerr here.
+		// for some reason, the rethrown exception is usually not caught by the main program, which is why we write its message to cerr here.
 		catch(TwoDLibException& e){
 			std::cerr << e.what() << std::endl;
 			throw e;
@@ -203,8 +206,8 @@ namespace TwoDLib {
 			throw TwoDLib::TwoDLibException("No initialization of the mass array has taken place. Call Initialize before configure.");
 	}
 
-	template <class WeightValue>
-	MPILib::AlgorithmGrid MeshAlgorithm<WeightValue>::getGrid(MPILib::NodeId id, bool b_state) const
+	template <class WeightValue, class Solver>
+	MPILib::AlgorithmGrid MeshAlgorithm<WeightValue,Solver>::getGrid(MPILib::NodeId id, bool b_state) const
 	{
 		// An empty grid will lead to crashes
 		vector<double> array_interpretation {0.};
@@ -227,13 +230,14 @@ namespace TwoDLib {
 				boost::filesystem::create_directory(dirname);
 			}
 			std::ofstream ofst(dirname + "/" + fn);
-			_sys.Dump(ofst);
+			std::vector<std::ostream*> vec_str{&ofst};
+			_sys.Dump(vec_str);
 		}
 		return MPILib::AlgorithmGrid(array_state,array_interpretation);
 	}
 
-	template <class WeightValue>
-	void MeshAlgorithm<WeightValue>::evolveNodeState
+	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::evolveNodeState
 	(
 		const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<WeightValue>& weightVector,
@@ -251,7 +255,6 @@ namespace TwoDLib {
 		    
 			_n_steps = static_cast<MPILib::Number>(round(n));
 			if (_n_steps == 0){
-
 			  throw TwoDLibException("Network time step is smaller than this grid's time step.");
 			}
 			if (fabs(_n_steps - n) > 1e-6){
@@ -272,23 +275,30 @@ namespace TwoDLib {
 	    // master equation
 	    _p_master->Apply(_n_steps*_dt,_vec_rates,_vec_map);
 
+	    // threshold
 	    _sys.RedistributeProbability();
 
  	    _t_cur += _n_steps*_dt;
- 	    _rate = (_sys.*_sysfunction)();
-
+ 	    _rate = (_sys.*_sysfunction)()[0];
  	    _n_evolve++;
 	}
 
-	template <class WeightValue>
-	void MeshAlgorithm<WeightValue>::FillMap(const std::vector<WeightValue>& vec_weights)
+	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::FillMap(const std::vector<WeightValue>& vec_weights)
 	{
+		// The order in which they weight matrices appear in the vec_weights vector is not related
+		// to the order in which the matrices are stored in the master equation solver.
+		// the former is determined by the order in which the connections to the node that this
+		// algorithm belongs to. The latter is determined by the order in which the user presents the TransitionMatrix
+		// objects to the Master object. For the user there is no obvious way to keep this in synchrony, so
+		// we allow any order, and use the synaptic efficacy of a connection to find the corresponding matrix.
+
  		// this function will only be called once;
 		_vec_map = std::vector<MPILib::Index>(vec_weights.size(),std::numeric_limits<MPILib::Index>::max());
 
  		for(MPILib::Index i_weight = 0; i_weight < _vec_map.size(); i_weight++){
-			for (MPILib::Index i_mat = 0; i_mat < _p_master->NrMatrix(); i_mat++){
-				if ( fabs( _p_master->Efficacy(i_mat) - vec_weights[i_weight]._efficacy) < _tolerance ){
+			for (MPILib::Index i_mat = 0; i_mat < _p_master->NrMatrices(0); i_mat++){
+				if ( fabs( _p_master->Efficacy(0,i_mat) - vec_weights[i_weight]._efficacy) < _tolerance ){
 					if (_vec_map[i_weight] == std::numeric_limits<MPILib::Index>::max())
 						_vec_map[i_weight] = i_mat;
 					else {
@@ -301,12 +311,13 @@ namespace TwoDLib {
 			}
 		}
 
- 		_vec_rates = std::vector<double>(vec_weights.size(),0.);
+ 		_vec_rates = std::vector< std::vector<MPILib::Efficacy> >(0); // MeshAlgorithm really only uses the first array, i.e. the rates it receives in prepareEvole
+ 		_vec_rates.push_back( std::vector<MPILib::Efficacy>(vec_weights.size(),0.) );
 
 	}
 
-	template <class WeightValue>
-	void MeshAlgorithm<WeightValue>::prepareEvolve
+	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::prepareEvolve
 	(
 		const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<WeightValue>& weightVector,
@@ -318,8 +329,9 @@ namespace TwoDLib {
 		// take into account the number of connections
 
 		assert(nodeVector.size() == weightVector.size());
-		for (MPILib::Index i = 0; i < nodeVector.size(); i++)
-			_vec_rates[i] = nodeVector[i]*weightVector[i]._number_of_connections;
+		for (MPILib::Index i = 0; i < nodeVector.size(); i++){
+			_vec_rates[0][i] = nodeVector[i]*weightVector[i]._number_of_connections;
+		}
 	}
 }
 
