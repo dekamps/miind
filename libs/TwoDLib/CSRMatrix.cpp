@@ -106,9 +106,9 @@ void CSRMatrix::Validate(const TransitionMatrix& mat){
 		}
 	}
 
-	if ( count != m.NrCellsInStrip(0) )	
+	if ( count != m.NrCellsInStrip(0) )
 	   throw TwoDLib::TwoDLibException("There is a stationary point in your mesh file, but no entries in the mat file that lead away from it.");
-      
+
 }
 
 void CSRMatrix::CSR(const vector<vector<MPILib::Index> >& vec_mat, const vector<vector<double> >& mat_vals){
@@ -128,7 +128,7 @@ void CSRMatrix::MV(vector<double>& out, const vector<double>& in){
 	assert( out.size() + 1 == _ia.size());
 
 	MPILib::Index nr_rows = _ia.size() - 1;
-	for (MPILib::Index i = 0; i < nr_rows; i++){
+	for (MPILib::Index i = 0; i < nr_rows ; i++){
 	  for(MPILib::Index j = _ia[i]; j < _ia[i+1]; j++){
 			out[i] += _val[j]*in[_ja[j]];
 		}
@@ -145,7 +145,7 @@ void CSRMatrix::MVMapped
 {
 	unsigned int nr_rows = _ia.size() - 1;
 
-#pragma omp parallel for 
+#pragma omp parallel for
 
 	for (MPILib::Index i = 0; i < nr_rows; i++){
 		MPILib::Index i_r =_sys.Map(i+_i_offset);

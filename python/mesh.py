@@ -937,7 +937,7 @@ def display_mesh(m, bbox, label = False, xtitle = 'V (mV)', ytitle = '', perimet
         vs = [point[0] for point in perimeter]
         ws = [point[1] for point in perimeter]
         pericell=Quadrilateral(vs,ws)
-        pericell.draw(plotlist,[0.,0.],2)
+        pericell.draw(plotlist,[0.,0.],3)
 
     for property in propertylist:
         if property.i > 0 and property.j >= 0:

@@ -31,25 +31,30 @@ Ode2DSystem::Ode2DSystem
 (
 	const Mesh& m,
 	const vector<Redistribution>&  vec_reversal,
-	const vector<Redistribution>&  vec_reset
+	const vector<Redistribution>&  vec_reset,
+	const vector<Redistribution>&  vec_next_reset,
+	const MPILib::Time& tau_refractive
 ):
 _mesh(m),
 _vec_length(InitializeLength(m)),
 _vec_cumulative(InitializeCumulative(m)),
 _vec_mass(InitializeMass()),
 _vec_area(InitializeArea(m)),
-_t(0),
+_it(0),
 _f(0),
 _map(InitializeMap()),
 _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
+_vec_next_reset(vec_next_reset),
 _reversal(*this,_vec_mass),
 _reset(*this,_vec_mass),
-_clean(*this,_vec_mass)
+_next_reset(*this,_vec_mass,_it,tau_refractive,_vec_next_reset),
+_reset_refractive(*this,_vec_mass,_it,tau_refractive,_vec_reset),
+_clean(*this,_vec_mass),
+_tau_refractive(tau_refractive)
 {
 	assert(m.TimeStep() != 0.0);
 	this->CheckConsistency();
-
 }
 
 bool Ode2DSystem::CheckConsistency() const {
@@ -66,7 +71,7 @@ bool Ode2DSystem::CheckConsistency() const {
 			ost_err << "In total there are: " << _mesh.NrStrips() << " strips." << std::endl;
 			throw TwoDLib::TwoDLibException(ost_err.str());
 		}
-	}	
+	}
 
 	for (const Redistribution& r: _vec_reset){
 		if ( r._from[0] >= _mesh.NrStrips() ){
@@ -77,8 +82,18 @@ bool Ode2DSystem::CheckConsistency() const {
 			ost_err << "reset. Nr cells in strip r._from[0]: " <<  _mesh.NrCellsInStrip(r._from[0] ) << ", from: " << r._from[1];
 			throw TwoDLib::TwoDLibException(ost_err.str());
 		}
-	}	
+	}
 
+	for (const Redistribution& r: _vec_next_reset){
+		if ( r._from[0] >= _mesh.NrQuadrilateralStrips() ){
+			ost_err << "reset. NrStrips: " << _mesh.NrQuadrilateralStrips() << ", from: " << r._from[0] << std::endl;
+			throw TwoDLib::TwoDLibException(ost_err.str());
+		}
+		if ( r._from[1] >= _mesh.NrCellsInStrip(r._from[0] ) ){
+			ost_err << "reset. Nr cells in strip r._from[0]: " <<  _mesh.NrCellsInStrip(r._from[0] ) << ", from: " << r._from[1];
+			throw TwoDLib::TwoDLibException(ost_err.str());
+		}
+	}
 	return true;
 }
 
@@ -147,13 +162,19 @@ void Ode2DSystem::Dump(std::ostream& ost, int mode) const
 			for (unsigned int j = 0; j < _mesh.NrCellsInStrip(i); j++ )
 				ost << i << "\t" << j << "\t" << " " << _vec_mass[this->Map(i,j)] << "\t";
 		}
+
 }
 
 void Ode2DSystem::Evolve()
 {
-	_t += 1;
+	_it += 1;
 	_f = 0;
-	this->UpdateMap();
+	UpdateMap();
+}
+
+void Ode2DSystem::EvolveWithoutMeshUpdate(){
+	_it += 1;
+	_f = 0;
 }
 
 void Ode2DSystem::UpdateMap()
@@ -161,7 +182,7 @@ void Ode2DSystem::UpdateMap()
 	for (MPILib::Index i = 1; i < _mesh.NrStrips(); i++){
 		// yes! i = 1. strip 0 is not supposed to have dynamics
 		for (MPILib::Index j = 0; j < _mesh.NrCellsInStrip(i); j++ ){
-			_map[i][j] =_vec_cumulative[i] + modulo(j-_t,_vec_length[i]);
+			_map[i][j] =_vec_cumulative[i] + modulo(j-_it,_vec_length[i]);
 		}
 	}
 }
@@ -172,10 +193,40 @@ void Ode2DSystem::RemapReversal(){
 
 void Ode2DSystem::RedistributeProbability()
 {
-	std::for_each(_vec_reset.begin(),_vec_reset.end(),_reset);
- 	std::for_each(_vec_reset.begin(),_vec_reset.end(),_clean);
+	if (_tau_refractive == 0.)
+		for(auto& m: _vec_reset)
+			_reset(m);
+	else
+		for(auto& m: _vec_reset)
+			_reset_refractive(m);
+
+	std::for_each(_vec_reset.begin(),_vec_reset.end(),_clean);
+
+	for(auto& m: _vec_next_reset)
+		_next_reset(m,1);
+
+	std::for_each(_vec_next_reset.begin(),_vec_next_reset.end(),_clean);
 
 	_f /= _mesh.TimeStep();
+}
+
+void Ode2DSystem::RedistributeProbability(MPILib::Number steps)
+{
+	if (_tau_refractive == 0.)
+		for(auto& m: _vec_reset)
+			_reset(m);
+	else
+		for(auto& m: _vec_reset)
+			_reset_refractive(m);
+
+	std::for_each(_vec_reset.begin(),_vec_reset.end(),_clean);
+
+	for(auto& m: _vec_next_reset)
+		_next_reset(m,steps);
+
+	std::for_each(_vec_next_reset.begin(),_vec_next_reset.end(),_clean);
+
+	_f /= (_mesh.TimeStep()*steps);
 }
 
 double Ode2DSystem::AvgV() const
@@ -190,4 +241,3 @@ double Ode2DSystem::AvgV() const
 
 	return av;
 }
-

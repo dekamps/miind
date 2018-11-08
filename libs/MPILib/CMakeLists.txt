@@ -7,6 +7,7 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_SOURCE_DIR}/../
    ${CMAKE_CURRENT_BINARY_DIR}/../
 )
+set( LIB_TYPE SHARED )
 
 include_directories(include)
 
@@ -53,6 +54,10 @@ set(MPI_SRCS
     src/SimulationRunParameter.cpp
 )
 
+set(MPI_HEADER 
+    include/ProbabilityQueue.hpp
+)
+
 #############################################################################
 # Libraries
 #############################################################################
@@ -64,12 +69,12 @@ set ( LIBLIST
     ${MPI_LIBRARIES} 
     ${MIIND_LIBRARY_PREFIX}numtools
     ${gsl_LINK_FLAGS} 
-	gsl    
+	gsl
 )
 
 add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${MPI_SRCS} ${MPI_HEADER})
 
-target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} )
+target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} -lpython2.7 -lboost_python)
 
 #############################################################################
 # Cmake generated header files
