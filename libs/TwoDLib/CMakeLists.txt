@@ -14,6 +14,7 @@ INCLUDE_DIRECTORIES(
 )
 				
 set( TWOD_SRC
+CSRAdapter.cpp
 CSRMatrix.cpp			
 Master.cpp			
 TransitionMatrix.cpp	 
@@ -29,11 +30,13 @@ Quadrilateral.cpp
 Triangle.cpp
 kd.cpp
 Fid.cpp		   				      			  
+Euler.cpp
 MeshTree.cpp   
 Redistribution.cpp  
 TriangleGenerator.cpp
 LineSegment.cpp												  		 		     
 Ode2DSystem.cpp   
+Ode2DSystemGroup.cpp   
 Stat.cpp   
 Uniform.cpp 
 )
@@ -49,10 +52,12 @@ LineSegment.hpp
 MeshTree.hpp   
 Stat.hpp   
 TwoDLib.hpp
+Euler.hpp
 Cell.hpp														   		  
 Master.hpp   
 MasterOdeint.hpp   
 Ode2DSystem.hpp   
+Ode2DSystemGroup.hpp   
 TransitionList.hpp  
 Uniform.hpp
 CheckSystem.hpp																  	       			 
@@ -73,6 +78,7 @@ FiducialElement.hpp
 MeshAlgorithm.hpp		       
 Quadrilateral.hpp  
 TriangleGenerator.hpp
+XML.hpp
 )
 
 

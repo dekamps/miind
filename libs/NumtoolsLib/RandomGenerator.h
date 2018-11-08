@@ -21,6 +21,7 @@
 #define _CODE_LIBS_NUMTOOLSLIB_RANDOMGENERATOR_INCLUDE_GUARD
 
 #include <vector>
+#include <iostream>
 #include <gsl/gsl_rng.h>
 #include "ChangeSeedException.h"
 
@@ -59,7 +60,7 @@ namespace NumtoolsLib
 	
 		// new, uniformly distributed value
 
-		void    AddOne         (){ ++_number_of_draws; }
+		void    AddOne         (){ std::cout << "zopa" << std::endl; ++_number_of_draws; }
 
 
 		long			_initial_seed;    // initial seed value

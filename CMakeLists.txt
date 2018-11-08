@@ -19,7 +19,6 @@ set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 ##############################################################################
 # compile flags
 ##############################################################################
-
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
     
 #for cross compiling remove the -march=native flag!
@@ -31,8 +30,8 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 # cmake options
 ##############################################################################
 
-OPTION(ENABLE_OPENMP "Enable OpenMP" OFF)
-OPTION(ENABLE_TESTING "Compile tests" ON)
+OPTION(ENABLE_OPENMP "Enable OpenMP" ON)
+OPTION(ENABLE_TESTING "Compile tests" OFF)
 OPTION(ENABLE_ROOT "Root Desired" OFF)
 OPTION(ENABLE_MEMORY_TEST "Generate memory test" OFF)
 OPTION(ENABLE_MPI "Enable mpi" FALSE)
@@ -62,8 +61,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
 				OUTPUT_VARIABLE GCC_VERSION)
 	if (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
-		message(STATUS "C++11 activated.")
-		set(CMAKE_CXX_FLAGS "-std=gnu++11")
+		message(STATUS "C++14 activated.")
+		set(CMAKE_CXX_FLAGS "-std=c++14")
 	else ()
 		message(FATAL_ERROR "C++11 needed (Ranged based for). Therefore a gcc compiler with a version higher or equal than 4.7 is needed.")   
 	endif()

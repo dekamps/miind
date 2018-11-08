@@ -23,7 +23,7 @@
 #include <vector>
 #include <MPILib/include/AlgorithmInterface.hpp>
 #include "MasterOdeint.hpp"
-#include "Ode2DSystem.hpp"
+#include "Ode2DSystemGroup.hpp"
 #include "pugixml.hpp"
 
 
@@ -35,17 +35,18 @@ namespace TwoDLib {
  * This class simulates the evolution of a neural population density function on a 2D grid.
  */
 
-	template <class WeightValue>
+	template <class WeightValue, class Solver=TwoDLib::MasterOdeint>
 	class MeshAlgorithm : public MPILib::AlgorithmInterface<WeightValue>  {
 
 	public:
 
 		MeshAlgorithm
 		(
-			const std::string&, 		    	 //!< model file name
-			const std::vector<std::string>&,     //!< collection of transition matrix files
-			MPILib::Time,                        //!< default time step for Master equation integration
-			const string& ratemethod = ""        //!< firing rate computation; by default the mass flux across threshold
+			const std::string&, 	                //!< model file name
+			const std::vector<std::string>&,        //!< vector of transition matrix files
+			MPILib::Time,                           //!< default time step for Master equation
+			MPILib::Time tau_refractive = 0,        //!< absolute refractive period
+			const string& ratemethod = ""           //!< firing rate computation; by default the mass flux across threshold
 		);
 
 		MeshAlgorithm(const MeshAlgorithm&);
@@ -92,6 +93,7 @@ namespace TwoDLib {
 		 * @param time Time point of the algorithm
 		 * @param typeVector Vector of the NodeTypes of the precursors
 		 */
+		using MPILib::AlgorithmInterface<WeightValue>::evolveNodeState;
 		virtual void evolveNodeState(const std::vector<MPILib::Rate>& nodeVector,
 				const std::vector<WeightValue>& weightVector, MPILib::Time time,
 				const std::vector<MPILib::NodeType>& typeVector);
@@ -110,7 +112,7 @@ namespace TwoDLib {
 		/**
 		 * Provides a reference to the Mesh
 		 */
-		const Mesh MeshReference() const { return _mesh; }
+		const Mesh& MeshReference() const { return _mesh_vec[0]; }
 
 		/**
 		 * By default, to find a matrix associated to an efficacy, MeshAlgorithm tests whether the efficacy quoted
@@ -127,14 +129,18 @@ namespace TwoDLib {
 		/**
 		 * Initialize a given Mesh cell before simulation starts
 		 */
-		void InitializeDensity(MPILib::Index i, MPILib::Index j){_sys.Initialize(i,j);}
+		void InitializeDensity(MPILib::Index i, MPILib::Index j){_sys.Initialize(0,i,j);}
 
+	   	const Ode2DSystemGroup& Sys() const { return _sys; }
+
+		const std::vector<TwoDLib::Redistribution>& MapReversal() const { return  _vec_vec_rev[0]; }
+		const std::vector<TwoDLib::Redistribution>& MapReset()    const { return  _vec_vec_res[0]; }
 	private:
 
 
 		// initialization routines
 		pugi::xml_node                          CreateRootNode(const std::string&);
-		Mesh                                    CreateMeshObject();
+		std::vector<TwoDLib::Mesh>              CreateMeshObject();
 		std::vector<TwoDLib::Redistribution>    Mapping(const std::string&);
 		std::vector<TwoDLib::TransitionMatrix>  InitializeMatrices(const std::vector<std::string>&);
 		void                                    FillMap(const std::vector<WeightValue>& weightVector);
@@ -155,21 +161,23 @@ namespace TwoDLib {
 		pugi::xml_node     _root;
 
 		// mesh and mappings
-		TwoDLib::Mesh _mesh;
-		std::vector<TwoDLib::Redistribution> _vec_rev;
-		std::vector<TwoDLib::Redistribution> _vec_res;
+		std::vector<TwoDLib::Mesh> _mesh_vec;          // we have to create a vector, even if MeshAlgorithm manages only one Mesh, because
+		                                               // there needs to be a place for Ode2DSystemGroup to store a vector of Mesh
+		std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_rev;
+		std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_res;
 
 		// map incoming rates onto the order used by MasterOMP
-		std::vector<unsigned int> _vec_map;
-		std::vector<MPILib::Rate> _vec_rates; // this is fed to the apply step of MasterOMP
+		std::vector<MPILib::Index>              _vec_map;
+		std::vector<std::vector<MPILib::Rate> > _vec_rates; // this is fed to the apply step of MasterOMP.
 
 		MPILib::Time 						_dt;     // mesh time step
-		TwoDLib::Ode2DSystem 				_sys;
-		std::unique_ptr<TwoDLib::MasterOdeint>	_p_master;
-		MPILib::Number						_n_evolve;
-		MPILib::Number						_n_steps;
+		TwoDLib::Ode2DSystemGroup 			_sys;
 
-		double (TwoDLib::Ode2DSystem::*_sysfunction) () const;
+		std::unique_ptr<Solver>	_p_master;
+		MPILib::Number			_n_evolve;
+		MPILib::Number			_n_steps;
+
+		const vector<double>& (TwoDLib::Ode2DSystemGroup::*_sysfunction) () const;
 	};
 }
 

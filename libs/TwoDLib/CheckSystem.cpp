@@ -35,7 +35,7 @@ void TwoDLib::CheckSystem
 	// Check whether mapping is one-on-one
 
 	std::vector<int> vec_map(sys._vec_mass.size(),0);
-	int n_strips = sys._mesh.NrQuadrilateralStrips();
+	int n_strips = sys._mesh.NrStrips();
 
 	for(int i = 0; i < n_strips; i++){
 		int n_cells = sys._mesh.NrCellsInStrip(i);

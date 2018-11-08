@@ -15,11 +15,13 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+
 #ifdef ENABLE_OPENMP
 #include <omp.h>
 #endif 
 #include <algorithm>
 #include <numeric>
+#include <fstream>
 
 #include "MasterOMP.hpp"
 
@@ -27,13 +29,13 @@
 
  MasterOMP::MasterOMP
  (
-	Ode2DSystem& sys,
-	const vector<TransitionMatrix>& vec_mat,
+	Ode2DSystemGroup&                                  sys,
+	const std::vector<std::vector<TransitionMatrix> >& vec_vec_mat,
 	const MasterParameter& par
 ):
 _sys(sys),
-_vec_mat(vec_mat),
-_vec_csr(InitializeCSR(vec_mat,sys)),
+_vec_vec_mat(vec_vec_mat),
+_vec_vec_csr(InitializeCSR(vec_vec_mat,sys)),
 _par(par),
 _dydt(sys._vec_mass.size(),0.),
 _rate(0.0),
@@ -43,26 +45,33 @@ _init(_rate)
  {
  }
 
- void MasterOMP::Apply(double t_step, const vector<double>& rates, const vector<MPILib::Index>& vec_map)
+ void MasterOMP::Apply
+ (
+	double t_step,
+	const std::vector< std::vector<double > >& vec_vec_rates,
+	const vector<MPILib::Index>&               vec_vec_map
+)
  {
+
+	 MPILib::Number n_mesh = vec_vec_rates.size();
 	 // the time step t_step is split into single solution steps _h, equal to 1/N_steps
 	 for (unsigned int j = 0; j < _par._N_steps; j++){
 
 #pragma omp parallel for
 		 for(unsigned int id = 0; id < _dydt.size(); id++)
 			 _dydt[id] = 0.;
-
-		 for (unsigned int irate = 0; irate < rates.size(); irate++){
-			 // do NOT map the rate
-			 _rate = rates[irate];
-
-			 // it is only the matrices that need to be mapped
-			 _vec_csr[vec_map[irate]].MVMapped
-			 (
-			    _dydt,
-			 	_sys._vec_mass,
-			 	_rate
-			 );
+		 for(MPILib::Index mesh_index = 0; mesh_index < n_mesh; mesh_index++){
+			 for (unsigned int irate = 0; irate < vec_vec_rates[mesh_index].size(); irate++){
+				 // do NOT map the rate
+				 _rate = vec_vec_rates[mesh_index][irate];
+				 // it is only the matrices that need to be mapped
+				 _vec_vec_csr[mesh_index][vec_vec_map[irate]].MVMapped
+				 (
+					_dydt,
+					_sys._vec_mass,
+					_rate
+				 );
+			 }
 		 }
 
 #pragma omp parallel for
@@ -71,12 +80,16 @@ _init(_rate)
 	 }
  }
 
- std::vector<CSRMatrix> MasterOMP::InitializeCSR(const std::vector<TransitionMatrix>& vec_mat, const Ode2DSystem& sys)
- {
-	 std::vector<CSRMatrix> vec_ret;
-
-	 for (const auto& mat: vec_mat)
-		 vec_ret.push_back(CSRMatrix(mat,sys));
-
-	 return vec_ret;
- }
+std::vector<std::vector<CSRMatrix> > MasterOMP::InitializeCSR(const std::vector< std::vector<TransitionMatrix> >& vec_vec_mat, const Ode2DSystemGroup& sys)
+  {
+ 	 std::vector<std::vector<CSRMatrix> > vec_ret;
+ 	 MPILib::Index mesh_index = 0;
+ 	 for (const auto& vec_mat: vec_vec_mat){
+ 		 std::vector<CSRMatrix> vec_dummy;
+ 		 for (const auto& mat: vec_mat)
+ 			 vec_dummy.push_back(CSRMatrix(mat,sys,mesh_index));
+ 		 vec_ret.push_back(vec_dummy);
+ 		 mesh_index++;
+ 	 }
+ 	 return vec_ret;
+  }

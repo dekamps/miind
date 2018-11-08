@@ -32,7 +32,7 @@ bool TranslationObject::GenerateTranslationList(const Mesh& mesh)
 		// we check that
 		if (_translation_list.size() == 0){
 			// all is well; use the mesh to instantiate the translation list
-			for( unsigned int i = 0; i <  mesh.NrQuadrilateralStrips(); i++){
+			for( unsigned int i = 0; i <  mesh.NrStrips(); i++){
 				vector<Translation> vec_trans;
 				for (unsigned int j = 0; j < mesh.NrCellsInStrip(i); j++){
 					vec_trans.push_back(Translation(_v,_w));
@@ -45,7 +45,7 @@ bool TranslationObject::GenerateTranslationList(const Mesh& mesh)
 	} else {
 		// OK, the list was loaded from the jump file, so the translation_list is already there;
 		// we only have to check whether it's consistent with the mesh.
-		for (unsigned int i = 0; i < mesh.NrQuadrilateralStrips(); i++)
+		for (unsigned int i = 0; i < mesh.NrStrips(); i++)
 			if ( _translation_list[i].size() != mesh.NrCellsInStrip(i))
 				throw TwoDLibException("The translation list and the mesh have different dimensions.");
 	}

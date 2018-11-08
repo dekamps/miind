@@ -148,7 +148,7 @@ void Write
 		MPILib::Index min_strip, max_strip;
 		if (l_min == 0 && l_max == 0){
 			min_strip = 0;
-			max_strip = mesh.NrQuadrilateralStrips();
+			max_strip = mesh.NrStrips();
 		} else {
 			min_strip = l_min;
 			max_strip = l_max;
@@ -224,12 +224,12 @@ void Write
 		std::istringstream i_mesh(o_mesh.str());
 		TwoDLib::Mesh mesh(i_mesh);
 
-		if (l_max > mesh.NrQuadrilateralStrips()){
+		if (l_max > mesh.NrStrips()){
 			std::cout << "Upper range too large: should not exceed number of strips" << std::endl;
 			exit(0);
 		}
 
-		std::cout << "There are: " << mesh.NrQuadrilateralStrips() << " strips" << std::endl;
+		std::cout << "There are: " << mesh.NrStrips() << " strips" << std::endl;
 
 		TwoDLib::Fid fid((base_name + std::string(".fid")).c_str());
 

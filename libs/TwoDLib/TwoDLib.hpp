@@ -19,8 +19,10 @@
 #define _CODE_LIBS_2DLIB_INCLUDE_GUARD
 
 #include "kd.h"
+#include "CSRAdapter.hpp"
 #include "CSRMatrix.hpp"
 #include "CheckSystem.hpp"
+#include "Euler.hpp"
 #include "Fid.hpp"
 #include "InputCombination.hpp"
 #include "LineSegment.hpp"
@@ -29,6 +31,7 @@
 #include "Mesh.hpp"
 #include "MeshAlgorithmCode.hpp"
 #include "Ode2DSystem.hpp"
+#include "Ode2DSystemGroup.hpp"
 #include "pugixml.hpp"
 #include "QuadGenerator.hpp"
 #include "Redistribution.hpp"
@@ -38,5 +41,6 @@
 #include "TriangleGenerator.hpp"
 #include "TwoDLibException.hpp"
 #include "Uniform.hpp"
+#include "XML.hpp"
 
 #endif

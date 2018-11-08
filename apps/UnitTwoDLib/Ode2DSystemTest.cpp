@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(SystemConstructionTest){
 	mesh.InsertStationary(reversal_bin);
 
 	vector<Redistribution> reversal_map;
-	for( unsigned int i = 0; i < mesh.NrQuadrilateralStrips();i++){
+	for( unsigned int i = 0; i < mesh.NrStrips();i++){
 		Coordinates from(i,0);
 		Coordinates to(0,0);
 		Redistribution m(from,to,1.0);
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(EvolutionTest){
 
 	vector<Redistribution> reversal_map;
 	// 1 is crucial. If 0 is in there, the reversal bin will be wiped out
-	for( unsigned int i = 1; i < mesh.NrQuadrilateralStrips();i++){
+	for( unsigned int i = 1; i < mesh.NrStrips();i++){
 		Coordinates from(i,0);
 		Coordinates to(0,0);
 		Redistribution m(from,to,1.0);
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(DumpTest){
 
 	vector<Redistribution> reversal_map;
 	// 1 is crucial. If 0 is in there, the reversal bin will be wiped out
-	for( unsigned int i = 1; i < mesh.NrQuadrilateralStrips();i++){
+	for( unsigned int i = 1; i < mesh.NrStrips();i++){
 		Coordinates from(i,0);
 		Coordinates to(0,0);
 		Redistribution m(from,to,1.0);
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(ResetTest){
 
 	vector<Redistribution> reversal_map;
 	// 1 is crucial. If 0 is in there, the reversal bin will be wiped out
-	for( unsigned int i = 1; i < mesh.NrQuadrilateralStrips();i++){
+	for( unsigned int i = 1; i < mesh.NrStrips();i++){
 		Coordinates from(i,0);
 		Coordinates to(0,0);
 		Redistribution m(from,to,1.0);

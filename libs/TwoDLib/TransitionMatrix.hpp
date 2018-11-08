@@ -37,6 +37,7 @@ namespace TwoDLib {
 			std::vector<Redistribution> _vec_to_line;
 		};
 
+
 		//! Requires a ".mat" file
 		TransitionMatrix(const std::string&);
 
@@ -54,11 +55,14 @@ namespace TwoDLib {
 
 	private:
 
+		TransitionMatrix();
+
 		std::vector<TransferLine>	_vec_line;
 		double						_tr_v;
 		double						_tr_w;
 
 	};
+
 }
 
 #endif
