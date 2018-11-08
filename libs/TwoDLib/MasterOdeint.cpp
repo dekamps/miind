@@ -17,7 +17,7 @@
 //
 #ifdef ENABLE_OPENMP
 #include <omp.h>
-#endif 
+#endif
 #include <algorithm>
 #include <numeric>
 

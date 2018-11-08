@@ -1,0 +1,323 @@
+#!/usr/bin/env python
+
+import argparse
+import codegen
+import sys
+import os
+import os.path as op
+import directories
+import jobs
+import miind_api as api
+import matplotlib.pyplot as plt
+import directories
+import numpy as np
+from scipy.integrate import odeint
+import math
+
+def rybak(y, t):
+    g_nap = 0.25; #mS
+    g_na = 30;
+    g_k = 1;
+    theta_m = -47.1; #mV
+    sig_m = -3.1; #mV
+    theta_h = -59; #mV
+    sig_h = 8; #mV
+    tau_h = 1200; #ms
+    E_na = 55; #mV
+    E_k = -80;
+    C = 1; #uF
+    g_l = 0.1; #mS
+    E_l = -64.0; #mV
+    I = 0.0; #
+    I_h = 0; #
+
+    v = y[0];
+    h = y[1];
+
+    I_nap = -g_nap * h * (v - E_na) * ((1 + np.exp((-v-47.1)/3.1))**-1);
+    I_l = -g_l*(v - E_l);
+    I_na = -g_na * 0.7243 * (v - E_na) * (((1 + np.exp((v+35)/-7.8))**-1)**3);
+    I_k = -g_k * (v - E_k) * (((1 + np.exp((v+28)/-15))**-1)**4);
+
+    v_prime = ((I_nap + I_l + I_na + I_k) / C)+I;
+    h_prime = (((1 + (np.exp((v - theta_h)/sig_h)))**(-1)) - h ) / (tau_h/np.cosh((v - theta_h)/(2*sig_h))) + I_h;
+
+    return [v_prime, h_prime]
+
+def adEx(y,t):
+    C = 200
+    g_l = 10
+    E_l = -70.0
+    v_t = -50.0
+    tau = 2.0
+    alpha = 2.0
+    tau_w = 30.0
+
+    v = y[0];
+    w = y[1];
+
+    v_prime = (-g_l*(v - E_l) + g_l*tau*np.exp((v - v_t)/tau) - w) / C
+    w_prime = (alpha*(v-E_l) - w) / tau_w
+
+    return [v_prime, w_prime]
+
+def cond(y,t):
+    param_dict={
+
+    'tau_m':   20e-3,
+    'E_r': -65e-3,
+    'E_e':  0e-3,
+    'tau_s':  5e-3,
+    'g_max': 0.8,
+    'V_min':-66.0e-3,
+    'V_max':  -55.0e-3,
+    'V_th': -55.0e-3, #'V_max', # sometimes used in other scripts
+    'N_V': 200,
+    'w_min':0.0,
+    'w_max':  10.0,
+    'N_w': 20,
+
+    }
+
+    v = y[0];
+    w = y[1];
+
+    v_prime = (-(v-param_dict['E_r'])  - w*(v-param_dict['E_e']))/param_dict['tau_m']
+    w_prime = -w/param_dict['tau_s']
+
+    return [v_prime, w_prime]
+
+def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid_v_min, grid_v_max, grid_h_min, grid_h_max, grid_v_res, grid_h_res,efficacy_orientation='v'):
+
+    grid_d1_res = grid_v_res;
+    grid_d1_min = reset_v;
+    grid_d1_max = threshold_v;
+
+    grid_d2_res = grid_h_res;
+    grid_d2_min = grid_h_min;
+    grid_d2_max = grid_h_max;
+
+    buffer_v = 5;
+    buffer_h = 20;
+
+    if (efficacy_orientation == 'v'):
+        grid_d1_res = grid_v_res;
+        grid_d1_min = grid_h_min;
+        grid_d1_max = grid_h_max;
+
+        grid_d2_res = grid_h_res;
+        grid_d2_min = reset_v;
+        grid_d2_max = threshold_v;
+
+    with open(basename + '.rev', 'w') as rev_file:
+        rev_file.write('<Mapping Type="Reversal">\n')
+        rev_file.write('</Mapping>\n')
+
+    with open(basename + '.stat', 'w') as stat_file:
+        stat_file.write('<Stationary>\n')
+        stat_file.write('</Stationary>\n')
+
+    with open(basename + '.mesh', 'w') as mesh_file:
+        mesh_file.write('ignore\n')
+        mesh_file.write('{}\n'.format(timestep))
+
+        for i in (np.array(range(grid_d1_res+(buffer_v*2)))-buffer_v) * (1.0/(grid_d1_res)):
+            svs_1 = [];
+            sus_1 = [];
+            svs_2 = [];
+            sus_2 = [];
+
+            for j in (np.array(range(grid_d2_res+(buffer_h*2)))-buffer_h) * (1.0/(grid_d2_res)):
+                if (efficacy_orientation != 'v'):
+                    x1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
+                    y1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
+
+                    svs_1.append(x1)
+                    sus_1.append(y1)
+                    svs_2.append(x1 + ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)))
+                    sus_2.append(y1)
+
+                else:
+                    y1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
+                    x1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
+
+                    svs_1.append(x1)
+                    sus_1.append(y1)
+                    svs_2.append(x1)
+                    sus_2.append(y1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)))
+
+
+            for s in svs_1:
+                mesh_file.write('{}\t'.format(s))
+            mesh_file.write('\n')
+            for s in sus_1:
+                mesh_file.write('{}\t'.format(s))
+            mesh_file.write('\n')
+            for s in svs_2:
+                mesh_file.write('{}\t'.format(s))
+            mesh_file.write('\n')
+            for s in sus_2:
+                mesh_file.write('{}\t'.format(s))
+            mesh_file.write('\n')
+            mesh_file.write('closed\n')
+        mesh_file.write('end\n')
+
+    with open(basename + '_transform.rev', 'w') as rev_file:
+        rev_file.write('<Mapping Type="Reversal">\n')
+        rev_file.write('</Mapping>\n')
+
+    with open(basename + '_transform.stat', 'w') as stat_file:
+        stat_file.write('<Stationary>\n')
+        stat_file.write('</Stationary>\n')
+
+    with open(basename + '_transform.mesh', 'w') as mesh_file:
+        mesh_file.write('ignore\n')
+        mesh_file.write('{}\n'.format(timestep))
+
+        progress = 0
+        count = 0
+        ten_percent = (int)((grid_d1_res+(2*buffer_v)) / 10)
+
+        tspan = np.linspace(0, 0.001,101)
+
+        t_1 = odeint(func, [-0.065, 0.02], tspan, atol=1e-12, rtol=1e-12)
+        t_2 = odeint(func, [-0.065, 0.0], tspan, atol=1e-12, rtol=1e-12)
+        t_3 = odeint(func, [-0.0648, 0.0], tspan, atol=1e-12, rtol=1e-12)
+        t_4 = odeint(func, [-0.0648, 0.02], tspan, atol=1e-12, rtol=1e-12)
+
+        print t_1
+        print t_2
+        print t_3
+        print t_4
+        plt.plot(t_1[:,0], t_1[:,1])
+        plt.plot(t_2[:,0], t_2[:,1])
+        plt.plot(t_3[:,0], t_3[:,1])
+        plt.plot(t_4[:,0], t_4[:,1])
+        plt.show()
+
+        for i in (np.array(range(grid_d1_res+(buffer_v*2)))-buffer_v) * (1.0/(grid_d1_res)):
+            svs_1 = [];
+            sus_1 = [];
+            svs_2 = [];
+            sus_2 = [];
+
+            count = count + 1
+            if (count % ten_percent == 0):
+                print('{} % complete.'.format(progress))
+                progress += 10
+
+            for j in (np.array(range(grid_d2_res+(buffer_h*2)))-buffer_h) * (1.0/(grid_d2_res)):
+
+                if (efficacy_orientation != 'v'):
+                    x1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
+                    y1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
+
+                    tspan = np.linspace(0, timestep, 101)
+
+                    t_1 = odeint(func, [x1,y1], tspan, atol=1e-12, rtol=1e-12)
+                    t_2 = odeint(func, [x1 + ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)),y1], tspan, atol=1e-12, rtol=1e-12)
+
+                else:
+                    y1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
+                    x1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
+
+                    tspan = np.linspace(0, timestep,101)
+
+                    t_1 = odeint(func, [x1,y1], tspan, atol=1e-12, rtol=1e-12)
+                    t_2 = odeint(func, [x1,y1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min))], tspan, atol=1e-12, rtol=1e-12)
+
+                t_x1 = t_1[-1][0]
+                t_y1 = t_1[-1][1]
+                t_x2 = t_2[-1][0]
+                t_y2 = t_2[-1][1]
+
+                if (math.isnan(t_x1) or math.isnan(t_y1)):
+                    t_x1 = x1 + (grid_d1_max-grid_d1_min)
+                    t_y1 = y1
+
+                if (math.isnan(t_x2) or math.isnan(t_y2)):
+                    t_x2 = x1 + (grid_d1_max-grid_d1_min) + 1
+                    t_y2 = y1
+
+
+                svs_1.append(t_x1)
+                sus_1.append(t_y1)
+                svs_2.append(t_x2)
+                sus_2.append(t_y2)
+
+            for s in svs_1:
+                mesh_file.write('{}\t'.format(s))
+            mesh_file.write('\n')
+            for s in sus_1:
+                mesh_file.write('{}\t'.format(s))
+            mesh_file.write('\n')
+            for s in svs_2:
+                mesh_file.write('{}\t'.format(s))
+            mesh_file.write('\n')
+            for s in sus_2:
+                mesh_file.write('{}\t'.format(s))
+            mesh_file.write('\n')
+            mesh_file.write('closed\n')
+        mesh_file.write('end\n')
+
+    api.MeshTools.buildModelFileFromMesh(basename, reset_v+0.00000000001, threshold_v+0.00000000001)
+    api.MeshTools.buildModelFileFromMesh(basename + '_transform', reset_v, threshold_v)
+
+    mod_file = open(basename + '.model', 'r')
+    lines = mod_file.readlines()
+    mod_file.close()
+
+    mod_file = open(basename + '.model', 'w')
+    for l in range(len(lines)):
+        if l != 3:
+            mod_file.write(lines[l])
+    mod_file.close()
+
+    mod_file = open(basename + '_transform.model', 'r')
+    lines = mod_file.readlines()
+    mod_file.close()
+
+    mod_file = open(basename + '_transform.model', 'w')
+    for l in range(len(lines)):
+        if l != 3:
+            mod_file.write(lines[l])
+    mod_file.close()
+
+    api.MeshTools.buildTransformFileFromModel(basename, 1000000000)
+    api.MeshTools.buildTransformFileFromModel(basename, reset_shift_w=reset_shift_h, mode='resettransform')
+
+    # filename = basename + '.mesh'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+
+    # filename = basename + '.rev'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '.stat'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '.res'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+
+    # filename = basename + '_transform.mesh'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+
+    # filename = basename + '_transform.rev'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '_transform.stat'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+
+    # filename = basename + '_transform.model'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+
+# generate(rybak, 1, 'grid', -10, -56, -0.004, -80, -40, -0.4, 1.0, 300, 200)
+# generate(adEx, 1, 'adex', -10, -58, 0.0, -90, -40, -20, 60, 300, 100)
+generate(cond, 1e-05, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, 0, 1.0, 30, 300, efficacy_orientation='w')

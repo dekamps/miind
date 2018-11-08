@@ -1,0 +1,14 @@
+apps/* usr/share/miind/apps
+build/* usr/share/miind/build
+cmake-modules/* usr/share/miind/cmake-modules
+doc/* usr/share/miind/doc
+examples/* usr/share/miind/examples
+images/* usr/share/miind/images
+libs/* usr/share/miind/libs
+Publication/* usr/share/miind/Publication
+python/* usr/share/miind/python
+CHANGE_LOG usr/share/miind
+CMakeLists.txt usr/share/miind
+README usr/share/miind
+
+

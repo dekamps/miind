@@ -25,7 +25,7 @@
 #include "MasterOdeint.hpp"
 #include "Ode2DSystemGroup.hpp"
 #include "pugixml.hpp"
-
+#include "display.hpp"
 
 namespace TwoDLib {
 
@@ -131,10 +131,11 @@ namespace TwoDLib {
 		 */
 		void InitializeDensity(MPILib::Index i, MPILib::Index j){_sys.Initialize(0,i,j);}
 
-	   	const Ode2DSystemGroup& Sys() const { return _sys; }
+	  const Ode2DSystemGroup& Sys() const { return _sys; }
 
 		const std::vector<TwoDLib::Redistribution>& MapReversal() const { return  _vec_vec_rev[0]; }
 		const std::vector<TwoDLib::Redistribution>& MapReset()    const { return  _vec_vec_res[0]; }
+
 	private:
 
 

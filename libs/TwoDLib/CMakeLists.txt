@@ -4,7 +4,7 @@ project( ${MIIND_LIBRARY_PREFIX}twod )
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
-set( LIB_TYPE STATIC )
+set( LIB_TYPE SHARED )
 
 
 #one below that MPILib is included in the paths they are needed for the camke config files
@@ -12,10 +12,11 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_SOURCE_DIR}/../
    ${CMAKE_CURRENT_BINARY_DIR}/../
 )
-				
+
 set( TWOD_SRC
 CSRAdapter.cpp
-CSRMatrix.cpp			
+CSRMatrix.cpp	
+display.cpp		
 Master.cpp			
 TransitionMatrix.cpp	 
 Cell.cpp											
@@ -24,9 +25,9 @@ MasterOdeint.cpp
 QuadGenerator.cpp  
 TransitionMatrixGenerator.cpp 
 pugixml.cpp
-CheckSystem.cpp														   		      
-Mesh.cpp			      
-Quadrilateral.cpp  
+CheckSystem.cpp
+Mesh.cpp
+Quadrilateral.cpp
 Triangle.cpp
 kd.cpp
 Fid.cpp		   				      			  
@@ -34,7 +35,7 @@ Euler.cpp
 MeshTree.cpp   
 Redistribution.cpp  
 TriangleGenerator.cpp
-LineSegment.cpp												  		 		     
+LineSegment.cpp												  		 	     
 Ode2DSystem.cpp   
 Ode2DSystemGroup.cpp   
 Stat.cpp   
@@ -42,41 +43,45 @@ Uniform.cpp
 )
 
 set( TWOD_HEADERS
+display.hpp
+GridAlgorithmCode.hpp
+GridReport.hpp
 Bin.hpp
-InputCombination.hpp		
-MeshAlgorithmCode.hpp		
-Redistribution.hpp	 
+InputCombination.hpp
+MeshAlgorithmCode.hpp
+Redistribution.hpp
 TwoDLibException.hpp
-CSRMatrix.hpp											
-LineSegment.hpp		  
-MeshTree.hpp   
-Stat.hpp   
+CSRMatrix.hpp
+LineSegment.hpp
+MeshTree.hpp
+Stat.hpp
 TwoDLib.hpp
 Euler.hpp
 Cell.hpp														   		  
 Master.hpp   
-MasterOdeint.hpp   
+MasterOdeint.hpp  
+MasterGrid.hpp 
 Ode2DSystem.hpp   
 Ode2DSystemGroup.hpp   
 TransitionList.hpp  
 Uniform.hpp
-CheckSystem.hpp																  	       			 
-MasterOMP.hpp	       
-TransitionMatrix.hpp  
+CheckSystem.hpp
+MasterOMP.hpp
+TransitionMatrix.hpp
 modulo.hpp
-Coordinates.hpp										 		       			 
-MasterParameter.hpp    
-Point.hpp   
-TransitionMatrixGenerator.hpp 
+Coordinates.hpp
+MasterParameter.hpp
+Point.hpp
+TransitionMatrixGenerator.hpp
 pugiconfig.hpp
-Fid.hpp																		 				
-Mesh.hpp   
-QuadGenerator.hpp  
-Triangle.hpp   
+Fid.hpp
+Mesh.hpp
+QuadGenerator.hpp
+Triangle.hpp
 pugixml.hpp
-FiducialElement.hpp																	  	     
-MeshAlgorithm.hpp		       
-Quadrilateral.hpp  
+FiducialElement.hpp
+MeshAlgorithm.hpp
+Quadrilateral.hpp
 TriangleGenerator.hpp
 XML.hpp
 )

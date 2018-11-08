@@ -41,14 +41,14 @@ BOOST_AUTO_TEST_CASE(SystemConstructionTest){
 	}
 
 	vector<Redistribution> reset_map;
-	Ode2DSystem sys(mesh,reversal_map, reset_map);
+	Ode2DSystem sys(mesh,reversal_map, reset_map, vector<Redistribution>());
 }
 
 BOOST_AUTO_TEST_CASE(MapTest){
 	Mesh mesh("condee2a5ff4-0087-4d69-bae3-c0a223d03693.mesh");
 	vector<Redistribution> vec_dummy;
 	vector<Redistribution> reset_map;
-	Ode2DSystem sys(mesh,vec_dummy, vec_dummy);
+	Ode2DSystem sys(mesh,vec_dummy, vec_dummy,vector<Redistribution>());
 	BOOST_REQUIRE(sys.Map(1,0) == 0);
 
 	// Note that sys.Map(0,0) is undefined as no stationary point has been added to the Mesh
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(MapTest){
 	Quadrilateral reversal_bin(v,w);
 	mesh.InsertStationary(reversal_bin);
 
-	Ode2DSystem sys2(mesh,vec_dummy,vec_dummy);
+	Ode2DSystem sys2(mesh,vec_dummy,vec_dummy,vector<Redistribution>());
 	// it exists in sys2
 	BOOST_REQUIRE(sys2.Map(0,0) == 0);
 	BOOST_REQUIRE(sys2.Map(1,0) == 1);
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(MapTest){
 	Quadrilateral reversal_bin2(v,w2);
 
 	mesh.InsertStationary(reversal_bin2);
-	Ode2DSystem sys3(mesh,vec_dummy,vec_dummy);
+	Ode2DSystem sys3(mesh,vec_dummy,vec_dummy,vector<Redistribution>());
 }
 
 BOOST_AUTO_TEST_CASE(EvolutionTest){
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(EvolutionTest){
 	}
 
 	vector<Redistribution> reset_map;
-	Ode2DSystem sys(mesh,reversal_map, reset_map);
+	Ode2DSystem sys(mesh,reversal_map, reset_map,vector<Redistribution>());
 	sys.Initialize(1,0);
 
 	std::ofstream ofst10("condres_10");
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(DumpTest){
 	}
 
 	vector<Redistribution> reset_map;
-	Ode2DSystem sys(mesh,reversal_map, reset_map);
+	Ode2DSystem sys(mesh,reversal_map, reset_map,vector<Redistribution>());
 	sys.Initialize(100,0);
 
 	// inspect these files with the visualize function in the cond.py script
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(ResetTest){
 
 	std::ifstream ifstres("condee2a5ff4-0087-4d69-bae3-c0a223d03693.res");
 	vector<Redistribution> reset_map = ReMapping(ifstres);
-	Ode2DSystem sys(mesh,reversal_map, reset_map);
+	Ode2DSystem sys(mesh,reversal_map, reset_map,vector<Redistribution>());
 	sys.Initialize(100,0);
 
 	std::ofstream ofstreset("reset37");
@@ -165,4 +165,3 @@ BOOST_AUTO_TEST_CASE(ResetTest){
 	sys.Dump(ofstreset);
 
 }
-

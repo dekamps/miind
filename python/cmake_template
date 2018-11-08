@@ -97,6 +97,8 @@ ENDIF(ENABLE_OPENMP)
 # Libraries
 #############################################################################
 
+set(GLUT_LIBRARY "-lGL -lGLU -lglut")
+
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
@@ -111,6 +113,7 @@ set ( LIBLIST
     ${gsl_LINK_FLAGS}
     gsl
     gslcblas
+    ${GLUT_LIBRARY}
 )
 
 if (ENABLE_CUDA)
@@ -125,7 +128,7 @@ endif(ENABLE_CUDA)
 #############################################################################
  #   add the flags for C++11
 if(CMAKE_COMPILER_IS_GNUCXX)
-add_definitions("-std=c++14 -fext-numeric-literals")
+add_definitions("-std=c++14 -fext-numeric-literals ${GLUT_LIBRARY}"")
 else(CMAKE_COMPILER_IS_GNUCXX)
-add_definitions("-std=c++14")
+add_definitions("-std=c++14 ${GLUT_LIBRARY}"")
 endif(CMAKE_COMPILER_IS_GNUCXX)

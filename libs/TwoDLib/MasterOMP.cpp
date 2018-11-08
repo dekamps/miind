@@ -18,7 +18,7 @@
 
 #ifdef ENABLE_OPENMP
 #include <omp.h>
-#endif 
+#endif
 #include <algorithm>
 #include <numeric>
 #include <fstream>
@@ -41,7 +41,9 @@ _dydt(sys._vec_mass.size(),0.),
 _rate(0.0),
 _derivative(_dydt,_sys,_rate),
 _add(1./static_cast<double>(par._N_steps)),
-_init(_rate)
+_init(_rate),
+_mask(101,0.),
+_mask_swap(101,0.)
  {
  }
 
@@ -52,7 +54,6 @@ _init(_rate)
 	const vector<MPILib::Index>&               vec_vec_map
 )
  {
-
 	 MPILib::Number n_mesh = vec_vec_rates.size();
 	 // the time step t_step is split into single solution steps _h, equal to 1/N_steps
 	 for (unsigned int j = 0; j < _par._N_steps; j++){

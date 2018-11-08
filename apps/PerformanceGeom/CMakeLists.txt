@@ -59,8 +59,8 @@ if (UNIX)
 endif (UNIX)
 set ( LIBLIST       
     ${MIIND_LIBRARY_PREFIX}geom
-    ${MIIND_LIBRARY_PREFIX}mpi      
     ${MIIND_LIBRARY_PREFIX}twod      
+    ${MIIND_LIBRARY_PREFIX}mpi      
     ${MPI_LIBRARIES} 
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
@@ -68,7 +68,7 @@ set ( LIBLIST
     ${gsl_LINK_FLAGS} 
     gsl
     gslcblas
-
+    ${GLUT_LIBRARY}
 )
 
 

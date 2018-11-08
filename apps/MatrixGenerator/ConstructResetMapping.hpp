@@ -24,6 +24,7 @@ namespace TwoDLib {
 
 	void ConstructResetMapping
 	(
+		std::string mapping_tag,
 		std::ostream&,
 		const Mesh&,
 		const vector<Coordinates>&,
@@ -31,6 +32,7 @@ namespace TwoDLib {
 		double,
 		TransitionMatrixGenerator*
 	);
+
 }
 
 #endif // include guard

@@ -48,7 +48,7 @@ set ( LIBLIST
     ${gsl_LINK_FLAGS} 
     gsl
     gslcblas
-
+    ${GLUT_LIBRARY}
 )
 #############################################################################
 # Copy Test files to executable directory

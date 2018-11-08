@@ -27,6 +27,7 @@
 #include "MeshAlgorithm.hpp"
 #include "Stat.hpp"
 #include "TwoDLibException.hpp"
+#include "display.hpp"
 
 namespace {
 
@@ -118,7 +119,7 @@ namespace TwoDLib {
 	_vec_vec_res(std::vector<std::vector<Redistribution> >{this->Mapping("Reset")}),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,vector<Redistribution>(),tau_refractive),
 	_n_evolve(0),
 	_n_steps(0),
 	// AvgV method is for Fitzhugh-Nagumo, and other methods that don't have a threshold crossing
@@ -144,7 +145,7 @@ namespace TwoDLib {
 	_vec_vec_res(rhs._vec_vec_res),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,vector<Redistribution>(),rhs._sys.Tau_ref()),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction)
@@ -181,7 +182,7 @@ namespace TwoDLib {
 		// the integration time step, stored in the MasterParameter, is gauged with respect to the
 		// network time step.
 		MPILib::Number n_ode = static_cast<MPILib::Number>(std::floor(t_step/_h));
-		MasterParameter par((n_ode > 1) ? n_ode : 1 );
+		MasterParameter par((n_ode > 1) ? n_ode : 1);
 
 		// vec_mat will go out of scope; MasterOMP will convert the matrices
 		// internally and we don't want to keep two versions.
@@ -206,7 +207,7 @@ namespace TwoDLib {
 			throw TwoDLib::TwoDLibException("No initialization of the mass array has taken place. Call Initialize before configure.");
 	}
 
-	template <class WeightValue, class Solver>
+	template <class WeightValue,class Solver>
 	MPILib::AlgorithmGrid MeshAlgorithm<WeightValue,Solver>::getGrid(MPILib::NodeId id, bool b_state) const
 	{
 		// An empty grid will lead to crashes
@@ -232,6 +233,15 @@ namespace TwoDLib {
 			std::ofstream ofst(dirname + "/" + fn);
 			std::vector<std::ostream*> vec_str{&ofst};
 			_sys.Dump(vec_str);
+
+			// Output to a rate file as well. This might be slow, but we can observe
+			// the rate as the simulation progresses rather than wait for root.
+			std::ostringstream ost2;
+			ost2 << "rate_" << id ;
+			std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
+			ofst_rate.precision(10);
+			ofst_rate << _t_cur << "\t" << _sys.F() << std::endl;
+			ofst_rate.close();
 		}
 		return MPILib::AlgorithmGrid(array_state,array_interpretation);
 	}
@@ -252,7 +262,7 @@ namespace TwoDLib {
 		if (_n_steps == 0){
 		  // since n_steps == 0, time is the network time step
 			double n = (time - _t_cur)/_dt;
-		    
+
 			_n_steps = static_cast<MPILib::Number>(round(n));
 			if (_n_steps == 0){
 			  throw TwoDLibException("Network time step is smaller than this grid's time step.");
@@ -268,15 +278,13 @@ namespace TwoDLib {
 
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
-	      _sys.Evolve();
-          _sys.RemapReversal();
+				_sys.Evolve();
 	    }
 
 	    // master equation
 	    _p_master->Apply(_n_steps*_dt,_vec_rates,_vec_map);
 
-	    // threshold
-	    _sys.RedistributeProbability();
+	    _sys.RedistributeProbability(_n_steps);
 
  	    _t_cur += _n_steps*_dt;
  	    _rate = (_sys.*_sysfunction)()[0];
@@ -316,7 +324,7 @@ namespace TwoDLib {
 
 	}
 
-	template <class WeightValue, class Solver>
+	template <class WeightValue,class Solver>
 	void MeshAlgorithm<WeightValue,Solver>::prepareEvolve
 	(
 		const std::vector<MPILib::Rate>& nodeVector,

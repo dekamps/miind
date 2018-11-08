@@ -14,7 +14,7 @@ def processlist(modelname):
     sortlist=sorted(filelist, key=lambda item: (float(item.split('_')[-2]) ))
     f=open('processlist.txt','w')
     for fi in sortlist:
-        f.write('file \'' + fi + '.png\'\n' )
+        f.write('file \'' + fi + '.pdf\'\n' )
 
 def display(modelname, mesh, step):
     m=visualize.ModelVisualizer(modelname)
