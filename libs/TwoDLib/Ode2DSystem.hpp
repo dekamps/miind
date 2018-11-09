@@ -82,7 +82,7 @@ namespace TwoDLib {
 		void RemapReversal();
 
 		//! Return the instantaneous firing rate
-		double F() const {return _f;}
+		double F() const {std::cout << _f << "\n"; return _f;}
 
 		//! total probability mass in the system, should not be too far away from 1.0
 		double P() const {

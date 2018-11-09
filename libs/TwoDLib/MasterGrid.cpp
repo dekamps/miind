@@ -160,7 +160,7 @@ _cell_width(cell_width)
     double stays = 1.0 - goes;
 
     // it is only the matrices that need to be mapped
-    MVGridMapped
+    MVGrid
    (
        dydt,
      vec_mass,

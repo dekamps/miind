@@ -112,15 +112,23 @@ void Display::display(void) {
 
 	LockMutex(window_index);
 
+	double cell_area = std::abs(m.Quad(1,1).SignedArea());
 	double max = 0.0;
 	for (int i=0; i<_dws[window_index]._system->Mass().size(); i++)
-		if (max < log10(_dws[window_index]._system->Mass()[i] + 0.000006))
-			max = log10(_dws[window_index]._system->Mass()[i] + 0.000006);
+		if (max < log10(_dws[window_index]._system->Mass()[i]/cell_area))
+			max = log10(_dws[window_index]._system->Mass()[i]/cell_area);
 
-	double min = 1.0;
-	for (int i=0; i<_dws[window_index]._system->Mass().size(); i++)
-		if (log10(_dws[window_index]._system->Mass()[i] + 0.000006) < min)
-			min = log10(_dws[window_index]._system->Mass()[i] + 0.000006);
+	double min = 999999.0;
+	for (int i=0; i<_dws[window_index]._system->Mass().size(); i++){
+		if(_dws[window_index]._system->Mass()[i]/cell_area <= 0){
+			min = 0.0;
+			continue;
+		}
+		if (log10(_dws[window_index]._system->Mass()[i]/cell_area) < min)
+			min = log10(_dws[window_index]._system->Mass()[i]/cell_area);
+	}
+
+	// std::cout << "max : " << max << " | min : " << min << " | area : " << cell_area << "\n";
 
 	double mesh_min_v = _dws[window_index].mesh_min_v;
 	double mesh_max_v = _dws[window_index].mesh_max_v;
@@ -131,7 +139,7 @@ void Display::display(void) {
 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
 			Quadrilateral q = m.Quad(i,j);
 			unsigned int idx = _dws[window_index]._system->Map(i,j);
-			double mass = (log10(_dws[window_index]._system->Mass()[idx] + 0.000006) - min) / (max-min);
+			double mass = (log10(_dws[window_index]._system->Mass()[idx]/cell_area) - min) / (max-min);
 			vector<Point> ps = q.Points();
 
 			glColor3f(std::min(1.0,mass*2.0), std::max(0.0,((mass*2.0) - 1.0)), 0);
@@ -167,8 +175,8 @@ void Display::display(void) {
 	double nice_min_h = (double)floor(mesh_min_h * 1) / 1.0;
 	double nice_max_h = (double)ceil(mesh_max_h * 1) / 1.0;
 
-	double nice_min_v = (double)floor(mesh_min_v * 0.01) / 0.01;
-	double nice_max_v = (double)ceil(mesh_max_v * 0.01) / 0.01;
+	double nice_min_v = (double)floor(mesh_min_v * 1000) / 1000.0;
+	double nice_max_v = (double)ceil(mesh_max_v * 1000) / 1000.0;
 
 	double pos = 0;
 	while(pos < nice_max_h){
