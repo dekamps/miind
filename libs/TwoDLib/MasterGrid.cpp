@@ -43,18 +43,19 @@ _cell_width(cell_width)
  	double                rate,
    double stays,
    double goes,
-   unsigned int offset
+   unsigned int offset,
+   double eff
  ) const
  {
 
    int offset_1 = -offset;
    int offset_2 = -(offset+1);
-   if(rate < 0) {
+   if(eff < 0) {
      offset_1 = (offset + 1);
      offset_2 = offset;
    }
  #pragma omp parallel for
- 	for (MPILib::Index i = offset+1; i < dydt.size(); i++){
+ 	for (MPILib::Index i = offset+1; i < dydt.size()-(offset+1); i++){
  		dydt[i] += rate*stays*vec_mass[i+offset_1];
  		dydt[i] += rate*goes*vec_mass[i+offset_2];
  	  dydt[i] -= rate*vec_mass[i];
@@ -68,19 +69,20 @@ _cell_width(cell_width)
  	double                rate,
    double stays,
    double goes,
-   unsigned int offset
+   unsigned int offset,
+   double eff
  ) const
  {
 
    int offset_1 = -offset;
    int offset_2 = -(offset+1);
-   if(rate < 0) {
+   if(eff < 0) {
      offset_1 = (offset + 1);
      offset_2 = offset;
    }
  #pragma omp parallel for
  	for (MPILib::Index i = 0; i < _sys.MeshObject().NrQuadrilateralStrips(); i++){
-    for (MPILib::Index j = offset+1; j < _sys.MeshObject().NrCellsInStrip(i)-offset+1; j++){
+    for (MPILib::Index j = offset+1; j < _sys.MeshObject().NrCellsInStrip(i)-(offset+1); j++){
       MPILib::Index i_r =_sys.Map(i,j);
       dydt[i_r] += rate*stays*vec_mass[i_r+offset_1];
       dydt[i_r] += rate*goes*vec_mass[i_r+offset_2];
@@ -120,14 +122,15 @@ _cell_width(cell_width)
     double stays = 1.0 - goes;
 
     // it is only the matrices that need to be mapped
-    MVGrid
+    MVGridMapped
    (
        dydt,
      vec_mass,
      rate,
      stays,
      goes,
-     offset
+     offset,
+     vec_eff[irate]
     );
   }
 }

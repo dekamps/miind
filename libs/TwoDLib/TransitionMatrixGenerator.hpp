@@ -92,8 +92,7 @@ namespace TwoDLib {
       unsigned int,
       unsigned int,
       const TwoDLib::MeshTree&,
-      std::vector<Coordinates>,
-      unsigned int);
+      std::vector<Coordinates>);
 
 	  //! After a simulation, the generator must be reset
 	  void Reset(unsigned int N = 10);
@@ -128,6 +127,10 @@ namespace TwoDLib {
 	  const MeshTree&  		_tree;
 	  Uniform&				_uni;
 	  unsigned int 			_N;
+
+    Point _grid_bottom_left;
+    Point _grid_extent;
+    bool _grid_normal_orientation;
 
 	  std::vector<Hit> 		_hit_list;
 	  std::vector<Point>	_lost;

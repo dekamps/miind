@@ -44,6 +44,12 @@ _lost(0),
 _accounted(0),
 _vec_fiducial(InitializeFiducialVector(tree.MeshRef(),element_list))
 {
+	// when using the grid method, unfortunately, we need to know the orientation of the grid to efficiently
+	// calculate the transition.
+	_grid_normal_orientation =
+	!((_tree.MeshRef().Quad(1,1).Centroid() - _tree.MeshRef().Quad(1,2).Centroid()).msquared() > (_tree.MeshRef().Quad(1,1).Centroid() - _tree.MeshRef().Quad(2,1).Centroid()).msquared());
+	_grid_extent = _tree.MeshRef().Quad(2,2).Centroid() - _tree.MeshRef().Quad(1,1).Centroid();
+	_grid_bottom_left = _tree.MeshRef().Quad(0,0).Centroid() - (_grid_extent * 0.5);
 }
 
 void TransitionMatrixGenerator::ApplyTranslation(vector<Point>* pvec, const Point& p)
@@ -234,16 +240,48 @@ void TransitionMatrixGenerator::GenerateTransformUsingQuadTranslation(unsigned i
 {
 	const Quadrilateral& quad_trans = trans_tree.MeshRef().Quad(strip_no,cell_no);
 
-	unsigned int buffer = 2;
+	// get the original cells underneath the transformed cell for overlap comparison
+
+	std::vector<Point> trans_points = quad_trans.Points();
+	Point search_min = Point(trans_points[0][0], trans_points[0][1]);
+	Point search_max = Point(trans_points[0][0], trans_points[0][1]);
+
+	for (Point p : trans_points) {
+		if (p[0] < search_min[0])
+			search_min[0] = p[0];
+		if (p[0] > search_max[0])
+			search_max[0] = p[0];
+		if (p[1] < search_min[1])
+			search_min[1] = p[1];
+		if (p[1] > search_max[1])
+			search_max[1] = p[1];
+	}
+
+	Coordinates start_cell = Coordinates(0,0);
+	Coordinates end_cell = Coordinates(0,0);
+
+	if(_grid_normal_orientation) {
+		start_cell = Coordinates(std::floor((search_min[1]-_grid_bottom_left[1])/_grid_extent[1]),std::floor((search_min[0]-_grid_bottom_left[0])/_grid_extent[0]));
+		end_cell = Coordinates(std::ceil((search_max[1]-_grid_bottom_left[1])/_grid_extent[1]),std::ceil((search_max[0]-_grid_bottom_left[0])/_grid_extent[0]));
+	} else {
+		start_cell = Coordinates(std::floor((search_min[0]-_grid_bottom_left[0])/_grid_extent[0]),std::floor((search_min[1]-_grid_bottom_left[1])/_grid_extent[1]));
+		end_cell = Coordinates(std::ceil((search_max[0]-_grid_bottom_left[0])/_grid_extent[0]),std::ceil((search_max[1]-_grid_bottom_left[1])/_grid_extent[1]));
+	}
+
+	start_cell[0] = std::max((int)start_cell[0]-1, 0);
+	start_cell[1] = std::max((int)start_cell[1]-1, 0);
+	end_cell[0] = std::max((int)end_cell[0]+1, 0);
+	end_cell[1] = std::max((int)end_cell[1]+1, 0);
+
+	start_cell[0] = std::min((int)start_cell[0], (int)_tree.MeshRef().NrQuadrilateralStrips()-1);
+	start_cell[1] = std::min((int)start_cell[1], (int)_tree.MeshRef().NrCellsInStrip(1)-1);
+	end_cell[0] = std::min((int)end_cell[0], (int)_tree.MeshRef().NrQuadrilateralStrips());
+	end_cell[1] = std::min((int)end_cell[1], (int)_tree.MeshRef().NrCellsInStrip(1));
 
 	double total_area = 0.0;
 	double total_area_full = 0.0;
-	for (MPILib::Index s = strip_no-buffer; s < strip_no+buffer ; s++){
-		if (s < 0 || s >= trans_tree.MeshRef().NrQuadrilateralStrips())
-			continue;
-		for (MPILib::Index c = cell_no-buffer; c < cell_no+buffer; c++){
-			if (c < 0 || c >= trans_tree.MeshRef().NrCellsInStrip(s))
-				continue;
+	for (MPILib::Index s = start_cell[0]; s < end_cell[0] ; s++){
+		for (MPILib::Index c = start_cell[1]; c < end_cell[1]; c++){
 			std::vector<Point> ps = _tree.MeshRef().Quad(s,c).Points();
 			Quadrilateral quad_scaled = Quadrilateral((ps[0]), (ps[1]), (ps[2]), (ps[3]));
 			std::vector<Point> ps_scaled = quad_scaled.Points();

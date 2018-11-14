@@ -94,7 +94,6 @@ namespace TwoDLib {
 
 		// If the OpenGL display is being used, track the index of this node and
 		// provide a mutex to lock on
-		unsigned int _display_index;
 		std::mutex _display_mutex;
 
 		MPILib::NodeId _node_id;
