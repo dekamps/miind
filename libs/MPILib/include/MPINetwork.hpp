@@ -197,6 +197,8 @@ public:
 	 */
   void setNodeExternalPrecursor(NodeId node, const WeightValue& weight);
 
+	SimulationRunParameter& getSimulationParams() { return _parameterSimulationRun; }
+
 private:
 
 	/**

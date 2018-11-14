@@ -118,7 +118,7 @@ namespace TwoDLib {
 	_vec_res(this->Mapping("Reset")),
 	_vec_map(0),
 	_dt(_mesh.TimeStep()),
-	_sys(_mesh,_vec_rev,_vec_res,vector<Redistribution>(),tau_refractive),
+	_sys(_mesh,_vec_rev,_vec_res,tau_refractive),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystem::AvgV : &TwoDLib::Ode2DSystem::F)
@@ -143,7 +143,7 @@ namespace TwoDLib {
 	_vec_res(rhs._vec_res),
 	_vec_map(0),
 	_dt(_mesh.TimeStep()),
-	_sys(_mesh,_vec_rev,_vec_res,vector<Redistribution>(),rhs._sys.Tau_ref()),
+	_sys(_mesh,_vec_rev,_vec_res,rhs._sys.Tau_ref()),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction)

@@ -19,8 +19,8 @@ namespace TwoDLib {
 		const std::string& model_name,
 		const std::string& transform_matrix,
 		MPILib::Time h,
-		MPILib::Index start_strip,
-		MPILib::Index start_cell,
+		double start_v,
+		double start_w,
 		MPILib::Time tau_refractive,
 		const std::string&  rate_method
 	):
@@ -32,20 +32,20 @@ namespace TwoDLib {
 	_mesh(CreateMeshObject()),
 	_vec_rev(Mapping("Reversal")),
 	_vec_res(Mapping("Reset")),
-	_vec_next_res(Mapping("NextReset")),
 	_dt(_mesh.TimeStep()),
-	_sys(_mesh,_vec_rev,_vec_res,_vec_next_res,tau_refractive),
+	_sys(_mesh,_vec_rev,_vec_res,tau_refractive),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystem::AvgV : &TwoDLib::Ode2DSystem::F),
-	_start_strip(start_strip),
-	_start_cell(start_cell),
+	_start_v(start_v),
+	_start_w(start_w),
 	_transform_matrix(transform_matrix)
 	{
 		_mass_swap = vector<double>(_sys._vec_mass.size());
 
-		// default initialization is (0,0); if there is no strip 0, it's down to the user
-		_sys.Initialize(_start_strip,_start_cell);
+		vector<Coordinates> coords = _mesh.findPointInMeshSlow(Point(start_v, start_w));
+
+		_sys.Initialize(coords[0][0],coords[0][1]);
 
 	}
 
@@ -59,19 +59,20 @@ namespace TwoDLib {
 	_root(rhs._root),
 	_vec_rev(rhs._vec_rev),
 	_vec_res(rhs._vec_res),
-	_vec_next_res(rhs._vec_next_res),
 	_dt(_mesh.TimeStep()),
-	_sys(_mesh,_vec_rev,_vec_res,_vec_next_res,rhs._sys.Tau_ref()),
+	_sys(_mesh,_vec_rev,_vec_res,rhs._sys.Tau_ref()),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction),
-	_start_strip(rhs._start_strip),
-	_start_cell(rhs._start_cell),
+	_start_v(rhs._start_v),
+	_start_w(rhs._start_w),
 	_transform_matrix(rhs._transform_matrix)
 	{
 		_mass_swap = vector<double>(_sys._vec_mass.size());
 
-		_sys.Initialize(_start_strip,_start_cell);
+		vector<Coordinates> coords = _mesh.findPointInMeshSlow(Point(_start_v, _start_w));
+
+		_sys.Initialize(coords[0][0],coords[0][1]);
 
 	}
 
@@ -111,7 +112,7 @@ namespace TwoDLib {
 		double cell_width = std::max(cell_h_dist, cell_v_dist);
 
 		try {
-			std::unique_ptr<MasterGrid> p_master(new MasterGrid(_sys,cell_width,101));
+			std::unique_ptr<MasterGrid> p_master(new MasterGrid(_sys,cell_width));
 			_p_master = std::move(p_master);
 		}
 		// TODO: investigate the following
@@ -233,11 +234,8 @@ namespace TwoDLib {
 
  	    _n_evolve++;
 
-			std::cout << "frame end\n";
-
 			Display::getInstance()->UnlockMutex(_node_id);
 
-			//Display::getInstance()->updateDisplay();
 	}
 
 	template <class WeightValue>

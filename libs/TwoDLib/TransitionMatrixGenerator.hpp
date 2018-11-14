@@ -48,8 +48,9 @@ namespace TwoDLib {
 		struct Hit {
 			  Coordinates	_cell;
 			  int 			_count;
+        double    _prop;
 
-			  Hit():_count(Lost){};
+			  Hit():_count(Lost),_prop(0){};
 		  };
 
 	  //! A TransitionMatrixGenerator. It accepts a MeshTree (effectively a Mesh proxy, a reference to a
@@ -91,7 +92,8 @@ namespace TwoDLib {
       unsigned int,
       unsigned int,
       const TwoDLib::MeshTree&,
-      std::vector<Coordinates> );
+      std::vector<Coordinates>,
+      unsigned int);
 
 	  //! After a simulation, the generator must be reset
 	  void Reset(unsigned int N = 10);

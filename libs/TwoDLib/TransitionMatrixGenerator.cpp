@@ -190,11 +190,11 @@ void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned 
 		if((std::abs(area))/(std::abs(quad_trans.SignedArea())) < 0.00001)
 			continue;
 
-		total_area += (std::abs(area))/(std::abs(quad_trans.SignedArea()));
+		total_area += (std::abs(area))/(std::abs(quad_scaled.SignedArea()));
 		if (std::abs(area) > 0) {
 			Hit h;
 			h._cell = Coordinates(i,j);
-			h._count = (int)(_N*(std::abs(area))/(std::abs(quad_trans.SignedArea())));
+			h._count = (int)(_N*(std::abs(area))/(std::abs(quad_scaled.SignedArea())));
 			_hit_list.push_back(h);
 		}
 
@@ -234,31 +234,30 @@ void TransitionMatrixGenerator::GenerateTransformUsingQuadTranslation(unsigned i
 {
 	const Quadrilateral& quad_trans = trans_tree.MeshRef().Quad(strip_no,cell_no);
 
-	unsigned int s_buffer = (unsigned int)(_tree.MeshRef().NrQuadrilateralStrips() * 0.01)+5;
-	unsigned int c_buffer = (unsigned int)(_tree.MeshRef().NrCellsInStrip(1) * 0.01)+5;
+	unsigned int buffer = 2;
 
 	double total_area = 0.0;
-	for (MPILib::Index s = strip_no-s_buffer; s < strip_no+s_buffer; s++){
-		if (s < 0 || s >= _tree.MeshRef().NrQuadrilateralStrips())
+	double total_area_full = 0.0;
+	for (MPILib::Index s = strip_no-buffer; s < strip_no+buffer ; s++){
+		if (s < 0 || s >= trans_tree.MeshRef().NrQuadrilateralStrips())
 			continue;
-		for (MPILib::Index c = cell_no-c_buffer; c < cell_no+c_buffer; c++){
-			if (c < 0 || c >= _tree.MeshRef().NrCellsInStrip(s))
+		for (MPILib::Index c = cell_no-buffer; c < cell_no+buffer; c++){
+			if (c < 0 || c >= trans_tree.MeshRef().NrCellsInStrip(s))
 				continue;
-
 			std::vector<Point> ps = _tree.MeshRef().Quad(s,c).Points();
 			Quadrilateral quad_scaled = Quadrilateral((ps[0]), (ps[1]), (ps[2]), (ps[3]));
 			std::vector<Point> ps_scaled = quad_scaled.Points();
 
-			double area = Quadrilateral::get_overlap_area(quad_trans, quad_scaled);
+			double area = Quadrilateral::get_overlap_area(quad_trans,quad_scaled);
 
-			if((std::abs(area))/(std::abs(quad_trans.SignedArea())) < 0.00001)
-				continue;
+			total_area_full += area;
 
 			total_area += (std::abs(area))/(std::abs(quad_trans.SignedArea()));
+
 			if (std::abs(area) > 0) {
 				Hit h;
 				h._cell = Coordinates(s,c);
-				h._count = (int)(_N*(std::abs(area))/(std::abs(quad_trans.SignedArea())));
+				h._prop = std::abs(area)/std::abs(quad_trans.SignedArea());
 				_hit_list.push_back(h);
 			}
 		}
@@ -267,27 +266,16 @@ void TransitionMatrixGenerator::GenerateTransformUsingQuadTranslation(unsigned i
 	if(_hit_list.size() == 0) {
 		Hit h;
 		h._cell = Coordinates(strip_no,cell_no);
-		h._count = _N;
+		h._prop = 1.0;
+		total_area = 1.0;
 		_hit_list.push_back(h);
 	}
 
 	if (total_area != 1.0) {
 		for(int i=0; i<_hit_list.size(); i++){
-				_hit_list[i]._count = (int)((double)_hit_list[i]._count/total_area);
+				_hit_list[i]._prop /= total_area;
 			}
 	}
-
-	// rectify rounding errors
-	int c = 0;
-	for(Hit h : _hit_list){
-		c += h._count;
-	}
-
-	if(c != _N){
-		int diff = c - _N;
-		_hit_list.front()._count -= diff;
-	}
-
 }
 
 

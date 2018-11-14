@@ -28,8 +28,8 @@ namespace TwoDLib {
 			const std::string&, 		    	 //!< model file name
 			const std::string&,     //!< Transform matrix
 			MPILib::Time,                        //!< default time step for Master equation
-			MPILib::Index,
-			MPILib::Index,
+			double,
+			double,
 			MPILib::Time tau_refractive = 0,     //!< absolute refractive period
 			const string& ratemethod = ""       //!< firing rate computation; by default the mass flux across threshold
 		);
@@ -87,7 +87,6 @@ namespace TwoDLib {
 
 		std::vector<TwoDLib::Redistribution> _vec_rev;
 		std::vector<TwoDLib::Redistribution> _vec_res;
-		std::vector<TwoDLib::Redistribution> _vec_next_res;
 
 		MPILib::Time _dt;
 
@@ -113,8 +112,8 @@ namespace TwoDLib {
 
 		std::string _transform_matrix;
 
-		MPILib::Index _start_strip;
-		MPILib::Index _start_cell;
+		double _start_v;
+		double _start_w;
 
 		double (TwoDLib::Ode2DSystem::*_sysfunction) () const;
 
