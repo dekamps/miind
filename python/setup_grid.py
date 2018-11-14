@@ -90,15 +90,12 @@ def cond(y,t):
 def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid_v_min, grid_v_max, grid_h_min, grid_h_max, grid_v_res, grid_h_res,efficacy_orientation='v'):
 
     grid_d1_res = grid_v_res;
-    grid_d1_min = reset_v;
-    grid_d1_max = threshold_v;
+    grid_d1_min = grid_v_min;
+    grid_d1_max = grid_v_max;
 
     grid_d2_res = grid_h_res;
     grid_d2_min = grid_h_min;
     grid_d2_max = grid_h_max;
-
-    buffer_v = int(grid_v_res*0.1)+5;
-    buffer_h = int(grid_h_res*0.1)+5;
 
     if (efficacy_orientation == 'v'):
         grid_d1_res = grid_v_res;
@@ -106,8 +103,8 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
         grid_d1_max = grid_h_max;
 
         grid_d2_res = grid_h_res;
-        grid_d2_min = reset_v;
-        grid_d2_max = threshold_v;
+        grid_d2_min = grid_v_min;
+        grid_d2_max = grid_v_max;
 
     with open(basename + '.rev', 'w') as rev_file:
         rev_file.write('<Mapping Type="Reversal">\n')
@@ -121,13 +118,13 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
         mesh_file.write('ignore\n')
         mesh_file.write('{}\n'.format(timestep))
 
-        for i in (np.array(range(grid_d1_res+(buffer_v*2)))-buffer_v) * (1.0/(grid_d1_res)):
+        for i in (np.array(range(grid_d1_res))) * (1.0/(grid_d1_res)):
             svs_1 = [];
             sus_1 = [];
             svs_2 = [];
             sus_2 = [];
 
-            for j in (np.array(range(grid_d2_res+(buffer_h*2)))-buffer_h) * (1.0/(grid_d2_res)):
+            for j in (np.array(range(grid_d2_res+1))) * (1.0/(grid_d2_res)):
                 if (efficacy_orientation != 'v'):
                     x1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
                     y1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
@@ -176,9 +173,9 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
 
         progress = 0
         count = 0
-        ten_percent = (int)((grid_d1_res+(2*buffer_v)) / 10)
+        ten_percent = (int)((grid_d1_res) / 10)
 
-        for i in (np.array(range(grid_d1_res+(buffer_v*2)))-buffer_v) * (1.0/(grid_d1_res)):
+        for i in (np.array(range(grid_d1_res))) * (1.0/(grid_d1_res)):
             svs_1 = [];
             sus_1 = [];
             svs_2 = [];
@@ -189,14 +186,14 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
                 print('{} % complete.'.format(progress))
                 progress += 10
 
-            for j in (np.array(range(grid_d2_res+(buffer_h*2)))-buffer_h) * (1.0/(grid_d2_res)):
+            for j in (np.array(range(grid_d2_res+1))) * (1.0/(grid_d2_res)):
 
                 if (efficacy_orientation != 'v'):
 
                     x1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
                     y1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
 
-                    tspan = np.linspace(0, timestep, 101)
+                    tspan = np.linspace(0, timestep, 11)
 
                     t_1 = odeint(func, [x1,y1], tspan, atol=1e-12, rtol=1e-12)
                     t_2 = odeint(func, [x1 + ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)),y1], tspan, atol=1e-12, rtol=1e-12)
@@ -205,7 +202,7 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
                     y1 = (i*(grid_d1_max-grid_d1_min))+grid_d1_min
                     x1 = (j*(grid_d2_max-grid_d2_min))+grid_d2_min
 
-                    tspan = np.linspace(0, timestep,101)
+                    tspan = np.linspace(0, timestep,11)
 
                     t_1 = odeint(func, [x1,y1], tspan, atol=1e-12, rtol=1e-12)
                     t_2 = odeint(func, [x1,y1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min))], tspan, atol=1e-12, rtol=1e-12)
@@ -235,7 +232,7 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
             mesh_file.write('closed\n')
         mesh_file.write('end\n')
 
-    api.MeshTools.buildModelFileFromMesh(basename, reset_v+0.00000000001, threshold_v+0.00000000001)
+    api.MeshTools.buildModelFileFromMesh(basename, reset_v, threshold_v)
     api.MeshTools.buildModelFileFromMesh(basename + '_transform', reset_v, threshold_v)
 
     mod_file = open(basename + '.model', 'r')
@@ -295,4 +292,4 @@ def generate(func, timestep, basename, threshold_v, reset_v, reset_shift_h, grid
 
 # generate(rybak, 1, 'grid', -10, -56, -0.004, -80, -40, -0.4, 1.0, 300, 200)
 # generate(adEx, 1, 'adex', -10, -58, 0.0, -90, -40, -20, 60, 300, 100)
-generate(cond, 1e-05, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, 0, 1.0, 2000, 100, efficacy_orientation='w')
+generate(cond, 1e-05, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, -0.2, 1.0, 300, 2000, efficacy_orientation='w')

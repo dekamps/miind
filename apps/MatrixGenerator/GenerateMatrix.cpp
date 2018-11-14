@@ -122,6 +122,35 @@ void Write
 	}
 }
 
+void WriteProportion
+(
+	const string& fn,
+	const std::vector<TwoDLib::TransitionList>& list,
+	const TwoDLib::Translation& efficacy,
+	MPILib::Index l_min,
+	MPILib::Index l_max
+)
+{
+	std::ofstream ofst(fn);
+	if (l_min == 0)
+		ofst << efficacy._v << "\t" << efficacy._w << "\n";
+
+	for (auto it = list.begin(); it != list.end(); it++){
+		ofst << it->_number     << ";";
+		ofst << it->_origin[0]  << ",";
+		ofst << it->_origin[1]  << ";";
+		for (auto ithit = it->_destination_list.begin(); ithit !=it-> _destination_list.end(); ithit++ ){
+			// if (ithit->_prop <= 0.00000000000000001)
+			// 	continue;
+
+			ofst << ithit->_cell[0] << ",";
+			ofst << ithit->_cell[1] << ":";
+			ofst << ithit->_prop << ";";
+		}
+		ofst << "\n";
+	}
+}
+
 void GenerateResetTransitionsOnly(
 	const string& base_name,
 	const TwoDLib::Mesh& mesh,
@@ -305,9 +334,6 @@ void GenerateResetTransitionsOnly(
 		cells.insert(cells.end(), ths.begin(), ths.end());
 		TwoDLib::ConstructResetMapping("Reset", ofst, mesh, cells, thres, tr_reset, &gen);
 
-		// cells = transform_above;
-		// cells.insert(cells.end(), transform_ths.begin(), transform_ths.end());
-		// TwoDLib::ConstructResetMapping("NextReset", ofst, mesh, cells, thres, tr_reset, &gen);
 		ofst.close(); // needed; FixModelFile will reopen this file
 
 		// the model file now needs to be fixed, to include the reset mapping
@@ -362,7 +388,7 @@ void GenerateResetTransitionsOnly(
 				max_strip = l_max;
 			}
 
-			for( MPILib::Index i = min_strip; i <  max_strip; i++){
+			for( MPILib::Index i = 0; i <  mesh.NrQuadrilateralStrips(); i++){
 				std::cout << i << " " << mesh.NrCellsInStrip(i) << std::endl;
 				for (MPILib::Index j = 0; j <  mesh.NrCellsInStrip(i); j++){
 
@@ -393,7 +419,7 @@ void GenerateResetTransitionsOnly(
 			vector<TwoDLib::Coordinates> resets  = mesh.findV(V_reset,TwoDLib::Mesh::EQUAL);
 
 			std::cout << "There are " << ths.size() << " reset bins." << std::endl;
-			Write(mat_name,transitions,efficacy,l_min,l_max);
+			WriteProportion(mat_name,transitions,efficacy,l_min,l_max);
 	}
 
 

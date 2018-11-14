@@ -32,7 +32,6 @@ Ode2DSystem::Ode2DSystem
 	const Mesh& m,
 	const vector<Redistribution>&  vec_reversal,
 	const vector<Redistribution>&  vec_reset,
-	const vector<Redistribution>&  vec_next_reset,
 	const MPILib::Time& tau_refractive
 ):
 _mesh(m),
@@ -45,10 +44,8 @@ _f(0),
 _map(InitializeMap()),
 _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
-_vec_next_reset(vec_next_reset),
 _reversal(*this,_vec_mass),
 _reset(*this,_vec_mass),
-_next_reset(*this,_vec_mass,_it,tau_refractive,_vec_next_reset),
 _reset_refractive(*this,_vec_mass,_it,tau_refractive,_vec_reset),
 _clean(*this,_vec_mass),
 _tau_refractive(tau_refractive)
@@ -84,16 +81,6 @@ bool Ode2DSystem::CheckConsistency() const {
 		}
 	}
 
-	for (const Redistribution& r: _vec_next_reset){
-		if ( r._from[0] >= _mesh.NrQuadrilateralStrips() ){
-			ost_err << "reset. NrStrips: " << _mesh.NrQuadrilateralStrips() << ", from: " << r._from[0] << std::endl;
-			throw TwoDLib::TwoDLibException(ost_err.str());
-		}
-		if ( r._from[1] >= _mesh.NrCellsInStrip(r._from[0] ) ){
-			ost_err << "reset. Nr cells in strip r._from[0]: " <<  _mesh.NrCellsInStrip(r._from[0] ) << ", from: " << r._from[1];
-			throw TwoDLib::TwoDLibException(ost_err.str());
-		}
-	}
 	return true;
 }
 
@@ -193,16 +180,7 @@ void Ode2DSystem::RemapReversal(){
 
 void Ode2DSystem::RedistributeProbability()
 {
-	if (_tau_refractive == 0.)
-		for(auto& m: _vec_reset)
-			_reset(m);
-	else
-		for(auto& m: _vec_reset)
-			_reset_refractive(m);
-
-	std::for_each(_vec_reset.begin(),_vec_reset.end(),_clean);
-
-	_f /= _mesh.TimeStep();
+	RedistributeProbability(1);
 }
 
 void Ode2DSystem::RedistributeProbability(MPILib::Number steps)
