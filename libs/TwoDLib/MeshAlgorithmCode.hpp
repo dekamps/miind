@@ -178,6 +178,8 @@ namespace TwoDLib {
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
 
+		Display::getInstance()->addOdeSystem(_node_id, &_sys, &_display_mutex);
+
 		// the integration time step, stored in the MasterParameter, is gauged with respect to the
 		// network time step.
 		MPILib::Number n_ode = static_cast<MPILib::Number>(std::floor(t_step/_h));
@@ -204,6 +206,11 @@ namespace TwoDLib {
 		double sum = _sys.P();
 		if (sum == 0.)
 			throw TwoDLib::TwoDLibException("No initialization of the mass array has taken place. Call Initialize before configure.");
+	}
+
+	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::assignNodeId( MPILib::NodeId nid ) {
+		_node_id = nid;
 	}
 
 	template <class WeightValue,class Solver>
@@ -275,6 +282,8 @@ namespace TwoDLib {
 			  ; // else is fine
 		}
 
+			Display::getInstance()->LockMutex(_node_id);
+
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 				_sys.Evolve();
@@ -289,6 +298,8 @@ namespace TwoDLib {
  	    _rate = (_sys.*_sysfunction)();
 
  	    _n_evolve++;
+
+			Display::getInstance()->UnlockMutex(_node_id);
 	}
 
 	template <class WeightValue, class Solver>

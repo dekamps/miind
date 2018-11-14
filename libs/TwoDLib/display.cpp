@@ -69,6 +69,18 @@ unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystem* sys, std::mu
 		}
 	}
 
+	// If there's only a single strip, then the min and max might be the same,
+	// find the
+	if (mesh_max_v == mesh_min_v){
+		mesh_max_v = 0.005;
+		mesh_min_v = 0.0;
+	}
+
+	if (mesh_min_h == mesh_max_h){
+		mesh_max_h = 0.005;
+		mesh_min_h = 0.0;
+	}
+
 	window.mesh_min_v = mesh_min_v;
 	window.mesh_max_v = mesh_max_v;
 	window.mesh_min_h = mesh_min_h;
@@ -112,23 +124,31 @@ void Display::display(void) {
 
 	LockMutex(window_index);
 
-	double cell_area = std::abs(m.Quad(1,1).SignedArea());
-	double max = 0.0;
-	for (int i=0; i<_dws[window_index]._system->Mass().size(); i++)
-		if (max < log10(_dws[window_index]._system->Mass()[i]/cell_area))
-			max = log10(_dws[window_index]._system->Mass()[i]/cell_area);
 
-	double min = 999999.0;
-	for (int i=0; i<_dws[window_index]._system->Mass().size(); i++){
-		if(_dws[window_index]._system->Mass()[i]/cell_area <= 0){
-			min = 0.0;
-			continue;
+	double max = -99999999.0;
+	for(unsigned int i = 0; i<m.NrQuadrilateralStrips(); i++){
+		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
+			double cell_area = std::abs(m.Quad(i,j).SignedArea());
+			if(_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area == 0){
+				continue;
+			}
+			if (max < log10(1e-4 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area))
+				max = log10(1e-4 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area);
 		}
-		if (log10(_dws[window_index]._system->Mass()[i]/cell_area) < min)
-			min = log10(_dws[window_index]._system->Mass()[i]/cell_area);
 	}
 
-	// std::cout << "max : " << max << " | min : " << min << " | area : " << cell_area << "\n";
+	double min = 999999.0;
+	for(unsigned int i = 0; i<m.NrQuadrilateralStrips(); i++){
+		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
+			double cell_area = std::abs(m.Quad(i,j).SignedArea());
+			if(_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area == 0){
+				continue;
+			}
+
+			if (log10(1e-4 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area) < min)
+				min = log10(1e-4 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area);
+		}
+	}
 
 	double mesh_min_v = _dws[window_index].mesh_min_v;
 	double mesh_max_v = _dws[window_index].mesh_max_v;
@@ -138,8 +158,11 @@ void Display::display(void) {
 	for(unsigned int i = 0; i<m.NrQuadrilateralStrips(); i++){
 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
 			Quadrilateral q = m.Quad(i,j);
+			double cell_area = std::abs(q.SignedArea());
 			unsigned int idx = _dws[window_index]._system->Map(i,j);
-			double mass = (log10(_dws[window_index]._system->Mass()[idx]/cell_area) - min) / (max-min);
+			double mass = 0.0;
+			if (_dws[window_index]._system->Mass()[idx]/cell_area != 0)
+				mass = (log10(_dws[window_index]._system->Mass()[idx]/cell_area) - min) / (max-min);
 			vector<Point> ps = q.Points();
 
 			glColor3f(std::min(1.0,mass*2.0), std::max(0.0,((mass*2.0) - 1.0)), 0);
@@ -197,6 +220,7 @@ void Display::display(void) {
 	while(pos < nice_max_h){
 		glColor3f( 1.0, 1.0, 1.0 );
 	  glRasterPos2f(-1.0, 2*((pos - (mesh_min_h + ((mesh_max_h - mesh_min_h)/2.0)))/(mesh_max_h - mesh_min_h)));
+
 		std::stringstream stream;
 		stream << pos;
 		t = stream.str();

@@ -135,6 +135,9 @@ namespace TwoDLib {
 		 */
 		const Ode2DSystem& Sys() const {return _sys; }
 
+		//keep track of the node id
+		virtual void assignNodeId( MPILib::NodeId );
+
 		/**
 		 *
 		 */
@@ -169,6 +172,11 @@ namespace TwoDLib {
 		// parsing auxilliaries
 		pugi::xml_document _doc;
 		pugi::xml_node     _root;
+
+		// If the OpenGL display is being used, track the index of this node and
+		// provide a mutex to lock on
+		std::mutex _display_mutex;
+		MPILib::NodeId _node_id;
 
 		// mesh and mappings
 		TwoDLib::Mesh _mesh;
