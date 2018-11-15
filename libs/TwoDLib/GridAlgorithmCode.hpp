@@ -223,13 +223,13 @@ namespace TwoDLib {
 
 				_sys._vec_mass = _mass_swap;
 
+				_p_master->Apply(_dt,_vec_rates,_efficacy_map);
+
+				_sys.RedistributeProbability();
+
+				_t_cur += _dt;
+
 	    }
-
-			_p_master->Apply(_n_steps*_dt,_vec_rates,_efficacy_map);
-
-			_sys.RedistributeProbability(_n_steps);
-
-			_t_cur += _n_steps*_dt;
 
  	    _rate = (_sys.*_sysfunction)();
 

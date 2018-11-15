@@ -53,7 +53,7 @@ namespace TwoDLib {
 			double                rate,
 		  double stays,
 		  double goes,
-		  unsigned int offset,
+		  int offset,
 			double eff) const;
 
 		void Apply(double t_step, const vector<double>& rates, vector<double>& efficacy_map);

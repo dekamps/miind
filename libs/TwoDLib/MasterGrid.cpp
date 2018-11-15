@@ -69,20 +69,16 @@ _cell_width(cell_width)
  	double                rate,
    double stays,
    double goes,
-   unsigned int offset,
+   int offset,
    double eff
  ) const
  {
 
-   int offset_1 = -offset;
-   int offset_2 = -(offset+1);
-   if(eff < 0) {
-     offset_1 = (offset + 1);
-     offset_2 = offset;
-   }
+   int offset_1 = eff > 0 ? -offset : offset;
+   int offset_2 = eff > 0 ? -(offset+1) : -(offset-1);
  #pragma omp parallel for
  	for (MPILib::Index i = 0; i < _sys.MeshObject().NrQuadrilateralStrips(); i++){
-    for (MPILib::Index j = offset+1; j < _sys.MeshObject().NrCellsInStrip(i)-(offset+1); j++){
+    for (MPILib::Index j = std::max(0,-offset_2); j < std::min(_sys.MeshObject().NrCellsInStrip(i)-1-offset_2, _sys.MeshObject().NrCellsInStrip(i)-1); j++){
       MPILib::Index i_r =_sys.Map(i,j);
       dydt[i_r] += rate*stays*vec_mass[i_r+offset_1];
       dydt[i_r] += rate*goes*vec_mass[i_r+offset_2];
