@@ -132,8 +132,8 @@ void Display::display(void) {
 			if(_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area == 0){
 				continue;
 			}
-			if (max < log10(1e-4 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area))
-				max = log10(1e-4 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area);
+			if (max < log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area))
+				max = log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area);
 		}
 	}
 
@@ -145,8 +145,8 @@ void Display::display(void) {
 				continue;
 			}
 
-			if (log10(1e-4 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area) < min)
-				min = log10(1e-4 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area);
+			if (log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area) < min)
+				min = log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(i,j)]/cell_area);
 		}
 	}
 

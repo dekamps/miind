@@ -98,11 +98,11 @@ def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold
     grid_d2_max = grid_h_max;
 
     if (efficacy_orientation == 'v'):
-        grid_d1_res = grid_v_res;
+        grid_d1_res = grid_h_res;
         grid_d1_min = grid_h_min;
         grid_d1_max = grid_h_max;
 
-        grid_d2_res = grid_h_res;
+        grid_d2_res = grid_v_res;
         grid_d2_min = grid_v_min;
         grid_d2_max = grid_v_max;
 
@@ -146,13 +146,13 @@ def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold
             if (threshold_capture_v > 0):
                 if (efficacy_orientation != 'v'):
                     svs_1.append(x1)
-                    sus_1.append(y1 + threshold_capture_v)
+                    sus_1.append(threshold_capture_v)
                     svs_2.append(x1 + ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)))
-                    sus_2.append(y1 + threshold_capture_v)
+                    sus_2.append(threshold_capture_v)
                 else:
-                    svs_1.append(x1 + threshold_capture_v)
+                    svs_1.append(threshold_capture_v)
                     sus_1.append(y1)
-                    svs_2.append(x1 + threshold_capture_v)
+                    svs_2.append(threshold_capture_v)
                     sus_2.append(y1+ ((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min)))
             else:
                 if (efficacy_orientation != 'v'):
@@ -285,38 +285,38 @@ def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold
     api.MeshTools.buildTransformFileFromModel(basename, 1000000000)
     api.MeshTools.buildTransformFileFromModel(basename, reset_shift_w=reset_shift_h, mode='resettransform')
 
-    filename = basename + '.mesh'
-    if os.path.exists(filename):
-        os.remove(filename)
+    # filename = basename + '.mesh'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '.rev'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '.stat'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '.res'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '_transform.mesh'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '_transform.rev'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '_transform.stat'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '_transform.model'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
 
-    filename = basename + '.rev'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '.stat'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '.res'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '_transform.mesh'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '_transform.rev'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '_transform.stat'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '_transform.model'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-generate(rybak, 1, 0.001, 1e-3, 'grid', -10, -56, -0.004, -80, 0, -0.4, 1.0,100, 100, threshold_capture_v=40)
+generate(rybak, 1, 0.001, 1e-3, 'grid', -10, -56, -0.004, -80, 0, -0.4, 1.0,200, 200)
 # generate(adEx, 1, 0.001, 1e-12, 'adex', -10, -58, 0.0, -90, -40, -20, 60, 300, 100)
-#generate(cond, 1e-05, 1, 1e-12, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, -0.2, 1.0, 100, 100, efficacy_orientation='w')
+# generate(cond, 1e-05, 1, 1e-12, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, -0.2, 1.0, 200, 200, efficacy_orientation='w')

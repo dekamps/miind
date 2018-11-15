@@ -44,10 +44,6 @@ _lost(0),
 _accounted(0),
 _vec_fiducial(InitializeFiducialVector(tree.MeshRef(),element_list))
 {
-	// when using the grid method, unfortunately, we need to know the orientation of the grid to efficiently
-	// calculate the transition.
-	_grid_normal_orientation =
-	!((_tree.MeshRef().Quad(1,1).Centroid() - _tree.MeshRef().Quad(1,2).Centroid()).msquared() > (_tree.MeshRef().Quad(1,1).Centroid() - _tree.MeshRef().Quad(2,1).Centroid()).msquared());
 	_grid_extent = _tree.MeshRef().Quad(2,2).Centroid() - _tree.MeshRef().Quad(1,1).Centroid();
 	_grid_bottom_left = _tree.MeshRef().Quad(0,0).Centroid() - (_grid_extent * 0.5);
 }
@@ -260,12 +256,44 @@ void TransitionMatrixGenerator::GenerateTransformUsingQuadTranslation(unsigned i
 	Coordinates start_cell = Coordinates(0,0);
 	Coordinates end_cell = Coordinates(0,0);
 
-	if(_grid_normal_orientation) {
-		start_cell = Coordinates(std::floor((search_min[1]-_grid_bottom_left[1])/_grid_extent[1]),std::floor((search_min[0]-_grid_bottom_left[0])/_grid_extent[0]));
-		end_cell = Coordinates(std::ceil((search_max[1]-_grid_bottom_left[1])/_grid_extent[1]),std::ceil((search_max[0]-_grid_bottom_left[0])/_grid_extent[0]));
-	} else {
-		start_cell = Coordinates(std::floor((search_min[0]-_grid_bottom_left[0])/_grid_extent[0]),std::floor((search_min[1]-_grid_bottom_left[1])/_grid_extent[1]));
-		end_cell = Coordinates(std::ceil((search_max[0]-_grid_bottom_left[0])/_grid_extent[0]),std::ceil((search_max[1]-_grid_bottom_left[1])/_grid_extent[1]));
+	start_cell = Coordinates(std::floor((search_min[1]-_grid_bottom_left[1])/_grid_extent[1]),std::floor((search_min[0]-_grid_bottom_left[0])/_grid_extent[0]));
+	end_cell = Coordinates(std::ceil((search_max[1]-_grid_bottom_left[1])/_grid_extent[1]),std::ceil((search_max[0]-_grid_bottom_left[0])/_grid_extent[0]));
+
+	// if the cell range is entirely out of the grid, then clamp to the nearest and return
+	if (start_cell[0] > _tree.MeshRef().NrQuadrilateralStrips()-1 && end_cell[0] > _tree.MeshRef().NrQuadrilateralStrips()-1){
+		// int mid_cell = start_cell[1] + std::floor((end_cell[1] - start_cell[1])/2.0);
+		Hit h;
+		h._cell = Coordinates(_tree.MeshRef().NrQuadrilateralStrips()-1,cell_no);
+		h._prop = 1.0;
+		_hit_list.push_back(h);
+		return;
+	}
+
+	if (start_cell[0] < 0 && end_cell[0] < 0){
+		// int mid_cell = start_cell[1] + std::floor((end_cell[1] - start_cell[1])/2.0);
+		Hit h;
+		h._cell = Coordinates(0,cell_no);
+		h._prop = 1.0;
+		_hit_list.push_back(h);
+		return;
+	}
+
+	if (start_cell[1] > _tree.MeshRef().NrCellsInStrip(1)-1 && end_cell[1] > _tree.MeshRef().NrCellsInStrip(1)-1){
+		// int mid_cell = start_cell[0] + std::floor((end_cell[0] - start_cell[0])/2.0);
+		Hit h;
+		h._cell = Coordinates(strip_no,_tree.MeshRef().NrCellsInStrip(1)-1);
+		h._prop = 1.0;
+		_hit_list.push_back(h);
+		return;
+	}
+
+	if (start_cell[1] < 0 && end_cell[1] < 0){
+		// int mid_cell = start_cell[0] + std::floor((end_cell[0] - start_cell[0])/2.0);
+		Hit h;
+		h._cell = Coordinates(strip_no,0);
+		h._prop = 1.0;
+		_hit_list.push_back(h);
+		return;
 	}
 
 	start_cell[0] = std::max((int)start_cell[0]-1, 0);
