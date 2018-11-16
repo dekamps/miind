@@ -43,19 +43,12 @@ _cell_width(cell_width)
  	double                rate,
    double stays,
    double goes,
-   unsigned int offset,
-   double eff
+   int offset_1,
+   int offset_2
  ) const
  {
-
-   int offset_1 = -offset;
-   int offset_2 = -(offset+1);
-   if(eff < 0) {
-     offset_1 = (offset + 1);
-     offset_2 = offset;
-   }
  #pragma omp parallel for
- 	for (MPILib::Index i = offset+1; i < dydt.size()-(offset+1); i++){
+ 	for (MPILib::Index i = offset_2; i < dydt.size()-(offset_2); i++){
  		dydt[i] += rate*stays*vec_mass[i+offset_1];
  		dydt[i] += rate*goes*vec_mass[i+offset_2];
  	  dydt[i] -= rate*vec_mass[i];
@@ -69,21 +62,26 @@ _cell_width(cell_width)
  	double                rate,
    double stays,
    double goes,
-   int offset,
-   double eff
+   int offset_1,
+   int offset_2
  ) const
  {
-
-   int offset_1 = eff > 0 ? -offset : offset;
-   int offset_2 = eff > 0 ? -(offset+1) : -(offset-1);
  #pragma omp parallel for
  	for (MPILib::Index i = 0; i < _sys.MeshObject().NrQuadrilateralStrips(); i++){
-    for (MPILib::Index j = std::max(0,-offset_2); j < std::min(_sys.MeshObject().NrCellsInStrip(i)-1-offset_2, _sys.MeshObject().NrCellsInStrip(i)-1); j++){
+    // When mapping, we have to ensure that the ends of the strip don't remove mass
+    // as there's nowhere for it to go
+    MPILib::Index i_r =_sys.Map(i,std::max(0,-offset_2));
+    dydt[i_r] += rate*stays*vec_mass[i_r+offset_1];
+    dydt[i_r] += rate*goes*vec_mass[i_r+offset_2];
+    for (MPILib::Index j = std::max(1,1-offset_2); j < std::min(_sys.MeshObject().NrCellsInStrip(i)-1-offset_2, _sys.MeshObject().NrCellsInStrip(i)-1); j++){
       MPILib::Index i_r =_sys.Map(i,j);
       dydt[i_r] += rate*stays*vec_mass[i_r+offset_1];
       dydt[i_r] += rate*goes*vec_mass[i_r+offset_2];
       dydt[i_r] -= rate*vec_mass[i_r];
     }
+    i_r =_sys.Map(i,std::min(_sys.MeshObject().NrCellsInStrip(i)-1-offset_2, _sys.MeshObject().NrCellsInStrip(i)-1));
+    dydt[i_r] += rate*stays*vec_mass[i_r+offset_1];
+    dydt[i_r] += rate*goes*vec_mass[i_r+offset_2];
  	}
  }
 
@@ -117,6 +115,9 @@ _cell_width(cell_width)
     double goes = fabs(vec_eff[irate] / _cell_width) - offset;
     double stays = 1.0 - goes;
 
+    int offset_1 = vec_eff[irate] > 0 ? -offset : offset;
+    int offset_2 = vec_eff[irate] > 0 ? -(offset+1) : -(offset-1);
+
     // it is only the matrices that need to be mapped
     MVGridMapped
    (
@@ -125,8 +126,8 @@ _cell_width(cell_width)
      rate,
      stays,
      goes,
-     offset,
-     vec_eff[irate]
+     offset_1,
+     offset_2
     );
   }
 }
