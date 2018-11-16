@@ -223,9 +223,12 @@ namespace TwoDLib {
 
 				_sys._vec_mass = _mass_swap;
 
-				_p_master->Apply(_dt,_vec_rates,_efficacy_map);
-
+				// WARNING: originally reset goes after master but this way,
+				// we can guarantee there's no mass above threshold when running
+				// MVGrid in MasterGrid
 				_sys.RedistributeProbability();
+
+				_p_master->Apply(_dt,_vec_rates,_efficacy_map);
 
 				_t_cur += _dt;
 
