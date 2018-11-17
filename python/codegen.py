@@ -47,7 +47,7 @@ def generate_closing(outfile, steps, type):
     outfile.write('\t\tnetwork.evolveSingleStep(std::vector<MPILib::ActivityType>());\n')
     outfile.write('\t\tTwoDLib::Display::getInstance()->updateDisplay();\n')
     outfile.write('\t\tTwoDLib::GridReport<' + s + '>::getInstance()->reportFiringRate();\n')
-    # outfile.write('\t\tTwoDLib::GridReport<' + s + '>::getInstance()->reportDensity();\n')
+    outfile.write('\t\tTwoDLib::GridReport<' + s + '>::getInstance()->reportDensity();\n')
     outfile.write('\t\t(*pb)++;\n')
     outfile.write('\t\tcount++;\n')
     outfile.write('\t}\n')

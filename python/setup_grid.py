@@ -317,6 +317,6 @@ def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold
     # if os.path.exists(filename):
     #     os.remove(filename)
 
-generate(rybak, 1, 0.001, 1e-3, 'grid', -10, -56, -0.004, -80, 0, -0.4, 1.0,200, 200)
+generate(rybak, 1, 0.001, 1e-3, 'grid', -10, -56, -0.004, -120, 0, -0.4, 1.0,400, 400)
 # generate(adEx, 1, 0.001, 1e-12, 'adex', -10, -58, 0.0, -90, -40, -20, 60, 300, 100)
 # generate(cond, 1e-05, 1, 1e-12, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, -0.2, 1.0, 200, 200, efficacy_orientation='w')
