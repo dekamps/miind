@@ -44,6 +44,10 @@ _lost(0),
 _accounted(0),
 _vec_fiducial(InitializeFiducialVector(tree.MeshRef(),element_list))
 {
+	_grid_normal_orientation =
+	(std::abs((_tree.MeshRef().Quad(1,1).Centroid() - _tree.MeshRef().Quad(1,2).Centroid())[0]) >
+	std::abs((_tree.MeshRef().Quad(1,1).Centroid() - _tree.MeshRef().Quad(2,1).Centroid())[0]));
+
 	_grid_extent = _tree.MeshRef().Quad(2,2).Centroid() - _tree.MeshRef().Quad(1,1).Centroid();
 	_grid_bottom_left = _tree.MeshRef().Quad(0,0).Centroid() - (_grid_extent * 0.5);
 }
@@ -256,8 +260,14 @@ void TransitionMatrixGenerator::GenerateTransformUsingQuadTranslation(unsigned i
 	Coordinates start_cell = Coordinates(0,0);
 	Coordinates end_cell = Coordinates(0,0);
 
-	start_cell = Coordinates(std::floor((search_min[1]-_grid_bottom_left[1])/_grid_extent[1]),std::floor((search_min[0]-_grid_bottom_left[0])/_grid_extent[0]));
-	end_cell = Coordinates(std::ceil((search_max[1]-_grid_bottom_left[1])/_grid_extent[1]),std::ceil((search_max[0]-_grid_bottom_left[0])/_grid_extent[0]));
+	if(_grid_normal_orientation){
+		start_cell = Coordinates(std::floor((search_min[1]-_grid_bottom_left[1])/_grid_extent[1]),std::floor((search_min[0]-_grid_bottom_left[0])/_grid_extent[0]));
+		end_cell = Coordinates(std::ceil((search_max[1]-_grid_bottom_left[1])/_grid_extent[1]),std::ceil((search_max[0]-_grid_bottom_left[0])/_grid_extent[0]));
+	} else {
+		start_cell = Coordinates(std::floor((search_min[0]-_grid_bottom_left[0])/_grid_extent[0]),std::floor((search_min[1]-_grid_bottom_left[1])/_grid_extent[1]));
+		end_cell = Coordinates(std::ceil((search_max[0]-_grid_bottom_left[0])/_grid_extent[0]),std::ceil((search_max[1]-_grid_bottom_left[1])/_grid_extent[1]));
+	}
+
 
 	// if the cell range is entirely out of the grid, then clamp to the nearest and return
 	if (start_cell[0] > _tree.MeshRef().NrQuadrilateralStrips()-1 && end_cell[0] > _tree.MeshRef().NrQuadrilateralStrips()-1){

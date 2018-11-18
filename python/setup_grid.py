@@ -285,38 +285,38 @@ def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold
     api.MeshTools.buildTransformFileFromModel(basename, 1000000000)
     api.MeshTools.buildTransformFileFromModel(basename, reset_shift_w=reset_shift_h, mode='resettransform')
 
-    # filename = basename + '.mesh'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '.rev'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '.stat'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '.res'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '_transform.mesh'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '_transform.rev'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '_transform.stat'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '_transform.model'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
+    filename = basename + '.mesh'
+    if os.path.exists(filename):
+        os.remove(filename)
 
-generate(rybak, 1, 0.001, 1e-3, 'grid', -10, -56, -0.004, -120, 0, -0.4, 1.0,400, 400)
+    filename = basename + '.rev'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '.stat'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '.res'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '_transform.mesh'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '_transform.rev'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '_transform.stat'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '_transform.model'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+generate(rybak, 1, 0.001, 1e-3, 'grid', -10, -56, -0.004, -110, 0, -0.4, 1.0,100, 100)
 # generate(adEx, 1, 0.001, 1e-12, 'adex', -10, -58, 0.0, -90, -40, -20, 60, 300, 100)
-# generate(cond, 1e-05, 1, 1e-12, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, -0.2, 1.0, 200, 200, efficacy_orientation='w')
+#generate(cond, 1e-05, 1, 1e-12, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, -0.2, 1.0, 200, 200, efficacy_orientation='w')
