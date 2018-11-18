@@ -162,7 +162,7 @@ void Display::display(void) {
 			unsigned int idx = _dws[window_index]._system->Map(i,j);
 			double mass = 0.0;
 			if (_dws[window_index]._system->Mass()[idx]/cell_area != 0)
-				mass = (log10(_dws[window_index]._system->Mass()[idx]/cell_area) - min) / (max-min);
+				mass = std::min(1.0,std::max(0.0,(log10(_dws[window_index]._system->Mass()[idx]/cell_area) - min) / (max-min)));
 			vector<Point> ps = q.Points();
 
 			glColor3f(std::min(1.0,mass*2.0), std::max(0.0,((mass*2.0) - 1.0)), 0);
@@ -218,11 +218,14 @@ void Display::display(void) {
 
 	double pos = nice_min_h;
 	while(pos < nice_max_h){
+		if (std::abs(pos) < 0.0000000001 )
+			pos = 0.0;
+			
 		glColor3f( 1.0, 1.0, 1.0 );
 	  glRasterPos2f(-1.0, 2*((pos - (mesh_min_h + ((mesh_max_h - mesh_min_h)/2.0)))/(mesh_max_h - mesh_min_h)));
 
 		std::stringstream stream;
-		stream << pos;
+		stream <<  std::setprecision(3) << pos;
 		t = stream.str();
 		c_string = t.c_str();
 	  len = (int)strlen( c_string );
@@ -234,9 +237,11 @@ void Display::display(void) {
 
 	pos = nice_min_v;
 	while(pos < nice_max_v){
+		if (std::abs(pos) < 0.0000000001 )
+			pos = 0.0;
 		glRasterPos2f(2*((pos - (mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v)), -1.0);
 		std::stringstream stream2;
-		stream2 << pos;
+		stream2 <<  std::setprecision(3) << pos;
 		t = stream2.str();
 		c_string = t.c_str();
 		len = (int)strlen( c_string );

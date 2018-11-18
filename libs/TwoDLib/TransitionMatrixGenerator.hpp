@@ -130,6 +130,7 @@ namespace TwoDLib {
 
     Point _grid_bottom_left;
     Point _grid_extent;
+    bool _grid_normal_orientation;
 
 	  std::vector<Hit> 		_hit_list;
 	  std::vector<Point>	_lost;

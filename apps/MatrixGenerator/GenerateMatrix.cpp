@@ -131,6 +131,7 @@ void WriteProportion
 	MPILib::Index l_max
 )
 {
+	std::setprecision(12);
 	std::ofstream ofst(fn);
 	if (l_min == 0)
 		ofst << efficacy._v << "\t" << efficacy._w << "\n";
@@ -145,7 +146,7 @@ void WriteProportion
 
 			ofst << ithit->_cell[0] << ",";
 			ofst << ithit->_cell[1] << ":";
-			ofst << ithit->_prop << ";";
+			ofst << std::setprecision(10) << ithit->_prop << ";";
 		}
 		ofst << "\n";
 	}

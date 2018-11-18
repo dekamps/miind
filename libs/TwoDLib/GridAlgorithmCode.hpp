@@ -222,17 +222,16 @@ namespace TwoDLib {
 			 	_csr_transform->MV(_mass_swap,_sys._vec_mass);
 
 				_sys._vec_mass = _mass_swap;
-
-				// WARNING: originally reset goes after master but this way,
-				// we can guarantee there's no mass above threshold when running
-				// MVGrid in MasterGrid
-				_sys.RedistributeProbability();
-
-				_p_master->Apply(_dt,_vec_rates,_efficacy_map);
-
-				_t_cur += _dt;
-
 	    }
+
+			// WARNING: originally reset goes after master but this way,
+			// we can guarantee there's no mass above threshold when running
+			// MVGrid in MasterGrid
+			_sys.RedistributeProbability(_n_steps);
+
+			_p_master->Apply(_n_steps*_dt,_vec_rates,_efficacy_map);
+
+			_t_cur += _n_steps*_dt;
 
  	    _rate = (_sys.*_sysfunction)();
 
