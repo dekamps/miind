@@ -39,13 +39,13 @@ def generate_closing(outfile, steps, type):
     else:
         s = "double"
 
-    outfile.write('\tTwoDLib::Display::getInstance()->animate(true);\n')
+    # outfile.write('\tTwoDLib::Display::getInstance()->animate(true);\n')
     outfile.write('\tnetwork.startSimulation();\n')
     outfile.write('\tMPILib::utilities::ProgressBar *pb = new MPILib::utilities::ProgressBar(' + steps + ');\n')
     outfile.write('\tlong count = 0;\n')
     outfile.write('\twhile(count < ' + steps + ') {\n')
     outfile.write('\t\tnetwork.evolveSingleStep(std::vector<MPILib::ActivityType>());\n')
-    outfile.write('\t\tTwoDLib::Display::getInstance()->updateDisplay();\n')
+    # outfile.write('\t\tTwoDLib::Display::getInstance()->updateDisplay();\n')
     outfile.write('\t\tTwoDLib::GridReport<' + s + '>::getInstance()->reportFiringRate();\n')
     # outfile.write('\t\tTwoDLib::GridReport<' + s + '>::getInstance()->reportDensity();\n')
     outfile.write('\t\t(*pb)++;\n')
