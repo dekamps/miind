@@ -87,6 +87,34 @@ def cond(y,t):
 
     return [v_prime, w_prime]
 
+def fn(y,t):
+    param_dict={
+
+    'tau_m':   20e-3,
+    'E_r': -65e-3,
+    'E_e':  0e-3,
+    'tau_s':  5e-3,
+
+    'V_min':-66.0e-3,
+    'V_max':  -55.0e-3,
+    'V_th': -55.0e-3, #'V_max', # sometimes used in other scripts
+    'N_V': 200,
+    'w_min':0.0,
+    'w_max':  0.8,
+    'N_w': 20,
+
+    'I': 0.5,
+
+    }
+
+    v = y[0];
+    w = y[1];
+
+    v_prime = v - v**3/3 - w + param_dict['I']
+    w_prime = .08*(v + .7 - .8*w)
+
+    return [v_prime, w_prime]
+
 def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold_v, reset_v, reset_shift_h, grid_v_min, grid_v_max, grid_h_min, grid_h_max, grid_v_res, grid_h_res,efficacy_orientation='v', threshold_capture_v=0):
 
     grid_d1_res = grid_v_res;
@@ -285,38 +313,39 @@ def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold
     api.MeshTools.buildTransformFileFromModel(basename, 1000000000)
     api.MeshTools.buildTransformFileFromModel(basename, reset_shift_w=reset_shift_h, mode='resettransform')
 
-    filename = basename + '.mesh'
-    if os.path.exists(filename):
-        os.remove(filename)
+    # filename = basename + '.mesh'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '.rev'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '.stat'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '.res'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '_transform.mesh'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '_transform.rev'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '_transform.stat'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '_transform.model'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
 
-    filename = basename + '.rev'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '.stat'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '.res'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '_transform.mesh'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '_transform.rev'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '_transform.stat'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '_transform.model'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-generate(rybak, 1, 0.001, 1e-3, 'grid', -10, -56, -0.004, -110, 0, -0.4, 1.0,400, 100)
+#generate(rybak, 1, 0.001, 1e-3, 'grid', -10, -56, -0.004, -110, 0, -0.4, 1.0,300, 300)
 # generate(adEx, 1, 0.001, 1e-12, 'adex', -10, -58, 0.0, -90, -40, -20, 60, 300, 100)
-#generate(cond, 1e-05, 1, 1e-12, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, -0.2, 1.0, 200, 200, efficacy_orientation='w')
+#generate(cond, 1e-05, 1, 1e-12, 'cond', -55.0e-3, -65e-3, 0.0, -67.0e-3, -54.0e-3, -0.2, 1.0, 100, 100, efficacy_orientation='w')
+generate(fn, 1e-03, 1, 1e-12, 'fn', 3.0, -3.0, 0.0, -3.0, 3.0, -1.0, 3.0, 500, 500)

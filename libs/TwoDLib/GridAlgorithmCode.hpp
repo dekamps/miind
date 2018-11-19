@@ -295,7 +295,7 @@ namespace TwoDLib {
 		ost2 << "rate_" << _node_id ;
 		std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
 		ofst_rate.precision(10);
-		ofst_rate << _t_cur << "\t" << _sys.F() << std::endl;
+		ofst_rate << _t_cur << "\t" << (_sys.*_sysfunction)() << std::endl;
 		ofst_rate.close();
 	}
 
