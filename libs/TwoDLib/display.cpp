@@ -54,7 +54,7 @@ unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystem* sys, std::mu
 	double mesh_min_h = 10000000.0;
 	double mesh_max_h = -10000000.0;
 
-	for(unsigned int i = 0; i<m.NrQuadrilateralStrips(); i++){
+	for(unsigned int i = 0; i<m.NrStrips(); i++){
 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
 			Quadrilateral q = m.Quad(i,j);
 			Point c = q.Centroid();
@@ -127,7 +127,7 @@ void Display::display(void) {
 	double mesh_min_h = _dws[window_index].mesh_min_h;
 	double mesh_max_h = _dws[window_index].mesh_max_h;
 
-	for(unsigned int i = 0; i<m.NrQuadrilateralStrips(); i++){
+	for(unsigned int i = 0; i<m.NrStrips(); i++){
 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
 			Quadrilateral q = m.Quad(i,j);
 			unsigned int idx = _dws[window_index]._system->Map(i,j);
