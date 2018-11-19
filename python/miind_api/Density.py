@@ -58,7 +58,7 @@ class Density(Result):
         return ax
 
     def colscale(self, density):
-        cols = np.log10(np.array(density) + 1e-6)
+        cols = np.log10(np.array(density) + 1e-16)
         vmax = np.max(cols)
         vmin = np.min(cols)
         vals = (cols - vmin)/(vmax - vmin)
