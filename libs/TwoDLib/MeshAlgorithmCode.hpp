@@ -287,6 +287,7 @@ namespace TwoDLib {
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 				_sys.Evolve();
+				_sys.RemapReversal();
 	    }
 
 	    // master equation
