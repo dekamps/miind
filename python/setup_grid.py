@@ -103,7 +103,7 @@ def fn(y,t):
     'w_max':  0.8,
     'N_w': 20,
 
-    'I': 0.5,
+    'I': 0.0,
 
     }
 
@@ -313,37 +313,37 @@ def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold
     api.MeshTools.buildTransformFileFromModel(basename, 1000000000)
     api.MeshTools.buildTransformFileFromModel(basename, reset_shift_w=reset_shift_h, mode='resettransform')
 
-    # filename = basename + '.mesh'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '.rev'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '.stat'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '.res'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '_transform.mesh'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '_transform.rev'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '_transform.stat'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-    #
-    # filename = basename + '_transform.model'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
+    filename = basename + '.mesh'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '.rev'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '.stat'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '.res'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '_transform.mesh'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '_transform.rev'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '_transform.stat'
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    filename = basename + '_transform.model'
+    if os.path.exists(filename):
+        os.remove(filename)
 
 #generate(rybak, 1, 0.001, 1e-3, 'grid', -10, -56, -0.004, -110, 0, -0.4, 1.0,300, 300)
 # generate(adEx, 1, 0.001, 1e-12, 'adex', -10, -58, 0.0, -90, -40, -20, 60, 300, 100)
