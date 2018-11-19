@@ -119,7 +119,7 @@ namespace TwoDLib {
 	_vec_vec_res(std::vector<std::vector<Redistribution> >{this->Mapping("Reset")}),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,vector<Redistribution>(),tau_refractive),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res),
 	_n_evolve(0),
 	_n_steps(0),
 	// AvgV method is for Fitzhugh-Nagumo, and other methods that don't have a threshold crossing
@@ -145,7 +145,7 @@ namespace TwoDLib {
 	_vec_vec_res(rhs._vec_vec_res),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,vector<Redistribution>(),rhs._sys.Tau_ref()),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction)
@@ -240,7 +240,7 @@ namespace TwoDLib {
 			ost2 << "rate_" << id ;
 			std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
 			ofst_rate.precision(10);
-			ofst_rate << _t_cur << "\t" << _sys.F() << std::endl;
+			ofst_rate << _t_cur << "\t" << (_sys.*_sysfunction)()[0] << std::endl;
 			ofst_rate.close();
 		}
 		return MPILib::AlgorithmGrid(array_state,array_interpretation);

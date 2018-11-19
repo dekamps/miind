@@ -180,16 +180,7 @@ void Ode2DSystem::RemapReversal(){
 
 void Ode2DSystem::RedistributeProbability()
 {
-	if (_tau_refractive == 0.)
-		for(auto& m: _vec_reset)
-			_reset(m);
-	else
-		for(auto& m: _vec_reset)
-			_reset_refractive(m);
-
-	std::for_each(_vec_reset.begin(),_vec_reset.end(),_clean);
-
-	_f /= _mesh.TimeStep();
+	RedistributeProbability(1);
 }
 
 void Ode2DSystem::RedistributeProbability(MPILib::Number steps)
