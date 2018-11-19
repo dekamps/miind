@@ -54,7 +54,6 @@ namespace TwoDLib {
 			const Mesh&, 					        //!< Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
 			const std::vector<Redistribution>&,     //!< A mapping from strip end to reversal bin
 			const std::vector<Redistribution>&,     //!< A mapping from threshold to reset bin
-			const std::vector<Redistribution>&,			//!< A mapping from incoming threshold to reset bin
 			const MPILib::Time& tau_refactive = 0   //!< absolute refractive period
 		);
 
@@ -87,7 +86,7 @@ namespace TwoDLib {
 		//! total probability mass in the system, should not be too far away from 1.0
 		double P() const {
 			return std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0)
-			+ _reset_refractive.getTotalProbInRefract() + _next_reset.getTotalProbInRefract();
+			+ _reset_refractive.getTotalProbInRefract();
 		}
 
 		//! average membrane potential
@@ -210,66 +209,6 @@ namespace TwoDLib {
 
 		};
 
-		class ResetNext {
-		public:
-
-			ResetNext
-			(
-				Ode2DSystem&                  sys,
-				vector<double>&               vec_mass,
-				const MPILib::Number&         it,
-				MPILib::Time                  tau_refractive,
-				const vector<Redistribution>& vec_reset
-			):
-			_it(it),
-			_t_step(sys.MeshObject().TimeStep()),
-			_tau_refractive(tau_refractive),
-			_vec_reset(vec_reset),
-			_vec_queue(vec_reset.size(),sys.MeshObject().TimeStep()),
-			_sys(sys),
-			_vec_mass(vec_mass)
-			{
-			}
-
-			void operator()(const Redistribution& map, MPILib::Number n_steps)
-			{
-				MPILib::Time t = _it*_t_step;
-				double from =  map._alpha*_vec_mass[_sys.Map(map._from[0],map._from[1])];
-				_sys._f += from;
-
-				MPILib::Index i = &map - &_vec_reset[0];
-				MPILib::populist::StampedProbability prob;
-				prob._prob = from;
-				prob._time = t + _tau_refractive + (_t_step * n_steps);
-
-				_vec_queue[i].push(prob);
-
-				from = _vec_queue[i].CollectAndRemove(t);
-				_vec_mass[_sys.Map(map._to[0],map._to[1])] += from;
-			}
-
-			double getTotalProbInRefract() const{
-				double total = 0.0;
-				for (MPILib::populist::ProbabilityQueue q : _vec_queue){
-					total += q.TotalProbability();
-				}
-				return total;
-			}
-
-		private:
-
-			const MPILib::Number&                      _it;
-			MPILib::Time                               _t_step;
-			MPILib::Time                               _tau_refractive;
-
-			const vector<Redistribution>&              _vec_reset;
-			vector<MPILib::populist::ProbabilityQueue> _vec_queue;
-
-			Ode2DSystem&	                           _sys;
-			vector<double>&                            _vec_mass;
-
-		};
-
 		//! Implement cleaning of the probability that was at threshold. TODO: this is mildly inefficient,
 		//! in a serial implementation, but seems simpler in threads
 
@@ -313,10 +252,8 @@ public:
 private:
 		vector<Redistribution> _vec_reversal;
 		vector<Redistribution> _vec_reset;
-		vector<Redistribution> _vec_next_reset;
 		Reversal               _reversal;
 		Reset                  _reset;
-		ResetNext 					 	 _next_reset;
 		ResetRefractive        _reset_refractive;
 		Clean				   _clean;
 

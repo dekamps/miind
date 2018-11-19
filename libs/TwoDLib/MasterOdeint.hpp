@@ -91,11 +91,6 @@ namespace TwoDLib {
 		vector<double>			_dydt;
 		double					_rate;
 
-		Derivative				_derivative;
-	  Add 					_add;
-		double					_h;
-		Init                    _init;
-
 		const std::vector<MPILib::Index>*              _p_vec_map;     // place holder for current mapping, needed in operator()
 		const std::vector<std::vector<MPILib::Rate> >* _p_vec_rates;   // place holder for rate vector
 

@@ -36,8 +36,8 @@ namespace TwoDLib {
 			Coordinates                 _from;
 			std::vector<Redistribution> _vec_to_line;
 		};
-		
-		TransitionMatrix(){};
+
+		TransitionMatrix();
 
 		//! Requires a ".mat" file
 		TransitionMatrix(const std::string&);
@@ -55,8 +55,6 @@ namespace TwoDLib {
 		double Efficacy() const { return _tr_v ? _tr_v : _tr_w; }
 
 	private:
-
-		TransitionMatrix();
 
 		std::vector<TransferLine>	_vec_line;
 		double						_tr_v;

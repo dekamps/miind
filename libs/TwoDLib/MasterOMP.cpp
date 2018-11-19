@@ -41,9 +41,7 @@ _dydt(sys._vec_mass.size(),0.),
 _rate(0.0),
 _derivative(_dydt,_sys,_rate),
 _add(1./static_cast<double>(par._N_steps)),
-_init(_rate),
-_mask(101,0.),
-_mask_swap(101,0.)
+_init(_rate)
  {
  }
 
