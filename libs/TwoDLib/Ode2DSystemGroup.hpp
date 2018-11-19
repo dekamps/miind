@@ -78,6 +78,8 @@ namespace TwoDLib {
 		//! Redistribute probability that has moved through threshold. Run this after the Master equation
 		void RedistributeProbability();
 
+		void RedistributeProbability(MPILib::Number);
+
 		//! Remap probability that has run from the end of a strip. Run this after evolution
 		void RemapReversal();
 

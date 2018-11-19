@@ -245,7 +245,7 @@ void Ode2DSystemGroup::RemapReversal(){
 		std::for_each(_vec_reversal[m].begin(),_vec_reversal[m].end(),_reversal[m]);
 }
 
-void Ode2DSystemGroup::RedistributeProbability()
+void Ode2DSystemGroup::RedistributeProbability(MPILib::Number steps)
 {
 	for(MPILib::Index m=0; m < _mesh_list.size(); m++){
 		std::for_each(_vec_reset[m].begin(),_vec_reset[m].end(),_reset[m]);
@@ -253,7 +253,12 @@ void Ode2DSystemGroup::RedistributeProbability()
 	}
 	MPILib::Time t_step = _mesh_list[0].TimeStep(); // they all should have the same time step
 	for (MPILib::Rate& f: _fs)
-		f /= t_step;
+		f /= t_step*steps;
+}
+
+void Ode2DSystemGroup::RedistributeProbability()
+{
+	RedistributeProbability(1);
 }
 
 const std::vector<MPILib::Potential>& Ode2DSystemGroup::AvgV() const
