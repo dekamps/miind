@@ -178,7 +178,7 @@ namespace TwoDLib {
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
 
-		Display::getInstance()->addOdeSystem(_node_id, &_sys, &_display_mutex);
+		Display::getInstance()->addOdeSystem(_node_id, &_sys);
 
 		// the integration time step, stored in the MasterParameter, is gauged with respect to the
 		// network time step.
@@ -238,17 +238,30 @@ namespace TwoDLib {
 			}
 			std::ofstream ofst(dirname + "/" + fn);
 			_sys.Dump(ofst);
-
-			// Output to a rate file as well. This might be slow, but we can observe
-			// the rate as the simulation progresses rather than wait for root.
-			std::ostringstream ost2;
-			ost2 << "rate_" << id ;
-			std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
-			ofst_rate.precision(10);
-			ofst_rate << _t_cur << "\t" << _sys.F() << std::endl;
-			ofst_rate.close();
 		}
 		return MPILib::AlgorithmGrid(array_state,array_interpretation);
+	}
+
+	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::reportDensity() const
+	{
+		std::ostringstream ost;
+		ost << _node_id  << "_" << _t_cur;
+		ost << "_" << _sys.P();
+		string fn("mesh_" + ost.str());
+
+		std::string model_path = _model_name;
+		boost::filesystem::path path(model_path);
+
+		// MdK 27/01/2017. grid file is now created in the cwd of the program and
+		// not in the directory where the mesh resides.
+		const std::string dirname = path.filename().string() + "_mesh";
+
+		if (! boost::filesystem::exists(dirname) ){
+			boost::filesystem::create_directory(dirname);
+		}
+		std::ofstream ofst(dirname + "/" + fn);
+		_sys.Dump(ofst);
 	}
 
 	template <class WeightValue, class Solver>
@@ -282,8 +295,6 @@ namespace TwoDLib {
 			  ; // else is fine
 		}
 
-			Display::getInstance()->LockMutex(_node_id);
-
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 				_sys.Evolve();
@@ -299,8 +310,6 @@ namespace TwoDLib {
  	    _rate = (_sys.*_sysfunction)();
 
  	    _n_evolve++;
-
-			Display::getInstance()->UnlockMutex(_node_id);
 	}
 
 	template <class WeightValue, class Solver>

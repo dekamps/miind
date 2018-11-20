@@ -22,6 +22,8 @@ class Density(Result):
         super(Density, self).__init__(io, nodename)
         self.path = op.join(self.io.output_directory,
                             self.nodename + '_density')
+        self.display_images_path = op.join(self.io.output_directory,
+                            'node_' + str(self.nodeindex) )
 
     @property
     def polygons(self):
@@ -64,32 +66,66 @@ class Density(Result):
         vals = (cols - vmin)/(vmax - vmin)
         return vmin, vmax, vals
 
-    def generateDensityAnimation(self, filename, image_size=300, generate_images=True, time_scale=1.0,
+    def generateDensityAnimation(self, filename, image_size=300, generate_images=True, time_step=0.001,
                             colorbar=None, cmap='inferno'):
-        # Generate the density image files
-        if generate_images:
-            self.generateAllDensityPlotImages(image_size, colorbar, cmap, '.png')
 
-        try:
-            # grab all the filenames
-            files = glob.glob(op.join(self.path, '*.png'))
-            files.sort()
+        image_path = self.path
+        gen_images = generate_images
+        extension = '*.png'
 
-            # note ffmpeg must be installed
-            process = ['ffmpeg',
-                '-r', str(int((1.0 / time_scale) * (len(files)/self.times[-1]))),
-                '-pattern_type', 'glob',
-                '-i', op.join(self.path, '*.png')]
+        # if display was used, there should be a directory full of images already
+        # otherwise we have to do the painful generation!
+        if os.path.exists(self.display_images_path):
+            gen_images = False
+            image_path = self.display_images_path
+            extension = '%d.tga'
 
-            process.append(filename + '.mp4')
+            try:
+                # grab all the filenames
+                files = glob.glob(op.join(image_path, extension))
+                files.sort()
 
-            subprocess.call(process)
-        except OSError as e:
-            if e.errno == 2:
-                print "MIIND API Error : generateDensityAnimation() requires ffmpeg to be installed."
-            else:
-                print "MIIND API Error : Unknown Error"
-                print e
+                # note ffmpeg must be installed
+                process = ['ffmpeg',
+                    '-r', str(1.0/time_step),
+                    '-i', op.join(image_path, extension)]
+
+                process.append(filename + '.mp4')
+
+                subprocess.call(process)
+
+                return
+            except OSError as e:
+                if e.errno == 2:
+                    print "MIIND API Error : generateDensityAnimation() requires ffmpeg to be installed."
+                else:
+                    print "MIIND API Error : Unknown Error"
+                    print e
+        else:
+            # Generate the density image files
+            if gen_images:
+                self.generateAllDensityPlotImages(image_size, colorbar, cmap, '.png')
+
+            try:
+                # grab all the filenames
+                files = glob.glob(op.join(image_path, extension))
+                files.sort()
+
+                # note ffmpeg must be installed
+                process = ['ffmpeg',
+                    '-r', str(1.0/time_step),
+                    '-pattern_type', 'glob',
+                    '-i', op.join(image_path, extension)]
+
+                process.append(filename + '.mp4')
+
+                subprocess.call(process)
+            except OSError as e:
+                if e.errno == 2:
+                    print "MIIND API Error : generateDensityAnimation() requires ffmpeg to be installed."
+                else:
+                    print "MIIND API Error : Unknown Error"
+                    print e
 
     def generateAllDensityPlotImages(self, image_size=300, colorbar=None, cmap='inferno', ext='.png'):
         if not ext.startswith('.'):

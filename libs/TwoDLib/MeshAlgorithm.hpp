@@ -84,6 +84,8 @@ namespace TwoDLib {
 		 */
 	  virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId, bool b_state = true) const;
 
+		virtual void reportDensity() const;
+
 		/**
 		 * Evolve the node state. In the default case it simply calls envolveNodeState
 		 * without the NodeTypes. However if an algorithm needs the nodeTypes
@@ -173,9 +175,6 @@ namespace TwoDLib {
 		pugi::xml_document _doc;
 		pugi::xml_node     _root;
 
-		// If the OpenGL display is being used, track the index of this node and
-		// provide a mutex to lock on
-		std::mutex _display_mutex;
 		MPILib::NodeId _node_id;
 
 		// mesh and mappings

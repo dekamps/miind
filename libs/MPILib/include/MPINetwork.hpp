@@ -197,6 +197,11 @@ public:
 	 */
   void setNodeExternalPrecursor(NodeId node, const WeightValue& weight);
 
+  /**
+  *
+  */
+  void reportNodeActivities(std::vector<MPILib::NodeId>& node_ids) const;
+
 	SimulationRunParameter& getSimulationParams() { return _parameterSimulationRun; }
 
 private:
