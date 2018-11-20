@@ -54,7 +54,6 @@ namespace TwoDLib {
 	  virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId, bool b_state = true) const;
 
 		virtual void reportDensity() const;
-		virtual void reportFiringRate() const;
 
 		virtual void prepareEvolve(const std::vector<MPILib::Rate>& nodeVector,
 				const std::vector<WeightValue>& weightVector,
@@ -91,10 +90,6 @@ namespace TwoDLib {
 		MPILib::Time _dt;
 
 		TwoDLib::Ode2DSystem _sys;
-
-		// If the OpenGL display is being used, track the index of this node and
-		// provide a mutex to lock on
-		std::mutex _display_mutex;
 
 		MPILib::NodeId _node_id;
 

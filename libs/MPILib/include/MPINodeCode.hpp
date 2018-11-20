@@ -164,6 +164,11 @@ ActivityType MPINode<Weight, NodeDistribution>::getActivity() const {
 }
 
 template<class Weight, class NodeDistribution>
+NodeId MPINode<Weight, NodeDistribution>::getNodeId() const {
+	return _nodeId;
+}
+
+template<class Weight, class NodeDistribution>
 ActivityType MPINode<Weight, NodeDistribution>::getExternalPrecursorActivity() {
 	return _externalPrecursorActivity;
 }

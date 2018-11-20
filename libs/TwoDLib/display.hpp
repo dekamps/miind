@@ -24,7 +24,6 @@ class DisplayWindow{
 public:
 
   Ode2DSystem* _system;
-  std::mutex* _read_mutex;
   int _window_index;
 
   double mesh_min_v;
@@ -50,7 +49,7 @@ public:
   void init() const;
   void update();
   void shutdown() const;
-  void animate(bool) const;
+  void animate(bool,std::vector<MPILib::NodeId>) const;
   void processDraw(void);
 
   static void stat_display(void) {
@@ -65,9 +64,8 @@ public:
   static void stat_shutdown(void){
     disp->shutdown();
   }
-  static void stat_runthreaded(void);
 
-  unsigned int addOdeSystem(MPILib::NodeId nid, Ode2DSystem* sys, std::mutex *mu);
+  unsigned int addOdeSystem(MPILib::NodeId nid, Ode2DSystem* sys);
 
   void updateDisplay();
 
@@ -77,16 +75,6 @@ public:
 
   void AssignNetworkPointer(Network* nt){
     disp->net = nt;
-  }
-
-  void LockMutex(unsigned int index) {
-    	if (_dws[index]._read_mutex)
-    		_dws[index]._read_mutex->lock();
-  }
-
-  void UnlockMutex(unsigned int index) {
-    	if (_dws[index]._read_mutex)
-    		_dws[index]._read_mutex->unlock();
   }
 
 private:
@@ -103,6 +91,8 @@ private:
   Network* net;
 
   int lastTime;
+
+  std::vector<MPILib::NodeId> _nodes_to_display;
 
   std::chrono::milliseconds start_time;
 

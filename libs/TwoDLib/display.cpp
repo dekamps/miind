@@ -37,12 +37,11 @@ Display::~Display(){
 	glutExit();
 }
 
-unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystem* sys, std::mutex *mu) {
+unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystem* sys) {
 	unsigned int index = _dws.size();
 
 	DisplayWindow window;
 	window._system = sys;
-	window._read_mutex = mu;
 
 
 	// Find extent of mesh to normalise to screen size
@@ -111,6 +110,8 @@ void Display::display(void) {
 	// if (time_elapsed.count() % 10 != 0)
 	// 	return;
 
+	glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
+
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// **** used for 3D ****
@@ -121,9 +122,6 @@ void Display::display(void) {
 	glBegin(GL_QUADS);
 
 	Mesh m = _dws[window_index]._system->MeshObject();
-
-	LockMutex(window_index);
-
 
 	double max = -99999999.0;
 	for(unsigned int i = 0; i<m.NrQuadrilateralStrips(); i++){
@@ -173,9 +171,6 @@ void Display::display(void) {
 		}
 	}
 
-
-	UnlockMutex(window_index);
-
 	glEnd();
 
 	// Print real time and sim time
@@ -220,7 +215,7 @@ void Display::display(void) {
 	while(pos < nice_max_h){
 		if (std::abs(pos) < 0.0000000001 )
 			pos = 0.0;
-			
+
 		glColor3f( 1.0, 1.0, 1.0 );
 	  glRasterPos2f(-1.0, 2*((pos - (mesh_min_h + ((mesh_max_h - mesh_min_h)/2.0)))/(mesh_max_h - mesh_min_h)));
 
@@ -334,7 +329,7 @@ void Display::init() const {
 	// **** used for 3D ****
 	//gluPerspective(45, 1, 2, 10);
 	//glEnable(GL_DEPTH_TEST);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
 }
 
 void Display::update() {
@@ -345,8 +340,8 @@ void Display::updateDisplay() {
 	time = glutGet(GLUT_ELAPSED_TIME);
 	lastTime = time;
 	//Sleep(50);
-	for (std::map<MPILib::NodeId, DisplayWindow>::iterator iter = Display::getInstance()->_dws.begin(); iter != Display::getInstance()->_dws.end(); ++iter){
-		glutSetWindow(iter->second._window_index);
+	for (MPILib::NodeId id = 0; id < _nodes_to_display.size(); id++) {
+		glutSetWindow(_dws[_nodes_to_display[id]]._window_index);
 		glutPostRedisplay();
 	}
 
@@ -357,18 +352,13 @@ void Display::updateDisplay() {
 void Display::shutdown() const {
 	glutExit();
 
-	// just in case - unlock all mutexes.
-	for (std::map<MPILib::NodeId, DisplayWindow>::iterator iter = Display::getInstance()->_dws.begin(); iter != Display::getInstance()->_dws.end(); ++iter){
-		disp->UnlockMutex(iter->first);
-	}
-
-
 	// Nice new line if we quit early.
 	std::cout << "\n";
 }
 
-void Display::animate(bool _write_frames) const{
+void Display::animate(bool _write_frames, std::vector<MPILib::NodeId> nodes_to_display) const{
 
+	Display::getInstance()->_nodes_to_display = nodes_to_display;
 	Display::getInstance()->write_frames = _write_frames;
 
 	char* arv[] = {"Miind"};
@@ -378,8 +368,8 @@ void Display::animate(bool _write_frames) const{
 	glutInitWindowSize(500, 500);
 	glutInitWindowPosition(0, 0);
 
-	for (std::map<MPILib::NodeId, DisplayWindow>::iterator iter = Display::getInstance()->_dws.begin(); iter != Display::getInstance()->_dws.end(); ++iter){
-		iter->second._window_index = glutCreateWindow("Miind2D");
+	for (MPILib::NodeId id = 0; id < Display::getInstance()->_nodes_to_display.size(); id++) {
+		Display::getInstance()->_dws[Display::getInstance()->_nodes_to_display[id]]._window_index = glutCreateWindow("Miind2D");
 		glutDisplayFunc(Display::stat_display);
 		glutReshapeFunc(Display::stat_scene);
 		glutIdleFunc(Display::stat_update);
@@ -390,19 +380,6 @@ void Display::animate(bool _write_frames) const{
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 
 	init();
-}
-
-void Display::stat_runthreaded() {
-	Display::getInstance()->animate(false);
-	while((Display::getInstance()->close_display) && !(*Display::getInstance()->close_display)){
-
-		if(!glutGetWindow()){
-			glutExit();
-			break;
-		}
-
-		Display::getInstance()->updateDisplay();
-	}
 }
 
 void Display::processDraw(void) {

@@ -93,8 +93,7 @@ namespace TwoDLib {
 		_transformMatrix = TransitionMatrix(_transform_matrix);
 		_csr_transform = new CSRMatrix(_transformMatrix, _sys);
 
-
-		Display::getInstance()->addOdeSystem(_node_id, &_sys, &_display_mutex);
+		Display::getInstance()->addOdeSystem(_node_id, &_sys);
 		GridReport<WeightValue>::getInstance()->registerObject(this);
 
 		_t_cur = par_run.getTBegin();
@@ -209,8 +208,6 @@ namespace TwoDLib {
 			else
 			  ; // else is fine
 		}
-
-			Display::getInstance()->LockMutex(_node_id);
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 
@@ -236,9 +233,6 @@ namespace TwoDLib {
  	    _rate = (_sys.*_sysfunction)();
 
  	    _n_evolve++;
-
-			Display::getInstance()->UnlockMutex(_node_id);
-
 	}
 
 	template <class WeightValue>
@@ -284,19 +278,6 @@ namespace TwoDLib {
 		}
 		std::ofstream ofst(dirname + "/" + fn);
 		_sys.Dump(ofst);
-	}
-
-	template <class WeightValue>
-	void GridAlgorithm<WeightValue>::reportFiringRate() const
-	{
-		// Output to a rate file as well. This might be slow, but we can observe
-		// the rate as the simulation progresses rather than wait for root.
-		std::ostringstream ost2;
-		ost2 << "rate_" << _node_id ;
-		std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
-		ofst_rate.precision(10);
-		ofst_rate << _t_cur << "\t" << (_sys.*_sysfunction)() << std::endl;
-		ofst_rate.close();
 	}
 
 	template <class WeightValue>
