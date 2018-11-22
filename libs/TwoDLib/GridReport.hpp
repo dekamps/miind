@@ -6,31 +6,26 @@
 
 namespace TwoDLib {
 
-template <class WeightValue>
+template <class Algorithm>
 class GridReport {
 
 public:
 
   GridReport():
-  _obs(vector<GridAlgorithm<WeightValue>*>()) {
+  _obs(vector<Algorithm*>()) {
 
   }
 
-  static GridReport<WeightValue>* getInstance() {
+  static GridReport<Algorithm>* getInstance() {
     if (!reg) {
-      reg = new GridReport<WeightValue>();
+      reg = new GridReport<Algorithm>();
     }
 
     return reg;
   }
 
-  void registerObject(GridAlgorithm<WeightValue>* obj) {
+  void registerObject(Algorithm* obj) {
     _obs.push_back(obj);
-  }
-
-  void reportFiringRate() const {
-    for (int i=0; i<_obs.size(); i++)
-      _obs[i]->reportFiringRate();
   }
 
   void reportDensity() const {
@@ -40,14 +35,14 @@ public:
 
 
 private:
-  vector<GridAlgorithm<WeightValue>*> _obs;
+  vector<Algorithm*> _obs;
 
-  static GridReport<WeightValue>* reg;
+  static GridReport<Algorithm>* reg;
 
 };
 
-template <class WeightValue>
-GridReport<WeightValue>* GridReport<WeightValue>::reg;
+template <class Algorithm>
+GridReport<Algorithm>* GridReport<Algorithm>::reg;
 
 }
 
