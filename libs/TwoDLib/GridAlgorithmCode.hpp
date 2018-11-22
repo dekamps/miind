@@ -230,7 +230,7 @@ namespace TwoDLib {
 
 			_t_cur += _n_steps*_dt;
 
- 	    _rate = (_sys.*_sysfunction)();
+ 	    _rate = (_sys.*_sysfunction)()[0];
 
  	    _n_evolve++;
 	}
@@ -277,7 +277,8 @@ namespace TwoDLib {
 			boost::filesystem::create_directory(dirname);
 		}
 		std::ofstream ofst(dirname + "/" + fn);
-		_sys.Dump(ofst);
+		std::vector<std::ostream*> vec_str{&ofst};
+		_sys.Dump(vec_str);
 	}
 
 	template <class WeightValue>

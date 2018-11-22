@@ -154,8 +154,7 @@ void Ode2DSystem::Dump(std::ostream& ost, int mode) const
 
 void Ode2DSystem::Evolve()
 {
-	_it += 1;
-	_f = 0;
+	EvolveWithoutMeshUpdate();
 	UpdateMap();
 }
 
