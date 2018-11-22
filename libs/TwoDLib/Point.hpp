@@ -52,6 +52,8 @@ namespace TwoDLib {
     //! < const operator access
     inline const double& operator[](unsigned int i) const { assert( i < 2); return (i == 0) ? _v : _w; }
 
+    inline double msquared() { return _v*_v + _w*_w;}
+
     Point& operator+=(const Point& p){ _v += p._v; _w += p._w; return *this; }
 
     Point& operator*=(double d){ _v *= d; _w*= d; return *this; }

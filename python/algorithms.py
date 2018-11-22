@@ -260,7 +260,7 @@ def parse_grid_algorithm(alg, i, weighttype):
     s += alg.attrib['modelfile'] + '\",'
     s += '\"' + alg.attrib['transformfile'] + '\",'
     s += timestep.text + ','
-    s += alg.attrib['start_strip'] + "," + alg.attrib['start_cell']
+    s += alg.attrib['start_v'] + "," + alg.attrib['start_w']
 
     if 'tau_refractive' in alg.keys():
         s += ', '  + alg.attrib['tau_refractive']

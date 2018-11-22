@@ -179,6 +179,8 @@ namespace TwoDLib {
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
 
+		Display::getInstance()->addOdeSystem(_node_id, &_sys);
+
 		// the integration time step, stored in the MasterParameter, is gauged with respect to the
 		// network time step.
 		MPILib::Number n_ode = static_cast<MPILib::Number>(std::floor(t_step/_h));
@@ -207,6 +209,11 @@ namespace TwoDLib {
 			throw TwoDLib::TwoDLibException("No initialization of the mass array has taken place. Call Initialize before configure.");
 	}
 
+	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::assignNodeId( MPILib::NodeId nid ) {
+		_node_id = nid;
+	}
+
 	template <class WeightValue,class Solver>
 	MPILib::AlgorithmGrid MeshAlgorithm<WeightValue,Solver>::getGrid(MPILib::NodeId id, bool b_state) const
 	{
@@ -233,17 +240,31 @@ namespace TwoDLib {
 			std::ofstream ofst(dirname + "/" + fn);
 			std::vector<std::ostream*> vec_str{&ofst};
 			_sys.Dump(vec_str);
-
-			// Output to a rate file as well. This might be slow, but we can observe
-			// the rate as the simulation progresses rather than wait for root.
-			std::ostringstream ost2;
-			ost2 << "rate_" << id ;
-			std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
-			ofst_rate.precision(10);
-			ofst_rate << _t_cur << "\t" << (_sys.*_sysfunction)()[0] << std::endl;
-			ofst_rate.close();
 		}
 		return MPILib::AlgorithmGrid(array_state,array_interpretation);
+	}
+
+	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::reportDensity() const
+	{
+		std::ostringstream ost;
+		ost << _node_id  << "_" << _t_cur;
+		ost << "_" << _sys.P();
+		string fn("mesh_" + ost.str());
+
+		std::string model_path = _model_name;
+		boost::filesystem::path path(model_path);
+
+		// MdK 27/01/2017. grid file is now created in the cwd of the program and
+		// not in the directory where the mesh resides.
+		const std::string dirname = path.filename().string() + "_mesh";
+
+		if (! boost::filesystem::exists(dirname) ){
+			boost::filesystem::create_directory(dirname);
+		}
+		std::ofstream ofst(dirname + "/" + fn);
+			std::vector<std::ostream*> vec_str{&ofst};
+			_sys.Dump(vec_str);
 	}
 
 	template <class WeightValue, class Solver>
@@ -279,6 +300,7 @@ namespace TwoDLib {
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 				_sys.Evolve();
+				_sys.RemapReversal();
 	    }
 
 	    // master equation

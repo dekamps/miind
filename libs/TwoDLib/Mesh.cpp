@@ -159,6 +159,21 @@ vector<Coordinates> Mesh::findV(double V, Threshold th) const
 	return vec_ret;
 }
 
+vector<Coordinates> Mesh::findPointInMeshSlow(const Point& p) const{
+	vector<Coordinates> vec_ret;
+	for (unsigned int i = 0; i < _vec_vec_quad.size(); i++){
+		for (unsigned int j = 0; j < _vec_vec_quad[i].size(); j++){
+			if ( _vec_vec_quad[i][j].IsInside(p))
+				vec_ret.push_back(Coordinates(i,j));
+		}
+	}
+
+	if(vec_ret.size() == 0)
+		throw TwoDLibException("Position does not exist in Mesh");
+
+	return vec_ret;
+}
+
 void Mesh::ProcessFileIntoBlocks(std::ifstream& ifst){
 
 	string line;

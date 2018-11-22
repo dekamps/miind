@@ -61,7 +61,7 @@ def np_seg_intersect(a, b):
     if np.isclose(denom, 0) and not np.isclose(num, 0):
 	# Parallel and non-intersecting
         return None
-    u = num / denom 
+    u = num / denom
     t = np_cross_product(v, s) / denom
 
     if u >= 0 and u <= 1 and t >=0 and t <=1:
@@ -88,7 +88,7 @@ class Cell:
     '''Cell is a part of a mesh, most often a quadrilateral, but there are exceptions.'''
 
     def __init__(self, vs, ws):
-        ''' assumption is that of 2D neural dynamics. One variable will be the membrane 
+        ''' assumption is that of 2D neural dynamics. One variable will be the membrane
         potential  v, and the other one will be called w here.'''
         self.vs = vs
         self.ws = ws
@@ -133,10 +133,10 @@ class Quadrilateral(Cell):
         else:
             self.reversal = False
 
-        
+
     def __area__(self):
         self.area = areaofquadrilateral(self.points)
-    
+
 
     def __centroid__(self):
         '''Use the vertex centroid, as it is always defined and not too wrong in a fine enough mesh.'''
@@ -166,8 +166,8 @@ class Quadrilateral(Cell):
         return isinsidetriangle(self.triangle1,point) or isinsidetriangle(self.triangle2,point)
 
     def draw(self, plotlist, translation = [0., 0.], c = 1):
-        '''Quadrilateral adds TLine elements representing its boundary to the plot list.'''  
-        lx = [ p[0] + translation[0] for p in self.points ] 
+        '''Quadrilateral adds TLine elements representing its boundary to the plot list.'''
+        lx = [ p[0] + translation[0] for p in self.points ]
         ly = [ p[1] + translation[1] for p in self.points ]
         # close area
         lx.append(lx[0])
@@ -179,7 +179,7 @@ class Quadrilateral(Cell):
         line.SetFillColor(0)
         line.SetLineColor(c)
         line.Draw('Fill')
-    
+
         plotlist.append(line)
 
 
@@ -192,20 +192,20 @@ class Quadrilateral(Cell):
 	diag_2=[self.points[1].tolist(),self.points[3].tolist()]
 	if np_seg_intersect(diag_1,diag_2) is None: # adapted to prevent elementwise comparison (MdK:7/4/2017)
 	    return False
-	else: 
+	else:
 	    return True
-	
+
     def isSelfIntersecting(self):
 	edge_1 = [self.points[0].tolist(), self.points[1].tolist()]
 	edge_2 = [self.points[1].tolist(), self.points[2].tolist()]
 	edge_3 = [self.points[2].tolist(), self.points[3].tolist()]
 	edge_4 = [self.points[3].tolist(), self.points[0].tolist()]
 
-	if np_seg_intersect(edge_1, edge_3) is None and np_seg_intersect(edge_2, edge_4) is None: # adapted to prevent elementwise comparison (MdK:7/4/2017)	
+	if np_seg_intersect(edge_1, edge_3) is None and np_seg_intersect(edge_2, edge_4) is None: # adapted to prevent elementwise comparison (MdK:7/4/2017)
 	    return False
 	else:
 	    return True
-	
+
     def isTooSmall(self, threshold = 1e-8):
 	if self.area < threshold:
 	    return True
@@ -223,7 +223,7 @@ class Negative(Cell):
         distance > 0 is defined, all points within that distance from the perimeter will be labeled as not in the bin. It is possible to exclude sides from
         this cut, which is necessary when the perimeter directly bounds the reset bin. list_of_segments is a list of indices that indicates which side of the
         quadrilaterals should be left out of this cut. The side defined by qudrilateral[0] and quadrilateral[1] is indexed by 0, etc.'''
-    
+
         self.cells          = cells
         self.perimeter      = quadrilateral
 
@@ -232,7 +232,7 @@ class Negative(Cell):
         self.triangle2        = triangle2
 
         self.N              = N
-        
+
         self.fiducial_distance  = fiducial_distance
         self.list_of_segments   = list_of_segments
         self.__prepare_fiducial_cut__()
@@ -242,10 +242,10 @@ class Negative(Cell):
 
         self.__cells_within_perimeter__()
         self.__generate_filtered__()
-        
+
         self.__determine_bbox__()
         self.__area__()
-        
+
 
     def __prepare_fiducial_cut__(self):
         '''Prepare the list of segments that the fiducial cut should applied on, i.e those sides of the perimeter that
@@ -272,7 +272,7 @@ class Negative(Cell):
 
         if self.__is_close_to_perimeter(point) == True:
             return False
-                                                                                                         
+
         for coord in self.cell_list:
             if self.cells[coord[0]][coord[1]].isPointInside(point) == True:
                 return False
@@ -294,14 +294,14 @@ class Negative(Cell):
 
         self.total    = total
         self.filtered = filtered
- 
-        return 
+
+        return
 
     def __determine_bbox__(self):
         ''' There are self.N points generated within the perimeter. There is a larger number of points that must be generated,
         which can be used to calculate the bin area. This function returns the total number of points that had to be generated
         to reach self.N points in the bin area.'''
-        
+
         vs = [ point[0] for point in self.filtered ]
         ws = [ point[1] for point in self.filtered ]
 
@@ -314,13 +314,13 @@ class Negative(Cell):
         maxw = np.max(ws)
 
         self.box = [[minv, minw],[maxv, maxw]]
-        
+
 
     def __add_cell_list(self,i,j):
         el = [i,j]
         if not el in self.cell_list:
             self.cell_list.append(el)
-    
+
     def __cells_within_perimeter__(self):
         ''' Add cells with at least one point within the perimeter. These cells with be checked to wether a point is inside this cell or not.'''
         for i, cells in enumerate(self.cells):
@@ -337,7 +337,7 @@ class Negative(Cell):
                         for p in self.perimeter.points:
                             if cell.isPointInside(p):
                                 self.__add_cell_list(i,j)
-    
+
     def isPointInside(self, point):
         return self.__is_point_inside__(point)
 
@@ -347,7 +347,7 @@ class Negative(Cell):
 
     def generate_points_in_cell(self,N):
         '''Generate N points, uniformly distributed inside the cell.'''
-        
+
         # It is assumed that enough points already have been generated.
         if len(self.filtered) >= N:
             return self.filtered[:N]
@@ -378,7 +378,7 @@ class Negative(Cell):
             plotlist.append(m)
 
 class Mesh:
-    
+
     def __init__(self, filename, kdTree=False):
         ''' A mesh has already been generated on a file.'''
         if filename is None:
@@ -386,7 +386,7 @@ class Mesh:
 	    self.ws = []
 	    self.cells = []
 	    self.neighbours = {}
-	else: 
+	else:
 
   	    self.filename = filename
             f = open(filename)
@@ -418,7 +418,7 @@ class Mesh:
         	self.vs.append(vs)
         	self.ws.append(ws)
         	self.__build_grid__(vs,ws)
-    
+
 
     	    if (kdTree == True): self.__build_tree__()
             self.neighbours = {}
@@ -427,7 +427,7 @@ class Mesh:
             self.are_labels_drawn = True
 
     def __split_blocks__(self,lines):
- 
+
         blocks   = []
         newblock = []
         for line in lines[2:]:
@@ -446,7 +446,7 @@ class Mesh:
                     if self.inversion == True:
                         raise ValueError
                     self.inversion = True
-                    # demarcate where the inversion happens, so that later the number 
+                    # demarcate where the inversion happens, so that later the number
                     # of strips before the inversion can be calculated
                     bound = len(blocks)
             else:
@@ -466,7 +466,7 @@ class Mesh:
 
     def __build_arrays__(self,block):
         '''Builds arrays of characteristics,
-        the  v points and the w points of a characteristic 
+        the  v points and the w points of a characteristic
         each have their own list.'''
         vs = []
         ws = []
@@ -475,7 +475,7 @@ class Mesh:
             items = line.split()
             data = [ float(el) for el in items ]
             vs.append(data)
-        for line in block[1::2]: 
+        for line in block[1::2]:
             items = line.split()
             data = [ float(el) for el in items ]
             ws.append(data)
@@ -484,7 +484,7 @@ class Mesh:
     def __build_tree__(self):
         ''' build a KDTree out of the characteristic arrays. The grid points are stored
         in self.data. Thhe same point may occur multiple times, as'''
-        points = []      
+        points = []
 
         tandem = zip(self.vs, self.ws)
         for block in tandem:
@@ -495,7 +495,7 @@ class Mesh:
                     point = [coord[0], coord[1]]
                     points.append(point)
 
-        self.data = np.array(points)            
+        self.data = np.array(points)
         self.tree = KDTree(self.data)
 
     def __build_grid__(self,vs,ws):
@@ -514,7 +514,7 @@ class Mesh:
                         print 'An error, probably a degeneracy in strip: ',i, ' cell: ', j
                     cell.append(quad)
                 self.cells.append(cell)
-    
+
     def __build_neighbours__(self):
         '''Builds a dictionary of lists of cells, keyed by a tuple representing a point. The list  contains all cells that
         a meshpoint is part of. Only the quadrilaterals should be included in this neighbours list.'''
@@ -533,12 +533,12 @@ class Mesh:
                         else:
                             self.neighbours[point] = []
                             self.neighbours[point].append([i,j])
-        return 
+        return
 
     def __add_label__(self, cell, i, j, labelsize):
         point = cell.centroid
         t=ROOT.TText(point[0], point[1],str(i) + ',' + str(j))
-        t.SetTextAlign(22) 
+        t.SetTextAlign(22)
         t.SetTextSize(labelsize)
         return t
 
@@ -546,7 +546,7 @@ class Mesh:
         '''Replace the place holder for a stationary point by a Negative instance. If more than one stationary point is present,
         extend the list.'''
         cell = Negative(self.cells,perimeter, N, fiducial_distance, exclusion_list)
-    
+
         if self.cells[0][0].area > 0:
             self.cells[0].append(cell)
         else:
@@ -554,7 +554,7 @@ class Mesh:
 
     def insert_stationary(self, quadrilateral):
         '''Quadrilateral needs to be a cell of type Quadrilateral.'''
-    
+
         if self.cells[0][0].area > 0:
             self.cells[0].append(quadrilateral)
         else:
@@ -582,10 +582,10 @@ class Mesh:
 
     def dimensions(self):
         '''Returns minv, maxv, minw, maxw'''
-        vs =  [point[0]  for celllist in self.cells[1:] for cell in celllist for point in cell.points]
-        ws =  [point[1]  for celllist in self.cells[1:] for cell in celllist for point in cell.points]
+        vs =  [point[0]  for celllist in self.cells[0:] for cell in celllist for point in cell.points]
+        ws =  [point[1]  for celllist in self.cells[0:] for cell in celllist for point in cell.points]
         return np.array([[min(vs), max(vs)], [min(ws), max(ws)]])
-    
+
     def bbox(self,i,j):
         ''' Give the bounding box of a given cell '''
         return self.cells[i][j].bbox()
@@ -597,14 +597,14 @@ class Mesh:
 
     def bin_from_point(self, point):
         '''Give the bin the point belongs to. Return None if there is none.'''
-    
+
         # first check the stationary bins
         for i, cell in enumerate(self.cells[0]):
             if self.isinbin(0,i,point):
                 return [0,i]
 
         # else walk the tree
-    
+
         close = self.tree.query(point,MAX_NEIGHBOURS)
         nearests=self.data[close[1]]
         for nearest in nearests:
@@ -698,13 +698,13 @@ class Mesh:
 		new_mesh.cells.append(self.cells[0])
 	    else:
 	    	for j, cell in enumerate(cells):
-				
+
 		    chkCell = self.cells[i][j]
 		    if j == 0 and chkCell.isSelfIntersecting():
-			new_mesh.cells.append([Cell([0.],[0.])])	
+			new_mesh.cells.append([Cell([0.],[0.])])
 		    elif j == 0 and not chkCell.isSelfIntersecting():
 			new_mesh.cells.append([chkCell])
-		    elif not chkCell.isSelfIntersecting(): 
+		    elif not chkCell.isSelfIntersecting():
 			new_mesh.cells[i].append(chkCell)
 		    elif chkCell.isSelfIntersecting():
 			break
@@ -712,7 +712,7 @@ class Mesh:
 	return new_mesh
 
     def removeSmallBins(self,thresh = 1e-5):
-	
+
 	new_mesh = Mesh(None)
 	new_mesh.dt = self.dt
 	new_mesh.filename = self.filename
@@ -749,7 +749,7 @@ class Mesh:
 	    else:
 		for j, cell in enumerate(cells):
 		    chkCell = self.cells[i][j]
-			
+
 		    if j == 0 and (chkCell.isSelfIntersecting() or chkCell.isTooSmall(threshold)):
 			new_mesh.cells.append([Cell([0.],[0.])])
 			print i,j
@@ -757,22 +757,22 @@ class Mesh:
 			new_mesh.cells.append([chkCell])
 		    elif not (chkCell.isSelfIntersecting() or chkCell.isTooSmall(threshold)):
 			new_mesh.cells[i].append(chkCell)
-			    
+
 			if j == len(self.cells[i]) - 1:
-			    #ind = np.argmin(distance.cdist([self.cells[1][k].centroid for k in range(len(self.cells[1]))],[chkCell.centroid],'euclidean')) 
+			    #ind = np.argmin(distance.cdist([self.cells[1][k].centroid for k in range(len(self.cells[1]))],[chkCell.centroid],'euclidean'))
 			    ind = np.argmin(distance.cdist([C.centroid for C in self.cells[1]], [chkCell.centroid],'euclidean'))
-			    f.write(repr(i)+ ',0\t1,' + repr(ind)+'\t1.0\n')	
+			    f.write(repr(i)+ ',0\t1,' + repr(ind)+'\t1.0\n')
 
 #                            end_strips.append([i, j])
 #			    limit_coords.append(ind)
 		    elif (chkCell.isSelfIntersecting() or chkCell.isTooSmall(threshold)):
 			if j != 0:
-			    flagged_cells.append([i,j])    
-			else: 
+			    flagged_cells.append([i,j])
+			else:
 			    print i,j
 			break
 #	f.write('</Mapping>')
-	
+
 #	for i,xy in enumerate(end_strips):
 #	    C = self.cells[xy[0]][xy[1]].centroid
 #	    D = self.cells[1][limit_coords[i]].centroid
@@ -783,7 +783,7 @@ class Mesh:
 	for coords in flagged_cells:
 	    ind = np.argmin(distance.cdist([x.centroid for y in (new_mesh.cells) for x in y], [self.cells[coords[0]][coords[1]].centroid], 'euclidean'))
 	    i,j = new_mesh.cellIndex(ind)
-	    f.write(repr(coords[0])+',0\t'+repr(i)+','+repr(j)+'\t1.0\n') 
+	    f.write(repr(coords[0])+',0\t'+repr(i)+','+repr(j)+'\t1.0\n')
 	f.write('</Mapping>')
 
 #	plt.show()
@@ -799,7 +799,7 @@ class Mesh:
 		    return i,j
 		else:
 		    test_index += 1
-		
+
 
 
 
@@ -823,16 +823,16 @@ class Mesh:
 
     def ToStat(self, fn):
 	with open(fn, 'w') as f:
-	    f.write('<Stationary>\n') 
+	    f.write('<Stationary>\n')
 	    for i, cells in enumerate(self.cells):
 		for j, cell in enumerate(cells):
-		    if len(cell.points) == 4:		
+		    if len(cell.points) == 4:
 			f.write('<Quadrilateral><vline>')
 			for p in cell.points:
 			    f.write("{:.12f}".format(p[0]))
 			    f.write(' ')
 		        f.write('</vline><wline>')
-		        for q in cell.points: 
+		        for q in cell.points:
 			    f.write("{:.12f}".format(q[1]))
 			    f.write(' ')
 		        f.write('</wline></Quadrilateral>\n')
@@ -847,14 +847,14 @@ class Mesh:
         else:
             self.filename=""
             root = ET.fromstring(fn)
-            
+
         for ts in root.iter('TimeStep'):
             self.dt = float(ts.text)
 
         for str in root.iter('Strip'):
-    
+
             l = []
-            
+
             # An empty strip should be allowed for example as a place holder for stationary cells
             if str.text is not None:
 
@@ -862,7 +862,7 @@ class Mesh:
                 if len(coords)%8 != 0:
                     raise ValueError
                 n_chunck = len(coords)/8
-                    
+
                 for i in range(0,n_chunck):
                     vs=[]
                     ws=[]
@@ -879,10 +879,10 @@ class Mesh:
 
             self.cells.append(l)
         self.__build_neighbours__()
-            
+
 def draw_shifted_bin(cell, plotlist, translation, fill = False, color = 2):
-        x = np.array([ p[0] + translation[0] for p in cell.points ]) 
-        y = np.array([ p[1] + translation[1] for p in cell.points ]) 
+        x = np.array([ p[0] + translation[0] for p in cell.points ])
+        y = np.array([ p[1] + translation[1] for p in cell.points ])
         line=ROOT.TPolyLine(len(x),x,y)
         if fill == True:
             line.SetFillColor(color)
@@ -908,16 +908,16 @@ def draw_curves(curvelist):
     return gs
 
 def display_mesh(m, bbox, label = False, xtitle = 'V (mV)', ytitle = '', perimeter = [],  propertylist = [], labelsize = 0.01, curvelist = [] ):
-    ''' Displays mesh. If i,j (>0=, ;existing in the grid, not tested) 
+    ''' Displays mesh. If i,j (>0=, ;existing in the grid, not tested)
     are given, the corresponding cell is drawn over the grid, translated by translation.'''
-    
+
     m.are_labels_drawn=label
     d=m.dimensions()
 
     c=ROOT.TCanvas('c1','',0,0,500,500)
     c.Draw()
 
-    h=ROOT.TH2F("h","",1000,bbox[0][0],bbox[0][1],1000,bbox[1][0],bbox[1][1])    
+    h=ROOT.TH2F("h","",1000,bbox[0][0],bbox[0][1],1000,bbox[1][0],bbox[1][1])
     a=ROOT.TGaxis
     a.SetMaxDigits(2)
     h.GetYaxis().SetTitleOffset(1.4)
@@ -965,7 +965,7 @@ def divide_perimeter(quad, N):
     quads = []
 
     N_div = N + 1
-    
+
     points = quad.points
     leftv = np.linspace(points[0][0], points[1][0],N_div)
     leftw = np.linspace(points[0][1], points[1][1],N_div)
@@ -987,5 +987,3 @@ if __name__ == "__main__":
         display_mesh(m,m.dimensions())
     else:
         print 'Usage in main program: python mesh.py <filename>'
-        
-

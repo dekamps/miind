@@ -150,6 +150,11 @@ public:
 	static void waitAll();
 
 	/**
+	 * Get this node's Id
+	 */
+	NodeId getNodeId() const;
+
+	/**
 	 * Expose current activity
 	 */
 	ActivityType getActivity();

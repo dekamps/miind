@@ -71,10 +71,9 @@ namespace TwoDLib {
 		static vector<Point> convexHull(const vector<Point>& points);
 
 		void print() {
-			printf("Tri : %f,%f | %f,%f | %f,%f\n",
-			_vec_points[0][0], _vec_points[0][1],
-			_vec_points[1][0], _vec_points[1][1],
-			_vec_points[2][0], _vec_points[2][1]);
+			std::cout << "Tri : " << _vec_points[0][0] << "," << _vec_points[0][1] << " | "
+			<< _vec_points[1][0] << "," << _vec_points[1][1] << " | "
+			<< _vec_points[2][0] << "," << _vec_points[2][1] << "\n";
 		}
 
 	private:

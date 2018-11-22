@@ -35,14 +35,8 @@ namespace TwoDLib {
 		MasterGrid
 		(
 			Ode2DSystem&,
-			double,
-			unsigned int
+			double
 		);
-
-		void ApplyDodgy(double, const vector<double>&, vector<double>&);
-
-		void MVCellMask(vector<double>&,vector<double>&,double,double, unsigned int) const;
-		void MVCellMaskInhib(vector<double>&,vector<double>&,double,double, unsigned int) const;
 
 		void MVGrid(
 			vector<double>&       dydt,
@@ -50,15 +44,8 @@ namespace TwoDLib {
 			double                rate,
 		  double stays,
 		  double goes,
-		  unsigned int offset) const;
-
-			void MVGridMapped(
-				vector<double>&       dydt,
-				const vector<double>& vec_mass,
-				double                rate,
-			  double stays,
-			  double goes,
-			  unsigned int offset) const;
+		  int offset_1,
+			int offset_2) const;
 
 		void Apply(double t_step, const vector<double>& rates, vector<double>& efficacy_map);
 
@@ -70,8 +57,6 @@ namespace TwoDLib {
 
 		Ode2DSystem& _sys;
 
-		vector<double> 			_mask;
-		vector<double>			_mask_swap;
 		double _cell_width;
 
 		vector<double>			_dydt;
