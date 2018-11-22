@@ -72,6 +72,8 @@ namespace TwoDLib {
 		//! Shift the density
 		void Evolve();
 
+		void EvolveWithoutMeshUpdate();
+
 		//! Dump the current density profile (0), or the mass profile (1) to an output stream
 		void Dump(const std::vector<std::ostream*>&, int mode = 0) const;
 

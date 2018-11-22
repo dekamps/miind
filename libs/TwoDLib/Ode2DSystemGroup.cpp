@@ -216,11 +216,16 @@ void Ode2DSystemGroup::Dump(const std::vector<std::ostream*>& vecost, int mode) 
 
 void Ode2DSystemGroup::Evolve()
 {
+	EvolveWithoutMeshUpdate();
+	this->UpdateMap();
+}
+
+void Ode2DSystemGroup::EvolveWithoutMeshUpdate(){
 	_t += 1;
 	for (MPILib::Rate& f: _fs)
 		f = 0.;
-	this->UpdateMap();
 }
+
 
 void Ode2DSystemGroup::UpdateMap()
 {
