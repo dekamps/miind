@@ -271,7 +271,7 @@ def densityMovie(command, current_sim):
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print 'Warning : This command can take a *long* time to complete and use *large* amounts of disk space.'
-        print name + ' [Node name] [Frame size] [Time scale] [Movie filename] : Generate all 2D density plot images for the given node with the given frame size. From the images, generate a movie with the given time scale (eg 0.5 = twice as fast, 10 = ten times slower).'
+        print name + ' [Node name] [Frame size] [Time step] [Movie filename] : Generate all 2D density plot images for the given node with the given frame size. From the images, generate a movie with the given time step.'
         print 'Alternative command names : ' + ' '.join(alts)
 
 def plotDensity(command, current_sim):

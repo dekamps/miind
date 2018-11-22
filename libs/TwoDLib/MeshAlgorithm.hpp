@@ -84,6 +84,8 @@ namespace TwoDLib {
 		 */
 	  virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId, bool b_state = true) const;
 
+		virtual void reportDensity() const;
+
 		/**
 		 * Evolve the node state. In the default case it simply calls envolveNodeState
 		 * without the NodeTypes. However if an algorithm needs the nodeTypes
@@ -133,6 +135,11 @@ namespace TwoDLib {
 
 	  const Ode2DSystemGroup& Sys() const { return _sys; }
 
+
+		//keep track of the node id
+		virtual void assignNodeId( MPILib::NodeId );
+
+
 		const std::vector<TwoDLib::Redistribution>& MapReversal() const { return  _vec_vec_rev[0]; }
 		const std::vector<TwoDLib::Redistribution>& MapReset()    const { return  _vec_vec_res[0]; }
 
@@ -160,6 +167,8 @@ namespace TwoDLib {
 		// parsing auxilliaries
 		pugi::xml_document _doc;
 		pugi::xml_node     _root;
+
+		MPILib::NodeId _node_id;
 
 		// mesh and mappings
 		std::vector<TwoDLib::Mesh> _mesh_vec;          // we have to create a vector, even if MeshAlgorithm manages only one Mesh, because

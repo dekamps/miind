@@ -28,8 +28,8 @@ namespace TwoDLib {
 			const std::string&, 		    	 //!< model file name
 			const std::string&,     //!< Transform matrix
 			MPILib::Time,                        //!< default time step for Master equation
-			MPILib::Index,
-			MPILib::Index,
+			double,
+			double,
 			MPILib::Time tau_refractive = 0,     //!< absolute refractive period
 			const string& ratemethod = ""       //!< firing rate computation; by default the mass flux across threshold
 		);
@@ -54,7 +54,6 @@ namespace TwoDLib {
 	  virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId, bool b_state = true) const;
 
 		virtual void reportDensity() const;
-		virtual void reportFiringRate() const;
 
 		virtual void prepareEvolve(const std::vector<MPILib::Rate>& nodeVector,
 				const std::vector<WeightValue>& weightVector,
@@ -87,16 +86,10 @@ namespace TwoDLib {
 
 		std::vector<TwoDLib::Redistribution> _vec_rev;
 		std::vector<TwoDLib::Redistribution> _vec_res;
-		std::vector<TwoDLib::Redistribution> _vec_next_res;
 
 		MPILib::Time _dt;
 
 		TwoDLib::Ode2DSystem _sys;
-
-		// If the OpenGL display is being used, track the index of this node and
-		// provide a mutex to lock on
-		unsigned int _display_index;
-		std::mutex _display_mutex;
 
 		MPILib::NodeId _node_id;
 
@@ -113,8 +106,8 @@ namespace TwoDLib {
 
 		std::string _transform_matrix;
 
-		MPILib::Index _start_strip;
-		MPILib::Index _start_cell;
+		double _start_v;
+		double _start_w;
 
 		double (TwoDLib::Ode2DSystem::*_sysfunction) () const;
 

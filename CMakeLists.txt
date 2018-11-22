@@ -55,27 +55,7 @@ IF(ENABLE_OPENMP)
 	find_package(OpenMP REQUIRED)
 	add_definitions( -DENABLE_OPENMP=1 )
 ENDIF(ENABLE_OPENMP)
-	
- #   add the flags for C++11 
-if(CMAKE_COMPILER_IS_GNUCXX)
-	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
-				OUTPUT_VARIABLE GCC_VERSION)
-	if (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
-		message(STATUS "C++14 activated.")
-		set(CMAKE_CXX_FLAGS "-std=c++14")
-	else ()
-		message(FATAL_ERROR "C++11 needed (Ranged based for). Therefore a gcc compiler with a version higher or equal than 4.7 is needed.")   
-	endif()
-else(CMAKE_COMPILER_IS_GNUCXX)
-	if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")            
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++11")
-	endif()
-	if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
-	        message(STATUS "Using Intel compiler.")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c++14")
-	endif()
 
-endif(CMAKE_COMPILER_IS_GNUCXX)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals -fPIC")
 

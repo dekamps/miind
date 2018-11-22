@@ -37,17 +37,16 @@ Display::~Display(){
 	glutExit();
 }
 
-unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystem* sys, std::mutex *mu) {
+unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys) {
 	unsigned int index = _dws.size();
 
 	DisplayWindow window;
 	window._system = sys;
-	window._read_mutex = mu;
 
 
 	// Find extent of mesh to normalise to screen size
 
-	Mesh m = sys->MeshObject();
+	Mesh m = sys->MeshObjects()[0];
 
 	double mesh_min_v = 10000000.0;
 	double mesh_max_v = -10000000.0;
@@ -67,6 +66,18 @@ unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystem* sys, std::mu
 			if (c[1] < mesh_min_h)
 				mesh_min_h = c[1];
 		}
+	}
+
+	// If there's only a single strip, then the min and max might be the same,
+	// find the
+	if (mesh_max_v == mesh_min_v){
+		mesh_max_v = 0.005;
+		mesh_min_v = 0.0;
+	}
+
+	if (mesh_min_h == mesh_max_h){
+		mesh_max_h = 0.005;
+		mesh_min_h = 0.0;
 	}
 
 	window.mesh_min_v = mesh_min_v;
@@ -99,6 +110,8 @@ void Display::display(void) {
 	// if (time_elapsed.count() % 10 != 0)
 	// 	return;
 
+	glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
+
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// **** used for 3D ****
@@ -108,19 +121,32 @@ void Display::display(void) {
 
 	glBegin(GL_QUADS);
 
-	Mesh m = _dws[window_index]._system->MeshObject();
+	Mesh m = _dws[window_index]._system->MeshObjects()[0];
 
-	LockMutex(window_index);
+	double max = -99999999.0;
+	for(unsigned int i = 0; i<m.NrStrips(); i++){
+		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
+			double cell_area = std::abs(m.Quad(i,j).SignedArea());
+			if(_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(0,i,j)]/cell_area == 0){
+				continue;
+			}
+			if (max < log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(0,i,j)]/cell_area))
+				max = log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(0,i,j)]/cell_area);
+		}
+	}
 
-	double max = 0.0;
-	for (int i=0; i<_dws[window_index]._system->Mass().size(); i++)
-		if (max < log10(_dws[window_index]._system->Mass()[i] + 0.000006))
-			max = log10(_dws[window_index]._system->Mass()[i] + 0.000006);
+	double min = 999999.0;
+	for(unsigned int i = 0; i<m.NrStrips(); i++){
+		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
+			double cell_area = std::abs(m.Quad(i,j).SignedArea());
+			if(_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(0,i,j)]/cell_area == 0){
+				continue;
+			}
 
-	double min = 1.0;
-	for (int i=0; i<_dws[window_index]._system->Mass().size(); i++)
-		if (log10(_dws[window_index]._system->Mass()[i] + 0.000006) < min)
-			min = log10(_dws[window_index]._system->Mass()[i] + 0.000006);
+			if (log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(0,i,j)]/cell_area) < min)
+				min = log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(0,i,j)]/cell_area);
+		}
+	}
 
 	double mesh_min_v = _dws[window_index].mesh_min_v;
 	double mesh_max_v = _dws[window_index].mesh_max_v;
@@ -130,8 +156,11 @@ void Display::display(void) {
 	for(unsigned int i = 0; i<m.NrStrips(); i++){
 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
 			Quadrilateral q = m.Quad(i,j);
-			unsigned int idx = _dws[window_index]._system->Map(i,j);
-			double mass = (log10(_dws[window_index]._system->Mass()[idx] + 0.000006) - min) / (max-min);
+			double cell_area = std::abs(q.SignedArea());
+			unsigned int idx = _dws[window_index]._system->Map(0,i,j);
+			double mass = 0.0;
+			if (_dws[window_index]._system->Mass()[idx]/cell_area != 0)
+				mass = std::min(1.0,std::max(0.0,(log10(_dws[window_index]._system->Mass()[idx]/cell_area) - min) / (max-min)));
 			vector<Point> ps = q.Points();
 
 			glColor3f(std::min(1.0,mass*2.0), std::max(0.0,((mass*2.0) - 1.0)), 0);
@@ -142,9 +171,6 @@ void Display::display(void) {
 		}
 	}
 
-
-	UnlockMutex(window_index);
-
 	glEnd();
 
 	// Print real time and sim time
@@ -152,7 +178,7 @@ void Display::display(void) {
 	double sim_time = 0.0;
 
 	if(net)
-		sim_time = net->getCurrentSimulationTime() * m.TimeStep();
+		sim_time = net->getCurrentSimulationTime() * net->getSimulationParams().getTStep();
 
 	glColor3f( 1.0, 1.0, 1.0 );
   glRasterPos2f(0.3, 0.9);
@@ -164,46 +190,53 @@ void Display::display(void) {
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
   }
 
-	double nice_min_h = (double)floor(mesh_min_h * 1) / 1.0;
-	double nice_max_h = (double)ceil(mesh_max_h * 1) / 1.0;
+	double h_width = (mesh_max_h - mesh_min_h);
+	char buff[32];
+  sprintf(buff, "%.*g", 1, h_width);
+	double h_step = (double)std::atof(buff) / 10.0;
 
-	double nice_min_v = (double)floor(mesh_min_v * 0.01) / 0.01;
-	double nice_max_v = (double)ceil(mesh_max_v * 0.01) / 0.01;
+	std::string s_h_step = std::to_string(h_step);
+	s_h_step.pop_back();
+	h_step = std::stod(s_h_step);
+	double nice_min_h = (double)floor(mesh_min_h/h_step) * h_step;
+	double nice_max_h = (double)ceil(mesh_max_h/h_step) * h_step;
 
-	double pos = 0;
+	double v_width = (mesh_max_v - mesh_min_v);
+  sprintf(buff, "%.*g", 1, v_width);
+	double v_step = (double)std::atof(buff) / 10.0;
+
+	std::string s_v_step = std::to_string(v_step);
+	s_v_step.pop_back();
+	v_step = std::stod(s_v_step);
+	double nice_min_v = (double)floor(mesh_min_v/v_step) * v_step;
+	double nice_max_v = (double)ceil(mesh_max_v/v_step) * v_step;
+
+	double pos = nice_min_h;
 	while(pos < nice_max_h){
+		if (std::abs(pos) < 0.0000000001 )
+			pos = 0.0;
+
 		glColor3f( 1.0, 1.0, 1.0 );
 	  glRasterPos2f(-1.0, 2*((pos - (mesh_min_h + ((mesh_max_h - mesh_min_h)/2.0)))/(mesh_max_h - mesh_min_h)));
+
 		std::stringstream stream;
-		stream << std::fixed << std:: setprecision(1) << pos;
+		stream <<  std::setprecision(3) << pos;
 		t = stream.str();
 		c_string = t.c_str();
 	  len = (int)strlen( c_string );
 	  for (i = 0; i < len; i++) {
 	    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
 	  }
-		pos +=  (nice_max_h - nice_min_h) / 10;
-	}
-	pos = 0;
-	while(pos > nice_min_h){
-		glColor3f( 1.0, 1.0, 1.0 );
-	  glRasterPos2f(-1.0, 2*((pos - (mesh_min_h + ((mesh_max_h - mesh_min_h)/2.0)))/(mesh_max_h - mesh_min_h)));
-		std::stringstream stream;
-		stream << std::fixed << std:: setprecision(1) << pos;
-		t = stream.str();
-		c_string = t.c_str();
-	  len = (int)strlen( c_string );
-	  for (i = 0; i < len; i++) {
-	    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
-	  }
-		pos -= (nice_max_h - nice_min_h) / 10;
+		pos += h_step;
 	}
 
-	pos = 0;
+	pos = nice_min_v;
 	while(pos < nice_max_v){
+		if (std::abs(pos) < 0.0000000001 )
+			pos = 0.0;
 		glRasterPos2f(2*((pos - (mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v)), -1.0);
 		std::stringstream stream2;
-		stream2 << std::fixed << std:: setprecision(1) << pos;
+		stream2 <<  std::setprecision(3) << pos;
 		t = stream2.str();
 		c_string = t.c_str();
 		len = (int)strlen( c_string );
@@ -211,19 +244,6 @@ void Display::display(void) {
 			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
 		}
 		pos += (nice_max_v - nice_min_v) / 10;
-	}
-	pos = 0;
-	while(pos > nice_min_v){
-		glRasterPos2f(2*((pos - (mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v)), -1.0);
-		std::stringstream stream2;
-		stream2 << std::fixed << std:: setprecision(1) << pos;
-		t = stream2.str();
-		c_string = t.c_str();
-		len = (int)strlen( c_string );
-		for (i = 0; i < len; i++) {
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
-		}
-		pos -= (nice_max_v - nice_min_v) / 10;
 	}
 
 	// **** used for 3D ****
@@ -309,7 +329,7 @@ void Display::init() const {
 	// **** used for 3D ****
 	//gluPerspective(45, 1, 2, 10);
 	//glEnable(GL_DEPTH_TEST);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
 }
 
 void Display::update() {
@@ -320,8 +340,8 @@ void Display::updateDisplay() {
 	time = glutGet(GLUT_ELAPSED_TIME);
 	lastTime = time;
 	//Sleep(50);
-	for (std::map<MPILib::NodeId, DisplayWindow>::iterator iter = Display::getInstance()->_dws.begin(); iter != Display::getInstance()->_dws.end(); ++iter){
-		glutSetWindow(iter->second._window_index);
+	for (MPILib::NodeId id = 0; id < _nodes_to_display.size(); id++) {
+		glutSetWindow(_dws[_nodes_to_display[id]]._window_index);
 		glutPostRedisplay();
 	}
 
@@ -332,18 +352,13 @@ void Display::updateDisplay() {
 void Display::shutdown() const {
 	glutExit();
 
-	// just in case - unlock all mutexes.
-	for (std::map<MPILib::NodeId, DisplayWindow>::iterator iter = Display::getInstance()->_dws.begin(); iter != Display::getInstance()->_dws.end(); ++iter){
-		disp->UnlockMutex(iter->first);
-	}
-
-
 	// Nice new line if we quit early.
 	std::cout << "\n";
 }
 
-void Display::animate(bool _write_frames) const{
+void Display::animate(bool _write_frames, std::vector<MPILib::NodeId> nodes_to_display) const{
 
+	Display::getInstance()->_nodes_to_display = nodes_to_display;
 	Display::getInstance()->write_frames = _write_frames;
 
 	char* arv[] = {"Miind"};
@@ -353,8 +368,8 @@ void Display::animate(bool _write_frames) const{
 	glutInitWindowSize(500, 500);
 	glutInitWindowPosition(0, 0);
 
-	for (std::map<MPILib::NodeId, DisplayWindow>::iterator iter = Display::getInstance()->_dws.begin(); iter != Display::getInstance()->_dws.end(); ++iter){
-		iter->second._window_index = glutCreateWindow("Miind2D");
+	for (MPILib::NodeId id = 0; id < Display::getInstance()->_nodes_to_display.size(); id++) {
+		Display::getInstance()->_dws[Display::getInstance()->_nodes_to_display[id]]._window_index = glutCreateWindow("Miind2D");
 		glutDisplayFunc(Display::stat_display);
 		glutReshapeFunc(Display::stat_scene);
 		glutIdleFunc(Display::stat_update);
@@ -365,19 +380,6 @@ void Display::animate(bool _write_frames) const{
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 
 	init();
-}
-
-void Display::stat_runthreaded() {
-	Display::getInstance()->animate(false);
-	while((Display::getInstance()->close_display) && !(*Display::getInstance()->close_display)){
-
-		if(!glutGetWindow()){
-			glutExit();
-			break;
-		}
-
-		Display::getInstance()->updateDisplay();
-	}
 }
 
 void Display::processDraw(void) {

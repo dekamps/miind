@@ -62,8 +62,8 @@ int Triangle::get_line_intersection(double p0_x, double p0_y, double p1_x, doubl
 }
 
 double Triangle::get_overlap_area(const Triangle& t1, const Triangle& t2) {
-  //printf("T1 = %f,%f | %f,%f | %f,%f\n", t1._vec_points[0][0], t1._vec_points[0][1], t1._vec_points[1][0], t1._vec_points[1][1], t1._vec_points[2][0], t1._vec_points[2][1]);
-  //printf("T2 = %f,%f | %f,%f | %f,%f\n", t2._vec_points[0][0], t2._vec_points[0][1], t2._vec_points[1][0], t2._vec_points[1][1], t2._vec_points[2][0], t2._vec_points[2][1]);
+  // printf("\n\nT1 = %f,%f | %f,%f | %f,%f\n", t1._vec_points[0][0], t1._vec_points[0][1], t1._vec_points[1][0], t1._vec_points[1][1], t1._vec_points[2][0], t1._vec_points[2][1]);
+  // printf("T2 = %f,%f | %f,%f | %f,%f\n", t2._vec_points[0][0], t2._vec_points[0][1], t2._vec_points[1][0], t2._vec_points[1][1], t2._vec_points[2][0], t2._vec_points[2][1]);
 	unordered_set<Point> overlap_poly = unordered_set<Point>();
 
 	// if any points in t2 are within t1 :
@@ -111,7 +111,7 @@ double Triangle::get_overlap_area(const Triangle& t1, const Triangle& t2) {
 
     vector<Point> vec_ordered_overlap = vector<Point>(vec_overlap_poly);
     if(vec_overlap_poly.size() > 3)
-      vector<Point> vec_ordered_overlap = convexHull(vec_overlap_poly);
+      vec_ordered_overlap = convexHull(vec_overlap_poly);
 
     if(vec_ordered_overlap.size() > 2) {
     	for(int i=0; i<static_cast<unsigned int>(vec_ordered_overlap.size() - 2); i++){
@@ -129,7 +129,7 @@ double Triangle::get_overlap_area(const Triangle& t1, const Triangle& t2) {
 
 int Triangle::orientation(Point p, Point q, Point r)
 {
-    int val = (q[1] - p[1]) * (r[0] - q[0]) -
+    double val = (q[1] - p[1]) * (r[0] - q[0]) -
               (q[0] - p[0]) * (r[1] - q[1]);
 
     if (val == 0) return 0;  // colinear
@@ -159,6 +159,8 @@ vector<Point> Triangle::convexHull(const vector<Point>& points)
         hull.push_back(points[p]);
         picked.push_back(p);
 
+
+
         // Search for a point 'q' such that orientation(p, x,
         // q) is counterclockwise for all points 'x'. The idea
         // is to keep track of last visited most counterclock-
@@ -167,7 +169,8 @@ vector<Point> Triangle::convexHull(const vector<Point>& points)
         q = (p+1)%(static_cast<unsigned int>(points.size()));
         for (int i = 0; i < static_cast<unsigned int>(points.size()); i++)
         {
-           // If i is more counterclockwise than current q, then
+
+            // If i is more counterclockwise than current q, then
            // update q
            if (orientation(points[p], points[i], points[q]) == 2 && find(picked.begin(), picked.end(), i) == picked.end())
                q = i;
@@ -178,7 +181,7 @@ vector<Point> Triangle::convexHull(const vector<Point>& points)
         // result 'hull'
         p = q;
 
-    } while (p != l);  // While we don't come to first point
+    } while (p != l && hull.size() < points.size());  // While we don't come to first point
 
     return hull;
 }

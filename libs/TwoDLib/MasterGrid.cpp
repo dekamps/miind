@@ -28,52 +28,12 @@
  MasterGrid::MasterGrid
  (
 	Ode2DSystem& sys,
-  double cell_width,
-  unsigned int mask_length
+  double cell_width
 ):
 _sys(sys),
 _dydt(sys._vec_mass.size(),0.),
-_mask(mask_length,0.),
-_mask_swap(mask_length,0.),
 _cell_width(cell_width)
  {
- }
-
- void MasterGrid::MVCellMask
- (
- 	vector<double>&       dydt,
- 	vector<double>&       dydt_new,
-  double stays,
-  double goes,
-  unsigned int offset
- ) const
- {
- 	for (MPILib::Index i = 0; i < dydt.size()-1-offset; i++){
- 		double mass = dydt[i];
- 		dydt_new[i+offset] += mass*stays;
- 		dydt_new[i+offset+1] += mass*goes;
- 		dydt_new[i+offset] -= mass;
- 	}
-
- }
-
- void MasterGrid::MVCellMaskInhib
- (
- 	vector<double>&       dydt,
- 	vector<double>&       dydt_new,
-  double stays,
-  double goes,
-  unsigned int offset
- ) const
- {
-
- 	for (MPILib::Index i = 1+offset; i < dydt.size(); i++){
- 		double mass = dydt[i];
- 		dydt_new[i-offset] += mass*stays;
- 		dydt_new[i-1-offset] += mass*goes;
- 		dydt_new[i-offset] -= mass;
- 	}
-
  }
 
  void MasterGrid::MVGrid
@@ -83,49 +43,15 @@ _cell_width(cell_width)
  	double                rate,
    double stays,
    double goes,
-   unsigned int offset
+   int offset_1,
+   int offset_2
  ) const
  {
-
-   int offset_1 = -offset;
-   int offset_2 = -(offset+1);
-   if(rate < 0) {
-     offset_1 = (offset + 1);
-     offset_2 = offset;
-   }
  #pragma omp parallel for
- 	for (MPILib::Index i = offset+1; i < dydt.size(); i++){
- 		dydt[i] += rate*stays*vec_mass[i+offset_1];
- 		dydt[i] += rate*goes*vec_mass[i+offset_2];
- 	  dydt[i] -= rate*vec_mass[i];
- 	}
- }
-
- void MasterGrid::MVGridMapped
- (
- 	vector<double>&       dydt,
- 	const vector<double>& vec_mass,
- 	double                rate,
-   double stays,
-   double goes,
-   unsigned int offset
- ) const
- {
-
-   int offset_1 = -offset;
-   int offset_2 = -(offset+1);
-   if(rate < 0) {
-     offset_1 = (offset + 1);
-     offset_2 = offset;
-   }
- #pragma omp parallel for
- 	for (MPILib::Index i = 0; i < _sys.MeshObject().NrQuadrilateralStrips(); i++){
-    for (MPILib::Index j = offset+1; j < _sys.MeshObject().NrCellsInStrip(i)-offset+1; j++){
-      MPILib::Index i_r =_sys.Map(i,j);
-      dydt[i_r] += rate*stays*vec_mass[i_r+offset_1];
-      dydt[i_r] += rate*goes*vec_mass[i_r+offset_2];
-      dydt[i_r] -= rate*vec_mass[i_r];
-    }
+ 	for (MPILib::Index i = 0; i < dydt.size(); i++){
+ 		 dydt[i] += rate*stays*vec_mass[(((int)i+offset_1)%(int)dydt.size()+(int)dydt.size()) % (int)dydt.size()];
+ 		 dydt[i] += rate*goes*vec_mass[(((int)i+offset_2)%(int)dydt.size()+(int)dydt.size()) % (int)dydt.size()];
+     dydt[i] -= rate*vec_mass[i];
  	}
  }
 
@@ -156,77 +82,22 @@ _cell_width(cell_width)
     double rate = rates[irate];
 
     unsigned int offset = (unsigned int)abs(vec_eff[irate]/_cell_width);
-    double goes = fabs(vec_eff[irate] / _cell_width) - offset;
+    double goes = (double)fabs(vec_eff[irate] / _cell_width) - offset;
     double stays = 1.0 - goes;
 
+    int offset_1 = vec_eff[irate] > 0 ? -offset : offset;
+    int offset_2 = vec_eff[irate] > 0 ? -(offset+1) : -(offset-1);
+
     // it is only the matrices that need to be mapped
-    MVGridMapped
+    MVGrid
    (
        dydt,
      vec_mass,
      rate,
      stays,
      goes,
-     offset
+     offset_1,
+     offset_2
     );
   }
 }
-
-
- void MasterGrid::ApplyDodgy(double t_step, const vector<double>& rates, vector<double>& efficacy_map)
- {
-#pragma omp parallel for
-	 for (MPILib::Index i = 0; i < _dydt.size(); i++)
-		_dydt[i] = 0.0;
-
-#pragma omp parallel for
-	 for (MPILib::Index i = 0; i < _mask_swap.size(); i++) {
-     _mask[i] = 0.0;
-     _mask_swap[i] = 0.0;
-   }
-
-   _mask[(unsigned int)floor(_mask.size()/2)] = 1.0;
-   _mask_swap[(unsigned int)floor(_mask.size()/2)] = 1.0;
-
-   for (MPILib::Index rate = 0; rate < rates.size(); rate++)
-   {
-     unsigned int offset = (unsigned int)abs(efficacy_map[rate]/_cell_width);
-     double goes = fabs(efficacy_map[rate] / _cell_width) - offset;
-     double stays = 1.0 - goes;
-
-     for(MPILib::Index j =0; j < (floor(rates[rate] * t_step)); j++){
-       if ( efficacy_map[rate] > 0 )
-         MVCellMask(_mask, _mask_swap, stays, goes, offset);
-       else
-         MVCellMaskInhib(_mask, _mask_swap, stays, goes, offset);
-#pragma omp parallel for
-       for (MPILib::Index i = 0; i < _mask_swap.size(); i++){
-         _mask[i] = _mask_swap[i];
-       }
-     }
-   }
-
-#pragma omp parallel for
-   for (MPILib::Index j = 0; j < _sys._map[1].size(); j++) {
-     for (MPILib::Index i = 0; i < _sys._map.size(); i++) {
-       MPILib::Index idx = _sys.Map(i,j);
-
-       for (MPILib::Index k = 0; k < _mask.size(); k++){
-         int des_i = i + (k-floor(_mask.size()/2));
-
-         if ( des_i < 1 )
-          des_i = 1;
-         if ( des_i > _sys._map.size()-1 )
-          des_i = _sys._map.size()-1;
-
-         unsigned int idx_dest = _sys.Map(des_i, j);
-         _dydt[idx_dest] += _sys._vec_mass[idx] * _mask[k];
-       }
-     }
-   }
-
-#pragma omp parallel for
-	 for (MPILib::Index imass = 0; imass < _sys._vec_mass.size(); imass++)
-		 _sys._vec_mass[imass] = _dydt[imass];
-
- }

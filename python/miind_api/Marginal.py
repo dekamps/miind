@@ -179,7 +179,7 @@ class Marginal(Result):
             self.plotW(self['times'][ii], axs[1])
             required_padding = len(str(len(self.times)))
             padding_format_code = '{0:0' + str(required_padding) + 'd}'
-            figname = op.join(self.path, (padding_format_code).format(idx) )
+            figname = op.join(self.path, (padding_format_code).format(ii) )
             fig.savefig(figname, res=image_size, bbox_inches='tight')
             plt.close(fig)
 
