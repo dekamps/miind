@@ -94,7 +94,7 @@ namespace TwoDLib {
 		_csr_transform = new CSRMatrix(_transformMatrix, _sys);
 
 		Display::getInstance()->addOdeSystem(_node_id, &_sys);
-		GridReport<WeightValue>::getInstance()->registerObject(this);
+		GridReport<GridAlgorithm<WeightValue>>::getInstance()->registerObject(this);
 
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();

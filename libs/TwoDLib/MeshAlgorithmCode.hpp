@@ -28,6 +28,7 @@
 #include "Stat.hpp"
 #include "TwoDLibException.hpp"
 #include "display.hpp"
+#include "GridReport.hpp"
 
 namespace {
 
@@ -180,6 +181,7 @@ namespace TwoDLib {
 		MPILib::Time t_step     = par_run.getTStep();
 
 		Display::getInstance()->addOdeSystem(_node_id, &_sys);
+		GridReport<MeshAlgorithm<WeightValue,Solver>>::getInstance()->registerObject(this);
 
 		// the integration time step, stored in the MasterParameter, is gauged with respect to the
 		// network time step.
