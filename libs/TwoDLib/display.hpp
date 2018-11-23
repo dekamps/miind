@@ -49,7 +49,7 @@ public:
   void init() const;
   void update();
   void shutdown() const;
-  void animate(bool,std::vector<MPILib::NodeId>) const;
+  void animate(bool,std::vector<MPILib::NodeId>, double time_step) const;
   void processDraw(void);
 
   static void stat_display(void) {
@@ -67,15 +67,7 @@ public:
 
   unsigned int addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys);
 
-  void updateDisplay();
-
-  void AssignCloseDisplayPointer(bool* cd) {
-    disp->close_display = cd;
-  }
-
-  void AssignNetworkPointer(Network* nt){
-    disp->net = nt;
-  }
+  void updateDisplay(long current_sim_it);
 
 private:
 
@@ -87,8 +79,8 @@ private:
   Display();
   ~Display();
 
-  bool *close_display;
-  Network* net;
+  long _current_sim_it;
+  double _time_step;
 
   int lastTime;
 

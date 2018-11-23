@@ -113,7 +113,7 @@ void CudaOde2DSystemAdapter::Validate() const
     fptype sum = 0.;
     for(int i = 0; i < _n; i++)
        sum += _hostmass[i];
- 
+
     fptype nmesh = static_cast<fptype>(_group.MeshObjects().size());
     if (fabs(sum - nmesh ) > tolerance){
 	fprintf(stderr,"Total mass  unequal to number of mesh objects:%f, %f\n",sum,nmesh);
@@ -121,10 +121,16 @@ void CudaOde2DSystemAdapter::Validate() const
     }
 }
 
-void CudaOde2DSystemAdapter::Evolve() 
+void CudaOde2DSystemAdapter::Evolve()
 {
     _group.Evolve();
     this->TransferMapData();
+}
+
+void CudaOde2DSystemAdapter::EvolveWithoutMeshUpdate()
+{
+    _group.EvolveWithoutMeshUpdate();
+		this->TransferMapData();
 }
 
 void CudaOde2DSystemAdapter::Dump(const std::vector<std::ostream*>& vec_stream, int mode)
@@ -138,7 +144,7 @@ void CudaOde2DSystemAdapter::Dump(const std::vector<std::ostream*>& vec_stream, 
 const std::vector<fptype>& CudaOde2DSystemAdapter::F() const
 {
      checkCudaErrors(cudaMemcpy(&_host_fs[0],_fs,_mesh_size*sizeof(fptype),cudaMemcpyDeviceToHost));
-     for (auto& rate: _host_fs) 
+     for (auto& rate: _host_fs)
          rate /= _time_step;
      return _host_fs;
 }
@@ -172,7 +178,7 @@ void CudaOde2DSystemAdapter::FillResetMap
        checkCudaErrors(cudaMemcpy(_res_from[m],&vec_from[0],vec_from.size()*sizeof(inttype),cudaMemcpyHostToDevice));
        checkCudaErrors(cudaMemcpy(_res_alpha[m],&vec_alpha[0],vec_alpha.size()*sizeof(fptype),cudaMemcpyHostToDevice));
   }
-} 
+}
 
 void CudaOde2DSystemAdapter::RedistributeProbability()
 {
@@ -182,15 +188,15 @@ void CudaOde2DSystemAdapter::RedistributeProbability()
     }
 }
 
-void CudaOde2DSystemAdapter::MapFinish() 
-{   
+void CudaOde2DSystemAdapter::MapFinish()
+{
     for (inttype m = 0; m < _mesh_size; m++)
         ResetFinish<<<1,1>>>(_nr_resets[m],_res_from[m],_mass,_map);
 }
 
 void CudaOde2DSystemAdapter::FillReversalMap
 (
-    const std::vector<TwoDLib::Mesh>& vec_mesh, 
+    const std::vector<TwoDLib::Mesh>& vec_mesh,
     const std::vector<std::vector<TwoDLib::Redistribution> >& vec_vec_reversal
 )
 {
@@ -210,7 +216,7 @@ void CudaOde2DSystemAdapter::FillReversalMap
               _rev_alpha[index] = r._alpha;
               index++;
           }
-     }     
+     }
 }
 
 void CudaOde2DSystemAdapter::RemapReversal()

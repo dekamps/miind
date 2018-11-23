@@ -31,7 +31,7 @@ Display::Display(){
 
 Display::~Display(){
 	if (glutGetWindow()){
-		Display::getInstance()->updateDisplay();
+		Display::getInstance()->updateDisplay(1);
 		glutDestroyWindow(glutGetWindow());
 	}
 	glutExit();
@@ -177,8 +177,7 @@ void Display::display(void) {
 
 	double sim_time = 0.0;
 
-	if(net)
-		sim_time = net->getCurrentSimulationTime() * net->getSimulationParams().getTStep();
+	sim_time = _current_sim_it * _time_step;
 
 	glColor3f( 1.0, 1.0, 1.0 );
   glRasterPos2f(0.3, 0.9);
@@ -251,8 +250,8 @@ void Display::display(void) {
 	glutSwapBuffers();
 	glFlush();
 
-	if(net && write_frames)
-		writeFrame(window_index,net->getCurrentSimulationTime());
+	if(write_frames)
+		writeFrame(window_index,_current_sim_it);
 }
 
 void Display::writeFrame(unsigned int system, long frame_num){
@@ -335,12 +334,15 @@ void Display::init() const {
 void Display::update() {
 }
 
-void Display::updateDisplay() {
+void Display::updateDisplay(long current_sim_it) {
 	int time;
 	time = glutGet(GLUT_ELAPSED_TIME);
+	Display::getInstance()->_current_sim_it = current_sim_it;
 	lastTime = time;
 	//Sleep(50);
 	for (MPILib::NodeId id = 0; id < _nodes_to_display.size(); id++) {
+		if(!glutGetWindow())
+			continue;
 		glutSetWindow(_dws[_nodes_to_display[id]]._window_index);
 		glutPostRedisplay();
 	}
@@ -356,10 +358,11 @@ void Display::shutdown() const {
 	std::cout << "\n";
 }
 
-void Display::animate(bool _write_frames, std::vector<MPILib::NodeId> nodes_to_display) const{
+void Display::animate(bool _write_frames, std::vector<MPILib::NodeId> nodes_to_display, double time_step) const{
 
 	Display::getInstance()->_nodes_to_display = nodes_to_display;
 	Display::getInstance()->write_frames = _write_frames;
+	Display::getInstance()->_time_step = time_step;
 
 	char* arv[] = {"Miind"};
 	int count = 1;

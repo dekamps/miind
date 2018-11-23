@@ -41,10 +41,10 @@ namespace CudaTwoDLib {
 	public:
 
 		//! Standard Constructor
-		CudaOde2DSystemAdapter	
+		CudaOde2DSystemAdapter
 		(
 	           TwoDLib::Ode2DSystemGroup& group // The group must already be initialized. This will be checked and an exception will be thrown if it is suspected this has not happened
-                                     
+
 		);
 
 
@@ -53,12 +53,14 @@ namespace CudaTwoDLib {
 
                 void Evolve();
 
+								void EvolveWithoutMeshUpdate();
+
                 void Dump(const std::vector<std::ostream*>&, int mode = 0);
 
-                void RemapReversal();        
+                void RemapReversal();
 
-                void RedistributeProbability();     
-  
+                void RedistributeProbability();
+
                 void MapFinish();
 
                 friend class CSRAdapter;
@@ -74,7 +76,7 @@ namespace CudaTwoDLib {
                   inttype _from;
                   fptype  _alpha;
                };
-                  
+
 	void Validate() const;
 
         void FillMass();
@@ -101,7 +103,7 @@ namespace CudaTwoDLib {
         std::vector<inttype> _hostmap;
 
         std::vector<inttype> _offsets;
- 
+
         // reversal mapping
         inttype  _n_rev;
         inttype* _rev_to;
@@ -110,7 +112,7 @@ namespace CudaTwoDLib {
 
 
         // reset mapping
-        std::vector<inttype> _nr_resets;        
+        std::vector<inttype> _nr_resets;
         std::vector<inttype*> _res_to;
         std::vector<inttype*> _res_from;
         std::vector<fptype*>  _res_alpha;
