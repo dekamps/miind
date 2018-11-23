@@ -22,6 +22,39 @@ __global__ void CudaCalculateDerivative(inttype N, fptype rate, fptype* derivati
     }
 }
 
+__global__ void CudaSingleTransformStep(inttype N, fptype* mass, fptype* val, inttype* ia, inttype* ja, inttype* map, inttype offset)
+{
+    int index  = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i+= stride ){
+      int i_r = map[i+offset];
+      fptype dr = 0.;
+      for(unsigned int j = ia[i]; j < ia[i+1]; j++){
+          int j_m = map[ja[j]+offset];
+          dr += val[j]*mass[j_m];
+      }
+      dr -= mass[i_r];
+      mass[i_r] += dr;
+    }
+}
+
+__global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays, fptype goes, inttype offset_1, inttype offset_2, fptype* derivative, fptype* mass, inttype offset)
+{
+    int index  = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i+= stride ){
+      fptype dr = 0.;
+      dr += stays*mass[((((int)i+offset_1)%(int)N+(int)N) % (int)N)+offset];
+  		dr += goes*mass[((((int)i+offset_2)%(int)N+(int)N) % (int)N)+offset];
+
+      int io = i + offset;
+      dr -= mass[io];
+      derivative[io] += rate*dr;
+    }
+}
+
 __global__ void EulerStep(inttype N, fptype* derivative, fptype* mass, fptype timestep)
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
@@ -54,7 +87,7 @@ __global__ void MapReset(inttype n_reset, inttype* res_from, inttype* res_to, fp
   }
   *rate = sum;
  }
- 
+
 __global__ void ResetFinish(inttype n_reset, inttype* res_from, fptype* mass,  inttype* map){
    for (int i = 0; i < n_reset; i++)
       mass[map[res_from[i]]] = 0.;
@@ -76,6 +109,5 @@ __global__ void CudaClearDerivative(inttype N, fptype* dydt, fptype* mass){
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
     for (int i = index; i < N; i+= stride)
-        dydt[i]  = 0.; 
-}        
- 
+        dydt[i]  = 0.;
+}

@@ -23,12 +23,8 @@ def generate_preamble(outfile):
 
     return
 
-def generate_closing(outfile, steps, type):
+def generate_closing(outfile, steps, type, t_step):
     outfile.write('\tnetwork.configureSimulation(par_run);\n')
-
-    outfile.write('\tbool close_display = false;\n')
-    outfile.write('\tTwoDLib::Display::getInstance()->AssignCloseDisplayPointer(&close_display);\n')
-    outfile.write('\tTwoDLib::Display::getInstance()->AssignNetworkPointer(&network);\n')
 
     # outfile.write('\tstd::thread t1(TwoDLib::Display::stat_runthreaded);\n')
     # outfile.write('\tt1.detach();\n')
@@ -41,14 +37,14 @@ def generate_closing(outfile, steps, type):
 
     outfile.write('\tstd::vector<MPILib::NodeId> nodes;\n')
     outfile.write('\tnodes.push_back(0);\n')
-    outfile.write('\tTwoDLib::Display::getInstance()->animate(true, nodes);\n')
+    outfile.write('\tTwoDLib::Display::getInstance()->animate(true, nodes,' + t_step + ');\n')
     outfile.write('\tnetwork.startSimulation();\n')
     outfile.write('\tMPILib::utilities::ProgressBar *pb = new MPILib::utilities::ProgressBar(' + steps + ');\n')
     outfile.write('\tlong count = 0;\n')
     outfile.write('\twhile(count < ' + steps + ') {\n')
     outfile.write('\t\tnetwork.evolveSingleStep(std::vector<MPILib::ActivityType>());\n')
     outfile.write('\t\tnetwork.reportNodeActivities(nodes);\n')
-    outfile.write('\t\tTwoDLib::Display::getInstance()->updateDisplay();\n')
+    outfile.write('\t\tTwoDLib::Display::getInstance()->updateDisplay(count);\n')
     outfile.write('\t\tTwoDLib::GridReport<TwoDLib::GridAlgorithm<DelayedConnection>>::getInstance()->reportDensity();\n')
     outfile.write('\t\t(*pb)++;\n')
     outfile.write('\t\tcount++;\n')
@@ -174,6 +170,6 @@ def generate_outputfile(infile, outfile):
     m=tree.find('WeightType')
     s = m.text
 
-    generate_closing(outfile, '(' + t_end.text + ' - ' + t_begin.text + ') / ' + t_step.text , s )
+    generate_closing(outfile, '(' + t_end.text + ' - ' + t_begin.text + ') / ' + t_step.text , s , t_step.text)
     algorithms.reset_algorithms()
     nodes.reset_nodes()

@@ -45,12 +45,16 @@ namespace CudaTwoDLib {
               CSRAdapter(CudaOde2DSystemAdapter& adapter, const std::vector<TwoDLib::CSRMatrix>& matrixvector, fptype euler_timestep );
 
               ~CSRAdapter();
- 
+
               void InspectMass(inttype);
 
               void ClearDerivative();
 
               void CalculateDerivative(const std::vector<fptype>&);
+
+							void CalculateGridDerivative(const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<inttype>&, const std::vector<inttype>&);
+
+							void SingleTransformStep();
 
               void AddDerivative();
 
@@ -69,27 +73,27 @@ namespace CudaTwoDLib {
 
 	          std::vector<inttype> Offsets(const std::vector<TwoDLib::CSRMatrix>&) const;
 	          std::vector<inttype> NrRows(const std::vector<TwoDLib::CSRMatrix>&) const;
-	          
+
 	      CudaOde2DSystemAdapter& _group;
               fptype                  _euler_timestep;
               inttype                 _nr_iterations;
               inttype                 _nr_m;
-  
+
               std::vector<inttype>   _nval;
               std::vector<fptype*>   _val;
               std::vector<inttype>   _nia;
               std::vector<inttype*>  _ia;
               std::vector<inttype>   _nja;
               std::vector<inttype*>  _ja;
-              
+
               std::vector<inttype> _offsets;
               std::vector<inttype> _nr_rows;
-            
+
               fptype* _dydt;
 
               int _blockSize;
-              int _numBlocks; 
-              
+              int _numBlocks;
+
               cudaStream_t* _streams;
 	};
 }

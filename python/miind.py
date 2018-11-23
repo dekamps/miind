@@ -8,7 +8,7 @@ import directories3 as directories
 from collections import Counter
 
 # These algorithms can feature in a MeshAlgorithmGroup simulation, and no others
-MESH_ALGORITHM_GROUP_LIST = ['MeshAlgorithmGroup', 'DelayAlgorithm', 'RateFunctor' ]
+MESH_ALGORITHM_GROUP_LIST = ['GridAlgorithmGroup', 'MeshAlgorithmGroup', 'DelayAlgorithm', 'RateFunctor' ]
 
 def parse_rate_functors(algorithms):
      s=''
@@ -127,6 +127,27 @@ def generate_log_function(cuda):
      s += '\n'
      return s
 
+def generate_rate_report_function(cuda):
+    '''Generate the code for reporting firing rates.'''
+
+    if cuda == True:
+         template_argument = 'fptype'
+    else:
+         template_argument = 'MPILib::Rate'
+
+    s='void reportNodeActivities(std::vector<MPILib::NodeId>& node_ids, long sim_time, const std::vector<'+template_argument+'>& vec_rates) {\n'
+    s+='\tfor (int i=0; i<node_ids.size(); i++){\n'
+    s+='\t\tstd::ostringstream ost2;\n'
+    s+='\t\tost2 << "rate_" << node_ids[i];\n'
+    s+='\t\tstd::ofstream ofst_rate(ost2.str(), std::ofstream::app);\n'
+    s+='\t\tofst_rate.precision(10);\n'
+    s+='\t\tofst_rate << sim_time << "\\t" << vec_rates[node_ids[i]] << std::endl;\n'
+    s+='\t\tofst_rate.close();\n'
+    s+='\t}\n'
+    s+='}\n'
+    s+='\n'
+    return s
+
 def generate_mag_table(nodes,algorithms):
      '''Generates a mapping from MeshAlgorithmGroup order to NodeId ( a MagId table).'''
      s = ''
@@ -134,7 +155,7 @@ def generate_mag_table(nodes,algorithms):
      for i, node in enumerate(nodes):
           algorithmname = node.attrib['algorithm']
           for alg in algorithms:
-               if alg.attrib['name'] == algorithmname and alg.attrib['type'] == "MeshAlgorithmGroup":
+               if alg.attrib['name'] == algorithmname and alg.attrib['type'] in ["MeshAlgorithmGroup","GridAlgorithmGroup"]:
                     magtab.append(i)
 
      s += '\tstd::vector<MPILib::Index>  mag_id_to_node_id{\n'
@@ -166,6 +187,8 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, cuda):
     fill_in_function = generate_fill_in_rate_function(cuda)
     apply_network_function = generate_apply_network_function(nodes, algorithms, connections, cuda)
 
+    rate_report_function = generate_rate_report_function(cuda)
+
     if cuda == True:
          template_argument = 'fptype'
     else:
@@ -186,6 +209,7 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, cuda):
         f.write(apply_network_function)
         f.write(function_declarations)
         f.write(log_function)
+        f.write(rate_report_function)
         f.write('\nint main(int argc, char *argv[]){\n')
         f.write(variable_declarations)
         f.write('\tconst MPILib::Number n_populations = ' + str(len(nodes)) + ';\n\n')
@@ -251,7 +275,6 @@ def generate_simulation_parameter(fn, parameters):
 
 def generate_model_files(nodes,algorithms):
      modelfiles=[]
-     matrixfilelist=[]
      for node in nodes:
           algname = node.attrib['algorithm']
           for alg in algorithms:
@@ -263,12 +286,18 @@ def generate_model_files(nodes,algorithms):
                ts = algorithm.findall('TimeStep')
                timestep = float(ts[0].text)
 
+     if len(modelfiles) == 0:
+        return modelfiles, -1.0
+
      return modelfiles, timestep
 
 def generate_mesh_algorithm_group(fn,nodes,algorithms,cuda):
      '''Colate al MeshAlgorithmGroup instances and generate the C++ code to instantiate the group'''
 
      modelfiles, timestep = generate_model_files(nodes,algorithms)
+
+     if len(modelfiles) == 0:
+         return
 
      with open(fn,'a') as f:
           f.write('\tpugi::xml_document doc;\n')
@@ -290,7 +319,54 @@ def generate_mesh_algorithm_group(fn,nodes,algorithms,cuda):
           f.write('\tTwoDLib::MasterParameter par(' + 'static_cast<MPILib::Number>(ceil(mesh0.TimeStep()/' + str(timestep) + ')));\n\n')
           f.write('\tconst MPILib::Time h = 1./par._N_steps*mesh0.TimeStep();\n')
 
+def generate_grid_model_files(nodes,algorithms):
+     modelfiles=[]
+     transforms=[]
+     startvs=[]
+     startws=[]
+     for node in nodes:
+          algname = node.attrib['algorithm']
+          for alg in algorithms:
+               if alg.attrib['name'] == algname: # here we assume the name is unique
+                    algorithm = alg
 
+          if algorithm.attrib['type'] == 'GridAlgorithmGroup':
+               modelfiles.append(algorithm.attrib['modelfile'])
+               transforms.append(algorithm.attrib['transformfile'])
+               startvs.append(algorithm.attrib['start_v'])
+               startws.append(algorithm.attrib['start_w'])
+               ts = algorithm.findall('TimeStep')
+               timestep = float(ts[0].text)
+
+     return modelfiles, transforms, startvs, startws, timestep
+
+def generate_grid_algorithm_group(fn,nodes,algorithms,cuda):
+     '''Colate al MeshAlgorithmGroup instances and generate the C++ code to instantiate the group'''
+
+     modelfiles, transforms, startvs, startws, timestep = generate_grid_model_files(nodes,algorithms)
+
+     with open(fn,'a') as f:
+          f.write('\tpugi::xml_document doc;\n')
+          f.write('\tstd::vector<TwoDLib::Mesh> vec_vec_mesh;\n')
+          f.write('\tstd::vector<TwoDLib::TransitionMatrix> vec_transforms;\n')
+          f.write('\tstd::vector< std::vector<TwoDLib::Redistribution> > vec_vec_rev;\n')
+          f.write('\tstd::vector< std::vector<TwoDLib::Redistribution> > vec_vec_res;\n');
+          for i,model in enumerate(modelfiles):
+               # according to pugixml doc, load_file destroys the old tree, soo this should be save
+               f.write('\tpugi::xml_parse_result result' + str(i) + ' = doc.load_file(\"' + model +'\");\n')
+               f.write('\tpugi::xml_node  root' + str(i) + ' = doc.first_child();\n\n')
+               f.write('\tTwoDLib::Mesh mesh' + str(i) +' = TwoDLib::RetrieveMeshFromXML(root' + str(i) + ');\n')
+               f.write('\tstd::vector<TwoDLib::Redistribution> vec_rev' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(i) + ');\n')
+               f.write('\tstd::vector<TwoDLib::Redistribution> vec_res' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reset",root' + str(i) + ');\n\n')
+               f.write('\tTwoDLib::TransitionMatrix transform' + str(i) + '(\"' + transforms[i] + '\");\n')
+               f.write('\tvec_transforms.push_back(transform'+str(i)+');\n')
+               f.write('\tvec_vec_mesh.push_back(mesh'+str(i)+');\n')
+               f.write('\tvec_vec_rev.push_back(vec_rev'+str(i)+');\n')
+               f.write('\tvec_vec_res.push_back(vec_res'+str(i)+');\n')
+
+
+          f.write('\tTwoDLib::MasterParameter par(' + 'static_cast<MPILib::Number>(ceil(mesh0.TimeStep()/' + str(timestep) + ')));\n\n')
+          f.write('\tconst MPILib::Time h = 1./par._N_steps*mesh0.TimeStep();\n')
 
 def node_name_to_node_id(nodes):
      '''Create a map from name to NodeId from node elements. Return this map.'''
@@ -332,6 +408,22 @@ def node_id_to_mag_id(nodes, algorithms):
           nodecounter += 1
      return map
 
+def node_id_to_gag_id(nodes, algorithms):
+     '''MagId is determined by the node order. Every time a MeshAlgorithmGroup is encoutered when traversing nodes in their  order in the XML file, the MagId
+     is increased.'''
+     map = []
+     nodecounter = 0
+     gagcounter = 0
+     for node in nodes:
+          algname = node.attrib['algorithm']
+          for algorithm in algorithms:
+               if algorithm.attrib['name'] == algname:
+                    if algorithm.attrib['type'] == 'GridAlgorithmGroup':
+                         map.append([[nodecounter],[gagcounter]])
+                         gagcounter += 1
+          nodecounter += 1
+     return map
+
 def node_name_to_mag_id(nodes,algorithms):
      '''Map a node name to the correct MagId, if it exists.'''
      map = {}
@@ -343,6 +435,19 @@ def node_name_to_mag_id(nodes,algorithms):
                     if algorithm.attrib['type'] == 'MeshAlgorithmGroup':
                          map[node.attrib['name']]  = magcounter
                          magcounter += 1
+     return map
+
+def node_name_to_gag_id(nodes,algorithms):
+     '''Map a node name to the correct MagId, if it exists.'''
+     map = {}
+     gagcounter = 0
+     for node in nodes:
+          algname = node.attrib['algorithm']
+          for algorithm in algorithms:
+               if algorithm.attrib['name'] == algname:
+                    if algorithm.attrib['type'] == 'GridAlgorithmGroup':
+                         map[node.attrib['name']]  = gagcounter
+                         gagcounter += 1
      return map
 
 
@@ -379,12 +484,48 @@ def construct_CSR_map(nodes,algorithms,connections):
 
      return csrlist
 
+def construct_efficacy_map(nodes,algorithms,connections):
+     '''Creates a list that corresponds one-to-one with the connection structure. Returns a tuple: [0] node name of receiving node,[1] matrix file name for this connection  '''
+     csrlist=[]
+     combi = []
+     for connection in connections:
+          for node in nodes:
+               if connection.attrib['Out'] == node.attrib['name']:
+                    # we have the right node, now see if it's a MeshAlgorithmGroup
+                    nodealgorithm=node.attrib['algorithm']
+                    for algorithm in algorithms:
+                         if nodealgorithm == algorithm.attrib['name']:
+                              if algorithm.attrib['type'] == 'GridAlgorithmGroup':
+
+
+                                   mfs=algorithm.findall('MatrixFile')
+                                   mfn= [ mf.text for mf in mfs]
+                                   efficacy=float(connection.text.split()[1])
+                                   effs= [extract_efficacy(fn) for fn in mfn]
+
+                                   candidates=[]
+                                   for i, eff in enumerate(effs):
+                                        if np.isclose(eff,efficacy):
+                                             candidates.append(i)
+                                   if len(candidates) == 0: raise ValueError('No efficacy found that corresponds to the connection efficacy ' + str(efficacy))
+                                   if len(candidates) > 1: raise ValueError('Same efficacy found twice')
+
+                                   count = Counter(combi)
+                                   combi.append((connection.attrib['Out'],connection.attrib['In']))
+                                   nr_connection = count[(connection.attrib['Out'],connection.attrib['In'])]
+                                   csrlist.append([node.attrib['name'],mfn[candidates[0]], effs[candidates[0]],connection.attrib['In'],nr_connection])
+
+     return csrlist
+
 
 def generate_connectivity(fn, nodes, algorithms, connections,cuda):
      '''Write out the CSR matrix lists and vectors into the C++ file.'''
      map = construct_CSR_map(nodes,algorithms,connections)
      nodemap=node_name_to_node_id(nodes)
      magmap=node_name_to_mag_id(nodes,algorithms)
+
+     if len(magmap) == 0:
+         return
 
      with open(fn,'a') as f:
           for el in map:
@@ -410,16 +551,54 @@ def generate_connectivity(fn, nodes, algorithms, connections,cuda):
           else:
                f.write('\tTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);')
 
+def generate_grid_csr(fn, nodes, algorithms, cuda):
+    nodemap=node_name_to_node_id(nodes)
+    gagmap=node_name_to_gag_id(nodes,algorithms)
+
+    if len(gagmap) == 0:
+        return
+
+    with open(fn,'a') as f:
+         f.write('\tconst std::vector<TwoDLib::CSRMatrix> vecmat {\\\n')
+
+         if cuda == True:
+              template_argument = 'fptype'
+              group = ', group_ode,'
+         else:
+              group = ', group,'
+              template_argument = 'MPILib::Rate'
+
+         for el in list(gagmap.keys())[:-1]:
+              f.write('\t\tTwoDLib::CSRMatrix(transform' + str(gagmap[el]) + group + str(gagmap[el]) + '), \\\n')
+         el = list(gagmap.keys())[-1]
+         f.write('\t\tTwoDLib::CSRMatrix(transform' + str(gagmap[el]) + group + str(gagmap[el]) + ') \\\n')
+         f.write('\t};\n')
+         f.write('\tstd::vector<' + template_argument + '> vec_magin_rates(vecmat.size(),0.);\n')
+
+         if cuda:
+              f.write('\tCudaTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);\n\n')
+         else:
+              f.write('\tTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);\n\n')
+
 def generate_simulation_loop(fn,cuda):
      '''Write the simulation loop into the C++ file.'''
      with open(fn,'a') as f:
+          f.write('\tstd::vector<MPILib::NodeId> display_nodes;\n')
+          f.write('\tdisplay_nodes.push_back(0);\n')
+          f.write('\tTwoDLib::Display::getInstance()->animate(true, display_nodes, mesh0.TimeStep());\n')
+          f.write('\tstd::vector<MPILib::NodeId> rate_nodes;\n')
+          f.write('\trate_nodes.push_back(0);\n')
+          f.write('\trate_nodes.push_back(1);\n')
           f.write('\tMPILib::Time time = 0;\n')
           f.write('\tboost::timer::auto_cpu_timer timer;\n')
           f.write('\tfor(MPILib::Index i_loop = 0; i_loop < n_iter; i_loop++){\n')
           f.write('\t\ttime = t_step*i_loop;\n')
           f.write('\t\tApplyNetwork(vec_activity_rates,vec_magin_rates);\n')
-          f.write('\n\t\tgroup.Evolve();\n')
-          f.write('\t\tgroup.RemapReversal();\n')
+          # f.write('\n\t\tgroup.Evolve();\n')
+          f.write('\n\t\tgroup.EvolveWithoutMeshUpdate();\n')
+          # f.write('\t\tgroup.RemapReversal();\n')
+          f.write('\t\tcsr_adapter.SingleTransformStep();\n')
+
           f.write('\t\tfor (MPILib::Index i_part = 0; i_part < par._N_steps; i_part++ ){\n')
           f.write('\t\t\tcsr_adapter.ClearDerivative();\n')
           f.write('\t\t\tcsr_adapter.CalculateDerivative(vec_magin_rates);\n')
@@ -429,6 +608,8 @@ def generate_simulation_loop(fn,cuda):
           if cuda:
                f.write('\t\tgroup.MapFinish();\n')
           f.write('\t\tFillInRates(group, functor_list, mag_id_to_node_id, vec_activity_rates, time);\n')
+          f.write('\t\tTwoDLib::Display::getInstance()->updateDisplay(i_loop);\n')
+          f.write('\t\treportNodeActivities(rate_nodes, time, vec_activity_rates);\n')
           f.write('\t\tif (i_loop%n_report == 0) LogData(log,time,vec_activity_rates);\n')
           f.write('\t}\n')
 
@@ -454,6 +635,7 @@ def generate_initialization(fn,nodes,algorithms,cuda):
           f.write('\tfor( auto id : mag_id_to_node_id)\n')
           f.write('\t\t' + group + '.Initialize(i_mesh++,0,0);\n')
           if cuda: f.write('\tCudaTwoDLib::CudaOde2DSystemAdapter group(group_ode);\n\n')
+          f.write('\tTwoDLib::Display::getInstance()->addOdeSystem(0, &group_ode);\n')
           f.write('\n\n')
 
 
@@ -473,6 +655,7 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
     generate_mesh_algorithm_group(fn,nodes,algorithms,cuda)
     generate_initialization(fn,nodes,algorithms,cuda)
     generate_connectivity(fn,nodes,algorithms,connections,cuda)
+    generate_grid_csr(fn,nodes,algorithms,cuda)
     generate_simulation_parameter(fn,parameter)
     generate_simulation_io(fn,io)
     generate_simulation_loop(fn,cuda)
@@ -492,7 +675,7 @@ def mesh_algorithm_group(root):
     algorithms=root.findall('.//Algorithm')
 
     for algorithm in algorithms:
-        if algorithm.attrib['type'] == "MeshAlgorithmGroup":
+        if algorithm.attrib['type'] in ["MeshAlgorithmGroup","GridAlgorithmGroup"]:
             return True
 
     return False

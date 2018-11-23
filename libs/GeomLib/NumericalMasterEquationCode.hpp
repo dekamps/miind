@@ -126,7 +126,7 @@ namespace
 
              typename Estimator::CoverPair pair = vec_cover_pair[0];
              Index i_shift = static_cast<Index>(pair.first._index);
-             assert(i_shift >= 0);
+             //assert(i_shift >= 0);
 
              if (i == i_shift)
                  dydt[system.MapPotentialToProbabilityBin(i)] -= (rate_i * pair.first._alpha) * y[system.MapPotentialToProbabilityBin(i)];
