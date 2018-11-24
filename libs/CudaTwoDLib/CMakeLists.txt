@@ -7,7 +7,7 @@ include_directories(${CUDA_INCLUDE_DIRS})
 include_directories( ${GSL_INCLUDE_DIRS} )
 set( LIB_TYPE STATIC )
 
-set(CUDA_NVCC_FLAGS 
+set(CUDA_NVCC_FLAGS
 ${CUDA_NVCC_FLAGS};
 -std=c++11
 -arch=sm_50 #adapt this to the GPU on your system
@@ -18,17 +18,19 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_SOURCE_DIR}/../
    ${CMAKE_CURRENT_BINARY_DIR}/../
 )
-				
+
 set( TWOD_SRC
 CSRAdapter.cu
 CudaOde2DSystemAdapter.cu
 CudaEuler.cu
+VectorizedNetwork.cu
 )
 
 set( TWOD_HEADERS
 CSRAdapter.cuh
 CudaOde2DSystemAdapter.cuh
 CudaEuler.cuh
+VectorizedNetwork.cuh
 )
 cuda_add_library( ${MIIND_LIBRARY_PREFIX}cudatwod ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS} ${SRC} )
 target_compile_options( ${MIIND_LIBRARY_PREFIX}cudatwod PUBLIC )

@@ -20,5 +20,6 @@
 
 #include "CSRAdapter.cuh"
 #include "CudaOde2DSystemAdapter.cuh"
+#include "VectorizedNetwork.cuh"
 
 #endif

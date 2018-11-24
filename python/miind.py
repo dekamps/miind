@@ -496,27 +496,11 @@ def construct_efficacy_map(nodes,algorithms,connections):
                     for algorithm in algorithms:
                          if nodealgorithm == algorithm.attrib['name']:
                               if algorithm.attrib['type'] == 'GridAlgorithmGroup':
-
-
-                                   mfs=algorithm.findall('MatrixFile')
-                                   mfn= [ mf.text for mf in mfs]
                                    efficacy=float(connection.text.split()[1])
-                                   effs= [extract_efficacy(fn) for fn in mfn]
 
-                                   candidates=[]
-                                   for i, eff in enumerate(effs):
-                                        if np.isclose(eff,efficacy):
-                                             candidates.append(i)
-                                   if len(candidates) == 0: raise ValueError('No efficacy found that corresponds to the connection efficacy ' + str(efficacy))
-                                   if len(candidates) > 1: raise ValueError('Same efficacy found twice')
-
-                                   count = Counter(combi)
-                                   combi.append((connection.attrib['Out'],connection.attrib['In']))
-                                   nr_connection = count[(connection.attrib['Out'],connection.attrib['In'])]
-                                   csrlist.append([node.attrib['name'],mfn[candidates[0]], effs[candidates[0]],connection.attrib['In'],nr_connection])
+                                   csrlist.append([node.attrib['name'],efficacy,connection.attrib['In'],int(connection.text.split()[0]),int(connection.text.split()[2])])
 
      return csrlist
-
 
 def generate_connectivity(fn, nodes, algorithms, connections,cuda):
      '''Write out the CSR matrix lists and vectors into the C++ file.'''
@@ -551,7 +535,7 @@ def generate_connectivity(fn, nodes, algorithms, connections,cuda):
           else:
                f.write('\tTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);')
 
-def generate_grid_csr(fn, nodes, algorithms, cuda):
+def generate_grid_csr(fn, nodes, algorithms, connections, cuda):
     nodemap=node_name_to_node_id(nodes)
     gagmap=node_name_to_gag_id(nodes,algorithms)
 
@@ -573,7 +557,11 @@ def generate_grid_csr(fn, nodes, algorithms, cuda):
          el = list(gagmap.keys())[-1]
          f.write('\t\tTwoDLib::CSRMatrix(transform' + str(gagmap[el]) + group + str(gagmap[el]) + ') \\\n')
          f.write('\t};\n')
-         f.write('\tstd::vector<' + template_argument + '> vec_magin_rates(vecmat.size(),0.);\n')
+
+         map = construct_efficacy_map(nodes,algorithms,connections)
+
+         f.write('\tstd::vector<' + template_argument + '> vec_gagin_rates(' + str(len(map)) + ',0.);\n')
+         f.write('\tstd::vector<' + template_argument + '> vec_gagin_stays(' + str(len(map)) + ',0.);\n')
 
          if cuda:
               f.write('\tCudaTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);\n\n')
@@ -653,9 +641,10 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
 
     generate_preamble(fn, variables, nodes, algorithms,connections,cuda)
     generate_mesh_algorithm_group(fn,nodes,algorithms,cuda)
+    generate_grid_algorithm_group(fn,nodes,algorithms,cuda)
     generate_initialization(fn,nodes,algorithms,cuda)
     generate_connectivity(fn,nodes,algorithms,connections,cuda)
-    generate_grid_csr(fn,nodes,algorithms,cuda)
+    generate_grid_csr(fn,nodes,algorithms,connections,cuda)
     generate_simulation_parameter(fn,parameter)
     generate_simulation_io(fn,io)
     generate_simulation_loop(fn,cuda)

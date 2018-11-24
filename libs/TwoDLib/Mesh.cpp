@@ -40,6 +40,19 @@ _vec_block(0),
 _vec_vec_quad(0),
 _vec_vec_gen(0){
 	this->FromXML(s);
+
+	// If this mesh is a grid, calculate the cell width.
+	// If it's not a mesh, _grid_cell_width is meaningless.
+	Quadrilateral q1 = Quad(1,0);
+	Quadrilateral q2 = Quad(1,1);
+
+	double cell_h_dist = std::fabs(q2.Centroid()[0] - q1.Centroid()[0]);
+	double cell_v_dist = std::fabs(q2.Centroid()[1] - q1.Centroid()[1]);
+
+	// one of these distances should be close to zero, so pick the other one
+	// we do this because we don't know if this is a v- or h- efficacy
+
+	double _grid_cell_width = std::max(cell_h_dist, cell_v_dist);
 }
 
 Mesh::Mesh(const Mesh& m):
@@ -48,10 +61,25 @@ _vec_vec_quad(m._vec_vec_quad),
 _vec_vec_gen(m._vec_vec_gen),
 _t_step(m._t_step),
 _map(m._map),
-_vec_vec_cell(m._vec_vec_cell)
+_vec_vec_cell(m._vec_vec_cell),
+_grid_cell_width(m._grid_cell_width)
 {
 }
 
+double Mesh::getCellWidth() const {
+	return _grid_cell_width;
+}
+
+Mesh::GridCellTransition Mesh::calculateCellTransition(double efficacy) const{
+	unsigned int offset = (unsigned int)abs(efficacy/_grid_cell_width);
+	double goes = (double)fabs(efficacy / _grid_cell_width) - offset;
+	double stays = 1.0 - goes;
+
+	int offset_1 = efficacy > 0 ? -offset : offset;
+	int offset_2 = efficacy > 0 ? -(offset+1) : -(offset-1);
+
+	return Mesh::GridCellTransition(stays, goes, offset_1, offset_2);
+}
 
 void Mesh::CreateCells(){
 	vector<double> v_points(Quadrilateral::_nr_points);
