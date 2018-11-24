@@ -105,6 +105,22 @@ namespace TwoDLib {
 		//! and therefore can be processed by getline
 		void ToXML(std::ostream&) const;
 
+		// Get the grid cell width (only useful if the mesh is a grid)
+		double getCellWidth() const;
+
+		class GridCellTransition{
+		public:
+			double _stays;
+			double _goes;
+			int _offset_1;
+			int _offset_2;
+
+			GridCellTransition(double s, double g, int o1, int o2):
+			_stays(s), _goes(g), _offset_1(o1), _offset_2(o2) {}
+		};
+
+		GridCellTransition calculateCellTransition(double efficacy) const;
+
 	private:
 
 		void FromXML(std::istream&);
@@ -135,6 +151,7 @@ namespace TwoDLib {
 		vector<vector<Quadrilateral> >   			_vec_vec_quad;
 		vector<vector<QuadGenerator> >	            _vec_vec_gen;
 		double										_t_step;
+		double										_grid_cell_width;
 
 		// It is sometimes necessary to find out to which cells a given mesh point belongs.
 		// A mesh point will be mapped to an index position in a list of a list of coordinates.
