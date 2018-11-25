@@ -60,6 +60,8 @@ namespace CudaTwoDLib {
 
               void AddDerivative();
 
+							void AddDerivativeFull();
+
               inttype NrIterations() const { return _nr_iterations; }
 
         private:

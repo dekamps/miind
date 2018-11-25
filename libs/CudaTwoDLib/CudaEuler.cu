@@ -22,7 +22,7 @@ __global__ void CudaCalculateDerivative(inttype N, fptype rate, fptype* derivati
     }
 }
 
-__global__ void CudaSingleTransformStep(inttype N, fptype* mass, fptype* val, inttype* ia, inttype* ja, inttype* map, inttype offset)
+__global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* mass, fptype* val, inttype* ia, inttype* ja, inttype* map, inttype offset)
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
@@ -35,7 +35,7 @@ __global__ void CudaSingleTransformStep(inttype N, fptype* mass, fptype* val, in
           dr += val[j]*mass[j_m];
       }
       dr -= mass[i_r];
-      mass[i_r] += dr;
+      derivative[i_r] += dr;
     }
 }
 
@@ -46,8 +46,8 @@ __global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays
 
     for (int i = index; i < N; i+= stride ){
       fptype dr = 0.;
-      dr += stays*mass[((((int)i+offset_1)%(int)N+(int)N) % (int)N)+offset];
-  		dr += goes*mass[((((int)i+offset_2)%(int)N+(int)N) % (int)N)+offset];
+      dr += stays*mass[((((i+offset_1)%N)+N) % N)+offset];
+  		dr += goes*mass[((((i+offset_2)%N)+N) % N)+offset];
 
       int io = i + offset;
       dr -= mass[io];
