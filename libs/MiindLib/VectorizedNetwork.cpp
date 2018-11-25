@@ -72,9 +72,8 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 	MPILib::Number n_report = static_cast<MPILib::Number>(ceil((t_report - t_begin)/_network_time_step));
 
   for(unsigned int i=0; i<_display_nodes.size(); i++){
-    TwoDLib::Display::getInstance()->addOdeSystem(0, _group, _node_id_to_grid_mesh[i]);
+    TwoDLib::Display::getInstance()->addOdeSystem(i, _group, _node_id_to_grid_mesh[i]);
   }
-
 
   const MPILib::Time h = 1./_n_steps*_vec_mesh[0].TimeStep();
 
@@ -113,10 +112,13 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
     }
 
 		_group_adapter->EvolveWithoutMeshUpdate();
-		_csr_adapter.SingleTransformStep();
 
-    // _group_adapter->RedistributeProbability();
-    // _group_adapter->MapFinish();
+    _csr_adapter.ClearDerivative();
+		_csr_adapter.SingleTransformStep();
+    _csr_adapter.AddDerivativeFull();
+
+    _group_adapter->RedistributeProbability();
+    _group_adapter->MapFinish();
 
     _group_adapter->updateGroupMass();
 

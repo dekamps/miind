@@ -10,7 +10,7 @@ set( LIB_TYPE STATIC )
 set(CUDA_NVCC_FLAGS
 ${CUDA_NVCC_FLAGS};
 -std=c++11
--arch=sm_50 #adapt this to the GPU on your system
+-arch=sm_60 #adapt this to the GPU on your system
 )
 
 #one below that MPILib is included in the paths they are needed for the camke config files

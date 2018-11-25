@@ -46,7 +46,7 @@ unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys, un
 
 	DisplayWindow window;
 	window._system = sys;
-
+	window._mesh_index = mesh_index;
 
 	// Find extent of mesh to normalise to screen size
 
@@ -131,11 +131,11 @@ void Display::display(void) {
 	for(unsigned int i = 0; i<m.NrStrips(); i++){
 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
 			double cell_area = std::abs(m.Quad(i,j).SignedArea());
-			if(_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(0,i,j)]/cell_area == 0){
+			if(_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j)]/cell_area == 0){
 				continue;
 			}
-			if (max < log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(0,i,j)]/cell_area))
-				max = log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(0,i,j)]/cell_area);
+			if (max < log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j)]/cell_area))
+				max = log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j)]/cell_area);
 		}
 	}
 
@@ -143,12 +143,12 @@ void Display::display(void) {
 	for(unsigned int i = 0; i<m.NrStrips(); i++){
 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
 			double cell_area = std::abs(m.Quad(i,j).SignedArea());
-			if(_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(0,i,j)]/cell_area == 0){
+			if(_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j)]/cell_area == 0){
 				continue;
 			}
 
-			if (log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(0,i,j)]/cell_area) < min)
-				min = log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(0,i,j)]/cell_area);
+			if (log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j)]/cell_area) < min)
+				min = log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j)]/cell_area);
 		}
 	}
 
@@ -161,7 +161,7 @@ void Display::display(void) {
 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
 			Quadrilateral q = m.Quad(i,j);
 			double cell_area = std::abs(q.SignedArea());
-			unsigned int idx = _dws[window_index]._system->Map(0,i,j);
+			unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j);
 			double mass = 0.0;
 			if (_dws[window_index]._system->Mass()[idx]/cell_area != 0)
 				mass = std::min(1.0,std::max(0.0,(log10(_dws[window_index]._system->Mass()[idx]/cell_area) - min) / (max-min)));

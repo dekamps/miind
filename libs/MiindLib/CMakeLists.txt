@@ -1,5 +1,5 @@
 
-project( ${MIIND_LIBRARY_PREFIX}miind )
+project( ${MIIND_LIBRARY_PREFIX}shared )
 
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
@@ -40,14 +40,14 @@ ${MIIND_LIBRARY_PREFIX}cudatwod
   ${GLUT_LIBRARY}
 )
 
-add_library( ${MIIND_LIBRARY_PREFIX}miind ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS})
+add_library( ${MIIND_LIBRARY_PREFIX}shared ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS})
 
-target_link_libraries( ${MIIND_LIBRARY_PREFIX}miind
+target_link_libraries( ${MIIND_LIBRARY_PREFIX}shared
     ${LIBLIST} -lpython2.7 -lboost_python)
 
 install( FILES ${numtools_HEADERS}
     DESTINATION include/miind/MiindLib )
 
-install( TARGETS ${MIIND_LIBRARY_PREFIX}miind
+install( TARGETS ${MIIND_LIBRARY_PREFIX}shared
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib )

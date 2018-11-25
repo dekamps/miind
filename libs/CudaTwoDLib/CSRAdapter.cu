@@ -226,7 +226,7 @@ void CSRAdapter::SingleTransformStep()
   {
       // be careful to use this block size
       inttype numBlocks = (_nr_rows[m] + _blockSize - 1)/_blockSize;
-      CudaSingleTransformStep<<<numBlocks,_blockSize,0,_streams[m]>>>(_nr_rows[m],_group._mass,_val[m],_ia[m],_ja[m],_group._map,_offsets[m]);
+      CudaSingleTransformStep<<<numBlocks,_blockSize,0,_streams[m]>>>(_nr_rows[m],_dydt,_group._mass,_val[m],_ia[m],_ja[m],_group._map,_offsets[m]);
   }
 
   for (inttype m = 0; m < _nr_m; m++)
@@ -236,4 +236,9 @@ void CSRAdapter::SingleTransformStep()
 void CSRAdapter::AddDerivative()
 {
   EulerStep<<<_numBlocks,_blockSize>>>(_group._n,_dydt,_group._mass,_euler_timestep);
+}
+
+void CSRAdapter::AddDerivativeFull()
+{
+  EulerStep<<<_numBlocks,_blockSize>>>(_group._n,_dydt,_group._mass, 1.0);
 }
