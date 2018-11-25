@@ -235,5 +235,5 @@ void CSRAdapter::SingleTransformStep()
 
 void CSRAdapter::AddDerivative()
 {
-    EulerStep<<<_numBlocks,_blockSize>>>(_group._n,_dydt,_group._mass,_euler_timestep);
+  EulerStep<<<_numBlocks,_blockSize>>>(_group._n,_dydt,_group._mass,_euler_timestep);
 }

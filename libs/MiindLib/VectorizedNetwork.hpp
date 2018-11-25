@@ -1,13 +1,15 @@
-#ifndef _CODE_CUDA2DLIB_VectorizedNetwork_INCLUDE_GUARD
-#define _CODE_CUDA2DLIB_VectorizedNetwork_INCLUDE_GUARD
+#ifndef _CODE_CUDATWODLIB_VectorizedNetwork_INCLUDE_GUARD
+#define _CODE_CUDATWODLIB_VectorizedNetwork_INCLUDE_GUARD
 
-#include "CudaTwoDLib.hpp"
+#include <CudaTwoDLib/CudaTwoDLib.hpp>
 
+typedef CudaTwoDLib::fptype fptype;
+typedef CudaTwoDLib::inttype inttype;
 typedef MPILib::Rate (*function_pointer)(MPILib::Time);
 typedef std::pair<MPILib::Index, function_pointer> function_association;
 typedef std::vector<function_association> function_list;
 
-namespace CudaTwoDLib {
+namespace MiindLib {
 
 class NodeConnection {
 public:
@@ -59,7 +61,7 @@ protected:
 
   TwoDLib::Ode2DSystemGroup *_group;
 
-  CudaOde2DSystemAdapter *_group_adapter;
+  CudaTwoDLib::CudaOde2DSystemAdapter *_group_adapter;
 
   std::vector<TwoDLib::CSRMatrix> _csrs;
 

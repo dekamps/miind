@@ -25,10 +25,10 @@ set(MPI_SRCS
     src/HebbianAlgorithm.cpp
     src/PersistantAlgorithm.cpp
     src/WilsonCowanAlgorithm.cpp
-    
+
 
     src/ProbabilityQueue.cpp
-    
+
     src/report/handler/AbstractReportHandler.cpp
     src/report/handler/CanvasParameter.cpp
     src/report/handler/GraphKey.cpp
@@ -38,9 +38,9 @@ set(MPI_SRCS
     src/report/handler/RootCanvasNoMPI.cpp
     src/report/handler/RootReportHandler.cpp
     src/report/handler/ValueHandlerHandler.cpp
-    
+
     src/report/Report.cpp
-    
+
     src/utilities/CircularDistribution.cpp
     src/utilities/Exception.cpp
     src/utilities/FileNameGenerator.cpp
@@ -49,12 +49,12 @@ set(MPI_SRCS
     src/utilities/MPIProxy.cpp
     src/utilities/ParallelException.cpp
     src/utilities/ProgressBar.cpp
-    
+
     src/NetworkState.cpp
     src/SimulationRunParameter.cpp
 )
 
-set(MPI_HEADER 
+set(MPI_HEADER
     include/ProbabilityQueue.hpp
 )
 
@@ -64,11 +64,11 @@ set(MPI_HEADER
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
-set ( LIBLIST 
-    ${Boost_LIBRARIES} 
-    ${MPI_LIBRARIES} 
+set ( LIBLIST
+    ${Boost_LIBRARIES}
+    ${MPI_LIBRARIES}
     ${MIIND_LIBRARY_PREFIX}numtools
-    ${gsl_LINK_FLAGS} 
+    ${gsl_LINK_FLAGS}
 	gsl
 )
 
@@ -80,7 +80,7 @@ target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} -lpython2.7 -lboost
 # Cmake generated header files
 #############################################################################
 #CONFIGURE_FILE(
-#    ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.cmake 
+#    ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.cmake
 #    ${CMAKE_CURRENT_BINARY_DIR}/config.hpp
 #)
 

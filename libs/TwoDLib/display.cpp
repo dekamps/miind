@@ -38,6 +38,10 @@ Display::~Display(){
 }
 
 unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys) {
+	return addOdeSystem(nid, sys, 0);
+}
+
+unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys, unsigned int mesh_index) {
 	unsigned int index = _dws.size();
 
 	DisplayWindow window;
@@ -46,7 +50,7 @@ unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys) {
 
 	// Find extent of mesh to normalise to screen size
 
-	Mesh m = sys->MeshObjects()[0];
+	Mesh m = sys->MeshObjects()[mesh_index];
 
 	double mesh_min_v = 10000000.0;
 	double mesh_max_v = -10000000.0;
@@ -121,7 +125,7 @@ void Display::display(void) {
 
 	glBegin(GL_QUADS);
 
-	Mesh m = _dws[window_index]._system->MeshObjects()[0];
+	Mesh m = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index];
 
 	double max = -99999999.0;
 	for(unsigned int i = 0; i<m.NrStrips(); i++){
