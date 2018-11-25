@@ -1,0 +1,53 @@
+
+project( ${MIIND_LIBRARY_PREFIX}miind )
+
+link_directories( ${GSL_LIBRARY_DIRS} )
+include( RequireGSL )
+include_directories( ${GSL_INCLUDE_DIRS} )
+set( LIB_TYPE SHARED )
+
+
+#one below that MPILib is included in the paths they are needed for the camke config files
+INCLUDE_DIRECTORIES(
+   ${CMAKE_CURRENT_SOURCE_DIR}/../
+   ${CMAKE_CURRENT_BINARY_DIR}/../
+)
+
+set( TWOD_SRC
+VectorizedNetwork.cpp
+)
+
+set( TWOD_HEADERS
+VectorizedNetwork.hpp
+)
+
+set(GLUT_LIBRARY "-lGL -lGLU -lglut")
+
+if (UNIX)
+   ADD_DEFINITIONS("-fno-strict-aliasing" )
+endif (UNIX)
+set ( LIBLIST
+${MIIND_LIBRARY_PREFIX}geom
+${MIIND_LIBRARY_PREFIX}twod
+${MIIND_LIBRARY_PREFIX}numtools
+${MIIND_LIBRARY_PREFIX}mpi
+${MIIND_LIBRARY_PREFIX}cudatwod
+    ${Boost_LIBRARIES}
+    ${MPI_LIBRARIES}
+    ${MIIND_LIBRARY_PREFIX}numtools
+    ${gsl_LINK_FLAGS}
+	gsl
+  ${GLUT_LIBRARY}
+)
+
+add_library( ${MIIND_LIBRARY_PREFIX}miind ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS})
+
+target_link_libraries( ${MIIND_LIBRARY_PREFIX}miind
+    ${LIBLIST} -lpython2.7 -lboost_python)
+
+install( FILES ${numtools_HEADERS}
+    DESTINATION include/miind/MiindLib )
+
+install( TARGETS ${MIIND_LIBRARY_PREFIX}miind
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib )

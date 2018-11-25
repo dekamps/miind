@@ -24,6 +24,7 @@ class DisplayWindow{
 public:
 
   Ode2DSystemGroup* _system;
+  unsigned int _mesh_index;
   int _window_index;
 
   double mesh_min_v;
@@ -65,6 +66,7 @@ public:
     disp->shutdown();
   }
 
+  unsigned int addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys, unsigned int mesh_index);
   unsigned int addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys);
 
   void updateDisplay(long current_sim_it);

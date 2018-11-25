@@ -1,17 +1,15 @@
-#include "VectorizedNetwork.cuh"
+#include "VectorizedNetwork.hpp"
 
-using namespace CudaTwoDLib;
+using namespace MiindLib;
 
 VectorizedNetwork::VectorizedNetwork(MPILib::Time time_step):
 _num_nodes(0),
-_n_steps(1),
+_n_steps(10),
 _network_time_step(time_step)
 {
 }
 
 VectorizedNetwork::~VectorizedNetwork(){
-  delete _group_adapter;
-  delete _group;
 }
 
 void VectorizedNetwork::addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w,
@@ -44,20 +42,18 @@ void VectorizedNetwork::initOde2DSystem(){
     _group->Initialize(i,coords[0][0],coords[0][1]);
   }
 
-	TwoDLib::Display::getInstance()->addOdeSystem(0, _group);
-
   for( MPILib::Index i=0; i < _vec_transforms.size(); i++)
     _csrs.push_back(TwoDLib::CSRMatrix(_vec_transforms[i], *(_group), i));
 
   // All grids/meshes must have the same timestep
   TwoDLib::MasterParameter par(static_cast<MPILib::Number>(ceil(_vec_mesh[0].TimeStep()/_network_time_step)));
-  _n_steps = par._N_steps;
+  _n_steps = par._N_steps * 10;
 
-  _group_adapter = new CudaOde2DSystemAdapter(*(_group));
+  _group_adapter = new CudaTwoDLib::CudaOde2DSystemAdapter(*(_group));
 }
 
 void VectorizedNetwork::reportNodeActivities(long sim_time){
-  for (int i=0; i<_num_nodes; i++){
+  for (int i=0; i<_rate_nodes.size(); i++){
 		std::ostringstream ost2;
 		ost2 << "rate_" << i;
 		std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
@@ -75,13 +71,17 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 	MPILib::Number n_iter = static_cast<MPILib::Number>(ceil((t_end - t_begin)/_network_time_step));
 	MPILib::Number n_report = static_cast<MPILib::Number>(ceil((t_report - t_begin)/_network_time_step));
 
+  for(unsigned int i=0; i<_display_nodes.size(); i++){
+    TwoDLib::Display::getInstance()->addOdeSystem(0, _group, _node_id_to_grid_mesh[i]);
+  }
+
 
   const MPILib::Time h = 1./_n_steps*_vec_mesh[0].TimeStep();
 
 	CudaTwoDLib::CSRAdapter _csr_adapter(*_group_adapter,_csrs,_connections.size(),h);
 
   // Setup the OpenGL displays (if there are any required)
-	TwoDLib::Display::getInstance()->animate(write_displays, _density_nodes, _network_time_step);
+	TwoDLib::Display::getInstance()->animate(write_displays, _display_nodes, _network_time_step);
 
   // Generate calculated transition vectors for grid derivative
   std::vector<inttype> node_to_group_meshes;
@@ -114,13 +114,17 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 
 		_group_adapter->EvolveWithoutMeshUpdate();
 		_csr_adapter.SingleTransformStep();
+
+    // _group_adapter->RedistributeProbability();
+    // _group_adapter->MapFinish();
+
+    _group_adapter->updateGroupMass();
+
 		for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++ ){
 			_csr_adapter.ClearDerivative();
 			_csr_adapter.CalculateGridDerivative(node_to_group_meshes, rates, stays, goes, off1s, off2s);
 			_csr_adapter.AddDerivative();
 		}
-		_group_adapter->RedistributeProbability();
-		_group_adapter->MapFinish(); //what does this do?
 
     const std::vector<fptype>& group_rates = _group_adapter->F();
     for(unsigned int i=0; i<group_rates.size(); i++)

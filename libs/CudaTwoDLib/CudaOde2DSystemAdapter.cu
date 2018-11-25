@@ -141,6 +141,13 @@ void CudaOde2DSystemAdapter::Dump(const std::vector<std::ostream*>& vec_stream, 
      _group.Dump(vec_stream, mode);
 }
 
+void CudaOde2DSystemAdapter::updateGroupMass()
+{
+     checkCudaErrors(cudaMemcpy(&_hostmass[0],_mass,_n*sizeof(fptype),cudaMemcpyDeviceToHost));
+     for(inttype i = 0; i < _n; i++)
+        _group.Mass()[i] = _hostmass[i];
+}
+
 const std::vector<fptype>& CudaOde2DSystemAdapter::F() const
 {
      checkCudaErrors(cudaMemcpy(&_host_fs[0],_fs,_mesh_size*sizeof(fptype),cudaMemcpyDeviceToHost));

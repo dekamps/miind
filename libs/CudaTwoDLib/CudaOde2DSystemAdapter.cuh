@@ -63,6 +63,8 @@ namespace CudaTwoDLib {
 
                 void MapFinish();
 
+								void updateGroupMass();
+
                 friend class CSRAdapter;
 
                 const std::vector<fptype>& F() const;

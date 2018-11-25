@@ -23,14 +23,12 @@ set( TWOD_SRC
 CSRAdapter.cu
 CudaOde2DSystemAdapter.cu
 CudaEuler.cu
-VectorizedNetwork.cu
 )
 
 set( TWOD_HEADERS
 CSRAdapter.cuh
 CudaOde2DSystemAdapter.cuh
 CudaEuler.cuh
-VectorizedNetwork.cuh
 )
 cuda_add_library( ${MIIND_LIBRARY_PREFIX}cudatwod ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS} ${SRC} )
 target_compile_options( ${MIIND_LIBRARY_PREFIX}cudatwod PUBLIC )
