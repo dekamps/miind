@@ -1,5 +1,5 @@
-#ifndef _CODE_CUDATWODLIB_VectorizedNetwork_INCLUDE_GUARD
-#define _CODE_CUDATWODLIB_VectorizedNetwork_INCLUDE_GUARD
+#ifndef _CODE_MIINDLIB_VectorizedNetwork_INCLUDE_GUARD
+#define _CODE_MIINDLIB_VectorizedNetwork_INCLUDE_GUARD
 
 #include <CudaTwoDLib/CudaTwoDLib.hpp>
 
@@ -11,22 +11,32 @@ typedef std::vector<function_association> function_list;
 
 namespace MiindLib {
 
-class NodeConnection {
+class NodeMeshConnection {
+public:
+  MPILib::NodeId _in;
+  MPILib::NodeId _out;
+  double _efficacy;
+  TwoDLib::TransitionMatrix *_transition;
+  int _n_connections;
+
+  NodeMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double eff, int n_conns, TwoDLib::TransitionMatrix *trans):
+  _in(in),_out(out),_efficacy(eff),_n_connections(n_conns), _transition(trans){}
+};
+
+class NodeGridConnection {
 public:
   MPILib::NodeId _in;
   MPILib::NodeId _out;
   double _efficacy;
   int _n_connections;
 
-  NodeConnection(MPILib::NodeId in, MPILib::NodeId out, double eff, int n_conns):
+  NodeGridConnection(MPILib::NodeId in, MPILib::NodeId out, double eff, int n_conns):
   _in(in),_out(out),_efficacy(eff),_n_connections(n_conns){}
 };
 
 class VectorizedNetwork {
 public:
   VectorizedNetwork(MPILib::Time time_step);
-
-  ~VectorizedNetwork();
 
   void initOde2DSystem();
 
@@ -43,9 +53,13 @@ public:
   void addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w,
     std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res);
 
+  void addMeshNode(TwoDLib::Mesh mesh, std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res);
+
   void addRateNode(function_pointer functor);
 
-  void addConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns);
+  void addGridConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns);
+
+  void addMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, TwoDLib::TransitionMatrix *tmat);
 
   void reportNodeActivities(long sim_time);
   void mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILib::Time t_report, bool write_displays);
@@ -58,6 +72,9 @@ protected:
   std::vector<TwoDLib::Mesh> _vec_mesh;
   std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_rev;
   std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_res;
+
+  std::vector<inttype> _grid_meshes;
+  std::vector<inttype> _mesh_meshes;
 
   TwoDLib::Ode2DSystemGroup *_group;
 
@@ -74,16 +91,15 @@ protected:
   std::vector<MPILib::NodeId> _rate_nodes;
   std::vector<MPILib::NodeId> _density_nodes;
 
-  std::vector<NodeConnection> _connections;
+  std::vector<NodeMeshConnection> _mesh_connections;
+  std::vector<NodeGridConnection> _grid_connections;
 
   std::map<MPILib::NodeId, double> _out_rates;
 
   function_list _rate_functions;
 
-  std::map<MPILib::NodeId, MPILib::Index> _node_id_to_grid_mesh;
-  std::map<MPILib::Index, MPILib::NodeId> _grid_mesh_to_node_id;
-
-  std::map<MPILib::NodeId, TwoDLib::CSRMatrix> _transforms;
+  std::map<MPILib::NodeId, MPILib::Index> _node_id_to_group_mesh;
+  std::map<MPILib::Index, MPILib::NodeId> _group_mesh_to_node_id;
 
 };
 

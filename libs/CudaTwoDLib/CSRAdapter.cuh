@@ -42,9 +42,10 @@ namespace CudaTwoDLib {
 	class CSRAdapter {
 	public:
 
-              CSRAdapter(CudaOde2DSystemAdapter& adapter, const std::vector<TwoDLib::CSRMatrix>& matrixvector, fptype euler_timestep );
+							CSRAdapter(CudaOde2DSystemAdapter& adapter, const std::vector<TwoDLib::CSRMatrix>& matrixvector, fptype euler_timestep );
 
-							CSRAdapter(CudaOde2DSystemAdapter& adapter, const std::vector<TwoDLib::CSRMatrix>& matrixvector, inttype num_rates, fptype euler_timestep );
+              CSRAdapter(CudaOde2DSystemAdapter& adapter, const std::vector<TwoDLib::CSRMatrix>& matrixvector,
+								inttype transform_offset, inttype nr_connections, fptype euler_timestep );
 
               ~CSRAdapter();
 
@@ -53,6 +54,8 @@ namespace CudaTwoDLib {
               void ClearDerivative();
 
               void CalculateDerivative(const std::vector<fptype>&);
+
+							void CalculateMeshGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<inttype>&, const std::vector<inttype>&);
 
 							void CalculateGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<inttype>&, const std::vector<inttype>&);
 
@@ -82,6 +85,7 @@ namespace CudaTwoDLib {
               fptype                  _euler_timestep;
               inttype                 _nr_iterations;
               inttype                 _nr_m;
+							inttype									_transform_offset;
 							inttype									_nr_streams;
 
               std::vector<inttype>   _nval;

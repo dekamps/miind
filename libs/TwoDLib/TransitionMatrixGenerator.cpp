@@ -44,12 +44,14 @@ _lost(0),
 _accounted(0),
 _vec_fiducial(InitializeFiducialVector(tree.MeshRef(),element_list))
 {
-	_grid_normal_orientation =
-	(std::abs((_tree.MeshRef().Quad(1,1).Centroid() - _tree.MeshRef().Quad(1,2).Centroid())[0]) >
-	std::abs((_tree.MeshRef().Quad(1,1).Centroid() - _tree.MeshRef().Quad(2,1).Centroid())[0]));
+	if(_tree.MeshRef().NrStrips() > 2) {
+		_grid_normal_orientation =
+		(std::abs((_tree.MeshRef().Quad(1,1).Centroid() - _tree.MeshRef().Quad(1,2).Centroid())[0]) >
+		std::abs((_tree.MeshRef().Quad(1,1).Centroid() - _tree.MeshRef().Quad(2,1).Centroid())[0]));
 
-	_grid_extent = _tree.MeshRef().Quad(2,2).Centroid() - _tree.MeshRef().Quad(1,1).Centroid();
-	_grid_bottom_left = _tree.MeshRef().Quad(0,0).Centroid() - (_grid_extent * 0.5);
+		_grid_extent = _tree.MeshRef().Quad(2,2).Centroid() - _tree.MeshRef().Quad(1,1).Centroid();
+		_grid_bottom_left = _tree.MeshRef().Quad(0,0).Centroid() - (_grid_extent * 0.5);
+	}
 }
 
 void TransitionMatrixGenerator::ApplyTranslation(vector<Point>* pvec, const Point& p)

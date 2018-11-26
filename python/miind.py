@@ -21,66 +21,6 @@ def parse_rate_functors(algorithms):
              s += '}\n\n'
      return s
 
-def generate_fill_in_rate_function(cuda):
-     '''Create the C++ function to read the firing rates, both external and from the MeshAlgorithmGroup into the input firing rate array.'''
-
-     if cuda == True:
-          group_argument = '\tconst CudaTwoDLib::CudaOde2DSystemAdapter& group,\n'
-          template_argument = 'fptype'
-
-     else:
-          group_argument = '\tconst TwoDLib::Ode2DSystemGroup& group,\n'
-          template_argument = 'MPILib::Rate'
-
-
-     s = ''
-     s += 'typedef MPILib::Rate (*function_pointer)(MPILib::Time);\n'
-     s += 'typedef std::pair<MPILib::Index, function_pointer> function_association;\n'
-     s += 'typedef std::vector<function_association> function_list;\n\n' \
-     + 'void FillInRates\n' \
-     + '(\n' \
-     + group_argument \
-     + '\tconst function_list& functor_list,\n' \
-     + '\tconst std::vector<MPILib::Index>& mag_id_to_node_id,\n' \
-     + '\tstd::vector<' + template_argument +'>& vec_activity_rates,\n' \
-     + '\tMPILib::Time t\n' \
-     + ')\n' \
-     + '{\n'\
-     + '\tfor(auto& rate: vec_activity_rates)\n\t\trate=0.0;\n' \
-     + '\tfor( const auto& element: functor_list)\n' \
-     + '\t\tvec_activity_rates[element.first] = element.second(t);\n' \
-     + '\tconst std::vector<' + template_argument + '>& magrates = group.F();\n' \
-     + '\tMPILib::Index i_counter = 0;\n' \
-     + '\tfor (auto& rate: magrates)\n' \
-     + '\t\tvec_activity_rates[mag_id_to_node_id[i_counter++]] += rate;\n' \
-     + '}\n\n'
-
-     return s;
-
-def generate_apply_network_function(nodes,algorithms,connections,cuda):
-     '''Generate the connectivity application function in the C++'''
-     map = construct_CSR_map(nodes,algorithms,connections)
-     magmap=node_name_to_mag_id(nodes,algorithms)
-     nodemap=node_name_to_node_id(nodes)
-
-     if cuda == True:
-          template_argument = 'fptype'
-     else:
-          template_argument = 'MPILib::Rate'
-
-     s = ''
-     s += 'void ApplyNetwork\n'
-     s += '(\n'
-     s += '\tconst std::vector<' + template_argument + '>& vec_node_rates,\n'
-     s += '\tstd::vector<' + template_argument + '>& vec_mag_rates\n'
-     s += '){\n'
-
-     for i,el in enumerate(map):
-          items=connections[i].text.split()
-          s += '\tvec_mag_rates[' + str(i) + ']=' + items[0] + '*vec_node_rates[' + str(nodemap[el[3]]) + '];\n'
-     s += '}\n\n'
-     return s
-
 
 def generate_variable_declarations(variables):
      s = ''
@@ -89,89 +29,6 @@ def generate_variable_declarations(variables):
      s += '\n'
      return s
 
-def generate_functor_table(nodes, algorithms):
-     '''Generate a table linking the nodes corresponding to external inputs'''
-     s = ''
-
-     pairlist = []
-     for i, node in enumerate(nodes):
-          namealg = node.attrib['algorithm']
-          for alg in algorithms:
-               if alg.attrib['name'] == namealg and alg.attrib['type'] == 'RateFunctor':
-                    pairlist.append((i, re.sub(r'\s+', '_', alg.attrib['name'])))
-
-     s += '\tfunction_list functor_list;\n'
-     for el in pairlist:
-          s += '\tfunctor_list.push_back(function_association(' + str(el[0]) + ',' + el[1] + '));\n'
-
-     s += '\n'
-
-     return s
-
-def generate_log_function(cuda):
-     '''Generate the code for writing simulation data into the C++ file.'''
-
-     if cuda == True:
-          template_argument = 'fptype'
-     else:
-          template_argument = 'MPILib::Rate'
-
-     s = ''
-
-     s += 'void LogData(std::ostream& s, MPILib::Time t, const std::vector<'+template_argument+'>& vec_rates)\n'
-     s += '{\n'
-     s += '\tMPILib::Index i_pop = 0;\n'
-     s += '\tfor(auto rate: vec_rates)\n'
-     s += '\t\ts << i_pop++ << "\\t" << t << "\\t" << rate << \"\\n\";\n'
-     s += '}\n'
-     s += '\n'
-     return s
-
-def generate_rate_report_function(cuda):
-    '''Generate the code for reporting firing rates.'''
-
-    if cuda == True:
-         template_argument = 'fptype'
-    else:
-         template_argument = 'MPILib::Rate'
-
-    s='void reportNodeActivities(std::vector<MPILib::NodeId>& node_ids, long sim_time, const std::vector<'+template_argument+'>& vec_rates) {\n'
-    s+='\tfor (int i=0; i<node_ids.size(); i++){\n'
-    s+='\t\tstd::ostringstream ost2;\n'
-    s+='\t\tost2 << "rate_" << node_ids[i];\n'
-    s+='\t\tstd::ofstream ofst_rate(ost2.str(), std::ofstream::app);\n'
-    s+='\t\tofst_rate.precision(10);\n'
-    s+='\t\tofst_rate << sim_time << "\\t" << vec_rates[node_ids[i]] << std::endl;\n'
-    s+='\t\tofst_rate.close();\n'
-    s+='\t}\n'
-    s+='}\n'
-    s+='\n'
-    return s
-
-def generate_mag_table(nodes,algorithms):
-     '''Generates a mapping from MeshAlgorithmGroup order to NodeId ( a MagId table).'''
-     s = ''
-     magtab=[]
-     for i, node in enumerate(nodes):
-          algorithmname = node.attrib['algorithm']
-          for alg in algorithms:
-               if alg.attrib['name'] == algorithmname and alg.attrib['type'] in ["MeshAlgorithmGroup","GridAlgorithmGroup"]:
-                    magtab.append(i)
-
-     s += '\tstd::vector<MPILib::Index>  mag_id_to_node_id{\n'
-
-     for nodeid in magtab[:-1]:
-          s += '\t\t' + str(nodeid) + ',\\\n'
-
-     nodeid=magtab[-1]
-     s += '\t\t' + str(nodeid) + '\n'
-     s += '\t};\n'
-
-     s += '\n'
-
-     return s
-
-
 
 def generate_preamble(fn, variables, nodes, algorithms, connections, cuda):
     '''Generates the function declarations, required for RateFunctors etc in the C++ file. fn is the file name where the C++
@@ -179,15 +36,7 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, cuda):
 
     # the rate functor functions need to be declared before the main program
     function_declarations = parse_rate_functors(algorithms)
-    log_function = generate_log_function(cuda)
     variable_declarations = generate_variable_declarations(variables)
-    functor_table = generate_functor_table(nodes,algorithms)
-    mag_table  = generate_mag_table(nodes,algorithms)
-
-    fill_in_function = generate_fill_in_rate_function(cuda)
-    apply_network_function = generate_apply_network_function(nodes, algorithms, connections, cuda)
-
-    rate_report_function = generate_rate_report_function(cuda)
 
     if cuda == True:
          template_argument = 'fptype'
@@ -204,28 +53,21 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, cuda):
         f.write('#include <MPILib/include/SimulationRunParameter.hpp>\n')
         f.write('#include <MPILib/include/DelayAlgorithmCode.hpp>\n')
         f.write('#include <MPILib/include/RateFunctorCode.hpp>\n\n')
+        f.write('#include <MiindLib/VectorizedNetwork.hpp>\n\n')
         if cuda == True: f.write('typedef CudaTwoDLib::fptype fptype;\n')
-        f.write(fill_in_function)
-        f.write(apply_network_function)
         f.write(function_declarations)
-        f.write(log_function)
-        f.write(rate_report_function)
+        f.write('\n')
         f.write('\nint main(int argc, char *argv[]){\n')
         f.write(variable_declarations)
-        f.write('\tconst MPILib::Number n_populations = ' + str(len(nodes)) + ';\n\n')
-        f.write(functor_table)
-        f.write(mag_table)
-        f.write('\tstd::vector<' + template_argument + '> vec_activity_rates(n_populations,0.0);\n')
-
-
+        f.write('\n')
+        f.write('\tMiindLib::VectorizedNetwork network(0.001);\n')
+        f.write('\tpugi::xml_document doc;\n')
         f.write('\n')
 
 def generate_closing(fn):
     '''Generates the closing statements in the C++ file.'''
     with open(fn,'a') as f:
         f.write('\n')
-        f.write('\tstd::cout << \"Overall time spend\";\n')
-        f.write('\ttimer.report();\n')
         f.write('\treturn 0;\n')
         f.write('}\n')
 
@@ -300,10 +142,6 @@ def generate_mesh_algorithm_group(fn,nodes,algorithms,cuda):
          return
 
      with open(fn,'a') as f:
-          f.write('\tpugi::xml_document doc;\n')
-          f.write('\tstd::vector<TwoDLib::Mesh> vec_vec_mesh;\n')
-          f.write('\tstd::vector< std::vector<TwoDLib::Redistribution> > vec_vec_rev;\n')
-          f.write('\tstd::vector< std::vector<TwoDLib::Redistribution> > vec_vec_res;\n');
           for i,model in enumerate(modelfiles):
                # according to pugixml doc, load_file destroys the old tree, soo this should be save
                f.write('\tpugi::xml_parse_result result' + str(i) + ' = doc.load_file(\"' + model +'\");\n')
@@ -311,13 +149,8 @@ def generate_mesh_algorithm_group(fn,nodes,algorithms,cuda):
                f.write('\tTwoDLib::Mesh mesh' + str(i) +' = TwoDLib::RetrieveMeshFromXML(root' + str(i) + ');\n')
                f.write('\tstd::vector<TwoDLib::Redistribution> vec_rev' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(i) + ');\n')
                f.write('\tstd::vector<TwoDLib::Redistribution> vec_res' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reset",root' + str(i) + ');\n\n')
-               f.write('\tvec_vec_mesh.push_back(mesh'+str(i)+');\n')
-               f.write('\tvec_vec_rev.push_back(vec_rev'+str(i)+');\n')
-               f.write('\tvec_vec_res.push_back(vec_res'+str(i)+');\n')
+               f.write('\tnetwork.addMeshNode(mesh'+ str(i) +', vec_rev'+ str(i) +', vec_res'+ str(i) +');\n')
 
-
-          f.write('\tTwoDLib::MasterParameter par(' + 'static_cast<MPILib::Number>(ceil(mesh0.TimeStep()/' + str(timestep) + ')));\n\n')
-          f.write('\tconst MPILib::Time h = 1./par._N_steps*mesh0.TimeStep();\n')
 
 def generate_grid_model_files(nodes,algorithms):
      modelfiles=[]
@@ -346,11 +179,6 @@ def generate_grid_algorithm_group(fn,nodes,algorithms,cuda):
      modelfiles, transforms, startvs, startws, timestep = generate_grid_model_files(nodes,algorithms)
 
      with open(fn,'a') as f:
-          f.write('\tpugi::xml_document doc;\n')
-          f.write('\tstd::vector<TwoDLib::Mesh> vec_vec_mesh;\n')
-          f.write('\tstd::vector<TwoDLib::TransitionMatrix> vec_transforms;\n')
-          f.write('\tstd::vector< std::vector<TwoDLib::Redistribution> > vec_vec_rev;\n')
-          f.write('\tstd::vector< std::vector<TwoDLib::Redistribution> > vec_vec_res;\n');
           for i,model in enumerate(modelfiles):
                # according to pugixml doc, load_file destroys the old tree, soo this should be save
                f.write('\tpugi::xml_parse_result result' + str(i) + ' = doc.load_file(\"' + model +'\");\n')
@@ -359,14 +187,8 @@ def generate_grid_algorithm_group(fn,nodes,algorithms,cuda):
                f.write('\tstd::vector<TwoDLib::Redistribution> vec_rev' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(i) + ');\n')
                f.write('\tstd::vector<TwoDLib::Redistribution> vec_res' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reset",root' + str(i) + ');\n\n')
                f.write('\tTwoDLib::TransitionMatrix transform' + str(i) + '(\"' + transforms[i] + '\");\n')
-               f.write('\tvec_transforms.push_back(transform'+str(i)+');\n')
-               f.write('\tvec_vec_mesh.push_back(mesh'+str(i)+');\n')
-               f.write('\tvec_vec_rev.push_back(vec_rev'+str(i)+');\n')
-               f.write('\tvec_vec_res.push_back(vec_res'+str(i)+');\n')
-
-
-          f.write('\tTwoDLib::MasterParameter par(' + 'static_cast<MPILib::Number>(ceil(mesh0.TimeStep()/' + str(timestep) + ')));\n\n')
-          f.write('\tconst MPILib::Time h = 1./par._N_steps*mesh0.TimeStep();\n')
+               f.write('\tvec_transforms.push_back(transform'+str(i)+');\n\n')
+               f.write('\tnetwork.addGridNode(mesh'+ str(i) +', transform'+ str(i) +', ' + str(startvs[i]) + ', ' + str(startws[i]) +', vec_rev'+ str(i) +', vec_res'+ str(i) +');\n')
 
 def node_name_to_node_id(nodes):
      '''Create a map from name to NodeId from node elements. Return this map.'''
@@ -568,66 +390,6 @@ def generate_grid_csr(fn, nodes, algorithms, connections, cuda):
          else:
               f.write('\tTwoDLib::CSRAdapter csr_adapter(group,vecmat,h);\n\n')
 
-def generate_simulation_loop(fn,cuda):
-     '''Write the simulation loop into the C++ file.'''
-     with open(fn,'a') as f:
-          f.write('\tstd::vector<MPILib::NodeId> display_nodes;\n')
-          f.write('\tdisplay_nodes.push_back(0);\n')
-          f.write('\tTwoDLib::Display::getInstance()->animate(true, display_nodes, mesh0.TimeStep());\n')
-          f.write('\tstd::vector<MPILib::NodeId> rate_nodes;\n')
-          f.write('\trate_nodes.push_back(0);\n')
-          f.write('\trate_nodes.push_back(1);\n')
-          f.write('\tMPILib::Time time = 0;\n')
-          f.write('\tboost::timer::auto_cpu_timer timer;\n')
-          f.write('\tfor(MPILib::Index i_loop = 0; i_loop < n_iter; i_loop++){\n')
-          f.write('\t\ttime = t_step*i_loop;\n')
-          f.write('\t\tApplyNetwork(vec_activity_rates,vec_magin_rates);\n')
-          # f.write('\n\t\tgroup.Evolve();\n')
-          f.write('\n\t\tgroup.EvolveWithoutMeshUpdate();\n')
-          # f.write('\t\tgroup.RemapReversal();\n')
-          f.write('\t\tcsr_adapter.SingleTransformStep();\n')
-
-          f.write('\t\tfor (MPILib::Index i_part = 0; i_part < par._N_steps; i_part++ ){\n')
-          f.write('\t\t\tcsr_adapter.ClearDerivative();\n')
-          f.write('\t\t\tcsr_adapter.CalculateDerivative(vec_magin_rates);\n')
-          f.write('\t\t\tcsr_adapter.AddDerivative();\n')
-          f.write('\t\t}\n')
-          f.write('\t\tgroup.RedistributeProbability();\n')
-          if cuda:
-               f.write('\t\tgroup.MapFinish();\n')
-          f.write('\t\tFillInRates(group, functor_list, mag_id_to_node_id, vec_activity_rates, time);\n')
-          f.write('\t\tTwoDLib::Display::getInstance()->updateDisplay(i_loop);\n')
-          f.write('\t\treportNodeActivities(rate_nodes, time, vec_activity_rates);\n')
-          f.write('\t\tif (i_loop%n_report == 0) LogData(log,time,vec_activity_rates);\n')
-          f.write('\t}\n')
-
-def generate_simulation_io(fn,io):
-     '''Write I/O paremeters into C++ file.'''
-     logname=io[0].findall('SimulationName') # just one io parameter
-     with open(fn,'a') as f:
-          f.write('\tstd::ofstream log("' + logname[0].text + '");\n')
-
-def generate_initialization(fn,nodes,algorithms,cuda):
-     '''Create C++ obejcts to be used inside the loop and initialize the Ode2DSystemGroup.'''
-     with open(fn,'a') as f:
-
-          if (cuda):
-               group = 'group_ode'
-               # in cuda, the group actions are performed by an adapter. To maintain identical code, the adpater is called group
-          else:
-               group = 'group'
-
-
-          f.write('\tTwoDLib::Ode2DSystemGroup ' + group + '(vec_vec_mesh,vec_vec_rev, vec_vec_res);\n\n')
-          f.write('\tMPILib::Index i_mesh = 0;\n')
-          f.write('\tfor( auto id : mag_id_to_node_id)\n')
-          f.write('\t\t' + group + '.Initialize(i_mesh++,0,0);\n')
-          if cuda: f.write('\tCudaTwoDLib::CudaOde2DSystemAdapter group(group_ode);\n\n')
-          f.write('\tTwoDLib::Display::getInstance()->addOdeSystem(0, &group_ode);\n')
-          f.write('\n\n')
-
-
-
 
 def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
     '''Write the C++ file specified by xmlfile into dirpath as progname.'''
@@ -640,14 +402,10 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
          fn=os.path.join(dirpath, progname)+'.cpp'
 
     generate_preamble(fn, variables, nodes, algorithms,connections,cuda)
+
     generate_mesh_algorithm_group(fn,nodes,algorithms,cuda)
     generate_grid_algorithm_group(fn,nodes,algorithms,cuda)
-    generate_initialization(fn,nodes,algorithms,cuda)
-    generate_connectivity(fn,nodes,algorithms,connections,cuda)
-    generate_grid_csr(fn,nodes,algorithms,connections,cuda)
-    generate_simulation_parameter(fn,parameter)
-    generate_simulation_io(fn,io)
-    generate_simulation_loop(fn,cuda)
+
     generate_closing(fn)
 
 def sanity_check(algorithms):
@@ -682,8 +440,6 @@ def produce_mesh_algorithm_version(dirname, filename, modname, root, cuda):
         directories.insert_cmake_template(progname,dirpath,cuda)
         create_cpp_file(xmlfile, dirpath, progname, modname, cuda)
         directories.move_model_files(xmlfile,dirpath)
-
-
 
 
 if __name__ == "__main__":

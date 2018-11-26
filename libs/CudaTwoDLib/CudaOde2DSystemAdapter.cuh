@@ -53,6 +53,8 @@ namespace CudaTwoDLib {
 
                 void Evolve();
 
+								void Evolve(std::vector<inttype>& meshes);
+
 								void EvolveWithoutMeshUpdate();
 
                 void Dump(const std::vector<std::ostream*>&, int mode = 0);

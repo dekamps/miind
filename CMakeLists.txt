@@ -11,7 +11,7 @@ INCLUDE(require_out_of_src_build)
 MACRO_REQUIRE_OUT_OF_SRC_BUILD("Miind requires out-of-source builds.")
 
 # default install prefix. can be set with ccmake
-set( CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix." ) 
+set( CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix." )
 
 
 set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
@@ -20,7 +20,7 @@ set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 # compile flags
 ##############################################################################
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
-    
+
 #for cross compiling remove the -march=native flag!
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -fext-numeric-literals -fPIC")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
@@ -34,7 +34,7 @@ OPTION(ENABLE_OPENMP "Enable OpenMP" ON)
 OPTION(ENABLE_TESTING "Compile tests" OFF)
 OPTION(ENABLE_ROOT "Root Desired" OFF)
 OPTION(ENABLE_MEMORY_TEST "Generate memory test" OFF)
-OPTION(ENABLE_MPI "Enable mpi" FALSE)
+OPTION(ENABLE_MPI "Enable mpi" OFF)
 OPTION(ENABLE_COVERAGE "Enable GCov coverage analysis (defines a 'coverage' target and enforces static build of miind)" OFF)
 
 set(DEBUGLEVEL "logINFO" CACHE STRING "Define the Debug Level")
@@ -44,9 +44,9 @@ add_definitions( -DDEBUGLEVEL=${DEBUGLEVEL})
 # enable MPI dependent build
 ##############################################################################
 
-MESSAGE(STATUS "MPI enabled")
 # Require MPI for this project:
 IF(ENABLE_MPI)
+  MESSAGE(STATUS "MPI enabled")
 	find_package(MPI REQUIRED)
 	add_definitions( -DENABLE_MPI=1 )
 ENDIF(ENABLE_MPI)
@@ -130,7 +130,7 @@ ELSE()
    MESSAGE(STATUS "Coverage disabled")
 ENDIF()
 
-    
+
 #############################################################################
 # documentation
 #############################################################################
@@ -166,4 +166,3 @@ MESSAGE(STATUS "Compiler cxx debug flags:" ${CMAKE_CXX_FLAGS_DEBUG})
 MESSAGE(STATUS "Compiler cxx release flags:" ${CMAKE_CXX_FLAGS_RELEASE})
 MESSAGE(STATUS "Compiler cxx min size flags:" ${CMAKE_CXX_FLAGS_MINSIZEREL})
 MESSAGE(STATUS "Compiler cxx flags:" ${CMAKE_CXX_FLAGS})
-
