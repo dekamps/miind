@@ -127,6 +127,12 @@ void CudaOde2DSystemAdapter::Evolve()
     this->TransferMapData();
 }
 
+void CudaOde2DSystemAdapter::Evolve(std::vector<inttype>& meshes)
+{
+    _group.Evolve(meshes);
+    this->TransferMapData();
+}
+
 void CudaOde2DSystemAdapter::EvolveWithoutMeshUpdate()
 {
     _group.EvolveWithoutMeshUpdate();

@@ -28,9 +28,14 @@ ProgressBar::ProgressBar(unsigned long expectedCount,
 		const std::string & description, std::ostream& os) :
 		_description(description), _outputStream(os) {
 
+#ifdef ENABLE_MPI
+	std::cout << "uh oh.\n";
 	if (MPIProxy().getRank() == 0) {
 		restart(expectedCount);
 	}
+#else
+	restart(expectedCount);
+#endif
 }
 
 void ProgressBar::restart(unsigned long expected_count) {
@@ -44,11 +49,17 @@ void ProgressBar::restart(unsigned long expected_count) {
 }
 
 unsigned long ProgressBar::operator+=(unsigned long increment) {
+#ifdef ENABLE_MPI
 	if (MPIProxy().getRank() == 0) {
 		if ((_count += increment) >= _nextTicCount) {
 			display_tic();
 		}
 	}
+#else
+	if ((_count += increment) >= _nextTicCount) {
+		display_tic();
+	}
+#endif
 	return _count;
 }
 

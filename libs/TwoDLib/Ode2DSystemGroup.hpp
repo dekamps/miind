@@ -71,6 +71,7 @@ namespace TwoDLib {
 
 		//! Shift the density
 		void Evolve();
+		void Evolve(std::vector<MPILib::Index>& meshes);
 
 		void EvolveWithoutMeshUpdate();
 
@@ -195,6 +196,7 @@ namespace TwoDLib {
 
 		std::vector< std::vector< std::vector<MPILib::Index> > > InitializeMap() const;
 		std::vector< MPILib::Index> InitializeLinearMap();
+		void 									UpdateMap(std::vector<MPILib::Index>& meshes);
 		void                  UpdateMap();
 
 		const std::vector<Mesh>&    _mesh_list;
