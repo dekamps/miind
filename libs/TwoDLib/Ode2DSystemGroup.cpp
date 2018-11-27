@@ -70,6 +70,7 @@ _vec_length(InitializeLengths(mesh_list)),
 _vec_cumulative(InitializeCumulatives(mesh_list)),
 _vec_mass(InitializeMass()),
 _vec_area(InitializeArea(mesh_list)),
+_vec_working_index(InitializeWorkingIndex()),
 _t(0),
 _fs(std::vector<MPILib::Rate>(mesh_list.size(),0.0)),
 _avs(std::vector<MPILib::Potential>(mesh_list.size(),0.0)),
@@ -128,6 +129,18 @@ vector<MPILib::Potential> Ode2DSystemGroup::InitializeMass() const
 		n_cells += v.back();
 
 	return vector<MPILib::Potential>(n_cells,0.0);
+}
+
+std::vector<MPILib::Index> Ode2DSystemGroup::InitializeWorkingIndex()
+{
+	std::vector<MPILib::Index> vec_ret;
+	MPILib::Index counter = 0;
+	for( const Mesh& mesh: _mesh_list){
+		for (MPILib::Index i = 0; i < mesh.NrStrips(); i++)
+			for (MPILib::Index j = 0; j < mesh.NrCellsInStrip(i); j++)
+				vec_ret.push_back(counter++);
+	}
+	return vec_ret;
 }
 
 std::vector<MPILib::Index> Ode2DSystemGroup::InitializeLength(const Mesh& m) const

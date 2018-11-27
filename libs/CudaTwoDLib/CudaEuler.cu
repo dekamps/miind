@@ -22,16 +22,16 @@ __global__ void CudaCalculateDerivative(inttype N, fptype rate, fptype* derivati
     }
 }
 
-__global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* mass, fptype* val, inttype* ia, inttype* ja, inttype* map, inttype offset)
+__global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* mass, fptype* val, inttype* ia, inttype* ja, inttype* map, inttype offset, inttype workingN, inttype* workindex)
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
 
-    for (int i = index; i < N; i+= stride ){
-      int i_r = map[i+offset];
+    for (int i = index; i < workingN; i+= stride ){
+      int i_r = map[workindex[i+offset]];
       fptype dr = 0.;
-      for(unsigned int j = ia[i]; j < ia[i+1]; j++){
-          int j_m = map[ja[j]+offset];
+      for(unsigned int j = ia[workindex[i+offset]-offset]; j < ia[workindex[i+offset]-offset+1]; j++){
+          int j_m = map[ja[j]];
           dr += val[j]*mass[j_m];
       }
       dr -= mass[i_r];
@@ -39,17 +39,19 @@ __global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* m
     }
 }
 
-__global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays, fptype goes, inttype offset_1, inttype offset_2, fptype* derivative, fptype* mass, inttype offset)
+__global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays,
+  fptype goes, inttype offset_1, inttype offset_2,
+  fptype* derivative, fptype* mass, inttype offset, inttype workingN, inttype* working)
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
 
-    for (int i = index; i < N; i+= stride ){
+    for (int i = index; i < workingN; i+= stride ){
       fptype dr = 0.;
-      dr += stays*mass[((((i+offset_1)%N)+N) % N)+offset];
-  		dr += goes*mass[((((i+offset_2)%N)+N) % N)+offset];
+      dr += stays*mass[((((working[i+offset]+offset_1)%N)+N) % N)];
+  		dr += goes*mass[((((working[i+offset]+offset_2)%N)+N) % N)];
 
-      int io = i + offset;
+      int io = working[i+offset];
       dr -= mass[io];
       derivative[io] += rate*dr;
     }

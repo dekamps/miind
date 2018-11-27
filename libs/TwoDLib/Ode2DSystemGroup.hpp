@@ -104,6 +104,8 @@ namespace TwoDLib {
 		//! See what part of the mass array each Mesh is responsible for: the offsets are given as a function of mesh index
 		const std::vector<MPILib::Index>& Offsets() const {return _vec_mesh_offset; }
 
+		std::vector<MPILib::Index>& WorkingIndex() { return _vec_working_index; }
+
 		//! Provide access to the mass array
 	    vector<MPILib::Mass>& Mass() { return _vec_mass; }
 
@@ -196,6 +198,7 @@ namespace TwoDLib {
 
 		std::vector< std::vector< std::vector<MPILib::Index> > > InitializeMap() const;
 		std::vector< MPILib::Index> InitializeLinearMap();
+		std::vector< MPILib::Index> InitializeWorkingIndex();
 		void 									UpdateMap(std::vector<MPILib::Index>& meshes);
 		void                  UpdateMap();
 
@@ -207,6 +210,7 @@ namespace TwoDLib {
 
 		vector<MPILib::Mass>	     	_vec_mass;
 		vector<MPILib::Potential>		_vec_area;
+		std::vector<MPILib::Index>  _vec_working_index;
 
 		unsigned int					_t;
 		std::vector<MPILib::Mass>		_fs;

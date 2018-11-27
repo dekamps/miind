@@ -67,6 +67,8 @@ namespace CudaTwoDLib {
 
 								void updateGroupMass();
 
+								void updateGroupWorkingIndex();
+
                 friend class CSRAdapter;
 
                 const std::vector<fptype>& F() const;
@@ -86,6 +88,10 @@ namespace CudaTwoDLib {
         void FillMass();
         void FillMapData();
         void TransferMapData();
+				void FillWorkingIndexData();
+	public:
+				void TransferWorkingIndexData(const std::vector<inttype>&);
+	private:
 
         void FillReversalMap(const std::vector<TwoDLib::Mesh>&, const std::vector<std::vector<TwoDLib::Redistribution> >&);
         void FillResetMap(const std::vector<TwoDLib::Mesh>&, const std::vector<std::vector<TwoDLib::Redistribution> >&);
@@ -93,6 +99,7 @@ namespace CudaTwoDLib {
         void DeleteMass();
 	void DeleteMapData();
 	void DeleteReversalMap();
+	void DeleteWorkingIndex();
         void DeleteResetMap();
 
 
@@ -105,7 +112,10 @@ namespace CudaTwoDLib {
         std::vector<fptype> _hostmass;
         inttype* _map;
         std::vector<inttype> _hostmap;
-
+				inttype* _working_index;
+				std::vector<inttype> _hostindex;
+				inttype* _reset_index;
+				std::vector<inttype> _hostresetindex;
         std::vector<inttype> _offsets;
 
         // reversal mapping

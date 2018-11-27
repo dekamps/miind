@@ -55,11 +55,11 @@ namespace CudaTwoDLib {
 
               void CalculateDerivative(const std::vector<fptype>&);
 
-							void CalculateMeshGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<inttype>&, const std::vector<inttype>&);
+							void CalculateMeshGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<inttype>&, const std::vector<inttype>&, const std::vector<inttype>&);
 
 							void CalculateGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<inttype>&, const std::vector<inttype>&);
 
-							void SingleTransformStep();
+							void SingleTransformStep(const std::vector<inttype>&);
 
               void AddDerivative();
 
