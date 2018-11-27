@@ -64,11 +64,17 @@ public:
   void reportNodeActivities(long sim_time);
   void mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILib::Time t_report, bool write_displays);
 
+  void rectifyWorkingIndexes(std::vector<inttype>& off1s, std::vector<inttype>& off2s);
+
 protected:
 
   std::vector<TwoDLib::TransitionMatrix> _vec_transforms;
   std::vector<double> _start_vs;
   std::vector<double> _start_ws;
+  std::vector< std::set<unsigned int>> _grid_working_index;
+  std::vector< std::vector<unsigned int>> _grid_working_vectors;
+  std::vector<unsigned int> _grid_working_index_flattened;
+  std::vector<unsigned int> _grid_working_index_sizes;
   std::vector<TwoDLib::Mesh> _vec_mesh;
   std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_rev;
   std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_res;

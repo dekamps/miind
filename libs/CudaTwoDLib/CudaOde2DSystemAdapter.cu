@@ -49,6 +49,7 @@ _mesh_size(group.MeshObjects().size()),
 _n(group.Mass().size()),
 _hostmass(_n,0.),
 _hostmap(_n,0.),
+_hostindex(_n,0.),
 _offsets(group.Offsets()),
 _res_to(group.MeshObjects().size(),0),
 _res_from(group.MeshObjects().size(),0),
@@ -57,6 +58,7 @@ _host_fs(group.MeshObjects().size(),0)
 {
     this->FillMass();
     this->FillMapData();
+		this->FillWorkingIndexData();
     this->FillReversalMap(group.MeshObjects(),group.MapReversal());
     this->FillResetMap(group.MeshObjects(),group.MapReset());
 }
@@ -68,6 +70,20 @@ void CudaOde2DSystemAdapter::TransferMapData()
         _hostmap[i] = _group.Map(i);
 
     checkCudaErrors(cudaMemcpy(_map,&_hostmap[0],_n*sizeof(inttype),cudaMemcpyHostToDevice));
+}
+
+void CudaOde2DSystemAdapter::FillWorkingIndexData(){
+    checkCudaErrors(cudaMalloc((inttype**)&_working_index,_n*sizeof(inttype)));
+
+    this->TransferWorkingIndexData(std::vector<inttype>(_n,0));
+}
+
+void CudaOde2DSystemAdapter::TransferWorkingIndexData(const std::vector<inttype>& working_index)
+{
+    for( inttype i = 0; i < working_index.size(); i++)
+        _hostindex[i] = working_index[i];
+
+    checkCudaErrors(cudaMemcpy(_working_index,&_hostindex[0],working_index.size()*sizeof(inttype),cudaMemcpyHostToDevice));
 }
 
 void CudaOde2DSystemAdapter::FillMapData(){
@@ -86,10 +102,16 @@ void CudaOde2DSystemAdapter::DeleteMapData()
     cudaFree(_map);
 }
 
+void CudaOde2DSystemAdapter::DeleteWorkingIndex()
+{
+    cudaFree(_working_index);
+}
+
 CudaOde2DSystemAdapter::~CudaOde2DSystemAdapter()
 {
     this->DeleteMass();
     this->DeleteMapData();
+		this->DeleteWorkingIndex();
     this->DeleteReversalMap();
     this->DeleteResetMap();
 }
@@ -152,6 +174,13 @@ void CudaOde2DSystemAdapter::updateGroupMass()
      checkCudaErrors(cudaMemcpy(&_hostmass[0],_mass,_n*sizeof(fptype),cudaMemcpyDeviceToHost));
      for(inttype i = 0; i < _n; i++)
         _group.Mass()[i] = _hostmass[i];
+}
+
+void CudaOde2DSystemAdapter::updateGroupWorkingIndex()
+{
+     checkCudaErrors(cudaMemcpy(&_hostindex[0],_working_index,_n*sizeof(fptype),cudaMemcpyDeviceToHost));
+     for(inttype i = 0; i < _n; i++)
+        _group.WorkingIndex()[i] = _hostindex[i];
 }
 
 const std::vector<fptype>& CudaOde2DSystemAdapter::F() const

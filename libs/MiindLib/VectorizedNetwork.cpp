@@ -49,18 +49,100 @@ void VectorizedNetwork::initOde2DSystem(){
   _group = new TwoDLib::Ode2DSystemGroup(_vec_mesh,_vec_vec_rev,_vec_vec_res);
 
 	for( MPILib::Index i=0; i < _grid_meshes.size(); i++){
-    vector<TwoDLib::Coordinates> coords = _vec_mesh[_grid_meshes[i]].findPointInMeshSlow(TwoDLib::Point(_start_vs[i], _start_ws[i]));
-    _group->Initialize(_grid_meshes[i],coords[0][0],coords[0][1]);
-  }
+    vector<TwoDLib::Coordinates> coords = _vec_mesh[i].findPointInMeshSlow(TwoDLib::Point(_start_vs[i], _start_ws[i]));
+    _group->Initialize(i,coords[0][0],coords[0][1]);
 
-  for( MPILib::Index i=0; i < _grid_meshes.size(); i++)
-    _csrs.push_back(TwoDLib::CSRMatrix(_vec_transforms[i], *(_group), _grid_meshes[i]));
+    //setup initial working index space for each grid mesh
+    std::set<unsigned int> working_index;
+    working_index.insert(_group->Map(i, coords[0][0],coords[0][1]));
+    _grid_working_index.push_back(working_index);
+
+    //create CSR Matrix for each transforms
+    _csrs.push_back(TwoDLib::CSRMatrix(_vec_transforms[i], *(_group), i));
+  }
 
   // All grids/meshes must have the same timestep
   TwoDLib::MasterParameter par(static_cast<MPILib::Number>(ceil(_vec_mesh[0].TimeStep()/_network_time_step)));
   _n_steps = std::max((int)par._N_steps,10);
 
   _group_adapter = new CudaTwoDLib::CudaOde2DSystemAdapter(*(_group));
+}
+
+void VectorizedNetwork::rectifyWorkingIndexes(std::vector<inttype>& off1s, std::vector<inttype>& off2s){
+
+  // calculate the largest noise spread
+  inttype max_offset = 0;
+  // find all cells which will be impacted by the master equation solver
+  for(unsigned int o1=0; o1 < off1s.size(); o1++){
+    max_offset = std::max((int)max_offset, (int)std::ceil((std::abs(off1s[o1]))));
+  }
+  for(unsigned int o2=0; o2 < off2s.size(); o2++){
+    max_offset = std::max((int)max_offset, (int)std::ceil((std::abs(off2s[o2]))));
+  }
+
+  int noise_spread = max_offset*_n_steps;
+
+  for (unsigned int m=0; m<_grid_meshes.size(); m++){
+    unsigned int mesh_offset = _group->Offsets()[m];
+
+    std::set<unsigned int> new_working_index_dynamics;
+    std::set<unsigned int> new_working_index_dynamics_and_reset;
+
+    std::set<unsigned int>::iterator it;
+    for(it = _grid_working_index[m].begin(); it != _grid_working_index[m].end(); it++){
+      unsigned int idx = *it;
+
+      //eliminate all cells with mass less than epsilon
+      if(_group->Mass()[idx] > 0.000001){
+        new_working_index_dynamics.insert(idx);
+
+        // find all cells which will recieve mass due to dynamics
+        for(unsigned int t=0; t < _vec_transforms[m].Matrix()[idx-mesh_offset]._vec_to_line.size(); t++){
+          unsigned int index = _group->Map(m,
+            _vec_transforms[m].Matrix()[idx-mesh_offset]._vec_to_line[t]._to[0],
+            _vec_transforms[m].Matrix()[idx-mesh_offset]._vec_to_line[t]._to[1]);
+          new_working_index_dynamics.insert(index);
+        }
+      }
+    }
+
+    //add any possible reset cells
+    for(it = new_working_index_dynamics.begin(); it != new_working_index_dynamics.end(); it++){
+      unsigned int idx = *it;
+      new_working_index_dynamics_and_reset.insert(idx);
+      // ew - we have to go looking for the correct reset cells!
+      for(int r=0; r<_vec_vec_res[m].size(); r++){
+        if( _group->Map(m, _vec_vec_res[m][r]._from[0], _vec_vec_res[m][r]._from[1]) == idx){
+          new_working_index_dynamics_and_reset.insert(_group->Map(m, _vec_vec_res[m][r]._to[0], _vec_vec_res[m][r]._to[1]));
+        }
+      }
+    }
+
+    _grid_working_index[m].clear();
+    // expand the index to include all noise receiving cells
+    int mesh_size = _group->Mass().size();
+    for(it = new_working_index_dynamics_and_reset.begin(); it != new_working_index_dynamics_and_reset.end(); it++){
+      int idx = *it;
+      for(int n=-noise_spread; n<noise_spread; n++){
+        int new_ind = ((((int)idx + (int)n)%(int)mesh_size)+(int)mesh_size)%(int)mesh_size;
+        _grid_working_index[m].insert(new_ind);
+      }
+    }
+  }
+
+  // flatten the vector of sets into a single vector
+  _grid_working_index_flattened = std::vector<inttype>(_group->Mass().size(),0);
+  _grid_working_index_sizes.clear();
+  for (unsigned int m=0; m< _grid_meshes.size(); m++){
+    std::set<unsigned int>::iterator it;
+    int i=0;
+    for(it = _grid_working_index[m].begin(); it != _grid_working_index[m].end(); it++){
+      unsigned int idx = *it;
+      _grid_working_index_flattened[i+_group->Offsets()[m]] = idx;
+      i++;
+    }
+    _grid_working_index_sizes.push_back(_grid_working_index[m].size());
+  }
 }
 
 void VectorizedNetwork::reportNodeActivities(long sim_time){
@@ -93,7 +175,7 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
   const MPILib::Time h = 1./_n_steps*_vec_mesh[0].TimeStep();
 
   // Setup the OpenGL displays (if there are any required)
-	TwoDLib::Display::getInstance()->animate(write_displays, _display_nodes, _network_time_step);
+	// TwoDLib::Display::getInstance()->animate(write_displays, _display_nodes, _network_time_step);
 
   // Generate calculated transition vectors for grid derivative
   std::vector<inttype> node_to_group_meshes;
@@ -128,6 +210,9 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 	for(MPILib::Index i_loop = 0; i_loop < n_iter; i_loop++){
 		time = _network_time_step*i_loop;
 
+    // rectifyWorkingIndexes(off1s, off2s);
+    // _group_adapter->TransferWorkingIndexData(_grid_working_index_flattened);
+
     std::vector<fptype> rates;
     for (unsigned int i=0; i<_grid_connections.size(); i++){
       rates.push_back(_out_rates[_grid_connections[i]._in]*_grid_connections[i]._n_connections);
@@ -138,19 +223,19 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 
 		_group_adapter->Evolve(_mesh_meshes);
 
-    _csr_adapter.ClearDerivative();
-		_csr_adapter.SingleTransformStep();
-    _csr_adapter.AddDerivativeFull();
+    // _csr_adapter.ClearDerivative();
+		// _csr_adapter.SingleTransformStep(_grid_working_index_sizes);
+    // _csr_adapter.AddDerivativeFull();
 
     _group_adapter->RedistributeProbability();
-    _group_adapter->MapFinish();
+    // _group_adapter->MapFinish();
 
-    _group_adapter->updateGroupMass();
+    // _group_adapter->updateGroupMass();
 
 		for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++ ){
-			_csr_adapter.ClearDerivative();
-			_csr_adapter.CalculateMeshGridDerivative(node_to_group_meshes, rates, stays, goes, off1s, off2s);
-			_csr_adapter.AddDerivative();
+			// _csr_adapter.ClearDerivative();
+			// _csr_adapter.CalculateMeshGridDerivative(node_to_group_meshes, rates, stays, goes, off1s, off2s,_grid_working_index_sizes);
+			// _csr_adapter.AddDerivative();
 		}
 
     const std::vector<fptype>& group_rates = _group_adapter->F();
@@ -160,7 +245,8 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
     for( const auto& element: _rate_functions)
   		_out_rates[element.first] = element.second(time);
 
-		TwoDLib::Display::getInstance()->updateDisplay(i_loop);
+    // _group_adapter->updateGroupWorkingIndex();
+		// TwoDLib::Display::getInstance()->updateDisplay(i_loop);
 		reportNodeActivities(time);
 
     (*pb)++;
