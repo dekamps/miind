@@ -76,6 +76,9 @@ _i_offset(sys.Offsets()[mesh_index])
 }
 
 void CSRMatrix::Validate(const TransitionMatrix& mat){
+
+	if (mat.isGeneratedFroimResetValues())
+		return;
 	// At this stage, the _coordinates list, which has been constructed from the TransitionMatrix
 	// should match one one one the cells that are in the Ode2DSystem. A failure is likely to
 	// originate from not inserting stationary bins into the Mesh object after it has been read from

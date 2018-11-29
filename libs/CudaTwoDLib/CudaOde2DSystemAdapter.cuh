@@ -63,11 +63,17 @@ namespace CudaTwoDLib {
 
                 void RedistributeProbability();
 
+								void RedistributeProbabilityThreaded();
+
                 void MapFinish();
+
+								void MapFinishThreaded();
 
 								void updateGroupMass();
 
-								void updateGroupWorkingIndex();
+								void ClearDerivative();
+
+								void AddDerivativeFull();
 
                 friend class CSRAdapter;
 
@@ -88,19 +94,18 @@ namespace CudaTwoDLib {
         void FillMass();
         void FillMapData();
         void TransferMapData();
-				void FillWorkingIndexData();
-	public:
-				void TransferWorkingIndexData(const std::vector<inttype>&);
-	private:
+				void FillResetMatrixMaps(const std::vector<TwoDLib::CSRMatrix>& vecmat);
 
         void FillReversalMap(const std::vector<TwoDLib::Mesh>&, const std::vector<std::vector<TwoDLib::Redistribution> >&);
         void FillResetMap(const std::vector<TwoDLib::Mesh>&, const std::vector<std::vector<TwoDLib::Redistribution> >&);
 
         void DeleteMass();
-	void DeleteMapData();
-	void DeleteReversalMap();
-	void DeleteWorkingIndex();
+				void DeleteMapData();
+				void DeleteReversalMap();
         void DeleteResetMap();
+				void FillDerivative();
+				void DeleteDerivative();
+				void DeleteCSR();
 
 
 	TwoDLib::Ode2DSystemGroup& _group;
@@ -108,14 +113,11 @@ namespace CudaTwoDLib {
         inttype _mesh_size;
         fptype _time_step;
 
-	fptype*  _mass;
+				fptype*  _mass;
+				fptype*  _dydt;
         std::vector<fptype> _hostmass;
         inttype* _map;
         std::vector<inttype> _hostmap;
-				inttype* _working_index;
-				std::vector<inttype> _hostindex;
-				inttype* _reset_index;
-				std::vector<inttype> _hostresetindex;
         std::vector<inttype> _offsets;
 
         // reversal mapping
@@ -130,6 +132,21 @@ namespace CudaTwoDLib {
         std::vector<inttype*> _res_to;
         std::vector<inttype*> _res_from;
         std::vector<fptype*>  _res_alpha;
+
+
+				std::vector<inttype>	_nr_to_cells;
+				std::vector<fptype*>   _res_to_mass;
+				std::vector<fptype*>   _res_sum;
+
+				std::vector<inttype>   _reset_nval;
+				std::vector<fptype*>   _reset_val;
+				std::vector<inttype>   _reset_nia;
+				std::vector<inttype*>  _reset_ia;
+				std::vector<inttype>   _reset_nja;
+				std::vector<inttype*>  _reset_ja;
+
+				int _blockSize;
+				int _numBlocks;
 
         // firing rates
         fptype* _fs;

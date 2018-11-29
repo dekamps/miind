@@ -30,12 +30,15 @@ using namespace TwoDLib;
 TransitionMatrix::TransitionMatrix():
 _vec_line(0),
 _tr_v(0),
-_tr_w(0)
+_tr_w(0),
+_generated_from_reset(false)
 {
 }
 
 TransitionMatrix::TransitionMatrix(const std::string& fn)
 {
+	_generated_from_reset = false;
+
 	std::ifstream ifst(fn);
 	if (!ifst){
 		std::cerr << "Can't open matrix file" << std::endl;
@@ -80,6 +83,23 @@ TransitionMatrix::TransitionMatrix(const std::string& fn)
 	}
 }
 
+TransitionMatrix::TransitionMatrix(const std::vector<TwoDLib::Redistribution>& redist){
+	_generated_from_reset = true;
+	
+	for(TwoDLib::Redistribution red : redist){
+		TransferLine line;
+		line._from = red._from;
+
+		Redistribution r;
+		r._fraction = red._alpha;
+		r._to = red._to;
+
+		line._vec_to_line.push_back(r);
+
+		_vec_line.push_back(line);
+	}
+}
+
 bool TransitionMatrix::SelfTest(double precision) const
 {
 
@@ -94,4 +114,3 @@ bool TransitionMatrix::SelfTest(double precision) const
 
 	return true;
 }
-

@@ -70,7 +70,6 @@ _vec_length(InitializeLengths(mesh_list)),
 _vec_cumulative(InitializeCumulatives(mesh_list)),
 _vec_mass(InitializeMass()),
 _vec_area(InitializeArea(mesh_list)),
-_vec_working_index(InitializeWorkingIndex()),
 _t(0),
 _fs(std::vector<MPILib::Rate>(mesh_list.size(),0.0)),
 _avs(std::vector<MPILib::Potential>(mesh_list.size(),0.0)),
@@ -80,7 +79,8 @@ _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
 _reversal(InitializeReversal()),
 _reset(InitializeReset()),
-_clean(InitializeClean())
+_clean(InitializeClean()),
+_reset_csrs(InitializeResetCSRs())
 {
 	for(const auto& m: _mesh_list)
 		assert(m.TimeStep() != 0.0);
@@ -101,6 +101,14 @@ std::vector<MPILib::Number> Ode2DSystemGroup::MeshOffset(const std::vector<Mesh>
 	return vec_ret;
 }
 
+std::vector<CSRMatrix> Ode2DSystemGroup::InitializeResetCSRs(){
+
+	std::vector<CSRMatrix> vec_csrs;
+	for (MPILib::Index m = 0; m < _vec_reset.size(); m++){
+		vec_csrs.push_back(TwoDLib::CSRMatrix(TransitionMatrix(_vec_reset[m]), *this, m));
+	}
+	return vec_csrs;
+}
 
 std::vector<MPILib::Index> Ode2DSystemGroup::InitializeCumulative(const Mesh& m) const
 {

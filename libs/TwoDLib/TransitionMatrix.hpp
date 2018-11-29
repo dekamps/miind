@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "Coordinates.hpp"
+#include "Redistribution.hpp"
 namespace TwoDLib {
 
 	class TransitionMatrix {
@@ -42,6 +43,9 @@ namespace TwoDLib {
 		//! Requires a ".mat" file
 		TransitionMatrix(const std::string&);
 
+		TransitionMatrix(const std::vector<TwoDLib::Redistribution>&);
+
+		bool isGeneratedFroimResetValues() const { return _generated_from_reset; }
 
 		friend class Master;
 		friend class MasterOMP;
@@ -59,6 +63,8 @@ namespace TwoDLib {
 		std::vector<TransferLine>	_vec_line;
 		double						_tr_v;
 		double						_tr_w;
+
+		bool _generated_from_reset;
 
 	};
 
