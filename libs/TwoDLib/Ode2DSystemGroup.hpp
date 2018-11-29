@@ -28,10 +28,12 @@
 #include "Mesh.hpp"
 #include "modulo.hpp"
 #include "Redistribution.hpp"
+#include "CSRMatrix.hpp"
 
 namespace TwoDLib {
 
 	class TransitionMatrix;
+	class CSRMatrix;
 
 
 	  /**
@@ -78,13 +80,13 @@ namespace TwoDLib {
 		//! Dump the current density profile (0), or the mass profile (1) to an output stream
 		void Dump(const std::vector<std::ostream*>&, int mode = 0) const;
 
+		//! Remap probability that has run from the end of a strip. Run this after evolution
+		void RemapReversal();
+
 		//! Redistribute probability that has moved through threshold. Run this after the Master equation
 		void RedistributeProbability();
 
 		void RedistributeProbability(MPILib::Number);
-
-		//! Remap probability that has run from the end of a strip. Run this after evolution
-		void RemapReversal();
 
 		//! Return the instantaneous firing rate
 		const vector<MPILib::Rate>& F() const {return _fs;}
@@ -104,8 +106,6 @@ namespace TwoDLib {
 		//! See what part of the mass array each Mesh is responsible for: the offsets are given as a function of mesh index
 		const std::vector<MPILib::Index>& Offsets() const {return _vec_mesh_offset; }
 
-		std::vector<MPILib::Index>& WorkingIndex() { return _vec_working_index; }
-
 		//! Provide access to the mass array
 	    vector<MPILib::Mass>& Mass() { return _vec_mass; }
 
@@ -114,6 +114,8 @@ namespace TwoDLib {
 
 	    //! Provide read access to the Reversal map
 		const std::vector<std::vector<Redistribution> >& MapReset()    const { return  _vec_reset;}
+
+		const std::vector<CSRMatrix>& ResetCSR() const { return _reset_csrs; }
 
 		friend class Master;
 	    friend class MasterOMP;
@@ -192,6 +194,7 @@ namespace TwoDLib {
 		std::vector<Reset>    InitializeReset();
 		std::vector<Reversal> InitializeReversal();
 		std::vector<Clean>    InitializeClean();
+		std::vector<CSRMatrix> InitializeResetCSRs();
 
 		vector<MPILib::Potential>  	InitializeArea(const std::vector<Mesh>&) const;
 		vector<MPILib::Mass>        InitializeMass() const;
@@ -210,7 +213,6 @@ namespace TwoDLib {
 
 		vector<MPILib::Mass>	     	_vec_mass;
 		vector<MPILib::Potential>		_vec_area;
-		std::vector<MPILib::Index>  _vec_working_index;
 
 		unsigned int					_t;
 		std::vector<MPILib::Mass>		_fs;
@@ -221,6 +223,8 @@ namespace TwoDLib {
 
 		std::vector<std::vector<Redistribution> > _vec_reversal;
 		std::vector<std::vector<Redistribution> > _vec_reset;
+
+		std::vector<CSRMatrix> _reset_csrs;
 
 		std::vector<Reversal> _reversal;
 		std::vector<Reset>    _reset;

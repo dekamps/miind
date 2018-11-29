@@ -52,10 +52,11 @@ void VectorizedNetwork::initOde2DSystem(){
     vector<TwoDLib::Coordinates> coords = _vec_mesh[i].findPointInMeshSlow(TwoDLib::Point(_start_vs[i], _start_ws[i]));
     _group->Initialize(i,coords[0][0],coords[0][1]);
 
-    //setup initial working index space for each grid mesh
-    std::set<unsigned int> working_index;
-    working_index.insert(_group->Map(i, coords[0][0],coords[0][1]));
-    _grid_working_index.push_back(working_index);
+    // //setup initial working index space for each grid mesh
+    // std::set<unsigned int> working_index;
+    // working_index.insert(_group->Map(i, coords[0][0],coords[0][1]));
+    // _grid_working_index.push_back(working_index);
+    // _grid_previous_working_index.push_back(std::set<unsigned int>());
 
     //create CSR Matrix for each transforms
     _csrs.push_back(TwoDLib::CSRMatrix(_vec_transforms[i], *(_group), i));
@@ -70,82 +71,85 @@ void VectorizedNetwork::initOde2DSystem(){
 
 void VectorizedNetwork::rectifyWorkingIndexes(std::vector<inttype>& off1s, std::vector<inttype>& off2s){
 
-  // calculate the largest noise spread
-  inttype max_offset = 0;
-  // find all cells which will be impacted by the master equation solver
-  for(unsigned int o1=0; o1 < off1s.size(); o1++){
-    max_offset = std::max((int)max_offset, (int)std::ceil((std::abs(off1s[o1]))));
-  }
-  for(unsigned int o2=0; o2 < off2s.size(); o2++){
-    max_offset = std::max((int)max_offset, (int)std::ceil((std::abs(off2s[o2]))));
-  }
+  // // calculate the largest noise spread
+  // inttype max_offset = 0;
+  // // find all cells which will be impacted by the master equation solver
+  // for(unsigned int o1=0; o1 < off1s.size(); o1++){
+  //   max_offset = std::max((int)max_offset, (int)std::ceil((std::abs(off1s[o1]))));
+  // }
+  // for(unsigned int o2=0; o2 < off2s.size(); o2++){
+  //   max_offset = std::max((int)max_offset, (int)std::ceil((std::abs(off2s[o2]))));
+  // }
+  //
+  // int noise_spread = max_offset*_n_steps;
+  //
+  // for (unsigned int m=0; m<_grid_meshes.size(); m++){
+  //   int mesh_size = _group->Mass().size();
+  //   unsigned int mesh_offset = _group->Offsets()[m];
+  //
+  //   std::vector<unsigned int> new_working_index_dynamics;
+  //   std::set<unsigned int> added_cells;
+  //
+  //   std::set_difference(_grid_working_index[m].begin(), _grid_working_index[m].end(),
+  //                       _grid_previous_working_index[m].begin(), _grid_previous_working_index[m].end(),
+  //                       std::inserter(added_cells, added_cells.begin()));
+  //
+  //   std::set<unsigned int>::iterator it;
+  //   for(it = added_cells.begin(); it != added_cells.end(); it++){
+  //     unsigned int idx = *it;
+  //     // find all cells which will recieve mass due to dynamics
+  //     for(unsigned int t=0; t < _vec_transforms[m].Matrix()[idx-mesh_offset]._vec_to_line.size(); t++){
+  //       unsigned int index = _group->Map(m,
+  //         _vec_transforms[m].Matrix()[idx-mesh_offset]._vec_to_line[t]._to[0],
+  //         _vec_transforms[m].Matrix()[idx-mesh_offset]._vec_to_line[t]._to[1]);
+  //
+  //       new_working_index_dynamics.push_back(index);
+  //
+  //         // expand the index to include all noise receiving cells
+  //       for(int n=-noise_spread; n<noise_spread; n++){
+  //         int new_ind = ((((int)idx + (int)n)%(int)mesh_size)+(int)mesh_size)%(int)mesh_size;
+  //         new_working_index_dynamics.push_back(new_ind);
+  //       }
+  //     }
+  //   }
+  //
+  //   _grid_previous_working_index[m] = std::set<unsigned int>(new_working_index_dynamics.begin(), new_working_index_dynamics.end());
+  //
+  //   //eliminate all cells with mass less than epsilon
+  //   for(it = _grid_working_index[m].begin(); it != _grid_working_index[m].end(); it++){
+  //     unsigned int idx = *it;
+  //     if(_group->Mass()[idx] > 0.00000001)
+  //       new_working_index_dynamics.push_back(idx);
+  //   }
+  //
+  //   _grid_working_index[m] = std::set<unsigned int>(new_working_index_dynamics.begin(), new_working_index_dynamics.end());
+  // }
+  //
+  // // flatten the vector of sets into a single vector
+  // _grid_working_index_flattened = std::vector<inttype>(_group->Mass().size(),0);
+  // _grid_working_index_sizes.clear();
+  // _min_indexes.clear();
+  // _max_indexes.clear();
+  // for (unsigned int m=0; m< _grid_meshes.size(); m++){
+  //   std::set<unsigned int>::iterator it;
+  //   int i=0;
+  //   int min_index = _group->Mass().size();
+  //   int max_index = 0;
+  //   for(it = _grid_working_index[m].begin(); it != _grid_working_index[m].end(); it++){
+  //     unsigned int idx = *it;
+  //     _grid_working_index_flattened[i+_group->Offsets()[m]] = idx;
+  //     min_index = std::min(min_index, (int)idx);
+  //     max_index = std::max(max_index, (int)idx);
+  //     i++;
+  //   }
+  //   _min_indexes.push_back(min_index);
+  //   _max_indexes.push_back(max_index);
+  //   _grid_working_index_sizes.push_back(_grid_working_index[m].size());
+  // }
 
-  int noise_spread = max_offset*_n_steps;
-
-  for (unsigned int m=0; m<_grid_meshes.size(); m++){
-    unsigned int mesh_offset = _group->Offsets()[m];
-
-    std::set<unsigned int> new_working_index_dynamics;
-    std::set<unsigned int> new_working_index_dynamics_and_reset;
-
-    std::set<unsigned int>::iterator it;
-    for(it = _grid_working_index[m].begin(); it != _grid_working_index[m].end(); it++){
-      unsigned int idx = *it;
-
-      //eliminate all cells with mass less than epsilon
-      if(_group->Mass()[idx] > 0.000001){
-        new_working_index_dynamics.insert(idx);
-
-        // find all cells which will recieve mass due to dynamics
-        for(unsigned int t=0; t < _vec_transforms[m].Matrix()[idx-mesh_offset]._vec_to_line.size(); t++){
-          unsigned int index = _group->Map(m,
-            _vec_transforms[m].Matrix()[idx-mesh_offset]._vec_to_line[t]._to[0],
-            _vec_transforms[m].Matrix()[idx-mesh_offset]._vec_to_line[t]._to[1]);
-          new_working_index_dynamics.insert(index);
-        }
-      }
-    }
-
-    //add any possible reset cells
-    for(it = new_working_index_dynamics.begin(); it != new_working_index_dynamics.end(); it++){
-      unsigned int idx = *it;
-      new_working_index_dynamics_and_reset.insert(idx);
-      // ew - we have to go looking for the correct reset cells!
-      for(int r=0; r<_vec_vec_res[m].size(); r++){
-        if( _group->Map(m, _vec_vec_res[m][r]._from[0], _vec_vec_res[m][r]._from[1]) == idx){
-          new_working_index_dynamics_and_reset.insert(_group->Map(m, _vec_vec_res[m][r]._to[0], _vec_vec_res[m][r]._to[1]));
-        }
-      }
-    }
-
-    _grid_working_index[m].clear();
-    // expand the index to include all noise receiving cells
-    int mesh_size = _group->Mass().size();
-    for(it = new_working_index_dynamics_and_reset.begin(); it != new_working_index_dynamics_and_reset.end(); it++){
-      int idx = *it;
-      for(int n=-noise_spread; n<noise_spread; n++){
-        int new_ind = ((((int)idx + (int)n)%(int)mesh_size)+(int)mesh_size)%(int)mesh_size;
-        _grid_working_index[m].insert(new_ind);
-      }
-    }
-  }
-
-  // flatten the vector of sets into a single vector
-  _grid_working_index_flattened = std::vector<inttype>(_group->Mass().size(),0);
-  _grid_working_index_sizes.clear();
-  for (unsigned int m=0; m< _grid_meshes.size(); m++){
-    std::set<unsigned int>::iterator it;
-    int i=0;
-    for(it = _grid_working_index[m].begin(); it != _grid_working_index[m].end(); it++){
-      unsigned int idx = *it;
-      _grid_working_index_flattened[i+_group->Offsets()[m]] = idx;
-      i++;
-    }
-    _grid_working_index_sizes.push_back(_grid_working_index[m].size());
-  }
 }
 
-void VectorizedNetwork::reportNodeActivities(long sim_time){
+void VectorizedNetwork::reportNodeActivities(MPILib::Time sim_time){
   for (int i=0; i<_rate_nodes.size(); i++){
 		std::ostringstream ost2;
 		ost2 << "rate_" << i;
@@ -210,9 +214,6 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 	for(MPILib::Index i_loop = 0; i_loop < n_iter; i_loop++){
 		time = _network_time_step*i_loop;
 
-    // rectifyWorkingIndexes(off1s, off2s);
-    // _group_adapter->TransferWorkingIndexData(_grid_working_index_flattened);
-
     std::vector<fptype> rates;
     for (unsigned int i=0; i<_grid_connections.size(); i++){
       rates.push_back(_out_rates[_grid_connections[i]._in]*_grid_connections[i]._n_connections);
@@ -223,30 +224,35 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 
 		_group_adapter->Evolve(_mesh_meshes);
 
-    // _csr_adapter.ClearDerivative();
-		// _csr_adapter.SingleTransformStep(_grid_working_index_sizes);
-    // _csr_adapter.AddDerivativeFull();
+    _csr_adapter.ClearDerivative();
+    _csr_adapter.SingleTransformStep();
 
-    _group_adapter->RedistributeProbability();
-    // _group_adapter->MapFinish();
+    _csr_adapter.AddDerivativeFull();
 
-    // _group_adapter->updateGroupMass();
+
+    _group_adapter->ClearDerivative();
+    _group_adapter->RedistributeProbabilityThreaded();
+    _group_adapter->AddDerivativeFull();
+
+    _group_adapter->MapFinishThreaded();
 
 		for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++ ){
-			// _csr_adapter.ClearDerivative();
-			// _csr_adapter.CalculateMeshGridDerivative(node_to_group_meshes, rates, stays, goes, off1s, off2s,_grid_working_index_sizes);
-			// _csr_adapter.AddDerivative();
+			_csr_adapter.ClearDerivative();
+      _csr_adapter.CalculateGridDerivative(node_to_group_meshes, rates, stays, goes, off1s, off2s);
+			_csr_adapter.AddDerivative();
 		}
 
     const std::vector<fptype>& group_rates = _group_adapter->F();
-    for(unsigned int i=0; i<group_rates.size(); i++)
+    for(unsigned int i=0; i<group_rates.size(); i++){
       _out_rates[_group_mesh_to_node_id[i]] = group_rates[i];
+    }
 
-    for( const auto& element: _rate_functions)
+    for( const auto& element: _rate_functions){
   		_out_rates[element.first] = element.second(time);
+    }
 
-    // _group_adapter->updateGroupWorkingIndex();
-		// TwoDLib::Display::getInstance()->updateDisplay(i_loop);
+    // _group_adapter->updateGroupMass();
+    // TwoDLib::Display::getInstance()->updateDisplay(i_loop);
 		reportNodeActivities(time);
 
     (*pb)++;

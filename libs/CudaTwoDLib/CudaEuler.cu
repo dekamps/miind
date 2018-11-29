@@ -22,16 +22,16 @@ __global__ void CudaCalculateDerivative(inttype N, fptype rate, fptype* derivati
     }
 }
 
-__global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* mass, fptype* val, inttype* ia, inttype* ja, inttype* map, inttype offset, inttype workingN, inttype* workindex)
+__global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* mass, fptype* val, inttype* ia, inttype* ja, inttype* map, inttype offset)
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
 
-    for (int i = index; i < workingN; i+= stride ){
-      int i_r = map[workindex[i+offset]];
+    for (int i = index; i < N; i+= stride ){
+      int i_r = map[i+offset];
       fptype dr = 0.;
-      for(unsigned int j = ia[workindex[i+offset]-offset]; j < ia[workindex[i+offset]-offset+1]; j++){
-          int j_m = map[ja[j]];
+      for(unsigned int j = ia[i]; j < ia[i+1]; j++){
+          int j_m = map[ja[j]+offset];
           dr += val[j]*mass[j_m];
       }
       dr -= mass[i_r];
@@ -41,17 +41,16 @@ __global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* m
 
 __global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays,
   fptype goes, inttype offset_1, inttype offset_2,
-  fptype* derivative, fptype* mass, inttype offset, inttype workingN, inttype* working)
+  fptype* derivative, fptype* mass, inttype offset)
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
 
-    for (int i = index; i < workingN; i+= stride ){
+    for (int i = index; i < N; i+= stride ){
+      int io = i+offset;
       fptype dr = 0.;
-      dr += stays*mass[((((working[i+offset]+offset_1)%N)+N) % N)];
-  		dr += goes*mass[((((working[i+offset]+offset_2)%N)+N) % N)];
-
-      int io = working[i+offset];
+      dr += stays*mass[((((io+offset_1)%N)+N) % N)+offset];
+  		dr += goes*mass[((((io+offset_2)%N)+N) % N)+offset];
       dr -= mass[io];
       derivative[io] += rate*dr;
     }
@@ -90,9 +89,54 @@ __global__ void MapReset(inttype n_reset, inttype* res_from, inttype* res_to, fp
   *rate = sum;
  }
 
+ __global__ void MapResetThreaded(unsigned int N, fptype* sum, fptype* derivative, fptype* mass, fptype* val, inttype* ia, inttype* ja, unsigned int* map, inttype offset)
+ {
+   int index  = blockIdx.x * blockDim.x + threadIdx.x;
+   int stride = blockDim.x * gridDim.x;
+
+   for (int i = index; i < N; i+= stride ){
+     int i_r = map[i+offset];
+     fptype dr = 0.;
+     for(unsigned int j = ia[i]; j < ia[i+1]; j++){
+         int j_m = map[ja[j]+offset];
+         dr += val[j]*mass[j_m];
+     }
+     sum[i] += dr;
+     derivative[i_r] += dr;
+   }
+ }
+
+ __global__ void SumReset(unsigned int n_sum, fptype* sum, fptype* rate){
+   extern __shared__ fptype sdata[];
+  // each thread loads one element from global to shared mem
+  unsigned int tid = threadIdx.x;
+  unsigned int i = blockIdx.x*blockDim.x + threadIdx.x;
+  sdata[tid] = sum[i];
+  __syncthreads();
+  // do reduction in shared mem
+  for (unsigned int s=blockDim.x/2; s>0; s>>=1) {
+    if (tid < s) {
+      sdata[tid] += sdata[tid + s];
+    }
+    __syncthreads();
+  }
+  // write result for this block to global mem
+  if (tid == 0) {
+    rate[blockIdx.x] += sdata[0];
+  }
+ }
+
 __global__ void ResetFinish(inttype n_reset, inttype* res_from, fptype* mass,  inttype* map){
    for (int i = 0; i < n_reset; i++)
       mass[map[res_from[i]]] = 0.;
+}
+
+__global__ void ResetFinishThreaded(inttype n_reset, inttype* res_from, fptype* mass, inttype* map){
+  int index  = blockIdx.x * blockDim.x + threadIdx.x;
+  int stride = blockDim.x * gridDim.x;
+
+  for (int i = index; i < n_reset; i+= stride)
+     mass[map[res_from[i]]] = 0.;
 }
 
 __global__ void Remap(int N, unsigned int* i_1, unsigned int t, unsigned int *map, unsigned int* first, unsigned int* length)

@@ -157,28 +157,30 @@ void Display::display(void) {
 	double mesh_min_h = _dws[window_index].mesh_min_h;
 	double mesh_max_h = _dws[window_index].mesh_max_h;
 
-	unsigned int mesh_offset = _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index];
-	unsigned int next_mesh_offset = _dws[window_index]._system->Mass().size();
-	if (_dws[window_index]._mesh_index < _dws[window_index]._system->Offsets().size())
-		next_mesh_offset = _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index+1];
+	// unsigned int mesh_offset = _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index];
+	// unsigned int next_mesh_offset = _dws[window_index]._system->Mass().size();
+	// if (_dws[window_index]._mesh_index < _dws[window_index]._system->Offsets().size())
+	// 	next_mesh_offset = _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index+1];
+	//
+	// for(unsigned int x = mesh_offset; x < next_mesh_offset; x++){
+	// 	// if(_dws[window_index]._system->WorkingIndex()[x] > next_mesh_offset)
+	// 	// 	continue;
+	// 	if ( _dws[window_index]._system->WorkingIndex()[x] == 0)
+	// 		continue;
+	//
+	// 	unsigned int index = _dws[window_index]._system->WorkingIndex()[x] - mesh_offset;
+	//
+	// 	unsigned int i = 0;
+	// 	unsigned int row = 0;
+	// 	while(i + m.NrCellsInStrip(row) <= index){
+	// 		i += m.NrCellsInStrip(row);
+	// 		row++;
+	// 	}
+	// 	unsigned int j= index- i;
+	// 	i = row;
 
-	for(unsigned int x = mesh_offset; x < next_mesh_offset; x++){
-		// if(_dws[window_index]._system->WorkingIndex()[x] > next_mesh_offset)
-		// 	continue;
-		if ( _dws[window_index]._system->WorkingIndex()[x] == 0)
-			continue;
-
-		unsigned int index = _dws[window_index]._system->WorkingIndex()[x] - mesh_offset;
-
-		unsigned int i = 0;
-		unsigned int row = 0;
-		while(i + m.NrCellsInStrip(row) < index){
-			i += m.NrCellsInStrip(row);
-			row++;
-		}
-		unsigned int j= index- i;
-		i = row;
-		
+	for(unsigned int i = 0; i<m.NrStrips(); i++){
+		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
 			unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j);
 			Quadrilateral q = m.Quad(i,j);
 			double cell_area = std::abs(q.SignedArea());
@@ -192,7 +194,7 @@ void Display::display(void) {
 			glVertex2f(2*(ps[1][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[1][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
 			glVertex2f(2*(ps[2][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[2][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
 			glVertex2f(2*(ps[3][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[3][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-
+		}
 	}
 
 	glEnd();
