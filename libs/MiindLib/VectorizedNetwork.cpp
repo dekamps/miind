@@ -226,9 +226,7 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 
     _csr_adapter.ClearDerivative();
     _csr_adapter.SingleTransformStep();
-
     _csr_adapter.AddDerivativeFull();
-
 
     _group_adapter->ClearDerivative();
     _group_adapter->RedistributeProbabilityThreaded();
