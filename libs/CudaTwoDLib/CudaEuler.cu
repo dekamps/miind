@@ -163,6 +163,22 @@ __global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays
     }
 }
 
+__global__ void CudaCalculateGridDerivativeFull(inttype N, fptype rate, fptype stays,
+  fptype goes, inttype offset_1, inttype offset_2,
+  fptype* derivative, fptype* mass)
+{
+    int index  = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i+= stride ){
+      fptype dr = 0.;
+      dr += stays*mass[((((i+offset_1)%N)+N) % N)];
+  		dr += goes*mass[((((i+offset_2)%N)+N) % N)];
+      dr -= mass[i];
+      derivative[i] += rate*dr;
+    }
+}
+
 __global__ void EulerStep(inttype N, fptype* derivative, fptype* mass, fptype timestep)
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
