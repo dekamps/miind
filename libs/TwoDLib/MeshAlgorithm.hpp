@@ -172,18 +172,11 @@ namespace TwoDLib {
 		std::vector<std::vector<MPILib::Rate> > _vec_rates; // this is fed to the apply step of MasterOMP.
 
 		MPILib::Time 						_dt;     // mesh time step
-<<<<<<< HEAD
 		TwoDLib::Ode2DSystemGroup 			_sys;
 
 		std::unique_ptr<Solver>	_p_master;
 		MPILib::Number			_n_evolve;
 		MPILib::Number			_n_steps;
-=======
-		TwoDLib::Ode2DSystem 				_sys;
-		std::unique_ptr<Solver>         	_p_master;
-		MPILib::Number						_n_evolve;
-		MPILib::Number						_n_steps;
->>>>>>> 9a4bdc8d49ec272917a236fdfa6ae5c49574de84
 
 		const vector<double>& (TwoDLib::Ode2DSystemGroup::*_sysfunction) () const;
 	};
