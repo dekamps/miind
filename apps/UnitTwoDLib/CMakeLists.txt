@@ -82,6 +82,7 @@ configure_file( life21da341-bd4a-4077-93c2-4d11804d0882_0.03_0_0_0_.mat ${CMAKE_
 configure_file( simple.mesh ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 configure_file( test.stat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 configure_file( multiple.stat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file( timefactor.mesh ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 #############################################################################
 # executables
