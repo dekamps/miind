@@ -27,12 +27,12 @@
 
 using namespace std;
 using namespace TwoDLib;
-
+/*
 BOOST_AUTO_TEST_CASE(TransitionMatrixConstructionTest)
 {
 	TransitionMatrix mat("condee2a5ff4-0087-4d69-bae3-c0a223d03693.mat");
 }
-/*
+
 BOOST_AUTO_TEST_CASE(SimpleMeshTest){
 	try {
 		Mesh m("simple.mesh");
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(SimpleMeshTest){
 		std::cout << excep.what() << std::endl;
 	}
 }
-*/
+
 BOOST_AUTO_TEST_CASE(TransitionMatrixUblasTest)
 {
 	TransitionMatrix mat("condee2a5ff4-0087-4d69-bae3-c0a223d03693.mat");
@@ -87,4 +87,4 @@ BOOST_AUTO_TEST_CASE(TransitionMatrixUblasTest)
     }
 #endif
 }
-
+*/

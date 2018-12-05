@@ -47,7 +47,7 @@ namespace {
 
 namespace TwoDLib {
 
-	template <class WeightValue,class Solver>
+	template <class WeightValue, class Solver>
 	pugi::xml_node MeshAlgorithm<WeightValue,Solver>::CreateRootNode(const string& model_name){
 
 		// document

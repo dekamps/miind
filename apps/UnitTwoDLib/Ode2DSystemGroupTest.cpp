@@ -26,7 +26,6 @@
 using namespace std;
 using namespace TwoDLib;
 
-
 BOOST_FIXTURE_TEST_CASE(SystemGroupConstructionTest,FixtureOde2DSystemGroup){
 
 	std::vector<Redistribution> vec_dummy;

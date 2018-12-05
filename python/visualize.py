@@ -248,7 +248,7 @@ class Visualizer:
         self.c.Modified()
         self.c.Update()
         if pdfname != '':
-            self.c.SaveAs(pdfname +'.png')
+            self.c.SaveAs(pdfname +'.pdf')
 
     def show(self,xlabel='',ylabel='',pdfname='',points=[],pointcolor=3, runningtext='', colorlegend=DEFAULT_COLOR_LEGEND):
         dens=self.density()

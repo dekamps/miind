@@ -19,7 +19,7 @@
 #include <cmath>
 #include <limits>
 #include "MPILib/include/TypeDefinitions.hpp"
-#include "QuadGenerator.hpp"
+#include "PolyGenerator.hpp"
 #include "TransitionMatrixGenerator.hpp"
 #include "TwoDLibException.hpp"
 
@@ -125,12 +125,11 @@ void TransitionMatrixGenerator::ProcessTranslatedPoints(const vector<Point>& vec
 void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsigned int cell_no, double v, double w)
 {
 
-	const Quadrilateral& quad = _tree.MeshRef().Quad(strip_no,cell_no);
+	const Cell& quad = _tree.MeshRef().Quad(strip_no,cell_no);
 	Point p(v,w);
-	// scale_distance determines the maximum search radius
-	double dist = scale_distance*DetermineDistance(quad);
+
 	vector<Point> vec_point(_N);
-	QuadGenerator gen(quad, _uni);
+	PolyGenerator gen(quad, _uni);
 	gen.Generate(&vec_point);
 	ApplyTranslation(&vec_point,p);
 	ProcessTranslatedPoints(vec_point);
@@ -144,15 +143,15 @@ void TransitionMatrixGenerator::Reset(unsigned int n)
 	_hit_list.clear();
 }
 
-
-double TransitionMatrixGenerator::DetermineDistance(const Quadrilateral& quad)
+/*
+double TransitionMatrixGenerator::DetermineDistance(const Celll& quad)
 {
 	double d1 = sqrt(pow(quad.Points()[0][0] - quad.Points()[2][0],2) + pow(quad.Points()[0][1] - quad.Points()[2][1],2));
 	double d2 = sqrt(pow(quad.Points()[1][0] - quad.Points()[3][0],2) + pow(quad.Points()[1][1] - quad.Points()[3][1],2));
 
 	return std::max(d1,d2);
 }
-
+*/
 
 vector<FiducialElement> TransitionMatrixGenerator::InitializeFiducialVector
 (

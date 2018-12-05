@@ -24,7 +24,8 @@
 #include <functional>
 #include "Coordinates.hpp"
 #include "Uniform.hpp"
-#include "QuadGenerator.hpp"
+#include "PolyGenerator.hpp"
+#include "pugixml.hpp"
 
 using std::string;
 
@@ -72,14 +73,14 @@ namespace TwoDLib {
 		//!< number of cells in strip i
 		unsigned int NrCellsInStrip(unsigned int i) const { assert( i < _vec_vec_quad.size()); return _vec_vec_quad[i].size();}
 
-		const Quadrilateral& Quad(unsigned int i, unsigned int j) const { return _vec_vec_quad[i][j]; }
+		const Cell& Quad(unsigned int i, unsigned int j) const { return _vec_vec_quad[i][j]; }
 
 		//!< Provide a mesh point, the function returns a list of Coordinates that this point belongs to
 		//!< Caution! Stationary points will not show up in the returned list and must be tested separately
 		vector<Coordinates> PointBelongsTo(const Point&) const;
 
 		//!<  Provide a list of cells that fall partly within this Quadrilateral
-		vector <Coordinates> CellsBelongTo(const Quadrilateral&) const;
+		vector <Coordinates> CellsBelongTo(const Cell&) const;
 
 		//! Coordinates are in the 'Python' numbering scheme: strips are numbered from 1 upwards
 		void GeneratePoints(Coordinates,vector<Point>*);
@@ -94,7 +95,7 @@ namespace TwoDLib {
 		//! points fall inside them should be made directly; they can not be expected to show up in
 		//! the results of PointBelongsTo. TtranslationMatrixGenerators will handle them correctly,
 		//! as long as this method is called before the TranslationMatrixGenerator is associated with the Mesh.
-		void  InsertStationary(const Quadrilateral&);
+		void  InsertStationary(const Cell&);
 
 		//! Time step used in Mesh generation.
 		double TimeStep() const {return _t_step;}
@@ -106,13 +107,22 @@ namespace TwoDLib {
 	private:
 
 		void FromXML(std::istream&);
-		std::vector<Quadrilateral> FromVals(const std::vector<double>&) const;
+		std::vector<Cell> FromVals(const std::vector<double>&) const;
 
 		bool CheckAreas() const;
 
 		void ProcessFileIntoBlocks(std::ifstream&);
 		void CreateCells();
 		void CreateNeighbours();
+		void FillTimeFactor();
+
+		std::vector<TwoDLib::Cell> CellsFromXMLStrip(const pugi::xml_node&, unsigned int) const;
+		std::vector<double> StripValuesFromStream(std::istream&) const;
+		std::vector<TwoDLib::Cell> CellsFromValues(const std::vector<double>&, unsigned int) const;
+
+		unsigned int TimeFactorFromStrip(const pugi::xml_node&) const;
+
+		bool ProcessNonXML(std::ifstream&); // in non xml, all cells are guaranteed to be quadrilateral
 
 		struct Block {
 			//!< Each block has a list of v_lists and of w_list, both of equal length
@@ -127,12 +137,13 @@ namespace TwoDLib {
 			}
 		};
 
-		static const int							_dimension; // we work with two dimensional points
+		static const int					_dimension; // we work with two dimensional points
 
-		vector<Block>                    			_vec_block;
-		vector<vector<Quadrilateral> >   			_vec_vec_quad;
-		vector<vector<QuadGenerator> >	            _vec_vec_gen;
-		double										_t_step;
+		vector<Block>                    	_vec_block;
+		vector<vector<Cell> >   			_vec_vec_quad;
+		vector<vector<PolyGenerator> >	    _vec_vec_gen;
+		vector<unsigned int>              	_vec_timefactor;
+		double								_t_step;
 
 		// It is sometimes necessary to find out to which cells a given mesh point belongs.
 		// A mesh point will be mapped to an index position in a list of a list of coordinates.

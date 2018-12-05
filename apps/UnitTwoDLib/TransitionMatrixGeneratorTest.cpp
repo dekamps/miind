@@ -81,9 +81,8 @@ BOOST_AUTO_TEST_CASE(FiducialTest){
 		sum += it->_count;
 	}
 
-
 	BOOST_REQUIRE(sum == 1000);    // the total is correct
-	BOOST_REQUIRE(gen.AccountedPoints().size() == 118); // points fall into the cleft, but are accounted for
+	BOOST_REQUIRE(gen.AccountedPoints().size() == 98); // points fall into the cleft, but are accounted for
 	BOOST_REQUIRE(gen.LostPoints().size() == 0); // no points are lost, as all are either accounted for or found.
 }
 

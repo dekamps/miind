@@ -18,6 +18,7 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 #include <MPILib/include/ProbabilityQueue.hpp>
+#include <iostream>
 
 using namespace MPILib;
 using namespace MPILib::populist;
@@ -35,6 +36,16 @@ _total				(0)
 {
 }
 
+ProbabilityQueue::ProbabilityQueue(const ProbabilityQueue& rhs):
+_scale(rhs._scale),
+_t_batch_size(rhs._t_batch_size),
+_t_current(rhs._t_current),
+_t_current_batch(rhs._t_current_batch),
+_prob_current_batch(rhs._prob_current_batch),
+_total(rhs._total),
+_queue(rhs._queue)
+{
+}
 
 void ProbabilityQueue::push(const StampedProbability& prob)
 {

@@ -39,6 +39,10 @@ namespace TwoDLib {
   class Cell {
   public:
 
+	///  Default constructor, required for vector of cells, avoid.
+	Cell();
+
+	/// Construct a cell from a vector of points
 	Cell
 	(
 		const vector<Point>&  //! vector of points defining the cell
@@ -55,7 +59,7 @@ namespace TwoDLib {
     Cell(const Cell&);
 
     /// Virtual destructor
-    virtual ~Cell() = 0;
+    virtual ~Cell();
 
 
     /// true of the point is inside the cell, false otherwise

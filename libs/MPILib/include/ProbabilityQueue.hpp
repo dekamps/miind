@@ -34,8 +34,11 @@ namespace populist {
   //! ProbabilityQueue stores StampedProbability instances.
 	class ProbabilityQueue {
 	public:
-		//! Probability is grouped in batches
+		//! Probability mass is grouped in batches
 		ProbabilityQueue(Time time_step = TIME_REFRACT_MIN);
+
+		//! Probability copy construct
+		ProbabilityQueue(const ProbabilityQueue&);
 
 		//! destructor
 		~ProbabilityQueue(){}
@@ -46,7 +49,7 @@ namespace populist {
 		//! if there is time stamped probability that would be retrieved by CollectAndRemove before this will return true, false otherwise
 		bool HasProbability(Time) const;
 
-		//! add all probability that is batched below the current time and remove it from the queue
+		//! add all probability mass that is batched below the current time and remove it from the queue
 		Probability CollectAndRemove(Time);
 
 		//! Total probability in queue

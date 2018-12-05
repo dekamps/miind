@@ -35,10 +35,11 @@ namespace TwoDLib {
 std::pair< TwoDLib::Point, TwoDLib::Point> Analyse(const TwoDLib::Mesh& mesh){
   TwoDLib::Point ll( std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
   TwoDLib::Point ur(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
+ //establish bounding box
 
   for( unsigned int i = 0; i < mesh.NrStrips(); i++ )
     for (unsigned int j = 0; j < mesh.NrCellsInStrip(i); j++ ){
-      const TwoDLib::Quadrilateral& quad = mesh.Quad(i,j);
+      const TwoDLib::Cell& quad = mesh.Quad(i,j);
       for (const TwoDLib::Point& p: quad.Points()){
 	if (p[0] < ll[0] )
 	  ll[0] = p[0];
@@ -80,8 +81,8 @@ void CalculateProjections
   ofst << "<transitions>\n";
   for( unsigned int i = 0; i < mesh.NrStrips(); i++ )
     for (unsigned int j = 0; j < mesh.NrCellsInStrip(i); j++ ){
-      const TwoDLib::Quadrilateral& quad = mesh.Quad(i,j);
-      TwoDLib::QuadGenerator gen(quad,uni);
+      const TwoDLib::Cell& quad = mesh.Quad(i,j);
+      TwoDLib::PolyGenerator gen(quad,uni);
       vector<TwoDLib::Point> vec_points(N_POINTS);
       gen.Generate(&vec_points);
       vector<float> vec_v(nv,0.), vec_w(nw,0.);

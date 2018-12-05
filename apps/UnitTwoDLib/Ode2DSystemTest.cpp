@@ -163,6 +163,6 @@ BOOST_AUTO_TEST_CASE(ResetTest){
 	for (int i = 0; i < 37; i++)
 		sys.Evolve();
 	sys.Dump(ofstreset);
-
 }
+
 

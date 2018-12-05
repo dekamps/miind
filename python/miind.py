@@ -512,8 +512,6 @@ def produce_mesh_algorithm_version(dirname, filename, modname, root, cuda):
         directories.move_model_files(xmlfile,dirpath)
 
 
-
-
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Generate C++ from XML descriptions.')
@@ -527,7 +525,6 @@ if __name__ == "__main__":
     filename = vars(args)['xml file']
     dirname  = vars(args)['d']
     modname  = vars(args)['m']
-
     
     fn = filename[0]
     root=parse(fn)
@@ -537,8 +534,9 @@ if __name__ == "__main__":
     else:
         # Simply run the old script
         if dirname == None:
+            raise ValueError("This option is deprecated") 
             fn = filename[0]
             directories.add_executable(fn,modname)
         else:
-            directories.add_executable(dirname, filename, modname)
+            directories.add_executable(dirname, filename, modname,vars(args)['cuda'])
 

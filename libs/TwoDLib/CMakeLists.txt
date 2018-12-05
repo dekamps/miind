@@ -22,6 +22,7 @@ Cell.cpp
 MasterOMP.cpp		   
 MasterOdeint.cpp		   
 QuadGenerator.cpp  
+PolyGenerator.cpp
 TransitionMatrixGenerator.cpp 
 pugixml.cpp
 CheckSystem.cpp														   		      
@@ -71,6 +72,7 @@ TransitionMatrixGenerator.hpp
 pugiconfig.hpp
 Fid.hpp																		 				
 Mesh.hpp   
+PolyGenerator.hpp
 QuadGenerator.hpp  
 Triangle.hpp   
 pugixml.hpp

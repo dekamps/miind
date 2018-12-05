@@ -118,7 +118,7 @@ double Cell::CalculateSignedArea() const
 
 	return area/2.0;
 }
-
+/*
 bool Cell::IsInside(const Point& p) const{
 
   for (MPILib::Index i = 0; i < _n_points; i++){
@@ -133,4 +133,39 @@ bool Cell::IsInside(const Point& p) const{
 	}
 
 	return true;
+}*/
+
+bool Cell::IsInside(const Point& p) const
+{
+	// returns true if point p is inside this cell, false if outside. Uses ray tracing method,
+	// and no longer relies on the assumption that the cell is convex.
+	// Adapted from: http://www.eecs.umich.edu/courses/eecs380/HANDOUTS/PROJ2/InsidePoly.html
+
+	  int counter = 0;
+	  int N = _vec_points.size();
+	  int i;
+	  double xinters;
+	  Point p1,p2;
+
+	  p1 = _vec_points[0];
+	  for (i=1;i<=N;i++) {
+	    p2 = _vec_points[i % N];
+	    if (p[1] > std::min(p1[1],p2[1])) {
+	      if (p[1] <= std::max(p1[1],p2[1])) {
+	        if (p[0] <= std::max(p1[0],p2[0])) {
+	          if (p1[1] != p2[1]) {
+	            xinters = (p[1]-p1[1])*(p2[0]-p1[0])/(p2[1]-p1[1])+p1[0];
+	            if (p1[0] == p2[0] || p[0] <= xinters)
+	              counter++;
+	          }
+	        }
+	      }
+	    }
+	    p1 = p2;
+	  }
+
+	  if (counter % 2 == 0)
+	    return false;
+	  else
+	    return true;
 }
