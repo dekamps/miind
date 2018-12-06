@@ -18,6 +18,8 @@ ENABLE_MPI='OFF'
 ENABLE_OPENMP='OFF'
 # global variable to hold ENABLE_ROOT (ON/OFF)
 ENABLE_ROOT='ON'
+# global variable to hold ENABLE_ROOT (ON/OFF)
+ENABLE_CUDA='ON'
 # global variable to hold CPP source file (for use with building the shared library)
 SOURCE_FILE='MiindModel.cpp'
 
@@ -229,10 +231,11 @@ def add_shared_library(dirname, xmlfiles, modname, enable_mpi=False, enable_open
         create_cpp_lib_file(xmlfile, dirpath, progname, modname)
         move_model_files(xmlfile,dirpath)
 
-def add_executable(dirname, xmlfiles, modname, enable_mpi=False, enable_openmp=False, enable_root=True):
+def add_executable(dirname, xmlfiles, modname, enable_mpi=False, enable_openmp=False, enable_root=True, enable_cuda=False):
     global ENABLE_MPI
     global ENABLE_OPENMP
     global ENABLE_ROOT
+    global ENABLE_CUDA
     global SOURCE_FILE
 
     ''' Add a user defined executable to the current working directory.
@@ -243,15 +246,19 @@ def add_executable(dirname, xmlfiles, modname, enable_mpi=False, enable_openmp=F
 
     # ROOT enabled by default
     if not enable_root:
-	ENABLE_ROOT = 'OFF'
+        ENABLE_ROOT = 'OFF'
 
     # MPI disabled by default
     if enable_mpi:
-	ENABLE_MPI = 'ON'
+        ENABLE_MPI = 'ON'
 
     # OPENMP disabled by default
     if enable_openmp:
-	ENABLE_OPENMP = 'ON'
+        ENABLE_OPENMP = 'ON'
+
+    # CUDA disabled by default
+    if enable_cuda:
+        ENABLE_CUDA = 'ON'
 
     for xmlfile in xmlfiles:
         progname = check_and_strip_name(xmlfile)

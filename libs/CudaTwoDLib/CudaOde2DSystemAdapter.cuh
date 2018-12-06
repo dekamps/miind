@@ -89,6 +89,7 @@ namespace CudaTwoDLib {
 
         void FillReversalMap(const std::vector<TwoDLib::Mesh>&, const std::vector<std::vector<TwoDLib::Redistribution> >&);
         void FillResetMap(const std::vector<TwoDLib::Mesh>&, const std::vector<std::vector<TwoDLib::Redistribution> >&);
+				void FillRefractoryTimes(const std::vector<MPILib::Time>&);
 
         void DeleteMass();
 				void DeleteMapData();
@@ -102,7 +103,7 @@ namespace CudaTwoDLib {
         inttype _mesh_size;
         fptype _time_step;
 
-				unsigned int _nr_refractory_steps;
+				std::vector<unsigned int> _nr_refractory_steps;
 				std::vector<fptype*> _refractory_mass;
 
 				fptype*  _mass;

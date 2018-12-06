@@ -45,6 +45,14 @@ def parse_connection(connection, weighttype):
 
     return s
 
+def parse_network_connection(connection):
+    i = str(nodes.NODE_NAMES[connection.attrib['In']])
+    o = str(nodes.NODE_NAMES[connection.attrib['Out']])
+    num_cons = connection.text.split()[0]
+    eff = connection.text.split()[1]
+
+    return '\tnetwork.addGridConnection('+ i +','+ o +','+ eff +','+ num_cons +');\n'
+
 def parse_connections(connection_list,weighttype,outfile):
     for connection in connection_list:
         s = parse_connection(connection,weighttype)

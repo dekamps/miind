@@ -17,6 +17,7 @@ from Marginal import Marginal
 
 # From MIIND
 import directories
+import miind
 
 class MiindSimulation:
     def __init__(self, xml_path, submit_name=None, **kwargs):
@@ -260,12 +261,12 @@ class MiindSimulation:
             shutil.copyfile(self.xml_path, op.join(self.output_directory,
                                                         self.xml_fname))
 
-    def submit(self, overwrite=False, enable_mpi=False, enable_openmp=False, enable_root=True, *args):
+    def submit(self, overwrite=False, enable_mpi=False, enable_openmp=False, enable_root=True, enable_cuda=False, *args):
         if op.exists(self.output_directory) and overwrite:
             shutil.rmtree(self.output_directory)
         with cd(self.xml_location):
-            directories.add_executable(self.submit_name, [self.xml_path], '',
-            enable_mpi, enable_openmp, enable_root)
+            miind.generate_vectorized_network_executable(self.submit_name, [self.xml_path], '',
+            enable_mpi, enable_openmp, enable_root, enable_cuda)
         fnames = os.listdir(self.output_directory)
         if 'CMakeLists.txt' in fnames:
             subprocess.call(['cmake .'] +

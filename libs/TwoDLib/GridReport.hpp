@@ -12,7 +12,7 @@ class GridReport {
 public:
 
   GridReport():
-  _obs(vector<Algorithm*>()) {
+  _obs(map<MPILib::NodeId, Algorithm*>()) {
 
   }
 
@@ -24,18 +24,24 @@ public:
     return reg;
   }
 
-  void registerObject(Algorithm* obj) {
-    _obs.push_back(obj);
+  void registerObject(MPILib::NodeId id, Algorithm* obj) {
+    _obs.insert(std::pair<MPILib::NodeId, Algorithm*>(id,obj));
   }
 
-  void reportDensity() const {
-    for (int i=0; i<_obs.size(); i++)
-      _obs[i]->reportDensity();
+  void reportDensity(const vector<MPILib::NodeId>& node_ids, const vector<MPILib::Time>& start_times,
+    const vector<MPILib::Time>& end_times, const vector<MPILib::Time>& intervals,  MPILib::Time time ) const {
+    for (int i=0; i<node_ids.size(); i++){
+      if ( _obs.find(node_ids[i]) == _obs.end() )
+        continue;
+      if(time >= start_times[i] && time <= end_times[i] && (time % intervals[i]) == 0 ){
+        _obs[node_ids[i]]->reportDensity();
+      }
+    }
   }
 
 
 private:
-  vector<Algorithm*> _obs;
+  map<MPILib::NodeId, Algorithm*> _obs;
 
   static GridReport<Algorithm>* reg;
 
