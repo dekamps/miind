@@ -113,7 +113,6 @@ namespace TwoDLib {
 
 	  bool CheckHitList				(const Coordinates&);
 	  void ApplyTranslation			(vector<Point>*, const Point&);
-	  double DetermineDistance		(const Quadrilateral&);
 	  void ProcessTranslatedPoints	(const vector<Point>& vec);
 	  bool IsInAssociated			(const FiducialElement&, const Point&, Coordinates*);
 	  SearchResult LocatePoint		(const Point&, Coordinates*);

@@ -38,7 +38,8 @@ const int Mesh::_dimension = 2;
 Mesh::Mesh(istream& s):
 _vec_block(0),
 _vec_vec_quad(0),
-_vec_vec_gen(0){
+_vec_vec_gen(0),
+_vec_timefactor(0){
 	this->FromXML(s);
 
 	// If this mesh is a grid, calculate the cell width.
@@ -59,6 +60,7 @@ Mesh::Mesh(const Mesh& m):
 _vec_block(m._vec_block),
 _vec_vec_quad(m._vec_vec_quad),
 _vec_vec_gen(m._vec_vec_gen),
+_vec_timefactor(m._vec_timefactor),
 _t_step(m._t_step),
 _map(m._map),
 _vec_vec_cell(m._vec_vec_cell),
@@ -82,6 +84,8 @@ Mesh::GridCellTransition Mesh::calculateCellTransition(double efficacy) const{
 }
 
 void Mesh::CreateCells(){
+	// This function is called in the streamline (Python) version of a mesh file.
+	// All Cells are in fact quadrilaterals here
 	vector<double> v_points(Quadrilateral::_nr_points);
 	vector<double> w_points(Quadrilateral::_nr_points);
 
@@ -89,7 +93,7 @@ void Mesh::CreateCells(){
 
 	// Create a strip zero without Quadrilaterals to maintain correspondence to the Python numbering
 	// scheme which starts with strip one.
-	vector<Quadrilateral> vec_quad;
+	vector<Cell> vec_quad;
 	_vec_vec_quad.push_back(vec_quad);
 
 	for( auto it = _vec_block.begin(); it != _vec_block.end(); it++, i++){
@@ -102,7 +106,7 @@ void Mesh::CreateCells(){
 		int strip = 0;
 		for(auto strit = vec_v.begin(); strit != --vec_v.end(); strit++, strip++){
 			unsigned int m = std::min(strit->size(),(strit+1)->size());
-			vector<Quadrilateral> vec_quad;
+			vector<Cell> vec_quad;
 			for (unsigned cell = 0; cell < m-1; cell++){
 				v_points[0] = vec_v[strip][cell];
 				v_points[1] = vec_v[strip][cell+1];
@@ -113,7 +117,7 @@ void Mesh::CreateCells(){
 				w_points[1] = vec_w[strip][cell+1];
 				w_points[2] = vec_w[strip+1][cell+1];
 				w_points[3] = vec_w[strip+1][cell];
-				Quadrilateral quad(v_points, w_points);
+				Cell quad(v_points, w_points);
 				vec_quad.push_back(quad);
 			}
 			_vec_vec_quad.push_back(vec_quad);
@@ -143,7 +147,7 @@ void Mesh::CreateNeighbours(){
 	}
 }
 
-void Mesh::InsertStationary(const Quadrilateral& quad){
+void Mesh::InsertStationary(const Cell& quad){
 	_vec_vec_quad[0].push_back(quad);
 }
 
@@ -246,7 +250,7 @@ void Mesh::GeneratePoints(Coordinates c, vector<Point>* pvec)
 	_vec_vec_gen[c[0]][c[1]].Generate(pvec);
 }
 
-std::vector<Coordinates> Mesh::CellsBelongTo(const Quadrilateral& quad) const
+std::vector<Coordinates> Mesh::CellsBelongTo(const Cell& quad) const
 {
 	std::vector<Coordinates> vec_ret;
 	for (unsigned int i = 0; i < _vec_vec_quad.size(); i++)
@@ -256,6 +260,22 @@ std::vector<Coordinates> Mesh::CellsBelongTo(const Quadrilateral& quad) const
 					vec_ret.push_back(TwoDLib::Coordinates(i,j));
 		}
 	return vec_ret;
+}
+
+void Mesh::FillTimeFactor()
+{
+	this->_vec_timefactor = std::vector<unsigned int>(_vec_vec_quad.size(),1);
+}
+
+bool Mesh::ProcessNonXML(std::ifstream& ifst)
+{
+	// not XML
+	this->ProcessFileIntoBlocks(ifst);
+	this->CreateCells();
+	this->CreateNeighbours();
+	this->FillTimeFactor();
+
+	return true;
 }
 
 Mesh::Mesh
@@ -288,10 +308,7 @@ _vec_vec_gen(0)
 			this->FromXML(newifst);
 		}
 		else {
-			// not XML
-			this->ProcessFileIntoBlocks(ifst);
-			this->CreateCells();
-			this->CreateNeighbours();
+			this->ProcessNonXML(ifst);
 		}
 	}
 	// if (! this->CheckAreas() )
@@ -321,10 +338,12 @@ bool Mesh::CheckAreas() const {
 	return true;
 }
 
-std::vector<Quadrilateral> Mesh::FromVals(const std::vector<double>& vals) const
+std::vector<Cell> Mesh::FromVals(const std::vector<double>& vals) const
 {
+	// this function should only be called on python meshes as it makes
+	// assumptions that cells are Quadrilaterals
 	assert(vals.size()%8 == 0);
-	vector<Quadrilateral> vec_ret;
+	vector<Cell> vec_ret;
 
 	unsigned int  nr_chuncks = vals.size()/8;
 
@@ -340,12 +359,79 @@ std::vector<Quadrilateral> Mesh::FromVals(const std::vector<double>& vals) const
 		ws[2] = vals[i*8 + 5];
 		ws[3] = vals[i*8 + 7];
 
-		Quadrilateral quad(vs, ws);
+		Cell quad(vs, ws);
 		vec_ret.push_back(quad);
 	}
 
 	return vec_ret;
 }
+
+unsigned int Mesh::TimeFactorFromStrip(const pugi::xml_node& node) const
+{
+	// find whether the timefactor attribute is there. if not time factor is 1.
+	// if it is, it is whatever the attribute values says it is
+
+	int tf = node.attribute("timefactor").as_int();
+	if (tf == 0) tf = 1;
+
+	return tf;
+}
+
+std::vector<double> Mesh::StripValuesFromStream(std::istream& s) const
+{
+	vector<double> cs;
+
+	std::string token;
+	while (getline(s, token,' ')){
+		if (!token.empty())
+			cs.push_back(std::stod(token));
+    }
+	return cs;
+}
+
+std::vector<TwoDLib::Cell> Mesh::CellsFromXMLStrip(const pugi::xml_node& strip, unsigned int time_factor) const
+{
+
+	std::istringstream ivals(strip.first_child().value());
+    vector<double> cs = this->StripValuesFromStream(ivals);
+    // Empty strips are legal
+    if (cs.size() == 0)
+    	return std::vector<TwoDLib::Cell>(0);
+
+    int n_coords = 4*(time_factor + 1);
+	if (cs.size()%n_coords != 0 )
+		throw TwoDLibException("Unexpected number of points in strip during XML read");
+
+	std::vector<TwoDLib::Cell> vec_ret = this->CellsFromValues(cs,n_coords);
+
+	return vec_ret;
+
+}
+
+std::vector<TwoDLib::Cell> Mesh::CellsFromValues(const std::vector<double>& vec_vals, unsigned int n_coords) const
+{
+	// n_coords is the number of coordinate values, so double the number of points.
+	// the number of cells is then vec_vals.size()/n_coords
+
+	std::vector<TwoDLib::Cell> vec_cells;
+	unsigned int n_cells = vec_vals.size()/n_coords;
+
+	for (unsigned int icell = 0; icell < n_cells; icell++)
+	{
+		std::vector<double> vs;
+		std::vector<double> ws;
+		unsigned int n_points = n_coords/2;
+		for(int ipoint = 0; ipoint < n_points; ipoint++)
+		{
+			vs.push_back(vec_vals[icell*n_coords + 2*ipoint]);
+			ws.push_back(vec_vals[icell*n_coords + 2*ipoint + 1]);
+		}
+		Cell cell(vs,ws);
+		vec_cells.push_back(cell);
+	}
+	return vec_cells;
+}
+
 
 void Mesh::FromXML(istream& s)
 {
@@ -371,18 +457,9 @@ void Mesh::FromXML(istream& s)
 
     for (pugi::xml_node strip = node_mesh.child("Strip"); strip; strip = strip.next_sibling("Strip")){
 
-		vector<double> cs;
-		std::istringstream ivals(strip.first_child().value());
-		while (ivals){
-			double d;
-			ivals >> d;
-			if (ivals.good())
-				cs.push_back(d);
-		}
-		if (cs.size()%8 != 0 )
-			throw TwoDLibException("Unexpected number of points in strip during XML read");
-
-        vector<Quadrilateral> vec_quad = FromVals(cs);
+    	unsigned int time_factor = this->TimeFactorFromStrip(strip);
+    	_vec_timefactor.push_back(time_factor);
+        vector<Cell> vec_quad = this->CellsFromXMLStrip(strip,time_factor);
 		_vec_vec_quad.push_back(vec_quad);
     }
 

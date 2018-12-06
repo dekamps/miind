@@ -22,6 +22,7 @@
 #include "FiducialElement.hpp"
 #include "pugixml.hpp"
 #include "TwoDLibException.hpp"
+#include "Quadrilateral.hpp"
 
 using namespace TwoDLib;
 
@@ -71,7 +72,7 @@ Fid::Fid(const std::string& fn){
 		}
 		else
 			throw TwoDLibException("Can't read .stat file");
-		Quadrilateral kwad(v,w);
+		Cell kwad(v,w);
 
 		ProtoFiducial prot(kwad,over);
 		_vec_prot.push_back(prot);

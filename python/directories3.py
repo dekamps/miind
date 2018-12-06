@@ -141,7 +141,7 @@ def move_model_files(xmlfile,dirpath):
     for fi in fls:
         sp.call(['cp',fi,dirpath])
 
-def add_executable(dirname, xmlfiles, modname):
+def add_executable(dirname, xmlfiles, modname,cuda):
 
     ''' Add a user defined executable to the current working directory.
      '''
@@ -152,7 +152,7 @@ def add_executable(dirname, xmlfiles, modname):
     for xmlfile in xmlfiles:
         progname = check_and_strip_name(xmlfile)
         dirpath = create_dir(os.path.join(dirname, progname))
-        insert_cmake_template(progname,dirpath)
+        insert_cmake_template(progname,dirpath,cuda)
         create_cpp_file(xmlfile, dirpath, progname, modname)
         move_model_files(xmlfile,dirpath)
 

@@ -73,6 +73,29 @@ BOOST_AUTO_TEST_CASE(QuadGeneratorTest)
 	for (auto it = vec.begin(); it != vec.end(); it++)
 		ofst2 << (*it)[0] << " " << (*it)[1] << '\n';
 	ofst2.close();
+}
 
+BOOST_AUTO_TEST_CASE(PolyGeneratorTest)
+{
+	Point p1(-1.,-1.);
+	Point p2( 1.,-1.);
+	Point p3( 0.,0.);
+	Point p4(-1.,1.);
+	Point p5( 0.,1.5);
+	Point p6( 1.,1.);
+
+
+	vector<Point> vec_point { p1, p2, p3, p4, p5, p6 };
+	Quadrilateral q(vec_point);
+
+	Uniform uni(0);
+	PolyGenerator gen(q,uni);
+	vector<Point> vec(1000);
+	gen.Generate(&vec);
+
+	ofstream ofst("complex.dat");
+	for (auto it = vec.begin(); it != vec.end(); it++)
+		ofst << (*it)[0] << " " << (*it)[1] << '\n';
+	ofst.close();
 }
 

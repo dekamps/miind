@@ -33,6 +33,7 @@
 #include "Ode2DSystem.hpp"
 #include "Ode2DSystemGroup.hpp"
 #include "pugixml.hpp"
+#include "PolyGenerator.hpp"
 #include "QuadGenerator.hpp"
 #include "Redistribution.hpp"
 #include "Stat.hpp"

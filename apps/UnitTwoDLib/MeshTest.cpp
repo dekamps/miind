@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(PoinTbelongsToTest){
 
 	Mesh mesh("aexpoverview.mesh");
 
-	Quadrilateral quad = mesh.Quad(10,10);
+	Cell quad = mesh.Quad(10,10);
 	vector<Point> vec = quad.Points();
 	Point p = vec[0];
  	vector<Coordinates> vecid = mesh.PointBelongsTo(p);
@@ -118,5 +118,9 @@ BOOST_AUTO_TEST_CASE(ModelFile){
 	// is structured correctly.
 
 	Mesh mesh("life21da341-bd4a-4077-93c2-4d11804d0882.model");
+}
+
+BOOST_AUTO_TEST_CASE(TimeFactorTest){
+	Mesh mesh("timefactor.mesh");
 }
 
