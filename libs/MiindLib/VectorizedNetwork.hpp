@@ -46,7 +46,8 @@ public:
   void setDisplayNodes(std::vector<MPILib::NodeId> ids){
     _display_nodes = ids;
   }
-  void setDensityNodes(std::vector<MPILib::NodeId> ids){
+  void setDensityNodes(std::vector<MPILib::NodeId> ids, std::vector<MPILib::Time> start_times,
+    std::vector<MPILib::Time> end_times, std::vector<MPILib::Time> intervals){
     _density_nodes = ids;
   }
 
@@ -90,6 +91,9 @@ protected:
   std::vector<MPILib::NodeId> _display_nodes;
   std::vector<MPILib::NodeId> _rate_nodes;
   std::vector<MPILib::NodeId> _density_nodes;
+  std::vector<MPILib::Time> _density_start_times;
+  std::vector<MPILib::Time> _density_end_times;
+  std::vector<MPILib::Time> _density_intervals;
 
   std::vector<NodeMeshConnection> _mesh_connections;
   std::vector<NodeGridConnection> _grid_connections;

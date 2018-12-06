@@ -94,7 +94,9 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
   const MPILib::Time h = 1./_n_steps*_vec_mesh[0].TimeStep();
 
   // Setup the OpenGL displays (if there are any required)
-	// TwoDLib::Display::getInstance()->animate(write_displays, _display_nodes, _network_time_step);
+  if(_display_nodes.size() > 0){
+	   TwoDLib::Display::getInstance()->animate(write_displays, _display_nodes, _network_time_step);
+   }
 
   // Generate calculated transition vectors for grid derivative
   std::vector<inttype> node_to_group_meshes;
@@ -161,8 +163,16 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
   		_out_rates[element.first] = element.second(time);
     }
 
-    // _group_adapter->updateGroupMass();
-    // TwoDLib::Display::getInstance()->updateDisplay(i_loop);
+    if(_display_nodes.size() > 0){
+      _group_adapter->updateGroupMass();
+      TwoDLib::Display::getInstance()->updateDisplay(i_loop);
+    }
+
+    TwoDLib::GridReport<TwoDLib::GridAlgorithm<DelayedConnection>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
+    TwoDLib::GridReport<TwoDLib::MeshAlgorithm<DelayedConnection>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
+    TwoDLib::GridReport<TwoDLib::MeshAlgorithm<DelayedConnection,TwoDLib::MasterOMP>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
+    TwoDLib::GridReport<TwoDLib::MeshAlgorithm<DelayedConnection,TwoDLib::MasterOdeint>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
+
 		reportNodeActivities(time);
 
     (*pb)++;

@@ -50,7 +50,7 @@ _n(group.Mass().size()),
 _hostmass(_n,0.),
 _hostmap(_n,0.),
 _offsets(group.Offsets()),
-_nr_refractory_steps(static_cast<unsigned int>(std::ceil(0.003 / _time_step))),
+_nr_refractory_steps(group.MeshObjects().size(),0),
 _refractory_mass(group.MeshObjects().size(),0),
 
 _nr_minimal_resets(_group.MeshObjects().size(),0),
@@ -69,7 +69,9 @@ _numBlocks( (_n + _blockSize - 1) / _blockSize)
     this->FillMass();
     this->FillMapData();
     this->FillReversalMap(group.MeshObjects(),group.MapReversal());
+		this->FillRefractoryTimes(group.Tau_ref());
     this->FillResetMap(group.MeshObjects(),group.MapReset());
+
 }
 
 void CudaOde2DSystemAdapter::TransferMapData()
@@ -79,6 +81,12 @@ void CudaOde2DSystemAdapter::TransferMapData()
         _hostmap[i] = _group.Map(i);
 
     checkCudaErrors(cudaMemcpy(_map,&_hostmap[0],_n*sizeof(inttype),cudaMemcpyHostToDevice));
+}
+
+void CudaOde2DSystemAdapter::FillRefractoryTimes(const std::vector<MPILib::Time>& times) {
+	for(inttype m = 0; m < _mesh_size; m++){
+		_nr_refractory_steps[m] = static_cast<unsigned int>(std::ceil(times[m] / _time_step));
+	}
 }
 
 void CudaOde2DSystemAdapter::FillMapData(){
@@ -204,7 +212,7 @@ void CudaOde2DSystemAdapter::FillResetMap
 
 			 _nr_minimal_resets[m] = reset_map.size();
 			 _nr_resets.push_back(vec_vec_reset[m].size());
-			 checkCudaErrors(cudaMalloc((fptype**)&_refractory_mass[m], _nr_refractory_steps*vec_vec_reset[m].size()*sizeof(fptype)));
+			 checkCudaErrors(cudaMalloc((fptype**)&_refractory_mass[m], _nr_refractory_steps[m]*vec_vec_reset[m].size()*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((inttype**)&_res_to_minimal[m], _nr_minimal_resets[m]*sizeof(inttype)));
        checkCudaErrors(cudaMalloc((inttype**)&_res_from_ordered[m], vec_vec_reset[m].size()*sizeof(inttype)));
        checkCudaErrors(cudaMalloc((fptype**)&_res_alpha_ordered[m], vec_vec_reset[m].size()*sizeof(fptype)));
@@ -252,10 +260,10 @@ void CudaOde2DSystemAdapter::RedistributeProbability()
 			CudaClearDerivative<<<numSumBlocks,_blockSize>>>(numBlocks,_res_sum[m],_mass);
 
 			MapResetThreaded<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m], _res_to_mass[m],_mass, _refractory_mass[m],
-				(_nr_refractory_steps-1)*_nr_resets[m],
+				(_nr_refractory_steps[m]-1)*_nr_resets[m],
 				_res_to_minimal[m],_res_alpha_ordered[m], _res_from_offsets[m], _res_from_counts[m], _map);
 
-			for(int t = _nr_refractory_steps-2; t >= 0; t--){
+			for(int t = _nr_refractory_steps[m]-2; t >= 0; t--){
 				MapResetShiftRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_refractory_mass[m], t*_nr_resets[m]);
 			}
 

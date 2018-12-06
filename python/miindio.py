@@ -158,20 +158,22 @@ def _settings(command):
             for k,v in settings.iteritems():
                 print k + ' = ' + str(v)
 
-        if len(command) > 1 and len(command) != 4:
-            print "settings command expects [ENABLE_MPI] [ENABLE_OPENMP] [ENABLE_ROOT]."
+        if len(command) > 1:
+            if len(command) != 5:
+                print "settings command expects [ENABLE_MPI] [ENABLE_OPENMP] [ENABLE_ROOT] [ENABLE_CUDA]."
+            else:
+                settings['mpi_enabled'] = (command[1] in ['True', 'true', 'TRUE'])
+                settings['openmp_enabled'] = (command[2] in ['True', 'true', 'TRUE'])
+                settings['root_enabled'] = (command[3] in ['True', 'true', 'TRUE'])
+                settings['cuda_enabled'] = (command[4] in ['True', 'true', 'TRUE'])
 
-            settings['mpi_enabled'] = (command[1] in ['True', 'true', 'TRUE'])
-            settings['openmp_enabled'] = (command[2] in ['True', 'true', 'TRUE'])
-            settings['root_enabled'] = (command[3] in ['True', 'true', 'TRUE'])
-
-            with open(settingsfilename, 'w') as settingsfile:
-                for k,v in settings.iteritems():
-                    settingsfile.write(k + '=' + str(v) + '\n')
+                with open(settingsfilename, 'w') as settingsfile:
+                    for k,v in settings.iteritems():
+                        settingsfile.write(k + '=' + str(v) + '\n')
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
-        print name + ' : List the current settings. Settings are stored in \'miind_ui_settings\' in the MIIND python directory.'
-        print name + ' [ENABLE_MPI] [ENABLE_OPENMP] [ENABLE_ROOT] : Expects \'True\' or \'False\' for each of the three settings. Settings are persistent.'
+        print name + ' : List the current settings. Settings are stored in \'.miind_settings\' in your home (~/) directory.'
+        print name + ' [ENABLE_MPI] [ENABLE_OPENMP] [ENABLE_ROOT] [ENABLE_CUDA]: Expects \'True\' or \'False\' for each of the three settings. Settings are persistent.'
 
 
 def submit(command, current_sim):
@@ -184,10 +186,10 @@ def submit(command, current_sim):
 
         if len(command) == 1:
             current_sim.submit(True,
-                  settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'])
+                  settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
         if len(command) >= 2:
             current_sim.submit(True,
-                  settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'], *command[1:])
+                  settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'], *command[1:])
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print name + ' : Generate and \'make\' the code from the current simulation xml file. Ensure you have the correct settings (call \'settings\').'
