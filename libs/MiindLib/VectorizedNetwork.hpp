@@ -64,8 +64,6 @@ public:
   void reportNodeActivities(MPILib::Time sim_time);
   void mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILib::Time t_report, bool write_displays);
 
-  void rectifyWorkingIndexes(std::vector<inttype>& off1s, std::vector<inttype>& off2s);
-
 protected:
 
   std::vector<TwoDLib::TransitionMatrix> _vec_transforms;

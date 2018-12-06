@@ -113,7 +113,7 @@ _nja(std::vector<inttype>(vecmat.size())),
 _ja(std::vector<inttype*>(vecmat.size())),
 _offsets(this->Offsets(vecmat)),
 _nr_rows(this->NrRows(vecmat)),
-_blockSize(256),
+_blockSize(1024),
 _numBlocks( (_group._n + _blockSize - 1) / _blockSize)
 {
     this->FillMatrixMaps(vecmat);
@@ -195,7 +195,6 @@ void CSRAdapter::CalculateGridDerivative(const std::vector<inttype>& vecindex, c
 {
     for(inttype m = 0; m < _nr_streams - (_nr_m - _transform_offset); m++)
     {
-        // std::cout << _offsets[vecindex[m]]<< " "<< m << " " << vecindex[m] << " " << vecrates[m] <<"\n";
         // be careful to use this block size
         inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1)/_blockSize;
         CudaCalculateGridDerivative<<<numBlocks,_blockSize,0,_streams[m]>>>(_nr_rows[vecindex[m]],vecrates[m],vecstays[m],vecgoes[m],vecoff1s[m],vecoff2s[m],_dydt,_group._mass,_offsets[vecindex[m]]);

@@ -22,7 +22,7 @@
 #include <boost/numeric/odeint.hpp>
 #include "CSRMatrix.hpp"
 #include "TransitionMatrix.hpp"
-#include "Ode2DSystem.hpp"
+#include "Ode2DSystemGroup.hpp"
 #include "MasterParameter.hpp"
 
 namespace TwoDLib {
@@ -34,7 +34,7 @@ namespace TwoDLib {
 
 		MasterGrid
 		(
-			Ode2DSystem&,
+			Ode2DSystemGroup&,
 			double
 		);
 
@@ -55,7 +55,7 @@ namespace TwoDLib {
 
 		MasterGrid& operator=(const MasterGrid&);
 
-		Ode2DSystem& _sys;
+		Ode2DSystemGroup& _sys;
 
 		double _cell_width;
 

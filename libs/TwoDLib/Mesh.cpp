@@ -294,8 +294,8 @@ _vec_vec_gen(0)
 			this->CreateNeighbours();
 		}
 	}
-	if (! this->CheckAreas() )
-		throw TwoDLib::TwoDLibException("Zero area in mesh.");
+	// if (! this->CheckAreas() )
+	// 	throw TwoDLib::TwoDLibException("Zero area in mesh.");
 
 	// If this mesh is a grid, calculate the cell width.
 	// If it's not a mesh, _grid_cell_width is meaningless.

@@ -50,67 +50,26 @@ _n(group.Mass().size()),
 _hostmass(_n,0.),
 _hostmap(_n,0.),
 _offsets(group.Offsets()),
-_res_to(group.MeshObjects().size(),0),
-_res_from(group.MeshObjects().size(),0),
-_res_alpha(group.MeshObjects().size(),0),
+_nr_refractory_steps(static_cast<unsigned int>(std::ceil(0.003 / _time_step))),
+_refractory_mass(group.MeshObjects().size(),0),
+
+_nr_minimal_resets(_group.MeshObjects().size(),0),
+_res_to_minimal(_group.MeshObjects().size(),0),
+_res_from_ordered(_group.MeshObjects().size(),0),
+_res_alpha_ordered(_group.MeshObjects().size(),0),
+_res_from_counts(_group.MeshObjects().size(),0),
+_res_from_offsets(_group.MeshObjects().size(),0),
+
 _res_sum(group.MeshObjects().size(),0),
 _res_to_mass(group.MeshObjects().size(),0),
-_nr_to_cells(group.MeshObjects().size(),0),
 _host_fs(group.MeshObjects().size(),0),
-_reset_nval(std::vector<inttype>(group.MeshObjects().size())),
-_reset_val(std::vector<fptype*>(group.MeshObjects().size())),
-_reset_nia(std::vector<inttype>(group.MeshObjects().size())),
-_reset_ia(std::vector<inttype*>(group.MeshObjects().size())),
-_reset_nja(std::vector<inttype>(group.MeshObjects().size())),
-_reset_ja(std::vector<inttype*>(group.MeshObjects().size())),
-_blockSize(256),
+_blockSize(1024),
 _numBlocks( (_n + _blockSize - 1) / _blockSize)
 {
     this->FillMass();
-		this->FillDerivative();
     this->FillMapData();
     this->FillReversalMap(group.MeshObjects(),group.MapReversal());
     this->FillResetMap(group.MeshObjects(),group.MapReset());
-		this->FillResetMatrixMaps(group.ResetCSR());
-}
-
-void CudaOde2DSystemAdapter::FillResetMatrixMaps(const std::vector<TwoDLib::CSRMatrix>& vecmat)
-{
-   for(inttype m = 0; m < vecmat.size(); m++)
-   {
-       _reset_nval[m] = vecmat[m].Val().size();
-       checkCudaErrors(cudaMalloc((fptype**)&_reset_val[m],_reset_nval[m]*sizeof(fptype)));
-       // dont't depend on Val() being of fptype
-       std::vector<fptype> vecval;
-       for (fptype val: vecmat[m].Val())
-           vecval.push_back(val);
-       checkCudaErrors(cudaMemcpy(_reset_val[m],&vecval[0],sizeof(fptype)*_reset_nval[m],cudaMemcpyHostToDevice));
-
-       _reset_nia[m] = vecmat[m].Ia().size();
-       checkCudaErrors(cudaMalloc((inttype**)&_reset_ia[m],_reset_nia[m]*sizeof(inttype)));
-			 checkCudaErrors(cudaMalloc((fptype**)&_res_to_mass[m],60000*sizeof(fptype)));
-       std::vector<inttype> vecia;
-       for(inttype ia: vecmat[m].Ia())
-           vecia.push_back(ia);
-       checkCudaErrors(cudaMemcpy(_reset_ia[m],&vecia[0],sizeof(inttype)*_reset_nia[m],cudaMemcpyHostToDevice));
-
-       _reset_nja[m] = vecmat[m].Ja().size();
-       checkCudaErrors(cudaMalloc((inttype**)&_reset_ja[m],_reset_nja[m]*sizeof(inttype)));
-       std::vector<inttype> vecja;
-       for(inttype ja: vecmat[m].Ja())
-           vecja.push_back(ja);
-       checkCudaErrors(cudaMemcpy(_reset_ja[m],&vecja[0],sizeof(inttype)*_reset_nja[m],cudaMemcpyHostToDevice));
-   }
-}
-
-void CudaOde2DSystemAdapter::DeleteCSR()
-{
-    for(inttype m = 0; m < _mesh_size; m++)
-    {
-        cudaFree(_reset_val[m]);
-        cudaFree(_reset_ia[m]);
-        cudaFree(_reset_ja[m]);
-    }
 }
 
 void CudaOde2DSystemAdapter::TransferMapData()
@@ -138,33 +97,11 @@ void CudaOde2DSystemAdapter::DeleteMapData()
     cudaFree(_map);
 }
 
-void CudaOde2DSystemAdapter::FillDerivative()
-{
-    checkCudaErrors(cudaMalloc((fptype**)&_dydt,_n*sizeof(fptype)));
-}
-
-void CudaOde2DSystemAdapter::DeleteDerivative()
-{
-    cudaFree(_dydt);
-}
-
-void CudaOde2DSystemAdapter::ClearDerivative()
-{
-  CudaClearDerivative<<<_numBlocks,_blockSize>>>(_n,_dydt,_mass);
-}
-
-void CudaOde2DSystemAdapter::AddDerivativeFull()
-{
-  EulerStep<<<_numBlocks,_blockSize>>>(_n,_dydt,_mass, 1.0);
-}
-
 CudaOde2DSystemAdapter::~CudaOde2DSystemAdapter()
 {
     this->DeleteMass();
-		this->DeleteDerivative();
     this->DeleteMapData();
     this->DeleteReversalMap();
-		this->DeleteCSR();
     this->DeleteResetMap();
 }
 
@@ -233,13 +170,14 @@ const std::vector<fptype>& CudaOde2DSystemAdapter::F() const
 	_host_fs.clear();
 	for(inttype m = 0; m < _mesh_size; m++)
 	{
-		inttype numBlocks = (60000 + 256 - 1)/256;
+		inttype numBlocks = std::ceil(((std::ceil(_nr_minimal_resets[m]/_blockSize) + _blockSize - 1)/_blockSize));
 		vector<fptype> host_sum(numBlocks,0.);
 		checkCudaErrors(cudaMemcpy(&host_sum[0],_res_sum[m],numBlocks*sizeof(fptype),cudaMemcpyDeviceToHost));
 		fptype sum = 0.0;
 		for (auto& rate: host_sum)
 				sum += rate;
-		_host_fs.push_back(sum*0.7/_time_step);
+
+		_host_fs.push_back(sum/_time_step);
 	}
 
   return _host_fs;
@@ -257,68 +195,84 @@ void CudaOde2DSystemAdapter::FillResetMap
 
    for(inttype m = 0; m < _mesh_size; m++)
    {
-       _nr_resets.push_back(vec_vec_reset[m].size());
-       checkCudaErrors(cudaMalloc((inttype**)&_res_to[m],   vec_vec_reset[m].size()*sizeof(inttype)));
-       checkCudaErrors(cudaMalloc((inttype**)&_res_from[m], vec_vec_reset[m].size()*sizeof(inttype)));
-       checkCudaErrors(cudaMalloc((fptype**)&_res_alpha[m], vec_vec_reset[m].size()*sizeof(fptype)));
-			 checkCudaErrors(cudaMalloc((fptype**)&_res_sum[m], ((60000 + 256 - 1)/256)*sizeof(fptype)));
-       std::vector<inttype> vec_to;
-       std::vector<inttype> vec_from;
-       std::vector<fptype>  vec_alpha;
-       for(inttype i = 0; i < vec_vec_reset[m].size(); i++)
-       {
-           vec_to.push_back(_group.Map(m,vec_vec_reset[m][i]._to[0],  vec_vec_reset[m][i]._to[1]));
-           vec_from.push_back(_group.Map(m,vec_vec_reset[m][i]._from[0],vec_vec_reset[m][i]._from[1]));
-           vec_alpha.push_back(vec_vec_reset[m][i]._alpha);
-       }
-       checkCudaErrors(cudaMemcpy(_res_to[m],&vec_to[0],vec_to.size()*sizeof(inttype),cudaMemcpyHostToDevice));
-       checkCudaErrors(cudaMemcpy(_res_from[m],&vec_from[0],vec_from.size()*sizeof(inttype),cudaMemcpyHostToDevice));
-       checkCudaErrors(cudaMemcpy(_res_alpha[m],&vec_alpha[0],vec_alpha.size()*sizeof(fptype),cudaMemcpyHostToDevice));
-  }
+			 std::map<inttype, std::vector<std::pair<inttype,fptype>>> reset_map;
+			 for(inttype i = 0; i < vec_vec_reset[m].size(); i++){
+				 reset_map[_group.Map(m,vec_vec_reset[m][i]._to[0],  vec_vec_reset[m][i]._to[1])].push_back(
+			 									std::pair<inttype,fptype>(_group.Map(m,vec_vec_reset[m][i]._from[0],vec_vec_reset[m][i]._from[1]),
+												vec_vec_reset[m][i]._alpha));
+			 }
+
+			 _nr_minimal_resets[m] = reset_map.size();
+			 _nr_resets.push_back(vec_vec_reset[m].size());
+			 checkCudaErrors(cudaMalloc((fptype**)&_refractory_mass[m], _nr_refractory_steps*vec_vec_reset[m].size()*sizeof(fptype)));
+			 checkCudaErrors(cudaMalloc((inttype**)&_res_to_minimal[m], _nr_minimal_resets[m]*sizeof(inttype)));
+       checkCudaErrors(cudaMalloc((inttype**)&_res_from_ordered[m], vec_vec_reset[m].size()*sizeof(inttype)));
+       checkCudaErrors(cudaMalloc((fptype**)&_res_alpha_ordered[m], vec_vec_reset[m].size()*sizeof(fptype)));
+			 checkCudaErrors(cudaMalloc((fptype**)&_res_from_counts[m], _nr_minimal_resets[m]*sizeof(fptype)));
+			 checkCudaErrors(cudaMalloc((fptype**)&_res_from_offsets[m], _nr_minimal_resets[m]*sizeof(fptype)));
+			 checkCudaErrors(cudaMalloc((fptype**)&_res_to_mass[m],_nr_minimal_resets[m]*sizeof(fptype)));
+			 checkCudaErrors(cudaMalloc((fptype**)&_res_sum[m], std::ceil(((std::ceil(_nr_minimal_resets[m]/_blockSize) + _blockSize - 1)/_blockSize))*sizeof(fptype)));
+			 std::vector<inttype> vec_to_min;
+			 std::vector<inttype> vec_from_ord;
+			 std::vector<fptype>  vec_alpha_ord;
+			 std::vector<inttype> counts;
+			 std::vector<inttype> offsets;
+
+			 unsigned int offset_count = 0;
+			 std::map<inttype, std::vector<std::pair<inttype,fptype>>>::iterator it;
+			 for ( it = reset_map.begin(); it != reset_map.end(); it++ ){
+				 vec_to_min.push_back(it->first);
+				 counts.push_back(it->second.size());
+				 offsets.push_back(offset_count);
+				 offset_count += it->second.size();
+				 for(int i=0; i<it->second.size(); i++){
+					 vec_from_ord.push_back(it->second[i].first);
+					 vec_alpha_ord.push_back(it->second[i].second);
+				 }
+			 }
+
+			 checkCudaErrors(cudaMemcpy(_res_to_minimal[m],&vec_to_min[0],vec_to_min.size()*sizeof(inttype),cudaMemcpyHostToDevice));
+       checkCudaErrors(cudaMemcpy(_res_from_ordered[m],&vec_from_ord[0],vec_from_ord.size()*sizeof(inttype),cudaMemcpyHostToDevice));
+       checkCudaErrors(cudaMemcpy(_res_alpha_ordered[m],&vec_alpha_ord[0],vec_alpha_ord.size()*sizeof(fptype),cudaMemcpyHostToDevice));
+			 checkCudaErrors(cudaMemcpy(_res_from_counts[m],&counts[0],counts.size()*sizeof(inttype),cudaMemcpyHostToDevice));
+			 checkCudaErrors(cudaMemcpy(_res_from_offsets[m],&offsets[0],offsets.size()*sizeof(inttype),cudaMemcpyHostToDevice));
+	  }
 }
 
 void CudaOde2DSystemAdapter::RedistributeProbability()
 {
-    // for (inttype m = 0; m < _mesh_size; m++){
-    //     fptype* f = _fs+m;
-    //     MapReset<<<1,1>>>(_nr_resets[m],_res_from[m],_res_to[m],_res_alpha[m],_mass,_map,f);
-    // }
-}
-
-void CudaOde2DSystemAdapter::RedistributeProbabilityThreaded()
-{
 	for(inttype m = 0; m < _mesh_size; m++)
 	{
 			// be careful to use this block size
-			inttype numBlocks = (60000 + 256 - 1)/256;
-			inttype numSumBlocks = (numBlocks + 256 - 1)/256;
+			inttype numBlocks = (_nr_minimal_resets[m] + _blockSize - 1)/_blockSize;
+			inttype numSumBlocks = (numBlocks + _blockSize - 1)/_blockSize;
+			inttype numResetBlocks = (_nr_resets[m] + _blockSize - 1)/_blockSize;
 
-			CudaClearDerivative<<<numBlocks,256>>>(60000,_res_to_mass[m],_mass);
-			CudaClearDerivative<<<numSumBlocks,256>>>(numBlocks,_res_sum[m],_mass);
+			CudaClearDerivative<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m],_res_to_mass[m],_mass);
+			CudaClearDerivative<<<numSumBlocks,_blockSize>>>(numBlocks,_res_sum[m],_mass);
 
-			MapResetThreaded<<<numBlocks,256>>>(60000, _res_to_mass[m],_dydt,_mass,_reset_val[m],_reset_ia[m],_reset_ja[m],_map,_offsets[m]);
+			MapResetThreaded<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m], _res_to_mass[m],_mass, _refractory_mass[m],
+				(_nr_refractory_steps-1)*_nr_resets[m],
+				_res_to_minimal[m],_res_alpha_ordered[m], _res_from_offsets[m], _res_from_counts[m], _map);
 
-			SumReset<<<numBlocks,256,256*sizeof(fptype)>>>(60000,_res_to_mass[m],_res_sum[m]);
+			for(int t = _nr_refractory_steps-2; t >= 0; t--){
+				MapResetShiftRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_refractory_mass[m], t*_nr_resets[m]);
+			}
+
+			MapResetToRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m], _mass, _map, _refractory_mass[m]);
+
+			SumReset<<<numBlocks,_blockSize,_blockSize*sizeof(fptype)>>>(_nr_minimal_resets[m],_res_to_mass[m],_res_sum[m]);
 	}
 
-	// F();
-	// for(int i=0; i<_host_fs.size(); i++)
-	// 	std::cout << _host_fs[i] << "\n";
 }
 
 void CudaOde2DSystemAdapter::MapFinish()
 {
-    for (inttype m = 0; m < _mesh_size; m++)
-        ResetFinish<<<1,1>>>(_nr_resets[m],_res_from[m],_mass,_map);
-}
-
-void CudaOde2DSystemAdapter::MapFinishThreaded()
-{
 	for(inttype m = 0; m < _mesh_size; m++)
   {
       // be careful to use this block size
-      inttype numBlocks = (_nr_resets[m] + 256 - 1)/256;
-			ResetFinishThreaded<<<numBlocks,256>>>(_nr_resets[m],_res_from[m],_mass,_map);
+      inttype numBlocks = (_nr_resets[m] + _blockSize - 1)/_blockSize;
+			ResetFinishThreaded<<<numBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m],_mass,_map);
   }
 }
 
@@ -359,9 +313,11 @@ void CudaOde2DSystemAdapter::DeleteResetMap()
 
     for(inttype m = 0; m < _mesh_size; m++)
     {
-	cudaFree(_res_to[m]);
-        cudaFree(_res_from[m]);
-        cudaFree(_res_alpha[m]);
+				cudaFree(_res_to_minimal[m]);
+        cudaFree(_res_from_ordered[m]);
+				cudaFree(_res_from_counts[m]);
+				cudaFree(_res_from_ordered[m]);
+        cudaFree(_res_from_offsets[m]);
 				cudaFree(_res_sum[m]);
     }
 
