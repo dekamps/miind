@@ -61,21 +61,13 @@ namespace CudaTwoDLib {
 
                 void RemapReversal();
 
-                void RedistributeProbability();
+								void RedistributeProbability();
 
-								void RedistributeProbabilityThreaded();
-
-                void MapFinish();
-
-								void MapFinishThreaded();
+								void MapFinish();
 
 								void updateGroupMass();
 
-								void ClearDerivative();
-
-								void AddDerivativeFull();
-
-                friend class CSRAdapter;
+								friend class CSRAdapter;
 
                 const std::vector<fptype>& F() const;
 	private:
@@ -94,7 +86,6 @@ namespace CudaTwoDLib {
         void FillMass();
         void FillMapData();
         void TransferMapData();
-				void FillResetMatrixMaps(const std::vector<TwoDLib::CSRMatrix>& vecmat);
 
         void FillReversalMap(const std::vector<TwoDLib::Mesh>&, const std::vector<std::vector<TwoDLib::Redistribution> >&);
         void FillResetMap(const std::vector<TwoDLib::Mesh>&, const std::vector<std::vector<TwoDLib::Redistribution> >&);
@@ -105,16 +96,16 @@ namespace CudaTwoDLib {
         void DeleteResetMap();
 				void FillDerivative();
 				void DeleteDerivative();
-				void DeleteCSR();
 
-
-	TwoDLib::Ode2DSystemGroup& _group;
+				TwoDLib::Ode2DSystemGroup& _group;
         inttype	 _n;
         inttype _mesh_size;
         fptype _time_step;
 
+				unsigned int _nr_refractory_steps;
+				std::vector<fptype*> _refractory_mass;
+
 				fptype*  _mass;
-				fptype*  _dydt;
         std::vector<fptype> _hostmass;
         inttype* _map;
         std::vector<inttype> _hostmap;
@@ -126,24 +117,17 @@ namespace CudaTwoDLib {
         inttype* _rev_from;
         fptype*  _rev_alpha;
 
-
         // reset mapping
         std::vector<inttype> _nr_resets;
-        std::vector<inttype*> _res_to;
-        std::vector<inttype*> _res_from;
-        std::vector<fptype*>  _res_alpha;
+				std::vector<inttype>  _nr_minimal_resets;
+				std::vector<inttype*> _res_to_minimal;
+				std::vector<fptype*>  _res_alpha_ordered;
+				std::vector<inttype*> _res_from_ordered;
+				std::vector<inttype*> _res_from_counts;
+				std::vector<inttype*> _res_from_offsets;
 
-
-				std::vector<inttype>	_nr_to_cells;
 				std::vector<fptype*>   _res_to_mass;
 				std::vector<fptype*>   _res_sum;
-
-				std::vector<inttype>   _reset_nval;
-				std::vector<fptype*>   _reset_val;
-				std::vector<inttype>   _reset_nia;
-				std::vector<inttype*>  _reset_ia;
-				std::vector<inttype>   _reset_nja;
-				std::vector<inttype*>  _reset_ja;
 
 				int _blockSize;
 				int _numBlocks;

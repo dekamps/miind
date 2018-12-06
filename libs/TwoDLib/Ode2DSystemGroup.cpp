@@ -48,6 +48,16 @@ std::vector<Ode2DSystemGroup::Reset> Ode2DSystemGroup::InitializeReset()
 	return vec_ret;
 }
 
+std::vector<Ode2DSystemGroup::ResetRefractive> Ode2DSystemGroup::InitializeResetRefractive()
+{
+	std::vector<Ode2DSystemGroup::ResetRefractive> vec_ret;
+	for (MPILib::Index m = 0; m < _mesh_list.size(); m++){
+		ResetRefractive reset(*this,_vec_mass,_t,_vec_tau_refractive[m],_vec_reset[m],m);
+		vec_ret.push_back(reset);
+	}
+	return vec_ret;
+}
+
 std::vector<Ode2DSystemGroup::Reversal> Ode2DSystemGroup::InitializeReversal()
 {
 	std::vector<Ode2DSystemGroup::Reversal> vec_ret;
@@ -56,6 +66,37 @@ std::vector<Ode2DSystemGroup::Reversal> Ode2DSystemGroup::InitializeReversal()
 		vec_ret.push_back(reversal);
 	}
 	return vec_ret;
+}
+
+Ode2DSystemGroup::Ode2DSystemGroup
+(
+	const std::vector<Mesh>& mesh_list,
+	const std::vector<std::vector<Redistribution> >& vec_reversal,
+	const std::vector<std::vector<Redistribution> >& vec_reset,
+	const std::vector<MPILib::Time>& vec_tau_refractive
+):
+_mesh_list(mesh_list),
+_vec_mesh_offset(MeshOffset(mesh_list)),
+_vec_length(InitializeLengths(mesh_list)),
+_vec_cumulative(InitializeCumulatives(mesh_list)),
+_vec_mass(InitializeMass()),
+_vec_area(InitializeArea(mesh_list)),
+_t(0),
+_fs(std::vector<MPILib::Rate>(mesh_list.size(),0.0)),
+_avs(std::vector<MPILib::Potential>(mesh_list.size(),0.0)),
+_map(InitializeMap()),
+_linear_map(InitializeLinearMap()),
+_vec_reversal(vec_reversal),
+_vec_reset(vec_reset),
+_vec_tau_refractive(vec_tau_refractive),
+_reset_refractive(InitializeResetRefractive()),
+_reversal(InitializeReversal()),
+_reset(InitializeReset()),
+_clean(InitializeClean())
+{
+	for(const auto& m: _mesh_list)
+		assert(m.TimeStep() != 0.0);
+	this->CheckConsistency();
 }
 
 Ode2DSystemGroup::Ode2DSystemGroup
@@ -77,10 +118,11 @@ _map(InitializeMap()),
 _linear_map(InitializeLinearMap()),
 _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
+_vec_tau_refractive(std::vector<MPILib::Time>()),
+_reset_refractive(InitializeResetRefractive()),
 _reversal(InitializeReversal()),
 _reset(InitializeReset()),
-_clean(InitializeClean()),
-_reset_csrs(InitializeResetCSRs())
+_clean(InitializeClean())
 {
 	for(const auto& m: _mesh_list)
 		assert(m.TimeStep() != 0.0);
@@ -99,15 +141,6 @@ std::vector<MPILib::Number> Ode2DSystemGroup::MeshOffset(const std::vector<Mesh>
 	}
 
 	return vec_ret;
-}
-
-std::vector<CSRMatrix> Ode2DSystemGroup::InitializeResetCSRs(){
-
-	std::vector<CSRMatrix> vec_csrs;
-	for (MPILib::Index m = 0; m < _vec_reset.size(); m++){
-		vec_csrs.push_back(TwoDLib::CSRMatrix(TransitionMatrix(_vec_reset[m]), *this, m));
-	}
-	return vec_csrs;
 }
 
 std::vector<MPILib::Index> Ode2DSystemGroup::InitializeCumulative(const Mesh& m) const

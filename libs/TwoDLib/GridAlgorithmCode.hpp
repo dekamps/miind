@@ -29,23 +29,24 @@ namespace TwoDLib {
 	_rate(0.0),
 	_t_cur(0.0),
 	_root(CreateRootNode(model_name)),
-	_mesh(CreateMeshObject()),
-	_vec_rev(Mapping("Reversal")),
-	_vec_res(Mapping("Reset")),
-	_dt(_mesh.TimeStep()),
-	_sys(_mesh,_vec_rev,_vec_res,tau_refractive),
+	_vec_mesh(CreateMeshObject()),
+	_vec_vec_rev(std::vector<std::vector<Redistribution> >{this->Mapping("Reversal")}),
+	_vec_vec_res(std::vector<std::vector<Redistribution> >{this->Mapping("Reset")}),
+	_vec_tau_refractive(std::vector<MPILib::Time>({tau_refractive})),
+	_dt(_vec_mesh[0].TimeStep()),
+	_sys(_vec_mesh,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive),
 	_n_evolve(0),
 	_n_steps(0),
-	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystem::AvgV : &TwoDLib::Ode2DSystem::F),
+	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystemGroup::AvgV : &TwoDLib::Ode2DSystemGroup::F),
 	_start_v(start_v),
 	_start_w(start_w),
 	_transform_matrix(transform_matrix)
 	{
 		_mass_swap = vector<double>(_sys._vec_mass.size());
 
-		vector<Coordinates> coords = _mesh.findPointInMeshSlow(Point(start_v, start_w));
+		vector<Coordinates> coords = _vec_mesh[0].findPointInMeshSlow(Point(start_v, start_w));
 
-		_sys.Initialize(coords[0][0],coords[0][1]);
+		_sys.Initialize(0,coords[0][0],coords[0][1]);
 
 	}
 
@@ -55,12 +56,12 @@ namespace TwoDLib {
 	_rate_method(rhs._rate_method),
 	_rate(rhs._rate),
 	_t_cur(rhs._t_cur),
-	_mesh(rhs._mesh),
+	_vec_mesh(rhs._vec_mesh),
 	_root(rhs._root),
-	_vec_rev(rhs._vec_rev),
-	_vec_res(rhs._vec_res),
-	_dt(_mesh.TimeStep()),
-	_sys(_mesh,_vec_rev,_vec_res,rhs._sys.Tau_ref()),
+	_vec_vec_rev(rhs._vec_vec_rev),
+	_vec_vec_res(rhs._vec_vec_res),
+	_dt(_vec_mesh[0].TimeStep()),
+	_sys(_vec_mesh,_vec_vec_rev,_vec_vec_res,rhs._sys.Tau_ref()),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction),
@@ -70,9 +71,9 @@ namespace TwoDLib {
 	{
 		_mass_swap = vector<double>(_sys._vec_mass.size());
 
-		vector<Coordinates> coords = _mesh.findPointInMeshSlow(Point(_start_v, _start_w));
+		vector<Coordinates> coords = _vec_mesh[0].findPointInMeshSlow(Point(_start_v, _start_w));
 
-		_sys.Initialize(coords[0][0],coords[0][1]);
+		_sys.Initialize(0,coords[0][0],coords[0][1]);
 
 	}
 
@@ -91,7 +92,7 @@ namespace TwoDLib {
 	void GridAlgorithm<WeightValue>::configure(const MPILib::SimulationRunParameter& par_run)
 	{
 		_transformMatrix = TransitionMatrix(_transform_matrix);
-		_csr_transform = new CSRMatrix(_transformMatrix, _sys);
+		_csr_transform = new CSRMatrix(_transformMatrix, _sys, 0);
 
 		Display::getInstance()->addOdeSystem(_node_id, &_sys);
 		GridReport<GridAlgorithm<WeightValue>>::getInstance()->registerObject(this);
@@ -99,8 +100,8 @@ namespace TwoDLib {
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
 
-		Quadrilateral q1 = _sys.MeshObject().Quad(1,0);
-		Quadrilateral q2 = _sys.MeshObject().Quad(1,1);
+		Quadrilateral q1 = _sys.MeshObjects()[0].Quad(1,0);
+		Quadrilateral q2 = _sys.MeshObjects()[0].Quad(1,1);
 
 		double cell_h_dist = std::fabs(q2.Centroid()[0] - q1.Centroid()[0]);
 		double cell_v_dist = std::fabs(q2.Centroid()[1] - q1.Centroid()[1]);
@@ -148,7 +149,7 @@ namespace TwoDLib {
 	}
 
 	template <class WeightValue>
-	Mesh GridAlgorithm<WeightValue>::CreateMeshObject(){
+	std::vector<Mesh> GridAlgorithm<WeightValue>::CreateMeshObject(){
 		// mesh
 		pugi::xml_node mesh_node = _root.first_child();
 
@@ -162,8 +163,8 @@ namespace TwoDLib {
 
 		// MatrixGenerator should already have inserted the stationary bin and there is no need
 		// to reexamine the stat file
-
-		return mesh;
+		std::vector<TwoDLib::Mesh> vec_mesh{ mesh };
+		return vec_mesh;
 	}
 
 	template <class WeightValue>

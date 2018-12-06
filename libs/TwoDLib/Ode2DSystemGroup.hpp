@@ -29,11 +29,11 @@
 #include "modulo.hpp"
 #include "Redistribution.hpp"
 #include "CSRMatrix.hpp"
+#include "MPILib/include/ProbabilityQueue.hpp"
 
 namespace TwoDLib {
 
 	class TransitionMatrix;
-	class CSRMatrix;
 
 
 	  /**
@@ -49,6 +49,14 @@ namespace TwoDLib {
 	public:
 
 		//! Standard Constructor
+		Ode2DSystemGroup
+		(
+			const std::vector<Mesh>&, 					       //!< A series of Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
+			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin
+			const std::vector< std::vector<Redistribution> >&,  //!< A series of mappings from threshold to reset bin
+			const std::vector<MPILib::Time>&
+		);
+
 		Ode2DSystemGroup
 		(
 			const std::vector<Mesh>&, 					       //!< A series of Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
@@ -115,7 +123,7 @@ namespace TwoDLib {
 	    //! Provide read access to the Reversal map
 		const std::vector<std::vector<Redistribution> >& MapReset()    const { return  _vec_reset;}
 
-		const std::vector<CSRMatrix>& ResetCSR() const { return _reset_csrs; }
+		const std::vector<MPILib::Time> Tau_ref() const { return _vec_tau_refractive; }
 
 		friend class Master;
 	    friend class MasterOMP;
@@ -164,6 +172,70 @@ namespace TwoDLib {
 			MPILib::Index       	_m;
 		};
 
+		class ResetRefractive {
+		public:
+
+			ResetRefractive
+			(
+				Ode2DSystemGroup&                  sys,
+				vector<double>&               vec_mass,
+				const MPILib::Number&         it,
+				MPILib::Time                  tau_refractive,
+				const vector<Redistribution>& vec_reset,
+				MPILib::Index m
+			):
+			_it(it),
+			_t_step(sys.MeshObjects()[m].TimeStep()),
+			_tau_refractive(tau_refractive),
+			_vec_reset(vec_reset),
+			_vec_queue(vec_reset.size(),sys.MeshObjects()[m].TimeStep()),
+			_sys(sys),
+			_vec_mass(vec_mass),
+			_m(m)
+			{
+			}
+
+			void operator()(const Redistribution& map)
+			{
+				MPILib::Time t = _it*_t_step;
+				double from =  map._alpha*_vec_mass[_sys.Map(_m,map._from[0],map._from[1])];
+				_sys._fs[_m] += from;
+
+				MPILib::Index i = &map - &_vec_reset[0];
+				MPILib::populist::StampedProbability prob;
+				prob._prob = from;
+				prob._time = t + _tau_refractive;
+				_vec_queue[i].push(prob);
+
+				from = _vec_queue[i].CollectAndRemove(t);
+				_vec_mass[_sys.Map(_m,map._to[0],map._to[1])] += from;
+			}
+
+			double getTotalProbInRefract() const{
+				double total = 0.0;
+				for (MPILib::populist::ProbabilityQueue q : _vec_queue){
+					total += q.TotalProbability();
+				}
+				return total;
+			}
+
+		private:
+
+			MPILib::Index       	_m;
+
+			const MPILib::Number&                      _it;
+			MPILib::Time                               _t_step;
+			MPILib::Time                               _tau_refractive;
+
+			const vector<Redistribution>&              _vec_reset;
+			vector<MPILib::populist::ProbabilityQueue> _vec_queue;
+
+			Ode2DSystemGroup&	                           _sys;
+			vector<double>&                            _vec_mass;
+
+
+		};
+
 		//! Implement cleaning of the probability that was at threshold. TODO: this is mildly inefficient,
 		//! in a serial implementation, but seems simpler in threads
 
@@ -192,9 +264,9 @@ namespace TwoDLib {
 
 		bool				  CheckConsistency() const;
 		std::vector<Reset>    InitializeReset();
+		std::vector<ResetRefractive>    InitializeResetRefractive();
 		std::vector<Reversal> InitializeReversal();
 		std::vector<Clean>    InitializeClean();
-		std::vector<CSRMatrix> InitializeResetCSRs();
 
 		vector<MPILib::Potential>  	InitializeArea(const std::vector<Mesh>&) const;
 		vector<MPILib::Mass>        InitializeMass() const;
@@ -211,7 +283,10 @@ namespace TwoDLib {
 		std::vector<std::vector<MPILib::Index> > _vec_length;
 		std::vector<std::vector<MPILib::Index> > _vec_cumulative;
 
+		std::vector<MPILib::Time>    _vec_tau_refractive;
+public:
 		vector<MPILib::Mass>	     	_vec_mass;
+private:
 		vector<MPILib::Potential>		_vec_area;
 
 		unsigned int					_t;
@@ -224,9 +299,8 @@ namespace TwoDLib {
 		std::vector<std::vector<Redistribution> > _vec_reversal;
 		std::vector<std::vector<Redistribution> > _vec_reset;
 
-		std::vector<CSRMatrix> _reset_csrs;
-
 		std::vector<Reversal> _reversal;
+		std::vector<ResetRefractive> _reset_refractive;
 		std::vector<Reset>    _reset;
 		std::vector<Clean>    _clean;
 	};

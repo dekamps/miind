@@ -27,7 +27,7 @@
 
  MasterGrid::MasterGrid
  (
-	Ode2DSystem& sys,
+	Ode2DSystemGroup& sys,
   double cell_width
 ):
 _sys(sys),

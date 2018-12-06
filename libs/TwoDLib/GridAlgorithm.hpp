@@ -6,7 +6,7 @@
 #include <MPILib/include/AlgorithmInterface.hpp>
 #include "MasterOdeint.hpp"
 #include "MasterOMP.hpp"
-#include "Ode2DSystem.hpp"
+#include "Ode2DSystemGroup.hpp"
 #include "pugixml.hpp"
 #include "display.hpp"
 #include "MasterGrid.hpp"
@@ -63,13 +63,13 @@ namespace TwoDLib {
 				const std::vector<WeightValue>& weightVector, MPILib::Time time,
 				const std::vector<MPILib::NodeType>& typeVector);
 
-		void InitializeDensity(MPILib::Index i, MPILib::Index j){_sys.Initialize(i,j);}
+		void InitializeDensity(MPILib::Index i, MPILib::Index j){_sys.Initialize(0,i,j);}
 
-		const Ode2DSystem& Sys() const {return _sys; }
+		const Ode2DSystemGroup& Sys() const {return _sys; }
 
-		std::vector<TwoDLib::Redistribution> ReversalMap() const { return _vec_rev; }
+		std::vector<std::vector<TwoDLib::Redistribution>> ReversalMap() const { return _vec_vec_rev; }
 
-		std::vector<TwoDLib::Redistribution> ResetMap() const { return _vec_res; }
+		std::vector<std::vector<TwoDLib::Redistribution>> ResetMap() const { return _vec_vec_res; }
 
 	private:
 
@@ -82,14 +82,16 @@ namespace TwoDLib {
 		pugi::xml_document _doc;
 		pugi::xml_node _root;
 
-		TwoDLib::Mesh _mesh;
+		std::vector<TwoDLib::Mesh> _vec_mesh;
 
-		std::vector<TwoDLib::Redistribution> _vec_rev;
-		std::vector<TwoDLib::Redistribution> _vec_res;
+		std::vector<std::vector<TwoDLib::Redistribution>> _vec_vec_rev;
+		std::vector<std::vector<TwoDLib::Redistribution>> _vec_vec_res;
+
+		std::vector<MPILib::Time>    _vec_tau_refractive;
 
 		MPILib::Time _dt;
 
-		TwoDLib::Ode2DSystem _sys;
+		TwoDLib::Ode2DSystemGroup _sys;
 
 		MPILib::NodeId _node_id;
 
@@ -109,12 +111,12 @@ namespace TwoDLib {
 		double _start_v;
 		double _start_w;
 
-		double (TwoDLib::Ode2DSystem::*_sysfunction) () const;
+		const vector<double>& (TwoDLib::Ode2DSystemGroup::*_sysfunction) () const;
 
 	private:
 
 		void FillMap(const std::vector<WeightValue>& weightVector);
-		Mesh CreateMeshObject();
+		std::vector<Mesh> CreateMeshObject();
 		pugi::xml_node CreateRootNode(const std::string&);
 		std::vector<TwoDLib::Redistribution> Mapping(const std::string&);
 
