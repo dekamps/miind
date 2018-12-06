@@ -471,7 +471,9 @@ if __name__ == "__main__":
     else:
         # Simply run the old script
         if dirname == None:
+            raise ValueError("This option is deprecated")
             fn = filename[0]
             directories.add_executable(fn,modname, enable_mpi, enable_openmp, disable_root)
         else:
+            #directories.add_executable(dirname, filename, modname,vars(args)['cuda'])
             directories.add_executable(dirname, filename, modname, enable_mpi, enable_openmp, disable_root)

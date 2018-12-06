@@ -24,12 +24,12 @@ namespace TwoDLib {
 
 	enum Overflow {CONTAIN, LEAK };
 
-	typedef std::pair<Quadrilateral,Overflow> ProtoFiducial;
+	typedef std::pair<Cell,Overflow> ProtoFiducial;
 
 	struct FiducialElement {
 
 		const Mesh*					_mesh;
-		const Quadrilateral* 		_quad;
+		const Cell* 				_quad;
 		Overflow					_overflow;
 		const vector<Coordinates> 	_vec_coords;
 
@@ -37,9 +37,9 @@ namespace TwoDLib {
 
 		FiducialElement
 		(
-			const Mesh&               mesh,
-			const Quadrilateral&      quad,
-			Overflow				  overflow,
+			const Mesh&             mesh,
+			const Cell&				quad,
+			Overflow				overflow,
 			const vector<Coordinates> vec_coords
 		):
 		_mesh(&mesh),

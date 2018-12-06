@@ -77,5 +77,5 @@ std::ofstream fs("fs.dat");
  std::ofstream dumpdata3("group3simulation.data");
  std::vector<std::ostream*> vec_stream { &dumpdata1, &dumpdata2, &dumpdata3 };
  group.Dump(vec_stream);
-
 }
+

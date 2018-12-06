@@ -28,6 +28,11 @@ ROOT.gStyle.SetOptStat(0)
 MAX_NEIGHBOURS = 128
 
 
+def mergeQuads(a,b):
+    newCell = Quadrilateral([a.points[0][0],b.points[1][0],b.points[2][0],a.points[3][0]],[a.points[0][1],b.points[1][1],b.points[2][1],a.points[3][1]])
+    return newCell
+
+
 from itertools import tee, islice, chain, izip
 
 def previous_and_next(some_iterable):
@@ -710,6 +715,25 @@ class Mesh:
                     elif not chkCell.isTooSmall(threshold = thresh):
                         new_mesh.cells[i].append(chkCell)
                     elif chkCell.isTooSmall(threshold = thresh):
+                        break
+        return new_mesh
+
+    def mergeSmallBins(self, thresh = 2e-3):
+        new_mesh = Mesh(None)
+        new_mesh.dt = self.dt
+        new_mesh.filename = self.filename
+        for i,cells in enumerate(self.cells):
+            if i==0:
+                new_mesh.cells.append(self.cells[0])
+            else:
+                for j, cell in enumerate(cells):
+                    chkCell = self.cells[i][j]
+                    if j==0:
+                        new_mesh.cells.append([chkCell])
+                    elif not chkCell.isTooSmall(threshold = thresh):
+                        new_mesh.cells[i].append(chkCell)
+                    elif chkCell.isTooSmall(threshold = thresh):
+                        new_mesh.cells[i].append(mergeQuads(chkCell,self.cells[i][-1]))
                         break
         return new_mesh
 
