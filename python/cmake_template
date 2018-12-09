@@ -14,6 +14,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/libs )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/GeomLib )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/TwoDLib )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/CudaTwoDLib )
+include_directories( ${CMAKE_SOURCE_DIR}/libs/MiindLib )
 
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
@@ -107,6 +108,7 @@ set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}twod
     ${MIIND_LIBRARY_PREFIX}numtools
     ${MIIND_LIBRARY_PREFIX}mpi
+    ${MIIND_LIBRARY_PREFIX}shared
     ${MPI_LIBRARIES}
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}

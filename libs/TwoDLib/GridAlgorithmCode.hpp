@@ -61,7 +61,8 @@ namespace TwoDLib {
 	_vec_vec_rev(rhs._vec_vec_rev),
 	_vec_vec_res(rhs._vec_vec_res),
 	_dt(_vec_mesh[0].TimeStep()),
-	_sys(_vec_mesh,_vec_vec_rev,_vec_vec_res,rhs._sys.Tau_ref()),
+	_vec_tau_refractive(rhs._vec_tau_refractive),
+	_sys(_vec_mesh,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction),
@@ -184,8 +185,7 @@ namespace TwoDLib {
 	(
 		const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<WeightValue>& weightVector,
-		MPILib::Time time,
-		const std::vector<MPILib::NodeType>& typeVector
+		MPILib::Time time
 	)
 	{
 	  // The network time step must be an integer multiple of the network time step; in principle

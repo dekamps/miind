@@ -10,6 +10,7 @@
 #include "display.hpp"
 #include "include/glm/glm.hpp"
 #include <MPILib/include/MPINetworkCode.hpp>
+#include "Quadrilateral.hpp"
 
 using namespace TwoDLib;
 using namespace std::chrono;
@@ -156,28 +157,6 @@ void Display::display(void) {
 	double mesh_max_v = _dws[window_index].mesh_max_v;
 	double mesh_min_h = _dws[window_index].mesh_min_h;
 	double mesh_max_h = _dws[window_index].mesh_max_h;
-
-	// unsigned int mesh_offset = _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index];
-	// unsigned int next_mesh_offset = _dws[window_index]._system->Mass().size();
-	// if (_dws[window_index]._mesh_index < _dws[window_index]._system->Offsets().size())
-	// 	next_mesh_offset = _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index+1];
-	//
-	// for(unsigned int x = mesh_offset; x < next_mesh_offset; x++){
-	// 	// if(_dws[window_index]._system->WorkingIndex()[x] > next_mesh_offset)
-	// 	// 	continue;
-	// 	if ( _dws[window_index]._system->WorkingIndex()[x] == 0)
-	// 		continue;
-	//
-	// 	unsigned int index = _dws[window_index]._system->WorkingIndex()[x] - mesh_offset;
-	//
-	// 	unsigned int i = 0;
-	// 	unsigned int row = 0;
-	// 	while(i + m.NrCellsInStrip(row) <= index){
-	// 		i += m.NrCellsInStrip(row);
-	// 		row++;
-	// 	}
-	// 	unsigned int j= index- i;
-	// 	i = row;
 
 	for(unsigned int i = 0; i<m.NrStrips(); i++){
 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {

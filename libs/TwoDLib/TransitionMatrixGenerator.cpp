@@ -139,7 +139,6 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 	Point p(v,w);
 
 	// scale_distance determines the maximum search radius
-	double dist = scale_distance*DetermineDistance(quad);
 	vector<Point> vec_point(_N);
 	PolyGenerator gen(quad, _uni);
 	gen.Generate(&vec_point);

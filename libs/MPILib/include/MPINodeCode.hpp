@@ -42,7 +42,6 @@ MPINode<Weight, NodeDistribution>::MPINode(
 		_rLocalNodes(localNode), //
 		_rNodeDistribution(nodeDistribution),
 		_name(name) {
-			_pAlgorithm->assignNodeId(_nodeId);
 }
 
 template<class Weight, class NodeDistribution>
@@ -125,6 +124,7 @@ void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 
 	_maximum_iterations = simParam.getMaximumNumberIterations();
 
+	_pAlgorithm->assignNodeId(_nodeId);
 	_pAlgorithm->configure(simParam);
 
 	// Add this line or other nodes will not get a proper input at the first simulation step!

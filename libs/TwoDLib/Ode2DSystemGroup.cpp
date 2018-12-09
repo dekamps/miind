@@ -118,7 +118,7 @@ _map(InitializeMap()),
 _linear_map(InitializeLinearMap()),
 _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
-_vec_tau_refractive(std::vector<MPILib::Time>()),
+_vec_tau_refractive(std::vector<MPILib::Time>(mesh_list.size(),0.0)),
 _reset_refractive(InitializeResetRefractive()),
 _reversal(InitializeReversal()),
 _reset(InitializeReset()),
@@ -331,8 +331,16 @@ void Ode2DSystemGroup::RemapReversal(){
 void Ode2DSystemGroup::RedistributeProbability(MPILib::Number steps)
 {
 	for(MPILib::Index m=0; m < _mesh_list.size(); m++){
-		std::for_each(_vec_reset[m].begin(),_vec_reset[m].end(),_reset[m]);
+		if (_vec_tau_refractive[m] == 0.){
+			std::for_each(_vec_reset[m].begin(),_vec_reset[m].end(),_reset[m]);
+		}
+		else{
+			for(auto& r: _vec_reset[m])
+				_reset_refractive[m](r);
+		}
+
 		std::for_each(_vec_reset[m].begin(),_vec_reset[m].end(),_clean[m]);
+
 	}
 	MPILib::Time t_step = _mesh_list[0].TimeStep(); // they all should have the same time step
 	for (MPILib::Rate& f: _fs)

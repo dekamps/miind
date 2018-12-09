@@ -85,7 +85,7 @@ void CudaOde2DSystemAdapter::TransferMapData()
 
 void CudaOde2DSystemAdapter::FillRefractoryTimes(const std::vector<MPILib::Time>& times) {
 	for(inttype m = 0; m < _mesh_size; m++){
-		_nr_refractory_steps[m] = static_cast<unsigned int>(std::ceil(times[m] / _time_step));
+		_nr_refractory_steps[m] = std::max(1,static_cast<int>(std::ceil(times[m] / _time_step)));
 	}
 }
 

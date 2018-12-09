@@ -181,17 +181,17 @@ namespace TwoDLib {
 				MPILib::populist::StampedProbability prob;
 				prob._prob = from;
 				prob._time = t + _tau_refractive;
-				_vec_queue[i].push(prob);
+				// _vec_queue[i].push(prob);
 
-				from = _vec_queue[i].CollectAndRemove(t);
+				// from = _vec_queue[i].CollectAndRemove(t);
 				_vec_mass[_sys.Map(map._to[0],map._to[1])] += from;
 			}
 
 			double getTotalProbInRefract() const{
 				double total = 0.0;
-				for (MPILib::populist::ProbabilityQueue q : _vec_queue){
-					total += q.TotalProbability();
-				}
+				// for (MPILib::populist::ProbabilityQueue q : _vec_queue){
+				// 	total += q.TotalProbability();
+				// }
 				return total;
 			}
 

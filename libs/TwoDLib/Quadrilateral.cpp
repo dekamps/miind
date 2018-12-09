@@ -231,6 +231,24 @@ Cell(quad)
 	}
 }
 
+Quadrilateral::Quadrilateral(const Cell& cell):
+Cell(cell)
+{
+	assert( _vec_v.size() == Quadrilateral::_n_points);
+	assert( _vec_w.size() == Quadrilateral::_n_points);
+
+	if (! this->SanityCheck())
+			throw TwoDLibException("Sanity check failed in quadrilateral.");
+	std::ostringstream ost;
+	if (! this->IsSimple()){
+		std::ostringstream ost;
+		for (const Point& p: _vec_points)
+			ost << p[0] << "," << p[1] << ";";
+
+		throw TwoDLibException(string("Quadrilateral is not simple.") + ost.str());
+	}
+}
+
 
 
 Quadrilateral::~Quadrilateral(){

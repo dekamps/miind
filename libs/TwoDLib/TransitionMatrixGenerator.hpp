@@ -24,6 +24,7 @@
 #include "FiducialElement.hpp"
 #include "MeshTree.hpp"
 #include "Uniform.hpp"
+#include "Quadrilateral.hpp"
 
 
 using std::vector;

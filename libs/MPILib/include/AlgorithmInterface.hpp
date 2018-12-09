@@ -121,7 +121,7 @@ public:
 	 * singleton reporters - by default this does nothing so not to
 	 * annoy the compiler.
 	**/
-	void assignNodeId( NodeId ) {}
+	virtual void assignNodeId( NodeId ) {}
 
 
 	std::valarray<double>& getArrayState(AlgorithmGrid& grid) const

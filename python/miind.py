@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 import directories3 as directories
 from collections import Counter
 import reporting
+import connections
 
 # These algorithms can feature in a MeshAlgorithmGroup simulation, and no others
 MESH_ALGORITHM_GROUP_LIST = ['GridAlgorithmGroup', 'MeshAlgorithmGroup', 'DelayAlgorithm', 'RateFunctor' ]
@@ -26,18 +27,19 @@ def parse_rate_functors(algorithms):
 def generate_variable_declarations(variables):
      s = ''
      for variable in variables:
-          s += '\tconst float ' + variable.attrib['Name'] + ' = ' + variable.text + ';\n'
+          s += 'const float ' + variable.attrib['Name'] + ' = ' + variable.text + ';\n'
      s += '\n'
      return s
 
 
-def generate_preamble(fn, variables, nodes, algorithms, connections, cuda):
+def generate_preamble(fn, variables, nodes, algorithms, connections, parameters, cuda):
     '''Generates the function declarations, required for RateFunctors etc in the C++ file. fn is the file name where the C++
     is to be written. variable, nodes and algorithms are XML elements.'''
 
     # the rate functor functions need to be declared before the main program
     function_declarations = parse_rate_functors(algorithms)
     variable_declarations = generate_variable_declarations(variables)
+    time_step = parameters.find('t_step').text
 
     if cuda == True:
          template_argument = 'fptype'
@@ -63,7 +65,7 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, cuda):
         f.write('\n')
         f.write('\nint main(int argc, char *argv[]){\n')
         f.write('\n')
-        f.write('\tMiindLib::VectorizedNetwork network(0.001);\n')
+        f.write('\tMiindLib::VectorizedNetwork network('+ time_step +');\n')
         f.write('\tpugi::xml_document doc;\n')
         f.write('\n')
 
@@ -71,18 +73,21 @@ def generate_closing(fn,parameters):
     start_time = parameters.find('t_begin').text
     end_time = parameters.find('t_end').text
     time_step = parameters.find('t_step').text
+
+    steps = ''
+    master_steps = parameters.findall('nr_master_steps')
+    if(len(master_steps) > 0):
+        steps = master_steps[0].text
+
     '''Generates the closing statements in the C++ file.'''
     with open(fn,'a') as f:
-        f.write(define_display_nodes(tree))
-        f.write(define_rate_nodes(tree))
-        f.write(define_density_nodes(tree))
-        f.write('network.setDisplayNodes(display_nodes)\n')
-        f.write('network.setRateNodes(rate_nodes)\n')
-        f.write('network.setDensityNodes(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals)\n')
+        f.write('\tnetwork.setDisplayNodes(display_nodes);\n')
+        f.write('\tnetwork.setRateNodes(rate_nodes);\n')
+        f.write('\tnetwork.setDensityNodes(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals);\n')
         f.write('\n')
-        f.write('network.initOde2DSystem();\n')
+        f.write('\tnetwork.initOde2DSystem('+ steps +');\n')
         f.write('\n')
-        f.write('network.mainLoop('+ start_time +','+ end_time + ','+ time_step + ', true);\n'
+        f.write('\tnetwork.mainLoop('+ start_time +','+ end_time + ','+ time_step + ', true);\n')
         f.write('\n')
         f.write('\treturn 0;\n')
         f.write('}\n')
@@ -95,7 +100,7 @@ def process_tree(root):
     connections=root.findall('.//Connection')
     parameters=root.findall('.//SimulationRunParameter')
     io=root.findall('.//SimulationIO')
-    return variables, nodes, algorithms, connections, parameters, io
+    return variables, nodes, algorithms, connections, parameters[0], io
 
 def parse(fn):
     '''Takes a filename. Puts the file with filename fn through the XML parser. Returns nothing.'''
@@ -109,6 +114,7 @@ def parse(fn):
 
 def generate_model_files(nodes,algorithms):
      modelfiles=[]
+     refs = []
      for node in nodes:
           algname = node.attrib['algorithm']
           for alg in algorithms:
@@ -117,18 +123,22 @@ def generate_model_files(nodes,algorithms):
 
           if algorithm.attrib['type'] == 'MeshAlgorithmGroup':
                modelfiles.append(algorithm.attrib['modelfile'])
+               if 'tau_refractive' in algorithm.attrib.keys():
+                   refs.append(algorithm.attrib['tau_refractive'])
+               else:
+                   refs.append('0.0')
                ts = algorithm.findall('TimeStep')
                timestep = float(ts[0].text)
 
      if len(modelfiles) == 0:
-        return modelfiles, -1.0
+        return modelfiles, -1.0, refs
 
-     return modelfiles, timestep
+     return modelfiles, timestep, refs
 
 def generate_mesh_algorithm_group(fn,nodes,algorithms,cuda):
      '''Colate al MeshAlgorithmGroup instances and generate the C++ code to instantiate the group'''
 
-     modelfiles, timestep = generate_model_files(nodes,algorithms)
+     modelfiles, timestep, refs = generate_model_files(nodes,algorithms)
 
      if len(modelfiles) == 0:
          return
@@ -141,7 +151,7 @@ def generate_mesh_algorithm_group(fn,nodes,algorithms,cuda):
                f.write('\tTwoDLib::Mesh mesh' + str(i) +' = TwoDLib::RetrieveMeshFromXML(root' + str(i) + ');\n')
                f.write('\tstd::vector<TwoDLib::Redistribution> vec_rev' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(i) + ');\n')
                f.write('\tstd::vector<TwoDLib::Redistribution> vec_res' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reset",root' + str(i) + ');\n\n')
-               f.write('\tnetwork.addMeshNode(mesh'+ str(i) +', vec_rev'+ str(i) +', vec_res'+ str(i) +');\n')
+               f.write('\tnetwork.addMeshNode(mesh'+ str(i) +', vec_rev'+ str(i) +', vec_res'+ str(i) +', ' + refs[i] + ');\n')
                f.write('\n')
 
 
@@ -150,6 +160,7 @@ def generate_grid_model_files(nodes,algorithms):
      transforms=[]
      startvs=[]
      startws=[]
+     refs=[]
      for node in nodes:
           algname = node.attrib['algorithm']
           for alg in algorithms:
@@ -161,15 +172,21 @@ def generate_grid_model_files(nodes,algorithms):
                transforms.append(algorithm.attrib['transformfile'])
                startvs.append(algorithm.attrib['start_v'])
                startws.append(algorithm.attrib['start_w'])
+               if 'tau_refractive' in algorithm.attrib.keys():
+                   refs.append(algorithm.attrib['tau_refractive'])
+               else:
+                   refs.append('0.0')
                ts = algorithm.findall('TimeStep')
                timestep = float(ts[0].text)
 
-     return modelfiles, transforms, startvs, startws, timestep
+     return modelfiles, transforms, startvs, startws, timestep, refs
 
 def generate_grid_algorithm_group(fn,nodes,algorithms,cuda):
      '''Colate al MeshAlgorithmGroup instances and generate the C++ code to instantiate the group'''
 
-     modelfiles, transforms, startvs, startws, timestep = generate_grid_model_files(nodes,algorithms)
+     modelfiles, transforms, startvs, startws, timestep, refs = generate_grid_model_files(nodes,algorithms)
+
+     print refs
 
      with open(fn,'a') as f:
           for i,model in enumerate(modelfiles):
@@ -180,7 +197,7 @@ def generate_grid_algorithm_group(fn,nodes,algorithms,cuda):
                f.write('\tstd::vector<TwoDLib::Redistribution> vec_rev' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(i) + ');\n')
                f.write('\tstd::vector<TwoDLib::Redistribution> vec_res' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reset",root' + str(i) + ');\n\n')
                f.write('\tTwoDLib::TransitionMatrix transform' + str(i) + '(\"' + transforms[i] + '\");\n')
-               f.write('\tnetwork.addGridNode(mesh'+ str(i) +', transform'+ str(i) +', ' + str(startvs[i]) + ', ' + str(startws[i]) +', vec_rev'+ str(i) +', vec_res'+ str(i) +');\n')
+               f.write('\tnetwork.addGridNode(mesh'+ str(i) +', transform'+ str(i) +', ' + str(startvs[i]) + ', ' + str(startws[i]) +', vec_rev'+ str(i) +', vec_res'+ str(i) +', '+ refs[i] +');\n')
                f.write('\n')
 
 def generate_rate_names(nodes,algorithms):
@@ -205,10 +222,88 @@ def generate_rate_nodes(fn,nodes,algorithms):
 
         f.write('\n')
 
-def generate_connections(fn,connections):
+def extract_efficacy(fn):
+     '''Extract efficacy from a matrix file. Takes a filename, returns efficacy as a single float. In the
+     file efficacies are represented by two numbers. We will assume for now that one of them in zero. We will
+     return the non-zero number as efficacy.'''
+
+     with open(fn) as f:
+          line=f.readline()
+          nrs = [ float(x) for x in line.split()]
+          if nrs[0] == 0.:
+               return nrs[1]
+          else:
+               if nrs[1] != 0:
+                    raise ValueError('Expected at least one non-zero value')
+               return nrs[0]
+
+def construct_CSR_map(nodes,algorithms,connections):
+     '''Creates a list that corresponds one-to-one with the connection structure. Returns a tuple: [0] node name of receiving node,[1] matrix file name for this connection  '''
+     csrlist=[]
+     combi = []
+     for connection in connections:
+          for node in nodes:
+               if connection.attrib['Out'] == node.attrib['name']:
+                    # we have the right node, now see if it's a MeshAlgorithmGroup
+                    nodealgorithm=node.attrib['algorithm']
+                    for algorithm in algorithms:
+                         if nodealgorithm == algorithm.attrib['name']:
+                              if algorithm.attrib['type'] == 'MeshAlgorithmGroup':
+
+                                   mfs=algorithm.findall('MatrixFile')
+                                   mfn= [ mf.text for mf in mfs]
+                                   efficacy=float(connection.text.split()[1])
+                                   effs= [extract_efficacy(fn) for fn in mfn]
+
+                                   candidates=[]
+                                   for i, eff in enumerate(effs):
+                                        if np.isclose(eff,efficacy):
+                                             candidates.append(i)
+                                   if len(candidates) == 0: raise ValueError('No efficacy found that corresponds to the connection efficacy ' + str(efficacy))
+                                   if len(candidates) > 1: raise ValueError('Same efficacy found twice')
+
+                                   count = Counter(combi)
+                                   combi.append((connection.attrib['Out'],connection.attrib['In']))
+                                   nr_connection = count[(connection.attrib['Out'],connection.attrib['In'])]
+                                   csrlist.append([node.attrib['name'],mfn[candidates[0]], effs[candidates[0]],connection.attrib['In'],nr_connection,connection])
+
+     return csrlist
+
+def construct_grid_connection_map(nodes,algorithms,connections):
+     '''Creates a list that corresponds one-to-one with the connection structure. Returns a tuple: [0] node name of receiving node,[1] matrix file name for this connection  '''
+     gridlist=[]
+     for connection in connections:
+          for node in nodes:
+               if connection.attrib['Out'] == node.attrib['name']:
+                    # we have the right node, now see if it's a MeshAlgorithmGroup
+                    nodealgorithm=node.attrib['algorithm']
+                    for algorithm in algorithms:
+                         if nodealgorithm == algorithm.attrib['name']:
+                              if algorithm.attrib['type'] == 'GridAlgorithmGroup':
+                                   gridlist.append([node.attrib['name'],connection])
+
+     return gridlist
+
+def node_name_to_node_id(nodes):
+     '''Create a map from name to NodeId from node elements. Return this map.'''
+     d ={}
+     for i,node in enumerate(nodes):
+          d[node.attrib['name']] = i
+     return d
+
+def generate_connections(fn,conns, nodes, algorithms):
+    grid_cons = construct_grid_connection_map(nodes, algorithms, conns)
+    mesh_cons = construct_CSR_map(nodes, algorithms, conns)
+    nodemap = node_name_to_node_id(nodes)
+
     with open(fn,'a') as f:
-        for cn in connections:
-            f.write(connections.parse_network_connection(cn))
+        for cn in mesh_cons:
+            cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
+            f.write('\tTwoDLib::TransitionMatrix ' + cpp_name + '(\"' + cn[1] + '\");\n')
+            f.write(connections.parse_mesh_connection(cn[1], nodemap, cpp_name))
+
+        for cn in grid_cons:
+            f.write(connections.parse_grid_connection(cn[1],nodemap))
 
         f.write('\n')
 
@@ -223,13 +318,18 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
     else:
          fn=os.path.join(dirpath, progname)+'.cpp'
 
-    generate_preamble(fn, variables, nodes, algorithms,connections,cuda)
+    generate_preamble(fn, variables, nodes, algorithms,connections,parameter, cuda)
 
     generate_mesh_algorithm_group(fn,nodes,algorithms,cuda)
     generate_grid_algorithm_group(fn,nodes,algorithms,cuda)
     generate_rate_nodes(fn,nodes,algorithms)
-    generate_connections(fn,connections)
-    generate_closing(fn,parameters)
+    generate_connections(fn,connections,nodes,algorithms)
+    nodemap = node_name_to_node_id(nodes)
+    with open(fn,'a') as f:
+        f.write(reporting.define_display_nodes(root,nodemap))
+        f.write(reporting.define_rate_nodes(root,nodemap))
+        f.write(reporting.define_density_nodes(root,nodemap))
+    generate_closing(fn,parameter)
 
 def sanity_check(algorithms):
     '''Check if only the allowd algorithms feature in this simulation. Returns True if so, False otherwise.'''
