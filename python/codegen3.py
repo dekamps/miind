@@ -35,10 +35,10 @@ def generate_closing(outfile, steps, t_step):
     outfile.write('\t\tnetwork.evolveSingleStep(std::vector<MPILib::ActivityType>());\n')
     outfile.write('\t\tnetwork.reportNodeActivities(rate_nodes);\n')
     outfile.write('\t\tTwoDLib::Display::getInstance()->updateDisplay(count);\n')
-    outfile.write('\t\tTwoDLib::GridReport<TwoDLib::GridAlgorithm<DelayedConnection>>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
-    outfile.write('\t\tTwoDLib::GridReport<TwoDLib::MeshAlgorithm<DelayedConnection>>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
-    outfile.write('\t\tTwoDLib::GridReport<TwoDLib::MeshAlgorithm<DelayedConnection,TwoDLib::MasterOMP>>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
-    outfile.write('\t\tTwoDLib::GridReport<TwoDLib::MeshAlgorithm<DelayedConnection,TwoDLib::MasterOdeint>>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
+    outfile.write('\t\tTwoDLib::GridReport<TwoDLib::GridAlgorithm<MPILib::DelayedConnection>>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
+    outfile.write('\t\tTwoDLib::GridReport<TwoDLib::MeshAlgorithm<MPILib::DelayedConnection>>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
+    outfile.write('\t\tTwoDLib::GridReport<TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOMP>>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
+    outfile.write('\t\tTwoDLib::GridReport<TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOdeint>>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
     outfile.write('\t\t(*pb)++;\n')
     outfile.write('\t\tcount++;\n')
     outfile.write('\t}\n')
@@ -99,7 +99,7 @@ def matrix_transform_name(fn):
 
     tmatnames = []
     for a in ma:
-        if a.attrib['type'] in ['GridAlgorithm','MeshAlgorithmGroup']:
+        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup']:
             tmatnames.append(a.attrib['transformfile'])
     return tmatnames
 
@@ -112,7 +112,7 @@ def model_name(fn):
 
     modelnames = []
     for a in ma:
-        if a.attrib['type'] in ['GridAlgorithm','MeshAlgorithmGroup','MeshAlgorithm','MeshAlgorithmGroup']:
+        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','MeshAlgorithm','MeshAlgorithmGroup']:
             modelnames.append(a.attrib['modelfile'])
     return modelnames
 
@@ -125,6 +125,13 @@ def matrix_names(fn):
     for a in ma:
         matrixnames.append(a.text)
     return matrixnames
+
+def node_name_to_node_id(nodes):
+     '''Create a map from name to NodeId from node elements. Return this map.'''
+     d ={}
+     for i,node in enumerate(nodes):
+          d[node.attrib['name']] = i
+     return d
 
 def generate_outputfile(infile, outfile):
     generate_preamble(outfile)
@@ -154,9 +161,10 @@ def generate_outputfile(infile, outfile):
     simpar = tree.find('SimulationRunParameter')
     simulation.parse_parameter(simpar,outfile)
 
-    outfile.write(define_display_nodes(tree))
-    outfile.write(define_rate_nodes(tree))
-    outfile.write(define_density_nodes(tree))
+    nodemap = node_name_to_node_id(node_list)
+    outfile.write(reporting.define_display_nodes(tree,nodemap))
+    outfile.write(reporting.define_rate_nodes(tree,nodemap))
+    outfile.write(reporting.define_density_nodes(tree,nodemap))
 
     t_begin = tree.find('SimulationRunParameter/t_begin')
     t_end   = tree.find('SimulationRunParameter/t_end')

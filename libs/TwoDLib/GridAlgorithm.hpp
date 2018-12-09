@@ -59,9 +59,9 @@ namespace TwoDLib {
 				const std::vector<WeightValue>& weightVector,
 				const std::vector<MPILib::NodeType>& typeVector);
 
+		using MPILib::AlgorithmInterface<WeightValue>::evolveNodeState;
 		virtual void evolveNodeState(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<WeightValue>& weightVector, MPILib::Time time,
-				const std::vector<MPILib::NodeType>& typeVector);
+				const std::vector<WeightValue>& weightVector, MPILib::Time time);
 
 		void InitializeDensity(MPILib::Index i, MPILib::Index j){_sys.Initialize(0,i,j);}
 

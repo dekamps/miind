@@ -38,7 +38,7 @@ class VectorizedNetwork {
 public:
   VectorizedNetwork(MPILib::Time time_step);
 
-  void initOde2DSystem();
+  void initOde2DSystem(unsigned int min_solve_steps=10);
 
   void setRateNodes(std::vector<MPILib::NodeId> ids){
     _rate_nodes = ids;
@@ -52,9 +52,9 @@ public:
   }
 
   void addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w,
-    std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res);
+    std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive);
 
-  void addMeshNode(TwoDLib::Mesh mesh, std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res);
+  void addMeshNode(TwoDLib::Mesh mesh, std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive);
 
   void addRateNode(function_pointer functor);
 
@@ -73,6 +73,7 @@ protected:
   std::vector<TwoDLib::Mesh> _vec_mesh;
   std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_rev;
   std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_res;
+  std::vector<MPILib::Time> _vec_tau_refractive;
 
   std::vector<inttype> _grid_meshes;
   std::vector<inttype> _mesh_meshes;

@@ -18,6 +18,7 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include "PolyGenerator.hpp"
 #include "TwoDLibException.hpp"
 

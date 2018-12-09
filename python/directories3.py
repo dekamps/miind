@@ -119,13 +119,14 @@ def insert_cmake_template(name,full_path_name,cuda):
         geomdir = libbase + '/GeomLib'
         mpidir  = libbase + '/MPILib'
         twodir  = libbase + '/TwoDLib'
+        shared  = libbase + '/MiindLib'
 
         if cuda == True:
             cudatwodir = libbase + '/CudaTwoDLib'
         else:
             cudatwodir = ''
 
-        fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ')\n')
+        fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ' ' + shared +')\n')
 
         if cuda == True:
             fout.write('\ncuda_add_executable( ' + name + ' ' + name + '.cu)\n')

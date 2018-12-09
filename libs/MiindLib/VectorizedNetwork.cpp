@@ -11,7 +11,7 @@ _network_time_step(time_step)
 }
 
 void VectorizedNetwork::addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w,
-  std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res) {
+  std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive) {
 
   _num_nodes++;
   _node_id_to_group_mesh.insert(std::pair<MPILib::NodeId, MPILib::Index>(_num_nodes-1,_vec_mesh.size()));
@@ -23,11 +23,12 @@ void VectorizedNetwork::addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatri
   _start_ws.push_back(start_w);
   _vec_vec_rev.push_back(vec_rev);
   _vec_vec_res.push_back(vec_res);
+  _vec_tau_refractive.push_back(tau_refractive);
 
 }
 
 void VectorizedNetwork::addMeshNode(TwoDLib::Mesh mesh,
-  std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res) {
+  std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive) {
 
   _num_nodes++;
   _node_id_to_group_mesh.insert(std::pair<MPILib::NodeId, MPILib::Index>(_num_nodes-1,_vec_mesh.size()));
@@ -36,6 +37,7 @@ void VectorizedNetwork::addMeshNode(TwoDLib::Mesh mesh,
   _vec_mesh.push_back(mesh);
   _vec_vec_rev.push_back(vec_rev);
   _vec_vec_res.push_back(vec_res);
+  _vec_tau_refractive.push_back(tau_refractive);
 
 }
 
@@ -44,9 +46,9 @@ void VectorizedNetwork::addRateNode(function_pointer functor){
   _rate_functions.push_back(function_association(_num_nodes-1,functor));
 }
 
-void VectorizedNetwork::initOde2DSystem(){
+void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps){
 
-  _group = new TwoDLib::Ode2DSystemGroup(_vec_mesh,_vec_vec_rev,_vec_vec_res);
+  _group = new TwoDLib::Ode2DSystemGroup(_vec_mesh,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive);
 
 	for( MPILib::Index i=0; i < _grid_meshes.size(); i++){
     vector<TwoDLib::Coordinates> coords = _vec_mesh[i].findPointInMeshSlow(TwoDLib::Point(_start_vs[i], _start_ws[i]));
@@ -58,7 +60,7 @@ void VectorizedNetwork::initOde2DSystem(){
 
   // All grids/meshes must have the same timestep
   TwoDLib::MasterParameter par(static_cast<MPILib::Number>(ceil(_network_time_step/_vec_mesh[0].TimeStep())));
-  _n_steps = std::max((int)par._N_steps,10);
+  _n_steps = std::max((int)par._N_steps,(int)min_solve_steps);
   std::cout << "Using master solver n_steps = " << _n_steps << "\n";
 
   _group_adapter = new CudaTwoDLib::CudaOde2DSystemAdapter(*(_group));
@@ -168,10 +170,10 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
       TwoDLib::Display::getInstance()->updateDisplay(i_loop);
     }
 
-    TwoDLib::GridReport<TwoDLib::GridAlgorithm<DelayedConnection>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
-    TwoDLib::GridReport<TwoDLib::MeshAlgorithm<DelayedConnection>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
-    TwoDLib::GridReport<TwoDLib::MeshAlgorithm<DelayedConnection,TwoDLib::MasterOMP>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
-    TwoDLib::GridReport<TwoDLib::MeshAlgorithm<DelayedConnection,TwoDLib::MasterOdeint>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
+    TwoDLib::GridReport<TwoDLib::GridAlgorithm<MPILib::DelayedConnection>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
+    TwoDLib::GridReport<TwoDLib::MeshAlgorithm<MPILib::DelayedConnection>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
+    TwoDLib::GridReport<TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOMP>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
+    TwoDLib::GridReport<TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOdeint>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
 
 		reportNodeActivities(time);
 

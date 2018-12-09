@@ -65,6 +65,8 @@ namespace TwoDLib {
     //! Copy constructor
     Quadrilateral(const Quadrilateral&);
 
+    Quadrilateral(const Cell&);
+
     //! Virtual destructor
     virtual ~Quadrilateral();
 

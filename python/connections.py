@@ -45,13 +45,21 @@ def parse_connection(connection, weighttype):
 
     return s
 
-def parse_network_connection(connection):
-    i = str(nodes.NODE_NAMES[connection.attrib['In']])
-    o = str(nodes.NODE_NAMES[connection.attrib['Out']])
+def parse_grid_connection(connection, nodemap):
+    i = str(nodemap[connection.attrib['In']])
+    o = str(nodemap[connection.attrib['Out']])
     num_cons = connection.text.split()[0]
     eff = connection.text.split()[1]
 
     return '\tnetwork.addGridConnection('+ i +','+ o +','+ eff +','+ num_cons +');\n'
+
+def parse_mesh_connection(connection, nodemap, mat_name):
+    i = str(nodemap[connection.attrib['In']])
+    o = str(nodemap[connection.attrib['Out']])
+    num_cons = connection.text.split()[0]
+    eff = connection.text.split()[1]
+
+    return '\tnetwork.addMeshConnection('+ i +','+ o +','+ eff +','+ num_cons +','+ mat_name +');\n'
 
 def parse_connections(connection_list,weighttype,outfile):
     for connection in connection_list:
