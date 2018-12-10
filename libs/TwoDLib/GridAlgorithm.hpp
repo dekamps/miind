@@ -20,7 +20,7 @@ namespace TwoDLib {
  */
 
 	template <class WeightValue>
-	class GridAlgorithm : public MPILib::AlgorithmInterface<WeightValue>{
+	class GridAlgorithm : public DensityAlgorithmInterface<WeightValue>{
 
 	public:
     GridAlgorithm

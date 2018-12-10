@@ -161,6 +161,7 @@ def generate_grid_model_files(nodes,algorithms):
      startvs=[]
      startws=[]
      refs=[]
+     timestep = 0.0
      for node in nodes:
           algname = node.attrib['algorithm']
           for alg in algorithms:
@@ -185,8 +186,6 @@ def generate_grid_algorithm_group(fn,nodes,algorithms,cuda):
      '''Colate al MeshAlgorithmGroup instances and generate the C++ code to instantiate the group'''
 
      modelfiles, transforms, startvs, startws, timestep, refs = generate_grid_model_files(nodes,algorithms)
-
-     print refs
 
      with open(fn,'a') as f:
           for i,model in enumerate(modelfiles):
@@ -300,7 +299,7 @@ def generate_connections(fn,conns, nodes, algorithms):
         for cn in mesh_cons:
             cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
             f.write('\tTwoDLib::TransitionMatrix ' + cpp_name + '(\"' + cn[1] + '\");\n')
-            f.write(connections.parse_mesh_connection(cn[1], nodemap, cpp_name))
+            f.write(connections.parse_mesh_connection(cn[5], nodemap, cpp_name))
 
         for cn in grid_cons:
             f.write(connections.parse_grid_connection(cn[1],nodemap))

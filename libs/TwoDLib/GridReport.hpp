@@ -2,30 +2,30 @@
 #define _CODE_LIBS_TWODLIB_GRIDREPORT_INCLUDE_GUARD
 
 #include <string>
-#include "GridAlgorithm.hpp"
+#include "DensityAlgorithmInterface.hpp"
 
 namespace TwoDLib {
 
-template <class Algorithm>
+template<class WeightValue>
 class GridReport {
 
 public:
 
   GridReport():
-  _obs(std::map<MPILib::NodeId, Algorithm*>()) {
+  _obs(std::map<MPILib::NodeId, DensityAlgorithmInterface<WeightValue>*>()) {
 
   }
 
-  static GridReport<Algorithm>* getInstance() {
+  static GridReport<WeightValue>* getInstance() {
     if (!reg) {
-      reg = new GridReport<Algorithm>();
+      reg = new GridReport<WeightValue>();
     }
 
     return reg;
   }
 
-  void registerObject(MPILib::NodeId id, Algorithm* obj) {
-    _obs.insert(std::pair<MPILib::NodeId, Algorithm*>(id,obj));
+  void registerObject(MPILib::NodeId id, DensityAlgorithmInterface<WeightValue>* obj) {
+    _obs.insert(std::pair<MPILib::NodeId, DensityAlgorithmInterface<WeightValue>*>(id,obj));
   }
 
   void reportDensity(const std::vector<MPILib::NodeId>& node_ids, const std::vector<MPILib::Time>& start_times,
@@ -33,7 +33,7 @@ public:
     for (int i=0; i<node_ids.size(); i++){
       if ( _obs.find(node_ids[i]) == _obs.end() )
         continue;
-      if(time >= start_times[i] && time <= end_times[i] && std::fmod(time, intervals[i]) == 0 ){
+      if(time >= start_times[i] && time <= end_times[i] && std::fabs(std::remainder(time, intervals[i])) < 0.00000001 ){
         _obs.at(node_ids[i])->reportDensity();
       }
     }
@@ -41,14 +41,14 @@ public:
 
 
 private:
-  std::map<MPILib::NodeId, Algorithm*> _obs;
+  std::map<MPILib::NodeId, DensityAlgorithmInterface<WeightValue>*> _obs;
 
-  static GridReport<Algorithm>* reg;
+  static GridReport<WeightValue>* reg;
 
 };
 
-template <class Algorithm>
-GridReport<Algorithm>* GridReport<Algorithm>::reg;
+template <class WeightValue>
+GridReport<WeightValue>* GridReport<WeightValue>::reg;
 
 }
 

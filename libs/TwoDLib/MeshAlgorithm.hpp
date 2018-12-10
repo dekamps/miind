@@ -26,6 +26,7 @@
 #include "Ode2DSystemGroup.hpp"
 #include "pugixml.hpp"
 #include "display.hpp"
+#include "DensityAlgorithmInterface.hpp"
 
 namespace TwoDLib {
 
@@ -36,7 +37,7 @@ namespace TwoDLib {
  */
 
 	template <class WeightValue, class Solver=TwoDLib::MasterOdeint>
-	class MeshAlgorithm : public MPILib::AlgorithmInterface<WeightValue>  {
+	class MeshAlgorithm : public DensityAlgorithmInterface<WeightValue>  {
 
 	public:
 
@@ -97,8 +98,7 @@ namespace TwoDLib {
 		 */
 		using MPILib::AlgorithmInterface<WeightValue>::evolveNodeState;
 		virtual void evolveNodeState(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<WeightValue>& weightVector, MPILib::Time time,
-				const std::vector<MPILib::NodeType>& typeVector);
+				const std::vector<WeightValue>& weightVector, MPILib::Time time);
 
 		/**
 		 * prepare the Evolve method
@@ -163,6 +163,8 @@ namespace TwoDLib {
 		MPILib::Time _h;
 		MPILib::Rate _rate;
 		MPILib::Time _t_cur;
+
+		std::vector<MPILib::Time>    _vec_tau_refractive;
 
 		// parsing auxilliaries
 		pugi::xml_document _doc;

@@ -88,6 +88,9 @@ namespace TwoDLib {
 		//! Dump the current density profile (0), or the mass profile (1) to an output stream
 		void Dump(const std::vector<std::ostream*>&, int mode = 0) const;
 
+		//! Dump a single mesh file
+		void DumpSingleMesh(std::ostream* vecost, unsigned int m, int mode = 0) const;
+
 		//! Remap probability that has run from the end of a strip. Run this after evolution
 		void RemapReversal();
 
