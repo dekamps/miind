@@ -209,6 +209,11 @@ def parse_mesh_algorithm(alg, i, weighttype):
     if alg.attrib['type'] != 'MeshAlgorithm':
         raise ValueError
 
+    if weighttype.text ==  "DelayedConnection":
+        type = "MPILib::" + weighttype.text
+    else:
+        type = "double"
+
 
     s += '\tstd::vector<std::string> '
     vec_name = 'vec_mat_' + str(i)
@@ -228,10 +233,10 @@ def parse_mesh_algorithm(alg, i, weighttype):
 
     if 'solver' in alg.attrib.keys():
         # solver type must be provided without TwoDLib::
-        s += '\tTwoDLib::MeshAlgorithm<DelayedConnection,TwoDLib::' + alg.attrib['solver'] + '> ' + cpp_name + '(\"'
+        s += '\tTwoDLib::MeshAlgorithm<'+type+',TwoDLib::' + alg.attrib['solver'] + '> ' + cpp_name + '(\"'
     else:
 
-        s += '\tTwoDLib::MeshAlgorithm<DelayedConnection> ' + cpp_name + '(\"'
+        s += '\tTwoDLib::MeshAlgorithm<'+type+'> ' + cpp_name + '(\"'
     s += alg.attrib['modelfile'] + '\",' + vec_name + ',' + timestep.text
 
     if 'tau_refractive' in alg.keys():
@@ -253,10 +258,15 @@ def parse_grid_algorithm(alg, i, weighttype):
     if alg.attrib['type'] != 'GridAlgorithm':
         raise ValueError
 
+    if weighttype.text ==  "DelayedConnection":
+        type = "MPILib::" + weighttype.text
+    else:
+        type = "double"
+
     timestep = alg.find('TimeStep')
 
     cpp_name = 'alg_mesh_' + str(i)
-    s += '\tTwoDLib::GridAlgorithm<DelayedConnection> ' + cpp_name + '(\"'
+    s += '\tTwoDLib::GridAlgorithm<' + type +'> ' + cpp_name + '(\"'
     s += alg.attrib['modelfile'] + '\",'
     s += '\"' + alg.attrib['transformfile'] + '\",'
     s += timestep.text + ','

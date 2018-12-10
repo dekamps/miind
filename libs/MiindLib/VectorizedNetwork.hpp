@@ -49,6 +49,9 @@ public:
   void setDensityNodes(std::vector<MPILib::NodeId> ids, std::vector<MPILib::Time> start_times,
     std::vector<MPILib::Time> end_times, std::vector<MPILib::Time> intervals){
     _density_nodes = ids;
+    _density_start_times = start_times;
+    _density_end_times = end_times;
+    _density_intervals = intervals;
   }
 
   void addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w,
@@ -63,6 +66,7 @@ public:
   void addMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, TwoDLib::TransitionMatrix *tmat);
 
   void reportNodeActivities(MPILib::Time sim_time);
+  void reportNodeDensities(MPILib::Time sim_time);
   void mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILib::Time t_report, bool write_displays);
 
 protected:

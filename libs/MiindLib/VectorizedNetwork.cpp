@@ -51,11 +51,15 @@ void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps){
   _group = new TwoDLib::Ode2DSystemGroup(_vec_mesh,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive);
 
 	for( MPILib::Index i=0; i < _grid_meshes.size(); i++){
-    vector<TwoDLib::Coordinates> coords = _vec_mesh[i].findPointInMeshSlow(TwoDLib::Point(_start_vs[i], _start_ws[i]));
-    _group->Initialize(i,coords[0][0],coords[0][1]);
+    vector<TwoDLib::Coordinates> coords = _vec_mesh[_grid_meshes[i]].findPointInMeshSlow(TwoDLib::Point(_start_vs[i], _start_ws[i]));
+    _group->Initialize(_grid_meshes[i],coords[0][0],coords[0][1]);
 
     //create CSR Matrix for each transforms
-    _csrs.push_back(TwoDLib::CSRMatrix(_vec_transforms[i], *(_group), i));
+    _csrs.push_back(TwoDLib::CSRMatrix(_vec_transforms[i], *(_group), _grid_meshes[i]));
+  }
+
+  for(MPILib::Index i=0; i < _mesh_meshes.size(); i++){
+    _group->Initialize(_mesh_meshes[i],0,0);
   }
 
   // All grids/meshes must have the same timestep
@@ -75,6 +79,30 @@ void VectorizedNetwork::reportNodeActivities(MPILib::Time sim_time){
 		ofst_rate << sim_time << "\t" << _out_rates[i] << std::endl;
 		ofst_rate.close();
 	}
+}
+
+void VectorizedNetwork::reportNodeDensities(MPILib::Time sim_time){
+  for (int i=0; i<_density_nodes.size(); i++){
+    if(sim_time < _density_start_times[i] || sim_time > _density_end_times[i] || std::fabs(std::remainder(sim_time, _density_intervals[i])) > 0.00000001 )
+      continue;
+
+    std::ostringstream ost;
+    ost << _density_nodes[i]  << "_" << sim_time;
+    string fn("node_" + ost.str());
+
+    std::string model_path("densities");
+    boost::filesystem::path path(model_path);
+
+    // MdK 27/01/2017. grid file is now created in the cwd of the program and
+    // not in the directory where the mesh resides.
+    const std::string dirname = path.filename().string();
+
+    if (! boost::filesystem::exists(dirname) ){
+      boost::filesystem::create_directory(dirname);
+    }
+    std::ofstream ofst(dirname + "/" + fn);
+    _group->DumpSingleMesh(&ofst, _density_nodes[i]);
+  }
 }
 
 void VectorizedNetwork::addGridConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns){
@@ -104,8 +132,8 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
   std::vector<inttype> node_to_group_meshes;
   std::vector<fptype> stays;
   std::vector<fptype> goes;
-  std::vector<inttype> off1s;
-  std::vector<inttype> off2s;
+  std::vector<int> off1s;
+  std::vector<int> off2s;
 
   for (unsigned int i=0; i<_grid_connections.size(); i++){
     // for each connection, which of group's meshes is being affected
@@ -152,7 +180,7 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 
 		for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++ ){
 			_csr_adapter.ClearDerivative();
-      _csr_adapter.CalculateGridDerivative(node_to_group_meshes, rates, stays, goes, off1s, off2s);
+      _csr_adapter.CalculateMeshGridDerivative(node_to_group_meshes,rates,stays, goes, off1s, off2s);
 			_csr_adapter.AddDerivative();
 		}
 
@@ -170,10 +198,10 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
       TwoDLib::Display::getInstance()->updateDisplay(i_loop);
     }
 
-    TwoDLib::GridReport<TwoDLib::GridAlgorithm<MPILib::DelayedConnection>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
-    TwoDLib::GridReport<TwoDLib::MeshAlgorithm<MPILib::DelayedConnection>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
-    TwoDLib::GridReport<TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOMP>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
-    TwoDLib::GridReport<TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOdeint>>::getInstance()->reportDensity(_density_nodes,_density_start_times,_density_end_times,_density_intervals,time);
+    if(_density_nodes.size() > 0){
+      _group_adapter->updateGroupMass();
+      reportNodeDensities(time);
+    }
 
 		reportNodeActivities(time);
 

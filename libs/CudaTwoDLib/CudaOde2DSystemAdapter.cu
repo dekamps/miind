@@ -135,7 +135,7 @@ void CudaOde2DSystemAdapter::Validate() const
 
     fptype nmesh = static_cast<fptype>(_group.MeshObjects().size());
     if (fabs(sum - nmesh ) > tolerance){
-	fprintf(stderr,"Total mass  unequal to number of mesh objects:%f, %f\n",sum,nmesh);
+	fprintf(stderr,"Total mass unequal to number of mesh objects:%f, %f\n",sum,nmesh);
         exit(0);
     }
 }

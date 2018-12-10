@@ -41,7 +41,7 @@ __global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* m
 }
 
 __global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays,
-  fptype goes, inttype offset_1, inttype offset_2,
+  fptype goes, int offset_1, int offset_2,
   fptype* derivative, fptype* mass, inttype offset)
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
@@ -50,8 +50,8 @@ __global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays
     for (int i = index; i < N; i+= stride ){
       int io = i+offset;
       fptype dr = 0.;
-      dr += stays*mass[((((io+offset_1)%N)+N) % N)+offset];
-  		dr += goes*mass[((((io+offset_2)%N)+N) % N)+offset];
+      dr += stays*mass[(modulo(io+offset_1,N))+offset];
+  		dr += goes*mass[(modulo(io+offset_2,N))+offset];
       dr -= mass[io];
       derivative[io] += rate*dr;
     }
@@ -109,7 +109,7 @@ __global__ void MapResetThreaded(unsigned int n_reset, fptype* sum, fptype* mass
          dr += rev_alpha[j]*refactory_mass[ref_offset+j];
 
      }
-     sum[i] = dr;
+     sum[i] += dr;
      mass[i_r] += dr;
    }
 }
@@ -119,6 +119,10 @@ __global__ void MapResetThreaded(unsigned int n_reset, fptype* sum, fptype* mass
   // each thread loads one element from global to shared mem
   unsigned int tid = threadIdx.x;
   unsigned int i = blockIdx.x*blockDim.x + threadIdx.x;
+
+  if(i >= n_sum)
+    return;
+
   sdata[tid] = sum[i];
   __syncthreads();
   // do reduction in shared mem

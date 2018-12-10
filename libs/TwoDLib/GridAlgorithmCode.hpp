@@ -96,7 +96,7 @@ namespace TwoDLib {
 		_csr_transform = new CSRMatrix(_transformMatrix, _sys, 0);
 
 		Display::getInstance()->addOdeSystem(_node_id, &_sys);
-		GridReport<GridAlgorithm<WeightValue>>::getInstance()->registerObject(_node_id, this);
+		GridReport<WeightValue>::getInstance()->registerObject(_node_id, this);
 
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
@@ -263,7 +263,7 @@ namespace TwoDLib {
 	void GridAlgorithm<WeightValue>::reportDensity() const
 	{
 		std::ostringstream ost;
-		ost << _node_id  << "_" << _t_cur;
+		ost << _node_id  << "_" << (_t_cur-_dt);
 		ost << "_" << _sys.P();
 		string fn("mesh_" + ost.str());
 

@@ -118,9 +118,10 @@ namespace TwoDLib {
 	_mesh_vec(CreateMeshObject()),
 	_vec_vec_rev(std::vector<std::vector<Redistribution> >{this->Mapping("Reversal")}),
 	_vec_vec_res(std::vector<std::vector<Redistribution> >{this->Mapping("Reset")}),
+	_vec_tau_refractive(std::vector<MPILib::Time>({tau_refractive})),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive),
 	_n_evolve(0),
 	_n_steps(0),
 	// AvgV method is for Fitzhugh-Nagumo, and other methods that don't have a threshold crossing
@@ -144,9 +145,10 @@ namespace TwoDLib {
 	_mesh_vec(rhs._mesh_vec),
 	_vec_vec_rev(rhs._vec_vec_rev),
 	_vec_vec_res(rhs._vec_vec_res),
+	_vec_tau_refractive(rhs._vec_tau_refractive),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction)
@@ -181,7 +183,7 @@ namespace TwoDLib {
 		MPILib::Time t_step     = par_run.getTStep();
 
 		Display::getInstance()->addOdeSystem(_node_id, &_sys);
-		GridReport<MeshAlgorithm<WeightValue,Solver>>::getInstance()->registerObject(_node_id, this);
+		GridReport<WeightValue>::getInstance()->registerObject(_node_id, this);
 
 		// the integration time step, stored in the MasterParameter, is gauged with respect to the
 		// network time step.
@@ -225,7 +227,7 @@ namespace TwoDLib {
 
 		if (b_state){
 			std::ostringstream ost;
-			ost << id  << "_" << _t_cur;
+			ost << id  << "_" << (_t_cur-_dt);
 			ost << "_" << _sys.P();
 			string fn("mesh_" + ost.str());
 
@@ -274,8 +276,7 @@ namespace TwoDLib {
 	(
 		const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<WeightValue>& weightVector,
-		MPILib::Time time,
-		const std::vector<MPILib::NodeType>& typeVector
+		MPILib::Time time
 	)
 	{
 	  // The network time step must be an integer multiple of the network time step; in principle

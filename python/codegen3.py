@@ -24,8 +24,13 @@ def generate_preamble(outfile):
 
     return
 
-def generate_closing(outfile, steps, t_step):
+def generate_closing(outfile, steps, t_step, weighttype):
     outfile.write('\tnetwork.configureSimulation(par_run);\n')
+
+    if weighttype.text ==  "DelayedConnection":
+        type = "MPILib::" + weighttype.text
+    else:
+        type = "double"
 
     outfile.write('\tTwoDLib::Display::getInstance()->animate(true, display_nodes,' + t_step + ');\n')
     outfile.write('\tnetwork.startSimulation();\n')
@@ -35,10 +40,7 @@ def generate_closing(outfile, steps, t_step):
     outfile.write('\t\tnetwork.evolveSingleStep(std::vector<MPILib::ActivityType>());\n')
     outfile.write('\t\tnetwork.reportNodeActivities(rate_nodes);\n')
     outfile.write('\t\tTwoDLib::Display::getInstance()->updateDisplay(count);\n')
-    outfile.write('\t\tTwoDLib::GridReport<TwoDLib::GridAlgorithm<MPILib::DelayedConnection>>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
-    outfile.write('\t\tTwoDLib::GridReport<TwoDLib::MeshAlgorithm<MPILib::DelayedConnection>>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
-    outfile.write('\t\tTwoDLib::GridReport<TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOMP>>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
-    outfile.write('\t\tTwoDLib::GridReport<TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOdeint>>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
+    outfile.write('\t\tTwoDLib::GridReport<'+type+'>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
     outfile.write('\t\t(*pb)++;\n')
     outfile.write('\t\tcount++;\n')
     outfile.write('\t}\n')
@@ -170,7 +172,7 @@ def generate_outputfile(infile, outfile):
     t_end   = tree.find('SimulationRunParameter/t_end')
     t_step = tree.find('SimulationRunParameter/t_step')
 
-    generate_closing(outfile, '(' + t_end.text + ' - ' + t_begin.text + ') / ' + t_step.text , t_step.text)
+    generate_closing(outfile, '(' + t_end.text + ' - ' + t_begin.text + ') / ' + t_step.text , t_step.text, weighttype)
 
     algorithms.reset_algorithms()
     nodes.reset_nodes()

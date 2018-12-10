@@ -191,7 +191,7 @@ void CSRAdapter::CalculateDerivative(const std::vector<fptype>& vecrates)
         cudaStreamSynchronize(_streams[m]);
 }
 
-void CSRAdapter::CalculateGridDerivative(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates, const std::vector<fptype>& vecstays, const std::vector<fptype>& vecgoes, const std::vector<inttype>& vecoff1s, const std::vector<inttype>& vecoff2s)
+void CSRAdapter::CalculateGridDerivative(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates, const std::vector<fptype>& vecstays, const std::vector<fptype>& vecgoes, const std::vector<int>& vecoff1s, const std::vector<int>& vecoff2s)
 {
     for(inttype m = 0; m < _nr_streams - (_nr_m - _transform_offset); m++)
     {
@@ -206,22 +206,22 @@ void CSRAdapter::CalculateGridDerivative(const std::vector<inttype>& vecindex, c
 
 void CSRAdapter::CalculateMeshGridDerivative(const std::vector<inttype>& vecindex,
   const std::vector<fptype>& vecrates, const std::vector<fptype>& vecstays,
-  const std::vector<fptype>& vecgoes, const std::vector<inttype>& vecoff1s,
-  const std::vector<inttype>& vecoff2s)
+  const std::vector<fptype>& vecgoes, const std::vector<int>& vecoff1s,
+  const std::vector<int>& vecoff2s)
 {
   for(inttype m = 0; m < _nr_streams - (_nr_m - _transform_offset); m++)
   {
     // be careful to use this block size
     inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1)/_blockSize;
     CudaCalculateGridDerivative<<<numBlocks,_blockSize,0,_streams[m]>>>(_nr_rows[vecindex[m]],vecrates[m],vecstays[m],vecgoes[m],vecoff1s[m],vecoff2s[m],_dydt,_group._mass,_offsets[vecindex[m]]);
-  }
+}
 
   inttype m = _transform_offset;
   for(inttype s =  _nr_streams - (_nr_m - _transform_offset); s < _nr_streams; s++)
   {
     // be careful to use this block size
     inttype numBlocks = (_nr_rows[m] + _blockSize - 1)/_blockSize;
-    CudaCalculateDerivative<<<numBlocks,_blockSize,0,_streams[s]>>>(_nr_rows[vecindex[m]],vecrates[m],_dydt,_group._mass,_val[vecindex[m]],_ia[vecindex[m]],_ja[vecindex[m]],_group._map,_offsets[vecindex[m]]);
+    CudaCalculateDerivative<<<numBlocks,_blockSize,0,_streams[s]>>>(_nr_rows[vecindex[m]],vecrates[m],_dydt,_group._mass,_val[m],_ia[m],_ja[m],_group._map,_offsets[vecindex[m]]);
     m++;
   }
 

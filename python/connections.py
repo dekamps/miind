@@ -59,7 +59,7 @@ def parse_mesh_connection(connection, nodemap, mat_name):
     num_cons = connection.text.split()[0]
     eff = connection.text.split()[1]
 
-    return '\tnetwork.addMeshConnection('+ i +','+ o +','+ eff +','+ num_cons +','+ mat_name +');\n'
+    return '\tnetwork.addMeshConnection('+ i +','+ o +','+ eff +','+ num_cons +',&'+ mat_name +');\n'
 
 def parse_connections(connection_list,weighttype,outfile):
     for connection in connection_list:
