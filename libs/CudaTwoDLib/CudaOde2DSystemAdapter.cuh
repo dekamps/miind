@@ -63,7 +63,11 @@ namespace CudaTwoDLib {
 
 								void RedistributeProbability();
 
+								void RedistributeProbability(std::vector<inttype>& meshes);
+
 								void MapFinish();
+
+								void MapFinish(std::vector<inttype>& meshes);
 
 								void updateGroupMass();
 

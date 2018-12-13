@@ -44,8 +44,9 @@ namespace CudaTwoDLib {
 
 							CSRAdapter(CudaOde2DSystemAdapter& adapter, const std::vector<TwoDLib::CSRMatrix>& matrixvector, fptype euler_timestep );
 
-              CSRAdapter(CudaOde2DSystemAdapter& adapter, const std::vector<TwoDLib::CSRMatrix>& matrixvector,
-								inttype transform_offset, inttype nr_connections, fptype euler_timestep );
+							CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib::CSRMatrix>& vecmat,
+							 inttype nr_connections, fptype euler_timestep,
+							 const std::vector<inttype>& vecmat_indexes, const std::vector<inttype>& grid_transforms);
 
               ~CSRAdapter();
 
@@ -78,15 +79,17 @@ namespace CudaTwoDLib {
               void CreateStreams();
               void DeleteStreams();
 
-	          std::vector<inttype> Offsets(const std::vector<TwoDLib::CSRMatrix>&) const;
-	          std::vector<inttype> NrRows(const std::vector<TwoDLib::CSRMatrix>&) const;
+	          	std::vector<inttype> Offsets(const std::vector<TwoDLib::CSRMatrix>&) const;
+	          	std::vector<inttype> NrRows(const std::vector<TwoDLib::CSRMatrix>&) const;
 
-	      CudaOde2DSystemAdapter& _group;
+	      			CudaOde2DSystemAdapter& _group;
               fptype                  _euler_timestep;
               inttype                 _nr_iterations;
               inttype                 _nr_m;
-							inttype									_transform_offset;
 							inttype									_nr_streams;
+
+							std::vector<inttype>		_grid_transforms;
+							std::vector<inttype> 		_vecmats;
 
               std::vector<inttype>   _nval;
               std::vector<fptype*>   _val;

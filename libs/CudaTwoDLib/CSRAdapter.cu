@@ -98,13 +98,15 @@ void CSRAdapter::InspectMass(inttype i)
 }
 
 CSRAdapter::CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib::CSRMatrix>& vecmat,
-  inttype transform_offset, inttype nr_connections, fptype euler_timestep):
+ inttype nr_connections, fptype euler_timestep,
+ const std::vector<inttype>& vecmat_indexes,const std::vector<inttype>& grid_transforms):
 _group(group),
 _euler_timestep(euler_timestep),
 _nr_iterations(NumberIterations(group,euler_timestep)),
 _nr_m(vecmat.size()),
 _nr_streams(nr_connections),
-_transform_offset(transform_offset),
+_vecmats(vecmat_indexes),
+_grid_transforms(grid_transforms),
 _nval(std::vector<inttype>(vecmat.size())),
 _val(std::vector<fptype*>(vecmat.size())),
 _nia(std::vector<inttype>(vecmat.size())),
@@ -122,8 +124,10 @@ _numBlocks( (_group._n + _blockSize - 1) / _blockSize)
 }
 
 CSRAdapter::CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib::CSRMatrix>& vecmat, fptype euler_timestep):
-CSRAdapter(group,vecmat, vecmat.size(),vecmat.size(),euler_timestep)
-{
+CSRAdapter(group,vecmat,vecmat.size(),euler_timestep,
+std::vector<inttype>(),std::vector<inttype>()){
+  for(unsigned int i=0; i<vecmat.size(); i++)
+   _vecmats.push_back(i);
 }
 
 CSRAdapter::~CSRAdapter()
@@ -180,27 +184,27 @@ std::vector<inttype> CSRAdapter::Offsets(const std::vector<TwoDLib::CSRMatrix>& 
 
 void CSRAdapter::CalculateDerivative(const std::vector<fptype>& vecrates)
 {
-    for(inttype m = _transform_offset; m < _nr_m; m++)
+    for(inttype m : _vecmats)
     {
         // be careful to use this block size
         inttype numBlocks = (_nr_rows[m] + _blockSize - 1)/_blockSize;
         CudaCalculateDerivative<<<numBlocks,_blockSize,0,_streams[m]>>>(_nr_rows[m],vecrates[m],_dydt,_group._mass,_val[m],_ia[m],_ja[m],_group._map,_offsets[m]);
     }
 
-    for (inttype m = _transform_offset; m < _nr_m; m++)
+    for (inttype m : _vecmats)
         cudaStreamSynchronize(_streams[m]);
 }
 
 void CSRAdapter::CalculateGridDerivative(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates, const std::vector<fptype>& vecstays, const std::vector<fptype>& vecgoes, const std::vector<int>& vecoff1s, const std::vector<int>& vecoff2s)
 {
-    for(inttype m = 0; m < _nr_streams - (_nr_m - _transform_offset); m++)
+    for(inttype m = 0; m < vecindex.size(); m++)
     {
         // be careful to use this block size
         inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1)/_blockSize;
         CudaCalculateGridDerivative<<<numBlocks,_blockSize,0,_streams[m]>>>(_nr_rows[vecindex[m]],vecrates[m],vecstays[m],vecgoes[m],vecoff1s[m],vecoff2s[m],_dydt,_group._mass,_offsets[vecindex[m]]);
     }
 
-    for (inttype m = 0; m < _nr_streams - (_nr_m - _transform_offset); m++)
+    for (inttype m = 0; m < vecindex.size(); m++)
         cudaStreamSynchronize(_streams[m]);
 }
 
@@ -209,36 +213,37 @@ void CSRAdapter::CalculateMeshGridDerivative(const std::vector<inttype>& vecinde
   const std::vector<fptype>& vecgoes, const std::vector<int>& vecoff1s,
   const std::vector<int>& vecoff2s)
 {
-  for(inttype m = 0; m < _nr_streams - (_nr_m - _transform_offset); m++)
+
+  for(inttype m = 0; m < vecstays.size(); m++)
   {
     // be careful to use this block size
     inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1)/_blockSize;
     CudaCalculateGridDerivative<<<numBlocks,_blockSize,0,_streams[m]>>>(_nr_rows[vecindex[m]],vecrates[m],vecstays[m],vecgoes[m],vecoff1s[m],vecoff2s[m],_dydt,_group._mass,_offsets[vecindex[m]]);
-}
+  }
 
-  inttype m = _transform_offset;
-  for(inttype s =  _nr_streams - (_nr_m - _transform_offset); s < _nr_streams; s++)
+  for(int n=vecstays.size(); n<vecrates.size(); n++)
   {
+    inttype m = vecindex[n];
     // be careful to use this block size
     inttype numBlocks = (_nr_rows[m] + _blockSize - 1)/_blockSize;
-    CudaCalculateDerivative<<<numBlocks,_blockSize,0,_streams[s]>>>(_nr_rows[vecindex[m]],vecrates[m],_dydt,_group._mass,_val[m],_ia[m],_ja[m],_group._map,_offsets[vecindex[m]]);
-    m++;
+    CudaCalculateDerivative<<<numBlocks,_blockSize,0,_streams[n]>>>(_nr_rows[m],vecrates[n],_dydt,_group._mass,_val[m],_ia[m],_ja[m],_group._map,_offsets[m]);
   }
 
   for (inttype m = 0; m < _nr_streams; m++)
       cudaStreamSynchronize(_streams[m]);
+
 }
 
 void CSRAdapter::SingleTransformStep()
 {
-  for(inttype m = 0; m < _transform_offset; m++)
+  for(inttype m : _grid_transforms)
   {
       // be careful to use this block size
       inttype numBlocks = (_nr_rows[m] + _blockSize - 1)/_blockSize;
       CudaSingleTransformStep<<<numBlocks,_blockSize,0,_streams[m]>>>(_nr_rows[m],_dydt,_group._mass,_val[m],_ia[m],_ja[m],_group._map,_offsets[m]);
   }
 
-  for (inttype m = 0; m < _transform_offset; m++)
+  for (inttype m : _grid_transforms)
       cudaStreamSynchronize(_streams[m]);
 }
 

@@ -120,8 +120,11 @@ __global__ void MapResetThreaded(unsigned int n_reset, fptype* sum, fptype* mass
   unsigned int tid = threadIdx.x;
   unsigned int i = blockIdx.x*blockDim.x + threadIdx.x;
 
-  if(i >= n_sum)
+  if(i >= n_sum){
+    sdata[tid] = 0.;
     return;
+  }
+
 
   sdata[tid] = sum[i];
   __syncthreads();
@@ -134,7 +137,7 @@ __global__ void MapResetThreaded(unsigned int n_reset, fptype* sum, fptype* mass
   }
   // write result for this block to global mem
   if (tid == 0) {
-    rate[blockIdx.x] += sdata[0];
+    rate[blockIdx.x] = sdata[0];
   }
  }
 

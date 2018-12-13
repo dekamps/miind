@@ -112,92 +112,45 @@ def parse(fn):
         print('No file ' + fn)
     return root
 
-def generate_model_files(nodes,algorithms):
-     modelfiles=[]
-     refs = []
-     for node in nodes:
-          algname = node.attrib['algorithm']
-          for alg in algorithms:
-               if alg.attrib['name'] == algname: # here we assume the name is unique
-                    algorithm = alg
-
-          if algorithm.attrib['type'] == 'MeshAlgorithmGroup':
-               modelfiles.append(algorithm.attrib['modelfile'])
-               if 'tau_refractive' in algorithm.attrib.keys():
-                   refs.append(algorithm.attrib['tau_refractive'])
-               else:
-                   refs.append('0.0')
-               ts = algorithm.findall('TimeStep')
-               timestep = float(ts[0].text)
-
-     if len(modelfiles) == 0:
-        return modelfiles, -1.0, refs
-
-     return modelfiles, timestep, refs
-
-def generate_mesh_algorithm_group(fn,nodes,algorithms,cuda):
-     '''Colate al MeshAlgorithmGroup instances and generate the C++ code to instantiate the group'''
-
-     modelfiles, timestep, refs = generate_model_files(nodes,algorithms)
-
-     if len(modelfiles) == 0:
-         return
-
+def generate_model_files(fn, nodes,algorithms):
      with open(fn,'a') as f:
-          for i,model in enumerate(modelfiles):
-               # according to pugixml doc, load_file destroys the old tree, soo this should be save
-               f.write('\tpugi::xml_parse_result result' + str(i) + ' = doc.load_file(\"' + model +'\");\n')
-               f.write('\tpugi::xml_node  root' + str(i) + ' = doc.first_child();\n\n')
-               f.write('\tTwoDLib::Mesh mesh' + str(i) +' = TwoDLib::RetrieveMeshFromXML(root' + str(i) + ');\n')
-               f.write('\tstd::vector<TwoDLib::Redistribution> vec_rev' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(i) + ');\n')
-               f.write('\tstd::vector<TwoDLib::Redistribution> vec_res' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reset",root' + str(i) + ');\n\n')
-               f.write('\tnetwork.addMeshNode(mesh'+ str(i) +', vec_rev'+ str(i) +', vec_res'+ str(i) +', ' + refs[i] + ');\n')
-               f.write('\n')
+         node_id = 0
+         for node in nodes:
+              algname = node.attrib['algorithm']
+              for alg in algorithms:
+                   if alg.attrib['name'] == algname: # here we assume the name is unique
+                        algorithm = alg
 
+              if algorithm.attrib['type'] == 'MeshAlgorithmGroup':
+                  ref = 0.0
+                  if 'tau_refractive' in algorithm.attrib.keys():
+                       ref = algorithm.attrib['tau_refractive']
 
-def generate_grid_model_files(nodes,algorithms):
-     modelfiles=[]
-     transforms=[]
-     startvs=[]
-     startws=[]
-     refs=[]
-     timestep = 0.0
-     for node in nodes:
-          algname = node.attrib['algorithm']
-          for alg in algorithms:
-               if alg.attrib['name'] == algname: # here we assume the name is unique
-                    algorithm = alg
+                  f.write('\tpugi::xml_parse_result result' + str(node_id) + ' = doc.load_file(\"' + algorithm.attrib['modelfile'] +'\");\n')
+                  f.write('\tpugi::xml_node  root' + str(node_id) + ' = doc.first_child();\n\n')
+                  f.write('\tTwoDLib::Mesh mesh' + str(node_id) +' = TwoDLib::RetrieveMeshFromXML(root' + str(node_id) + ');\n')
+                  f.write('\tstd::vector<TwoDLib::Redistribution> vec_rev' + str(node_id) + ' = TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(node_id) + ');\n')
+                  f.write('\tstd::vector<TwoDLib::Redistribution> vec_res' + str(node_id) + ' = TwoDLib::RetrieveMappingFromXML("Reset",root' + str(node_id) + ');\n\n')
+                  f.write('\tnetwork.addMeshNode(mesh'+ str(node_id) +', vec_rev'+ str(node_id) +', vec_res'+ str(node_id) +', ' + ref + ');\n')
+                  f.write('\n')
 
-          if algorithm.attrib['type'] == 'GridAlgorithmGroup':
-               modelfiles.append(algorithm.attrib['modelfile'])
-               transforms.append(algorithm.attrib['transformfile'])
-               startvs.append(algorithm.attrib['start_v'])
-               startws.append(algorithm.attrib['start_w'])
-               if 'tau_refractive' in algorithm.attrib.keys():
-                   refs.append(algorithm.attrib['tau_refractive'])
-               else:
-                   refs.append('0.0')
-               ts = algorithm.findall('TimeStep')
-               timestep = float(ts[0].text)
+                  node_id = node_id + 1
 
-     return modelfiles, transforms, startvs, startws, timestep, refs
+              elif algorithm.attrib['type'] == 'GridAlgorithmGroup':
+                  ref = 0.0
+                  if 'tau_refractive' in algorithm.attrib.keys():
+                     ref = algorithm.attrib['tau_refractive']
 
-def generate_grid_algorithm_group(fn,nodes,algorithms,cuda):
-     '''Colate al MeshAlgorithmGroup instances and generate the C++ code to instantiate the group'''
+                  f.write('\tpugi::xml_parse_result result' + str(node_id) + ' = doc.load_file(\"' + algorithm.attrib['modelfile'] +'\");\n')
+                  f.write('\tpugi::xml_node  root' + str(node_id) + ' = doc.first_child();\n\n')
+                  f.write('\tTwoDLib::Mesh mesh' + str(node_id) +' = TwoDLib::RetrieveMeshFromXML(root' + str(node_id) + ');\n')
+                  f.write('\tstd::vector<TwoDLib::Redistribution> vec_rev' + str(node_id) + ' = TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(node_id) + ');\n')
+                  f.write('\tstd::vector<TwoDLib::Redistribution> vec_res' + str(node_id) + ' = TwoDLib::RetrieveMappingFromXML("Reset",root' + str(node_id) + ');\n\n')
+                  f.write('\tTwoDLib::TransitionMatrix transform' + str(node_id) + '(\"' + algorithm.attrib['transformfile'] + '\");\n')
+                  f.write('\tnetwork.addGridNode(mesh'+ str(node_id) +', transform'+ str(node_id) +', ' + str(algorithm.attrib['start_v']) + ', ' + str(algorithm.attrib['start_w']) +', vec_rev'+ str(node_id) +', vec_res'+ str(node_id) +', '+ ref +');\n')
+                  f.write('\n')
 
-     modelfiles, transforms, startvs, startws, timestep, refs = generate_grid_model_files(nodes,algorithms)
-
-     with open(fn,'a') as f:
-          for i,model in enumerate(modelfiles):
-               # according to pugixml doc, load_file destroys the old tree, soo this should be save
-               f.write('\tpugi::xml_parse_result result' + str(i) + ' = doc.load_file(\"' + model +'\");\n')
-               f.write('\tpugi::xml_node  root' + str(i) + ' = doc.first_child();\n\n')
-               f.write('\tTwoDLib::Mesh mesh' + str(i) +' = TwoDLib::RetrieveMeshFromXML(root' + str(i) + ');\n')
-               f.write('\tstd::vector<TwoDLib::Redistribution> vec_rev' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(i) + ');\n')
-               f.write('\tstd::vector<TwoDLib::Redistribution> vec_res' + str(i) + ' = TwoDLib::RetrieveMappingFromXML("Reset",root' + str(i) + ');\n\n')
-               f.write('\tTwoDLib::TransitionMatrix transform' + str(i) + '(\"' + transforms[i] + '\");\n')
-               f.write('\tnetwork.addGridNode(mesh'+ str(i) +', transform'+ str(i) +', ' + str(startvs[i]) + ', ' + str(startws[i]) +', vec_rev'+ str(i) +', vec_res'+ str(i) +', '+ refs[i] +');\n')
-               f.write('\n')
+              node_id = node_id + 1
 
 def generate_rate_names(nodes,algorithms):
      func_names=[]
@@ -319,8 +272,7 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
 
     generate_preamble(fn, variables, nodes, algorithms,connections,parameter, cuda)
 
-    generate_mesh_algorithm_group(fn,nodes,algorithms,cuda)
-    generate_grid_algorithm_group(fn,nodes,algorithms,cuda)
+    generate_model_files(fn,nodes,algorithms)
     generate_rate_nodes(fn,nodes,algorithms)
     generate_connections(fn,connections,nodes,algorithms)
     nodemap = node_name_to_node_id(nodes)
