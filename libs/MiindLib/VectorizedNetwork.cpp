@@ -56,6 +56,7 @@ void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps){
 
     //create CSR Matrix for each transforms
     _csrs.push_back(TwoDLib::CSRMatrix(_vec_transforms[i], *(_group), _grid_meshes[i]));
+    _grid_transform_indexes.push_back(i);
   }
 
   for(MPILib::Index i=0; i < _mesh_meshes.size(); i++){
@@ -151,9 +152,13 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
   for (unsigned int i=0; i<_mesh_connections.size(); i++){
     node_to_group_meshes.push_back(_node_id_to_group_mesh[_mesh_connections[i]._out]);
     _csrs.push_back(TwoDLib::CSRMatrix(*(_mesh_connections[i]._transition), *(_group), _node_id_to_group_mesh[_mesh_connections[i]._out]));
+    // _csrs contains all the grid transforms first (see initOde2DSystem)
+    // now we're adding all the mesh transition matrices so set the correct index value
+    _mesh_transform_indexes.push_back(_grid_meshes.size()+i);
   }
 
-  CudaTwoDLib::CSRAdapter _csr_adapter(*_group_adapter,_csrs,_grid_meshes.size(),_grid_connections.size()+_mesh_connections.size(),h);
+  CudaTwoDLib::CSRAdapter _csr_adapter(*_group_adapter,_csrs,
+  _grid_connections.size()+_mesh_connections.size(),h,_mesh_transform_indexes,_grid_transform_indexes);
 
   MPILib::utilities::ProgressBar *pb = new MPILib::utilities::ProgressBar(n_iter);
 	MPILib::Time time = 0;
@@ -170,19 +175,23 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
     }
 
 		_group_adapter->Evolve(_mesh_meshes);
+    _group_adapter->RemapReversal();
 
     _csr_adapter.ClearDerivative();
     _csr_adapter.SingleTransformStep();
     _csr_adapter.AddDerivativeFull();
 
-    _group_adapter->RedistributeProbability();
-    _group_adapter->MapFinish();
+    _group_adapter->RedistributeProbability(_grid_meshes);
+    _group_adapter->MapFinish(_grid_meshes);
 
 		for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++ ){
 			_csr_adapter.ClearDerivative();
       _csr_adapter.CalculateMeshGridDerivative(node_to_group_meshes,rates,stays, goes, off1s, off2s);
 			_csr_adapter.AddDerivative();
 		}
+
+    _group_adapter->RedistributeProbability(_mesh_meshes);
+    _group_adapter->MapFinish(_mesh_meshes);
 
     const std::vector<fptype>& group_rates = _group_adapter->F();
     for(unsigned int i=0; i<group_rates.size(); i++){

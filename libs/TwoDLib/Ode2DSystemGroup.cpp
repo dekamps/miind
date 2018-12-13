@@ -323,17 +323,20 @@ void Ode2DSystemGroup::UpdateMap()
 
 void Ode2DSystemGroup::UpdateMap(std::vector<MPILib::Index>& meshes)
 {
-	MPILib::Index counter = 0;
 	for (MPILib::Index n = 0; n < meshes.size(); n++){ // we need the index for mapping, so no range-based loop
+		MPILib::Index counter = 0;
 		MPILib::Index m = meshes[n];
-		for(MPILib::Index i_stat = 0; i_stat < _mesh_list[m].NrCellsInStrip(0); i_stat++)
-			_linear_map[counter++] = i_stat + _vec_mesh_offset[m]; // the stationary strip needs to be handled separately
+		for(MPILib::Index i_stat = 0; i_stat < _mesh_list[m].NrCellsInStrip(0); i_stat++){
+			_linear_map[_vec_mesh_offset[m] + counter] = i_stat + _vec_mesh_offset[m]; // the stationary strip needs to be handled separately
+			counter++;
+		}
 		for (MPILib::Index i = 1; i < _mesh_list[m].NrStrips(); i++){
 			// yes! i = 1. strip 0 is not supposed to have dynamics
 			for (MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++ ){
 				MPILib::Index ind = _vec_cumulative[m][i] + modulo(j-_t,_vec_length[m][i]) + _vec_mesh_offset[m];
 				_map[m][i][j] = ind;
-				_linear_map[counter++] = ind;
+				_linear_map[_vec_mesh_offset[m] + counter] = ind;
+				counter++;
 			}
 		}
 	}

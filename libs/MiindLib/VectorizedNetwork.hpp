@@ -79,6 +79,9 @@ protected:
   std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_res;
   std::vector<MPILib::Time> _vec_tau_refractive;
 
+  std::vector<inttype> _grid_transform_indexes;
+  std::vector<inttype> _mesh_transform_indexes;
+
   std::vector<inttype> _grid_meshes;
   std::vector<inttype> _mesh_meshes;
 

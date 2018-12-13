@@ -36,7 +36,7 @@ namespace TwoDLib {
  * This class simulates the evolution of a neural population density function on a 2D grid.
  */
 
-	template <class WeightValue, class Solver=TwoDLib::MasterOdeint>
+	template <class WeightValue, class Solver=TwoDLib::MasterOMP>
 	class MeshAlgorithm : public DensityAlgorithmInterface<WeightValue>  {
 
 	public:

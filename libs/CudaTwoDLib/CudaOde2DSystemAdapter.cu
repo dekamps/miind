@@ -183,8 +183,8 @@ const std::vector<fptype>& CudaOde2DSystemAdapter::F() const
 		checkCudaErrors(cudaMemcpy(&host_sum[0],_res_sum[m],numBlocks*sizeof(fptype),cudaMemcpyDeviceToHost));
 		fptype sum = 0.0;
 		for (auto& rate: host_sum)
-				sum += rate;
-
+			sum += rate;
+			
 		_host_fs.push_back(sum/_time_step);
 	}
 
@@ -247,10 +247,11 @@ void CudaOde2DSystemAdapter::FillResetMap
 	  }
 }
 
-void CudaOde2DSystemAdapter::RedistributeProbability()
+void CudaOde2DSystemAdapter::RedistributeProbability(std::vector<inttype>& meshes)
 {
-	for(inttype m = 0; m < _mesh_size; m++)
-	{
+	for(inttype i = 0; i < meshes.size(); i++)
+  {
+			inttype m = meshes[i];
 			// be careful to use this block size
 			inttype numBlocks = (_nr_minimal_resets[m] + _blockSize - 1)/_blockSize;
 			inttype numSumBlocks = (numBlocks + _blockSize - 1)/_blockSize;
@@ -270,18 +271,39 @@ void CudaOde2DSystemAdapter::RedistributeProbability()
 			MapResetToRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m], _mass, _map, _refractory_mass[m]);
 
 			SumReset<<<numBlocks,_blockSize,_blockSize*sizeof(fptype)>>>(_nr_minimal_resets[m],_res_to_mass[m],_res_sum[m]);
+
+			cudaDeviceSynchronize();
 	}
 
 }
 
-void CudaOde2DSystemAdapter::MapFinish()
+void CudaOde2DSystemAdapter::RedistributeProbability()
 {
-	for(inttype m = 0; m < _mesh_size; m++)
+	std::vector<inttype> meshes(_mesh_size);
+	for(int i=0;i<_mesh_size;i++)
+		meshes[i] = i;
+
+	RedistributeProbability(meshes);
+}
+
+void CudaOde2DSystemAdapter::MapFinish(std::vector<inttype>& meshes)
+{
+	for(inttype i = 0; i < meshes.size(); i++)
   {
+			inttype m = meshes[i];
       // be careful to use this block size
       inttype numBlocks = (_nr_resets[m] + _blockSize - 1)/_blockSize;
 			ResetFinishThreaded<<<numBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m],_mass,_map);
   }
+}
+
+void CudaOde2DSystemAdapter::MapFinish()
+{
+	std::vector<inttype> meshes(_mesh_size);
+	for(int i=0;i<_mesh_size;i++)
+		meshes[i] = i;
+
+	MapFinish(meshes);
 }
 
 void CudaOde2DSystemAdapter::FillReversalMap
@@ -324,8 +346,9 @@ void CudaOde2DSystemAdapter::DeleteResetMap()
 				cudaFree(_res_to_minimal[m]);
         cudaFree(_res_from_ordered[m]);
 				cudaFree(_res_from_counts[m]);
-				cudaFree(_res_from_ordered[m]);
+				cudaFree(_res_alpha_ordered[m]);
         cudaFree(_res_from_offsets[m]);
+				cudaFree(_res_to_mass[m]);
 				cudaFree(_res_sum[m]);
     }
 
