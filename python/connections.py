@@ -50,16 +50,18 @@ def parse_grid_connection(connection, nodemap):
     o = str(nodemap[connection.attrib['Out']])
     num_cons = connection.text.split()[0]
     eff = connection.text.split()[1]
+    delay = connection.text.split()[2]
 
-    return '\tnetwork.addGridConnection('+ i +','+ o +','+ eff +','+ num_cons +');\n'
+    return '\tnetwork.addGridConnection('+ i +','+ o +','+ eff +','+ num_cons +','+ delay +');\n'
 
 def parse_mesh_connection(connection, nodemap, mat_name):
     i = str(nodemap[connection.attrib['In']])
     o = str(nodemap[connection.attrib['Out']])
     num_cons = connection.text.split()[0]
     eff = connection.text.split()[1]
+    delay = connection.text.split()[2]
 
-    return '\tnetwork.addMeshConnection('+ i +','+ o +','+ eff +','+ num_cons +',&'+ mat_name +');\n'
+    return '\tnetwork.addMeshConnection('+ i +','+ o +','+ eff +','+ num_cons +','+delay+',&'+ mat_name +');\n'
 
 def parse_connections(connection_list,weighttype,outfile):
     for connection in connection_list:

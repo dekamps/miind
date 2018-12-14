@@ -74,10 +74,10 @@ void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps){
 void VectorizedNetwork::reportNodeActivities(MPILib::Time sim_time){
   for (int i=0; i<_rate_nodes.size(); i++){
 		std::ostringstream ost2;
-		ost2 << "rate_" << i;
+		ost2 << "rate_" << _rate_nodes[i];
 		std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
 		ofst_rate.precision(10);
-		ofst_rate << sim_time << "\t" << _out_rates[i] << std::endl;
+		ofst_rate << sim_time << "\t" << _out_rate_queues[_rate_nodes[i]].front() << std::endl;
 		ofst_rate.close();
 	}
 }
@@ -106,12 +106,12 @@ void VectorizedNetwork::reportNodeDensities(MPILib::Time sim_time){
   }
 }
 
-void VectorizedNetwork::addGridConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns){
-  _grid_connections.push_back(NodeGridConnection(in,out,efficacy,n_conns));
+void VectorizedNetwork::addGridConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, double delay){
+  _grid_connections.push_back(NodeGridConnection(in,out,efficacy,n_conns,delay));
 }
 
-void VectorizedNetwork::addMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, TwoDLib::TransitionMatrix *tmat){
-  _mesh_connections.push_back(NodeMeshConnection(in,out,efficacy,n_conns,tmat));
+void VectorizedNetwork::addMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, double delay, TwoDLib::TransitionMatrix *tmat){
+  _mesh_connections.push_back(NodeMeshConnection(in,out,efficacy,n_conns,delay,tmat));
 }
 
 void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILib::Time t_report, bool write_displays) {
@@ -119,7 +119,7 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 	MPILib::Number n_report = static_cast<MPILib::Number>(ceil((t_report - t_begin)/_network_time_step));
 
   for(unsigned int i=0; i<_display_nodes.size(); i++){
-    TwoDLib::Display::getInstance()->addOdeSystem(i, _group, _node_id_to_group_mesh[i]);
+    TwoDLib::Display::getInstance()->addOdeSystem(_display_nodes[i], _group, _node_id_to_group_mesh[_display_nodes[i]]);
   }
 
   const MPILib::Time h = 1./_n_steps*_vec_mesh[0].TimeStep();
@@ -147,6 +147,9 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
     goes.push_back(cell_transition._goes);
     off1s.push_back(cell_transition._offset_1);
     off2s.push_back(cell_transition._offset_2);
+
+    unsigned int queue_length = static_cast<int>(std::floor(_grid_connections[i]._delay/_network_time_step)) + 1;
+    _out_rate_queues[_grid_connections[i]._in] = std::queue<double>(std::deque<MPILib::Rate>(queue_length));
   }
 
   for (unsigned int i=0; i<_mesh_connections.size(); i++){
@@ -155,6 +158,9 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
     // _csrs contains all the grid transforms first (see initOde2DSystem)
     // now we're adding all the mesh transition matrices so set the correct index value
     _mesh_transform_indexes.push_back(_grid_meshes.size()+i);
+
+    unsigned int queue_length = static_cast<int>(std::floor(_mesh_connections[i]._delay/_network_time_step)) + 1;
+    _out_rate_queues[_mesh_connections[i]._in] = std::queue<double>(std::deque<MPILib::Rate>(queue_length));
   }
 
   CudaTwoDLib::CSRAdapter _csr_adapter(*_group_adapter,_csrs,
@@ -168,10 +174,12 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 
     std::vector<fptype> rates;
     for (unsigned int i=0; i<_grid_connections.size(); i++){
-      rates.push_back(_out_rates[_grid_connections[i]._in]*_grid_connections[i]._n_connections);
+      rates.push_back(_out_rate_queues[_grid_connections[i]._in].front()*_grid_connections[i]._n_connections);
+      _out_rate_queues[_grid_connections[i]._in].pop();
     }
     for (unsigned int i=0; i<_mesh_connections.size(); i++){
-      rates.push_back(_out_rates[_mesh_connections[i]._in]*_mesh_connections[i]._n_connections);
+      rates.push_back(_out_rate_queues[_mesh_connections[i]._in].front()*_mesh_connections[i]._n_connections);
+      _out_rate_queues[_mesh_connections[i]._in].pop();
     }
 
 		_group_adapter->Evolve(_mesh_meshes);
@@ -195,11 +203,11 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 
     const std::vector<fptype>& group_rates = _group_adapter->F();
     for(unsigned int i=0; i<group_rates.size(); i++){
-      _out_rates[_group_mesh_to_node_id[i]] = group_rates[i];
+      _out_rate_queues[_group_mesh_to_node_id[i]].push(group_rates[i]);
     }
 
     for( const auto& element: _rate_functions){
-  		_out_rates[element.first] = element.second(time);
+  		_out_rate_queues[element.first].push(element.second(time));
     }
 
     if(_display_nodes.size() > 0){

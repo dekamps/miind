@@ -99,7 +99,7 @@ namespace TwoDLib {
 		MPILib::Number _n_evolve;
 		MPILib::Number _n_steps;
 
-		std::vector<MPILib::Rate> _vec_rates;
+		std::vector<std::vector<std::queue<MPILib::Rate> > > _vec_rate_queues;
 
 		TransitionMatrix 							_transformMatrix;
 		CSRMatrix*										_csr_transform;

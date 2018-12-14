@@ -227,7 +227,17 @@ namespace TwoDLib {
 			// MVGrid in MasterGrid
 			_sys.RedistributeProbability(_n_steps);
 
-			_p_master->Apply(_n_steps*_dt,_vec_rates,_efficacy_map);
+			std::vector<std::vector<MPILib::Rate>> vec_rates;
+			for(unsigned int i=0; i<_vec_rate_queues.size(); i++){
+				std::vector<MPILib::Rate> rates;
+				for(unsigned int j=0; j<_vec_rate_queues[i].size(); j++){
+					rates.push_back(_vec_rate_queues[i][j].front());
+					_vec_rate_queues[i][j].pop();
+				}
+				vec_rates.push_back(rates);
+			}
+
+			_p_master->Apply(_n_steps*_dt,vec_rates[0],_efficacy_map);
 
 			_t_cur += _n_steps*_dt;
 
@@ -246,7 +256,12 @@ namespace TwoDLib {
 			_efficacy_map[i_weight] = vec_weights[i_weight]._efficacy;
 		}
 
- 		_vec_rates = std::vector<double>(vec_weights.size(),0.);
+		_vec_rate_queues = std::vector< std::vector<std::queue<MPILib::Rate>> >(0); // MeshAlgorithm really only uses the first array, i.e. the rates it receives in prepareEvole
+ 		_vec_rate_queues.push_back( std::vector<std::queue<MPILib::Rate>>(vec_weights.size()));
+		for(unsigned int q = 0; q < vec_weights.size(); q++){
+			unsigned int queue_length = static_cast<unsigned int>(std::ceil(vec_weights[q]._delay/(_n_steps*_dt)));
+			_vec_rate_queues[0][q] = std::queue<MPILib::Rate>(std::deque<MPILib::Rate>(queue_length));
+		}
 	}
 
 	template <class WeightValue>
@@ -295,8 +310,10 @@ namespace TwoDLib {
 		// take into account the number of connections
 
 		assert(nodeVector.size() == weightVector.size());
-		for (MPILib::Index i = 0; i < nodeVector.size(); i++)
-			_vec_rates[i] = nodeVector[i]*weightVector[i]._number_of_connections;
+		for (MPILib::Index i = 0; i < nodeVector.size(); i++){
+			_vec_rate_queues[0][i].push(nodeVector[i]*weightVector[i]._number_of_connections);
+		}
+
 	}
 
 
