@@ -16,11 +16,12 @@ public:
   MPILib::NodeId _in;
   MPILib::NodeId _out;
   double _efficacy;
+  double _delay;
   TwoDLib::TransitionMatrix *_transition;
   int _n_connections;
 
-  NodeMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double eff, int n_conns, TwoDLib::TransitionMatrix *trans):
-  _in(in),_out(out),_efficacy(eff),_n_connections(n_conns), _transition(trans){}
+  NodeMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double eff, int n_conns, double delay, TwoDLib::TransitionMatrix *trans):
+  _in(in),_out(out),_efficacy(eff),_n_connections(n_conns),_delay(delay),_transition(trans){}
 };
 
 class NodeGridConnection {
@@ -28,10 +29,11 @@ public:
   MPILib::NodeId _in;
   MPILib::NodeId _out;
   double _efficacy;
+  double _delay;
   int _n_connections;
 
-  NodeGridConnection(MPILib::NodeId in, MPILib::NodeId out, double eff, int n_conns):
-  _in(in),_out(out),_efficacy(eff),_n_connections(n_conns){}
+  NodeGridConnection(MPILib::NodeId in, MPILib::NodeId out, double eff, int n_conns, double delay):
+  _in(in),_out(out),_efficacy(eff),_n_connections(n_conns),_delay(delay){}
 };
 
 class VectorizedNetwork {
@@ -61,9 +63,9 @@ public:
 
   void addRateNode(function_pointer functor);
 
-  void addGridConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns);
+  void addGridConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, double delay);
 
-  void addMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, TwoDLib::TransitionMatrix *tmat);
+  void addMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, double delay, TwoDLib::TransitionMatrix *tmat);
 
   void reportNodeActivities(MPILib::Time sim_time);
   void reportNodeDensities(MPILib::Time sim_time);
@@ -106,7 +108,7 @@ protected:
   std::vector<NodeMeshConnection> _mesh_connections;
   std::vector<NodeGridConnection> _grid_connections;
 
-  std::map<MPILib::NodeId, double> _out_rates;
+  std::map<MPILib::NodeId, std::queue<double>> _out_rate_queues;
 
   function_list _rate_functions;
 

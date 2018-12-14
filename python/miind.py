@@ -75,7 +75,7 @@ def generate_closing(fn,parameters):
     time_step = parameters.find('t_step').text
 
     steps = ''
-    master_steps = parameters.findall('nr_master_steps')
+    master_steps = parameters.findall('master_steps')
     if(len(master_steps) > 0):
         steps = master_steps[0].text
 
