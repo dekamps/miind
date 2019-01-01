@@ -9,9 +9,9 @@ from shapely.geometry import Polygon
 from descartes.patch import PolygonPatch
 from matplotlib.collections import PatchCollection
 
-from tools import *
+from .tools import *
 
-import mesh as meshmod
+import mesh3 as meshmod
 
 class Result(object):
     def __init__(self, io, nodename):

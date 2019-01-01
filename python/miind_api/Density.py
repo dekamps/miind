@@ -1,4 +1,4 @@
-from Result import Result
+from .Result import Result
 
 import os.path as op
 import glob
@@ -13,9 +13,9 @@ from shapely.geometry.polygon import Polygon
 from descartes.patch import PolygonPatch
 from matplotlib.collections import PatchCollection
 
-from tools import *
+from .tools import *
 
-import mesh as meshmod
+import mesh3 as meshmod
 
 class Density(Result):
     def __init__(self, io, nodename):
@@ -97,10 +97,10 @@ class Density(Result):
                 return
             except OSError as e:
                 if e.errno == 2:
-                    print "MIIND API Error : generateDensityAnimation() requires ffmpeg to be installed."
+                    print ("MIIND API Error : generateDensityAnimation() requires ffmpeg to be installed.")
                 else:
-                    print "MIIND API Error : Unknown Error"
-                    print e
+                    print ("MIIND API Error : Unknown Error")
+                    print (e)
         else:
             # Generate the density image files
             if gen_images:
@@ -122,10 +122,10 @@ class Density(Result):
                 subprocess.call(process)
             except OSError as e:
                 if e.errno == 2:
-                    print "MIIND API Error : generateDensityAnimation() requires ffmpeg to be installed."
+                    print ("MIIND API Error : generateDensityAnimation() requires ffmpeg to be installed.")
                 else:
-                    print "MIIND API Error : Unknown Error"
-                    print e
+                    print ("MIIND API Error : Unknown Error")
+                    print (e)
 
     def generateAllDensityPlotImages(self, image_size=300, colorbar=None, cmap='inferno', ext='.png'):
         if not ext.startswith('.'):

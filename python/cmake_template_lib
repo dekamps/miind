@@ -1,4 +1,13 @@
+##############################################################################
+# include the header files
+##############################################################################
+
+#############################################################################
+
 cmake_minimum_required(VERSION 2.8)
+FIND_PACKAGE(GSL REQUIRED)
+FIND_PACKAGE(CUDA QUIET)
+
 set(MIIND_LIBRARY_PREFIX miind)
 
 FIND_PACKAGE(GSL REQUIRED)
@@ -10,6 +19,8 @@ include_directories( ${CMAKE_SOURCE_DIR}/libs/ )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/MPILib )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/GeomLib )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/TwoDLib )
+include_directories( ${CMAKE_SOURCE_DIR}/libs/CudaTwoDLib )
+include_directories( ${CMAKE_SOURCE_DIR}/libs/MiindLib )
 set( LIB_TYPE SHARED )
 
 OPTION(ENABLE_MPI "MPI Desired" ${TOKEN_ENABLE_MPI})
@@ -96,7 +107,7 @@ set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}mpi
     ${MIIND_LIBRARY_PREFIX}twod
     ${MIIND_LIBRARY_PREFIX}numtools
-    ${gsl_LINK_FLAGS}
+    ${MIIND_LIBRARY_PREFIX}shared
     ${MPI_LIBRARIES}
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
@@ -105,4 +116,20 @@ set ( LIBLIST
     gslcblas
     ${GLUT_LIBRARY}
 )
-add_definitions("-std=gnu++11 -fext-numeric-literals")
+
+if (ENABLE_CUDA)
+   if (NOT APPLE)
+   list(APPEND LIBLIST ${MIIND_LIBRARY_PREFIX}cudatwod)
+   endif (NOT APPLE)
+endif(ENABLE_CUDA)
+
+
+#############################################################################
+# executables
+#############################################################################
+ #   add the flags for C++11
+if(CMAKE_COMPILER_IS_GNUCXX)
+add_definitions("-std=c++14 -fext-numeric-literals ${GLUT_LIBRARY}")
+else(CMAKE_COMPILER_IS_GNUCXX)
+add_definitions("-std=c++14 ${GLUT_LIBRARY}")
+endif(CMAKE_COMPILER_IS_GNUCXX)

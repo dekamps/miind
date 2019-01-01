@@ -1,4 +1,4 @@
-from Result import Result
+from .Result import Result
 
 import os.path as op
 import glob
@@ -11,9 +11,9 @@ from shapely.geometry import Polygon
 from descartes.patch import PolygonPatch
 from matplotlib.collections import PatchCollection
 
-from tools import *
+from .tools import *
 
-import mesh as meshmod
+import mesh3 as meshmod
 
 class Marginal(Result):
     def __init__(self, io, nodename, vn=500, wn=500):
@@ -207,7 +207,7 @@ class Marginal(Result):
             subprocess.call(process)
         except OSError as e:
             if e.errno == 2:
-                print "MIIND API Error : generateMarginalAnimation() requires ffmpeg to be installed."
+                print ("MIIND API Error : generateMarginalAnimation() requires ffmpeg to be installed.")
             else:
-                print "MIIND API Error : Unknown Error"
-                print e
+                print ("MIIND API Error : Unknown Error")
+                print (e)

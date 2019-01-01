@@ -30,7 +30,7 @@ public:
 
 	virtual void init(boost::python::list) {};
 
-	int startSimulation() {
+	virtual int startSimulation() {
 		pb = new utilities::ProgressBar(network.startSimulation());
 
 		// child processes just loop here - evolve isn't called here to avoid a deadlock
@@ -46,7 +46,7 @@ public:
 		return utilities::MPIProxy().getRank();
 	}
 
-	boost::python::list evolveSingleStep(boost::python::list c) {
+	virtual boost::python::list evolveSingleStep(boost::python::list c) {
 		boost::python::ssize_t len = boost::python::len(c);
 		std::vector<double> activity = std::vector<double>();
 
@@ -65,7 +65,7 @@ public:
 		return out;
 	}
 
-	void endSimulation() {
+	virtual void endSimulation() {
 		network.endSimulation();
 		t.stop();
 		if(utilities::MPIProxy().getRank() == 0)

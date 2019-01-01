@@ -24,6 +24,13 @@ def generate_preamble(outfile):
 
     return
 
+def define_network_type(outfile, type):
+    if type ==  "DelayedConnection":
+        s = "MPILib::" + type
+    else:
+        s = "double"
+    return 'typedef MPILib::MPINetwork<' + s + ', MPILib::utilities::CircularDistribution> Network;\n'
+
 def generate_closing(outfile, steps, t_step, weighttype):
     outfile.write('\tnetwork.configureSimulation(par_run);\n')
 
@@ -68,14 +75,6 @@ def generate_closing(outfile, steps, t_step, weighttype):
         outfile.write(t)
 
     return
-
-
-def define_network_type(outfile, type):
-    if type ==  "DelayedConnection":
-        s = "MPILib::" + type
-    else:
-        s = "double"
-    return 'typedef MPILib::MPINetwork<' + s + ', MPILib::utilities::CircularDistribution> Network;\n'
 
 def parse_xml(infile, outfile):
     tree=ET.fromstring(infile.read())

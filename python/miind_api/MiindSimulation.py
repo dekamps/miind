@@ -1,7 +1,6 @@
 import os
 import os.path as op
 import glob
-import ROOT
 import numpy as np
 import subprocess
 import shutil
@@ -11,13 +10,14 @@ import hashlib
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
 
-from tools import *
-from Density import Density
-from Marginal import Marginal
+from .tools import *
+from .Density import Density
+from .Marginal import Marginal
 
 # From MIIND
-import directories
+import directories3 as directories
 import miind
+import miind_lib
 
 class MiindSimulation:
     def __init__(self, xml_path, submit_name=None, **kwargs):
@@ -246,12 +246,12 @@ class MiindSimulation:
     def nodes(self):
         return self.nodenames
 
-    def submit_shared_lib(self, overwrite=False, enable_mpi=False, enable_openmp=False, enable_root=True, *args):
+    def submit_shared_lib(self, overwrite=False, enable_mpi=False, enable_openmp=False, enable_root=True, enable_cuda=False, *args):
         if op.exists(self.output_directory) and overwrite:
             shutil.rmtree(self.output_directory)
         with cd(self.xml_location):
-            directories.add_shared_library(self.submit_name, [self.xml_path], '',
-            enable_mpi, enable_openmp, enable_root)
+            miind_lib.generate_vectorized_network_lib(self.submit_name, [self.xml_path], '',
+            enable_mpi, enable_openmp, enable_root, enable_cuda)
         fnames = os.listdir(self.output_directory)
         if 'CMakeLists.txt' in fnames:
             subprocess.call(['cmake .'] +
