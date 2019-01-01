@@ -8,7 +8,7 @@ import glob
 import numpy as np
 import copy
 from collections import Mapping, OrderedDict
-import directories
+import directories3
 
 
 class cd:

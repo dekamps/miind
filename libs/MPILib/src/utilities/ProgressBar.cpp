@@ -29,7 +29,6 @@ ProgressBar::ProgressBar(unsigned long expectedCount,
 		_description(description), _outputStream(os) {
 
 #ifdef ENABLE_MPI
-	std::cout << "uh oh.\n";
 	if (MPIProxy().getRank() == 0) {
 		restart(expectedCount);
 	}

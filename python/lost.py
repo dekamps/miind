@@ -102,7 +102,7 @@ def zoom_fun(event, ax, base_scale=1.5):
     else:
         # deal with something that should never happen
         scale_factor = 1
-        print event.button
+        print (event.button)
     # set new limits
     ax.set_xlim([xdata - cur_xrange*scale_factor,
                  xdata + cur_xrange*scale_factor])
@@ -112,7 +112,7 @@ def zoom_fun(event, ax, base_scale=1.5):
 
 def main(args):
     if len(args) != 2:
-        print 'Usage: \' python lost.py <filename>.lost \' '
+        print ('Usage: \' python lost.py <filename>.lost \' ')
         raise SystemExit()
 
     global fig

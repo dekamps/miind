@@ -13,6 +13,8 @@ namespace MiindLib {
 
 class NodeMeshConnection {
 public:
+  bool _external;
+  unsigned int _external_id;
   MPILib::NodeId _in;
   MPILib::NodeId _out;
   double _efficacy;
@@ -21,11 +23,16 @@ public:
   int _n_connections;
 
   NodeMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double eff, int n_conns, double delay, TwoDLib::TransitionMatrix *trans):
-  _in(in),_out(out),_efficacy(eff),_n_connections(n_conns),_delay(delay),_transition(trans){}
+  _external(false),_external_id(0),_in(in),_out(out),_efficacy(eff),_n_connections(n_conns),_delay(delay),_transition(trans){}
+
+  NodeMeshConnection(MPILib::NodeId out, double eff, int n_conns, double delay, TwoDLib::TransitionMatrix *trans, MPILib::NodeId ext_id):
+  _external(true),_external_id(ext_id),_out(out),_efficacy(eff),_n_connections(n_conns),_delay(delay),_transition(trans){}
 };
 
 class NodeGridConnection {
 public:
+  bool _external;
+  unsigned int _external_id;
   MPILib::NodeId _in;
   MPILib::NodeId _out;
   double _efficacy;
@@ -33,7 +40,10 @@ public:
   int _n_connections;
 
   NodeGridConnection(MPILib::NodeId in, MPILib::NodeId out, double eff, int n_conns, double delay):
-  _in(in),_out(out),_efficacy(eff),_n_connections(n_conns),_delay(delay){}
+  _external(false),_external_id(0),_in(in),_out(out),_efficacy(eff),_n_connections(n_conns),_delay(delay){}
+
+  NodeGridConnection(MPILib::NodeId out, double eff, int n_conns, double delay, MPILib::NodeId ext_id):
+  _external(true),_external_id(ext_id),_out(out),_efficacy(eff),_n_connections(n_conns),_delay(delay){}
 };
 
 class VectorizedNetwork {
@@ -63,13 +73,23 @@ public:
 
   void addRateNode(function_pointer functor);
 
+  void addExternalMonitor(MPILib::NodeId node);
+
   void addGridConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, double delay);
 
+  void addGridConnection(MPILib::NodeId out, double efficacy, int n_conns, double delay, MPILib::NodeId ext_id);
+
   void addMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, double delay, TwoDLib::TransitionMatrix *tmat);
+
+  void addMeshConnection(MPILib::NodeId out, double efficacy, int n_conns, double delay, TwoDLib::TransitionMatrix *tmat, MPILib::NodeId ext_id);
 
   void reportNodeActivities(MPILib::Time sim_time);
   void reportNodeDensities(MPILib::Time sim_time);
   void mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILib::Time t_report, bool write_displays);
+
+  void setupLoop(bool write_displays);
+  std::vector<double> singleStep(std::vector<double>, unsigned int i_loop);
+  void endLoops();
 
 protected:
 
@@ -90,6 +110,7 @@ protected:
   TwoDLib::Ode2DSystemGroup *_group;
 
   CudaTwoDLib::CudaOde2DSystemAdapter *_group_adapter;
+  CudaTwoDLib::CSRAdapter *_csr_adapter;
 
   std::vector<TwoDLib::CSRMatrix> _csrs;
 
@@ -105,10 +126,19 @@ protected:
   std::vector<MPILib::Time> _density_end_times;
   std::vector<MPILib::Time> _density_intervals;
 
+  std::vector<inttype> _connection_out_group_mesh;
+  std::vector<std::queue<double>> _connection_queue;
+  std::map<MPILib::NodeId, std::vector<MPILib::NodeId>> _node_to_connection_queue;
+  std::map<MPILib::NodeId, std::vector<MPILib::NodeId>> _external_to_connection_queue;
+  std::vector<fptype> _stays;
+  std::vector<fptype> _goes;
+  std::vector<int> _off1s;
+  std::vector<int> _off2s;
+
+  std::vector<inttype> _monitored_nodes;
+
   std::vector<NodeMeshConnection> _mesh_connections;
   std::vector<NodeGridConnection> _grid_connections;
-
-  std::map<MPILib::NodeId, std::queue<double>> _out_rate_queues;
 
   function_list _rate_functions;
 

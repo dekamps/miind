@@ -419,7 +419,39 @@ def parse_ratefunctor_algorithm(alg, i, weighttype):
 
     return s
 
-def parse_algorithm(alg,i,weighttype):
+def parse_miindmodel_ratefunctor_algorithm(alg, i, weighttype):
+    s = ''
+    if alg.attrib['type'] != 'RateFunctor':
+        raise ValueError
+
+    cpp_name = 'rate_functor_' + str(i)
+    Register(alg.attrib['name'],cpp_name)
+
+    s += '\tMPILib::RateFunctor<' + weighttype.text + '> ' + cpp_name + '('
+    s += 'MiindModel::RateFunction_' + str(i) + ');\n'
+
+    cd = alg.find('code')
+    rb = alg.find('expression')
+
+    if (cd != None and rb != None):
+        raise ValueError('You cannot use expression and code tags in the same RateFunctor.')
+    if cd == None  and rb == 0:
+        raise ValueError('You must use either a code or an expression tag in a rate functor.')
+    if rb != None:
+        body=rb.text
+        t = 'static MPILib::Rate RateFunction_' + str(i) + '(MPILib::Time t){\n'
+        t += '\treturn ' + body + ';\n}\n'
+
+    if cd != None:
+        t = 'static MPILib::Rate RateFunction_' + str(i) + '(MPILib::Time t){\n'
+        t += cd.text
+        t += '}\n\n'
+
+    RATEFUNCTIONS.append(t)
+
+    return s
+
+def parse_algorithm(alg,i,weighttype,for_lib=False):
     algname=alg.get('type')
 
     if algname=='WilsonCowanAlgorithm':
@@ -427,8 +459,10 @@ def parse_algorithm(alg,i,weighttype):
             return parse_wilsoncowan_algorithm(alg,i,weighttype)
         else:
             raise NameError('Wrong type for WilsonCowanAlgorithm')
-    if algname == 'RateFunctor':
+    if algname == 'RateFunctor' and not for_lib:
         return parse_ratefunctor_algorithm(alg,i,weighttype)
+    if algname == 'RateFunctor' and for_lib:
+        return parse_miindmodel_ratefunctor_algorithm(alg,i,weighttype)
     if algname == 'DelayAlgorithm':
         return parse_delay_algorithm(alg,i,weighttype)
     if algname == 'PersistantAlgorithm':
@@ -456,11 +490,11 @@ def parse_algorithm(alg,i,weighttype):
         raise NameError('Wrong algorithm name')
     return ''
 
-def parse_algorithms(alg_list,weighttype,outfile):
+def parse_algorithms(alg_list,weighttype,outfile,for_lib=False):
     '''alg_list is a list of Algorithm elements as found by the parser. Each element
     of the list represents an individual algorithm.'''
     for i, alg in enumerate(alg_list):
-        s = parse_algorithm(alg,i, weighttype)
+        s = parse_algorithm(alg,i, weighttype,for_lib)
         outfile.write(s)
     return
 

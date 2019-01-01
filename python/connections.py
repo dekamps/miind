@@ -45,23 +45,45 @@ def parse_connection(connection, weighttype):
 
     return s
 
-def parse_grid_connection(connection, nodemap):
+def parse_external_outgoing_connection(connection, nodemap, network_name='network'):
+    o = str(nodemap[connection.attrib['Node']])
+
+    return '\t' + network_name + '.addExternalMonitor('+ o +');\n'
+
+
+def parse_grid_connection(connection, nodemap, network_name='network'):
     i = str(nodemap[connection.attrib['In']])
     o = str(nodemap[connection.attrib['Out']])
     num_cons = connection.text.split()[0]
     eff = connection.text.split()[1]
     delay = connection.text.split()[2]
 
-    return '\tnetwork.addGridConnection('+ i +','+ o +','+ eff +','+ num_cons +','+ delay +');\n'
+    return '\t' + network_name + '.addGridConnection('+ i +','+ o +','+ eff +','+ num_cons +','+ delay +');\n'
 
-def parse_mesh_connection(connection, nodemap, mat_name):
+def parse_external_incoming_grid_connection(connection, nodemap, id, network_name='network'):
+    o = str(nodemap[connection.attrib['Node']])
+    num_cons = connection.text.split()[0]
+    eff = connection.text.split()[1]
+    delay = connection.text.split()[2]
+
+    return '\t' + network_name + '.addGridConnection('+ o +','+ eff +','+ num_cons +',(double)'+ delay +','+ str(id) +');\n'
+
+def parse_mesh_connection(connection, nodemap, mat_name, network_name='network'):
     i = str(nodemap[connection.attrib['In']])
     o = str(nodemap[connection.attrib['Out']])
     num_cons = connection.text.split()[0]
     eff = connection.text.split()[1]
     delay = connection.text.split()[2]
 
-    return '\tnetwork.addMeshConnection('+ i +','+ o +','+ eff +','+ num_cons +','+delay+',&'+ mat_name +');\n'
+    return '\t' + network_name + '.addMeshConnection('+ i +','+ o +','+ eff +','+ num_cons +','+delay+',&'+ mat_name +');\n'
+
+def parse_external_incoming_mesh_connection(connection, nodemap, id, network_name='network'):
+    o = str(nodemap[connection.attrib['Node']])
+    num_cons = connection.text.split()[0]
+    eff = connection.text.split()[1]
+    delay = connection.text.split()[2]
+
+    return '\t' + network_name + '.addMeshConnection('+ o +','+ eff +','+ num_cons +',(double)'+delay+',&'+ mat_name +','+ str(id) +');\n'
 
 def parse_connections(connection_list,weighttype,outfile):
     for connection in connection_list:

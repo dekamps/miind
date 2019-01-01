@@ -13,10 +13,10 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.collections import PatchCollection
 
-from tools import *
+from .tools import *
 
 import lost
-import mesh as meshmod
+import mesh3 as meshmod
 
 class MeshTools:
     @staticmethod
@@ -55,7 +55,7 @@ class MeshTools:
             if model is not None:
                 with open(basename + '.model', 'w') as xml_file:
                     xml_file.write(ET.tostring(model))
-                    print 'Deleted old reset mapping.'
+                    print ('Deleted old reset mapping.')
 
         subprocess.call([
           matrix_generator_exe,
@@ -92,7 +92,7 @@ class MeshTools:
             if model is not None:
                 with open(basename + '.model', 'w') as xml_file:
                     xml_file.write(ET.tostring(model))
-                    print 'Deleted old reset mapping.'
+                    print ('Deleted old reset mapping.')
 
             subprocess.call([
               matrix_generator_exe,
@@ -110,7 +110,7 @@ class MeshTools:
             return
 
         if spike_shift_v == 0.0 and spike_shift_w == 0.0:
-            print 'Spike shift magnitude must be > 0.'
+            print ('Spike shift magnitude must be > 0.')
             return
 
         if jump_file:
@@ -184,7 +184,7 @@ class MeshTools:
             point = Point(event.xdata, event.ydata)
             for poly_key, poly_val in polygons.iteritems():
                 if poly_val.contains(point):
-                    print 'Clicked Cell ' + str(poly_key[0]) + ', ' + str(poly_key[1])
+                    print ('Clicked Cell ' + str(poly_key[0]) + ', ' + str(poly_key[1]))
 
         cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
@@ -193,19 +193,19 @@ class MeshTools:
 
     @staticmethod
     def plotLost(lost_path, **kwargs):
-        print '\nPoints indicate locations of lost mass in the transition matrix. (No points = No mass loss)'
-        print 'Click four locations to draw a quad to surround an area of points.'
-        print 'Continue adding quads until all points are covered.'
-        print 'This does not need to be accurate and you should ensure that quads cover ares of possible loss as well as where points are located.'
-        print '(Think about the mesh and where there are gaps).'
-        print 'Smaller quads decrease the search time for the Matrix Generator.'
-        print '\n'
-        print 'Left Click to place points.'
-        print 'Mouse Wheel to zoom in and out.'
-        print '\'d\' to delete the quad currently under the mouse pointer.'
-        print '\'c\' to clear all quads.'
-        print 'Double-Click to write the created quads to the Fiducial file and quit.'
-        print '\n'
+        print ('\nPoints indicate locations of lost mass in the transition matrix. (No points = No mass loss)')
+        print ('Click four locations to draw a quad to surround an area of points.')
+        print ('Continue adding quads until all points are covered.')
+        print ('This does not need to be accurate and you should ensure that quads cover ares of possible loss as well as where points are located.')
+        print ('(Think about the mesh and where there are gaps).')
+        print ('Smaller quads decrease the search time for the Matrix Generator.')
+        print ('\n')
+        print ('Left Click to place points.')
+        print ('Mouse Wheel to zoom in and out.')
+        print ('\'d\' to delete the quad currently under the mouse pointer.')
+        print ('\'c\' to clear all quads.')
+        print( 'Double-Click to write the created quads to the Fiducial file and quit.')
+        print ('\n')
         from tools_lost import (add_fiducial, extract_base,
                                     plot_lost, read_fiducial,
                                     onclick, zoom_fun, onkey)

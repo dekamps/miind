@@ -172,7 +172,7 @@ def GenerateTestMesh():
         n, t_d, v_lim, w_lim = DetermineNegativeTime(aexpdevelop.AEIFrev, aexpdevelop.Jrev, I, t, v, w, V_min, aexpdevelop.w_min, t_max)
         t, curve = CreateIntegralCurveStep(aexpdevelop.AEIFrev, aexpdevelop.Jrev, I, v, w, t_d, delta_t)
         red = ReduceCurve(curve,fact)
-        print w, t_d, len(red[:,0])
+        print (w, t_d, len(red[:,0]))
         WriteOutCurve(f,red,False)
 
 
@@ -180,4 +180,4 @@ def GenerateTestMesh():
 
 
 if __name__ == "__main__":
-    print 'Only for module use.'
+    print( 'Only for module use.')

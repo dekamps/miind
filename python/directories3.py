@@ -3,6 +3,7 @@ import errno
 import string
 import inspect
 import codegen3 as codegen
+import codegen_lib3 as codegen_lib
 import subprocess as sp
 
 # global variable to hold absolute path
@@ -14,18 +15,6 @@ MIIND_ROOT=''
 
 
 PATH_VARS_DEFINED=False
-
-# global variable to hold ENABLE_MPI (ON/OFF)
-ENABLE_MPI='OFF'
-# global variable to hold ENABLE_OPENMP (ON/OFF)
-ENABLE_OPENMP='OFF'
-# global variable to hold ENABLE_ROOT (ON/OFF)
-ENABLE_ROOT='ON'
-# global variable to hold ENABLE_ROOT (ON/OFF)
-ENABLE_CUDA='OFF'
-# global variable to hold CPP source file (for use with building the shared library)
-SOURCE_FILE='MiindModel.cpp'
-
 
 
 def initialize_global_variables():
@@ -67,29 +56,96 @@ def create_dir(name):
             raise
     return abs_path
 
-def filter(lines):
+def filter(lines,enable_mpi,enable_openmp,enable_root, source_file_name):
+    # ROOT enabled by default
+    if enable_root:
+        ENABLE_ROOT = 'ON'
+    else:
+        ENABLE_ROOT = 'OFF'
+
+    # MPI disabled by default
+    if enable_mpi:
+        ENABLE_MPI = 'ON'
+    else:
+        ENABLE_MPI = 'OFF'
+
+    # OPENMP disabled by default
+    if enable_openmp:
+        ENABLE_OPENMP = 'ON'
+    else:
+        ENABLE_OPENMP = 'OFF'
+
     nw = []
     for line in lines:
         if '${CMAKE_SOURCE_DIR}' in line:
-            hh=string.replace(line,'${CMAKE_SOURCE_DIR}',MIIND_ROOT)
+            hh=line.replace('${CMAKE_SOURCE_DIR}',MIIND_ROOT)
             nw.append(hh)
-    	elif '${TOKEN_ENABLE_MPI}' in line:
-    	    hh=string.replace(line,'${TOKEN_ENABLE_MPI}',ENABLE_MPI)
+        elif '${TOKEN_ENABLE_MPI}' in line:
+    	    hh=line.replace('${TOKEN_ENABLE_MPI}',ENABLE_MPI)
     	    nw.append(hh)
-    	elif '${TOKEN_ENABLE_OPENMP}' in line:
-    	    hh=string.replace(line,'${TOKEN_ENABLE_OPENMP}',ENABLE_OPENMP)
+        elif '${TOKEN_ENABLE_OPENMP}' in line:
+    	    hh=line.replace('${TOKEN_ENABLE_OPENMP}',ENABLE_OPENMP)
     	    nw.append(hh)
-    	elif '${TOKEN_ENABLE_ROOT}' in line:
-    	    hh=string.replace(line,'${TOKEN_ENABLE_ROOT}',ENABLE_ROOT)
+        elif '${TOKEN_ENABLE_ROOT}' in line:
+    	    hh=line.replace('${TOKEN_ENABLE_ROOT}',ENABLE_ROOT)
     	    nw.append(hh)
         elif 'TOKEN_SOURCE_FILE' in line:
-    	    hh=string.replace(line,'TOKEN_SOURCE_FILE',SOURCE_FILE)
+    	    hh=line.replace('TOKEN_SOURCE_FILE',source_file_name)
     	    nw.append(hh)
         else:
             nw.append(line)
     return nw
 
-def insert_cmake_template(name,full_path_name,cuda):
+def insert_cmake_template_lib(name, full_path_name, enable_mpi,enable_openmp,enable_root,cuda,source_file_name):
+    ''' name is the executable name, full_path is the directory where the cmake template
+    needs to be written into.'''
+
+    # If we're rebuilding CMakeLists.txt, then we need to clear CMakeCache to avoid unexpected
+    # behaviour.
+    cachefile = os.path.join(full_path_name, 'CMakeCache.txt')
+    if os.path.exists(cachefile):
+	       os.remove(cachefile)
+
+    outname = os.path.join(full_path_name, 'CMakeLists.txt')
+    template_path = os.path.join(miind_root(),'python','cmake_template_lib')
+    with open(template_path) as f:
+        lines=f.readlines()
+
+    # filter the template CMakeLists.txt to that was is needed locally
+    replace = filter(lines,enable_mpi,enable_openmp,enable_root,source_file_name)
+
+    with open(outname,'w') as fout:
+        if cuda == True:
+            fout.write('OPTION(ENABLE_CUDA \"CUDA Desired\" ON)\n')
+        else:
+            fout.write('OPTION(ENABLE_CUDA \"CUDA Desired\" OFF)\n')
+            
+        for line in replace:
+            fout.write(line)
+
+        libbase = MIIND_ROOT + '/build/libs'
+        numdir  = libbase + '/NumtoolsLib'
+        geomdir = libbase + '/GeomLib'
+        mpidir  = libbase + '/MPILib'
+        twodir  = libbase + '/TwoDLib'
+        shared  = libbase + '/MiindLib'
+
+        if cuda == True:
+            cudatwodir = libbase + '/CudaTwoDLib'
+        else:
+            cudatwodir = ''
+
+        fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ' ' + shared +')\n')
+        if cuda == True:
+            fout.write('\ncuda_add_library( '+ name + ' ${LIB_TYPE} ${TVB_LIF_SRC} ${PW_HEADERS})\n')
+        else:
+            fout.write('\nadd_library( '+ name + ' ${LIB_TYPE} ${TVB_LIF_SRC} ${PW_HEADERS})\n')
+
+        fout.write('target_link_libraries( ' + name + ' ${LIBLIST} -lpython2.7 -lboost_python)\n')
+
+
+
+def insert_cmake_template(name,full_path_name,enable_mpi,enable_openmp,enable_root,cuda,source_file_name):
     ''' name is the executable name, full_path is the directory where the cmake template
     needs to be written into.'''
 
@@ -101,7 +157,7 @@ def insert_cmake_template(name,full_path_name,cuda):
         lines=f.readlines()
 
     # filter the template CMakeLists.txt to that was is needed locally
-    replace = filter(lines)
+    replace = filter(lines,enable_mpi,enable_openmp,enable_root,source_file_name)
 
     with open(outname,'w') as fout:
         if cuda == True:
@@ -140,7 +196,7 @@ def create_cpp_lib_file(name, dir_path, prog_name, mod_name):
     abs_path = os.path.join(dir_path,cpp_name)
     with open(abs_path,'w') as fout:
         with open(name) as fin:
-            codegen_lib.generate_outputfile(fin,fout)
+            codegen_lib.generate_outputfile(fin,fout,prog_name)
 
     if mod_name != None:
         for f in mod_name:
@@ -174,7 +230,7 @@ def move_model_files(xmlfile,dirpath):
 
     for tmat in tms:
         if not os.path.exists(tmat):
-            print 'Please put the file: ', tmat, 'in the same directory as the xml file.'
+            print('Please put the file: ', tmat, 'in the same directory as the xml file.')
 
     for mat in mans:
         if not os.path.exists(mat):
@@ -184,12 +240,7 @@ def move_model_files(xmlfile,dirpath):
     for fi in fls:
         sp.call(['cp',fi,dirpath])
 
-def add_shared_library(dirname, xmlfiles, modname, enable_mpi=False, enable_openmp=False, enable_root=True, enable_cuda=False):
-    global ENABLE_MPI
-    global ENABLE_OPENMP
-    global ENABLE_ROOT
-    global ENABLE_CUDA
-    global SOURCE_FILE
+def add_shared_library(dirname, xmlfiles, modname, enable_mpi=True, enable_openmp=True, enable_root=True, enable_cuda=False):
 
     ''' Add a user defined executable to the current working directory.
      '''
@@ -197,65 +248,26 @@ def add_shared_library(dirname, xmlfiles, modname, enable_mpi=False, enable_open
     if not PATH_VARS_DEFINED:
         initialize_global_variables()
 
-    # ROOT enabled by default
-    if not enable_root:
-	ENABLE_ROOT = 'OFF'
-
-    # MPI disabled by default
-    if enable_mpi:
-	ENABLE_MPI = 'ON'
-
-    # OPENMP disabled by default
-    if enable_openmp:
-	ENABLE_OPENMP = 'ON'
-
-    # OPENMP disabled by default
-    if enable_cuda:
-	ENABLE_CUDA = 'ON'
-
     for xmlfile in xmlfiles:
         progname = check_and_strip_name(xmlfile)
         dirpath = create_dir(os.path.join(dirname, progname))
         SOURCE_FILE = progname + '.cpp'
-        insert_cmake_template_lib(progname,dirpath)
+        insert_cmake_template_lib(progname,dirpath,enable_mpi,enable_openmp,enable_root,enable_cuda,SOURCE_FILE)
         create_cpp_lib_file(xmlfile, dirpath, progname, modname)
         move_model_files(xmlfile,dirpath)
 
-def add_executable(dirname, xmlfiles, modname,enable_mpi=False, enable_openmp=False, enable_root=True, enable_cuda=False):
-    global ENABLE_MPI
-    global ENABLE_OPENMP
-    global ENABLE_ROOT
-    global ENABLE_CUDA
-    global SOURCE_FILE
-
+def add_executable(dirname, xmlfiles, modname,enable_mpi=True, enable_openmp=True, enable_root=True, enable_cuda=False):
     ''' Add a user defined executable to the current working directory.
      '''
     global PATH_VARS_DEFINED
     if not PATH_VARS_DEFINED:
         initialize_global_variables()
 
-
-    # ROOT enabled by default
-    if not enable_root:
-	ENABLE_ROOT = 'OFF'
-
-    # MPI disabled by default
-    if enable_mpi:
-	ENABLE_MPI = 'ON'
-
-    # OPENMP disabled by default
-    if enable_openmp:
-	ENABLE_OPENMP = 'ON'
-
-    # OPENMP disabled by default
-    if enable_cuda:
-	ENABLE_CUDA = 'ON'
-
     for xmlfile in xmlfiles:
         progname = check_and_strip_name(xmlfile)
         dirpath = create_dir(os.path.join(dirname, progname))
         SOURCE_FILE = progname + '.cpp'
-        insert_cmake_template(progname,dirpath,enable_cuda)
+        insert_cmake_template(progname,dirpath,enable_mpi,enable_openmp,enable_root,enable_cuda,SOURCE_FILE)
         create_cpp_file(xmlfile, dirpath, progname, modname)
         move_model_files(xmlfile,dirpath)
 

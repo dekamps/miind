@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import os
 import re
 import argparse
@@ -65,6 +65,10 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, parameters,
         f.write('\n')
         f.write('\nint main(int argc, char *argv[]){\n')
         f.write('\n')
+        f.write('#ifdef ENABLE_MPI\n')
+        f.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
+        f.write('\tboost::mpi::environment env(argc, argv);\n')
+        f.write('#endif\n\n')
         f.write('\tMiindLib::VectorizedNetwork network('+ time_step +');\n')
         f.write('\tpugi::xml_document doc;\n')
         f.write('\n')
@@ -301,7 +305,7 @@ def mesh_algorithm_group(root):
 
     return False
 
-def produce_mesh_algorithm_version(dirname, filename, modname, root, enable_mpi, enable_openmp, disable_root, cuda):
+def produce_mesh_algorithm_version(dirname, filename, modname, root, enable_mpi, enable_openmp, enable_root, cuda):
     '''Entry point for the vector version of a MIIND C++ file. Filename is file name of the XML file, dirname is the user-specified directory hierarchy
     where the C++ file will be generated and the simulation will be stored. The simulation file will be placed in directory <dirname>/<xml_file_name>.'''
 
@@ -311,19 +315,22 @@ def produce_mesh_algorithm_version(dirname, filename, modname, root, enable_mpi,
     for xmlfile in filename:
         progname = directories.check_and_strip_name(xmlfile)
         dirpath = directories.create_dir(os.path.join(dirname, progname))
-        directories.insert_cmake_template(progname,dirpath,cuda)
+        SOURCE_FILE = progname + '.cpp'
+        if cuda:
+            SOURCE_FILE = progname + '.cu'
+        directories.insert_cmake_template(progname,dirpath,enable_mpi, enable_openmp, enable_root,cuda,SOURCE_FILE)
         create_cpp_file(xmlfile, dirpath, progname, modname, cuda)
         directories.move_model_files(xmlfile,dirpath)
 
-def generate_vectorized_network_executable(dirname, filename, modname, enable_mpi, enable_openmp, disable_root, enable_cuda):
+def generate_vectorized_network_executable(dirname, filename, modname, enable_mpi, enable_openmp, enable_root, enable_cuda):
     fn = filename[0]
     root=parse(fn)
     if mesh_algorithm_group(root) == True:
         # Run the MeshAlgorithm version
-        produce_mesh_algorithm_version(dirname, filename, modname, root, enable_mpi, enable_openmp, disable_root, enable_cuda)
+        produce_mesh_algorithm_version(dirname, filename, modname, root, enable_mpi, enable_openmp, enable_root, enable_cuda)
     else:
         # Simply run the old script
-        directories.add_executable(dirname, filename, modname, enable_mpi, enable_openmp, disable_root, False)
+        directories.add_executable(dirname, filename, modname, enable_mpi, enable_openmp, enable_root, False)
 
 
 if __name__ == "__main__":
