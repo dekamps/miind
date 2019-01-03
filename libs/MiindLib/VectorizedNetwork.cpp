@@ -260,7 +260,7 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
   }
 
   if(_display_nodes.size() > 0){
-    _group_adapter->updateGroupMass();
+    _group_adapter->updateGroupMass ();
     TwoDLib::Display::getInstance()->updateDisplay(i_loop);
   }
 

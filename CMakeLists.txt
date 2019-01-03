@@ -31,6 +31,7 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 ##############################################################################
 
 OPTION(ENABLE_OPENMP "Enable OpenMP" ON)
+OPTION(ENABLE_CUDA "Enable CUDA" OFF)
 OPTION(ENABLE_TESTING "Compile tests" OFF)
 OPTION(ENABLE_ROOT "Root Desired" OFF)
 OPTION(ENABLE_MEMORY_TEST "Generate memory test" OFF)
