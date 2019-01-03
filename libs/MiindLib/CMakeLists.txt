@@ -14,12 +14,21 @@ INCLUDE_DIRECTORIES(
 )
 
 set( TWOD_SRC
-VectorizedNetwork.cpp
 )
 
 set( TWOD_HEADERS
-VectorizedNetwork.hpp
 )
+
+if (ENABLE_CUDA)
+   if (NOT APPLE)
+   list(APPEND TWOD_SRC 
+	VectorizedNetwork.cpp
+   )
+   list(APPEND TWOD_HEADERS 
+	VectorizedNetwork.hpp
+   )
+   endif (NOT APPLE)
+endif(ENABLE_CUDA)
 
 set(GLUT_LIBRARY "-lGL -lGLU -lglut")
 
@@ -31,7 +40,6 @@ ${MIIND_LIBRARY_PREFIX}geom
 ${MIIND_LIBRARY_PREFIX}twod
 ${MIIND_LIBRARY_PREFIX}numtools
 ${MIIND_LIBRARY_PREFIX}mpi
-${MIIND_LIBRARY_PREFIX}cudatwod
     ${Boost_LIBRARIES}
     ${MPI_LIBRARIES}
     ${MIIND_LIBRARY_PREFIX}numtools
@@ -39,6 +47,12 @@ ${MIIND_LIBRARY_PREFIX}cudatwod
 	gsl
   ${GLUT_LIBRARY}
 )
+
+if (ENABLE_CUDA)
+   if (NOT APPLE)
+   list(APPEND LIBLIST ${MIIND_LIBRARY_PREFIX}cudatwod)
+   endif (NOT APPLE)
+endif(ENABLE_CUDA)
 
 add_library( ${MIIND_LIBRARY_PREFIX}shared ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS})
 

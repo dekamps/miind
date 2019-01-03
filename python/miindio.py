@@ -14,10 +14,11 @@ import directories3
 
 cwdfilename = 'miind_cwd'
 settingsfilename = op.expanduser('~/.miind_settings')
+miind_cmake_cache = op.join(directories3.miind_root(), 'build/CMakeCache.txt')
 debug = False
 
 def getMiindPythonPath():
-    return os.path.join(directories.miind_root(), 'python')
+    return os.path.join(directories3.miind_root(), 'python')
 
 def _help(command):
     command_name = command[0]
@@ -578,20 +579,40 @@ if __name__ == "__main__":
   cwd_settings['sim'] = 'NOT_SET'
   cwd_settings['sim_project'] = 'NOT_SET'
 
-  if not op.exists(settingsfilename):
-      print('Settings file ('+ settingsfilename +') not found. MPI, OPENMP, ROOT and CUDA enabled.')
-      with open(settingsfilename, 'w') as settingsfile:
-          settings['mpi_enabled'] = True
-          settings['openmp_enabled'] = True
-          settings['root_enabled'] = True
-          settings['cuda_enabled'] = True
-          for k,v in settings.items():
-              settingsfile.write(k + '=' + str(v) + '\n')
-  else:
-      with open(settingsfilename, 'r') as settingsfile:
-          for line in settingsfile:
-              tokens = line.split('=')
-              settings[tokens[0].strip()] = (tokens[1].strip() == 'True')
+  flags_set = [False,False,False,False]
+  if op.exists(miind_cmake_cache):
+      with open(miind_cmake_cache, 'r') as cachefile:
+          for line in cachefile:
+              tokens = line.strip().split('=')
+              if(tokens[0] == 'ENABLE_CUDA:BOOL'):
+                  settings['cuda_enabled'] = (tokens[1] == 'ON')
+                  flags_set[0] = True
+              if(tokens[0] == 'ENABLE_MPI:BOOL'):
+                  settings['mpi_enabled'] = (tokens[1] == 'ON')
+                  flags_set[1] = True
+              if(tokens[0] == 'ENABLE_OPENMP:BOOL'):
+                  settings['openmp_enabled'] = (tokens[1] == 'ON')
+                  flags_set[2] = True
+              if(tokens[0] == 'ENABLE_ROOT:BOOL'):
+                  settings['root_enabled'] = (tokens[1] == 'ON')
+                  flags_set[3] = True
+
+  if(not op.exists(miind_cmake_cache) or not all(flags_set)):
+      if not op.exists(settingsfilename):
+          print('CMakeCache.txt in MIIND_ROOT/Build directory not found. Fall back to user settings file...')
+          print('Settings file ('+ settingsfilename +') not found. MPI, OPENMP, ROOT and CUDA enabled by default.')
+          with open(settingsfilename, 'w') as settingsfile:
+              settings['mpi_enabled'] = True
+              settings['openmp_enabled'] = True
+              settings['root_enabled'] = True
+              settings['cuda_enabled'] = True
+              for k,v in settings.items():
+                  settingsfile.write(k + '=' + str(v) + '\n')
+      else:
+          with open(settingsfilename, 'r') as settingsfile:
+              for line in settingsfile:
+                  tokens = line.split('=')
+                  settings[tokens[0].strip()] = (tokens[1].strip() == 'True')
 
   if not op.exists(cwdfilename):
       with open(cwdfilename, 'w') as cwdsettingsfile:

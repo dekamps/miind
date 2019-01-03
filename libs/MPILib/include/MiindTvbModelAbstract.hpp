@@ -25,7 +25,6 @@ public:
 	}
 
 	~MiindTvbModelAbstract() {
-		endSimulation();
 	}
 
 	virtual void init(boost::python::list) {};
