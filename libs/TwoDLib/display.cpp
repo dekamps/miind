@@ -3,7 +3,9 @@
 #include <vector>
 #include <iomanip>
 #include <sstream>
+#ifdef ENABLE_OPENMP
 #include <omp.h>
+#endif
 #include <math.h>
 #include <boost/filesystem.hpp>
 
@@ -22,12 +24,6 @@ Display::Display(){
 	write_frames = false;
 	start_time = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
 	_dws = std::map<MPILib::NodeId, DisplayWindow>();
-	// When using OpenMP, all cores are reserved for simulation. For displaying,
-	// we need to set aside a thread/core otherwise display gets interleaved and
-	// is super slow.
-	int num_threads = omp_get_max_threads();
-	if (num_threads > 1)
-		omp_set_num_threads(num_threads-1);
 }
 
 Display::~Display(){
