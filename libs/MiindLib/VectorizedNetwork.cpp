@@ -14,16 +14,15 @@ void VectorizedNetwork::addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatri
   std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive) {
 
   _num_nodes++;
-  _node_id_to_group_mesh.insert(std::pair<MPILib::NodeId, MPILib::Index>(_num_nodes-1,_vec_mesh.size()));
-  _group_mesh_to_node_id.insert(std::pair<MPILib::Index, MPILib::NodeId>(_vec_mesh.size(),_num_nodes-1));
-  _grid_meshes.push_back(_vec_mesh.size());
-  _vec_mesh.push_back(mesh);
+  _grid_node_ids.push_back(_num_nodes-1);
+  _grid_vec_mesh.push_back(mesh);
+  _grid_vec_vec_rev.push_back(vec_rev);
+  _grid_vec_vec_res.push_back(vec_res);
+  _grid_vec_tau_refractive.push_back(tau_refractive);
+
   _vec_transforms.push_back(tmat);
   _start_vs.push_back(start_v);
   _start_ws.push_back(start_w);
-  _vec_vec_rev.push_back(vec_rev);
-  _vec_vec_res.push_back(vec_res);
-  _vec_tau_refractive.push_back(tau_refractive);
 
 }
 
@@ -31,13 +30,11 @@ void VectorizedNetwork::addMeshNode(TwoDLib::Mesh mesh,
   std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive) {
 
   _num_nodes++;
-  _node_id_to_group_mesh.insert(std::pair<MPILib::NodeId, MPILib::Index>(_num_nodes-1,_vec_mesh.size()));
-  _group_mesh_to_node_id.insert(std::pair<MPILib::Index, MPILib::NodeId>(_vec_mesh.size(),_num_nodes-1));
-  _mesh_meshes.push_back(_vec_mesh.size());
-  _vec_mesh.push_back(mesh);
-  _vec_vec_rev.push_back(vec_rev);
-  _vec_vec_res.push_back(vec_res);
-  _vec_tau_refractive.push_back(tau_refractive);
+  _mesh_node_ids.push_back(_num_nodes-1);
+  _mesh_vec_mesh.push_back(mesh);
+  _mesh_vec_vec_rev.push_back(vec_rev);
+  _mesh_vec_vec_res.push_back(vec_res);
+  _mesh_vec_tau_refractive.push_back(tau_refractive);
 
 }
 
@@ -47,6 +44,29 @@ void VectorizedNetwork::addRateNode(function_pointer functor){
 }
 
 void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps){
+
+  int mesh_count = 0;
+  for(int g=0; g<_grid_node_ids.size(); g++){
+    _node_id_to_group_mesh.insert(std::pair<MPILib::NodeId, MPILib::Index>(_grid_node_ids[g],mesh_count));
+    _group_mesh_to_node_id.insert(std::pair<MPILib::Index, MPILib::NodeId>(mesh_count,_grid_node_ids[g]));
+    _grid_meshes.push_back(mesh_count);
+    mesh_count++;
+    _vec_mesh.push_back(_grid_vec_mesh[g]);
+    _vec_vec_rev.push_back(_grid_vec_vec_rev[g]);
+    _vec_vec_res.push_back(_grid_vec_vec_res[g]);
+    _vec_tau_refractive.push_back(_grid_vec_tau_refractive[g]);
+  }
+
+  for(int m=0; m<_mesh_node_ids.size(); m++){
+    _node_id_to_group_mesh.insert(std::pair<MPILib::NodeId, MPILib::Index>(_mesh_node_ids[m],mesh_count));
+    _group_mesh_to_node_id.insert(std::pair<MPILib::Index, MPILib::NodeId>(mesh_count,_mesh_node_ids[m]));
+    _mesh_meshes.push_back(mesh_count);
+    mesh_count++;
+    _vec_mesh.push_back(_mesh_vec_mesh[m]);
+    _vec_vec_rev.push_back(_mesh_vec_vec_rev[m]);
+    _vec_vec_res.push_back(_mesh_vec_vec_res[m]);
+    _vec_tau_refractive.push_back(_mesh_vec_tau_refractive[m]);
+  }
 
   _group = new TwoDLib::Ode2DSystemGroup(_vec_mesh,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive);
 
@@ -102,7 +122,7 @@ void VectorizedNetwork::reportNodeDensities(MPILib::Time sim_time){
       boost::filesystem::create_directory(dirname);
     }
     std::ofstream ofst(dirname + "/" + fn);
-    _group->DumpSingleMesh(&ofst, _density_nodes[i]);
+    _group->DumpSingleMesh(&ofst, _node_id_to_group_mesh[_density_nodes[i]]);
   }
 }
 

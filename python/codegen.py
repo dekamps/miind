@@ -135,7 +135,7 @@ def matrix_names(fn):
         matrixnames.append(a.text)
     return matrixnames
 
-def generate_outputfile(infile, outfile):
+def generate_outputfile(infile, outfile, enable_root):
     generate_preamble(outfile)
     nettype, tree = parse_xml(infile,outfile)
     outfile.write(nettype)
@@ -159,7 +159,7 @@ def generate_outputfile(infile, outfile):
     connections.parse_connections(connection_list,weighttype,outfile)
     outfile.write('\t// generation simulation parameter\n')
     simhand = tree.find('SimulationIO')
-    simulation.parse_simulation(simhand,outfile)
+    simulation.parse_simulation(simhand,outfile,enable_root)
     simpar = tree.find('SimulationRunParameter')
     simulation.parse_parameter(simpar,outfile)
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-import ROOT
+#import ROOT
 import numpy as np
 import uuid
 import matplotlib.pyplot as plt
@@ -21,8 +21,8 @@ from scipy.spatial import distance
 from matplotlib.path import Path
 
 
-ROOT.gROOT.SetBatch(True)
-ROOT.gStyle.SetOptStat(0)
+# ROOT.gROOT.SetBatch(True)
+# ROOT.gStyle.SetOptStat(0)
 
 #enlarge if there are missing points
 MAX_NEIGHBOURS = 128
@@ -854,8 +854,8 @@ class Mesh:
                 if len(coords)%8 != 0:
                     raise ValueError
                 n_chunck = len(coords)/8
-
-                for i in range(0,n_chunck):
+                
+                for i in range(0,int(n_chunck)):
                     vs=[]
                     ws=[]
                     vs.append(coords[8*i])

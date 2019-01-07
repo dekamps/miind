@@ -119,7 +119,7 @@ def insert_cmake_template_lib(name, full_path_name, enable_mpi,enable_openmp,ena
             fout.write('OPTION(ENABLE_CUDA \"CUDA Desired\" ON)\n')
         else:
             fout.write('OPTION(ENABLE_CUDA \"CUDA Desired\" OFF)\n')
-            
+
         for line in replace:
             fout.write(line)
 
@@ -128,12 +128,14 @@ def insert_cmake_template_lib(name, full_path_name, enable_mpi,enable_openmp,ena
         geomdir = libbase + '/GeomLib'
         mpidir  = libbase + '/MPILib'
         twodir  = libbase + '/TwoDLib'
-        shared  = libbase + '/MiindLib'
+
 
         if cuda == True:
             cudatwodir = libbase + '/CudaTwoDLib'
+            shared  = libbase + '/MiindLib'
         else:
             cudatwodir = ''
+            shared  = ''
 
         fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ' ' + shared +')\n')
         if cuda == True:
@@ -175,12 +177,13 @@ def insert_cmake_template(name,full_path_name,enable_mpi,enable_openmp,enable_ro
         geomdir = libbase + '/GeomLib'
         mpidir  = libbase + '/MPILib'
         twodir  = libbase + '/TwoDLib'
-        shared  = libbase + '/MiindLib'
 
         if cuda == True:
             cudatwodir = libbase + '/CudaTwoDLib'
+            shared  = libbase + '/MiindLib'
         else:
             cudatwodir = ''
+            shared  = ''
 
         fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ' ' + shared +')\n')
 
@@ -190,26 +193,26 @@ def insert_cmake_template(name,full_path_name,enable_mpi,enable_openmp,enable_ro
             fout.write('\nadd_executable( ' + name + ' ' + name + '.cpp)\n')
         fout.write('target_link_libraries( ' + name  + ' ${LIBLIST} )\n')
 
-def create_cpp_lib_file(name, dir_path, prog_name, mod_name):
+def create_cpp_lib_file(name, dir_path, prog_name, mod_name, enable_root):
 
     cpp_name = prog_name + '.cpp'
     abs_path = os.path.join(dir_path,cpp_name)
     with open(abs_path,'w') as fout:
         with open(name) as fin:
-            codegen_lib.generate_outputfile(fin,fout,prog_name)
+            codegen_lib.generate_outputfile(fin,fout,prog_name, enable_root)
 
     if mod_name != None:
         for f in mod_name:
             sp.call(['cp',f,dir_path])
     return
 
-def create_cpp_file(name, dir_path, prog_name, mod_name):
+def create_cpp_file(name, dir_path, prog_name, mod_name, enable_root):
 
     cpp_name = prog_name + '.cpp'
     abs_path = os.path.join(dir_path,cpp_name)
     with open(abs_path,'w') as fout:
         with open(name) as fin:
-            codegen.generate_outputfile(fin,fout)
+            codegen.generate_outputfile(fin,fout, enable_root)
 
     if mod_name != None:
         for f in mod_name:
@@ -253,7 +256,7 @@ def add_shared_library(dirname, xmlfiles, modname, enable_mpi=True, enable_openm
         dirpath = create_dir(os.path.join(dirname, progname))
         SOURCE_FILE = progname + '.cpp'
         insert_cmake_template_lib(progname,dirpath,enable_mpi,enable_openmp,enable_root,enable_cuda,SOURCE_FILE)
-        create_cpp_lib_file(xmlfile, dirpath, progname, modname)
+        create_cpp_lib_file(xmlfile, dirpath, progname, modname, enable_root)
         move_model_files(xmlfile,dirpath)
 
 def add_executable(dirname, xmlfiles, modname,enable_mpi=True, enable_openmp=True, enable_root=True, enable_cuda=False):
@@ -268,7 +271,7 @@ def add_executable(dirname, xmlfiles, modname,enable_mpi=True, enable_openmp=Tru
         dirpath = create_dir(os.path.join(dirname, progname))
         SOURCE_FILE = progname + '.cpp'
         insert_cmake_template(progname,dirpath,enable_mpi,enable_openmp,enable_root,enable_cuda,SOURCE_FILE)
-        create_cpp_file(xmlfile, dirpath, progname, modname)
+        create_cpp_file(xmlfile, dirpath, progname, modname, enable_root)
         move_model_files(xmlfile,dirpath)
 
 if __name__ == "__main__":

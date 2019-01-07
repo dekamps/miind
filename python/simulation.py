@@ -60,7 +60,7 @@ def add_nodes(tree):
         s += '\thandler.addNodeToCanvas(id_' +  str(NODE_NAMES[node.attrib['Name']]) + ');\n'
     return s
 
-def parse_simulation(tree,outfile):
+def parse_simulation(tree,outfile,enable_root):
     name=tree.find('SimulationName')
     name_str = name.text
     state=tree.find('WithState')
@@ -77,18 +77,21 @@ def parse_simulation(tree,outfile):
     screen=tree.find('OnScreen')
     if screen.text == 'TRUE':
         s = parse_canvas_handler(tree)
-        s += '\tMPILib::report::handler::InactiveReportHandler handler;\n'
-        # s += '\tMPILib::report::handler::RootReportHandler handler(\"'
-        # s += name_str + '\",'
-        # s += state_bool + ','
-        # s += 'true, par_canvas);\n'
-
-        s += add_nodes(tree)
+        if(enable_root):
+            s += '\tMPILib::report::handler::RootReportHandler handler(\"'
+            s += name_str + '\",'
+            s += state_bool + ','
+            s += 'true, par_canvas);\n'
+            s += add_nodes(tree)
+        else:
+            s += '\tMPILib::report::handler::InactiveReportHandler handler;\n'
     else:
-        s  = '\tMPILib::report::handler::InactiveReportHandler handler;\n'
-        # s  = '\tMPILib::report::handler::RootReportHandler handler(\"'
-        # s += name_str   + '\",'
-        # s += state_bool + ');\n\n'
+        if(enable_root):
+            s  = '\tMPILib::report::handler::RootReportHandler handler(\"'
+            s += name_str   + '\",'
+            s += state_bool + ');\n\n'
+        else:
+            s  = '\tMPILib::report::handler::InactiveReportHandler handler;\n'
 
     outfile.write(s)
     return

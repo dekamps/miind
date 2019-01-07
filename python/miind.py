@@ -154,29 +154,11 @@ def generate_model_files(fn, nodes,algorithms):
                   f.write('\tnetwork.addGridNode(mesh'+ str(node_id) +', transform'+ str(node_id) +', ' + str(algorithm.attrib['start_v']) + ', ' + str(algorithm.attrib['start_w']) +', vec_rev'+ str(node_id) +', vec_res'+ str(node_id) +', '+ ref +');\n')
                   f.write('\n')
 
-              node_id = node_id + 1
-
-def generate_rate_names(nodes,algorithms):
-     func_names=[]
-     for node in nodes:
-          algname = node.attrib['algorithm']
-          for alg in algorithms:
-               if alg.attrib['name'] == algname: # here we assume the name is unique
-                    algorithm = alg
-
-          if algorithm.attrib['type'] == 'RateFunctor':
-               func_names.append(algorithm.attrib['name'])
-
-     return func_names
-
-def generate_rate_nodes(fn,nodes,algorithms):
-    rate_nodes = generate_rate_names(nodes,algorithms)
-
-    with open(fn,'a') as f:
-        for rn in rate_nodes:
-            f.write('\tnetwork.addRateNode(' + rn + ');\n')
-
-        f.write('\n')
+                  node_id = node_id + 1
+              elif algorithm.attrib['type'] == 'RateFunctor':
+                  rn = algorithm.attrib['name']
+                  f.write('\tnetwork.addRateNode(' + rn + ');\n')
+                  node_id = node_id + 1
 
 def extract_efficacy(fn):
      '''Extract efficacy from a matrix file. Takes a filename, returns efficacy as a single float. In the
@@ -277,7 +259,6 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
     generate_preamble(fn, variables, nodes, algorithms,connections,parameter, cuda)
 
     generate_model_files(fn,nodes,algorithms)
-    generate_rate_nodes(fn,nodes,algorithms)
     generate_connections(fn,connections,nodes,algorithms)
     nodemap = node_name_to_node_id(nodes)
     with open(fn,'a') as f:

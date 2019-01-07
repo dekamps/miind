@@ -16,18 +16,26 @@
 </Algorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="E" name="QIF E" type="INHIBITORY_DIRECT" />
-<Node algorithm="I" name="QIF I" type="INHIBITORY_DIRECT" />
+<Node algorithm="E" name="QIF_E" type="INHIBITORY_DIRECT" />
+<Node algorithm="I" name="QIF_I" type="INHIBITORY_DIRECT" />
 <Node algorithm="Exc Input" name="Inp" type="NEUTRAL" />
 </Nodes>
 <Connections>
-  <Connection In="Inp" Out="QIF E">2 0.05 0</Connection>
-  <Connection In="Inp" Out="QIF I">6 0.05 0</Connection>
-  <Connection In="QIF E" Out="QIF I">160 -0.05 0</Connection>
+  <Connection In="Inp" Out="QIF_E">2 0.05 0</Connection>
+  <Connection In="Inp" Out="QIF_I">6 0.05 0</Connection>
+  <Connection In="QIF_E" Out="QIF_I">160 -0.05 0</Connection>
   <!--<Connection In="QIF E" Out="QIF E">5 -0.05 0</Connection>-->
   <!--<Connection In="QIF I" Out="QIF I">5 -0.05 0</Connection>-->
-  <Connection In="QIF I" Out="QIF E">130 -0.05 0</Connection>
+  <Connection In="QIF_I" Out="QIF_E">130 -0.05 0</Connection>
 </Connections>
+<Reporting>
+<Density node="QIF_E" t_start="0.0" t_end="10.0" t_interval="0.001" />
+<Density node="QIF_I" t_start="0.0" t_end="10.0" t_interval="0.001" />
+<!--<Display node="QIF_E" />
+<Display node="QIF_I" />-->
+<Rate node="QIF_E" />
+<Rate node="QIF_I" />
+</Reporting>
 <SimulationIO>
 <SimulationName>qif.dat</SimulationName>
 <OnScreen>FALSE</OnScreen>
@@ -43,8 +51,8 @@
 <Dense_min>0</Dense_min>
 <Dense_max>2.5</Dense_max>
 </CanvasParameter>
-<CanvasNode Name="QIF E" />
-<CanvasNode Name="QIF I" />
+<CanvasNode Name="QIF_E" />
+<CanvasNode Name="QIF_I" />
 </SimulationIO>
 <SimulationRunParameter>
 <max_iter>1000000</max_iter>

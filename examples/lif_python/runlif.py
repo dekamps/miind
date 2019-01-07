@@ -5,7 +5,7 @@
 import pylab
 import numpy
 import matplotlib.pyplot as plt
-import imp
+import liblif as miind
 
 # Comment out MPI, comm and rank lines below if not using
 # MPI
@@ -16,12 +16,14 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 #######################
 
-miind = imp.load_dynamic('libmiindlif', './libmiindlif.so')
 number_of_nodes = 1
 simulation_length = 3 #ms
 miindmodel = miind.MiindModel(number_of_nodes, simulation_length)
 
 miindmodel.init([])
+
+timestep = miindmodel.getTimeStep()
+print('Timestep from XML : {}'.format(timestep))
 
 # For MPI child processes, startSimulation runs the full simulation loop
 # and so will not return until MPI process 0 has completed. At that point,
@@ -29,10 +31,12 @@ miindmodel.init([])
 if miindmodel.startSimulation() > 0 :
     quit()
 
-constant_input = [5000]
+constant_input = [1500]
 activities = []
-for i in range(int(simulation_length/0.001)): #0.001 is the time step defined in the xml
+for i in range(int(simulation_length/timestep)): #0.001 is the time step defined in the xml
     activities.append(miindmodel.evolveSingleStep(constant_input)[0])
+
+miindmodel.endSimulation()
 
 plt.figure()
 plt.plot(activities)
