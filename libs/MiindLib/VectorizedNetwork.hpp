@@ -96,10 +96,25 @@ protected:
   std::vector<TwoDLib::TransitionMatrix> _vec_transforms;
   std::vector<double> _start_vs;
   std::vector<double> _start_ws;
+
   std::vector<TwoDLib::Mesh> _vec_mesh;
   std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_rev;
   std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_res;
   std::vector<MPILib::Time> _vec_tau_refractive;
+
+  std::vector<inttype> _grid_node_ids;
+  std::vector<TwoDLib::Mesh> _grid_vec_mesh;
+  std::vector< std::vector<TwoDLib::Redistribution> > _grid_vec_vec_rev;
+  std::vector< std::vector<TwoDLib::Redistribution> > _grid_vec_vec_res;
+  std::vector<MPILib::Time> _grid_vec_tau_refractive;
+
+  std::vector<inttype> _mesh_node_ids;
+  std::vector<TwoDLib::Mesh> _mesh_vec_mesh;
+  std::vector< std::vector<TwoDLib::Redistribution> > _mesh_vec_vec_rev;
+  std::vector< std::vector<TwoDLib::Redistribution> > _mesh_vec_vec_res;
+  std::vector<MPILib::Time> _mesh_vec_tau_refractive;
+
+  std::vector<inttype> _rate_func_node_ids;
 
   std::vector<inttype> _grid_transform_indexes;
   std::vector<inttype> _mesh_transform_indexes;

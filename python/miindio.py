@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #import matplotlib
 #matplotlib.use('Agg')
@@ -242,8 +242,8 @@ def rate(command, current_sim):
 
         if len(command) == 1:
             print('The following nodes can be queried for a mean firing rate :')
-            for name in current_sim.nodenames:
-                print (name)
+            for (name,_) in current_sim.nodenames:
+                print (str(current_sim.getIndexFromNode(name)) + ' : ' + name)
         if len(command) == 2:
             current_sim.plotRate(command[1])
 

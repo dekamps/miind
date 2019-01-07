@@ -309,29 +309,13 @@ def generate_model_files(fn, nodes,algorithms):
               f.write('\n')
 
               node_id = node_id + 1
+
+            elif algorithm.attrib['type'] == 'RateFunctor':
+                rn = 'MiindModel::' + algorithm.attrib['name']
+                f.write('\tvec_network.addRateNode(' + rn + ');\n')
+                node_id = node_id + 1
+
     return members
-
-def generate_rate_names(nodes,algorithms):
-     func_names=[]
-     for node in nodes:
-          algname = node.attrib['algorithm']
-          for alg in algorithms:
-               if alg.attrib['name'] == algname: # here we assume the name is unique
-                    algorithm = alg
-
-          if algorithm.attrib['type'] == 'RateFunctor':
-               func_names.append('MiindModel::' + algorithm.attrib['name'])
-
-     return func_names
-
-def generate_rate_nodes(fn,nodes,algorithms):
-    rate_nodes = generate_rate_names(nodes,algorithms)
-
-    with open(fn,'a') as f:
-        for rn in rate_nodes:
-            f.write('\tvec_network.addRateNode(' + rn + ');\n')
-
-        f.write('\n')
 
 def extract_efficacy(fn):
      '''Extract efficacy from a matrix file. Takes a filename, returns efficacy as a single float. In the
@@ -519,7 +503,6 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
     weighttype = root.find('WeightType')
     generate_opening(fn, root, weighttype.text, algorithms, variables)
     members = generate_model_files(fn,nodes,algorithms)
-    generate_rate_nodes(fn,nodes,algorithms)
     members += generate_connections(fn,connections,external_incoming_connections, external_outgoing_connections,nodes,algorithms)
     generate_closing(fn,parameter,root,weighttype.text,progname,members)
 

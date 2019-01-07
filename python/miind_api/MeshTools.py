@@ -35,7 +35,7 @@ class MeshTools:
     def generateStubFidFile(basename):
         with open(basename + '.fid', 'w') as fidfile:
             fid = ET.Element('Fiducual')
-            fidfile.write(ET.tostring(fid))
+            fidfile.write(ET.tostring(fid).decode())
         return basename + '.fid'
 
     @staticmethod
@@ -54,7 +54,7 @@ class MeshTools:
 
             if model is not None:
                 with open(basename + '.model', 'w') as xml_file:
-                    xml_file.write(ET.tostring(model))
+                    xml_file.write(ET.tostring(model).decode())
                     print ('Deleted old reset mapping.')
 
         subprocess.call([
@@ -91,7 +91,7 @@ class MeshTools:
 
             if model is not None:
                 with open(basename + '.model', 'w') as xml_file:
-                    xml_file.write(ET.tostring(model))
+                    xml_file.write(ET.tostring(model).decode())
                     print ('Deleted old reset mapping.')
 
             subprocess.call([

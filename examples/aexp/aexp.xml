@@ -5,7 +5,7 @@
 <Algorithm type="MeshAlgorithm" name="LIF_excitatory Algorithm" modelfile="aexp.model" >
 <TimeStep>0.00001</TimeStep>
 <!--<MatrixFile>aexp_-1_0_0.mat</MatrixFile>-->
-<!--<MatrixFile>aexp_1_0_0.mat</MatrixFile>-->
+<MatrixFile>aexp_1_0_0.mat</MatrixFile>
 </Algorithm>
 <Algorithm type="RateFunctor" name="Exc Input">
 <expression>2000.</expression>
@@ -20,9 +20,14 @@
 <Node algorithm="Inh Input" name="Inhib" type="NEUTRAL" />
 </Nodes>
 <Connections>
-<!--<Connection In="Excit" Out="LIF E">1  1. 0</Connection>-->
+<Connection In="Excit" Out="LIF E">1  1. 0</Connection>
 <!--<Connection In="Inhib" Out="LIF E">1 -1. 0</Connection>-->
 </Connections>
+<Reporting>
+<Density node="LIF E" t_start="0.0" t_end="1.0" t_interval="0.001" />
+<!--<Display node="LIF E" />-->
+<Rate node="LIF E" />
+</Reporting>
 <SimulationIO>
 <SimulationName>single</SimulationName>
 <OnScreen>FALSE</OnScreen>

@@ -1,7 +1,7 @@
 Source: miind
 Priority: optional
 Maintainer: Hugh Osborne <hugh.osborne@gmail.com>
-Build-Depends: debhelper (>= 9),python-scipy,libboost-all-dev,libgsl0-dev,g++
+Build-Depends: debhelper (>= 9),python-scipy,libgsl0-dev,g++
 Standards-Version: 3.9.8
 Section: libs
 Homepage: <insert the upstream URL, if relevant>
@@ -10,6 +10,6 @@ Homepage: <insert the upstream URL, if relevant>
 
 Package: miind
 Architecture: any
-Depends: ${misc:Depends},python-scipy,libboost-all-dev,libgsl0-dev,g++
+Depends: ${misc:Depends},python-scipy,libgsl0-dev,g++
 Description: MIIND
- MIIND 1.04
+ MIIND 1.05

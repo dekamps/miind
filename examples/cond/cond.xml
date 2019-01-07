@@ -16,6 +16,11 @@
 <Connections>
 <Connection In="Inp" Out="Cond E">1   0.05 0</Connection>
 </Connections>
+<Reporting>
+<Density node="Cond E" t_start="0.0" t_end="0.1" t_interval="0.001" />
+<!--<Display node="Cond E" />-->
+<Rate node="Cond E" />
+</Reporting>
 <SimulationIO>
 <SimulationName>cond.dat</SimulationName>
 <OnScreen>FALSE</OnScreen>

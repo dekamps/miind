@@ -6,7 +6,7 @@
 <MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
 </Algorithm>
 <Algorithm type="RateFunctor" name="Exc Input">
-<expression>10.</expression>
+<expression>0</expression>
 </Algorithm>
 </Algorithms>
 <Nodes>
@@ -18,6 +18,11 @@
 <IncomingConnection Node="LIF">1 0.01 0</IncomingConnection>
 <OutgoingConnection Node="LIF"/>
 </Connections>
+<Reporting>
+<Density node="LIF" t_start="0.0" t_end="3.0" t_interval="0.001" />
+<!--<Display node="LIF" />-->
+<Rate node="LIF" />
+</Reporting>
 <SimulationIO>
 <SimulationName>lif.dat</SimulationName>
 <OnScreen>FALSE</OnScreen>

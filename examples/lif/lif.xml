@@ -16,6 +16,11 @@
 <Connections>
 <Connection In="Inp" Out="LIF E">3 0.005 0</Connection>
 </Connections>
+<Reporting>
+<Density node="LIF E" t_start="0.0" t_end="2.0" t_interval="0.00770095348827" />
+<!--<Display node="LIF E" />-->
+<Rate node="LIF E" />
+</Reporting>
 <SimulationIO>
 <SimulationName>lif.dat</SimulationName>
 <OnScreen>FALSE</OnScreen>
