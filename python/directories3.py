@@ -199,7 +199,7 @@ def create_cpp_lib_file(name, dir_path, prog_name, mod_name, enable_root):
     abs_path = os.path.join(dir_path,cpp_name)
     with open(abs_path,'w') as fout:
         with open(name) as fin:
-            codegen_lib.generate_outputfile(fin,fout,prog_name, enable_root)
+            codegen_lib.generate_outputfile(fin,fout,prog_name)
 
     if mod_name != None:
         for f in mod_name:
