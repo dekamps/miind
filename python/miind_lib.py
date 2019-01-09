@@ -26,14 +26,6 @@ def parse_rate_functors(algorithms):
      return s
 
 
-def generate_variable_declarations(variables):
-     s = ''
-     for variable in variables:
-          s += 'const float ' + variable.attrib['Name'] + ' = ' + variable.text + ';\n'
-     s += '\n'
-     return s
-
-
 def generate_preamble(fn, variables, nodes, algorithms, connections, parameters, cuda):
     '''Generates the function declarations, required for RateFunctors etc in the C++ file. fn is the file name where the C++
     is to be written. variable, nodes and algorithms are XML elements.'''
@@ -172,9 +164,7 @@ def generate_opening(fn, tree, typ, algorithms, variables):
 
         # the rate functor functions need to be declared before the main program
         function_declarations = parse_rate_functors(algorithms)
-        variable_declarations = generate_variable_declarations(variables)
         outfile.write(function_declarations)
-        outfile.write(variable_declarations)
         constructor_override(outfile, tree,typ)
         function_overrides(outfile,tree,typ)
         outfile.write('\n')
@@ -232,7 +222,7 @@ def generate_closing(fn,parameters,tree,type,prog_name,members):
 
         if len(variable_list) > 0:
             var_types = variables.parse_variable_types(variable_list)
-            outfile.write('\t.def(init<int,long' + var_types + '>())\n')
+            f.write('\t.def(init<int,long' + var_types + '>())\n')
         f.write('\t.def("init", &MiindModel::init)\n')
         f.write('\t.def("init", &MiindModel::init)\n')
         f.write('\t.def("startSimulation", &MiindModel::startSimulation)\n')
@@ -445,7 +435,6 @@ def construct_monitor_external(nodes,algorithms, connections):
                    nodealgorithm=node.attrib['algorithm']
                    for algorithm in algorithms:
                         if nodealgorithm == algorithm.attrib['name']:
-                             if algorithm.attrib['type'] == 'GridAlgorithmGroup':
                                   gridlist.append([node.attrib['name'],connection])
 
     return gridlist

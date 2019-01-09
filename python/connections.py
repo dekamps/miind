@@ -77,7 +77,7 @@ def parse_mesh_connection(connection, nodemap, mat_name, network_name='network')
 
     return '\t' + network_name + '.addMeshConnection('+ i +','+ o +','+ eff +','+ num_cons +','+delay+',&'+ mat_name +');\n'
 
-def parse_external_incoming_mesh_connection(connection, nodemap, id, network_name='network'):
+def parse_external_incoming_mesh_connection(connection, nodemap, mat_name, id, network_name='network'):
     o = str(nodemap[connection.attrib['Node']])
     num_cons = connection.text.split()[0]
     eff = connection.text.split()[1]

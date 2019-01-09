@@ -191,6 +191,17 @@ vector<Coordinates> Mesh::findV(double V, Threshold th) const
 	return vec_ret;
 }
 
+vector<Coordinates> Mesh::allCoords() const{
+	vector<Coordinates> vec_ret;
+	for (unsigned int i = 0; i < _vec_vec_quad.size(); i++){
+		for (unsigned int j = 0; j < _vec_vec_quad[i].size(); j++){
+			vec_ret.push_back(Coordinates(i,j));
+		}
+	}
+
+	return vec_ret;
+}
+
 vector<Coordinates> Mesh::findPointInMeshSlow(const Point& p) const{
 	vector<Coordinates> vec_ret;
 	for (unsigned int i = 0; i < _vec_vec_quad.size(); i++){

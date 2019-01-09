@@ -89,6 +89,8 @@ namespace TwoDLib {
 
 		enum Threshold {ABOVE, EQUAL, BELOW };
 
+		vector<Coordinates> allCoords() const;
+
 		vector<Coordinates> findV(double V, Threshold) const;
 
 		vector<Coordinates> findPointInMeshSlow(const Point&) const;

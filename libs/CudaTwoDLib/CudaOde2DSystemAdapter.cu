@@ -85,7 +85,7 @@ void CudaOde2DSystemAdapter::TransferMapData()
 
 void CudaOde2DSystemAdapter::FillRefractoryTimes(const std::vector<MPILib::Time>& times) {
 	for(inttype m = 0; m < _mesh_size; m++){
-		_nr_refractory_steps[m] = std::max(1,static_cast<int>(std::ceil(times[m] / _time_step)));
+		_nr_refractory_steps[m] = static_cast<int>(std::ceil(times[m] / _time_step));
 	}
 }
 
@@ -169,8 +169,9 @@ void CudaOde2DSystemAdapter::Dump(const std::vector<std::ostream*>& vec_stream, 
 void CudaOde2DSystemAdapter::updateGroupMass()
 {
      checkCudaErrors(cudaMemcpy(&_hostmass[0],_mass,_n*sizeof(fptype),cudaMemcpyDeviceToHost));
-     for(inttype i = 0; i < _n; i++)
-        _group.Mass()[i] = _hostmass[i];
+     for(inttype i = 0; i < _n; i++){
+			 _group.Mass()[i] = _hostmass[i];
+		 }
 }
 
 const std::vector<fptype>& CudaOde2DSystemAdapter::F() const
@@ -184,7 +185,7 @@ const std::vector<fptype>& CudaOde2DSystemAdapter::F() const
 		fptype sum = 0.0;
 		for (auto& rate: host_sum)
 			sum += rate;
-			
+
 		_host_fs.push_back(sum/_time_step);
 	}
 
@@ -212,7 +213,8 @@ void CudaOde2DSystemAdapter::FillResetMap
 
 			 _nr_minimal_resets[m] = reset_map.size();
 			 _nr_resets.push_back(vec_vec_reset[m].size());
-			 checkCudaErrors(cudaMalloc((fptype**)&_refractory_mass[m], _nr_refractory_steps[m]*vec_vec_reset[m].size()*sizeof(fptype)));
+
+			 checkCudaErrors(cudaMalloc((fptype**)&_refractory_mass[m], std::max(1,(int)_nr_refractory_steps[m])*vec_vec_reset[m].size()*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((inttype**)&_res_to_minimal[m], _nr_minimal_resets[m]*sizeof(inttype)));
        checkCudaErrors(cudaMalloc((inttype**)&_res_from_ordered[m], vec_vec_reset[m].size()*sizeof(inttype)));
        checkCudaErrors(cudaMalloc((fptype**)&_res_alpha_ordered[m], vec_vec_reset[m].size()*sizeof(fptype)));
@@ -260,20 +262,31 @@ void CudaOde2DSystemAdapter::RedistributeProbability(std::vector<inttype>& meshe
 			CudaClearDerivative<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m],_res_to_mass[m],_mass);
 			CudaClearDerivative<<<numSumBlocks,_blockSize>>>(numBlocks,_res_sum[m],_mass);
 
-			MapResetThreaded<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m], _res_to_mass[m],_mass, _refractory_mass[m],
-				(_nr_refractory_steps[m]-1)*_nr_resets[m],
-				_res_to_minimal[m],_res_alpha_ordered[m], _res_from_offsets[m], _res_from_counts[m], _map);
+			if (_nr_refractory_steps[m] == 0) {
 
-			for(int t = _nr_refractory_steps[m]-2; t >= 0; t--){
-				MapResetShiftRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_refractory_mass[m], t*_nr_resets[m]);
+				MapResetToRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m], _mass, _map, _refractory_mass[m]);
+
+				MapResetThreaded<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m], _res_to_mass[m],_mass, _refractory_mass[m],
+					0,
+					_res_to_minimal[m],_res_alpha_ordered[m], _res_from_offsets[m], _res_from_counts[m], _map);
+
+			}
+			else {
+				MapResetThreaded<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m], _res_to_mass[m],_mass, _refractory_mass[m],
+					(_nr_refractory_steps[m]-1)*_nr_resets[m],
+					_res_to_minimal[m],_res_alpha_ordered[m], _res_from_offsets[m], _res_from_counts[m], _map);
+
+				for(int t = _nr_refractory_steps[m]-2; t >= 0; t--){
+					MapResetShiftRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_refractory_mass[m], t*_nr_resets[m]);
+				}
+
+				MapResetToRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m], _mass, _map, _refractory_mass[m]);
 			}
 
-			MapResetToRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m], _mass, _map, _refractory_mass[m]);
-
 			SumReset<<<numBlocks,_blockSize,_blockSize*sizeof(fptype)>>>(_nr_minimal_resets[m],_res_to_mass[m],_res_sum[m]);
-
-			cudaDeviceSynchronize();
 	}
+
+	cudaDeviceSynchronize();
 
 }
 
@@ -295,6 +308,8 @@ void CudaOde2DSystemAdapter::MapFinish(std::vector<inttype>& meshes)
       inttype numBlocks = (_nr_resets[m] + _blockSize - 1)/_blockSize;
 			ResetFinishThreaded<<<numBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m],_mass,_map);
   }
+
+	cudaDeviceSynchronize();
 }
 
 void CudaOde2DSystemAdapter::MapFinish()
@@ -334,6 +349,7 @@ void CudaOde2DSystemAdapter::FillReversalMap
 void CudaOde2DSystemAdapter::RemapReversal()
 {
     MapReversal<<<1,1>>>(_n_rev, _rev_from, _rev_to, _rev_alpha, _mass, _map);
+		cudaDeviceSynchronize();
 }
 
 

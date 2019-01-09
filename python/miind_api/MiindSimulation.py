@@ -152,25 +152,15 @@ class MiindSimulation:
         _rates = {}
         _rates['times'] = []
 
-        with open(self.output_directory + "/rate_0") as rate_file:
-            for line in rate_file:
-                tokens = line.split('\t')
-                _rates['times'] = _rates['times'] + [float(tokens[0])]
-
         for i in range(len(self.nodenames)):
             if not op.exists(self.output_directory + "/rate_" + str(i)):
                 continue
             with open(self.output_directory + "/rate_" + str(i)) as rate_file:
                 _rates[i] = []
                 for line in rate_file:
-                    # If the simulation is still running, it's possible that
-                    # len(times) might not match len(rates) so
-                    # make sure we don't hit trouble when we want to draw the rate.
-                    if len(_rates['times']) == len(_rates[i]):
-                        break
-
                     tokens = line.split('\t')
                     _rates[i] = _rates[i] + [float(tokens[1])]
+                    _rates['times'] = _rates['times'] + [float(tokens[0])]
 
         self._rates = _rates
         return _rates
