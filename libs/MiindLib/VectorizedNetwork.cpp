@@ -199,7 +199,7 @@ void VectorizedNetwork::setupLoop(bool write_displays){
 
     unsigned int queue_length = static_cast<int>(std::floor(_mesh_connections[i]._delay/_network_time_step)) + 1;
     _connection_queue.push_back(std::queue<double>(std::deque<MPILib::Rate>(queue_length)));
-    if ( _grid_connections[i]._external )
+    if ( _mesh_connections[i]._external )
       if (_external_to_connection_queue.find(_mesh_connections[i]._external_id) == _external_to_connection_queue.end()){
         _external_to_connection_queue.insert(
           std::pair<MPILib::NodeId, std::vector<MPILib::NodeId>>(_mesh_connections[i]._external_id, std::vector<MPILib::NodeId>()));
@@ -230,9 +230,10 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
     }
   }
 
-  for(int i=0; i<activities.size(); i++)
-    for(unsigned int j=0; j<_external_to_connection_queue[i].size(); j++)
-      _connection_queue[_external_to_connection_queue[i][j]].push(activities[i]);
+  for(int i=0; i<activities.size(); i++){
+      for(unsigned int j=0; j<_external_to_connection_queue[i].size(); j++)
+        _connection_queue[_external_to_connection_queue[i][j]].push(activities[i]);
+  }
 
   std::vector<fptype> rates;
   int connection_count = 0;
@@ -280,7 +281,7 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
   }
 
   if(_display_nodes.size() > 0){
-    _group_adapter->updateGroupMass ();
+    _group_adapter->updateGroupMass();
     TwoDLib::Display::getInstance()->updateDisplay(i_loop);
   }
 
@@ -352,7 +353,7 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
 
     unsigned int queue_length = static_cast<int>(std::floor(_mesh_connections[i]._delay/_network_time_step)) + 1;
     _connection_queue.push_back(std::queue<double>(std::deque<MPILib::Rate>(queue_length)));
-    if ( _grid_connections[i]._external )
+    if ( _mesh_connections[i]._external )
       if (_external_to_connection_queue.find(_mesh_connections[i]._external_id) == _external_to_connection_queue.end()){
         _external_to_connection_queue.insert(
           std::pair<MPILib::NodeId, std::vector<MPILib::NodeId>>(_mesh_connections[i]._external_id, std::vector<MPILib::NodeId>()));
