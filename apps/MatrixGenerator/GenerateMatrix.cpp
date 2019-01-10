@@ -141,8 +141,6 @@ void WriteProportion
 		ofst << it->_origin[0]  << ",";
 		ofst << it->_origin[1]  << ";";
 		for (auto ithit = it->_destination_list.begin(); ithit !=it-> _destination_list.end(); ithit++ ){
-			// if (ithit->_prop <= 0.00000000000000001)
-			// 	continue;
 
 			ofst << ithit->_cell[0] << ",";
 			ofst << ithit->_cell[1] << ":";
@@ -263,13 +261,8 @@ void GenerateResetTransitionsOnly(
 					l._origin = TwoDLib::Coordinates(i,j);
 					l._destination_list = gen.HitList();
 
-					if(mode == TwoDLib::AreaCalculation || mode == TwoDLib::JumpFile) {
-						transitions.push_back(l);
-					} else {
-						TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
-						transitions.push_back(lcor);
-					}
-
+					TwoDLib::TransitionList lcor = TwoDLib::CorrectStrays(l,ths,above,mesh);
+					transitions.push_back(lcor);
 				}
 			}
 		}
@@ -395,17 +388,14 @@ void GenerateResetTransitionsOnly(
 					TwoDLib::Coordinates c(i,j);
 					gen.Reset(nr_points);
 						TwoDLib::Translation tr = translation_list[i][j];
-
-						vector<TwoDLib::Coordinates> cells = below;
-						cells.insert(cells.end(), ths.begin(), ths.end());
-						cells.insert(cells.end(), above.begin(), above.end());
-						gen.GenerateTransformUsingQuadTranslation(i,j,tree_transform,cells);
+						gen.GenerateTransformUsingQuadTranslation(i,j,tree_transform,mesh.allCoords());
 
 						l._number = gen.N();
 						l._origin = TwoDLib::Coordinates(i,j);
 						l._destination_list = gen.HitList();
 
-						transitions.push_back(l);
+						TwoDLib::TransitionList lcor = TwoDLib::CorrectStraysProportion(l,ths,above,mesh);
+						transitions.push_back(lcor);
 					}
 			}
 
