@@ -163,7 +163,6 @@ void CSRAdapter::ClearDerivative()
 {
   inttype n=_group._n;
   CudaClearDerivative<<<_numBlocks,_blockSize>>>(n,_dydt,_group._mass);
-  cudaDeviceSynchronize();
 }
 
 std::vector<inttype> CSRAdapter::NrRows(const std::vector<TwoDLib::CSRMatrix>& vecmat) const
@@ -200,7 +199,7 @@ void CSRAdapter::CalculateGridDerivative(const std::vector<inttype>& vecindex, c
     {
         // be careful to use this block size
         inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1)/_blockSize;
-        CudaCalculateGridDerivative<<<numBlocks,_blockSize,0,_streams[vecindex[m]]>>>(_nr_rows[vecindex[m]],vecrates[m],vecstays[m],vecgoes[m],vecoff1s[m],vecoff2s[m],_dydt,_group._mass,_offsets[vecindex[m]]);
+        CudaCalculateGridDerivative<<<numBlocks,_blockSize,0,_streams[vecindex[m]]>>>(_nr_rows[vecindex[m]],vecrates[m],vecstays[m],vecgoes[m],vecoff1s[m],vecoff2s[m],_dydt,_group._mass,_offsets[m]);
     }
 
     cudaDeviceSynchronize();
@@ -215,16 +214,16 @@ void CSRAdapter::CalculateMeshGridDerivative(const std::vector<inttype>& vecinde
   for(inttype m = 0; m < vecstays.size(); m++)
   {
     // be careful to use this block size
-    inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1)/_blockSize;
-    CudaCalculateGridDerivative<<<numBlocks,_blockSize,0,_streams[vecindex[m]]>>>(_nr_rows[vecindex[m]],vecrates[m],vecstays[m],vecgoes[m],vecoff1s[m],vecoff2s[m],_dydt,_group._mass,_offsets[vecindex[m]]);
+    inttype numBlocks = (_nr_rows[m] + _blockSize - 1)/_blockSize;
+    CudaCalculateGridDerivative<<<numBlocks,_blockSize,0,_streams[vecindex[m]]>>>(_nr_rows[m],vecrates[m],vecstays[m],vecgoes[m],vecoff1s[m],vecoff2s[m],_dydt,_group._mass,_offsets[vecindex[m]]);
   }
 
   for(int n=vecstays.size(); n<vecrates.size(); n++)
   {
     inttype mat_index = _grid_transforms.size() + (n - vecstays.size());
     // be careful to use this block size
-    inttype numBlocks = (_nr_rows[vecindex[n]] + _blockSize - 1)/_blockSize;
-    CudaCalculateDerivative<<<numBlocks,_blockSize,0,_streams[vecindex[n]]>>>(_nr_rows[vecindex[n]],vecrates[n],_dydt,_group._mass,_val[mat_index],_ia[mat_index],_ja[mat_index],_group._map,_offsets[vecindex[n]]);
+    inttype numBlocks = (_nr_rows[mat_index] + _blockSize - 1)/_blockSize;
+    CudaCalculateDerivative<<<numBlocks,_blockSize,0,_streams[vecindex[n]]>>>(_nr_rows[mat_index],vecrates[n],_dydt,_group._mass,_val[mat_index],_ia[mat_index],_ja[mat_index],_group._map,_offsets[mat_index]);
   }
 
   cudaDeviceSynchronize();
@@ -239,8 +238,6 @@ void CSRAdapter::SingleTransformStep()
       inttype numBlocks = (_nr_rows[m] + _blockSize - 1)/_blockSize;
       CudaSingleTransformStep<<<numBlocks,_blockSize,0,_streams[m]>>>(_nr_rows[m],_dydt,_group._mass,_val[m],_ia[m],_ja[m],_group._map,_offsets[m]);
   }
-
-  cudaDeviceSynchronize();
 }
 
 void CSRAdapter::AddDerivative()

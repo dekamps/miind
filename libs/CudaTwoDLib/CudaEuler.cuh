@@ -16,6 +16,7 @@ __global__ void SumReset(unsigned int n_sum, fptype* sum, fptype* rate);
 __global__ void Remap(int N, unsigned int* i_1, unsigned int t, unsigned int *map, unsigned int* first, unsigned int* length);
 __global__ void ResetFinishThreaded(inttype n_reset, inttype* res_from, fptype* mass, inttype* map);
 __global__ void CudaClearDerivative(inttype N, fptype* dydt, fptype* mass);
+__global__ void CheckDerivativeEqualsZero(inttype N, fptype* derivative);
 __device__ int modulo(int a, int b);
 
 

@@ -309,6 +309,8 @@ void CudaOde2DSystemAdapter::MapFinish(std::vector<inttype>& meshes)
 			ResetFinishThreaded<<<numBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m],_mass,_map);
   }
 
+	cudaDeviceSynchronize();
+
 }
 
 void CudaOde2DSystemAdapter::MapFinish()
@@ -348,6 +350,7 @@ void CudaOde2DSystemAdapter::FillReversalMap
 void CudaOde2DSystemAdapter::RemapReversal()
 {
     MapReversal<<<1,1>>>(_n_rev, _rev_from, _rev_to, _rev_alpha, _mass, _map);
+		cudaDeviceSynchronize();
 }
 
 
