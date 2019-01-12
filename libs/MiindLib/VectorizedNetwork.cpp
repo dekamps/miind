@@ -171,7 +171,7 @@ void VectorizedNetwork::setupLoop(bool write_displays){
     _off2s.push_back(cell_transition._offset_2);
 
     unsigned int queue_length = static_cast<int>(std::floor(_grid_connections[i]._delay/_network_time_step)) + 1;
-    _connection_queue.push_back(std::queue<double>(std::deque<MPILib::Rate>(queue_length)));
+    _connection_queue.push_back(std::queue<fptype>(std::deque<fptype>(queue_length)));
     if ( _grid_connections[i]._external )
       if (_external_to_connection_queue.find(_grid_connections[i]._external_id) == _external_to_connection_queue.end()){
         _external_to_connection_queue.insert(
@@ -198,7 +198,7 @@ void VectorizedNetwork::setupLoop(bool write_displays){
     _mesh_transform_indexes.push_back(_grid_meshes.size()+i);
 
     unsigned int queue_length = static_cast<int>(std::floor(_mesh_connections[i]._delay/_network_time_step)) + 1;
-    _connection_queue.push_back(std::queue<double>(std::deque<MPILib::Rate>(queue_length)));
+    _connection_queue.push_back(std::queue<fptype>(std::deque<fptype>(queue_length)));
     if ( _mesh_connections[i]._external )
       if (_external_to_connection_queue.find(_mesh_connections[i]._external_id) == _external_to_connection_queue.end()){
         _external_to_connection_queue.insert(
@@ -248,24 +248,42 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
     connection_count++;
   }
 
+  // std::cout << "check 1 : ";
+  // _group_adapter->updateGroupMass();
+
   _group_adapter->Evolve(_mesh_meshes);
   _group_adapter->RemapReversal();
+  //
+  // std::cout << "check 2 : ";
+  // _group_adapter->updateGroupMass();
 
   _csr_adapter->ClearDerivative();
   _csr_adapter->SingleTransformStep();
   _csr_adapter->AddDerivativeFull();
 
+  // std::cout << "check 3 : ";
+  // _group_adapter->updateGroupMass();
+
   _group_adapter->RedistributeProbability(_grid_meshes);
   _group_adapter->MapFinish(_grid_meshes);
 
+  // std::cout << "check 4 : ";
+  // _group_adapter->updateGroupMass();
+
   for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++ ){
     _csr_adapter->ClearDerivative();
-    _csr_adapter->CalculateMeshGridDerivative(_connection_out_group_mesh,rates,_stays, _goes, _off1s, _off2s);
+    _csr_adapter->CalculateMeshGridDerivative(_connection_out_group_mesh, rates, _stays, _goes, _off1s, _off2s);
     _csr_adapter->AddDerivative();
   }
 
+  // std::cout << "check 5 : ";
+  // _group_adapter->updateGroupMass();
+
   _group_adapter->RedistributeProbability(_mesh_meshes);
   _group_adapter->MapFinish(_mesh_meshes);
+
+  // std::cout << "check 6 : ";
+  // _group_adapter->updateGroupMass();
 
   const std::vector<fptype>& group_rates = _group_adapter->F();
 
@@ -324,7 +342,7 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
     _off2s.push_back(cell_transition._offset_2);
 
     unsigned int queue_length = static_cast<int>(std::floor(_grid_connections[i]._delay/_network_time_step)) + 1;
-    _connection_queue.push_back(std::queue<double>(std::deque<MPILib::Rate>(queue_length)));
+    _connection_queue.push_back(std::queue<fptype>(std::deque<fptype>(queue_length)));
     if ( _grid_connections[i]._external )
       if (_external_to_connection_queue.find(_grid_connections[i]._external_id) == _external_to_connection_queue.end()){
         _external_to_connection_queue.insert(
@@ -352,7 +370,7 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
     _mesh_transform_indexes.push_back(_grid_meshes.size()+i);
 
     unsigned int queue_length = static_cast<int>(std::floor(_mesh_connections[i]._delay/_network_time_step)) + 1;
-    _connection_queue.push_back(std::queue<double>(std::deque<MPILib::Rate>(queue_length)));
+    _connection_queue.push_back(std::queue<fptype>(std::deque<fptype>(queue_length)));
     if ( _mesh_connections[i]._external )
       if (_external_to_connection_queue.find(_mesh_connections[i]._external_id) == _external_to_connection_queue.end()){
         _external_to_connection_queue.insert(

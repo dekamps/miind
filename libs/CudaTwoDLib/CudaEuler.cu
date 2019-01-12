@@ -67,6 +67,19 @@ __global__ void EulerStep(inttype N, fptype* derivative, fptype* mass, fptype ti
     }
 }
 
+__global__ void CheckDerivativeEqualsZero(inttype N, fptype* derivative)
+{
+  fptype total = 0.;
+
+  for (int i = 0; i < N; i++){
+     total += derivative[i];
+     printf("add : %i %f : %f\n", i, derivative[i], total);
+
+  }
+
+  printf("data : %f\n", total);
+}
+
 __global__ void MapReversal(unsigned int n_reversal, unsigned int* rev_from, unsigned int* rev_to, fptype* rev_alpha, fptype* mass, unsigned int* map)
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
@@ -145,8 +158,9 @@ __global__ void ResetFinishThreaded(inttype n_reset, inttype* res_from, fptype* 
   int index  = blockIdx.x * blockDim.x + threadIdx.x;
   int stride = blockDim.x * gridDim.x;
 
-  for (int i = index; i < n_reset; i+= stride)
-     mass[map[res_from[i]]] = 0.;
+  for (int i = index; i < n_reset; i+= stride){
+    mass[map[res_from[i]]] = 0.;
+  }
 }
 
 __global__ void Remap(int N, unsigned int* i_1, unsigned int t, unsigned int *map, unsigned int* first, unsigned int* length)

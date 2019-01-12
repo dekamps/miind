@@ -142,7 +142,7 @@ protected:
   std::vector<MPILib::Time> _density_intervals;
 
   std::vector<inttype> _connection_out_group_mesh;
-  std::vector<std::queue<double>> _connection_queue;
+  std::vector<std::queue<fptype>> _connection_queue;
   std::map<MPILib::NodeId, std::vector<MPILib::NodeId>> _node_to_connection_queue;
   std::map<MPILib::NodeId, std::vector<MPILib::NodeId>> _external_to_connection_queue;
   std::vector<fptype> _stays;
