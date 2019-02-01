@@ -32,6 +32,7 @@ Quadrilateral.cpp
 Triangle.cpp
 kd.cpp
 MasterGrid.cpp
+MasterGridJump.cpp
 Fid.cpp
 Euler.cpp
 MeshTree.cpp
@@ -63,6 +64,7 @@ Cell.hpp
 Master.hpp
 MasterOdeint.hpp
 MasterGrid.hpp
+MasterGridJump.hpp
 Ode2DSystem.hpp
 Ode2DSystemGroup.hpp
 TransitionList.hpp

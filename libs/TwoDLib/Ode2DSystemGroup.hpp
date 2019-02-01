@@ -30,6 +30,7 @@
 #include "Redistribution.hpp"
 #include "CSRMatrix.hpp"
 #include "MPILib/include/ProbabilityQueue.hpp"
+#include "MPILib/include/RefractoryQueue.hpp"
 
 namespace TwoDLib {
 
@@ -120,6 +121,8 @@ namespace TwoDLib {
 		//! Provide access to the mass array
 	    vector<MPILib::Mass>& Mass() { return _vec_mass; }
 
+		const std::vector<double>& Vs() const { return _vec_vs; }
+
 	    //! Provide read access to the Reversal map
 		const std::vector<std::vector<Redistribution> >& MapReversal() const { return  _vec_reversal;}
 
@@ -191,7 +194,7 @@ namespace TwoDLib {
 			_t_step(sys.MeshObjects()[m].TimeStep()),
 			_tau_refractive(tau_refractive),
 			_vec_reset(vec_reset),
-			_vec_queue(vec_reset.size(),sys.MeshObjects()[m].TimeStep()),
+			_vec_queue(vec_reset.size(),MPILib::RefractoryQueue(sys.MeshObjects()[m].TimeStep(),tau_refractive)),
 			_sys(sys),
 			_vec_mass(vec_mass),
 			_m(m)
@@ -200,24 +203,19 @@ namespace TwoDLib {
 
 			void operator()(const Redistribution& map)
 			{
-				MPILib::Time t = _it*_t_step;
 				double from =  map._alpha*_vec_mass[_sys.Map(_m,map._from[0],map._from[1])];
 				_sys._fs[_m] += from;
 
 				MPILib::Index i = &map - &_vec_reset[0];
-				MPILib::populist::StampedProbability prob;
-				prob._prob = from;
-				prob._time = t + _tau_refractive;
-				_vec_queue[i].push(prob);
+				from = _vec_queue[i].updateQueue(from);
 
-				from = _vec_queue[i].CollectAndRemove(t);
 				_vec_mass[_sys.Map(_m,map._to[0],map._to[1])] += from;
 			}
 
 			double getTotalProbInRefract() const{
 				double total = 0.0;
-				for (MPILib::populist::ProbabilityQueue q : _vec_queue){
-					total += q.TotalProbability();
+				for (MPILib::RefractoryQueue q : _vec_queue){
+					total += q.getTotalMass();
 				}
 				return total;
 			}
@@ -231,7 +229,7 @@ namespace TwoDLib {
 			MPILib::Time                               _tau_refractive;
 
 			const vector<Redistribution>&              _vec_reset;
-			vector<MPILib::populist::ProbabilityQueue> _vec_queue;
+			vector<MPILib::RefractoryQueue>  					_vec_queue;
 
 			Ode2DSystemGroup&	                           _sys;
 			vector<double>&                            _vec_mass;
@@ -264,6 +262,7 @@ namespace TwoDLib {
 		std::vector<MPILib::Index> InitializeCumulative(const Mesh&) const;
 		std::vector<std::vector<MPILib::Index> > InitializeCumulatives(const std::vector<Mesh>&);
 		std::vector<MPILib::Number> MeshOffset(const std::vector<Mesh>&) const;
+		std::vector<double> MeshVs(const std::vector<Mesh>&) const;
 
 		bool				  CheckConsistency() const;
 		std::vector<Reset>    InitializeReset();
@@ -285,6 +284,7 @@ namespace TwoDLib {
 		std::vector<MPILib::Number>              _vec_mesh_offset;
 		std::vector<std::vector<MPILib::Index> > _vec_length;
 		std::vector<std::vector<MPILib::Index> > _vec_cumulative;
+		std::vector<double>					_vec_vs;
 
 		std::vector<MPILib::Time>    _vec_tau_refractive;
 public:

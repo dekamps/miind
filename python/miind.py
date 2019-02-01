@@ -86,7 +86,7 @@ def generate_closing(fn,parameters):
     '''Generates the closing statements in the C++ file.'''
     with open(fn,'a') as f:
         f.write('\tnetwork.setDisplayNodes(display_nodes);\n')
-        f.write('\tnetwork.setRateNodes(rate_nodes);\n')
+        f.write('\tnetwork.setRateNodes(rate_nodes, rate_node_intervals);\n')
         f.write('\tnetwork.setDensityNodes(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals);\n')
         f.write('\n')
         f.write('\tnetwork.initOde2DSystem('+ steps +');\n')
@@ -135,7 +135,7 @@ def generate_model_files(fn, nodes,algorithms):
                   f.write('\tTwoDLib::Mesh mesh' + str(node_id) +' = TwoDLib::RetrieveMeshFromXML(root' + str(node_id) + ');\n')
                   f.write('\tstd::vector<TwoDLib::Redistribution> vec_rev' + str(node_id) + ' = TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(node_id) + ');\n')
                   f.write('\tstd::vector<TwoDLib::Redistribution> vec_res' + str(node_id) + ' = TwoDLib::RetrieveMappingFromXML("Reset",root' + str(node_id) + ');\n\n')
-                  f.write('\tnetwork.addMeshNode(mesh'+ str(node_id) +', vec_rev'+ str(node_id) +', vec_res'+ str(node_id) +', ' + ref + ');\n')
+                  f.write('\tnetwork.addMeshNode(mesh'+ str(node_id) +', vec_rev'+ str(node_id) +', vec_res'+ str(node_id) +', ' + str(ref) + ');\n')
                   f.write('\n')
 
                   node_id = node_id + 1

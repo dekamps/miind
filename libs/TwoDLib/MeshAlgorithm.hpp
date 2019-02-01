@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <MPILib/include/AlgorithmInterface.hpp>
+#include <MPILib/include/DelayedConnectionQueue.hpp>
 #include "MasterOdeint.hpp"
 #include "Ode2DSystemGroup.hpp"
 #include "pugixml.hpp"
@@ -36,7 +37,7 @@ namespace TwoDLib {
  * This class simulates the evolution of a neural population density function on a 2D grid.
  */
 
-	template <class WeightValue, class Solver=TwoDLib::MasterOMP>
+	template <class WeightValue, class Solver=TwoDLib::MasterOdeint>
 	class MeshAlgorithm : public DensityAlgorithmInterface<WeightValue>  {
 
 	public:
@@ -180,7 +181,7 @@ namespace TwoDLib {
 
 		// map incoming rates onto the order used by MasterOMP
 		std::vector<MPILib::Index>              _vec_map;
-		std::vector<std::vector<std::queue<MPILib::Rate> > > _vec_rate_queues; // this is fed to the apply step of MasterOMP.
+		std::vector<std::vector<MPILib::DelayedConnectionQueue>> _vec_vec_delay_queues; // this is fed to the apply step of MasterOMP.
 
 		MPILib::Time 						_dt;     // mesh time step
 		TwoDLib::Ode2DSystemGroup 			_sys;

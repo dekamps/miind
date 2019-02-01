@@ -52,6 +52,9 @@ set(MPI_SRCS
 
     src/NetworkState.cpp
     src/SimulationRunParameter.cpp
+
+    src/DelayedConnectionQueueCode.cpp
+    src/RefractoryQueue.cpp
 )
 
 set(MPI_HEADER

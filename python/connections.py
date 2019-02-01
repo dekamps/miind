@@ -33,6 +33,12 @@ def parse_connection(connection, weighttype):
         s += connection.text.split()[0] + ','
         s += connection.text.split()[1] + ','
         s += connection.text.split()[2] + ');\n'
+    elif weighttype.text == "CustomConnectionParameters":
+        s += '\tCustomConnectionParameters con_' + i + '_' + o + tally + ';\n'
+        for ak,av in connection.attrib.items():
+            if ak == 'In' or ak == 'Out':
+                continue
+            s += '\tcon_' + i + '_' + o + tally + '.setParam(\"' + ak + '\", ' + av +');\n'
     else:
         if weighttype.text == 'double':
             s += '\tdouble con_' + i + '_' + o + tally + '('
@@ -54,17 +60,18 @@ def parse_external_outgoing_connection(connection, nodemap, network_name='networ
 def parse_grid_connection(connection, nodemap, network_name='network'):
     i = str(nodemap[connection.attrib['In']])
     o = str(nodemap[connection.attrib['Out']])
-    num_cons = connection.text.split()[0]
-    eff = connection.text.split()[1]
-    delay = connection.text.split()[2]
+    eff = connection.attrib['efficacy']
+    num_cons = connection.attrib['num_connections']
+    delay = connection.attrib['delay']
 
     return '\t' + network_name + '.addGridConnection('+ i +','+ o +','+ eff +','+ num_cons +','+ delay +');\n'
 
 def parse_external_incoming_grid_connection(connection, nodemap, id, network_name='network'):
     o = str(nodemap[connection.attrib['Node']])
-    num_cons = connection.text.split()[0]
-    eff = connection.text.split()[1]
-    delay = connection.text.split()[2]
+
+    eff = connection.attrib['efficacy']
+    num_cons = connection.attrib['num_connections']
+    delay = connection.attrib['delay']
 
     return '\t' + network_name + '.addGridConnection('+ o +','+ eff +','+ num_cons +',(double)'+ delay +','+ str(id) +');\n'
 
@@ -114,6 +121,12 @@ def parse_incoming_connection(connection, weighttype):
         s += connection.text.split()[0] + ','
         s += connection.text.split()[1] + ','
         s += connection.text.split()[2] + ');\n'
+    elif weighttype.text == "CustomConnectionParameters":
+        s += '\tCustomConnectionParameters con_EXTERNAL_' + node + tally + ';\n'
+        for ak,av in connection.attrib.items():
+            if ak == 'Node':
+                continue
+            s += '\tcon_EXTERNAL_' + node + tally + '.setParam(\"' + ak + '\", ' + av +');\n'
     else:
         if weighttype.text == 'double':
             s += '\tdouble con_EXTERNAL_' + node + tally + '('

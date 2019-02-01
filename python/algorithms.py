@@ -6,7 +6,8 @@ ALGORITHMS = { 'RateAlgorithm'   : {'Connection' : 'double', 'Parameter': '' },
                'OUAlgorithm'     : {'Connection' : 'DelayedConnection', 'Parameter' : 'NeuronParameter'},
                'GeomAlgorithmDC' : {'Connection' : 'DelayedConnection', 'Parameter' : 'GeomParameter'},
                'MeshAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter': ''},
-               'GridAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter': ''} }
+               'GridAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter': ''},
+               'GridJumpAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter': ''} }
 
 ALGORITHM_NAMES = {}
 
@@ -258,15 +259,37 @@ def parse_grid_algorithm(alg, i, weighttype):
     if alg.attrib['type'] != 'GridAlgorithm':
         raise ValueError
 
-    if weighttype.text ==  "DelayedConnection":
-        type = "MPILib::" + weighttype.text
+    timestep = alg.find('TimeStep')
+
+    cpp_name = 'alg_mesh_' + str(i)
+    s += '\tTwoDLib::GridAlgorithm ' + cpp_name + '(\"'
+    s += alg.attrib['modelfile'] + '\",'
+    s += '\"' + alg.attrib['transformfile'] + '\",'
+    s += timestep.text + ','
+    s += alg.attrib['start_v'] + "," + alg.attrib['start_w']
+
+    if 'tau_refractive' in alg.keys():
+        s += ', '  + alg.attrib['tau_refractive']
     else:
-        type = "double"
+        s += ', 0.0'
+    if 'ratemethod' in alg.keys():
+        s += ', '  + "\"" + alg.attrib['ratemethod'] + "\""
+    s += ');\n'
+
+
+    Register(alg.attrib['name'], cpp_name)
+
+    return s
+
+def parse_grid_jump_algorithm(alg, i, weighttype):
+    s = ''
+    if alg.attrib['type'] != 'GridJumpAlgorithm':
+        raise ValueError
 
     timestep = alg.find('TimeStep')
 
     cpp_name = 'alg_mesh_' + str(i)
-    s += '\tTwoDLib::GridAlgorithm<' + type +'> ' + cpp_name + '(\"'
+    s += '\tTwoDLib::GridJumpAlgorithm ' + cpp_name + '(\"'
     s += alg.attrib['modelfile'] + '\",'
     s += '\"' + alg.attrib['transformfile'] + '\",'
     s += timestep.text + ','
@@ -482,10 +505,15 @@ def parse_algorithm(alg,i,weighttype,for_lib=False):
         else:
             raise NameError('Wrong conection type for MeshAlgorithm')
     if algname =='GridAlgorithm':
-        if weighttype.text == 'DelayedConnection':
+        if weighttype.text == 'CustomConnectionParameters':
             return parse_grid_algorithm(alg,i,weighttype)
         else:
-            raise NameError('Wrong conection type for GridAlgorithm')
+            raise NameError('Connection type for GridAlgorithm must be CustomConnectionParameters')
+    if algname =='GridJumpAlgorithm':
+        if weighttype.text == 'CustomConnectionParameters':
+            return  parse_grid_jump_algorithm(alg,i,weighttype)
+        else:
+            raise NameError('Connection type for GridJumpAlgorithm must be CustomConnectionParameters')
     else:
         raise NameError('Wrong algorithm name')
     return ''

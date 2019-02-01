@@ -16,8 +16,6 @@
 #include <mutex>
 #include <map>
 
-typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
-
 namespace TwoDLib {
 
 class DisplayWindow{

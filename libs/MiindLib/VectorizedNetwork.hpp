@@ -2,6 +2,7 @@
 #define _CODE_MIINDLIB_VectorizedNetwork_INCLUDE_GUARD
 
 #include <CudaTwoDLib/CudaTwoDLib.hpp>
+#include <MPILib/include/DelayedConnectionQueue.hpp>
 
 typedef CudaTwoDLib::fptype fptype;
 typedef CudaTwoDLib::inttype inttype;
@@ -52,8 +53,9 @@ public:
 
   void initOde2DSystem(unsigned int min_solve_steps=10);
 
-  void setRateNodes(std::vector<MPILib::NodeId> ids){
+  void setRateNodes(std::vector<MPILib::NodeId> ids, std::vector<MPILib::Time> intervals){
     _rate_nodes = ids;
+    _rate_intervals = intervals;
   }
   void setDisplayNodes(std::vector<MPILib::NodeId> ids){
     _display_nodes = ids;
@@ -130,25 +132,30 @@ protected:
   std::vector<TwoDLib::CSRMatrix> _csrs;
 
   unsigned int _n_steps;
+  unsigned int _master_steps;
 
   unsigned int _num_nodes;
   MPILib::Time _network_time_step;
 
   std::vector<MPILib::NodeId> _display_nodes;
   std::vector<MPILib::NodeId> _rate_nodes;
+  std::vector<MPILib::Time> _rate_intervals;
   std::vector<MPILib::NodeId> _density_nodes;
   std::vector<MPILib::Time> _density_start_times;
   std::vector<MPILib::Time> _density_end_times;
   std::vector<MPILib::Time> _density_intervals;
 
   std::vector<inttype> _connection_out_group_mesh;
-  std::vector<std::queue<fptype>> _connection_queue;
+  std::vector<MPILib::DelayedConnectionQueue> _connection_queue;
   std::map<MPILib::NodeId, std::vector<MPILib::NodeId>> _node_to_connection_queue;
   std::map<MPILib::NodeId, std::vector<MPILib::NodeId>> _external_to_connection_queue;
   std::vector<fptype> _stays;
   std::vector<fptype> _goes;
   std::vector<int> _off1s;
   std::vector<int> _off2s;
+  std::vector<fptype> _effs;
+
+  std::map<MPILib::NodeId, fptype> _current_node_rates;
 
   std::vector<inttype> _monitored_nodes;
 

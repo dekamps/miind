@@ -21,11 +21,11 @@
 #include <algorithm>
 #include <numeric>
 
-#include "MasterGrid.hpp"
+#include "MasterGridJump.hpp"
 
  using namespace TwoDLib;
 
- MasterGrid::MasterGrid
+ MasterGridJump::MasterGridJump
  (
 	Ode2DSystemGroup& sys,
   double cell_width
@@ -36,26 +36,7 @@ _cell_width(cell_width)
  {
  }
 
- void MasterGrid::MVGrid
- (
- 	vector<double>&       dydt,
- 	const vector<double>& vec_mass,
- 	double                rate,
-   double stays,
-   double goes,
-   int offset_1,
-   int offset_2
- ) const
- {
- #pragma omp parallel for
- 	for (MPILib::Index i = 0; i < dydt.size(); i++){
- 		 dydt[i] += rate*stays*vec_mass[(((int)i+offset_1)%(int)dydt.size()+(int)dydt.size()) % (int)dydt.size()];
- 		 dydt[i] += rate*goes*vec_mass[(((int)i+offset_2)%(int)dydt.size()+(int)dydt.size()) % (int)dydt.size()];
-     dydt[i] -= rate*vec_mass[i];
- 	}
- }
-
- void MasterGrid::CalculateStaticEfficiacies(vector<double>& efficacy_map) {
+ void MasterGridJump::CalculateStaticEfficiacies(vector<double>& efficacy_map) {
    	for (MPILib::Index i = 0; i < efficacy_map.size(); i++){
       unsigned int offset = (unsigned int)abs(efficacy_map[i]/_cell_width);
       double goes = (double)fabs(efficacy_map[i] / _cell_width) - offset;
@@ -78,7 +59,7 @@ _cell_width(cell_width)
     }
  }
 
- void MasterGrid::CalculateStaticEfficiaciesForConductance(vector<double>& efficacy_map, vector<double>& rest_v) {
+ void MasterGridJump::CalculateStaticEfficiaciesForConductance(vector<double>& efficacy_map, vector<double>& rest_v) {
    	for (MPILib::Index i = 0; i < efficacy_map.size(); i++){
       _stays.push_back(vector<double>(_dydt.size()));
       _goes.push_back(vector<double>(_dydt.size()));
@@ -102,7 +83,7 @@ _cell_width(cell_width)
     }
  }
 
- void MasterGrid::MVGridWithEfficacy
+ void MasterGridJump::MVGrid
  (
  	vector<double>&       dydt,
  	const vector<double>& vec_mass,
@@ -118,8 +99,7 @@ _cell_width(cell_width)
  	}
  }
 
- void MasterGrid::Apply(double t_step, const vector<double>& rates, vector<double>& efficacy_map) {
-   _p_vec_eff   = &efficacy_map;
+ void MasterGridJump::Apply(double t_step, const vector<double>& rates) {
 	 _p_vec_rates = &rates;
 
 	 typedef boost::numeric::odeint::runge_kutta_cash_karp54< vector<double> > error_stepper_type;
@@ -130,45 +110,24 @@ _cell_width(cell_width)
 			 *this , _sys._vec_mass , 0.0 , t_step , 1e-4 );
  }
 
- void MasterGrid::operator()(const vector<double>& vec_mass, vector<double>& dydt, const double)
+void MasterGridJump::operator()(const vector<double>& vec_mass, vector<double>& dydt, const double)
 {
-  const vector<double>& vec_eff = *_p_vec_eff;
   const vector<double>& rates = *_p_vec_rates;
 
 
 #pragma omp parallel for
- for(unsigned int id = 0; id < dydt.size(); id++)
-   dydt[id] = 0.;
+  for(unsigned int id = 0; id < dydt.size(); id++)
+    dydt[id] = 0.;
 
- for (unsigned int irate = 0; irate < rates.size(); irate++){
-   // do NOT map the rate
+  for (unsigned int irate = 0; irate < rates.size(); irate++){
     double rate = rates[irate];
 
-    unsigned int offset = (unsigned int)abs(vec_eff[irate]/_cell_width);
-    double goes = (double)fabs(vec_eff[irate] / _cell_width) - offset;
-    double stays = 1.0 - goes;
-
-    int offset_1 = vec_eff[irate] > 0 ? -offset : offset;
-    int offset_2 = vec_eff[irate] > 0 ? -(offset+1) : -(offset-1);
-
-    // it is only the matrices that need to be mapped
     MVGrid
-   (
-       dydt,
-     vec_mass,
-     rate,
-     stays,
-     goes,
-     offset_1,
-     offset_2
+    (
+      dydt,
+      vec_mass,
+      rate,
+      irate
     );
-
-    // MVGridWithEfficacy
-    // (
-    //   dydt,
-    // vec_mass,
-    // rate,
-    // irate
-    // );
   }
 }

@@ -307,11 +307,10 @@ namespace TwoDLib {
 	    }
 
 			std::vector<std::vector<MPILib::Rate>> vec_rates;
-			for(unsigned int i=0; i<_vec_rate_queues.size(); i++){
+			for(unsigned int i=0; i<_vec_vec_delay_queues.size(); i++){
 				std::vector<MPILib::Rate> rates;
-				for(unsigned int j=0; j<_vec_rate_queues[i].size(); j++){
-					rates.push_back(_vec_rate_queues[i][j].front());
-					_vec_rate_queues[i][j].pop();
+				for(unsigned int j=0; j<_vec_vec_delay_queues[i].size(); j++){
+					rates.push_back(_vec_vec_delay_queues[i][j].getCurrentRate());
 				}
 				vec_rates.push_back(rates);
 			}
@@ -319,7 +318,7 @@ namespace TwoDLib {
 	    // master equation
 	    _p_master->Apply(_n_steps*_dt,vec_rates,_vec_map);
 
-	    _sys.RedistributeProbability(_n_steps);
+			_sys.RedistributeProbability(_n_steps);
 
  	    _t_cur += _n_steps*_dt;
  	    _rate = (_sys.*_sysfunction)()[0];
@@ -354,11 +353,10 @@ namespace TwoDLib {
 			}
 		}
 
- 		_vec_rate_queues = std::vector< std::vector<std::queue<MPILib::Rate>> >(0); // MeshAlgorithm really only uses the first array, i.e. the rates it receives in prepareEvole
- 		_vec_rate_queues.push_back( std::vector<std::queue<MPILib::Rate>>(vec_weights.size()) );
-		for(unsigned int q = 0; q < _vec_rate_queues[0].size(); q++){
-			unsigned int queue_length = static_cast<unsigned int>(std::ceil(vec_weights[q]._delay/(_n_steps*_dt)));
-			_vec_rate_queues[0][q] = std::queue<MPILib::Rate>(std::deque<MPILib::Rate>(queue_length));
+		_vec_vec_delay_queues = std::vector< std::vector<MPILib::DelayedConnectionQueue> >(0); // MeshAlgorithm really only uses the first array, i.e. the rates it receives in prepareEvole
+ 		_vec_vec_delay_queues.push_back( std::vector<MPILib::DelayedConnectionQueue>(vec_weights.size()));
+		for(unsigned int q = 0; q < vec_weights.size(); q++){
+			_vec_vec_delay_queues[0][q] = MPILib::DelayedConnectionQueue(_dt, vec_weights[q]._delay);
 		}
 	}
 
@@ -376,7 +374,7 @@ namespace TwoDLib {
 
 		assert(nodeVector.size() == weightVector.size());
 		for (MPILib::Index i = 0; i < nodeVector.size(); i++){
-			_vec_rate_queues[0][i].push(nodeVector[i]*weightVector[i]._number_of_connections);
+			_vec_vec_delay_queues[0][i].updateQueue(nodeVector[i]*weightVector[i]._number_of_connections);
 		}
 	}
 }

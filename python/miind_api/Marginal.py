@@ -16,7 +16,7 @@ from .tools import *
 import mesh3 as meshmod
 
 class Marginal(Result):
-    def __init__(self, io, nodename, vn=500, wn=500):
+    def __init__(self, io, nodename, vn=1000, wn=1000):
         super(Marginal, self).__init__(io, nodename)
         self.path = op.join(self.io.output_directory,
                             self.nodename + '_marginal_density')
@@ -108,8 +108,8 @@ class Marginal(Result):
           [projection_exe, self.modelfname], cwd=self.io.xml_location)
 
         # Parse the output
-        vmax, wmax = np.array(out.split('\n')[3].split(' ')[2:], dtype=float)
-        vmin, wmin = np.array(out.split('\n')[4].split(' ')[2:], dtype=float)
+        vmax, wmax = np.array(out.decode('ascii').split('\n')[3].split(' ')[2:], dtype=float)
+        vmin, wmin = np.array(out.decode('ascii').split('\n')[4].split(' ')[2:], dtype=float)
         # assert that we bound the range
         inc = lambda x: x * 1.01 if x > 0 else x * 0.99
         vmax, wmax = inc(vmax), inc(wmax)

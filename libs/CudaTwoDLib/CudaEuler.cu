@@ -40,6 +40,62 @@ __global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* m
     }
 }
 
+
+// Performing this calculation per iteration doubles the simulation time.
+// This function shouldn't be used in that way but it a good example in case you want to
+// include some kind of variable efficacy.
+__global__ void CudaCalculateGridEfficacies(inttype N,
+  fptype efficacy, fptype grid_cell_width,
+  fptype* stays, fptype* goes, int* offset1s, int* offset2s)
+{
+  int index  = blockIdx.x * blockDim.x + threadIdx.x;
+  int stride = blockDim.x * gridDim.x;
+
+  for (int i = index; i < N; i+= stride ){
+    inttype ofs = (inttype)abs(efficacy / grid_cell_width);
+    fptype g = (fptype)fabs(efficacy / grid_cell_width) - ofs;
+    fptype s = 1.0 - g;
+
+    int o1 = efficacy > 0 ? ofs : -ofs;
+    int o2 = efficacy > 0 ? (ofs+1) : (ofs-1);
+
+    stays[modulo(i+o1,N)] = s;
+    goes[modulo(i+o2,N)] = g;
+    offset1s[modulo(i+o1,N)] = -o1;
+    offset2s[modulo(i+o2,N)] = -o2;
+  }
+}
+
+// As above, this function should not be used per iteration as the efficacy doesn't
+// change during simulation.
+__global__ void CudaCalculateGridEfficaciesWithConductance(inttype N,
+  fptype efficacy, fptype grid_cell_width, fptype* cell_vs, fptype cond_stable,
+  fptype* stays, fptype* goes, int* offset1s, int* offset2s, inttype vs_offset)
+{
+  int index  = blockIdx.x * blockDim.x + threadIdx.x;
+  int stride = blockDim.x * gridDim.x;
+
+  for (int i = index; i < N; i+= stride ){
+    // WARNING! If the offset changes from, say, 0 and 1 to 1 and 2 along
+    // a strip (due to changing V), there will be an overwrite of goes and stays
+    // which will lead to mass loss.
+    // Solution must be to allow multiple stays and goes into each cell. There
+    // should be a github bug report for this.
+    fptype eff = efficacy * (cell_vs[i + vs_offset] - cond_stable);
+    inttype ofs = (inttype)abs(eff / grid_cell_width);
+    fptype g = (fptype)fabs(eff / grid_cell_width) - ofs;
+    fptype s = 1.0 - g;
+
+    int o1 = efficacy > 0 ? ofs : -ofs;
+    int o2 = efficacy > 0 ? (ofs+1) : (ofs-1);
+
+    stays[modulo(i+o1,N)] = s;
+    goes[modulo(i+o2,N)] = g;
+    offset1s[modulo(i+o1,N)] = -o1;
+    offset2s[modulo(i+o2,N)] = -o2;
+  }
+}
+
 __global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays,
   fptype goes, int offset_1, int offset_2,
   fptype* derivative, fptype* mass, inttype offset)
@@ -55,6 +111,23 @@ __global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays
       dr -= mass[io];
       derivative[io] += rate*dr;
     }
+}
+
+__global__ void CudaCalculateGridDerivativeWithEfficacy(inttype N, fptype rate, fptype* stays,
+  fptype* goes, int* offset_1, int* offset_2,
+  fptype* derivative, fptype* mass, inttype offset)
+{
+  int index  = blockIdx.x * blockDim.x + threadIdx.x;
+  int stride = blockDim.x * gridDim.x;
+
+  for (int i = index; i < N; i+= stride ){
+    int io = i+offset;
+    fptype dr = 0.;
+    dr += stays[i]*mass[(modulo(io+offset_1[i],N))+offset];
+    dr += goes[i]*mass[(modulo(io+offset_2[i],N))+offset];
+    dr -= mass[io];
+    derivative[io] += rate*dr;
+  }
 }
 
 __global__ void EulerStep(inttype N, fptype* derivative, fptype* mass, fptype timestep)
@@ -104,14 +177,13 @@ __global__ void MapResetShiftRefractory(unsigned int n_reset, fptype* refactory_
   int index  = blockIdx.x * blockDim.x + threadIdx.x;
   int stride = blockDim.x * gridDim.x;
 
-  // printf("%i %i %i\n", offset+index, offset+n_reset, n_reset);
   for (int i = offset+index; i < offset+n_reset; i+=stride){
     refactory_mass[i+n_reset] = refactory_mass[i];
   }
 }
 
-__global__ void MapResetThreaded(unsigned int n_reset, fptype* sum, fptype* mass, fptype* refactory_mass, inttype ref_offset,
- unsigned int* rev_to, fptype* rev_alpha, inttype* rev_offsets, inttype* rev_counts, unsigned int* map){
+__global__ void MapResetThreaded(unsigned int n_reset, fptype* mass, fptype* refactory_mass, inttype ref_offset,
+ unsigned int* rev_to, fptype* rev_alpha, inttype* rev_offsets, inttype* rev_counts, unsigned int* map, fptype proportion){
    int index  = blockIdx.x * blockDim.x + threadIdx.x;
    int stride = blockDim.x * gridDim.x;
 
@@ -119,11 +191,24 @@ __global__ void MapResetThreaded(unsigned int n_reset, fptype* sum, fptype* mass
      int i_r = map[rev_to[i]];
      fptype dr = 0.;
      for(unsigned int j = rev_offsets[i]; j < rev_offsets[i]+rev_counts[i]; j++){
-         dr += rev_alpha[j]*refactory_mass[ref_offset+j];
+         dr += rev_alpha[j]*refactory_mass[ref_offset+j]*proportion;
 
      }
-     sum[i] += dr;
      mass[i_r] += dr;
+   }
+}
+
+__global__ void GetResetMass(unsigned int n_reset, fptype* sum, fptype* refactory_mass,
+ fptype* rev_alpha, inttype* rev_offsets, inttype* rev_counts){
+   int index  = blockIdx.x * blockDim.x + threadIdx.x;
+   int stride = blockDim.x * gridDim.x;
+
+   for (int i = index; i < n_reset; i+= stride ){
+     fptype dr = 0.;
+     for(unsigned int j = rev_offsets[i]; j < rev_offsets[i]+rev_counts[i]; j++){
+         dr += rev_alpha[j]*refactory_mass[j];
+     }
+     sum[i] = dr;
    }
 }
 
