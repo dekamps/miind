@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <MPILib/include/AlgorithmInterface.hpp>
+#include <MPILib/include/DelayedConnectionQueue.hpp>
+#include <MPILib/include/CustomConnectionParameters.hpp>
 #include "MasterOdeint.hpp"
 #include "MasterOMP.hpp"
 #include "Ode2DSystemGroup.hpp"
@@ -19,8 +21,7 @@ namespace TwoDLib {
  * This class simulates the evolution of a neural population density function on a 2D grid.
  */
 
-	template <class WeightValue>
-	class GridAlgorithm : public DensityAlgorithmInterface<WeightValue>{
+	class GridAlgorithm : public DensityAlgorithmInterface<CustomConnectionParameters>{
 
 	public:
     GridAlgorithm
@@ -55,13 +56,17 @@ namespace TwoDLib {
 
 		virtual void reportDensity() const;
 
+		virtual void setupMasterSolver(double cell_width);
+
 		virtual void prepareEvolve(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<WeightValue>& weightVector,
+				const std::vector<CustomConnectionParameters>& weightVector,
 				const std::vector<MPILib::NodeType>& typeVector);
 
-		using MPILib::AlgorithmInterface<WeightValue>::evolveNodeState;
+		using MPILib::AlgorithmInterface<CustomConnectionParameters>::evolveNodeState;
 		virtual void evolveNodeState(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<WeightValue>& weightVector, MPILib::Time time);
+				const std::vector<CustomConnectionParameters>& weightVector, MPILib::Time time);
+
+		virtual void applyMasterSolver(std::vector<MPILib::Rate> rates);
 
 		void InitializeDensity(MPILib::Index i, MPILib::Index j){_sys.Initialize(0,i,j);}
 
@@ -71,7 +76,7 @@ namespace TwoDLib {
 
 		std::vector<std::vector<TwoDLib::Redistribution>> ResetMap() const { return _vec_vec_res; }
 
-	private:
+	protected:
 
 		const std::string _model_name;
 		const std::string _rate_method;
@@ -99,7 +104,7 @@ namespace TwoDLib {
 		MPILib::Number _n_evolve;
 		MPILib::Number _n_steps;
 
-		std::vector<std::vector<std::queue<MPILib::Rate> > > _vec_rate_queues;
+		std::vector<std::vector<MPILib::DelayedConnectionQueue>> _vec_vec_delay_queues;
 
 		TransitionMatrix 							_transformMatrix;
 		CSRMatrix*										_csr_transform;
@@ -113,9 +118,9 @@ namespace TwoDLib {
 
 		const vector<double>& (TwoDLib::Ode2DSystemGroup::*_sysfunction) () const;
 
-	private:
+	protected:
 
-		void FillMap(const std::vector<WeightValue>& weightVector);
+		virtual void FillMap(const std::vector<CustomConnectionParameters>& weightVector);
 		std::vector<Mesh> CreateMeshObject();
 		pugi::xml_node CreateRootNode(const std::string&);
 		std::vector<TwoDLib::Redistribution> Mapping(const std::string&);

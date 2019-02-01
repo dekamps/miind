@@ -11,11 +11,14 @@ def define_display_nodes(tree,nodemap):
 
 def define_rate_nodes(tree, nodemap):
     s  = '\tstd::vector<MPILib::NodeId> rate_nodes;\n'
+    s += '\tstd::vector<MPILib::Time> rate_node_intervals;\n'
 
     rate_nodes = tree.findall('.//Rate')
     for rn in rate_nodes:
         node_id = nodemap[rn.attrib['node']]
+        t_interval = rn.attrib['t_interval']
         s += '\trate_nodes.push_back('+ str(node_id) + ');\n'
+        s += '\trate_node_intervals.push_back('+ t_interval + ');\n'
 
     s += '\n'
     return s

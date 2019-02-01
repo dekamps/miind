@@ -1,10 +1,10 @@
-import mesh3
+import mesh3 as mesh
 import writemesh
 import numpy as np
 
 class LifMeshGenerator:
     def __init__(self, basename):
-        self.tau             = 0.01     # membrane time constant in s
+        self.tau             = 10     # membrane time constant in s
         self.V_threshold     = -35.0     # threshold in V
         self.epsilon         = 0.001     # padding as fraction of the threshold potential
         self.labda           = 0.0001      # fiducial bin size
@@ -12,7 +12,7 @@ class LifMeshGenerator:
         self.V_min           = -70.0       # guaranteed minimum value of the grid
         self.V_max           = -34.99     # guaranteed maximum value of the grid
         self.N_grid          = 150       # number of points in the interval [V_res, self.V_threshold); e.g if self.V_min = self.V_threshold, the grid holds double this number of bins
-        self.dt              = 0.001     # timestep for each bin
+        self.dt              = 0.0001     # timestep for each bin
         self.strip_w         = 0.005     # arbitrary value for strip width
         self.basename        = basename
 

@@ -150,6 +150,7 @@ bool Cell::IsInside(const Point& p) const
 	  double xinters;
 	  Point p1,p2;
 
+
 	  p1 = _vec_points[0];
 	  for (i=1;i<=N;i++) {
 	    p2 = _vec_points[i % N];

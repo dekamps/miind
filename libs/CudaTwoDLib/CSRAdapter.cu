@@ -67,6 +67,50 @@ void CSRAdapter::FillMatrixMaps(const std::vector<TwoDLib::CSRMatrix>& vecmat)
    }
 }
 
+void CSRAdapter::InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy) {
+  _nr_grid_connections = efficacy.size();
+  for(inttype m = 0; m < efficacy.size(); m++)
+  {
+    checkCudaErrors(cudaMalloc((fptype**)&_goes[m],_nr_rows[vecindex[m]]*sizeof(fptype)));
+    checkCudaErrors(cudaMalloc((fptype**)&_stays[m],_nr_rows[vecindex[m]]*sizeof(fptype)));
+    checkCudaErrors(cudaMalloc((inttype**)&_offset1s[m],_nr_rows[vecindex[m]]*sizeof(inttype)));
+    checkCudaErrors(cudaMalloc((inttype**)&_offset2s[m],_nr_rows[vecindex[m]]*sizeof(inttype)));
+
+    inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1)/_blockSize;
+
+    CudaCalculateGridEfficacies<<<numBlocks,_blockSize>>>(_nr_rows[vecindex[m]],
+      efficacy[m], _cell_widths[vecindex[m]],
+      _stays[m], _goes[m], _offset1s[m], _offset2s[m]);
+  }
+}
+
+void CSRAdapter::InitializeStaticGridConductanceEfficacies(const std::vector<inttype>& vecindex,
+  const std::vector<fptype>& efficacy, const std::vector<fptype>& rest_vs) {
+    _nr_grid_connections = efficacy.size();
+
+    checkCudaErrors(cudaMalloc((fptype**)&_cell_vs,_group.getGroup().Vs().size()*sizeof(fptype)));
+
+    std::vector<fptype> vecval;
+    for (double val: _group.getGroup().Vs())
+        vecval.push_back((fptype)val);
+
+    checkCudaErrors(cudaMemcpy(_cell_vs,&vecval[0],_group.getGroup().Vs().size()*sizeof(fptype),cudaMemcpyHostToDevice));
+
+    for(inttype m = 0; m < efficacy.size(); m++)
+    {
+      checkCudaErrors(cudaMalloc((fptype**)&_goes[m],_nr_rows[vecindex[m]]*sizeof(fptype)));
+      checkCudaErrors(cudaMalloc((fptype**)&_stays[m],_nr_rows[vecindex[m]]*sizeof(fptype)));
+      checkCudaErrors(cudaMalloc((inttype**)&_offset1s[m],_nr_rows[vecindex[m]]*sizeof(inttype)));
+      checkCudaErrors(cudaMalloc((inttype**)&_offset2s[m],_nr_rows[vecindex[m]]*sizeof(inttype)));
+
+      inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1)/_blockSize;
+
+      CudaCalculateGridEfficaciesWithConductance<<<numBlocks,_blockSize>>>(_nr_rows[vecindex[m]],
+        efficacy[m], _cell_widths[vecindex[m]], _cell_vs, rest_vs[m],
+        _stays[m], _goes[m], _offset1s[m], _offset2s[m],_offsets[vecindex[m]]);
+    }
+  }
+
 
 void CSRAdapter::DeleteMatrixMaps()
 {
@@ -104,7 +148,7 @@ _group(group),
 _euler_timestep(euler_timestep),
 _nr_iterations(NumberIterations(group,euler_timestep)),
 _nr_m(vecmat.size()),
-_nr_streams(nr_connections),
+_nr_streams(vecmat.size()),
 _vecmats(vecmat_indexes),
 _grid_transforms(grid_transforms),
 _nval(std::vector<inttype>(vecmat.size())),
@@ -115,7 +159,12 @@ _nja(std::vector<inttype>(vecmat.size())),
 _ja(std::vector<inttype*>(vecmat.size())),
 _offsets(this->Offsets(vecmat)),
 _nr_rows(this->NrRows(vecmat)),
-_blockSize(1024),
+_cell_widths(this->CellWidths(vecmat)),
+_goes(std::vector<fptype*>(grid_transforms.size())),
+_stays(std::vector<fptype*>(grid_transforms.size())),
+_offset1s(std::vector<int*>(grid_transforms.size())),
+_offset2s(std::vector<int*>(grid_transforms.size())),
+_blockSize(256),
 _numBlocks( (_group._n + _blockSize - 1) / _blockSize)
 {
     this->FillMatrixMaps(vecmat);
@@ -173,6 +222,13 @@ std::vector<inttype> CSRAdapter::NrRows(const std::vector<TwoDLib::CSRMatrix>& v
 	return vecret;
 }
 
+std::vector<fptype> CSRAdapter::CellWidths(const std::vector<TwoDLib::CSRMatrix>& vecmat) const
+{
+	std::vector<fptype> vecret;
+	for (inttype m = 0; m < _grid_transforms.size(); m++)
+		vecret.push_back(_group.getGroup().MeshObjects()[_grid_transforms[m]].getCellWidth());
+	return vecret;
+}
 
 std::vector<inttype> CSRAdapter::Offsets(const std::vector<TwoDLib::CSRMatrix>& vecmat) const
 {
@@ -213,14 +269,39 @@ void CSRAdapter::CalculateMeshGridDerivative(const std::vector<inttype>& vecinde
 
   for(inttype m = 0; m < vecstays.size(); m++)
   {
-    // be careful to use this block size
-    inttype numBlocks = (_nr_rows[m] + _blockSize - 1)/_blockSize;
-    CudaCalculateGridDerivative<<<numBlocks,_blockSize,0,_streams[vecindex[m]]>>>(_nr_rows[m],vecrates[m],vecstays[m],vecgoes[m],vecoff1s[m],vecoff2s[m],_dydt,_group._mass,_offsets[vecindex[m]]);
+    // be careful to use this blo							void CalculateMeshGridDerivativeForward(const std::vector<inttype>& vecindex,ck size
+    inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1)/_blockSize;
+    CudaCalculateGridDerivative<<<numBlocks,_blockSize,0,_streams[vecindex[m]]>>>(_nr_rows[vecindex[m]],vecrates[m],vecstays[m],vecgoes[m],vecoff1s[m],vecoff2s[m],_dydt,_group._mass,_offsets[vecindex[m]]);
   }
 
   for(int n=vecstays.size(); n<vecrates.size(); n++)
   {
     inttype mat_index = _grid_transforms.size() + (n - vecstays.size());
+    // be careful to use this block size
+    inttype numBlocks = (_nr_rows[mat_index] + _blockSize - 1)/_blockSize;
+    CudaCalculateDerivative<<<numBlocks,_blockSize,0,_streams[vecindex[n]]>>>(_nr_rows[mat_index],vecrates[n],_dydt,_group._mass,_val[mat_index],_ia[mat_index],_ja[mat_index],_group._map,_offsets[mat_index]);
+  }
+
+  cudaDeviceSynchronize();
+
+}
+
+void CSRAdapter::CalculateMeshGridDerivativeWithEfficacy(const std::vector<inttype>& vecindex,
+  const std::vector<fptype>& vecrates)
+{
+
+  for(inttype m = 0; m < _nr_grid_connections; m++)
+  {
+    // be careful to use this block size
+    inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1)/_blockSize;
+
+    CudaCalculateGridDerivativeWithEfficacy<<<numBlocks,_blockSize,0,_streams[vecindex[m]]>>>(_nr_rows[vecindex[m]],
+      vecrates[m],_stays[m], _goes[m], _offset1s[m], _offset2s[m],_dydt,_group._mass,_offsets[vecindex[m]]);
+  }
+
+  for(int n=_nr_grid_connections; n<vecrates.size(); n++)
+  {
+    inttype mat_index = _grid_transforms.size() + (n - _nr_grid_connections);
     // be careful to use this block size
     inttype numBlocks = (_nr_rows[mat_index] + _blockSize - 1)/_blockSize;
     CudaCalculateDerivative<<<numBlocks,_blockSize,0,_streams[vecindex[n]]>>>(_nr_rows[mat_index],vecrates[n],_dydt,_group._mass,_val[mat_index],_ia[mat_index],_ja[mat_index],_group._map,_offsets[mat_index]);

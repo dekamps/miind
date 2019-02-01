@@ -33,4 +33,34 @@ def rybak(y, t):
 
     return [v_prime, h_prime]
 
-grid_generate.generate(rybak, 1, 0.001, 1e-3, 'grid', -10, -56, -0.004, -110, 0, -0.4, 1.0,500, 200)
+def rybakInterneuron(y, t):
+    E_na = 55; #mV
+    E_k = -80;
+    C = 1; #uF
+
+    g_na = 120; #mS
+    g_k = 100;
+    g_l = 0.51; #mS
+    E_l = -64.0; #mV
+
+    theta_h = -55; #mV
+    sig_h = 7; #mV
+
+    I = 0.0; #
+    I_h = 0; #
+
+    v = y[0];
+    h = y[1];
+
+    I_l = -g_l*(v - E_l);
+    I_na = -g_na * (v - E_na) * h * (((1 + np.exp((v+35)/-7.8))**-1)**3);
+    I_k = -g_k * (v - E_k) * (((1 + np.exp((v+28)/-15))**-1)**4);
+
+    v_prime = ((I_l + I_na + I_k) / C)+I;
+    h_prime = (((1 + (np.exp((v - theta_h)/sig_h)))**(-1)) - h ) / (30/(np.exp((v+50)/15) + np.exp(-(v+50)/16))) + I_h;
+
+    return [v_prime, h_prime]
+
+
+grid_generate.generate(rybakInterneuron, 0.1, 0.001, 1e-3, 'grid', 0.0, -64.0, 0.0, -110, 20, -0.4, 1.0,300, 300)
+# grid_generate.generate(rybak, 1, 0.001, 1e-3, 'grid', -10, -56, -0.004, -110, 0, -0.4, 1.0,500, 200)

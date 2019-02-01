@@ -200,7 +200,7 @@ public:
   /**
   *
   */
-  void reportNodeActivities(std::vector<MPILib::NodeId>& node_ids) const;
+  void reportNodeActivities(std::vector<MPILib::NodeId>& node_ids, std::vector<double>& intervals, double time) const;
 
 	SimulationRunParameter& getSimulationParams() { return _parameterSimulationRun; }
 

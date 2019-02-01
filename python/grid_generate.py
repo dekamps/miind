@@ -11,7 +11,7 @@ import numpy as np
 from scipy.integrate import odeint
 import math
 
-def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold_v, reset_v, reset_shift_h, grid_v_min, grid_v_max, grid_h_min, grid_h_max, grid_v_res, grid_h_res,efficacy_orientation='v', threshold_capture_v=0):
+def generate(func, timestep, timescale, tolerance, basename, threshold_v, reset_v, reset_shift_h, grid_v_min, grid_v_max, grid_h_min, grid_h_max, grid_v_res, grid_h_res,efficacy_orientation='v', threshold_capture_v=0):
 
     grid_d1_res = grid_v_res;
     grid_d1_min = grid_v_min;
@@ -40,7 +40,7 @@ def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold
 
     with open(basename + '.mesh', 'w') as mesh_file:
         mesh_file.write('ignore\n')
-        mesh_file.write('{}\n'.format(timestep*timestep_multiplier))
+        mesh_file.write('{}\n'.format(timestep*timescale))
 
         for i in (np.array(range(grid_d1_res))) * (1.0/(grid_d1_res)):
             svs_1 = [];
@@ -120,7 +120,7 @@ def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold
 
     with open(basename + '_transform.mesh', 'w') as mesh_file:
         mesh_file.write('ignore\n')
-        mesh_file.write('{}\n'.format(timestep*timestep_multiplier))
+        mesh_file.write('{}\n'.format(timestep*timescale))
 
         progress = 0
         count = 0
@@ -209,9 +209,9 @@ def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold
     api.MeshTools.buildTransformFileFromModel(basename, 1000000000)
     api.MeshTools.buildTransformFileFromModel(basename, reset_shift_w=reset_shift_h, mode='resettransform')
 
-    filename = basename + '.mesh'
-    if os.path.exists(filename):
-        os.remove(filename)
+    # filename = basename + '.mesh'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
 
     filename = basename + '.rev'
     if os.path.exists(filename):
@@ -225,9 +225,9 @@ def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold
     if os.path.exists(filename):
         os.remove(filename)
 
-    filename = basename + '_transform.mesh'
-    if os.path.exists(filename):
-        os.remove(filename)
+    # filename = basename + '_transform.mesh'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
 
     filename = basename + '_transform.rev'
     if os.path.exists(filename):
@@ -240,4 +240,3 @@ def generate(func, timestep, timestep_multiplier, tolerance, basename, threshold
     filename = basename + '_transform.model'
     if os.path.exists(filename):
         os.remove(filename)
-

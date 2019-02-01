@@ -51,6 +51,7 @@ _hostmass(_n,0.),
 _hostmap(_n,0.),
 _offsets(group.Offsets()),
 _nr_refractory_steps(group.MeshObjects().size(),0),
+_refractory_prop(group.MeshObjects().size(),0),
 _refractory_mass(group.MeshObjects().size(),0),
 
 _nr_minimal_resets(_group.MeshObjects().size(),0),
@@ -63,7 +64,7 @@ _res_from_offsets(_group.MeshObjects().size(),0),
 _res_sum(group.MeshObjects().size(),0),
 _res_to_mass(group.MeshObjects().size(),0),
 _host_fs(group.MeshObjects().size(),0),
-_blockSize(1024),
+_blockSize(256),
 _numBlocks( (_n + _blockSize - 1) / _blockSize)
 {
     this->FillMass();
@@ -85,7 +86,8 @@ void CudaOde2DSystemAdapter::TransferMapData()
 
 void CudaOde2DSystemAdapter::FillRefractoryTimes(const std::vector<MPILib::Time>& times) {
 	for(inttype m = 0; m < _mesh_size; m++){
-		_nr_refractory_steps[m] = static_cast<int>(std::ceil(times[m] / _time_step));
+		_nr_refractory_steps[m] = 2 + static_cast<int>(std::floor(times[m] / _time_step));
+		_refractory_prop[m] = std::abs(std::fmod(times[m],_time_step) - _time_step) < 0.000001 ? 0 : std::fmod(times[m],_time_step)/_time_step;
 	}
 }
 
@@ -174,19 +176,19 @@ void CudaOde2DSystemAdapter::updateGroupMass()
 		 }
 }
 
-const std::vector<fptype>& CudaOde2DSystemAdapter::F() const
+const std::vector<fptype>& CudaOde2DSystemAdapter::F(unsigned int n_steps) const
 {
 	_host_fs.clear();
 	for(inttype m = 0; m < _mesh_size; m++)
 	{
-		inttype numBlocks = std::ceil(((std::ceil(_nr_minimal_resets[m]/_blockSize) + _blockSize - 1)/_blockSize));
+		inttype numBlocks = (_nr_minimal_resets[m] + _blockSize - 1)/_blockSize;
 		vector<fptype> host_sum(numBlocks,0.);
 		checkCudaErrors(cudaMemcpy(&host_sum[0],_res_sum[m],numBlocks*sizeof(fptype),cudaMemcpyDeviceToHost));
 		fptype sum = 0.0;
 		for (auto& rate: host_sum)
 			sum += rate;
 
-		_host_fs.push_back(sum/_time_step);
+		_host_fs.push_back(sum/(_time_step*n_steps));
 	}
 
   return _host_fs;
@@ -214,14 +216,15 @@ void CudaOde2DSystemAdapter::FillResetMap
 			 _nr_minimal_resets[m] = reset_map.size();
 			 _nr_resets.push_back(vec_vec_reset[m].size());
 
-			 checkCudaErrors(cudaMalloc((fptype**)&_refractory_mass[m], std::max(1,(int)_nr_refractory_steps[m])*vec_vec_reset[m].size()*sizeof(fptype)));
+			 checkCudaErrors(cudaMalloc((fptype**)&_refractory_mass[m], _nr_refractory_steps[m]*vec_vec_reset[m].size()*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((inttype**)&_res_to_minimal[m], _nr_minimal_resets[m]*sizeof(inttype)));
        checkCudaErrors(cudaMalloc((inttype**)&_res_from_ordered[m], vec_vec_reset[m].size()*sizeof(inttype)));
        checkCudaErrors(cudaMalloc((fptype**)&_res_alpha_ordered[m], vec_vec_reset[m].size()*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((fptype**)&_res_from_counts[m], _nr_minimal_resets[m]*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((fptype**)&_res_from_offsets[m], _nr_minimal_resets[m]*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((fptype**)&_res_to_mass[m],_nr_minimal_resets[m]*sizeof(fptype)));
-			 checkCudaErrors(cudaMalloc((fptype**)&_res_sum[m], std::ceil(((std::ceil(_nr_minimal_resets[m]/_blockSize) + _blockSize - 1)/_blockSize))*sizeof(fptype)));
+			 inttype numBlocks = (_nr_minimal_resets[m] + _blockSize - 1)/_blockSize;
+			 checkCudaErrors(cudaMalloc((fptype**)&_res_sum[m], numBlocks*sizeof(fptype)));
 			 std::vector<inttype> vec_to_min;
 			 std::vector<inttype> vec_from_ord;
 			 std::vector<fptype>  vec_alpha_ord;
@@ -262,26 +265,22 @@ void CudaOde2DSystemAdapter::RedistributeProbability(std::vector<inttype>& meshe
 			CudaClearDerivative<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m],_res_to_mass[m],_mass);
 			CudaClearDerivative<<<numSumBlocks,_blockSize>>>(numBlocks,_res_sum[m],_mass);
 
-			if (_nr_refractory_steps[m] == 0) {
-
-				MapResetToRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m], _mass, _map, _refractory_mass[m]);
-
-				MapResetThreaded<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m], _res_to_mass[m],_mass, _refractory_mass[m],
-					0,
-					_res_to_minimal[m],_res_alpha_ordered[m], _res_from_offsets[m], _res_from_counts[m], _map);
-
+			for(int t = _nr_refractory_steps[m]-2; t >= 0; t--){
+				MapResetShiftRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_refractory_mass[m], t*_nr_resets[m]);
 			}
-			else {
-				MapResetThreaded<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m], _res_to_mass[m],_mass, _refractory_mass[m],
-					(_nr_refractory_steps[m]-1)*_nr_resets[m],
-					_res_to_minimal[m],_res_alpha_ordered[m], _res_from_offsets[m], _res_from_counts[m], _map);
 
-				for(int t = _nr_refractory_steps[m]-2; t >= 0; t--){
-					MapResetShiftRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_refractory_mass[m], t*_nr_resets[m]);
-				}
+			MapResetToRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m], _mass, _map, _refractory_mass[m]);
 
-				MapResetToRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m], _mass, _map, _refractory_mass[m]);
-			}
+			GetResetMass<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m], _res_to_mass[m], _refractory_mass[m],
+				_res_alpha_ordered[m], _res_from_offsets[m], _res_from_counts[m]);
+
+			MapResetThreaded<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m], _mass, _refractory_mass[m],
+				(_nr_refractory_steps[m]-1)*_nr_resets[m],
+				_res_to_minimal[m],_res_alpha_ordered[m], _res_from_offsets[m], _res_from_counts[m], _map, _refractory_prop[m]);
+
+			MapResetThreaded<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m], _mass, _refractory_mass[m],
+				(_nr_refractory_steps[m]-2)*_nr_resets[m],
+				_res_to_minimal[m],_res_alpha_ordered[m], _res_from_offsets[m], _res_from_counts[m], _map, 1.0 - _refractory_prop[m]);
 
 			SumReset<<<numBlocks,_blockSize,_blockSize*sizeof(fptype)>>>(_nr_minimal_resets[m],_res_to_mass[m],_res_sum[m]);
 	}

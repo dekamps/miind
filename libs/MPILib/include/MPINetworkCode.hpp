@@ -374,16 +374,19 @@ void MPINetwork<WeightValue, NodeDistribution>::evolve() {
 }
 
 template<class WeightValue, class NodeDistribution>
-void MPINetwork<WeightValue, NodeDistribution>::reportNodeActivities(std::vector<MPILib::NodeId>& node_ids) const{
+void MPINetwork<WeightValue, NodeDistribution>::reportNodeActivities(std::vector<MPILib::NodeId>& node_ids, std::vector<double>& intervals, double time) const{
 	for (int i=0; i<node_ids.size(); i++){
 		if (!_localNodes.count(node_ids[i]))
+			continue;
+
+		if(std::fabs(std::remainder(time, intervals[i])) > 0.0000000001 )
 			continue;
 
 		std::ostringstream ost2;
 		ost2 << "rate_" << _localNodes.at(node_ids[i]).getNodeId();
 		std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
 		ofst_rate.precision(10);
-		ofst_rate << getCurrentSimulationTime() << "\t" << _localNodes.at(node_ids[i]).getActivity() << std::endl;
+		ofst_rate << time << "\t" << _localNodes.at(node_ids[i]).getActivity() << std::endl;
 		ofst_rate.close();
 	}
 }

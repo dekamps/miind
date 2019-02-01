@@ -73,7 +73,9 @@ namespace CudaTwoDLib {
 
 								friend class CSRAdapter;
 
-                const std::vector<fptype>& F() const;
+                const std::vector<fptype>& F(unsigned int n_steps = 1) const;
+
+								const TwoDLib::Ode2DSystemGroup& getGroup() { return _group; }
 	private:
 
                CudaOde2DSystemAdapter(const CudaOde2DSystemAdapter&);
@@ -108,6 +110,7 @@ namespace CudaTwoDLib {
         fptype _time_step;
 
 				std::vector<unsigned int> _nr_refractory_steps;
+				std::vector<fptype> _refractory_prop;
 				std::vector<fptype*> _refractory_mass;
 
 				fptype*  _mass;

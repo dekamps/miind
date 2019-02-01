@@ -13,8 +13,7 @@
 
 namespace TwoDLib {
 
-	template <class WeightValue>
-	GridAlgorithm<WeightValue>::GridAlgorithm
+	GridAlgorithm::GridAlgorithm
 	(
 		const std::string& model_name,
 		const std::string& transform_matrix,
@@ -50,8 +49,7 @@ namespace TwoDLib {
 
 	}
 
-	template <class WeightValue>
-	GridAlgorithm<WeightValue>::GridAlgorithm(const GridAlgorithm<WeightValue>& rhs):
+	GridAlgorithm::GridAlgorithm(const GridAlgorithm& rhs):
 	_model_name(rhs._model_name),
 	_rate_method(rhs._rate_method),
 	_rate(rhs._rate),
@@ -78,25 +76,22 @@ namespace TwoDLib {
 
 	}
 
-  template <class WeightValue>
-	GridAlgorithm<WeightValue>* GridAlgorithm<WeightValue>::clone() const
+	GridAlgorithm* GridAlgorithm::clone() const
 	{
-	  return new GridAlgorithm<WeightValue>(*this);
+	  return new GridAlgorithm(*this);
 	}
 
-	template <class WeightValue>
-	void GridAlgorithm<WeightValue>::assignNodeId( MPILib::NodeId nid ) {
+	void GridAlgorithm::assignNodeId( MPILib::NodeId nid ) {
 		_node_id = nid;
 	}
 
-	template <class WeightValue>
-	void GridAlgorithm<WeightValue>::configure(const MPILib::SimulationRunParameter& par_run)
+	void GridAlgorithm::configure(const MPILib::SimulationRunParameter& par_run)
 	{
 		_transformMatrix = TransitionMatrix(_transform_matrix);
 		_csr_transform = new CSRMatrix(_transformMatrix, _sys, 0);
 
 		Display::getInstance()->addOdeSystem(_node_id, &_sys);
-		GridReport<WeightValue>::getInstance()->registerObject(_node_id, this);
+		GridReport<CustomConnectionParameters>::getInstance()->registerObject(_node_id, this);
 
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
@@ -112,6 +107,17 @@ namespace TwoDLib {
 
 		double cell_width = std::max(cell_h_dist, cell_v_dist);
 
+		setupMasterSolver(cell_width);
+		// at this stage initialization must have taken place, either by default in (0,0),
+		// or by the user calling Initialize if there is no strip 0
+
+		double sum = _sys.P();
+		if (sum == 0.)
+			throw TwoDLib::TwoDLibException("No initialization of the mass array has taken place. Call Initialize before configure.");
+
+	}
+
+	void GridAlgorithm::setupMasterSolver(double cell_width){
 		try {
 			std::unique_ptr<MasterGrid> p_master(new MasterGrid(_sys,cell_width));
 			_p_master = std::move(p_master);
@@ -123,17 +129,9 @@ namespace TwoDLib {
 			throw e;
 		}
 
-		// at this stage initialization must have taken place, either by default in (0,0),
-		// or by the user calling Initialize if there is no strip 0
-
-		double sum = _sys.P();
-		if (sum == 0.)
-			throw TwoDLib::TwoDLibException("No initialization of the mass array has taken place. Call Initialize before configure.");
-
 	}
 
-	template <class WeightValue>
-	std::vector<TwoDLib::Redistribution> GridAlgorithm<WeightValue>::Mapping(const string& type)
+	std::vector<TwoDLib::Redistribution> GridAlgorithm::Mapping(const string& type)
 	{
 		Pred pred(type);
 		pugi::xml_node rev_node = _root.find_child(pred);
@@ -149,8 +147,7 @@ namespace TwoDLib {
 		return vec_rev;
 	}
 
-	template <class WeightValue>
-	std::vector<Mesh> GridAlgorithm<WeightValue>::CreateMeshObject(){
+	std::vector<Mesh> GridAlgorithm::CreateMeshObject(){
 		// mesh
 		pugi::xml_node mesh_node = _root.first_child();
 
@@ -168,8 +165,7 @@ namespace TwoDLib {
 		return vec_mesh;
 	}
 
-	template <class WeightValue>
-	pugi::xml_node GridAlgorithm<WeightValue>::CreateRootNode(const string& model_name){
+	pugi::xml_node GridAlgorithm::CreateRootNode(const string& model_name){
 
 		// document
 		pugi::xml_parse_result result = _doc.load_file(model_name.c_str());
@@ -180,11 +176,10 @@ namespace TwoDLib {
 		return root;
 	}
 
-	template <class WeightValue>
-	void GridAlgorithm<WeightValue>::evolveNodeState
+	void GridAlgorithm::evolveNodeState
 	(
 		const std::vector<MPILib::Rate>& nodeVector,
-		const std::vector<WeightValue>& weightVector,
+		const std::vector<CustomConnectionParameters>& weightVector,
 		MPILib::Time time
 	)
 	{
@@ -222,22 +217,21 @@ namespace TwoDLib {
 				_sys._vec_mass = _mass_swap;
 	    }
 
-			// WARNING: originally reset goes after master but this way,
+			// WARNING: originally reset goes afvirtual void applyMasterSolver();ter master but this way,
 			// we can guarantee there's no mass above threshold when running
 			// MVGrid in MasterGrid
 			_sys.RedistributeProbability(_n_steps);
 
 			std::vector<std::vector<MPILib::Rate>> vec_rates;
-			for(unsigned int i=0; i<_vec_rate_queues.size(); i++){
+			for(unsigned int i=0; i<_vec_vec_delay_queues.size(); i++){
 				std::vector<MPILib::Rate> rates;
-				for(unsigned int j=0; j<_vec_rate_queues[i].size(); j++){
-					rates.push_back(_vec_rate_queues[i][j].front());
-					_vec_rate_queues[i][j].pop();
+				for(unsigned int j=0; j<_vec_vec_delay_queues[i].size(); j++){
+					rates.push_back(_vec_vec_delay_queues[i][j].getCurrentRate());
 				}
 				vec_rates.push_back(rates);
 			}
 
-			_p_master->Apply(_n_steps*_dt,vec_rates[0],_efficacy_map);
+			applyMasterSolver(vec_rates[0]);
 
 			_t_cur += _n_steps*_dt;
 
@@ -246,26 +240,27 @@ namespace TwoDLib {
  	    _n_evolve++;
 	}
 
-	template <class WeightValue>
-	void GridAlgorithm<WeightValue>::FillMap(const std::vector<WeightValue>& vec_weights)
+	void GridAlgorithm::applyMasterSolver(std::vector<MPILib::Rate> rates) {
+			_p_master->Apply(_n_steps*_dt,rates,_efficacy_map);
+	}
+
+	void GridAlgorithm::FillMap(const std::vector<CustomConnectionParameters>& vec_weights)
 	{
 		// this function will only be called once;
 		_efficacy_map = std::vector<double>(vec_weights.size());
 
  		for(MPILib::Index i_weight = 0; i_weight < _efficacy_map.size(); i_weight++){
-			_efficacy_map[i_weight] = vec_weights[i_weight]._efficacy;
+			_efficacy_map[i_weight] = vec_weights[i_weight]._params.at("efficacy");
 		}
 
-		_vec_rate_queues = std::vector< std::vector<std::queue<MPILib::Rate>> >(0); // MeshAlgorithm really only uses the first array, i.e. the rates it receives in prepareEvole
- 		_vec_rate_queues.push_back( std::vector<std::queue<MPILib::Rate>>(vec_weights.size()));
+		_vec_vec_delay_queues = std::vector< std::vector<MPILib::DelayedConnectionQueue> >(0); // MeshAlgorithm really only uses the first array, i.e. the rates it receives in prepareEvole
+ 		_vec_vec_delay_queues.push_back( std::vector<MPILib::DelayedConnectionQueue>(vec_weights.size()));
 		for(unsigned int q = 0; q < vec_weights.size(); q++){
-			unsigned int queue_length = static_cast<unsigned int>(std::ceil(vec_weights[q]._delay/(_n_steps*_dt)));
-			_vec_rate_queues[0][q] = std::queue<MPILib::Rate>(std::deque<MPILib::Rate>(queue_length));
+			_vec_vec_delay_queues[0][q] = MPILib::DelayedConnectionQueue(_dt, vec_weights[q]._params.at("delay"));
 		}
 	}
 
-	template <class WeightValue>
-	MPILib::AlgorithmGrid GridAlgorithm<WeightValue>::getGrid(MPILib::NodeId id, bool b_state) const
+	MPILib::AlgorithmGrid GridAlgorithm::getGrid(MPILib::NodeId id, bool b_state) const
 	{
 		// An empty grid will lead to crashes
 		vector<double> array_interpretation {0.};
@@ -274,8 +269,7 @@ namespace TwoDLib {
 		return MPILib::AlgorithmGrid(array_state,array_interpretation);
 	}
 
-	template <class WeightValue>
-	void GridAlgorithm<WeightValue>::reportDensity() const
+	void GridAlgorithm::reportDensity() const
 	{
 		std::ostringstream ost;
 		ost << _node_id  << "_" << (_t_cur-_dt);
@@ -297,21 +291,22 @@ namespace TwoDLib {
 		_sys.Dump(vec_str);
 	}
 
-	template <class WeightValue>
-	void GridAlgorithm<WeightValue>::prepareEvolve
+	void GridAlgorithm::prepareEvolve
 	(
 		const std::vector<MPILib::Rate>& nodeVector,
-		const std::vector<WeightValue>& weightVector,
+		const std::vector<CustomConnectionParameters>& weightVector,
 		const std::vector<MPILib::NodeType>& typeVector
 	)
 	{
-		if (_efficacy_map.size() == 0)
+		if (_efficacy_map.size() == 0){
 			FillMap(weightVector);
+		}
+
 		// take into account the number of connections
 
 		assert(nodeVector.size() == weightVector.size());
 		for (MPILib::Index i = 0; i < nodeVector.size(); i++){
-			_vec_rate_queues[0][i].push(nodeVector[i]*weightVector[i]._number_of_connections);
+			_vec_vec_delay_queues[0][i].updateQueue(nodeVector[i]*weightVector[i]._params.at("num_connections"));
 		}
 
 	}

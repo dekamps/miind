@@ -77,6 +77,7 @@ Ode2DSystemGroup::Ode2DSystemGroup
 ):
 _mesh_list(mesh_list),
 _vec_mesh_offset(MeshOffset(mesh_list)),
+_vec_vs(MeshVs(mesh_list)),
 _vec_length(InitializeLengths(mesh_list)),
 _vec_cumulative(InitializeCumulatives(mesh_list)),
 _vec_mass(InitializeMass()),
@@ -107,6 +108,7 @@ Ode2DSystemGroup::Ode2DSystemGroup
 ):
 _mesh_list(mesh_list),
 _vec_mesh_offset(MeshOffset(mesh_list)),
+_vec_vs(MeshVs(mesh_list)),
 _vec_length(InitializeLengths(mesh_list)),
 _vec_cumulative(InitializeCumulatives(mesh_list)),
 _vec_mass(InitializeMass()),
@@ -138,6 +140,23 @@ std::vector<MPILib::Number> Ode2DSystemGroup::MeshOffset(const std::vector<Mesh>
 			for( MPILib::Index j = 0; j < m.NrCellsInStrip(i); j++)
 				n_cell++;
 		vec_ret.push_back(n_cell + vec_ret.back());
+	}
+
+	return vec_ret;
+}
+
+std::vector<double> Ode2DSystemGroup::MeshVs(const std::vector<Mesh>& l) const
+{
+	std::vector<double> vec_ret; // first offset is 0
+	for (const Mesh& m: l){
+		for (MPILib::Index i = 0; i < m.NrStrips(); i++){
+			for( MPILib::Index j = 0; j < m.NrCellsInStrip(i); j++){
+				double v = 0.0;
+				for(double pv : m.Quad(i,j).getVecV())
+					v += pv;
+				vec_ret.push_back(v/4.0);
+			}
+		}
 	}
 
 	return vec_ret;
@@ -363,8 +382,9 @@ void Ode2DSystemGroup::RedistributeProbability(MPILib::Number steps)
 
 	}
 	MPILib::Time t_step = _mesh_list[0].TimeStep(); // they all should have the same time step
-	for (MPILib::Rate& f: _fs)
+	for (MPILib::Rate& f: _fs){
 		f /= t_step*steps;
+	}
 }
 
 void Ode2DSystemGroup::RedistributeProbability()

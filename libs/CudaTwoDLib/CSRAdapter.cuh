@@ -60,6 +60,12 @@ namespace CudaTwoDLib {
 
 							void CalculateGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<int>&, const std::vector<int>&);
 
+							void InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy);
+
+							void InitializeStaticGridConductanceEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy, const std::vector<fptype>& rest_vs);
+
+							void CalculateMeshGridDerivativeWithEfficacy(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates);
+
 							void SingleTransformStep();
 
               void AddDerivative();
@@ -81,12 +87,14 @@ namespace CudaTwoDLib {
 
 	          	std::vector<inttype> Offsets(const std::vector<TwoDLib::CSRMatrix>&) const;
 	          	std::vector<inttype> NrRows(const std::vector<TwoDLib::CSRMatrix>&) const;
+							std::vector<fptype> CellWidths(const std::vector<TwoDLib::CSRMatrix>&) const;
 
 	      			CudaOde2DSystemAdapter& _group;
               fptype                  _euler_timestep;
               inttype                 _nr_iterations;
               inttype                 _nr_m;
 							inttype									_nr_streams;
+							inttype									_nr_grid_connections;
 
 							std::vector<inttype>		_grid_transforms;
 							std::vector<inttype> 		_vecmats;
@@ -101,7 +109,14 @@ namespace CudaTwoDLib {
               std::vector<inttype> _offsets;
               std::vector<inttype> _nr_rows;
 
+							std::vector<fptype>	 _cell_widths;
+							std::vector<fptype*> _goes;
+							std::vector<fptype*> _stays;
+							std::vector<int*> _offset1s;
+							std::vector<int*> _offset2s;
+
               fptype* _dydt;
+							fptype* _cell_vs;
 
               int _blockSize;
               int _numBlocks;
