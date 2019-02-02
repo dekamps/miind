@@ -43,14 +43,16 @@ def generate_closing(outfile, steps, t_step, weighttype):
     else:
         type = "double"
 
-    outfile.write('\tTwoDLib::Display::getInstance()->animate(true, display_nodes,' + t_step + ');\n')
+    outfile.write('\tif (display_nodes.size() > 0)\n')
+    outfile.write('\t\tTwoDLib::Display::getInstance()->animate(true, display_nodes,' + t_step + ');\n')
     outfile.write('\tnetwork.startSimulation();\n')
     outfile.write('\tMPILib::utilities::ProgressBar *pb = new MPILib::utilities::ProgressBar(' + steps + ');\n')
     outfile.write('\tlong count = 0;\n')
     outfile.write('\twhile(count < ' + steps + ') {\n')
     outfile.write('\t\tnetwork.evolveSingleStep(std::vector<MPILib::ActivityType>());\n')
     outfile.write('\t\tnetwork.reportNodeActivities(rate_nodes, rate_node_intervals, (count * ' + t_step + '));\n')
-    outfile.write('\t\tTwoDLib::Display::getInstance()->updateDisplay(count);\n')
+    outfile.write('\t\tif (display_nodes.size() > 0)\n')
+    outfile.write('\t\t\tTwoDLib::Display::getInstance()->updateDisplay(count);\n')
     outfile.write('\t\tTwoDLib::GridReport<'+type+'>::getInstance()->reportDensity(density_nodes,density_node_start_times,density_node_end_times,density_node_intervals,(count * ' + t_step + '));\n')
     outfile.write('\t\t(*pb)++;\n')
     outfile.write('\t\tcount++;\n')
