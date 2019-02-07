@@ -31,14 +31,14 @@ namespace MPILib {
  */
 struct CustomConnectionParameters {
 
-  std::map<std::string, double> _params;
+  std::map<std::string, std::string> _params;
 
 	/**
 	 * default constructor
 	 */
 	CustomConnectionParameters()=default;
 
-  void setParam(std::string k, double v) {
+  void setParam(std::string k, std::string v) {
     _params[k] = v;
   }
 
@@ -48,7 +48,7 @@ struct CustomConnectionParameters {
 	 * @param efficacy synaptic efficacy
 	 * @param delay  delay of connection
 	 */
-	CustomConnectionParameters(std::map<std::string, double> params
+	CustomConnectionParameters(std::map<std::string, std::string> params
 	) :
 	_params(params) {}
 };
@@ -58,7 +58,7 @@ struct CustomConnectionParameters {
  * @param connection The connection
  * @return The efficacy of the connection
  */
-inline double getParam(const CustomConnectionParameters& connection, const std::string p_name) {
+inline std::string getParam(const CustomConnectionParameters& connection, const std::string p_name) {
 	return connection._params.at(p_name);
 }
 
@@ -68,7 +68,7 @@ inline double getParam(const CustomConnectionParameters& connection, const std::
  * @return The efficacy of the connection
  */
 inline double toEfficacy(const CustomConnectionParameters& connection) {
-	return connection._params.at("efficacy");
+	return std::stod(connection._params.at("efficacy"));
 }
 
 }

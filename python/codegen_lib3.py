@@ -177,7 +177,7 @@ def function_overrides(outfile,tree,typ):
     outfile.write('\t\t_density_node_end_times = density_node_end_times;\n')
     outfile.write('\t\t_density_node_intervals = density_node_intervals;\n')
     outfile.write('\t\t\n')
-    outfile.write('\t\tif (display_nodes.size() > 0)\n')
+    outfile.write('\t\tif (_display_nodes.size() > 0)\n')
     outfile.write('\t\t\tTwoDLib::Display::getInstance()->animate(true, display_nodes,_time_step);\n')
     outfile.write('\t\treturn '+ abstract_type(typ) +'::startSimulation();\n')
     outfile.write('\t}\n')
@@ -185,7 +185,7 @@ def function_overrides(outfile,tree,typ):
     t_step = tree.find('SimulationRunParameter/t_step')
     outfile.write('\t\tboost::python::list evolveSingleStep(boost::python::list c){\n')
     outfile.write('\t\tnetwork.reportNodeActivities(_rate_nodes, _rate_node_intervals, (_count * ' + t_step.text + '));\n')
-    outfile.write('\t\tif (display_nodes.size() > 0)\n')
+    outfile.write('\t\tif (_display_nodes.size() > 0)\n')
     outfile.write('\t\t\tTwoDLib::Display::getInstance()->updateDisplay(_count);\n')
     outfile.write('\t\tTwoDLib::GridReport<'+typ+'>::getInstance()->reportDensity(_density_nodes,_density_node_start_times,_density_node_end_times,_density_node_intervals,(_count * _time_step));\n')
     outfile.write('\t\t_count++;\n')
@@ -213,7 +213,7 @@ def matrix_transform_name(fn):
 
     tmatnames = []
     for a in ma:
-        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm']:
+        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm','GridSomaDendriteAlgorithm']:
             tmatnames.append(a.attrib['transformfile'])
     return tmatnames
 
@@ -226,7 +226,7 @@ def model_name(fn):
 
     modelnames = []
     for a in ma:
-        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm','MeshAlgorithm','MeshAlgorithmGroup']:
+        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm','GridSomaDendriteAlgorithm','MeshAlgorithm','MeshAlgorithmGroup']:
             modelnames.append(a.attrib['modelfile'])
     return modelnames
 

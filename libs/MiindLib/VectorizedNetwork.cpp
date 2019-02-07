@@ -165,17 +165,8 @@ void VectorizedNetwork::setupLoop(bool write_displays){
   for (unsigned int i=0; i<_grid_connections.size(); i++){
     // for each connection, which of group's meshes is being affected
     _connection_out_group_mesh.push_back(_node_id_to_group_mesh[_grid_connections[i]._out]);
-    // the input rate comes from the node indexed by connection _in
-    TwoDLib::Mesh::GridCellTransition cell_transition =
-      _group->MeshObjects()[_node_id_to_group_mesh[_grid_connections[i]._out]]
-      .calculateCellTransition(_grid_connections[i]._efficacy);
-    _stays.push_back(cell_transition._stays);
-    _goes.push_back(cell_transition._goes);
-    _off1s.push_back(cell_transition._offset_1);
-    _off2s.push_back(cell_transition._offset_2);
-    _effs.push_back(_grid_connections[i]._efficacy);
 
-    _connection_queue.push_back(MPILib::DelayedConnectionQueue(_vec_mesh[0].TimeStep(),_grid_connections[i]._delay));
+    _connection_queue.push_back(MPILib::DelayedConnectionQueue(_network_time_step,std::stod(_grid_connections[i]._params["delay"])));
     if ( _grid_connections[i]._external )
       if (_external_to_connection_queue.find(_grid_connections[i]._external_id) == _external_to_connection_queue.end()){
         _external_to_connection_queue.insert(
@@ -201,7 +192,7 @@ void VectorizedNetwork::setupLoop(bool write_displays){
     // now we're adding all the mesh transition matrices so set the correct index value
     _mesh_transform_indexes.push_back(_grid_meshes.size()+i);
 
-    _connection_queue.push_back(MPILib::DelayedConnectionQueue(_vec_mesh[0].TimeStep(),_mesh_connections[i]._delay));
+    _connection_queue.push_back(MPILib::DelayedConnectionQueue(_network_time_step,_mesh_connections[i]._delay));
     if ( _mesh_connections[i]._external )
       if (_external_to_connection_queue.find(_mesh_connections[i]._external_id) == _external_to_connection_queue.end()){
         _external_to_connection_queue.insert(
@@ -222,6 +213,8 @@ void VectorizedNetwork::setupLoop(bool write_displays){
 
   _csr_adapter = new CudaTwoDLib::CSRAdapter(*_group_adapter,_csrs,
   _mesh_connections.size()+_grid_connections.size(),h,_mesh_transform_indexes,_grid_transform_indexes);
+
+  _csr_adapter->InitializeStaticGridEfficacies(_connection_out_group_mesh, _effs);
 }
 
 std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities, unsigned int i_loop){
@@ -241,7 +234,7 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
   std::vector<fptype> rates;
   int connection_count = 0;
   for (unsigned int i=0; i<_grid_connections.size(); i++){
-    rates.push_back(_connection_queue[connection_count].getCurrentRate()*_grid_connections[i]._n_connections);
+    rates.push_back(_connection_queue[connection_count].getCurrentRate()*std::stod(_grid_connections[i]._params["num_connections"]));
     connection_count++;
   }
   for (unsigned int i=0; i<_mesh_connections.size(); i++){
@@ -261,7 +254,7 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
 
   for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++ ){
     _csr_adapter->ClearDerivative();
-    _csr_adapter->CalculateMeshGridDerivative(_connection_out_group_mesh, rates, _stays, _goes, _off1s, _off2s);
+    _csr_adapter->CalculateMeshGridDerivativeWithEfficacy(_connection_out_group_mesh,rates);
     _csr_adapter->AddDerivative();
   }
 
@@ -299,152 +292,12 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
 void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILib::Time t_report, bool write_displays) {
 	MPILib::Number n_iter = static_cast<MPILib::Number>(ceil((t_end - t_begin)/_network_time_step));
 
-  for(unsigned int i=0; i<_display_nodes.size(); i++){
-    TwoDLib::Display::getInstance()->addOdeSystem(_display_nodes[i], _group, _node_id_to_group_mesh[_display_nodes[i]]);
-  }
-
-  const MPILib::Time h = 1./_master_steps*_vec_mesh[0].TimeStep();
-
-  // Setup the OpenGL displays (if there are any required)
-  if(_display_nodes.size() > 0){
-	   TwoDLib::Display::getInstance()->animate(write_displays, _display_nodes, _network_time_step);
-   }
-
-  // Generate calculated transition vectors for grid derivative
-
-  for (unsigned int i=0; i<_grid_connections.size(); i++){
-    // for each connection, which of group's meshes is being affected
-    _connection_out_group_mesh.push_back(_node_id_to_group_mesh[_grid_connections[i]._out]);
-    // the input rate comes from the node indexed by connection _in
-    TwoDLib::Mesh::GridCellTransition cell_transition =
-      _group->MeshObjects()[_node_id_to_group_mesh[_grid_connections[i]._out]]
-      .calculateCellTransition(_grid_connections[i]._efficacy);
-    _stays.push_back(cell_transition._stays);
-    _goes.push_back(cell_transition._goes);
-    _off1s.push_back(cell_transition._offset_1);
-    _off2s.push_back(cell_transition._offset_2);
-    _effs.push_back(_grid_connections[i]._efficacy);
-
-    _connection_queue.push_back(MPILib::DelayedConnectionQueue(_vec_mesh[0].TimeStep(),_grid_connections[i]._delay));
-    if ( _grid_connections[i]._external )
-      if (_external_to_connection_queue.find(_grid_connections[i]._external_id) == _external_to_connection_queue.end()){
-        _external_to_connection_queue.insert(
-        std::pair<MPILib::NodeId,std::vector<MPILib::NodeId>>(_grid_connections[i]._external_id, std::vector<MPILib::NodeId>()));
-        _external_to_connection_queue[_grid_connections[i]._external_id].push_back(_connection_queue.size()-1);
-      } else {
-        _external_to_connection_queue[_grid_connections[i]._external_id].push_back(_connection_queue.size()-1);
-      }
-    else
-      if (_node_to_connection_queue.find(_grid_connections[i]._in) == _node_to_connection_queue.end()){
-        _node_to_connection_queue.insert(
-          std::pair<MPILib::NodeId, std::vector<MPILib::NodeId>>(_grid_connections[i]._in, std::vector<MPILib::NodeId>()));
-          _node_to_connection_queue[_grid_connections[i]._in].push_back(_connection_queue.size()-1);
-      } else {
-        _node_to_connection_queue[_grid_connections[i]._in].push_back(_connection_queue.size()-1);
-      }
-
-  }
-
-  for (unsigned int i=0; i<_mesh_connections.size(); i++){
-    _connection_out_group_mesh.push_back(_node_id_to_group_mesh[_mesh_connections[i]._out]);
-    _csrs.push_back(TwoDLib::CSRMatrix(*(_mesh_connections[i]._transition), *(_group), _node_id_to_group_mesh[_mesh_connections[i]._out]));
-    // _csrs contains all the grid transforms first (see initOde2DSystem)
-    // now we're adding all the mesh transition matrices so set the correct index value
-    _mesh_transform_indexes.push_back(_grid_meshes.size()+i);
-
-    _connection_queue.push_back(MPILib::DelayedConnectionQueue(_vec_mesh[0].TimeStep(),_mesh_connections[i]._delay));
-    if ( _mesh_connections[i]._external )
-      if (_external_to_connection_queue.find(_mesh_connections[i]._external_id) == _external_to_connection_queue.end()){
-        _external_to_connection_queue.insert(
-          std::pair<MPILib::NodeId, std::vector<MPILib::NodeId>>(_mesh_connections[i]._external_id, std::vector<MPILib::NodeId>()));
-          _external_to_connection_queue[_mesh_connections[i]._external_id].push_back(_connection_queue.size()-1);
-      } else {
-        _external_to_connection_queue[_mesh_connections[i]._external_id].push_back(_connection_queue.size()-1);
-      }
-    else
-      if (_node_to_connection_queue.find(_mesh_connections[i]._in) == _node_to_connection_queue.end()){
-        _node_to_connection_queue.insert(
-          std::pair<MPILib::NodeId, std::vector<MPILib::NodeId>>(_mesh_connections[i]._in, std::vector<MPILib::NodeId>()));
-          _node_to_connection_queue[_mesh_connections[i]._in].push_back(_connection_queue.size()-1);
-      } else {
-        _node_to_connection_queue[_mesh_connections[i]._in].push_back(_connection_queue.size()-1);
-      }
-  }
-
-  _csr_adapter = new CudaTwoDLib::CSRAdapter(*_group_adapter,_csrs,
-  _mesh_connections.size()+_grid_connections.size(),h,_mesh_transform_indexes,_grid_transform_indexes);
-
-  //_csr_adapter->InitializeStaticGridEfficacies(_connection_out_group_mesh, _effs);
+  setupLoop(write_displays);
 
   MPILib::utilities::ProgressBar *pb = new MPILib::utilities::ProgressBar(n_iter);
-	MPILib::Time time = 0;
   boost::timer::auto_cpu_timer timer;
 	for(MPILib::Index i_loop = 0; i_loop < n_iter; i_loop++){
-		time = _network_time_step*i_loop;
-
-    for( const auto& element: _rate_functions){
-      _current_node_rates[_group_mesh_to_node_id[element.first]] = element.second(time);
-      for(unsigned int i=0; i<_node_to_connection_queue[element.first].size(); i++){
-        _connection_queue[_node_to_connection_queue[element.first][i]].updateQueue(element.second(time));
-      }
-    }
-
-    std::vector<fptype> rates;
-    int connection_count = 0;
-    for (unsigned int i=0; i<_grid_connections.size(); i++){
-      rates.push_back(_connection_queue[connection_count].getCurrentRate()*_grid_connections[i]._n_connections);
-      connection_count++;
-    }
-
-    for (unsigned int i=0; i<_mesh_connections.size(); i++){
-      rates.push_back(_connection_queue[connection_count].getCurrentRate()*_mesh_connections[i]._n_connections);
-      connection_count++;
-    }
-
-    for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++ ){
-      _group_adapter->Evolve(_mesh_meshes);
-      _group_adapter->RemapReversal();
-
-      _csr_adapter->ClearDerivative();
-      _csr_adapter->SingleTransformStep();
-      _csr_adapter->AddDerivativeFull();
-    }
-
-    _group_adapter->RedistributeProbability(_grid_meshes);
-    _group_adapter->MapFinish(_grid_meshes);
-
-		for (MPILib::Index i_part = 0; i_part < _master_steps*_n_steps; i_part++ ){
-			_csr_adapter->ClearDerivative();
-      _csr_adapter->CalculateMeshGridDerivative(_connection_out_group_mesh,rates,_stays, _goes, _off1s, _off2s);
-      //_csr_adapter->CalculateMeshGridDerivativeWithEfficacy(_connection_out_group_mesh,rates);
-			_csr_adapter->AddDerivative();
-		}
-
-    _group_adapter->RedistributeProbability(_mesh_meshes);
-    _group_adapter->MapFinish(_mesh_meshes);
-
-    const std::vector<fptype>& group_rates = _group_adapter->F(_n_steps);
-
-    for(unsigned int i=0; i<group_rates.size(); i++){
-      _current_node_rates[_group_mesh_to_node_id[i]] = group_rates[i];
-      for(unsigned int j=0; j<_node_to_connection_queue[_group_mesh_to_node_id[i]].size(); j++){
-        _connection_queue[_node_to_connection_queue[_group_mesh_to_node_id[i]][j]].updateQueue(group_rates[i]);
-      }
-    }
-
-    if(_display_nodes.size() > 0){
-      _group_adapter->updateGroupMass();
-      TwoDLib::Display::getInstance()->updateDisplay(i_loop);
-    }
-
-    if(_density_nodes.size() > 0){
-      _group_adapter->updateGroupMass();
-      reportNodeDensities(time);
-    }
-
-		reportNodeActivities(time);
-
+    singleStep(std::vector<double>(), i_loop);
     (*pb)++;
-
 	}
 }

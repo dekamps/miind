@@ -110,10 +110,8 @@ namespace CudaTwoDLib {
               std::vector<inttype> _nr_rows;
 
 							std::vector<fptype>	 _cell_widths;
-							std::vector<fptype*> _goes;
-							std::vector<fptype*> _stays;
-							std::vector<int*> _offset1s;
-							std::vector<int*> _offset2s;
+							std::vector<std::map<int,fptype*>> _goes;
+							std::vector<std::map<int,fptype*>> _stays;
 
               fptype* _dydt;
 							fptype* _cell_vs;
