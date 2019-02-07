@@ -106,7 +106,7 @@ def matrix_transform_name(fn):
 
     tmatnames = []
     for a in ma:
-        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm']:
+        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm','GridSomaDendriteAlgorithm']:
             tmatnames.append(a.attrib['transformfile'])
     return tmatnames
 
@@ -119,7 +119,7 @@ def model_name(fn):
 
     modelnames = []
     for a in ma:
-        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm','MeshAlgorithm','MeshAlgorithmGroup']:
+        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm','GridSomaDendriteAlgorithm','MeshAlgorithm','MeshAlgorithmGroup']:
             modelnames.append(a.attrib['modelfile'])
     return modelnames
 

@@ -33,6 +33,7 @@ Triangle.cpp
 kd.cpp
 MasterGrid.cpp
 MasterGridJump.cpp
+MasterGridSomaDendrite.cpp
 Fid.cpp
 Euler.cpp
 MeshTree.cpp
@@ -48,6 +49,7 @@ Uniform.cpp
 set( TWOD_HEADERS
 display.hpp
 GridAlgorithmCode.hpp
+GridSomaDendriteAlgorithm.hpp
 GridReport.hpp
 Bin.hpp
 InputCombination.hpp
@@ -65,6 +67,7 @@ Master.hpp
 MasterOdeint.hpp
 MasterGrid.hpp
 MasterGridJump.hpp
+MasterGridSomaDendrite.hpp
 Ode2DSystem.hpp
 Ode2DSystemGroup.hpp
 TransitionList.hpp

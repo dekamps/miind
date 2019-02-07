@@ -1,5 +1,4 @@
-// Copyright (c) 2005 - 2012 Marc de Kamps
-//						2012 David-Matthias Sichau
+// Copyright (c) 2005 - 2015 Marc de Kamps
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,48 +15,57 @@
 // USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+#ifndef _CODE_LIBS_TWODLIB_MASTERGRIDSOMADENDRITE_INCLUDE_GUARD
+#define _CODE_LIBS_TWODLIB_MASTERGRIDSOMADENDRITE_INCLUDE_GUARD
 
-#ifndef MPILIB_DELAYEDCONNECTIONQUEUE_HPP_
-#define MPILIB_DELAYEDCONNECTIONQUEUE_HPP_
+#include <string>
+#include <map>
+#include <boost/numeric/odeint.hpp>
+#include "CSRMatrix.hpp"
+#include "TransitionMatrix.hpp"
+#include "Ode2DSystemGroup.hpp"
+#include "MasterParameter.hpp"
 
-#include <deque>
-#include <MPILib/include/TypeDefinitions.hpp>
-#include <math.h>
+namespace TwoDLib {
 
-namespace MPILib {
+	//! OpenMP version of a forward Euler integration of the Master equation
 
-/**
-* @brief This is a carbon copy of the DelayAlgorithm class.
-*/
-class DelayedConnectionQueue {
-public:
+	class MasterGridSomaDendrite {
+	public:
 
- /**
-  * Create algorithm with a delay time
-  * @param t_delay The delay time
-  */
- DelayedConnectionQueue(Time timestep = 0.001,Time delay = 0):
-   	_t_delay(delay),
-    _queue(1 + static_cast<int>(std::floor(delay/timestep)),0.0),
-    _t_delay_proprtion(std::abs(std::fmod(delay,timestep) - timestep) < 0.0000000001 ? 0.0 : std::fmod(delay,timestep)/timestep){
-    }
+		MasterGridSomaDendrite
+		(
+			Ode2DSystemGroup&,
+			double
+		);
 
- void updateQueue(ActivityType inRate);
+		void MVGrid(
+			vector<double>&       dydt,
+			const vector<double>& vec_mass,
+			double                rate,
+			unsigned int          efficiacy_index) const;
 
- ActivityType getCurrentRate() const;
+		void InitializeEfficacyVectors(unsigned int size);
+		void CalculateDynamicEfficiacies(vector<std::string>& conn_types, vector<double>& efficacy_map, vector<double>& rest_v, vector<double>& conductances);
 
- Time getDelayTime() const { return _t_delay; }
+		void Apply(double t_step, const vector<double>& rates);
 
-private:
+		void operator()(const vector<double>&, vector<double>&, const double t = 0);
 
- Time _t_delay;
- Time _t_delay_proprtion;
- ActivityType _rate_current;
+	private:
 
- std::deque<ActivityType> _queue;
+		MasterGridSomaDendrite& operator=(const MasterGridSomaDendrite&);
 
-};
+		Ode2DSystemGroup& _sys;
 
-} /* end namespace MPILib */
+		double _cell_width;
 
-#endif
+		vector<double>			_dydt;
+		vector<std::map<int, vector<double>>>		_stays;
+		vector<std::map<int, vector<double>>>		_goes;
+
+		const vector<double>* _p_vec_rates;
+	};
+}
+
+#endif // include guard

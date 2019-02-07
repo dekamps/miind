@@ -94,7 +94,7 @@ namespace TwoDLib {
 		GridReport<CustomConnectionParameters>::getInstance()->registerObject(_node_id, this);
 
 		_t_cur = par_run.getTBegin();
-		MPILib::Time t_step     = par_run.getTStep();
+		_network_time_step     = par_run.getTStep();
 
 		Quadrilateral q1 = _sys.MeshObjects()[0].Quad(1,0);
 		Quadrilateral q2 = _sys.MeshObjects()[0].Quad(1,1);
@@ -250,13 +250,13 @@ namespace TwoDLib {
 		_efficacy_map = std::vector<double>(vec_weights.size());
 
  		for(MPILib::Index i_weight = 0; i_weight < _efficacy_map.size(); i_weight++){
-			_efficacy_map[i_weight] = vec_weights[i_weight]._params.at("efficacy");
+			_efficacy_map[i_weight] = std::stod(vec_weights[i_weight]._params.at("efficacy"));
 		}
 
 		_vec_vec_delay_queues = std::vector< std::vector<MPILib::DelayedConnectionQueue> >(0); // MeshAlgorithm really only uses the first array, i.e. the rates it receives in prepareEvole
  		_vec_vec_delay_queues.push_back( std::vector<MPILib::DelayedConnectionQueue>(vec_weights.size()));
 		for(unsigned int q = 0; q < vec_weights.size(); q++){
-			_vec_vec_delay_queues[0][q] = MPILib::DelayedConnectionQueue(_dt, vec_weights[q]._params.at("delay"));
+			_vec_vec_delay_queues[0][q] = MPILib::DelayedConnectionQueue(_network_time_step, std::stod(vec_weights[q]._params.at("delay")));
 		}
 	}
 
@@ -306,7 +306,11 @@ namespace TwoDLib {
 
 		assert(nodeVector.size() == weightVector.size());
 		for (MPILib::Index i = 0; i < nodeVector.size(); i++){
-			_vec_vec_delay_queues[0][i].updateQueue(nodeVector[i]*weightVector[i]._params.at("num_connections"));
+			double offset = 0.0;
+			if (weightVector[i]._params.find("avgv_offset") != weightVector[i]._params.end())
+				offset = std::stod(weightVector[i]._params.at("avgv_offset"));
+
+			_vec_vec_delay_queues[0][i].updateQueue((offset + nodeVector[i])*std::stod(weightVector[i]._params.at("num_connections")));
 		}
 
 	}
