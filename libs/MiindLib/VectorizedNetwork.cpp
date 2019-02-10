@@ -90,7 +90,7 @@ void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps){
   _n_steps = par._N_steps;
   std::cout << "Using master solver n_steps = " << _master_steps << "\n";
 
-  _group_adapter = new CudaTwoDLib::CudaOde2DSystemAdapter(*(_group));
+  _group_adapter = new CudaTwoDLib::CudaOde2DSystemAdapter(*(_group), _network_time_step);
 }
 
 void VectorizedNetwork::reportNodeActivities(MPILib::Time sim_time){
@@ -130,12 +130,12 @@ void VectorizedNetwork::reportNodeDensities(MPILib::Time sim_time){
   }
 }
 
-void VectorizedNetwork::addGridConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, double delay){
-  _grid_connections.push_back(NodeGridConnection(in,out,efficacy,n_conns,delay));
+void VectorizedNetwork::addGridConnection(MPILib::NodeId in, MPILib::NodeId out, std::map<std::string, std::string> params){
+  _grid_connections.push_back(NodeGridConnection(in,out,params));
 }
 
-void VectorizedNetwork::addGridConnection(MPILib::NodeId out, double efficacy, int n_conns, double delay, MPILib::NodeId ext_id){
-  _grid_connections.push_back(NodeGridConnection(out,efficacy,n_conns,delay,ext_id));
+void VectorizedNetwork::addGridConnection(MPILib::NodeId out,std::map<std::string, std::string> params, MPILib::NodeId ext_id){
+  _grid_connections.push_back(NodeGridConnection(out,params,ext_id));
 }
 
 void VectorizedNetwork::addMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, double delay, TwoDLib::TransitionMatrix *tmat){
