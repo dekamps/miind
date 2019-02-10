@@ -96,6 +96,8 @@ namespace TwoDLib {
 		_t_cur = par_run.getTBegin();
 		_network_time_step     = par_run.getTStep();
 
+		_sys.InitializeResetRefractive(_network_time_step);
+
 		Quadrilateral q1 = _sys.MeshObjects()[0].Quad(1,0);
 		Quadrilateral q2 = _sys.MeshObjects()[0].Quad(1,1);
 

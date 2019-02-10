@@ -40,10 +40,16 @@ namespace CudaTwoDLib {
 	class CudaOde2DSystemAdapter {
 	public:
 
-		//! Standard Constructor
 		CudaOde2DSystemAdapter
 		(
 	           TwoDLib::Ode2DSystemGroup& group // The group must already be initialized. This will be checked and an exception will be thrown if it is suspected this has not happened
+		);
+
+		//! Standard Constructor
+		CudaOde2DSystemAdapter
+		(
+	           TwoDLib::Ode2DSystemGroup& group, // The group must already be initialized. This will be checked and an exception will be thrown if it is suspected this has not happened
+				 		MPILib::Time network_time_step
 
 		);
 
@@ -108,6 +114,7 @@ namespace CudaTwoDLib {
         inttype	 _n;
         inttype _mesh_size;
         fptype _time_step;
+				fptype _network_time_step;
 
 				std::vector<unsigned int> _nr_refractory_steps;
 				std::vector<fptype> _refractory_prop;

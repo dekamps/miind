@@ -36,12 +36,12 @@ public:
   unsigned int _external_id;
   MPILib::NodeId _in;
   MPILib::NodeId _out;
-  std::map<std::string, std::string> _params
+  std::map<std::string, std::string> _params;
 
   NodeGridConnection(MPILib::NodeId in, MPILib::NodeId out, std::map<std::string, std::string> params):
   _external(false),_external_id(0),_in(in),_out(out),_params(params){}
 
-  NodeGridConnection(MPILib::NodeId out, , std::map<std::string, std::string> params, MPILib::NodeId ext_id):
+  NodeGridConnection(MPILib::NodeId out, std::map<std::string, std::string> params, MPILib::NodeId ext_id):
   _external(true),_external_id(ext_id),_out(out),_params(params){}
 };
 
