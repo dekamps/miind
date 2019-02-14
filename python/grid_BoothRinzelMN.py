@@ -72,5 +72,5 @@ def BoothRinzelMNDendrite(y, t):
     return [v_prime, w_prime]
 
 
-grid_generate.generate(BoothRinzelMNSoma, 0.001, 0.001, 1e-3, 'soma', 0.98, -1.48, 0.0, -1.5, 1.0, -0.2, 1.2, 200, 200)
-grid_generate.generate(BoothRinzelMNDendrite, 0.001, 0.001, 1e-3, 'dendrite', 0.98, -1.48, 0.0, -1.5, 1.0, -0.2, 1.2, 200, 200)
+grid_generate.generate(BoothRinzelMNSoma, 0.001, 0.001, 1e-3, 'soma', 0.98, -1.48, 0.0, -1.5, 1.0, -0.2, 1.2, 400, 400)
+grid_generate.generate(BoothRinzelMNDendrite, 0.001, 0.001, 1e-3, 'dendrite', 0.98, -1.48, 0.0, -1.5, 1.0, -0.2, 1.2, 300, 300)
