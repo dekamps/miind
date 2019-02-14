@@ -241,7 +241,7 @@ def generate_connections(fn,conns, nodes, algorithms):
             f.write(connections.parse_mesh_connection(cn[5], nodemap, cpp_name))
 
         for cn in grid_cons:
-            f.write(connections.parse_grid_connection(cn[1],nodemap))
+            f.write(connections.parse_grid_vectorized_connection(cn[1],nodemap))
 
         f.write('\n')
 
