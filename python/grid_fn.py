@@ -19,7 +19,7 @@ def fn(y,t):
     'w_max':  0.8,
     'N_w': 20,
 
-    'I': 0.0,
+    'I': 0.5,
 
     }
 
@@ -31,4 +31,4 @@ def fn(y,t):
 
     return [v_prime, w_prime]
 
-grid_generate.generate(fn, 0.01, 1e-03, 1e-12, 'fn', 3.0, -3.0, 0.0, -3.0, 3.0, -1.0, 2.0, 400, 400)
+grid_generate.generate(fn, 0.1, 1e-03, 1e-12, 'fn', 2.5, -2.5, 0.0, -2.5, 2.5, -0.6, 1.6, 400, 400)
