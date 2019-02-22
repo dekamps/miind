@@ -179,10 +179,10 @@ class MeshTools:
 
         def onclick(event):
             toolbar = plt.get_current_fig_manager().toolbar
-            if (event.button is not 1) or (event.ydata is None) or (event.xdata is None) or toolbar.mode!='':
+            if (event.ydata is None) or (event.xdata is None) or (toolbar.mode is not ''):
                 return
             point = Point(event.xdata, event.ydata)
-            for poly_key, poly_val in polygons.iteritems():
+            for poly_key, poly_val in polygons.items():
                 if poly_val.contains(point):
                     print ('Clicked Cell ' + str(poly_key[0]) + ', ' + str(poly_key[1]))
 
@@ -206,7 +206,7 @@ class MeshTools:
         print ('\'c\' to clear all quads.')
         print( 'Double-Click to write the created quads to the Fiducial file and quit.')
         print ('\n')
-        from tools_lost import (add_fiducial, extract_base,
+        from .tools_lost import (add_fiducial, extract_base,
                                     plot_lost, read_fiducial,
                                     onclick, zoom_fun, onkey)
         backend = matplotlib.get_backend().lower()
