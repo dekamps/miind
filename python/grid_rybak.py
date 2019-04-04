@@ -64,5 +64,5 @@ def rybakInterneuron(y, t):
     return [v_prime, h_prime]
 
 
-grid_generate.generate(rybakInterneuron, 0.001, 0.001, 1e-3, 'grid', 60.0, -64.0, 0.0, -90, 60, -0.4, 1.0,300, 300)
-# grid_generate.generate(rybak, 1, 0.001, 1e-3, 'grid', -10, -56, -0.004, -110, 0, -0.4, 1.0,500, 200)
+#grid_generate.generate(rybakInterneuron, 0.001, 0.001, 1e-3, 'rybak_interneuron', 60.0, -64.0, 0.0, -90, 60, -0.4, 1.0,300, 300)
+grid_generate.generate(rybak, 0.1, 0.001, 1e-3, 'rybak_burster', -30, -56, -0.004, -120, -20, -0.4, 1.0 ,400, 300)
