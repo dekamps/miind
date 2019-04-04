@@ -119,7 +119,7 @@ def model_name(fn):
 
     modelnames = []
     for a in ma:
-        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm','GridSomaDendriteAlgorithm','MeshAlgorithm','MeshAlgorithmGroup']:
+        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm','GridSomaDendriteAlgorithm','MeshAlgorithm','MeshAlgorithmGroup','MeshAlgorithmCustom']:
             modelnames.append(a.attrib['modelfile'])
     return modelnames
 

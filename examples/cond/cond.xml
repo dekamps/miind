@@ -10,16 +10,16 @@
 </Algorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="E" name="Cond E" type="EXCITATORY_DIRECT" />
+<Node algorithm="E" name="CE" type="EXCITATORY_DIRECT" />
 <Node algorithm="Exc Input" name="Inp" type="NEUTRAL" />
 </Nodes>
 <Connections>
-<Connection In="Inp" Out="Cond E">1   0.05 0</Connection>
+<Connection In="Inp" Out="CE">1   0.05 0</Connection>
 </Connections>
 <Reporting>
-<Density node="Cond E" t_start="0.0" t_end="0.1" t_interval="0.001" />
-<!--<Display node="Cond E" />-->
-<Rate node="Cond E" />
+<Density node="CE" t_start="0.0" t_end="0.1" t_interval="0.001" />
+<Display node="CE" />
+<Rate node="CE" t_interval="0.001" />
 </Reporting>
 <SimulationIO>
 <SimulationName>cond.dat</SimulationName>
@@ -36,7 +36,7 @@
 <Dense_min>0</Dense_min>
 <Dense_max>2.5</Dense_max>
 </CanvasParameter>
-<CanvasNode Name="Cond E" />
+<CanvasNode Name="CE" />
 </SimulationIO>
 <SimulationRunParameter>
 <max_iter>1000000</max_iter>

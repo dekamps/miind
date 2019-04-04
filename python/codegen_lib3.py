@@ -91,11 +91,11 @@ def generate_closing(outfile, steps, t_step, weighttype, tree, prog_name):
     outfile.write('{\n')
     outfile.write('\tusing namespace boost::python;\n')
     outfile.write('\t' + define_abstract_type(type))
-    outfile.write('\tclass_<MiindModel, bases<' + abstract_type(type) + '>>("MiindModel", init<int,long>())\n')
+    outfile.write('\tclass_<MiindModel, bases<' + abstract_type(type) + '>>("MiindModel", init<int>())\n')
 
     if len(variable_list) > 0:
         var_types = variables.parse_variable_types(variable_list)
-        outfile.write('\t.def(init<int,long' + var_types + '>())\n')
+        outfile.write('\t.def(init<int' + var_types + '>())\n')
     outfile.write('\t.def("init", &MiindModel::init)\n')
     outfile.write('\t.def("init", &MiindModel::init)\n')
     outfile.write('\t.def("startSimulation", &MiindModel::startSimulation)\n')
@@ -111,19 +111,22 @@ def parse_xml(infile, outfile):
 
 def constructor_override(outfile,tree,typ):
 
+    t_begin = tree.find('SimulationRunParameter/t_begin')
+    t_end = tree.find('SimulationRunParameter/t_end')
+
     variable_list = tree.findall('Variable')
     variables.parse_variables(variable_list,outfile)
 
-    outfile.write('\tMiindModel(int num_nodes, long simulation_length ):\n')
-    outfile.write('\t\tMiindTvbModelAbstract(num_nodes, simulation_length),_count(0){\n')
+    outfile.write('\tMiindModel(int num_nodes):\n')
+    outfile.write('\t\tMiindTvbModelAbstract(num_nodes, ' + t_end.text + '-' + t_begin.text + '),_count(0){\n')
     outfile.write('#ifdef ENABLE_MPI\n')
     outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
     outfile.write('\tboost::mpi::environment env();\n')
     outfile.write('#endif\n')
     outfile.write('}\n\n')
 
-    outfile.write('\tMiindModel(long simulation_length ):\n')
-    outfile.write('\t\tMiindTvbModelAbstract(1, simulation_length),_count(0){\n')
+    outfile.write('\tMiindModel():\n')
+    outfile.write('\t\tMiindTvbModelAbstract(1, ' + t_end.text + '-' + t_begin.text + '),_count(0){\n')
     outfile.write('#ifdef ENABLE_MPI\n')
     outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
     outfile.write('\tboost::mpi::environment env();\n')
@@ -131,10 +134,10 @@ def constructor_override(outfile,tree,typ):
     outfile.write('}\n\n')
 
     if len(variable_list) > 0:
-        outfile.write('\tMiindModel(int num_nodes, long simulation_length \n')
+        outfile.write('\tMiindModel(int num_nodes \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
-        outfile.write('\t\tMiindTvbModelAbstract(num_nodes, simulation_length),_count(0)\n')
+        outfile.write('\t\tMiindTvbModelAbstract(num_nodes, ' + t_end.text + '-' + t_begin.text + '),_count(0)\n')
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{\n')
         outfile.write('#ifdef ENABLE_MPI\n')
@@ -144,10 +147,10 @@ def constructor_override(outfile,tree,typ):
         outfile.write('}\n\n')
 
     if len(variable_list) > 0:
-        outfile.write('\tMiindModel(long simulation_length \n')
+        outfile.write('\tMiindModel( \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
-        outfile.write('\t\tMiindTvbModelAbstract(1, simulation_length),_count(0)\n')
+        outfile.write('\t\tMiindTvbModelAbstract(1, ' + t_end.text + '-' + t_begin.text + '),_count(0)\n')
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{\n')
         outfile.write('#ifdef ENABLE_MPI\n')
@@ -250,7 +253,7 @@ def node_name_to_node_id(nodes):
 def generate_outputfile(infile, outfile, prog_name):
     generate_preamble(outfile)
     nettype, tree = parse_xml(infile,outfile)
-    outfile.write(nettype)
+
     algies = tree.findall('Algorithms')
     if len(algies) != 1:
         raise ValueError

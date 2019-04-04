@@ -19,8 +19,8 @@ def BoothRinzelMNSoma(y, t):
 
     phi_s = 0.2;
 
-    tau_v = 1;
-    tau_w = 1;
+    tau_v = 0.001;
+    tau_w = 0.001;
 
     v = y[0];
     w = y[1];
@@ -56,8 +56,8 @@ def BoothRinzelMNDendrite(y, t):
     v = y[0];
     w = y[1];
 
-    tau_v = 1;
-    tau_w = 1;
+    tau_v = 0.001;
+    tau_w = 0.001;
 
     I_l = -g_l * (v - V_l);
     I_ca = -g_ca * (v - V_ca) * ((1/2)*(1 + (np.tanh((v - v_1)/v_2))));
@@ -72,5 +72,5 @@ def BoothRinzelMNDendrite(y, t):
     return [v_prime, w_prime]
 
 
-grid_generate.generate(BoothRinzelMNSoma, 0.001, 0.001, 1e-3, 'soma', 0.98, -1.48, 0.0, -1.5, 1.0, -0.2, 1.2, 400, 400)
-grid_generate.generate(BoothRinzelMNDendrite, 0.001, 0.001, 1e-3, 'dendrite', 0.98, -1.48, 0.0, -1.5, 1.0, -0.2, 1.2, 300, 300)
+grid_generate.generate(BoothRinzelMNSoma, 0.0001, 1, 1e-8, 'soma', 0.98, -1.48, 0.0, -1.5, 1.0, -0.2, 1.2, 400, 400)
+grid_generate.generate(BoothRinzelMNDendrite, 0.0001, 1, 1e-8, 'dendrite', 0.98, -1.48, 0.0, -1.5, 1.0, -0.2, 1.2, 300, 300)

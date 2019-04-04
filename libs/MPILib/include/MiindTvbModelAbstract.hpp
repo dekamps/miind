@@ -20,7 +20,7 @@ template<class Weight, class NodeDistribution>
 class MiindTvbModelAbstract {
 public:
 
-	MiindTvbModelAbstract(int num_nodes, long simulation_length) :
+	MiindTvbModelAbstract(int num_nodes, double simulation_length) :
 		_num_nodes(num_nodes), _simulation_length(simulation_length){
 	}
 
@@ -75,12 +75,16 @@ public:
 		return _time_step;
 	}
 
+	double getSimulationLength() {
+		return _simulation_length;
+	}
+
 protected:
 	MPINetwork<Weight, NodeDistribution> network;
 	report::handler::AbstractReportHandler *report_handler;
 	boost::timer::auto_cpu_timer t;
 	utilities::ProgressBar *pb;
-	long _simulation_length; // ms
+	double _simulation_length; // ms
 	double _time_step; // ms
 	int _num_nodes;
 };
@@ -93,7 +97,8 @@ void define_python_MiindTvbModelAbstract()
 				.def("startSimulation", &MiindTvbModelAbstract<Weight, NodeDistribution>::startSimulation)
 				.def("endSimulation", &MiindTvbModelAbstract<Weight, NodeDistribution>::endSimulation)
 				.def("evolveSingleStep", &MiindTvbModelAbstract<Weight, NodeDistribution>::evolveSingleStep)
-				.def("getTimeStep", &MiindTvbModelAbstract<Weight, NodeDistribution>::getTimeStep);
+				.def("getTimeStep", &MiindTvbModelAbstract<Weight, NodeDistribution>::getTimeStep)
+				.def("getSimulationLength", &MiindTvbModelAbstract<Weight, NodeDistribution>::getSimulationLength);
 }
 
 }

@@ -254,6 +254,54 @@ def parse_mesh_algorithm(alg, i, weighttype):
 
     return s
 
+def parse_mesh_algorithm_custom(alg, i, weighttype):
+    s = ''
+    if alg.attrib['type'] != 'MeshAlgorithmCustom':
+        raise ValueError
+
+    if weighttype.text ==  "CustomConnectionParameters":
+        type = "MPILib::" + weighttype.text
+    else:
+        type = "double"
+
+
+    s += '\tstd::vector<std::string> '
+    vec_name = 'vec_mat_' + str(i)
+    s += vec_name + '{\"'
+
+    matfilelist = alg.findall('MatrixFile')
+    # don't use i below
+    for k, fl in enumerate(matfilelist):
+        if k > 0:
+            s +='\",\"'
+        s += fl.text
+    s += '\"};\n'
+
+    timestep = alg.find('TimeStep')
+
+    cpp_name = 'alg_mesh_' + str(i)
+
+    if 'solver' in alg.attrib.keys():
+        # solver type must be provided without TwoDLib::
+        s += '\tTwoDLib::MeshAlgorithmCustom<TwoDLib::' + alg.attrib['solver'] + '> ' + cpp_name + '(\"'
+    else:
+
+        s += '\tTwoDLib::MeshAlgorithmCustom<TwoDLib::MasterOdeint> ' + cpp_name + '(\"'
+    s += alg.attrib['modelfile'] + '\",' + vec_name + ',' + timestep.text
+
+    if 'tau_refractive' in alg.keys():
+        s += ', '  + alg.attrib['tau_refractive']
+    else:
+        s += ', 0.0'
+    if 'ratemethod' in alg.keys():
+        s += ', '  + "\"" + alg.attrib['ratemethod'] + "\""
+    s += ');\n'
+
+
+    Register(alg.attrib['name'], cpp_name)
+
+    return s
+
 
 def parse_grid_algorithm(alg, i, weighttype):
     s = ''
@@ -532,6 +580,11 @@ def parse_algorithm(alg,i,weighttype,for_lib=False):
             return parse_mesh_algorithm(alg,i,weighttype)
         else:
             raise NameError('Wrong conection type for MeshAlgorithm')
+    if algname =='MeshAlgorithmCustom':
+        if weighttype.text == 'CustomConnectionParameters':
+            return parse_mesh_algorithm_custom(alg,i,weighttype)
+        else:
+            raise NameError('Wrong conection type for MeshAlgorithmCustom')
     if algname =='GridAlgorithm':
         if weighttype.text == 'CustomConnectionParameters':
             return parse_grid_algorithm(alg,i,weighttype)
