@@ -52,6 +52,12 @@ class Visualizer:
         self.h.GetYaxis().SetAxisColor(AXISCOLOR)
         self.h.GetXaxis().SetLabelColor(AXISCOLOR)
         self.h.GetYaxis().SetLabelColor(AXISCOLOR)
+        self.h.GetXaxis().SetLabelSize(0.05)
+        self.h.GetXaxis().SetLabelOffset(0.02)
+        self.h.GetYaxis().SetLabelSize(0.05)
+        self.h.GetYaxis().SetLabelOffset(0.02)
+        self.h.GetXaxis().SetNdivisions(5)
+        
         self.p.cd()
         self.h.Draw()
         
@@ -248,7 +254,7 @@ class Visualizer:
         self.c.Modified()
         self.c.Update()
         if pdfname != '':
-            self.c.SaveAs(pdfname +'.pdf')
+            self.c.SaveAs(pdfname +'.pdf','pdf')
 
     def show(self,xlabel='',ylabel='',pdfname='',points=[],pointcolor=3, runningtext='', colorlegend=DEFAULT_COLOR_LEGEND):
         dens=self.density()
