@@ -31,7 +31,7 @@ print('Timestep from XML : {}'.format(timestep))
 if miindmodel.startSimulation() > 0 :
     quit()
 
-constant_input = [1500]
+constant_input = [2500]
 activities = []
 for i in range(int(simulation_length/timestep)): #0.001 is the time step defined in the xml
     activities.append(miindmodel.evolveSingleStep(constant_input)[0])

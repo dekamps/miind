@@ -15,18 +15,18 @@
 </Algorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="LIF_excitatory Algorithm" name="LIF E" type="EXCITATORY_DIRECT" />
+<Node algorithm="LIF_excitatory Algorithm" name="LIFE" type="EXCITATORY_DIRECT" />
 <Node algorithm="Exc Input" name="Excit" type="NEUTRAL" />
 <Node algorithm="Inh Input" name="Inhib" type="NEUTRAL" />
 </Nodes>
 <Connections>
-<Connection In="Excit" Out="LIF E">1  1. 0</Connection>
-<!--<Connection In="Inhib" Out="LIF E">1 -1. 0</Connection>-->
+<Connection In="Excit" Out="LIFE">1  1. 0</Connection>
+<!--<Connection In="Inhib" Out="LIFE">1 -1. 0</Connection>-->
 </Connections>
 <Reporting>
-<Density node="LIF E" t_start="0.0" t_end="1.0" t_interval="0.001" />
-<!--<Display node="LIF E" />-->
-<Rate node="LIF E" />
+<Density node="LIFE" t_start="0.0" t_end="1.0" t_interval="0.001" />
+<!--<Display node="LIFE" />-->
+<Rate node="LIFE" t_interval="0.001"/>
 </Reporting>
 <SimulationIO>
 <SimulationName>single</SimulationName>
@@ -43,7 +43,7 @@
 <Dense_min>0</Dense_min>
 <Dense_max>2.5</Dense_max>
 </CanvasParameter>
-<CanvasNode Name="LIF E" />
+<CanvasNode Name="LIFE" />
 </SimulationIO>
 <SimulationRunParameter>
 <max_iter>1000000</max_iter>
