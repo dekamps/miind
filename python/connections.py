@@ -116,6 +116,30 @@ def parse_external_incoming_mesh_connection(connection, nodemap, mat_name, id, n
 
     return '\t' + network_name + '.addMeshConnection('+ o +','+ eff +','+ num_cons +',(double)'+delay+',&'+ mat_name +','+ str(id) +');\n'
 
+def parse_mesh_vectorized_connection(connection, nodemap, mat_name, network_name='network'):
+    i = str(nodemap[connection.attrib['In']])
+    o = str(nodemap[connection.attrib['Out']])
+    s = '\tstd::map<std::string, std::string> params_' + i  + '_' + o + ';\n'
+    for ak,av in connection.attrib.items():
+        if ak in ['In', 'Out']:
+            continue
+        s += '\tparams_' + i  + '_' + o + '[\"' + ak + '\"] = \"' + av + '\";\n'
+
+    s += '\t' + network_name + '.addGridConnection('+ i +','+ o +', params_' + i  + '_' + o + ',&'+ mat_name +');\n'
+    return s
+
+def parse_external_incoming_mesh_vectorized_connection(connection, nodemap, mat_name, id, network_name='network'):
+    o = str(nodemap[connection.attrib['Node']])
+
+    s = '\tstd::map<std::string, std::string> params_extern_' + o + ';\n'
+    for ak,av in connection.attrib.items():
+        if ak in ['Node']:
+            continue
+        s += '\tparams_extern_' + o + '[\"' + ak + '\"] = \"' + av + '\";\n'
+
+    s += '\t' + network_name + '.addGridConnection('+ i +', params_extern_' + o + ',&'+ mat_name +',' + str(id) + ');\n'
+    return s
+
 def parse_connections(connection_list,weighttype,outfile):
     for connection in connection_list:
         s = parse_connection(connection,weighttype)

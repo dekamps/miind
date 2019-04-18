@@ -441,7 +441,7 @@ def construct_monitor_external(nodes,algorithms, connections):
 
     return gridlist
 
-def generate_connections(fn,conns, external_incoming_connections, external_outgoing_connections, nodes, algorithms):
+def generate_connections(fn,conns, external_incoming_connections, external_outgoing_connections, nodes, algorithms, weighttype):
     members = ''
     grid_cons = construct_grid_connection_map(nodes, algorithms, conns)
     grid_cons_ext = construct_grid_connection_map_external(nodes, algorithms, external_incoming_connections)
@@ -452,24 +452,39 @@ def generate_connections(fn,conns, external_incoming_connections, external_outgo
 
     external_node_id = 0
     with open(fn,'a') as f:
-        for cn in mesh_cons:
-            cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
-            members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
-            f.write('\t' + cpp_name + '.push_back(TwoDLib::TransitionMatrix(\"' + cn[1] + '\"));\n')
-            f.write(connections.parse_mesh_connection(cn[5], nodemap, cpp_name +'[i]', 'vec_network'))
+        if weighttype.text ==  "DelayedConnection":
+            for cn in mesh_cons:
+                cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
+                members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
+                f.write('\t' + cpp_name + '.push_back(TwoDLib::TransitionMatrix(\"' + cn[1] + '\"));\n')
+                f.write(connections.parse_mesh_connection(cn[5], nodemap, cpp_name +'[i]', 'vec_network'))
 
-        for cn in mesh_cons_ext:
-            cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_ext_' + str(cn[3])
-            members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
-            f.write('\t' + cpp_name + '.push_back(TwoDLib::TransitionMatrix(\"' + cn[1] + '\"));\n')
-            f.write(connections.parse_external_incoming_mesh_connection(cn[4], nodemap, cpp_name +'[i]', external_node_id, 'vec_network'))
-            external_node_id = external_node_id + 1
+            for cn in mesh_cons_ext:
+                cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_ext_' + str(cn[3])
+                members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
+                f.write('\t' + cpp_name + '.push_back(TwoDLib::TransitionMatrix(\"' + cn[1] + '\"));\n')
+                f.write(connections.parse_external_incoming_mesh_connection(cn[4], nodemap, cpp_name +'[i]', external_node_id, 'vec_network'))
+                external_node_id = external_node_id + 1
+
+        if weighttype.text ==  "CustomConnectionParameters":
+            for cn in mesh_cons:
+                cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
+                members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
+                f.write('\t' + cpp_name + '.push_back(TwoDLib::TransitionMatrix(\"' + cn[1] + '\"));\n')
+                f.write(connections.parse_mesh_vectorized_connection(cn[5], nodemap, cpp_name +'[i]', 'vec_network'))
+
+            for cn in mesh_cons_ext:
+                cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_ext_' + str(cn[3])
+                members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
+                f.write('\t' + cpp_name + '.push_back(TwoDLib::TransitionMatrix(\"' + cn[1] + '\"));\n')
+                f.write(connections.parse_external_incoming_mesh_vectorized_connection(cn[4], nodemap, cpp_name +'[i]', external_node_id, 'vec_network'))
+                external_node_id = external_node_id + 1
 
         for cn in grid_cons:
-            f.write(connections.parse_grid_connection(cn[1],nodemap, 'vec_network'))
+            f.write(connections.parse_grid_vectorized_connection(cn[1],nodemap, 'vec_network'))
 
         for cn in grid_cons_ext:
-            f.write(connections.parse_external_incoming_grid_connection(cn[1],nodemap, external_node_id, 'vec_network'))
+            f.write(connections.parse_external_incoming_grid_vectorized_connection(cn[1],nodemap, external_node_id, 'vec_network'))
             external_node_id = external_node_id + 1
 
         for cn in mesh_ext:
@@ -494,7 +509,7 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
     weighttype = root.find('WeightType')
     generate_opening(fn, root, weighttype.text, algorithms, variables)
     members = generate_model_files(fn,nodes,algorithms)
-    members += generate_connections(fn,connections,external_incoming_connections, external_outgoing_connections,nodes,algorithms)
+    members += generate_connections(fn,connections,external_incoming_connections, external_outgoing_connections,nodes,algorithms,weighttype)
     generate_closing(fn,parameter,root,weighttype.text,progname,members)
 
 def sanity_check(algorithms):

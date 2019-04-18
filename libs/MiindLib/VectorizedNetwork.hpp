@@ -45,6 +45,22 @@ public:
   _external(true),_external_id(ext_id),_out(out),_params(params){}
 };
 
+class NodeMeshCustomConnection {
+public:
+  bool _external;
+  unsigned int _external_id;
+  MPILib::NodeId _in;
+  MPILib::NodeId _out;
+  TwoDLib::TransitionMatrix *_transition;
+  std::map<std::string, std::string> _params;
+
+  NodeMeshCustomConnection(MPILib::NodeId in, MPILib::NodeId out, std::map<std::string, std::string> params, TwoDLib::TransitionMatrix *trans):
+  _external(false),_external_id(0),_in(in),_out(out),_params(params),_transition(trans){}
+
+  NodeMeshCustomConnection(MPILib::NodeId out, std::map<std::string, std::string> params, TwoDLib::TransitionMatrix *trans, MPILib::NodeId ext_id):
+  _external(true),_external_id(ext_id),_out(out),_params(params),_transition(trans){}
+};
+
 class VectorizedNetwork {
 public:
   VectorizedNetwork(MPILib::Time time_step);
@@ -82,6 +98,11 @@ public:
   void addMeshConnection(MPILib::NodeId in, MPILib::NodeId out, double efficacy, int n_conns, double delay, TwoDLib::TransitionMatrix *tmat);
 
   void addMeshConnection(MPILib::NodeId out, double efficacy, int n_conns, double delay, TwoDLib::TransitionMatrix *tmat, MPILib::NodeId ext_id);
+
+  void addMeshCustomConnection(MPILib::NodeId in, MPILib::NodeId out, std::map<std::string, std::string> params, TwoDLib::TransitionMatrix *tmat);
+
+  void addMeshCustomConnection(MPILib::NodeId out,std::map<std::string, std::string> params,  TwoDLib::TransitionMatrix *tmat, MPILib::NodeId ext_id);
+
 
   void reportNodeActivities(MPILib::Time sim_time);
   void reportNodeDensities(MPILib::Time sim_time);
@@ -154,6 +175,7 @@ protected:
   std::vector<inttype> _monitored_nodes;
 
   std::vector<NodeMeshConnection> _mesh_connections;
+  std::vector<NodeMeshCustomConnection> _mesh_custom_connections;
   std::vector<NodeGridConnection> _grid_connections;
 
   function_list _rate_functions;
