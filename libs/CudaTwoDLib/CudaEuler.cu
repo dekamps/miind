@@ -106,6 +106,7 @@ __global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays
     for (int i = index; i < N; i+= stride ){
       int io = i+offset;
       fptype dr = 0.;
+
       dr += stays*mass[(modulo(io+offset_1,N))+offset];
   		dr += goes*mass[(modulo(io+offset_2,N))+offset];
       dr -= mass[io];
