@@ -2,31 +2,31 @@
 <WeightType>DelayedConnection</WeightType>
 <Variable Name="omega">1.0</Variable>
 <Algorithms>
-<Algorithm type="MeshAlgorithm" name="LIF_excitatory Algorithm" modelfile="aexp.model" >
+<Algorithm type="MeshAlgorithmGroup" name="ALG_ADEX" modelfile="aexp.model" >
 <TimeStep>0.00001</TimeStep>
 <!--<MatrixFile>aexp_-1_0_0.mat</MatrixFile>-->
 <MatrixFile>aexp_1_0_0.mat</MatrixFile>
 </Algorithm>
-<Algorithm type="RateFunctor" name="Exc Input">
+<Algorithm type="RateFunctor" name="ExcInput">
 <expression>2000.</expression>
 </Algorithm>
-<Algorithm type="RateFunctor" name="Inh Input">
+<Algorithm type="RateFunctor" name="InhInput">
 <expression><![CDATA[t < 0.1 ? 0. : 0.]]></expression>
 </Algorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="LIF_excitatory Algorithm" name="LIF E" type="EXCITATORY_DIRECT" />
-<Node algorithm="Exc Input" name="Excit" type="NEUTRAL" />
-<Node algorithm="Inh Input" name="Inhib" type="NEUTRAL" />
+<Node algorithm="ALG_ADEX" name="ADEX" type="EXCITATORY_DIRECT" />
+<Node algorithm="ExcInput" name="Excit" type="NEUTRAL" />
+<Node algorithm="InhInput" name="Inhib" type="NEUTRAL" />
 </Nodes>
 <Connections>
-<Connection In="Excit" Out="LIF E">1  1. 0</Connection>
-<!--<Connection In="Inhib" Out="LIF E">1 -1. 0</Connection>-->
+<Connection In="Excit" Out="ADEX">1  1. 0</Connection>
+<!--<Connection In="Inhib" Out="ADEX">1 -1. 0</Connection>-->
 </Connections>
 <Reporting>
-<Density node="LIF E" t_start="0.0" t_end="1.0" t_interval="0.001" />
-<!--<Display node="LIF E" />-->
-<Rate node="LIF E" />
+<Density node="ADEX" t_start="0.0" t_end="1.0" t_interval="0.001" />
+<Display node="ADEX" />
+<Rate node="ADEX" t_interval="0.001"/>
 </Reporting>
 <SimulationIO>
 <SimulationName>single</SimulationName>
@@ -43,7 +43,7 @@
 <Dense_min>0</Dense_min>
 <Dense_max>2.5</Dense_max>
 </CanvasParameter>
-<CanvasNode Name="LIF E" />
+<CanvasNode Name="ADEX" />
 </SimulationIO>
 <SimulationRunParameter>
 <max_iter>1000000</max_iter>

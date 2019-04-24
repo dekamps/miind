@@ -134,7 +134,7 @@ def constructor_override(outfile,tree,typ):
     outfile.write('}\n\n')
 
     if len(variable_list) > 0:
-        outfile.write('\tMiindModel(int num_nodes \n')
+        outfile.write('\tMiindModel(int num_nodes, \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
         outfile.write('\t\tMiindTvbModelAbstract(num_nodes, ' + t_end.text + '-' + t_begin.text + '),_count(0)\n')

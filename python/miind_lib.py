@@ -51,20 +51,24 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, parameters,
         f.write('\n')
 
 def constructor_override(outfile,tree,typ):
+
+    t_begin = tree.find('SimulationRunParameter/t_begin')
+    t_end = tree.find('SimulationRunParameter/t_end')
+
     variable_list = tree.findall('Variable')
     variables.parse_variables(variable_list,outfile)
     t_step = tree.find('SimulationRunParameter/t_step')
 
-    outfile.write('\tMiindModel(int num_nodes, long simulation_length ):\n')
-    outfile.write('\t\tMiindTvbModelAbstract(num_nodes, simulation_length), vec_network('+ t_step.text +'),_count(0){\n')
+    outfile.write('\tMiindModel(int num_nodes):\n')
+    outfile.write('\t\tMiindTvbModelAbstract(num_nodes,  ' + t_end.text + '-' + t_begin.text + '), vec_network('+ t_step.text +'),_count(0){\n')
     outfile.write('#ifdef ENABLE_MPI\n')
     outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
     outfile.write('\tboost::mpi::environment env();\n')
     outfile.write('#endif\n')
     outfile.write('}\n\n')
 
-    outfile.write('\tMiindModel(long simulation_length ):\n')
-    outfile.write('\t\tMiindTvbModelAbstract(1, simulation_length), vec_network('+ t_step.text +'),_count(0){\n')
+    outfile.write('\tMiindModel():\n')
+    outfile.write('\t\tMiindTvbModelAbstract(1,  ' + t_end.text + '-' + t_begin.text + '), vec_network('+ t_step.text +'),_count(0){\n')
     outfile.write('#ifdef ENABLE_MPI\n')
     outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
     outfile.write('\tboost::mpi::environment env();\n')
@@ -76,10 +80,10 @@ def constructor_override(outfile,tree,typ):
     outfile.write('\tMiindTvbModelAbstract(1, rhs._simulation_length), vec_network('+ t_step.text +'),_count(rhs._count) {}\n\n')
 
     if len(variable_list) > 0:
-        outfile.write('\tMiindModel(int num_nodes, long simulation_length \n')
+        outfile.write('\tMiindModel(int num_nodes, \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
-        outfile.write('\t\tMiindTvbModelAbstract(num_nodes, simulation_length), vec_network('+ t_step.text +'),_count(0)\n')
+        outfile.write('\t\tMiindTvbModelAbstract(num_nodes,  ' + t_end.text + '-' + t_begin.text + '), vec_network('+ t_step.text +'),_count(0)\n')
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{\n')
         outfile.write('#ifdef ENABLE_MPI\n')
@@ -89,10 +93,10 @@ def constructor_override(outfile,tree,typ):
         outfile.write('}\n\n')
 
     if len(variable_list) > 0:
-        outfile.write('\tMiindModel(long simulation_length \n')
+        outfile.write('\tMiindModel( \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
-        outfile.write('\t\tMiindTvbModelAbstract(1, simulation_length), vec_network('+ t_step.text +'),_count(0)\n')
+        outfile.write('\t\tMiindTvbModelAbstract(1,  ' + t_end.text + '-' + t_begin.text + '), vec_network('+ t_step.text +'),_count(0)\n')
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{\n')
         outfile.write('#ifdef ENABLE_MPI\n')
@@ -123,7 +127,7 @@ def function_overrides(outfile,tree,typ):
 
     outfile.write('\tint startSimulation(){\n')
     outfile.write('\t\tvec_network.setupLoop(true);\n')
-    outfile.write('\t\tpb = new utilities::ProgressBar((int)_simulation_length/_time_step);\n')
+    outfile.write('\t\tpb = new utilities::ProgressBar((int)(_simulation_length/_time_step));\n')
     outfile.write('\t\treturn 0;\n')
     outfile.write('\t}\n')
 
@@ -220,11 +224,11 @@ def generate_closing(fn,parameters,tree,type,prog_name,members):
         f.write('{\n')
         f.write('\tusing namespace boost::python;\n')
         f.write('\t' + define_abstract_type(type))
-        f.write('\tclass_<MiindModel, bases<' + abstract_type(type) + '>>("MiindModel", init<int,long>())\n')
+        f.write('\tclass_<MiindModel, bases<' + abstract_type(type) + '>>("MiindModel", init<int>())\n')
 
         if len(variable_list) > 0:
             var_types = variables.parse_variable_types(variable_list)
-            f.write('\t.def(init<int,long' + var_types + '>())\n')
+            f.write('\t.def(init<int' + var_types + '>())\n')
         f.write('\t.def("init", &MiindModel::init)\n')
         f.write('\t.def("init", &MiindModel::init)\n')
         f.write('\t.def("startSimulation", &MiindModel::startSimulation)\n')
@@ -265,7 +269,7 @@ def generate_model_files(fn, nodes,algorithms):
                     algorithm = alg
 
             if algorithm.attrib['type'] == 'MeshAlgorithmGroup':
-              ref = 0.0
+              ref = '0.0'
               if 'tau_refractive' in algorithm.attrib.keys():
                    ref = algorithm.attrib['tau_refractive']
 

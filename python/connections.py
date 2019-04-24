@@ -38,7 +38,7 @@ def parse_connection(connection, weighttype):
         for ak,av in connection.attrib.items():
             if ak == 'In' or ak == 'Out':
                 continue
-            s += '\tcon_' + i + '_' + o + tally + '.setParam(\"' + ak + '\", \"' + av +'\");\n'
+            s += '\tcon_' + i + '_' + o + tally + '.setParam(\"' + ak + '\", std::to_string(' + av +'));\n'
     else:
         if weighttype.text == 'double':
             s += '\tdouble con_' + i + '_' + o + tally + '('
@@ -82,7 +82,7 @@ def parse_grid_vectorized_connection(connection, nodemap, network_name='network'
     for ak,av in connection.attrib.items():
         if ak in ['In', 'Out']:
             continue
-        s += '\tparams_' + i  + '_' + o + '[\"' + ak + '\"] = \"' + av + '\";\n'
+        s += '\tparams_' + i  + '_' + o + '[\"' + ak + '\"] = std::to_string(' + av + ');\n'
 
     s += '\t' + network_name + '.addGridConnection('+ i +','+ o +', params_' + i  + '_' + o + ');\n'
     return s
@@ -94,9 +94,9 @@ def parse_external_incoming_grid_vectorized_connection(connection, nodemap, id, 
     for ak,av in connection.attrib.items():
         if ak in ['Node']:
             continue
-        s += '\tparams_extern_' + o + '[\"' + ak + '\"] = \"' + av + '\";\n'
+        s += '\tparams_extern_' + o + '[\"' + ak + '\"] = std::to_string(' + av + ');\n'
 
-    s += '\t' + network_name + '.addGridConnection('+ i +', params_extern_' + o + ',' + str(id) + ');\n'
+    s += '\t' + network_name + '.addGridConnection('+ o +', params_extern_' + o + ',' + str(id) + ');\n'
     return s
 
 def parse_mesh_connection(connection, nodemap, mat_name, network_name='network'):
@@ -123,7 +123,7 @@ def parse_mesh_vectorized_connection(connection, nodemap, mat_name, network_name
     for ak,av in connection.attrib.items():
         if ak in ['In', 'Out']:
             continue
-        s += '\tparams_' + i  + '_' + o + '[\"' + ak + '\"] = \"' + av + '\";\n'
+        s += '\tparams_' + i  + '_' + o + '[\"' + ak + '\"] = std::to_string(' + av + ');\n'
 
     s += '\t' + network_name + '.addGridConnection('+ i +','+ o +', params_' + i  + '_' + o + ',&'+ mat_name +');\n'
     return s
@@ -135,9 +135,9 @@ def parse_external_incoming_mesh_vectorized_connection(connection, nodemap, mat_
     for ak,av in connection.attrib.items():
         if ak in ['Node']:
             continue
-        s += '\tparams_extern_' + o + '[\"' + ak + '\"] = \"' + av + '\";\n'
+        s += '\tparams_extern_' + o + '[\"' + ak + '\"] = std::to_string(' + av + ');\n'
 
-    s += '\t' + network_name + '.addGridConnection('+ i +', params_extern_' + o + ',&'+ mat_name +',' + str(id) + ');\n'
+    s += '\t' + network_name + '.addGridConnection('+ o +', params_extern_' + o + ',&'+ mat_name +',' + str(id) + ');\n'
     return s
 
 def parse_connections(connection_list,weighttype,outfile):
@@ -174,7 +174,7 @@ def parse_incoming_connection(connection, weighttype):
         for ak,av in connection.attrib.items():
             if ak == 'Node':
                 continue
-            s += '\tcon_EXTERNAL_' + node + tally + '.setParam(\"' + ak + '\", \"' + av +'\");\n'
+            s += '\tcon_EXTERNAL_' + node + tally + '.setParam(\"' + ak + '\", std::to_string(' + av +'));\n'
     else:
         if weighttype.text == 'double':
             s += '\tdouble con_EXTERNAL_' + node + tally + '('

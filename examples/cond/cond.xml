@@ -1,17 +1,17 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<Algorithm type="MeshAlgorithm" name="E" modelfile="cond.model" >
+<Algorithm type="MeshAlgorithmGroup" name="E" modelfile="cond.model" >
 <TimeStep>0.00001</TimeStep>
 <MatrixFile>cond_0_0.05_0.mat</MatrixFile>
 </Algorithm>
-<Algorithm type="RateFunctor" name="Exc Input">
+<Algorithm type="RateFunctor" name="ExcInput">
 <expression>1000.</expression>
 </Algorithm>
 </Algorithms>
 <Nodes>
 <Node algorithm="E" name="CE" type="EXCITATORY_DIRECT" />
-<Node algorithm="Exc Input" name="Inp" type="NEUTRAL" />
+<Node algorithm="ExcInput" name="Inp" type="NEUTRAL" />
 </Nodes>
 <Connections>
 <Connection In="Inp" Out="CE">1   0.05 0</Connection>
