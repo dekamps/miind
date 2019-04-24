@@ -17,12 +17,12 @@ rank = comm.Get_rank()
 #######################
 
 number_of_nodes = 1
-simulation_length = 3 #ms
-miindmodel = miind.MiindModel(number_of_nodes, simulation_length)
+miindmodel = miind.MiindModel(number_of_nodes)
 
 miindmodel.init([])
 
 timestep = miindmodel.getTimeStep()
+simulation_length = miindmodel.getSimulationLength()
 print('Timestep from XML : {}'.format(timestep))
 
 # For MPI child processes, startSimulation runs the full simulation loop
@@ -31,7 +31,7 @@ print('Timestep from XML : {}'.format(timestep))
 if miindmodel.startSimulation() > 0 :
     quit()
 
-constant_input = [1500]
+constant_input = [2500]
 activities = []
 for i in range(int(simulation_length/timestep)): #0.001 is the time step defined in the xml
     activities.append(miindmodel.evolveSingleStep(constant_input)[0])
