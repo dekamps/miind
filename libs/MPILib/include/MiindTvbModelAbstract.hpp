@@ -1,4 +1,3 @@
-#include <boost/python.hpp>
 #include <vector>
 #include <boost/timer/timer.hpp>
 #include <GeomLib.hpp>
@@ -27,48 +26,21 @@ public:
 	~MiindTvbModelAbstract() {
 	}
 
-	virtual void init(boost::python::list) {};
+	virtual void init() {};
 
-	virtual int startSimulation() {
+	virtual void startSimulation() {
 		pb = new utilities::ProgressBar(network.startSimulation());
-
-		// child processes just loop here - evolve isn't called here to avoid a deadlock
-		// issue - would like to fix.
-
-		if(utilities::MPIProxy().getRank() > 0)
-			for(int i=0; i<int(_simulation_length/_time_step)+1; i++)
-				evolveSingleStep(boost::python::list());
-
-		// Return the MPI process rank so that the host python program can
-		// end child processes after evolve (otherwise, it'll continue to try to
-	  // generate a new TVB simulation which it already did in rank 0)
-		return utilities::MPIProxy().getRank();
 	}
 
-	virtual boost::python::list evolveSingleStep(boost::python::list c) {
-		boost::python::ssize_t len = boost::python::len(c);
-		std::vector<double> activity = std::vector<double>();
-
-		for(int i=0; i<len; i++) {
-			double ca = boost::python::extract<double>(c[i]);
-			activity.push_back(ca);
-		}
-
-		boost::python::list out;
-		for(auto& it : network.evolveSingleStep(activity)) {
-			out.append(it);
-		}
-
+	virtual std::vector<double> evolveSingleStep(std::vector<double> activity) {
 		(*pb)++;
-
-		return out;
+		return network.evolveSingleStep(activity);
 	}
 
 	virtual void endSimulation() {
 		network.endSimulation();
 		t.stop();
-		if(utilities::MPIProxy().getRank() == 0)
-			t.report();
+		t.report();
 	}
 
 	double getTimeStep() {
@@ -88,18 +60,6 @@ protected:
 	double _time_step; // ms
 	int _num_nodes;
 };
-
-template<class Weight, class NodeDistribution>
-void define_python_MiindTvbModelAbstract()
-{
-	using namespace boost::python;
-    class_<MiindTvbModelAbstract<Weight, NodeDistribution>>("MiindTvbModelAbstract", init<int,long>())
-				.def("startSimulation", &MiindTvbModelAbstract<Weight, NodeDistribution>::startSimulation)
-				.def("endSimulation", &MiindTvbModelAbstract<Weight, NodeDistribution>::endSimulation)
-				.def("evolveSingleStep", &MiindTvbModelAbstract<Weight, NodeDistribution>::evolveSingleStep)
-				.def("getTimeStep", &MiindTvbModelAbstract<Weight, NodeDistribution>::getTimeStep)
-				.def("getSimulationLength", &MiindTvbModelAbstract<Weight, NodeDistribution>::getSimulationLength);
-}
 
 }
 
