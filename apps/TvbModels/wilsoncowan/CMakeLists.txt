@@ -56,4 +56,4 @@ set ( LIBLIST
 
 add_library( miindwc ${LIB_TYPE} ${TVB_WC_SRC} ${PW_HEADERS})
 
-target_link_libraries( miindwc ${LIBLIST} -lpython2.7 -lboost_python)
+target_link_libraries( miindwc ${LIBLIST})
