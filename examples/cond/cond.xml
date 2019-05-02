@@ -1,11 +1,11 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<Algorithm type="MeshAlgorithm" name="E" modelfile="cond.model" >
+<Algorithm type="MeshAlgorithmGroup" name="E" modelfile="cond.model" >
 <TimeStep>0.00001</TimeStep>
 <MatrixFile>cond_0_0.05_0.mat</MatrixFile>
 </Algorithm>
-<Algorithm type="RateFunctor" name="Exc Input">
+<Algorithm type="RateFunctor" name="ExcInput">
 <expression>1000.</expression>
 </Algorithm>
 </Algorithms>

@@ -167,3 +167,8 @@ MESSAGE(STATUS "Compiler cxx debug flags:" ${CMAKE_CXX_FLAGS_DEBUG})
 MESSAGE(STATUS "Compiler cxx release flags:" ${CMAKE_CXX_FLAGS_RELEASE})
 MESSAGE(STATUS "Compiler cxx min size flags:" ${CMAKE_CXX_FLAGS_MINSIZEREL})
 MESSAGE(STATUS "Compiler cxx flags:" ${CMAKE_CXX_FLAGS})
+
+
+ADD_SUBDIRECTORY( python )
+ADD_SUBDIRECTORY( examples )
+

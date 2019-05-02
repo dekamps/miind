@@ -194,6 +194,9 @@ namespace TwoDLib {
 		// internally and we don't want to keep two versions.
 		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
 
+		_network_time_step = par_run.getTStep();
+		_sys.InitializeResetRefractive(_network_time_step);
+
 		try {
 			std::unique_ptr<Solver> p_master(new Solver(_sys,std::vector<std::vector<TransitionMatrix > >{vec_mat}, par));
 			_p_master = std::move(p_master);
@@ -356,7 +359,7 @@ namespace TwoDLib {
 		_vec_vec_delay_queues = std::vector< std::vector<MPILib::DelayedConnectionQueue> >(0); // MeshAlgorithm really only uses the first array, i.e. the rates it receives in prepareEvole
  		_vec_vec_delay_queues.push_back( std::vector<MPILib::DelayedConnectionQueue>(vec_weights.size()));
 		for(unsigned int q = 0; q < vec_weights.size(); q++){
-			_vec_vec_delay_queues[0][q] = MPILib::DelayedConnectionQueue(_dt, vec_weights[q]._delay);
+			_vec_vec_delay_queues[0][q] = MPILib::DelayedConnectionQueue(_network_time_step, vec_weights[q]._delay);
 		}
 	}
 
