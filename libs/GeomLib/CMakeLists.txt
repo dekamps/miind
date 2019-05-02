@@ -49,6 +49,7 @@ GeomLib.hpp
 GeomParameter.hpp
 InitialDensityParameter.hpp  
 InputParameterSet.hpp
+GeomLibException.hpp
 LeakingOdeSystem.hpp
 LifEstimator.hpp
 LifNeuralDynamics.hpp

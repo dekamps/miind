@@ -1,4 +1,4 @@
-	
+
 set( AEXP
 aexp/aexp_-1_0_0.mat
 aexp/aexp_1_0_0.mat
@@ -8,8 +8,6 @@ aexp/aexpnoa642fee6a-9257-4624-9178-9a404b8bad50_-1_0_0_0_.mat
 aexp/aexpnoa642fee6a-9257-4624-9178-9a404b8bad50_1_0_0_0_.mat
 aexp/aexpnoa642fee6a-9257-4624-9178-9a404b8bad50.model
 aexp/aexp.xml
-aexp/izsh_0.03_0_0.mat
-aexp/aexp/izsh.model
 )
 
 set( COND
@@ -22,7 +20,7 @@ cond/mc_gain_curves.py
 )
 
 set( LIF
-lif/lif_0.005_0_0.mat
+lif/lif_0.01_0_0_0_.mat
 lif/lif.model
 lif/lifanalysis.py
 lif/lif.xml
@@ -30,7 +28,6 @@ lif/steady_state.dat
 )
 
 set( LIF_PYTHON
-lif_python/lif_0.01_0_0_0_.lost
 lif_python/lif.fid
 lif_python/lif.model
 lif_python/lif.rev
