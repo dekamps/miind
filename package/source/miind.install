@@ -1,0 +1,5 @@
+doc/* usr/share/miind/doc
+examples/* usr/share/miind/examples
+python/* usr/bin/miind/python
+
+

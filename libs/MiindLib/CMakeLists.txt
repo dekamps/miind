@@ -14,9 +14,11 @@ INCLUDE_DIRECTORIES(
 )
 
 set( TWOD_SRC
+VectorizedNetwork.cpp
 )
 
 set( TWOD_HEADERS
+VectorizedNetwork.hpp
 )
 
 if (ENABLE_CUDA)
@@ -57,9 +59,9 @@ endif(ENABLE_CUDA)
 add_library( ${MIIND_LIBRARY_PREFIX}shared ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS})
 
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}shared
-    ${LIBLIST} -lpython2.7 -lboost_python)
+    ${LIBLIST})
 
-install( FILES ${numtools_HEADERS}
+install( FILES ${TWOD_HEADERS}
     DESTINATION include/miind/MiindLib )
 
 install( TARGETS ${MIIND_LIBRARY_PREFIX}shared
