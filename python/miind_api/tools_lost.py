@@ -94,7 +94,7 @@ def zoom_fun(event, ax, base_scale=1.5):
     else:
         # deal with something that should never happen
         scale_factor = 1
-        print event.button
+        print(event.button)
     # set new limits
     ax.set_xlim([xdata - cur_xrange*scale_factor,
                  xdata + cur_xrange*scale_factor])
@@ -108,7 +108,7 @@ def onclick(event, ax, fid_fname, curr_points, quads):
     toolbar = plt.get_current_fig_manager().toolbar
     if toolbar.mode!='':
         return
-    
+
     if event.dblclick:
         write_fid(fid_fname, quads)
         plt.close()

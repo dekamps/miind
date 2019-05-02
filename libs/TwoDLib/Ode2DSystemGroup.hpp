@@ -131,6 +131,9 @@ namespace TwoDLib {
 
 		const std::vector<MPILib::Time> Tau_ref() const { return _vec_tau_refractive; }
 
+		// Initialize the refractory reset queue with the network's time step
+		void    InitializeResetRefractive(MPILib::Time network_time_step);
+
 		friend class Master;
 	    friend class MasterOMP;
 	    friend class MasterOdeint;
@@ -185,16 +188,15 @@ namespace TwoDLib {
 			(
 				Ode2DSystemGroup&                  sys,
 				vector<double>&               vec_mass,
-				const MPILib::Number&         it,
+				MPILib::Time                  network_time_step,
 				MPILib::Time                  tau_refractive,
 				const vector<Redistribution>& vec_reset,
 				MPILib::Index m
 			):
-			_it(it),
-			_t_step(sys.MeshObjects()[m].TimeStep()),
+			_t_step(network_time_step),
 			_tau_refractive(tau_refractive),
 			_vec_reset(vec_reset),
-			_vec_queue(vec_reset.size(),MPILib::RefractoryQueue(sys.MeshObjects()[m].TimeStep(),tau_refractive)),
+			_vec_queue(vec_reset.size(),MPILib::RefractoryQueue(network_time_step,tau_refractive)),
 			_sys(sys),
 			_vec_mass(vec_mass),
 			_m(m)
@@ -224,7 +226,6 @@ namespace TwoDLib {
 
 			MPILib::Index       	_m;
 
-			const MPILib::Number&                      _it;
 			MPILib::Time                               _t_step;
 			MPILib::Time                               _tau_refractive;
 
@@ -266,8 +267,8 @@ namespace TwoDLib {
 
 		bool				  CheckConsistency() const;
 		std::vector<Reset>    InitializeReset();
-		std::vector<ResetRefractive>    InitializeResetRefractive();
 		std::vector<Reversal> InitializeReversal();
+		std::vector<ResetRefractive> InitializeResetRefractiveInternal(MPILib::Time network_time_step);
 		std::vector<Clean>    InitializeClean();
 
 		vector<MPILib::Potential>  	InitializeArea(const std::vector<Mesh>&) const;

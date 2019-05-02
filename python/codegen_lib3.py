@@ -85,24 +85,6 @@ def generate_closing(outfile, steps, t_step, weighttype, tree, prog_name):
 
     outfile.write('};\n\n')
 
-    type = weighttype.text
-    variable_list = tree.findall('Variable')
-    outfile.write('BOOST_PYTHON_MODULE(lib' + prog_name + ')\n')
-    outfile.write('{\n')
-    outfile.write('\tusing namespace boost::python;\n')
-    outfile.write('\t' + define_abstract_type(type))
-    outfile.write('\tclass_<MiindModel, bases<' + abstract_type(type) + '>>("MiindModel", init<int,long>())\n')
-
-    if len(variable_list) > 0:
-        var_types = variables.parse_variable_types(variable_list)
-        outfile.write('\t.def(init<int,long' + var_types + '>())\n')
-    outfile.write('\t.def("init", &MiindModel::init)\n')
-    outfile.write('\t.def("init", &MiindModel::init)\n')
-    outfile.write('\t.def("startSimulation", &MiindModel::startSimulation)\n')
-    outfile.write('\t.def("endSimulation", &MiindModel::endSimulation)\n')
-    outfile.write('\t.def("evolveSingleStep", &MiindModel::evolveSingleStep);\n')
-    outfile.write('}\n')
-
 def parse_xml(infile, outfile):
     tree=ET.fromstring(infile.read())
     m=tree.find('WeightType')
@@ -111,49 +93,36 @@ def parse_xml(infile, outfile):
 
 def constructor_override(outfile,tree,typ):
 
+    t_begin = tree.find('SimulationRunParameter/t_begin')
+    t_end = tree.find('SimulationRunParameter/t_end')
+
     variable_list = tree.findall('Variable')
     variables.parse_variables(variable_list,outfile)
 
-    outfile.write('\tMiindModel(int num_nodes, long simulation_length ):\n')
-    outfile.write('\t\tMiindTvbModelAbstract(num_nodes, simulation_length),_count(0){\n')
-    outfile.write('#ifdef ENABLE_MPI\n')
-    outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
-    outfile.write('\tboost::mpi::environment env();\n')
-    outfile.write('#endif\n')
+    outfile.write('\tMiindModel(int num_nodes):\n')
+    outfile.write('\t\tMiindTvbModelAbstract(num_nodes, ' + t_end.text + '-' + t_begin.text + '),_count(0){\n')
     outfile.write('}\n\n')
 
-    outfile.write('\tMiindModel(long simulation_length ):\n')
-    outfile.write('\t\tMiindTvbModelAbstract(1, simulation_length),_count(0){\n')
-    outfile.write('#ifdef ENABLE_MPI\n')
-    outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
-    outfile.write('\tboost::mpi::environment env();\n')
-    outfile.write('#endif\n')
+    outfile.write('\tMiindModel():\n')
+    outfile.write('\t\tMiindTvbModelAbstract(1, ' + t_end.text + '-' + t_begin.text + '),_count(0){\n')
     outfile.write('}\n\n')
 
     if len(variable_list) > 0:
-        outfile.write('\tMiindModel(int num_nodes, long simulation_length \n')
+        outfile.write('\tMiindModel(int num_nodes, \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
-        outfile.write('\t\tMiindTvbModelAbstract(num_nodes, simulation_length),_count(0)\n')
+        outfile.write('\t\tMiindTvbModelAbstract(num_nodes, ' + t_end.text + '-' + t_begin.text + '),_count(0)\n')
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{\n')
-        outfile.write('#ifdef ENABLE_MPI\n')
-        outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
-        outfile.write('\tboost::mpi::environment env();\n')
-        outfile.write('#endif\n')
         outfile.write('}\n\n')
 
     if len(variable_list) > 0:
-        outfile.write('\tMiindModel(long simulation_length \n')
+        outfile.write('\tMiindModel( \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
-        outfile.write('\t\tMiindTvbModelAbstract(1, simulation_length),_count(0)\n')
+        outfile.write('\t\tMiindTvbModelAbstract(1, ' + t_end.text + '-' + t_begin.text + '),_count(0)\n')
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{\n')
-        outfile.write('#ifdef ENABLE_MPI\n')
-        outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
-        outfile.write('\tboost::mpi::environment env();\n')
-        outfile.write('#endif\n')
         outfile.write('}\n\n')
 
 def function_overrides(outfile,tree,typ):
@@ -164,7 +133,7 @@ def function_overrides(outfile,tree,typ):
     node_list = tree.findall('Nodes/Node')
     nodemap = node_name_to_node_id(node_list)
 
-    outfile.write('\tint startSimulation(){\n')
+    outfile.write('\tvoid startSimulation(){\n')
     outfile.write(reporting.define_display_nodes(tree,nodemap))
     outfile.write(reporting.define_rate_nodes(tree,nodemap))
     outfile.write(reporting.define_density_nodes(tree,nodemap))
@@ -179,17 +148,17 @@ def function_overrides(outfile,tree,typ):
     outfile.write('\t\t\n')
     outfile.write('\t\tif (_display_nodes.size() > 0)\n')
     outfile.write('\t\t\tTwoDLib::Display::getInstance()->animate(true, _display_nodes,_time_step);\n')
-    outfile.write('\t\treturn '+ abstract_type(typ) +'::startSimulation();\n')
-    outfile.write('\t}\n')
+    outfile.write('\t\t'+ abstract_type(typ) +'::startSimulation();\n')
+    outfile.write('\t}\n\n')
 
     t_step = tree.find('SimulationRunParameter/t_step')
-    outfile.write('\t\tboost::python::list evolveSingleStep(boost::python::list c){\n')
+    outfile.write('\t\tstd::vector<double> evolveSingleStep(std::vector<double> activity){\n')
     outfile.write('\t\tnetwork.reportNodeActivities(_rate_nodes, _rate_node_intervals, (_count * ' + t_step.text + '));\n')
     outfile.write('\t\tif (_display_nodes.size() > 0)\n')
     outfile.write('\t\t\tTwoDLib::Display::getInstance()->updateDisplay(_count);\n')
     outfile.write('\t\tTwoDLib::GridReport<'+typ+'>::getInstance()->reportDensity(_density_nodes,_density_node_start_times,_density_node_end_times,_density_node_intervals,(_count * _time_step));\n')
     outfile.write('\t\t_count++;\n')
-    outfile.write('\t\treturn '+ abstract_type(typ) +'::evolveSingleStep(c);\n')
+    outfile.write('\t\treturn '+ abstract_type(typ) +'::evolveSingleStep(activity);\n')
     outfile.write('\t}\n\n')
 
 def generate_opening(outfile, tree, typ):
@@ -198,7 +167,7 @@ def generate_opening(outfile, tree, typ):
     constructor_override(outfile, tree,typ)
     function_overrides(outfile,tree,typ)
     outfile.write('\n')
-    outfile.write('\tvoid init(boost::python::list params)\n')
+    outfile.write('\tvoid init()\n')
     outfile.write('\t{\n')
     t_step = tree.find('SimulationRunParameter/t_step')
     outfile.write('\t\t_time_step = ' + t_step.text + ';\n')
@@ -213,9 +182,113 @@ def matrix_transform_name(fn):
 
     tmatnames = []
     for a in ma:
-        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm']:
+        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm','GridSomaDendriteAlgorithm']:
             tmatnames.append(a.attrib['transformfile'])
     return tmatnames
+
+def python_wrapper(outfile, prog_name):
+    addition = """
+static MiindModel *model;
+
+static PyObject *miind_init(PyObject *self, PyObject *args)
+{{
+    int command;
+
+    if (!PyArg_ParseTuple(args, "i", &command))
+	model = new MiindModel();
+    else
+	model = new MiindModel(command);
+
+    model->init();
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}}
+
+static PyObject *miind_getTimeStep(PyObject *self, PyObject *args)
+{{
+    return Py_BuildValue("d", model->getTimeStep());
+}}
+
+static PyObject *miind_getSimulationLength(PyObject *self, PyObject *args)
+{{
+    return Py_BuildValue("d", model->getSimulationLength());
+}}
+
+static PyObject *miind_startSimulation(PyObject *self, PyObject *args)
+{{
+    model->startSimulation();
+    Py_INCREF(Py_None);
+    return Py_None;
+}}
+
+static PyObject *miind_evolveSingleStep(PyObject *self, PyObject *args)
+{{
+    PyObject *float_list;
+    int pr_length;
+
+    if (!PyArg_ParseTuple(args, "O", &float_list))
+        return NULL;
+    pr_length = PyObject_Length(float_list);
+    if (pr_length < 0)
+        return NULL;
+
+    std::vector<double> activities(pr_length);
+
+    for (int index = 0; index < pr_length; index++) {{
+        PyObject *item;
+        item = PyList_GetItem(float_list, index);
+        if (!PyFloat_Check(item))
+            activities[index] = 0.0;
+        activities[index] = PyFloat_AsDouble(item);
+    }}
+
+    std::vector<double> out_activities = model->evolveSingleStep(activities);
+
+    PyObject* tuple = PyTuple_New(pr_length);
+
+    for (int index = 0; index < pr_length; index++) {{
+        PyTuple_SetItem(tuple, index, Py_BuildValue("d", out_activities[index]));
+    }}
+
+    return tuple;
+}}
+
+static PyObject *miind_endSimulation(PyObject *self, PyObject *args)
+{{
+    model->endSimulation();
+    Py_INCREF(Py_None);
+    return Py_None;
+}}
+
+static PyMethodDef MiindModelMethods[] = {{
+    {{"init",  miind_init, METH_VARARGS, "Init Miind Model."}},
+    {{"getTimeStep",  miind_getTimeStep, METH_VARARGS, "Get time step."}},
+    {{"getSimulationLength",  miind_getSimulationLength, METH_VARARGS, "Get sim time."}},
+    {{"startSimulation",  miind_startSimulation, METH_VARARGS, "Start simulation."}},
+    {{"evolveSingleStep",  miind_evolveSingleStep, METH_VARARGS, "Evolve one time step."}},
+    {{"endSimulation",  miind_endSimulation, METH_VARARGS, "Clean up."}},
+    {{NULL, NULL, 0, NULL}}        /* Sentinel */
+}};
+
+static struct PyModuleDef miindmodule = {{
+    PyModuleDef_HEAD_INIT,
+    "lib{name}",   /* name of module */
+    NULL, /* module documentation, may be NULL */
+    -1,       /* size of per-interpreter state of the module,
+                 or -1 if the module keeps state in global variables. */
+    MiindModelMethods
+}};
+
+PyMODINIT_FUNC
+PyInit_lib{name}(void)
+{{
+    return PyModule_Create(&miindmodule);
+}}
+"""
+    context = { "name" : prog_name }
+
+    outfile.write(addition.format(**context))
 
 def model_name(fn):
     '''Identifies model files mentioned in an XML file. For example used in placing the right model file in
@@ -226,7 +299,7 @@ def model_name(fn):
 
     modelnames = []
     for a in ma:
-        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm','MeshAlgorithm','MeshAlgorithmGroup']:
+        if a.attrib['type'] in ['GridAlgorithm','GridAlgorithmGroup','GridJumpAlgorithm','GridSomaDendriteAlgorithm','MeshAlgorithm','MeshAlgorithmGroup']:
             modelnames.append(a.attrib['modelfile'])
     return modelnames
 
@@ -250,7 +323,7 @@ def node_name_to_node_id(nodes):
 def generate_outputfile(infile, outfile, prog_name):
     generate_preamble(outfile)
     nettype, tree = parse_xml(infile,outfile)
-    outfile.write(nettype)
+
     algies = tree.findall('Algorithms')
     if len(algies) != 1:
         raise ValueError
@@ -276,6 +349,8 @@ def generate_outputfile(infile, outfile, prog_name):
     t_step = tree.find('SimulationRunParameter/t_step')
 
     generate_closing(outfile, '(' + t_end.text + ' - ' + t_begin.text + ') / ' + t_step.text , t_step.text, weighttype, tree, prog_name)
+
+    python_wrapper(outfile, prog_name)
 
     algorithms.reset_algorithms()
     nodes.reset_nodes()

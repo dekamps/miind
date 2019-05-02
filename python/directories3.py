@@ -143,7 +143,7 @@ def insert_cmake_template_lib(name, full_path_name, enable_mpi,enable_openmp,ena
         else:
             fout.write('\nadd_library( '+ name + ' ${LIB_TYPE} ${TVB_LIF_SRC} ${PW_HEADERS})\n')
 
-        fout.write('target_link_libraries( ' + name + ' ${LIBLIST} -lpython2.7 -lboost_python)\n')
+        fout.write('target_link_libraries( ' + name + ' ${LIBLIST})\n')
 
 
 

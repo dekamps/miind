@@ -229,19 +229,26 @@ def node_name_to_node_id(nodes):
           d[node.attrib['name']] = i
      return d
 
-def generate_connections(fn,conns, nodes, algorithms):
+def generate_connections(fn,conns, nodes, algorithms, weighttype):
     grid_cons = construct_grid_connection_map(nodes, algorithms, conns)
     mesh_cons = construct_CSR_map(nodes, algorithms, conns)
     nodemap = node_name_to_node_id(nodes)
 
     with open(fn,'a') as f:
-        for cn in mesh_cons:
-            cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
-            f.write('\tTwoDLib::TransitionMatrix ' + cpp_name + '(\"' + cn[1] + '\");\n')
-            f.write(connections.parse_mesh_connection(cn[5], nodemap, cpp_name))
+        if weighttype.text ==  "DelayedConnection":
+            for cn in mesh_cons:
+                cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
+                f.write('\tTwoDLib::TransitionMatrix ' + cpp_name + '(\"' + cn[1] + '\");\n')
+                f.write(connections.parse_mesh_connection(cn[5], nodemap, cpp_name))
+
+        if weighttype.text == "CustomConnectionParameters":
+            for cn in mesh_cons:
+                cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
+                f.write('\tTwoDLib::TransitionMatrix ' + cpp_name + '(\"' + cn[1] + '\");\n')
+                f.write(connections.parse_mesh_vectorized_connection(cn[5],nodemap,cpp_name))
 
         for cn in grid_cons:
-            f.write(connections.parse_grid_connection(cn[1],nodemap))
+            f.write(connections.parse_grid_vectorized_connection(cn[1],nodemap))
 
         f.write('\n')
 
@@ -259,7 +266,8 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
     generate_preamble(fn, variables, nodes, algorithms,connections,parameter, cuda)
 
     generate_model_files(fn,nodes,algorithms)
-    generate_connections(fn,connections,nodes,algorithms)
+    weighttype = root.find('WeightType')
+    generate_connections(fn,connections,nodes,algorithms,weighttype)
     nodemap = node_name_to_node_id(nodes)
     with open(fn,'a') as f:
         f.write(reporting.define_display_nodes(root,nodemap))
