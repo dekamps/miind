@@ -28,7 +28,7 @@ add_library( ${MIIND_LIBRARY_PREFIX}epfl ${LIB_TYPE} ${EPFL_SRC} ${EPFL_HEADERS}
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}epfl
     ${gsl_LINK_FLAGS} )
 
-install( FILES ${numtools_HEADERS}
+install( FILES ${TWOD_HEADERS}
     DESTINATION include/miind/EPFLLib )
 
 install( TARGETS ${MIIND_LIBRARY_PREFIX}epfl

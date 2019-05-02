@@ -52,4 +52,4 @@ set ( LIBLIST
 
 add_library( miindlif ${LIB_TYPE} ${TVB_LIF_SRC} ${PW_HEADERS})
 
-target_link_libraries( miindlif ${LIBLIST} -lpython2.7 -lboost_python)
+target_link_libraries( miindlif ${LIBLIST})
