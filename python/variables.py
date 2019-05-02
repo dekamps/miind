@@ -41,7 +41,7 @@ def parse_variables_as_parameters(variable_list, outfile):
         # Otherwise, assume it's a string
         else :
             s += '\n\t\t\t, const std::string _' + name
-    outfile.write(s)
+    outfile.write(s[5:])
 
 def parse_variables_as_constructor_defaults(variable_list, outfile):
     s = ''

@@ -21,7 +21,7 @@
 # dh_make generated override targets
 # This is example for Cmake (See https://bugs.debian.org/641051 )
 override_dh_auto_configure:
-	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release
+	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release -DENABLE_CUDA=ON -DENABLE_MPI=ON -DENABLE_OPENMP=ON -DCMAKE_BUILD_TYPE=Release
 
 #override_dh_makeshlibs:
 #	#dh_makeshlibs
