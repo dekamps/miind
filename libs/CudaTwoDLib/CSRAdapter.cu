@@ -225,8 +225,9 @@ std::vector<inttype> CSRAdapter::NrRows(const std::vector<TwoDLib::CSRMatrix>& v
 std::vector<fptype> CSRAdapter::CellWidths(const std::vector<TwoDLib::CSRMatrix>& vecmat) const
 {
 	std::vector<fptype> vecret;
-	for (inttype m = 0; m < _grid_transforms.size(); m++)
-		vecret.push_back(_group.getGroup().MeshObjects()[_grid_transforms[m]].getCellWidth());
+	for (inttype m = 0; m < _grid_transforms.size(); m++){
+    vecret.push_back(_group.getGroup().MeshObjects()[_grid_transforms[m]].getCellWidth());
+  }
 	return vecret;
 }
 
@@ -289,7 +290,6 @@ void CSRAdapter::CalculateMeshGridDerivative(const std::vector<inttype>& vecinde
 void CSRAdapter::CalculateMeshGridDerivativeWithEfficacy(const std::vector<inttype>& vecindex,
   const std::vector<fptype>& vecrates)
 {
-
   for(inttype m = 0; m < _nr_grid_connections; m++)
   {
     // be careful to use this block size

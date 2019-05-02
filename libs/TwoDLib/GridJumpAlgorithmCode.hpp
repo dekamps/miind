@@ -59,7 +59,7 @@ namespace TwoDLib {
 
 		assert(nodeVector.size() == weightVector.size());
 		for (MPILib::Index i = 0; i < nodeVector.size(); i++){
-			_vec_vec_delay_queues[0][i].updateQueue(nodeVector[i]*weightVector[i]._params.at("num_connections"));
+			_vec_vec_delay_queues[0][i].updateQueue(nodeVector[i]*std::stod(weightVector[i]._params.at("num_connections")));
 		}
 
 	}
@@ -71,8 +71,8 @@ namespace TwoDLib {
     _connection_stat_v = std::vector<double>(vec_weights.size());
 
  		for(MPILib::Index i_weight = 0; i_weight < _efficacy_map.size(); i_weight++){
-			_efficacy_map[i_weight] = vec_weights[i_weight]._params.at("efficacy");
-      _connection_stat_v[i_weight] = vec_weights[i_weight]._params.at("stationary");
+			_efficacy_map[i_weight] = std::stod(vec_weights[i_weight]._params.at("efficacy"));
+      _connection_stat_v[i_weight] = std::stod(vec_weights[i_weight]._params.at("stationary"));
 		}
 
     _p_master_jump->CalculateStaticEfficiaciesForConductance(_efficacy_map, _connection_stat_v);
@@ -80,7 +80,7 @@ namespace TwoDLib {
 		_vec_vec_delay_queues = std::vector< std::vector<MPILib::DelayedConnectionQueue> >(0); // MeshAlgorithm really only uses the first array, i.e. the rates it receives in prepareEvole
  		_vec_vec_delay_queues.push_back( std::vector<MPILib::DelayedConnectionQueue>(vec_weights.size()));
 		for(unsigned int q = 0; q < vec_weights.size(); q++){
-			_vec_vec_delay_queues[0][q] = MPILib::DelayedConnectionQueue(_dt, vec_weights[q]._params.at("delay"));
+			_vec_vec_delay_queues[0][q] = MPILib::DelayedConnectionQueue(_network_time_step, std::stod(vec_weights[q]._params.at("delay")));
 		}
 	}
 
