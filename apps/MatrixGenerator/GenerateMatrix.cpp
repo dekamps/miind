@@ -63,19 +63,12 @@ void FixModelFile(const string& basename){
 			{
 					str_reset = std::string(mapping.child_value());
 			}
-			if (mapping.attribute("type").value() == string("NextReset") ){
-				str_reset_next = std::string(mapping.child_value());
-			}
 	}
 
 	// insert a reset mapping node in the document before the threshold node
 	pugi::xml_node node_rev = model.append_child("Mapping");
 	node_rev.append_attribute("type") = "Reset";
 	node_rev.append_child(pugi::node_pcdata).set_value(str_reset.c_str());
-
-	pugi::xml_node node_next_rev = model.append_child("Mapping");
-	node_next_rev.append_attribute("type") = "NextReset";
-	node_next_rev.append_child(pugi::node_pcdata).set_value(str_reset_next.c_str());
 
 	std::ofstream ofst(str_model);
 	if (!ofst)

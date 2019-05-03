@@ -2,24 +2,28 @@
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
 <Algorithm type="MeshAlgorithm" name="E" modelfile="lif.model" >
-<TimeStep>0.000770095348827</TimeStep>
-<MatrixFile>lif_0.005_0_0.mat</MatrixFile>
+<TimeStep>0.001</TimeStep>
+<MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
 </Algorithm>
-<Algorithm type="RateFunctor" name="Exc Input">
-<expression>1000.</expression>
+<Algorithm type="RateFunctor" name="ExcInput">
+<expression>1500.</expression>
 </Algorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="E" name="LIF E" type="EXCITATORY_DIRECT" />
-<Node algorithm="Exc Input" name="Inp" type="NEUTRAL" />
+<Node algorithm="E" name="LIF" type="EXCITATORY_DIRECT" />
+<Node algorithm="ExcInput" name="Inp" type="NEUTRAL" />
 </Nodes>
 <Connections>
-<Connection In="Inp" Out="LIF E">3 0.005 0</Connection>
+<Connection In="Inp" Out="LIF">1 0.01 0</Connection>
 </Connections>
 <Reporting>
-<Density node="LIF E" t_start="0.0" t_end="2.0" t_interval="0.00770095348827" />
+<Density node="LIF" t_start="0.0" t_end="2.0" t_interval="0.001" />
 <!--<Display node="LIF E" />-->
+<<<<<<< HEAD
 <Rate node="LIF E" t_interval="0.001"/>
+=======
+<Rate node="LIF" t_interval="0.001"/>
+>>>>>>> hughsfork/master
 </Reporting>
 <SimulationIO>
 <SimulationName>lif.dat</SimulationName>
@@ -36,16 +40,16 @@
 <Dense_min>0</Dense_min>
 <Dense_max>2.5</Dense_max>
 </CanvasParameter>
-<CanvasNode Name="LIF E" />
+<CanvasNode Name="LIF" />
 </SimulationIO>
 <SimulationRunParameter>
 <max_iter>1000000</max_iter>
 <t_begin>0</t_begin>
-<t_end>2.0</t_end>
-<t_report>0.00770095348827</t_report>
-<t_state_report>0.00770095348827</t_state_report>
-<t_step>0.000770095348827</t_step>
-<t_update>0.00770095348827</t_update>
+<t_end>3.0</t_end>
+<t_report>0.001</t_report>
+<t_state_report>0.001</t_state_report>
+<t_step>0.001</t_step>
+<t_update>0.001</t_update>
 <name_log>lif.log</name_log>
 </SimulationRunParameter>
 </Simulation>

@@ -30,7 +30,6 @@
 ** THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "display.hpp"
 #ifdef LINUX
   #include "include/GL/glew.h"
 

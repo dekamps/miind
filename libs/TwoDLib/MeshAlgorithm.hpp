@@ -184,6 +184,7 @@ namespace TwoDLib {
 		std::vector<std::vector<MPILib::DelayedConnectionQueue>> _vec_vec_delay_queues; // this is fed to the apply step of MasterOMP.
 
 		MPILib::Time 						_dt;     // mesh time step
+		MPILib::Time						_network_time_step; // network time step
 		TwoDLib::Ode2DSystemGroup 			_sys;
 
 		std::unique_ptr<Solver>	_p_master;

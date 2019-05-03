@@ -17,29 +17,25 @@ rank = comm.Get_rank()
 #######################
 
 number_of_nodes = 1
-simulation_length = 3 #ms
-miindmodel = miind.MiindModel(number_of_nodes, simulation_length)
+miind.init(number_of_nodes)
 
-miindmodel.init([])
-
-timestep = miindmodel.getTimeStep()
+timestep = miind.getTimeStep()
+simulation_length = miind.getSimulationLength()
 print('Timestep from XML : {}'.format(timestep))
+print('Sim time from XML : {}'.format(simulation_length))
 
-# For MPI child processes, startSimulation runs the full simulation loop
-# and so will not return until MPI process 0 has completed. At that point,
-# we want to kill the child processes so that sim() is not called more than once.
-if miindmodel.startSimulation() > 0 :
-    quit()
+miind.startSimulation()
 
-constant_input = [1500]
+constant_input = [2500]
 activities = []
 for i in range(int(simulation_length/timestep)): #0.001 is the time step defined in the xml
-    activities.append(miindmodel.evolveSingleStep(constant_input)[0])
+    activities.append(miind.evolveSingleStep(constant_input)[0])
 
-miindmodel.endSimulation()
+miind.endSimulation()
 
 plt.figure()
 plt.plot(activities)
 plt.title("Firing Rate.")
 
 plt.show()
+

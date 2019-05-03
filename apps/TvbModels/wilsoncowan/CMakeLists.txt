@@ -63,5 +63,4 @@ set ( LIBLIST
 
 message("bla" ${Boost_LIBRARIES} )
 
-add_library( miindwc ${LIB_TYPE} ${TVB_WC_SRC} ${PW_HEADERS})
-target_link_libraries( miindwc ${LIBLIST} ${PYTHON_LIBRARIES} )
+target_link_libraries( miindwc ${LIBLIST})

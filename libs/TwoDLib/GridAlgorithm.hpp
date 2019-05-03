@@ -95,6 +95,7 @@ namespace TwoDLib {
 		std::vector<MPILib::Time>    _vec_tau_refractive;
 
 		MPILib::Time _dt;
+		MPILib::Time _network_time_step;
 
 		TwoDLib::Ode2DSystemGroup _sys;
 

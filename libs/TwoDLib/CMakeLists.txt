@@ -13,81 +13,87 @@ INCLUDE_DIRECTORIES(
 )
 
 set( TWOD_SRC
-CSRAdapter.cpp
-CSRMatrix.cpp
-display.cpp
-Master.cpp
-TransitionMatrix.cpp
-Cell.cpp
 MasterOMP.cpp
-MasterOdeint.cpp
-QuadGenerator.cpp
-PolyGenerator.cpp
-TransitionMatrixGenerator.cpp
-pugixml.cpp
+Cell.cpp
 CheckSystem.cpp
 Mesh.cpp
+CSRAdapter.cpp
+MeshTree.cpp
+Ode2DSystem.cpp
+CSRMatrix.cpp
+Ode2DSystemGroup.cpp
+display.cpp
+PolyGenerator.cpp
+Euler.cpp
+pugixml.cpp
+Fid.cpp
+QuadGenerator.cpp
 Quadrilateral.cpp
-Triangle.cpp
+Redistribution.cpp
+Stat.cpp
+TransitionMatrix.cpp
+TransitionMatrixGenerator.cpp
 kd.cpp
+LineSegment.cpp
+Triangle.cpp
+TriangleGenerator.cpp
+Master.cpp
 MasterGrid.cpp
 MasterGridJump.cpp
-Fid.cpp
-Euler.cpp
-MeshTree.cpp
-Redistribution.cpp
-TriangleGenerator.cpp
-LineSegment.cpp
-Ode2DSystem.cpp
-Ode2DSystemGroup.cpp
-Stat.cpp
 Uniform.cpp
+MasterOdeint.cpp
 )
 
 set( TWOD_HEADERS
-display.hpp
-GridAlgorithmCode.hpp
-GridReport.hpp
 Bin.hpp
-InputCombination.hpp
-MeshAlgorithmCode.hpp
-Redistribution.hpp
-TwoDLibException.hpp
-CSRMatrix.hpp
-LineSegment.hpp
-MeshTree.hpp
-Stat.hpp
-TwoDLib.hpp
-Euler.hpp
-Cell.hpp
-Master.hpp
-MasterOdeint.hpp
-MasterGrid.hpp
-MasterGridJump.hpp
-Ode2DSystem.hpp
-Ode2DSystemGroup.hpp
-TransitionList.hpp
-Uniform.hpp
-CheckSystem.hpp
 MasterOMP.hpp
-TransitionMatrix.hpp
-modulo.hpp
-Coordinates.hpp
+Cell.hpp
 MasterParameter.hpp
-Point.hpp
-TransitionMatrixGenerator.hpp
-pugiconfig.hpp
-Fid.hpp
-Mesh.hpp
-PolyGenerator.hpp
-QuadGenerator.hpp
-Triangle.hpp
-pugixml.hpp
-FiducialElement.hpp
+MeshAlgorithmCode.hpp
+CheckSystem.hpp
 MeshAlgorithm.hpp
+Coordinates.hpp
+Mesh.hpp
+MeshTree.hpp
+CSRAdapter.hpp
+modulo.hpp
+CSRMatrix.hpp
+Ode2DSystemGroup.hpp
+DensityAlgorithmInterface.hpp
+Ode2DSystem.hpp
+Point.hpp
+display.hpp
+PolyGenerator.hpp
+pugiconfig.hpp
+Euler.hpp
+pugixml.hpp
+Fid.hpp
+QuadGenerator.hpp
+FiducialElement.hpp
 Quadrilateral.hpp
+GridAlgorithmCode.hpp
+GridAlgorithm.hpp
+Redistribution.hpp
+GridJumpAlgorithmCode.hpp
+GridJumpAlgorithm.hpp
+Stat.hpp
+GridReport.hpp
+TransitionList.hpp
+InputCombination.hpp
+TransitionMatrixGenerator.hpp
+kd.h
+TransitionMatrix.hpp
+LineSegment.hpp
 TriangleGenerator.hpp
+Triangle.hpp
+MasterGrid.hpp
+TwoDLibException.hpp
+TwoDLib.hpp
+MasterGridJump.hpp
+Master.hpp
+Uniform.hpp
 XML.hpp
+MasterOdeint.hpp
 )
 
 #############################################################################
@@ -110,7 +116,7 @@ add_library( ${MIIND_LIBRARY_PREFIX}twod ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS}
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}twod ${LIBLIST}
     ${gsl_LINK_FLAGS} ${MIIND_LIBRARY_PREFIX}mpi GL glut )
 
-install( FILES ${numtools_HEADERS}
+install( FILES ${TWOD_HEADERS}
     DESTINATION include/miind/TwoDLib )
 
 install( TARGETS ${MIIND_LIBRARY_PREFIX}twod

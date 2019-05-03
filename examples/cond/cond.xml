@@ -1,25 +1,31 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<Algorithm type="MeshAlgorithm" name="E" modelfile="cond.model" >
+<Algorithm type="MeshAlgorithmGroup" name="E" modelfile="cond.model" >
 <TimeStep>0.00001</TimeStep>
 <MatrixFile>cond_0_0.05_0.mat</MatrixFile>
 </Algorithm>
-<Algorithm type="RateFunctor" name="Exc Input">
+<Algorithm type="RateFunctor" name="ExcInput">
 <expression>1000.</expression>
 </Algorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="E" name="Cond E" type="EXCITATORY_DIRECT" />
+<Node algorithm="E" name="CondE" type="EXCITATORY_DIRECT" />
 <Node algorithm="Exc Input" name="Inp" type="NEUTRAL" />
 </Nodes>
 <Connections>
-<Connection In="Inp" Out="Cond E">1   0.05 0</Connection>
+<Connection In="Inp" Out="CondE">1   0.05 0</Connection>
 </Connections>
 <Reporting>
+<<<<<<< HEAD
 <Density node="Cond E" t_start="0.0" t_end="0.1" t_interval="0.001" />
 <!--<Display node="Cond E" />-->
 <Rate node="Cond E" t_interval="0.001"/>
+=======
+<Density node="CondE" t_start="0.0" t_end="0.1" t_interval="0.001" />
+<!--<Display node="CondE" />-->
+<Rate node="CondE" t_interval="0.001"/>
+>>>>>>> hughsfork/master
 </Reporting>
 <SimulationIO>
 <SimulationName>cond.dat</SimulationName>
@@ -36,7 +42,7 @@
 <Dense_min>0</Dense_min>
 <Dense_max>2.5</Dense_max>
 </CanvasParameter>
-<CanvasNode Name="Cond E" />
+<CanvasNode Name="CondE" />
 </SimulationIO>
 <SimulationRunParameter>
 <max_iter>1000000</max_iter>
