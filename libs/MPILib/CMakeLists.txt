@@ -140,14 +140,9 @@ set ( LIBLIST
     gsl
 )
 
-<<<<<<< HEAD
-add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${MPI_SRCS} ${MPI_HEADER})
-target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} -lpython2.7 )
-=======
 add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${MPI_SRCS} ${MPI_HEADER} ${MPI_HEADER_POP} ${MPI_HEADER_REP} ${MPI_HEADER_REP_HANDL} ${MPI_HEADER_UTIL})
 
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST})
->>>>>>> hughsfork/master
 
 #############################################################################
 # Cmake generated header files

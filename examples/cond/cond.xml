@@ -17,15 +17,9 @@
 <Connection In="Inp" Out="CondE">1   0.05 0</Connection>
 </Connections>
 <Reporting>
-<<<<<<< HEAD
-<Density node="Cond E" t_start="0.0" t_end="0.1" t_interval="0.001" />
-<!--<Display node="Cond E" />-->
-<Rate node="Cond E" t_interval="0.001"/>
-=======
 <Density node="CondE" t_start="0.0" t_end="0.1" t_interval="0.001" />
 <!--<Display node="CondE" />-->
 <Rate node="CondE" t_interval="0.001"/>
->>>>>>> hughsfork/master
 </Reporting>
 <SimulationIO>
 <SimulationName>cond.dat</SimulationName>
