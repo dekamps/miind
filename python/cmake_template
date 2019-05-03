@@ -8,8 +8,11 @@ cmake_minimum_required(VERSION 2.8)
 FIND_PACKAGE(GSL REQUIRED)
 FIND_PACKAGE(CUDA QUIET)
 
+find_package(PythonLibs REQUIRED)
+
 set(MIIND_LIBRARY_PREFIX miind)
 
+include_directories(${PYTHON_INCLUDE_DIRS})
 include_directories( ${CMAKE_SOURCE_DIR}/libs )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/GeomLib )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/TwoDLib )
@@ -61,9 +64,9 @@ ENDIF(ENABLE_MPI)
 # find boost with mpi
 ##############################################################################
 IF(ENABLE_MPI)
-        find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer system)
+        find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer python system)
 ELSE(ENABLE_MPI)
-	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer system)
+	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer python system)
 ENDIF(ENABLE_MPI)
 if( Boost_FOUND )
    message(STATUS "Boost found setting up directories")

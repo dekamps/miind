@@ -22,7 +22,7 @@
 
 #include <deque>
 #include <MPILib/include/TypeDefinitions.hpp>
-#include <math.h>
+#include <cmath> // Changed to cmath: MdK 08/04/2019
 
 namespace MPILib {
 

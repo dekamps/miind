@@ -20,8 +20,8 @@
 </Connections>
 <Reporting>
 <Density node="LIF" t_start="0.0" t_end="3.0" t_interval="0.001" />
-<!--<Display node="LIF" />-->
-<Rate node="LIF" />
+<Display node="LIF" />
+<Rate node="LIF" t_interval="0.001"/>
 </Reporting>
 <SimulationIO>
 <SimulationName>lif.dat</SimulationName>

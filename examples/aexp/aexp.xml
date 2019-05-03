@@ -26,7 +26,7 @@
 <Reporting>
 <Density node="LIF E" t_start="0.0" t_end="1.0" t_interval="0.001" />
 <!--<Display node="LIF E" />-->
-<Rate node="LIF E" />
+<Rate node="LIF E" t_interval="0.001"/>
 </Reporting>
 <SimulationIO>
 <SimulationName>single</SimulationName>

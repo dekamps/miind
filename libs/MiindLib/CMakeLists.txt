@@ -57,7 +57,7 @@ endif(ENABLE_CUDA)
 add_library( ${MIIND_LIBRARY_PREFIX}shared ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS})
 
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}shared
-    ${LIBLIST} -lpython2.7 -lboost_python)
+    ${LIBLIST} -lpython2.7 )
 
 install( FILES ${numtools_HEADERS}
     DESTINATION include/miind/MiindLib )
