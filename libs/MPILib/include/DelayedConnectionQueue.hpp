@@ -38,7 +38,7 @@ public:
   */
  DelayedConnectionQueue(Time timestep = 0.001,Time delay = 0):
    	_t_delay(delay),
-    _queue(1 + static_cast<int>(std::floor(delay/timestep))),
+    _queue(1 + static_cast<int>(std::floor(delay/timestep)),0.0),
     _t_delay_proprtion(std::abs(std::fmod(delay,timestep) - timestep) < 0.0000000001 ? 0.0 : std::fmod(delay,timestep)/timestep){
     }
 

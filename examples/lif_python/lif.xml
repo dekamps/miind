@@ -5,13 +5,13 @@
 <TimeStep>0.001</TimeStep>
 <MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
 </Algorithm>
-<Algorithm type="RateFunctor" name="Exc Input">
+<Algorithm type="RateFunctor" name="ExcInput">
 <expression>0</expression>
 </Algorithm>
 </Algorithms>
 <Nodes>
 <Node algorithm="E" name="LIF" type="EXCITATORY_DIRECT" />
-<Node algorithm="Exc Input" name="Inp" type="NEUTRAL" />
+<Node algorithm="ExcInput" name="Inp" type="NEUTRAL" />
 </Nodes>
 <Connections>
 <Connection In="Inp" Out="LIF">1 0.01 0</Connection>
@@ -20,8 +20,13 @@
 </Connections>
 <Reporting>
 <Density node="LIF" t_start="0.0" t_end="3.0" t_interval="0.001" />
+<<<<<<< HEAD
 <Display node="LIF" />
 <Rate node="LIF" t_interval="0.001"/>
+=======
+<!--<Display node="LIF" />-->
+<Rate node="LIF" t_interval="0.001" />
+>>>>>>> hughsfork/master
 </Reporting>
 <SimulationIO>
 <SimulationName>lif.dat</SimulationName>

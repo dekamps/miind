@@ -48,11 +48,16 @@ std::vector<Ode2DSystemGroup::Reset> Ode2DSystemGroup::InitializeReset()
 	return vec_ret;
 }
 
-std::vector<Ode2DSystemGroup::ResetRefractive> Ode2DSystemGroup::InitializeResetRefractive()
+void Ode2DSystemGroup::InitializeResetRefractive(MPILib::Time network_time_step)
+{
+	_reset_refractive = InitializeResetRefractiveInternal(network_time_step);
+}
+
+std::vector<Ode2DSystemGroup::ResetRefractive> Ode2DSystemGroup::InitializeResetRefractiveInternal(MPILib::Time network_time_step)
 {
 	std::vector<Ode2DSystemGroup::ResetRefractive> vec_ret;
 	for (MPILib::Index m = 0; m < _mesh_list.size(); m++){
-		ResetRefractive reset(*this,_vec_mass,_t,_vec_tau_refractive[m],_vec_reset[m],m);
+		ResetRefractive reset(*this,_vec_mass,network_time_step,_vec_tau_refractive[m],_vec_reset[m],m);
 		vec_ret.push_back(reset);
 	}
 	return vec_ret;
@@ -90,13 +95,14 @@ _linear_map(InitializeLinearMap()),
 _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
 _vec_tau_refractive(vec_tau_refractive),
-_reset_refractive(InitializeResetRefractive()),
 _reversal(InitializeReversal()),
 _reset(InitializeReset()),
+_reset_refractive(InitializeResetRefractiveInternal(mesh_list[0].TimeStep())),
 _clean(InitializeClean())
 {
 	for(const auto& m: _mesh_list)
 		assert(m.TimeStep() != 0.0);
+
 	this->CheckConsistency();
 }
 
@@ -121,13 +127,14 @@ _linear_map(InitializeLinearMap()),
 _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
 _vec_tau_refractive(std::vector<MPILib::Time>(mesh_list.size(),0.0)),
-_reset_refractive(InitializeResetRefractive()),
 _reversal(InitializeReversal()),
 _reset(InitializeReset()),
+_reset_refractive(InitializeResetRefractiveInternal(mesh_list[0].TimeStep())),
 _clean(InitializeClean())
 {
 	for(const auto& m: _mesh_list)
 		assert(m.TimeStep() != 0.0);
+
 	this->CheckConsistency();
 }
 

@@ -29,13 +29,15 @@ set( TWOD_HEADERS
 CSRAdapter.cuh
 CudaOde2DSystemAdapter.cuh
 CudaEuler.cuh
+CudaTwoDLib.hpp
 )
 cuda_add_library( ${MIIND_LIBRARY_PREFIX}cudatwod ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS} ${SRC} )
 target_compile_options( ${MIIND_LIBRARY_PREFIX}cudatwod PUBLIC )
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}cudatwod
     ${gsl_LINK_FLAGS} )
 
-install( FILES ${numtools_HEADERS}
+
+install( FILES ${TWOD_HEADERS}
     DESTINATION include/miind/CudaTwoDLib )
 
 install( TARGETS ${MIIND_LIBRARY_PREFIX}cudatwod

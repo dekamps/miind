@@ -653,6 +653,14 @@ if __name__ == "__main__":
   else:
       debug = len(sys.argv) > 1 and sys.argv[1] == '-debug'
 
+      try:
+          import gnureadline as readline
+      except ImportError:
+          import readline
+
+      readline.parse_and_bind('tab: complete')
+      readline.parse_and_bind('set editing-mode vi')
+
       while True:
           command_string = input('> ')
           command = command_string.split(' ')

@@ -41,10 +41,12 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 CudaOde2DSystemAdapter::CudaOde2DSystemAdapter
 (
-    TwoDLib::Ode2DSystemGroup& group
+    TwoDLib::Ode2DSystemGroup& group,
+		MPILib::Time network_time_step
 ):
 _group(group),
 _time_step(group.MeshObjects()[0].TimeStep()),
+_network_time_step(network_time_step),
 _mesh_size(group.MeshObjects().size()),
 _n(group.Mass().size()),
 _hostmass(_n,0.),
@@ -75,6 +77,13 @@ _numBlocks( (_n + _blockSize - 1) / _blockSize)
 
 }
 
+CudaOde2DSystemAdapter::CudaOde2DSystemAdapter
+(
+    TwoDLib::Ode2DSystemGroup& group
+): CudaOde2DSystemAdapter(group, group.MeshObjects()[0].TimeStep())
+{
+}
+
 void CudaOde2DSystemAdapter::TransferMapData()
 {
 
@@ -86,8 +95,8 @@ void CudaOde2DSystemAdapter::TransferMapData()
 
 void CudaOde2DSystemAdapter::FillRefractoryTimes(const std::vector<MPILib::Time>& times) {
 	for(inttype m = 0; m < _mesh_size; m++){
-		_nr_refractory_steps[m] = 2 + static_cast<int>(std::floor(times[m] / _time_step));
-		_refractory_prop[m] = std::abs(std::fmod(times[m],_time_step) - _time_step) < 0.000001 ? 0 : std::fmod(times[m],_time_step)/_time_step;
+		_nr_refractory_steps[m] = 2 + static_cast<int>(std::floor(times[m] / _network_time_step));
+		_refractory_prop[m] = std::abs(std::fmod(times[m],_network_time_step) - _network_time_step) < 0.000001 ? 0 : std::fmod(times[m],_network_time_step)/_network_time_step;
 	}
 }
 

@@ -209,9 +209,9 @@ def generate(func, timestep, timescale, tolerance, basename, threshold_v, reset_
     api.MeshTools.buildTransformFileFromModel(basename, 1000000000)
     api.MeshTools.buildTransformFileFromModel(basename, reset_shift_w=reset_shift_h, mode='resettransform')
 
-    # filename = basename + '.mesh'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
+    filename = basename + '.mesh'
+    if os.path.exists(filename):
+        os.remove(filename)
 
     filename = basename + '.rev'
     if os.path.exists(filename):
@@ -225,9 +225,9 @@ def generate(func, timestep, timescale, tolerance, basename, threshold_v, reset_
     if os.path.exists(filename):
         os.remove(filename)
 
-    # filename = basename + '_transform.mesh'
-    # if os.path.exists(filename):
-    #     os.remove(filename)
+    filename = basename + '_transform.mesh'
+    if os.path.exists(filename):
+        os.remove(filename)
 
     filename = basename + '_transform.rev'
     if os.path.exists(filename):
