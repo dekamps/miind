@@ -11,9 +11,10 @@ FIND_PACKAGE(CUDA QUIET)
 set(MIIND_LIBRARY_PREFIX miind)
 
 FIND_PACKAGE(GSL REQUIRED)
-
+find_package(PythonLibs REQUIRED)
 link_directories( ${GSL_LIBRARY_DIRS} )
 
+include_directories(${PYTHON_INCLUDE_DIRS})
 include_directories( ${GSL_INCLUDE_DIRS} )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/ )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/MPILib )
@@ -69,9 +70,9 @@ ENDIF(ENABLE_MPI)
 # find boost with mpi
 ##############################################################################
 IF(ENABLE_MPI)
-        find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer system)
+        find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer python system)
 ELSE(ENABLE_MPI)
-	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer system)
+	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer python system)
 ENDIF(ENABLE_MPI)
 if( Boost_FOUND )
    message(STATUS "Boost found setting up directories")

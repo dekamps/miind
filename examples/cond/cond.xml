@@ -19,7 +19,7 @@
 <Reporting>
 <Density node="Cond E" t_start="0.0" t_end="0.1" t_interval="0.001" />
 <!--<Display node="Cond E" />-->
-<Rate node="Cond E" />
+<Rate node="Cond E" t_interval="0.001"/>
 </Reporting>
 <SimulationIO>
 <SimulationName>cond.dat</SimulationName>

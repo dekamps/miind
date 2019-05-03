@@ -9,6 +9,7 @@ INCLUDE_DIRECTORIES(
 )
 set( LIB_TYPE SHARED )
 
+find_package(gsl REQUIRED)
 include_directories(include)
 
 include_directories( ${GSL_INCLUDE_DIRS} )
@@ -72,12 +73,11 @@ set ( LIBLIST
     ${MPI_LIBRARIES}
     ${MIIND_LIBRARY_PREFIX}numtools
     ${gsl_LINK_FLAGS}
-	gsl
+    gsl
 )
 
 add_library( ${MIIND_LIBRARY_PREFIX}mpi ${LIB_TYPE} ${MPI_SRCS} ${MPI_HEADER})
-
-target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} -lpython2.7 -lboost_python)
+target_link_libraries( ${MIIND_LIBRARY_PREFIX}mpi ${LIBLIST} -lpython2.7 )
 
 #############################################################################
 # Cmake generated header files

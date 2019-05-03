@@ -1,4 +1,3 @@
-
 project( ${MIIND_LIBRARY_PREFIX}twod )
 
 link_directories( ${GSL_LIBRARY_DIRS} )
@@ -91,11 +90,25 @@ TriangleGenerator.hpp
 XML.hpp
 )
 
+#############################################################################
+# Libraries
+#############################################################################
+if (UNIX)
+   ADD_DEFINITIONS("-fno-strict-aliasing" )
+endif (UNIX)
+set ( LIBLIST
+    ${Boost_LIBRARIES}
+    ${MPI_LIBRARIES}
+    ${MIIND_LIBRARY_PREFIX}numtools
+    ${gsl_LINK_FLAGS}
+    gsl
+)
+
 
 add_library( ${MIIND_LIBRARY_PREFIX}twod ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS})
 
-target_link_libraries( ${MIIND_LIBRARY_PREFIX}twod
-    ${gsl_LINK_FLAGS} )
+target_link_libraries( ${MIIND_LIBRARY_PREFIX}twod ${LIBLIST}
+    ${gsl_LINK_FLAGS} ${MIIND_LIBRARY_PREFIX}mpi GL glut )
 
 install( FILES ${numtools_HEADERS}
     DESTINATION include/miind/TwoDLib )
