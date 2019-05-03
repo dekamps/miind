@@ -33,13 +33,8 @@
 <Density node="QIF_I" t_start="0.0" t_end="10.0" t_interval="0.001" />
 <!--<Display node="QIF_E" />
 <Display node="QIF_I" />-->
-<<<<<<< HEAD
-<Rate node="QIF_E" t_interval="0.001"/>
-<Rate node="QIF_I" t_interval="0.001"/>
-=======
 <Rate node="QIF_E" t_interval="0.001" />
 <Rate node="QIF_I" t_interval="0.001" />
->>>>>>> hughsfork/master
 </Reporting>
 <SimulationIO>
 <SimulationName>qif.dat</SimulationName>

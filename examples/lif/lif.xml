@@ -19,11 +19,7 @@
 <Reporting>
 <Density node="LIF" t_start="0.0" t_end="2.0" t_interval="0.001" />
 <!--<Display node="LIF E" />-->
-<<<<<<< HEAD
-<Rate node="LIF E" t_interval="0.001"/>
-=======
 <Rate node="LIF" t_interval="0.001"/>
->>>>>>> hughsfork/master
 </Reporting>
 <SimulationIO>
 <SimulationName>lif.dat</SimulationName>
