@@ -91,7 +91,7 @@ if( Boost_FOUND )
    include_directories( ${Boost_INCLUDE_DIR} )
    link_directories( ${Boost_LIBRARY_DIR} )
 else ( Boost_FOUND )
-   message(FATAL_ERROR "Boost is mandatory to build the libraries")
+   message("Boost is not found. Non MPI only.")
 endif( Boost_FOUND )
 ##############################################################################
 #
