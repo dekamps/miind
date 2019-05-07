@@ -19,9 +19,9 @@ include_directories( ${GSL_INCLUDE_DIRS} )
 # Use GeomLib as identifier for include directories
 
 find_path(MIIND_INCLUDE_DIR_DEFAULT NAMES "miind/GeomLib/GeomLib.hpp")
+IF (MIIND_INCLUDE_DIR_DEFAULT)
 set (MIIND_INCLUDE_DIR_DEFAULT "${MIIND_INCLUDE_DIR_DEFAULT}/miind")
 MESSAGE( " Miind include directory (default) : ${MIIND_INCLUDE_DIR_DEFAULT}" )
-IF (MIIND_INCLUDE_DIR_DEFAULT)
 include_directories( ${MIIND_INCLUDE_DIR_DEFAULT} )
 include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/GeomLib )
 include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/TwoDLib )
