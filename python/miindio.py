@@ -572,7 +572,7 @@ if __name__ == "__main__":
   settings = {}
   settings['mpi_enabled'] = True
   settings['openmp_enabled'] = True
-  settings['root_enabled'] = True
+  settings['root_enabled'] = False # default is root switched off
   settings['cuda_enabled'] = True
 
   cwd_settings = {}
@@ -600,11 +600,11 @@ if __name__ == "__main__":
   if(not op.exists(miind_cmake_cache) or not all(flags_set)):
       if not op.exists(settingsfilename):
           print('CMakeCache.txt in MIIND_ROOT/Build directory not found. Fall back to user settings file...')
-          print('Settings file ('+ settingsfilename +') not found. MPI, OPENMP, ROOT and CUDA enabled by default.')
+          print('Settings file ('+ settingsfilename +') not found. MPI, OPENMP and CUDA enabled by default. ROOT disabled.')
           with open(settingsfilename, 'w') as settingsfile:
               settings['mpi_enabled'] = True
               settings['openmp_enabled'] = True
-              settings['root_enabled'] = True
+              settings['root_enabled'] = False
               settings['cuda_enabled'] = True
               for k,v in settings.items():
                   settingsfile.write(k + '=' + str(v) + '\n')
