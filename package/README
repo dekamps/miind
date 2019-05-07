@@ -1,0 +1,25 @@
+How to generate the miind debian package
+1.05 is used as the example version number here, increment as appropriate.
+
+In working directory: 
+git clone <miind git repo link> miind-1.05
+cd miind-1.05
+rm -r .git
+cd ..
+tar -cvzf miind-1.05.tar.gz miind-1.05
+cd miind-1.05
+dh_make -f ../miind-1.05.tar.gz
+(When prompted) answer i and y
+cp package/control debian/
+cp package/miind.links debian/
+cp package/rules debian/
+dpkg-buildpackage -us -uc --source-option=--include-binaries
+cd ..
+
+Working directory contains miind_1.05-1_all.deb which can be installed using
+
+sudo apt install ./miind_1.05-1_all.deb
+
+This package has MPI, OPENMP and CUDA enabled. ROOT is disabled. To change this, edit the dh_auto_configure line in rules and set the required CMAKE flags. 
+
+Note also that by default, miindio.py sets MPI, OPENMP and CUDA to enabled and ROOT to disabled - can be changed with the 'settings' command.

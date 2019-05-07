@@ -14,97 +14,116 @@ INCLUDE_DIRECTORIES(
 )
 
 set( TWOD_SRC
-MasterOMP.cpp
 Cell.cpp
 CheckSystem.cpp
 Mesh.cpp
 CSRAdapter.cpp
 MeshTree.cpp
-Ode2DSystem.cpp
 CSRMatrix.cpp
-Ode2DSystemGroup.cpp
+Ode2DSystem.cpp
 display.cpp
-PolyGenerator.cpp
+Ode2DSystemGroup.cpp
 Euler.cpp
-pugixml.cpp
 Fid.cpp
+PolyGenerator.cpp
+pugixml.cpp
 QuadGenerator.cpp
 Quadrilateral.cpp
 Redistribution.cpp
 Stat.cpp
-TransitionMatrix.cpp
-TransitionMatrixGenerator.cpp
 kd.cpp
+TransitionMatrix.cpp
 LineSegment.cpp
-Triangle.cpp
-TriangleGenerator.cpp
+TransitionMatrixGenerator.cpp
 Master.cpp
 MasterGrid.cpp
+Triangle.cpp
+TriangleGenerator.cpp
 MasterGridJump.cpp
+MasterGridSomaDendrite.cpp
 Uniform.cpp
 MasterOdeint.cpp
+MasterOMP.cpp
 )
 
 set( TWOD_HEADERS
 Bin.hpp
 MasterOMP.hpp
-Cell.hpp
 MasterParameter.hpp
+Cell.hpp
 MeshAlgorithmCode.hpp
+MeshAlgorithmCustomCode.hpp
 CheckSystem.hpp
+MeshAlgorithmCustom.hpp
 MeshAlgorithm.hpp
 Coordinates.hpp
 Mesh.hpp
-MeshTree.hpp
 CSRAdapter.hpp
-modulo.hpp
+MeshTree.hpp
 CSRMatrix.hpp
-Ode2DSystemGroup.hpp
+modulo.hpp
 DensityAlgorithmInterface.hpp
-Ode2DSystem.hpp
-Point.hpp
 display.hpp
-PolyGenerator.hpp
-pugiconfig.hpp
+Ode2DSystemGroup.hpp
+Ode2DSystem.hpp
 Euler.hpp
-pugixml.hpp
+Point.hpp
 Fid.hpp
-QuadGenerator.hpp
+PolyGenerator.hpp
 FiducialElement.hpp
-Quadrilateral.hpp
+pugiconfig.hpp
 GridAlgorithmCode.hpp
+pugixml.hpp
 GridAlgorithm.hpp
-Redistribution.hpp
 GridJumpAlgorithmCode.hpp
+QuadGenerator.hpp
 GridJumpAlgorithm.hpp
-Stat.hpp
 GridReport.hpp
-TransitionList.hpp
+Quadrilateral.hpp
+GridSomaDendriteAlgorithmCode.hpp
+GridSomaDendriteAlgorithm.hpp
+Redistribution.hpp
 InputCombination.hpp
-TransitionMatrixGenerator.hpp
+Stat.hpp
+TransitionList.hpp
 kd.h
-TransitionMatrix.hpp
 LineSegment.hpp
-TriangleGenerator.hpp
-Triangle.hpp
+TransitionMatrixGenerator.hpp
+TransitionMatrix.hpp
 MasterGrid.hpp
-TwoDLibException.hpp
-TwoDLib.hpp
+TriangleGenerator.hpp
 MasterGridJump.hpp
+Triangle.hpp
+TwoDLibException.hpp
+MasterGridSomaDendrite.hpp
+TwoDLib.hpp
 Master.hpp
 Uniform.hpp
-XML.hpp
 MasterOdeint.hpp
+XML.hpp
 )
 
+set( GL_HEADERS 
+include/GL/eglew.h
+include/GL/freeglut.h
+include/GL/freeglut_ext.h
+include/GL/freeglut_std.h
+include/GL/glew.h
+include/GL/glut.h
+include/GL/glxew.h
+include/GL/wglew.h
+)
 
-add_library( ${MIIND_LIBRARY_PREFIX}twod ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS})
+add_library( ${MIIND_LIBRARY_PREFIX}twod ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS} ${GL_HEADERS})
 
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}twod
     ${gsl_LINK_FLAGS} )
 
 install( FILES ${TWOD_HEADERS}
     DESTINATION include/miind/TwoDLib )
+
+install( FILES ${GL_HEADERS}
+    DESTINATION include/miind/TwoDLib/include/GL )
 
 install( TARGETS ${MIIND_LIBRARY_PREFIX}twod
     LIBRARY DESTINATION lib
