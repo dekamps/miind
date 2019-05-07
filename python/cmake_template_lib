@@ -15,12 +15,34 @@ FIND_PACKAGE(GSL REQUIRED)
 link_directories( ${GSL_LIBRARY_DIRS} )
 
 include_directories( ${GSL_INCLUDE_DIRS} )
-include_directories( ${CMAKE_SOURCE_DIR}/libs/ )
-include_directories( ${CMAKE_SOURCE_DIR}/libs/MPILib )
-include_directories( ${CMAKE_SOURCE_DIR}/libs/GeomLib )
-include_directories( ${CMAKE_SOURCE_DIR}/libs/TwoDLib )
-include_directories( ${CMAKE_SOURCE_DIR}/libs/CudaTwoDLib )
-include_directories( ${CMAKE_SOURCE_DIR}/libs/MiindLib )
+
+# Use GeomLib as identifier for include directories
+
+find_path(MIIND_INCLUDE_DIR_DEFAULT NAMES "GeomLib/GeomLib.hpp")
+set (MIIND_INCLUDE_DIR_DEFAULT "${MIIND_INCLUDE_DIR_DEFAULT}/..")
+MESSAGE( " Miind include directory (default) : ${MIIND_INCLUDE_DIR_DEFAULT}" )
+IF (MIIND_INCLUDE_DIR_DEFAULT)
+include_directories( ${MIIND_INCLUDE_DIR_DEFAULT} )
+include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/GeomLib )
+include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/TwoDLib )
+include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/CudaTwoDLib )
+include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/MiindLib )
+
+ELSE (MIIND_INCLUDE_DIR_DEFAULT) # Miind isn't installed, so see if we can find a the dev location
+
+find_path(MIIND_INCLUDE_DIR NAMES "GeomLib/GeomLib.hpp" PATHS "${CMAKE_SOURCE_DIR}/libs/")
+MESSAGE( " Miind include directory : ${MIIND_INCLUDE_DIR} " )
+IF (MIIND_INCLUDE_DIR)
+include_directories( ${MIIND_INCLUDE_DIR} )
+include_directories( ${MIIND_INCLUDE_DIR}/GeomLib )
+include_directories( ${MIIND_INCLUDE_DIR}/TwoDLib )
+include_directories( ${MIIND_INCLUDE_DIR}/CudaTwoDLib )
+include_directories( ${MIIND_INCLUDE_DIR}/MiindLib )
+ENDIF (MIIND_INCLUDE_DIR)
+
+ENDIF (MIIND_INCLUDE_DIR_DEFAULT)
+
+
 set( LIB_TYPE SHARED )
 
 OPTION(ENABLE_MPI "MPI Desired" ${TOKEN_ENABLE_MPI})
