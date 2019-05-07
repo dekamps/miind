@@ -67,8 +67,8 @@ xml/wilsoncowan.xml
 )
 
 install( FILES ${PYTHON_SCRIPTS}
-    DESTINATION bin/miind/python )
+    DESTINATION share/miind/python )
 install( FILES ${PYTHON_SCRIPTS_API}
-    DESTINATION bin/miind/python/miind_api )
+    DESTINATION share/miind/python/miind_api )
 install( FILES ${PYTHON_SCRIPTS_XML}
-    DESTINATION bin/miind/python/xml )
+    DESTINATION share/miind/python/xml )
