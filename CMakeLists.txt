@@ -22,7 +22,11 @@ set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
 
 #for cross compiling remove the -march=native flag!
+if (APPLE)
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -fPIC -std=c++11")
+else (APPLE)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -fext-numeric-literals -fPIC")
+endif(APPLE)
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
 
@@ -58,7 +62,6 @@ IF(ENABLE_OPENMP)
 ENDIF(ENABLE_OPENMP)
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals -fPIC")
 
 IF(ENABLE_OPENMP)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -76,9 +79,9 @@ ENDIF(ENABLE_MPI)
 # find boost with mpi
 ##############################################################################
 IF(ENABLE_MPI)
-	find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer system)
+	find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer system python)
 ELSE(ENABLE_MPI)
-	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer system)
+	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer system python)
 ENDIF(ENABLE_MPI)
 if( Boost_FOUND )
    message(STATUS "Boost found setting up directories")
@@ -88,7 +91,7 @@ if( Boost_FOUND )
    include_directories( ${Boost_INCLUDE_DIR} )
    link_directories( ${Boost_LIBRARY_DIR} )
 else ( Boost_FOUND )
-   message(FATAL_ERROR "Boost is mandatory to build the libraries")
+   message("Boost is not found. Non MPI only.")
 endif( Boost_FOUND )
 ##############################################################################
 #

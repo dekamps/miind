@@ -148,6 +148,7 @@ def function_overrides(outfile,tree,typ):
     outfile.write('\t\t\n')
     outfile.write('\t\tif (_display_nodes.size() > 0)\n')
     outfile.write('\t\t\tTwoDLib::Display::getInstance()->animate(true, _display_nodes,_time_step);\n')
+
     outfile.write('\t\t'+ abstract_type(typ) +'::startSimulation();\n')
     outfile.write('\t}\n\n')
 

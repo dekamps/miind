@@ -7,7 +7,6 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_BINARY_DIR}/../../libs/
 )
 
-
 include_directories( ../../libs/MPILib )
 include_directories( ../../libs/GeomLib )
 include_directories( ../../libs/TwoDLib )
@@ -21,34 +20,34 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 # UnitGeom source and header files
 #############################################################################
 
-set (ONEPOP_TWOD_SRC 
+set (ONEPOP_TWOD_SRC
 	OnePop.cpp
 )
 
-set (ONELIF_GEOM_SRC 
+set (ONELIF_GEOM_SRC
 	LifOne.cpp
 )
 
-set (ONELIF_CANVAS_GEOM_SRC 
+set (ONELIF_CANVAS_GEOM_SRC
 	LifOneCanvas.cpp
 )
 
-set (TWOLIF_GEOM_SRC 
+set (TWOLIF_GEOM_SRC
 	LifTwo.cpp
 )
 
-set (TWOLIF_CANVAS_GEOM_SRC 
+set (TWOLIF_CANVAS_GEOM_SRC
 	LifTwoCanvas.cpp
 )
 
 set (ONEQIF_GEOM_SRC
-        QifJumpPoisson.cpp)	
+        QifJumpPoisson.cpp)
 
 set (QIF_GEOM_SRC_CORRELATED
-        QifCorrelated.cpp)	
+        QifCorrelated.cpp)
 
 set (RESPONSE_DATA
-        ResponseData.cpp)	
+        ResponseData.cpp)
 
 #############################################################################
 # Libraries
@@ -57,15 +56,15 @@ set (RESPONSE_DATA
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
-set ( LIBLIST       
+set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}geom
-    ${MIIND_LIBRARY_PREFIX}twod      
-    ${MIIND_LIBRARY_PREFIX}mpi      
-    ${MPI_LIBRARIES} 
+    ${MIIND_LIBRARY_PREFIX}twod
+    ${MIIND_LIBRARY_PREFIX}mpi
+    ${MPI_LIBRARIES}
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
     ${MIIND_LIBRARY_PREFIX}numtools
-    ${gsl_LINK_FLAGS} 
+    ${gsl_LINK_FLAGS}
     gsl
     gslcblas
     ${GLUT_LIBRARY}
@@ -98,5 +97,3 @@ target_link_libraries(QifCorrelated ${LIBLIST})
 
 add_executable(ResponseData ${RESPONSE_DATA})
 target_link_libraries(ResponseData ${LIBLIST})
-
-

@@ -7,7 +7,6 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_BINARY_DIR}/../../libs/
 )
 
-
 include_directories( ../../libs/MPILib )
 include_directories( ../../libs/GeomLib )
 
@@ -20,7 +19,7 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 # UnitMPILib source and header files
 #############################################################################
 
-set (UNIT_MPI_SRC 
+set (UNIT_MPI_SRC
     UnitMPILib.cpp
     DelayAssemblyTest.cpp
     HebbianAlgorithmTest.cpp
@@ -35,14 +34,14 @@ set (UNIT_MPI_SRC
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
-set ( LIBLIST       
+set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}geom
-    ${MIIND_LIBRARY_PREFIX}mpi      
-    ${MPI_LIBRARIES} 
+    ${MIIND_LIBRARY_PREFIX}mpi
+    ${MPI_LIBRARIES}
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
     ${MIIND_LIBRARY_PREFIX}numtools
-    ${gsl_LINK_FLAGS} 
+    ${gsl_LINK_FLAGS}
     gsl
     gslcblas
 )
@@ -53,4 +52,3 @@ set ( LIBLIST
 #############################################################################
 add_executable(UnitMPILib ${UNIT_MPI_SRC})
 target_link_libraries(UnitMPILib ${LIBLIST})
-

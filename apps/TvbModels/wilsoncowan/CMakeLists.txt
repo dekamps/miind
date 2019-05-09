@@ -1,11 +1,18 @@
 project( ${MIIND_LIBRARY_PREFIX}pythonmodule )
 
 link_directories( ${GSL_LIBRARY_DIRS} )
+
+
 include( RequireGSL )
+
 include_directories( ${GSL_INCLUDE_DIRS} )
 include_directories( ../../../libs/ )
 include_directories( ../../../libs/GeomLib )
 include_directories( ../../../libs/TwoDLib )
+
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
+
 set( LIB_TYPE SHARED )
 
 # TVB does not support MPI - as this Wilson Cowan shared library goes into the TVB source code,
@@ -54,6 +61,6 @@ set ( LIBLIST
     ${Boost_LIBRARIES}
 )
 
-add_library( miindwc ${LIB_TYPE} ${TVB_WC_SRC} ${PW_HEADERS})
+message("bla" ${Boost_LIBRARIES} )
 
 target_link_libraries( miindwc ${LIBLIST})

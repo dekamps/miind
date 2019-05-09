@@ -14,8 +14,6 @@ else( WIN32 )
   set( LIB_TYPE STATIC )
 endif( WIN32 )
 
-include_directories( ${GSL_INCLUDE_DIRS} )
-
 set( numtools_SRC
     Distribution.cpp
     GaussianDistribution.cpp
@@ -58,6 +56,7 @@ set( numtools_HEADERS
     TestDefinitions.h
     UniformDistribution.h )
 
+include_directories( ${GSL_INCLUDE_DIRS} )
 add_library( ${MIIND_LIBRARY_PREFIX}numtools ${LIB_TYPE} ${numtools_SRC} ${numtools_HEADERS})
 
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}numtools
