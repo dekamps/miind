@@ -23,3 +23,107 @@ sudo apt install ./miind_1.05-1_all.deb
 This package has MPI, OPENMP and CUDA enabled. ROOT is disabled. To change this, edit the dh_auto_configure line in rules and set the required CMAKE flags. 
 
 Note also that by default, miindio.py sets MPI, OPENMP and CUDA to enabled and ROOT to disabled - can be changed with the 'settings' command.
+
+######################################################################################################
+
+How to build the docker image
+Copy Dockerfile to working directory.
+
+In working directory:
+sudo docker build -t hughosborne/miind .
+sudo docker run -it --name  MiindBuild  hughosborne/miind /bin/bash
+
+Bash should now be started inside the docker.
+
+cd /root
+apt install git -y
+git clone https://github.com/dekamps/miind.git miind
+cd miind
+mkdir build
+cd build
+ccmake ..
+
+Recommended options:
+
+CMAKE_BUILD_TYPE = Release
+ENABLE_CUDA = ON (if supported)
+ENABLE_MPI = ON (if supported)
+ENABLE_OPENMP = ON (if supported)
+ENABLE_ROOT = OFF
+
+Complete all configuration in ccmake then generate.
+
+make
+
+(possible boost error here - see notes below)
+
+Edit .bashrc (~/.bashrc):
+
+export PATH=$PATH:/root/miind/python
+export PYTHONPATH=$PYTHONPATH:/root/miind/python
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/include/python3.6m/
+export OMP_NUM_THREADS=4
+
+bash
+
+mkdir /root/examples
+cp -r /root/miind/examples/* /root/examples
+
+Check everything works.
+
+rm -r /root/miind/.git
+rm -r /root/miind/.gitignore
+apt remove git
+exit
+exit
+
+Once out of the docker container.
+
+sudo docker login
+sudo docker commit MiindBuild hughosborne/miind:latest
+sudo docker push hughosborne/miind:latest
+
+(in case of issue with boost/communicator.hpp - the following is helpful for editing the file)
+
+/usr/include/boost/mpi/communicator.hpp(1750): error: explicit specialization of function "boost::mpi::communicator::send(int, int, const T &) const [with T=boost::mpi::packed_oarchive]" must precede its first use (
+(1177): here)
+
+/usr/include/boost/mpi/communicator.hpp(1773): error: explicit specialization of function "boost::mpi::communicator::recv(int, int, T &) const [with T=boost::mpi::packed_iarchive]" must precede its first use (
+(1265): here)
+
+/usr/include/boost/mpi/communicator.hpp(1808): error: explicit specialization of function "boost::mpi::communicator::isend(int, int, const T &) const [with T=boost::mpi::packed_oarchive]" must precede its first use (
+(1414): here)
+
+// line 1750
+/**
+ * INTERNAL ONLY
+ */
+template<>
+BOOST_MPI_DECL void
+communicator::send<packed_oarchive>(int dest, int tag,
+                                    const packed_oarchive& ar) const;
+
+
+// line 1773
+/**
+ * INTERNAL ONLY
+ */
+template<>
+BOOST_MPI_DECL status
+communicator::recv<packed_iarchive>(int source, int tag,
+                                    packed_iarchive& ar) const;
+
+
+// line 1808
+/**
+ * INTERNAL ONLY
+ */
+template<>
+BOOST_MPI_DECL request
+communicator::isend<packed_oarchive>(int dest, int tag,
+                                     const packed_oarchive& ar) const;
+
+
+
+
+
