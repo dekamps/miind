@@ -19,6 +19,7 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 #include "Cell.hpp"
 #include "modulo.hpp"
+#include <iostream>
 
 using namespace TwoDLib;
 
@@ -122,11 +123,13 @@ double Cell::CalculateSignedArea() const
 bool Cell::IsInside(const Point& p) const{
 
   for (MPILib::Index i = 0; i < _n_points; i++){
+
 		double dx = _vec_points[modulo((i+1),_n_points)][0] - _vec_points[i][0];
 		double dy = _vec_points[modulo((i+1),_n_points)][1] - _vec_points[i][1];
 
 		double dpx = p[0] - _vec_points[i][0];
 		double dpy = p[1] - _vec_points[i][1];
+
 		double cp = (dpx*dy - dpy*dx)*_b_is_clockwise;
 		if (cp < 0)
 			return false;
@@ -146,6 +149,7 @@ bool Cell::IsInside(const Point& p) const
 	  int i;
 	  double xinters;
 	  Point p1,p2;
+
 
 	  p1 = _vec_points[0];
 	  for (i=1;i<=N;i++) {

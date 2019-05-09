@@ -42,17 +42,35 @@ namespace CudaTwoDLib {
 	class CSRAdapter {
 	public:
 
-              CSRAdapter(CudaOde2DSystemAdapter& adapter, const std::vector<TwoDLib::CSRMatrix>& matrixvector, fptype euler_timestep );
+							CSRAdapter(CudaOde2DSystemAdapter& adapter, const std::vector<TwoDLib::CSRMatrix>& matrixvector, fptype euler_timestep );
+
+							CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib::CSRMatrix>& vecmat,
+							 inttype nr_connections, fptype euler_timestep,
+							 const std::vector<inttype>& vecmat_indexes, const std::vector<inttype>& grid_transforms);
 
               ~CSRAdapter();
- 
+
               void InspectMass(inttype);
 
               void ClearDerivative();
 
               void CalculateDerivative(const std::vector<fptype>&);
 
+							void CalculateMeshGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<int>&, const std::vector<int>&);
+
+							void CalculateGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<int>&, const std::vector<int>&);
+
+							void InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy);
+
+							void InitializeStaticGridConductanceEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy, const std::vector<fptype>& rest_vs);
+
+							void CalculateMeshGridDerivativeWithEfficacy(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates);
+
+							void SingleTransformStep();
+
               void AddDerivative();
+
+							void AddDerivativeFull();
 
               inttype NrIterations() const { return _nr_iterations; }
 
@@ -67,29 +85,42 @@ namespace CudaTwoDLib {
               void CreateStreams();
               void DeleteStreams();
 
-	          std::vector<inttype> Offsets(const std::vector<TwoDLib::CSRMatrix>&) const;
-	          std::vector<inttype> NrRows(const std::vector<TwoDLib::CSRMatrix>&) const;
-	          
-	      CudaOde2DSystemAdapter& _group;
+	          	std::vector<inttype> Offsets(const std::vector<TwoDLib::CSRMatrix>&) const;
+	          	std::vector<inttype> NrRows(const std::vector<TwoDLib::CSRMatrix>&) const;
+							std::vector<fptype> CellWidths(const std::vector<TwoDLib::CSRMatrix>&) const;
+
+	      			CudaOde2DSystemAdapter& _group;
               fptype                  _euler_timestep;
               inttype                 _nr_iterations;
               inttype                 _nr_m;
-  
+							inttype									_nr_streams;
+							inttype									_nr_grid_connections;
+
+							std::vector<inttype>		_grid_transforms;
+							std::vector<inttype> 		_vecmats;
+
               std::vector<inttype>   _nval;
               std::vector<fptype*>   _val;
               std::vector<inttype>   _nia;
               std::vector<inttype*>  _ia;
               std::vector<inttype>   _nja;
               std::vector<inttype*>  _ja;
-              
+
               std::vector<inttype> _offsets;
               std::vector<inttype> _nr_rows;
-            
+
+							std::vector<fptype>	 _cell_widths;
+							std::vector<fptype*> _goes;
+							std::vector<fptype*> _stays;
+							std::vector<int*> _offset1s;
+							std::vector<int*> _offset2s;
+
               fptype* _dydt;
+							fptype* _cell_vs;
 
               int _blockSize;
-              int _numBlocks; 
-              
+              int _numBlocks;
+
               cudaStream_t* _streams;
 	};
 }

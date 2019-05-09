@@ -80,7 +80,7 @@ public:
 	 * @param time Time point of the algorithm
 	 * @param typeVector Vector of the NodeTypes of the precursors
 	 */
-	virtual void evolveNodeState(const std::vector<Rate>& nodeVector,
+	void evolveNodeState(const std::vector<Rate>& nodeVector,
 			const std::vector<WeightValue>& weightVector, Time time,
 			const std::vector<NodeType>& typeVector) {
 		this->evolveNodeState(nodeVector, weightVector, time);
@@ -115,6 +115,13 @@ public:
 	 * @return The state of the algorithm. The Grid must at least contain one element; an empty grid will cause a crash.
 	 */
 	virtual AlgorithmGrid getGrid(NodeId, bool b_state = true) const = 0;
+
+	/**
+	 * Provide the algorithm with an identifier for self-identification in
+	 * singleton reporters - by default this does nothing so not to
+	 * annoy the compiler.
+	**/
+	virtual void assignNodeId( NodeId ) {}
 
 
 	std::valarray<double>& getArrayState(AlgorithmGrid& grid) const

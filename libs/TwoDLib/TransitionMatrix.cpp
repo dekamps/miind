@@ -94,4 +94,3 @@ bool TransitionMatrix::SelfTest(double precision) const
 
 	return true;
 }
-

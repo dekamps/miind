@@ -7,7 +7,7 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_BINARY_DIR}/../../libs/
 )
 
-
+find_package(gsl REQUIRED)
 include_directories( ../../libs/MPILib )
 include_directories( ../../libs/GeomLib )
 
@@ -45,7 +45,6 @@ set ( LIBLIST
     ${gsl_LINK_FLAGS} 
     gsl
     gslcblas
-
 )
 
 

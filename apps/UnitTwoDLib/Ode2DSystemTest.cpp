@@ -164,5 +164,3 @@ BOOST_AUTO_TEST_CASE(ResetTest){
 		sys.Evolve();
 	sys.Dump(ofstreset);
 }
-
-

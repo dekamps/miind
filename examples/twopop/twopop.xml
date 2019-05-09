@@ -28,15 +28,15 @@
 <V_reset>0</V_reset>
 <V_reversal>0</V_reversal>
 </NeuronParameter>
-<InitialDensityParameter> 
+<InitialDensityParameter>
 <mu>0.0</mu>
-<sigma>0.0</sigma> 
+<sigma>0.0</sigma>
 </InitialDensityParameter>
 <V_min>-0.02</V_min>
-<N_bins>2200</N_bins>
+<N_bins>5000</N_bins>
 </OdeParameter>
 </Algorithm>
-<Algorithm name="LIF_inhibitory"  system="LeakingOdeSystem" lambda="0.01" type="GeomAlgorithm">
+<Algorithm name="LIF_inhibitory"  system="LeakingOdeSystem" lambda="exp( -double(n_bins_3 - 1)*dyn_ode_leak_2.TStep()/(3e-3))" type="GeomAlgorithm">
 <OdeParameter>
 <NeuronParameter>
 <t_membrane>3e-3</t_membrane>
@@ -45,12 +45,12 @@
 <V_reset>0</V_reset>
 <V_reversal>0</V_reversal>
 </NeuronParameter>
-<InitialDensityParameter> 
-<mu>0.0</mu> 
+<InitialDensityParameter>
+<mu>0.0</mu>
 <sigma>0.0</sigma>
 </InitialDensityParameter>
 <V_min>-0.02</V_min>
-<N_bins>2200</N_bins>
+<N_bins>1 - ((3e-3)/dyn_ode_leak_2.TStep())*log(0.01)</N_bins>
 </OdeParameter>
 </Algorithm>
 <Algorithm name="Cortical Background Algorithm" type="RateFunctor">
@@ -85,7 +85,7 @@
 <Dense_min>0</Dense_min>
 <Dense_max>250</Dense_max>
 </CanvasParameter>
-<CanvasNode Name="LIF E"></CanvasNode> 
+<CanvasNode Name="LIF E"></CanvasNode>
 <CanvasNode Name="LIF I"></CanvasNode>
 </SimulationIO>
 <SimulationRunParameter>
@@ -94,7 +94,7 @@
 <t_end>0.05</t_end>
 <t_report>1e-04</t_report>
 <t_state_report>1e-04</t_state_report>
-<t_step>1e-06</t_step>
+<t_step>dyn_ode_leak_2.TStep()</t_step>
 <t_update>1e-04</t_update>
 <name_log>twopoptest.log</name_log>
 </SimulationRunParameter>

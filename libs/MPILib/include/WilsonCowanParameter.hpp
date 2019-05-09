@@ -38,9 +38,9 @@ struct WilsonCowanParameter {
 	 * @param f_bias bias
 	 */
 	WilsonCowanParameter(Time time_membrane, Rate rate_maximum, double f_noise,
-			     double f_bias = 0, double f_input = 0) :
+			     double f_bias = 0, double f_input = 0, double f_smoothing = 0) :
 	  _time_membrane(time_membrane), _rate_maximum(rate_maximum), _f_bias(f_bias),_f_noise(
-					f_noise), _f_input(f_input) {
+					f_noise), _f_input(f_input), _f_smoothing(f_smoothing) {
 	}
 
 	/**
@@ -73,6 +73,11 @@ struct WilsonCowanParameter {
 	 * input
 	 */
 	double _f_input = 0;
+
+	/**
+	 * smoothing term
+	 */
+	 double _f_smoothing = 0;
 };
 
 

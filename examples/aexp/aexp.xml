@@ -1,0 +1,58 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Variable Name="omega">1.0</Variable>
+<Algorithms>
+<Algorithm type="MeshAlgorithmGroup" name="ALG_ADEX" modelfile="aexp.model" >
+<TimeStep>0.00001</TimeStep>
+<!--<MatrixFile>aexp_-1_0_0.mat</MatrixFile>-->
+<MatrixFile>aexp_1_0_0.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="ExcInput">
+<expression>2000.</expression>
+</Algorithm>
+<Algorithm type="RateFunctor" name="InhInput">
+<expression><![CDATA[t < 0.1 ? 0. : 0.]]></expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="ALG_ADEX" name="ADEX" type="EXCITATORY_DIRECT" />
+<Node algorithm="ExcInput" name="Excit" type="NEUTRAL" />
+<Node algorithm="InhInput" name="Inhib" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="Excit" Out="ADEX">1  1. 0</Connection>
+<!--<Connection In="Inhib" Out="ADEX">1 -1. 0</Connection>-->
+</Connections>
+<Reporting>
+<Density node="ADEX" t_start="0.0" t_end="1.0" t_interval="0.001" />
+<Display node="ADEX" />
+<Rate node="ADEX" t_interval="0.001"/>
+</Reporting>
+<SimulationIO>
+<SimulationName>single</SimulationName>
+<OnScreen>FALSE</OnScreen>
+<WithState>TRUE</WithState>
+<WriteNet>FALSE</WriteNet>
+<CanvasParameter>
+<T_min>0</T_min>
+<T_max>0.3</T_max>
+<F_min>0</F_min>
+<F_max>20</F_max>
+<State_min>0</State_min>
+<State_max>1.0</State_max>
+<Dense_min>0</Dense_min>
+<Dense_max>2.5</Dense_max>
+</CanvasParameter>
+<CanvasNode Name="ADEX" />
+</SimulationIO>
+<SimulationRunParameter>
+<max_iter>1000000</max_iter>
+<t_begin>0</t_begin>
+<t_end>1.0</t_end>
+<t_report>0.013</t_report>
+<t_state_report>1e-03</t_state_report>
+<t_step>0.0001</t_step>
+<t_update>0.01</t_update>
+<name_log>single.log</name_log>
+</SimulationRunParameter>
+</Simulation>

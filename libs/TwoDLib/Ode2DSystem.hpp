@@ -24,6 +24,7 @@
 #include <iostream>
 #include <numeric>
 #include <vector>
+#include <math.h>
 #include "MPILib/include/TypeDefinitions.hpp"
 #include "MPILib/include/ProbabilityQueue.hpp"
 #include "Mesh.hpp"
@@ -67,11 +68,14 @@ namespace TwoDLib {
 		//! Shift the density
 		void Evolve();
 
+		void EvolveWithoutMeshUpdate();
 		//! Dump the current density profile (0), or the mass profile (1) to an output stream
 		void Dump(std::ostream&, int mode = 0) const;
 
 		//! Redistribute probability that has moved through threshold. Run this after the Master equation
 		void RedistributeProbability();
+
+		void RedistributeProbability(MPILib::Number);
 
 		//! Remap probability that has run from the end of a strip. Run this after evolution
 		void RemapReversal();
@@ -80,7 +84,10 @@ namespace TwoDLib {
 		double F() const {return _f;}
 
 		//! total probability mass in the system, should not be too far away from 1.0
-		double P() const { return std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0); }
+		double P() const {
+			return std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0)
+			+ _reset_refractive.getTotalProbInRefract();
+		}
 
 		//! average membrane potential
 		double AvgV() const ;
@@ -174,10 +181,18 @@ namespace TwoDLib {
 				MPILib::populist::StampedProbability prob;
 				prob._prob = from;
 				prob._time = t + _tau_refractive;
-				_vec_queue[i].push(prob);
+				// _vec_queue[i].push(prob);
 
-				from = _vec_queue[i].CollectAndRemove(t);
+				// from = _vec_queue[i].CollectAndRemove(t);
 				_vec_mass[_sys.Map(map._to[0],map._to[1])] += from;
+			}
+
+			double getTotalProbInRefract() const{
+				double total = 0.0;
+				// for (MPILib::populist::ProbabilityQueue q : _vec_queue){
+				// 	total += q.TotalProbability();
+				// }
+				return total;
 			}
 
 		private:
@@ -224,14 +239,17 @@ namespace TwoDLib {
 		const Mesh&           _mesh;
 		vector<MPILib::Index> _vec_length;
 		vector<MPILib::Index> _vec_cumulative;
+	public:
 		vector<double>	      _vec_mass;
+	private:
 		vector<double>		  _vec_area;
 
 		unsigned int	_it;
 		double			_f;
 
+public:
 		vector<vector<MPILib::Index> > _map;
-
+private:
 		vector<Redistribution> _vec_reversal;
 		vector<Redistribution> _vec_reset;
 		Reversal               _reversal;

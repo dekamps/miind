@@ -22,10 +22,12 @@
 #include <string>
 #include <vector>
 #include <MPILib/include/AlgorithmInterface.hpp>
+#include <MPILib/include/DelayedConnectionQueue.hpp>
 #include "MasterOdeint.hpp"
 #include "Ode2DSystemGroup.hpp"
 #include "pugixml.hpp"
-
+#include "display.hpp"
+#include "DensityAlgorithmInterface.hpp"
 
 namespace TwoDLib {
 
@@ -36,7 +38,7 @@ namespace TwoDLib {
  */
 
 	template <class WeightValue, class Solver=TwoDLib::MasterOdeint>
-	class MeshAlgorithm : public MPILib::AlgorithmInterface<WeightValue>  {
+	class MeshAlgorithm : public DensityAlgorithmInterface<WeightValue>  {
 
 	public:
 
@@ -84,6 +86,8 @@ namespace TwoDLib {
 		 */
 	  virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId, bool b_state = true) const;
 
+		virtual void reportDensity() const;
+
 		/**
 		 * Evolve the node state. In the default case it simply calls envolveNodeState
 		 * without the NodeTypes. However if an algorithm needs the nodeTypes
@@ -95,8 +99,7 @@ namespace TwoDLib {
 		 */
 		using MPILib::AlgorithmInterface<WeightValue>::evolveNodeState;
 		virtual void evolveNodeState(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<WeightValue>& weightVector, MPILib::Time time,
-				const std::vector<MPILib::NodeType>& typeVector);
+				const std::vector<WeightValue>& weightVector, MPILib::Time time);
 
 		/**
 		 * prepare the Evolve method
@@ -131,7 +134,12 @@ namespace TwoDLib {
 		 */
 		void InitializeDensity(MPILib::Index i, MPILib::Index j){_sys.Initialize(0,i,j);}
 
-	   	const Ode2DSystemGroup& Sys() const { return _sys; }
+	  const Ode2DSystemGroup& Sys() const { return _sys; }
+
+
+		//keep track of the node id
+		virtual void assignNodeId( MPILib::NodeId );
+
 
 		const std::vector<TwoDLib::Redistribution>& MapReversal() const { return  _vec_vec_rev[0]; }
 		const std::vector<TwoDLib::Redistribution>& MapReset()    const { return  _vec_vec_res[0]; }
@@ -157,9 +165,13 @@ namespace TwoDLib {
 		MPILib::Rate _rate;
 		MPILib::Time _t_cur;
 
+		std::vector<MPILib::Time>    _vec_tau_refractive;
+
 		// parsing auxilliaries
 		pugi::xml_document _doc;
 		pugi::xml_node     _root;
+
+		MPILib::NodeId _node_id;
 
 		// mesh and mappings
 		std::vector<TwoDLib::Mesh> _mesh_vec;          // we have to create a vector, even if MeshAlgorithm manages only one Mesh, because
@@ -169,9 +181,10 @@ namespace TwoDLib {
 
 		// map incoming rates onto the order used by MasterOMP
 		std::vector<MPILib::Index>              _vec_map;
-		std::vector<std::vector<MPILib::Rate> > _vec_rates; // this is fed to the apply step of MasterOMP.
+		std::vector<std::vector<MPILib::DelayedConnectionQueue>> _vec_vec_delay_queues; // this is fed to the apply step of MasterOMP.
 
 		MPILib::Time 						_dt;     // mesh time step
+		MPILib::Time						_network_time_step; // network time step
 		TwoDLib::Ode2DSystemGroup 			_sys;
 
 		std::unique_ptr<Solver>	_p_master;

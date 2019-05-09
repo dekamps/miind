@@ -7,7 +7,7 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_BINARY_DIR}/../../libs/
 )
 
-
+find_package(gsl REQUIRED)
 include_directories( ../../libs/MPILib )
 include_directories( ../../libs/GeomLib )
 include_directories( ../../libs/TwoDLib )
@@ -21,7 +21,7 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 # UnitGeom source and header files
 #############################################################################
 
-set (INT_TWOD_SRC 
+set (INT_TWOD_SRC
 )
 
 #############################################################################
@@ -31,18 +31,18 @@ set (INT_TWOD_SRC
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
-set ( LIBLIST       
+set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}geom
-    ${MIIND_LIBRARY_PREFIX}twod      
-    ${MIIND_LIBRARY_PREFIX}mpi      
-    ${MPI_LIBRARIES} 
+    ${MIIND_LIBRARY_PREFIX}twod
+    ${MIIND_LIBRARY_PREFIX}mpi
+    ${MPI_LIBRARIES}
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
     ${MIIND_LIBRARY_PREFIX}numtools
-    ${gsl_LINK_FLAGS} 
+    ${gsl_LINK_FLAGS}
     gsl
     gslcblas
-
+  ${GLUT_LIBRARY}
 )
 
 
@@ -78,5 +78,3 @@ target_link_libraries(aexp ${LIBLIST})
 
 add_executable(rinzel  rinzel.cpp)
 target_link_libraries(rinzel ${LIBLIST})
-
-

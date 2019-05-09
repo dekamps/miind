@@ -8,24 +8,28 @@ cmake_minimum_required(VERSION 2.8)
 FIND_PACKAGE(GSL REQUIRED)
 FIND_PACKAGE(CUDA QUIET)
 
+find_package(PythonLibs REQUIRED)
+
 set(MIIND_LIBRARY_PREFIX miind)
 
+include_directories(${PYTHON_INCLUDE_DIRS})
 include_directories( ${CMAKE_SOURCE_DIR}/libs )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/GeomLib )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/TwoDLib )
 include_directories( ${CMAKE_SOURCE_DIR}/libs/CudaTwoDLib )
+include_directories( ${CMAKE_SOURCE_DIR}/libs/MiindLib )
 
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
 
-OPTION(ENABLE_MPI "MPI Desired" OFF)
-OPTION(ENABLE_OPENMP "MPI Desired" ON)
-
+OPTION(ENABLE_MPI "MPI Desired" ${TOKEN_ENABLE_MPI})
+OPTION(ENABLE_OPENMP "OpenMP Desired" ${TOKEN_ENABLE_OPENMP})
 
 ##############################################################################
 # find ROOT
 ##############################################################################
-OPTION(ENABLE_ROOT "Root Desired" OFF)
+
+OPTION(ENABLE_ROOT "Root Desired" ${TOKEN_ENABLE_ROOT})
 
 IF (ENABLE_ROOT)
    # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
@@ -47,13 +51,22 @@ IF (ENABLE_ROOT)
    # target_link_libraries(Event ${ROOT_LIBRARIES})
    add_definitions("-DWANTROOT")
 ENDIF(ENABLE_ROOT)
+
+IF(ENABLE_MPI)
+  find_package(MPI REQUIRED)
+  add_definitions( -DENABLE_MPI=1 )
+	set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
+	set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
+	include_directories(${MPI_INCLUDE_PATH})
+ENDIF(ENABLE_MPI)
+
 ##############################################################################
 # find boost with mpi
 ##############################################################################
 IF(ENABLE_MPI)
-        find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer system)
+        find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer python system)
 ELSE(ENABLE_MPI)
-	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer system)
+	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer python system)
 ENDIF(ENABLE_MPI)
 if( Boost_FOUND )
    message(STATUS "Boost found setting up directories")
@@ -81,25 +94,29 @@ ENDIF(ENABLE_OPENMP)
 # Libraries
 #############################################################################
 
+set(GLUT_LIBRARY "-lGL -lGLU -lglut")
+
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
-set ( LIBLIST       
+set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}geom
-    ${MIIND_LIBRARY_PREFIX}twod           
+    ${MIIND_LIBRARY_PREFIX}twod
     ${MIIND_LIBRARY_PREFIX}numtools
-    ${MIIND_LIBRARY_PREFIX}mpi           
-    ${MPI_LIBRARIES} 
+    ${MIIND_LIBRARY_PREFIX}mpi
+    ${MPI_LIBRARIES}
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
-    ${gsl_LINK_FLAGS} 
+    ${gsl_LINK_FLAGS}
     gsl
     gslcblas
+    ${GLUT_LIBRARY}
 )
 
 if (ENABLE_CUDA)
    if (NOT APPLE)
    list(APPEND LIBLIST ${MIIND_LIBRARY_PREFIX}cudatwod)
+   list(APPEND LIBLIST ${MIIND_LIBRARY_PREFIX}shared)
    endif (NOT APPLE)
 endif(ENABLE_CUDA)
 
@@ -109,7 +126,7 @@ endif(ENABLE_CUDA)
 #############################################################################
  #   add the flags for C++11
 if(CMAKE_COMPILER_IS_GNUCXX)
-add_definitions("-std=c++14 -fext-numeric-literals")
+add_definitions("-std=c++14 -fext-numeric-literals ${GLUT_LIBRARY}")
 else(CMAKE_COMPILER_IS_GNUCXX)
-add_definitions("-std=c++14")
+add_definitions("-std=c++14 ${GLUT_LIBRARY}")
 endif(CMAKE_COMPILER_IS_GNUCXX)

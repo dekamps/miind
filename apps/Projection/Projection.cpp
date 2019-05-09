@@ -158,10 +158,10 @@ void CreateProjections
   ofst << "</Projection>\n";
 }
 
- 
+
 void ProduceProjectionFile
 (
- const string& mesh_name, 
+ const string& mesh_name,
  double v_min,
  double v_max,
  int nv,
@@ -180,12 +180,12 @@ void ProduceProjectionFile
     throw TwoDLib::TwoDLibException("Your binning doesn't cover the mesh");
 
   std::vector<string> elem;
-  // Parse input arguments                                                                                                                                                       
+  // Parse input arguments
   TwoDLib::split(mesh_name,'.',elem);
 
   string projection_name(elem[0] + ".projection");
   CreateProjections(projection_name, mesh, v_min, v_max, nv, w_min, w_max, nw);
-  
+
 }
 
 int main(int argc, char** argv){
@@ -197,10 +197,10 @@ int main(int argc, char** argv){
       // Typical use, generate projection file
       std::string mesh_name(argv[1]);
       std::vector<string> elem;
-    
+
       // Parse input arguments
       TwoDLib::split(mesh_name,'.',elem);
-   
+
       if (elem.size() < 2 || elem[1] != string("model"))
 	throw TwoDLib::TwoDLibException("Model extension not .model");
 
@@ -220,7 +220,7 @@ int main(int argc, char** argv){
       ist_wmin >> w_min;
       ist_wmax >> w_max;
       ist_nw   >> nw;
-      
+
       ProduceProjectionFile(argv[1],v_min, v_max, nv, w_min, w_max, nw);
 
     } else if (argc == 2){
@@ -229,18 +229,18 @@ int main(int argc, char** argv){
 
       std::string mesh_name(argv[1]);
       std::vector<string> elem;
-    
+
       // parse input arguments
 
       TwoDLib::split(mesh_name,'.',elem);
-   
+
       if (elem.size() < 2 || elem[1] != string("model"))
 	throw TwoDLib::TwoDLibException("Model extension not .model");
 
       // print some info about the mesh
       const TwoDLib::Mesh mesh(argv[1]);
       std::cout << "There are: " << mesh.NrStrips() << " strips in the mesh." << std::endl;
-      
+
       // in particular, the bounding box
       std::pair<TwoDLib::Point,TwoDLib::Point> point_pair = Analyse(mesh);
       std::cout << "Bounding box: " << std::endl;

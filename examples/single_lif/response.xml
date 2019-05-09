@@ -1,7 +1,7 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<Algorithm type = "GeomAlgorithm" name="LIF_excitatory Algorithm" lambda="0.01" system="LeakingOdeSystem">
+<Algorithm lambda="0.01" name="LIF_excitatory Algorithm" system="LeakingOdeSystem" type="GeomAlgorithm">
 <OdeParameter>
 <NeuronParameter>
 <t_membrane>50e-3</t_membrane>
@@ -10,15 +10,15 @@
 <V_reset>0</V_reset>
 <V_reversal>0</V_reversal>
 </NeuronParameter>
-<InitialDensityParameter> 
+<InitialDensityParameter>
 <mu>0.0</mu>
-<sigma>0.0</sigma> 
+<sigma>0.0</sigma>
 </InitialDensityParameter>
 <V_min>-0.02</V_min>
 <N_bins>500</N_bins>
 </OdeParameter>
 </Algorithm>
-<Algorithm type="RateAlgorithm" name="Cortical Background Algorithm">
+<Algorithm name="Cortical Background Algorithm" type="RateAlgorithm">
 <rate>1.0</rate>
 </Algorithm>
 </Algorithms>
@@ -44,7 +44,7 @@
 <Dense_min>0</Dense_min>
 <Dense_max>2.5</Dense_max>
 </CanvasParameter>
-<CanvasNode Name="LIF E" /> 
+<CanvasNode Name="LIF E" />
 </SimulationIO>
 <SimulationRunParameter>
 <max_iter>1000000</max_iter>
@@ -52,7 +52,7 @@
 <t_end>0.3</t_end>
 <t_report>1e-03</t_report>
 <t_state_report>1e-03</t_state_report>
-<t_step>1e-05</t_step>
+<t_step>dyn_ode_leak_0.TStep()</t_step>
 <t_update>1e-05</t_update>
 <name_log>single.log</name_log>
 </SimulationRunParameter>

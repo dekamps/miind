@@ -6,6 +6,7 @@
 INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_BINARY_DIR}/../../libs/
 )
+find_package(gsl REQUIRED)
 
 include_directories( ../../libs/TwoDLib )
 include_directories( ../../libs/MPILib )
@@ -33,6 +34,7 @@ set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}numtools
     ${gsl_LINK_FLAGS} 
     gsl
+    ${GLUT_LIBRARY}
 )
 
 
