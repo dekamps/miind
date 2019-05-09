@@ -23,10 +23,10 @@ VectorizedNetwork.hpp
 
 if (ENABLE_CUDA)
    if (NOT APPLE)
-   list(APPEND TWOD_SRC 
+   list(APPEND TWOD_SRC
 	VectorizedNetwork.cpp
    )
-   list(APPEND TWOD_HEADERS 
+   list(APPEND TWOD_HEADERS
 	VectorizedNetwork.hpp
    )
    endif (NOT APPLE)
@@ -58,8 +58,7 @@ endif(ENABLE_CUDA)
 
 add_library( ${MIIND_LIBRARY_PREFIX}shared ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS})
 
-target_link_libraries( ${MIIND_LIBRARY_PREFIX}shared
-    ${LIBLIST})
+target_link_libraries( ${MIIND_LIBRARY_PREFIX}shared ${LIBLIST})
 
 install( FILES ${TWOD_HEADERS}
     DESTINATION include/miind/MiindLib )

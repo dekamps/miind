@@ -23,15 +23,15 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
-set ( LIBLIST       
+set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}twod
     ${MIIND_LIBRARY_PREFIX}geom
-    ${MIIND_LIBRARY_PREFIX}mpi           
-    ${MPI_LIBRARIES} 
+    ${MIIND_LIBRARY_PREFIX}mpi
+    ${MPI_LIBRARIES}
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
     ${MIIND_LIBRARY_PREFIX}numtools
-    ${gsl_LINK_FLAGS} 
+    ${gsl_LINK_FLAGS}
     gsl
     ${GLUT_LIBRARY}
 )
@@ -47,4 +47,3 @@ target_link_libraries(MatrixGenerator ${LIBLIST})
 
 install( TARGETS Bind DESTINATION share/miind/apps/)
 install( TARGETS MatrixGenerator DESTINATION share/miind/apps/)
-
