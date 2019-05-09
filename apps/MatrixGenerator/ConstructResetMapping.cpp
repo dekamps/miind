@@ -21,6 +21,7 @@
 
 void TwoDLib::ConstructResetMapping
 (
+	std::string mapping_tag,
 	std::ostream& ost,
 	const TwoDLib::Mesh& mesh,
 	const vector<TwoDLib::Coordinates>& ths,
@@ -29,7 +30,7 @@ void TwoDLib::ConstructResetMapping
 	TransitionMatrixGenerator* pgen
 ){
 
-	ost << "<Mapping type=\"Reset\">\n";
+	ost << "<Mapping type=\"" << mapping_tag <<"\">\n";
 	// can't assume sorting
 	vector<Coordinates> ressort = thres;
 	std::sort(ressort.begin(),ressort.end(),[&mesh](const Coordinates& c1, const Coordinates& c2)
@@ -53,7 +54,7 @@ void TwoDLib::ConstructResetMapping
 		// if that is not found mass should be added to the largest element
 		if (it == ressort.end()){
 		  ost << c[0] << "," << c[1] << "\t" << ressort.back()[0] << "," << ressort.back()[1] << "\t1.0\n";
-		  
+
 		} else
 		  if (it == ressort.begin())
 		    ost << c[0] << "," << c[1] << "\t" << ressort[0][0] << "," << ressort[0][1] << "\t1.0\n";

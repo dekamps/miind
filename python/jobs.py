@@ -3,7 +3,7 @@ Mainly for use by the miind script.'''
 
 import os
 import errno
-import directories
+import directories3 as directories
 
 def create_dir(name):
     '''Creates a directory relative to the MIIND_ROOT/build/jobs.'''

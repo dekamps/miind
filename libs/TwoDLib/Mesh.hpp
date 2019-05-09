@@ -89,7 +89,11 @@ namespace TwoDLib {
 
 		enum Threshold {ABOVE, EQUAL, BELOW };
 
+		vector<Coordinates> allCoords() const;
+
 		vector<Coordinates> findV(double V, Threshold) const;
+
+		vector<Coordinates> findPointInMeshSlow(const Point&) const;
 
 		//! These cells are labeled with Coordinates(0,j). They have no neighbours, and tests as to whether
 		//! points fall inside them should be made directly; they can not be expected to show up in
@@ -103,6 +107,22 @@ namespace TwoDLib {
 		//! Write to an XM format. It is guaranteed that a single strip is written on a single line,
 		//! and therefore can be processed by getline
 		void ToXML(std::ostream&) const;
+
+		// Get the grid cell width (only useful if the mesh is a grid)
+		double getCellWidth() const;
+
+		class GridCellTransition{
+		public:
+			double _stays;
+			double _goes;
+			int _offset_1;
+			int _offset_2;
+
+			GridCellTransition(double s, double g, int o1, int o2):
+			_stays(s), _goes(g), _offset_1(o1), _offset_2(o2) {}
+		};
+
+		GridCellTransition calculateCellTransition(double efficacy) const;
 
 	private:
 
@@ -144,6 +164,7 @@ namespace TwoDLib {
 		vector<vector<PolyGenerator> >	    _vec_vec_gen;
 		vector<unsigned int>              	_vec_timefactor;
 		double								_t_step;
+		double										_grid_cell_width;
 
 		// It is sometimes necessary to find out to which cells a given mesh point belongs.
 		// A mesh point will be mapped to an index position in a list of a list of coordinates.

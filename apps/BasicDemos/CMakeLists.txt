@@ -32,6 +32,7 @@ set ( LIBLIST
     ${gsl_LINK_FLAGS} 
     gsl
     gslcblas
+    ${GLUT_LIBRARY}
 )
 
 
@@ -40,8 +41,8 @@ set ( LIBLIST
 #############################################################################
 if (ENABLE_ROOT)
 add_executable(wilsoncowanDemo wilsoncowan.cpp)
-target_link_libraries(wilsoncowanDemo ${LIBLIST})
+target_link_libraries(wilsoncowanDemo ${LIBLIST} )
 
 add_executable(populationDemo population-example.cpp)
-target_link_libraries(populationDemo ${LIBLIST})
+target_link_libraries(populationDemo ${LIBLIST} )
 endif (ENABLE_ROOT)

@@ -4,15 +4,15 @@
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 //
 //    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation 
+//    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation
 //      and/or other materials provided with the distribution.
-//    * Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software 
+//    * Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software
 //      without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY 
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF 
-// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
@@ -24,6 +24,7 @@
 #include "FiducialElement.hpp"
 #include "MeshTree.hpp"
 #include "Uniform.hpp"
+#include "Quadrilateral.hpp"
 
 
 using std::vector;
@@ -48,8 +49,9 @@ namespace TwoDLib {
 		struct Hit {
 			  Coordinates	_cell;
 			  int 			_count;
+        double    _prop;
 
-			  Hit():_count(Lost){};
+			  Hit():_count(Lost),_prop(0){};
 		  };
 
 	  //! A TransitionMatrixGenerator. It accepts a MeshTree (effectively a Mesh proxy, a reference to a
@@ -75,6 +77,23 @@ namespace TwoDLib {
 			  double,		//!< translation in the v direction
 			  double    	//!< translation in the w direction
 	  	  );
+
+    //! Specify which transitions must be generated
+	  void GenerateTransitionUsingQuadTranslation
+	  	  (
+			  unsigned int,	//!< strip no
+			  unsigned int,	//!< cell no
+			  double,		//!< translation in the v direction
+			  double,    	//!< translation in the w direction
+        std::vector<Coordinates>  //!< above threshold cells
+	  	  );
+
+    void GenerateTransformUsingQuadTranslation
+    (
+      unsigned int,
+      unsigned int,
+      const TwoDLib::MeshTree&,
+      std::vector<Coordinates>);
 
 	  //! After a simulation, the generator must be reset
 	  void Reset(unsigned int N = 10);
@@ -108,6 +127,10 @@ namespace TwoDLib {
 	  const MeshTree&  		_tree;
 	  Uniform&				_uni;
 	  unsigned int 			_N;
+
+    Point _grid_bottom_left;
+    Point _grid_extent;
+    bool _grid_normal_orientation;
 
 	  std::vector<Hit> 		_hit_list;
 	  std::vector<Point>	_lost;

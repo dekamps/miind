@@ -14,13 +14,11 @@ def no_decay():
 
     tag_report = xml_tag('<t_report>1e-05</t_report>')
     tag_state  = xml_tag('<t_state_report>1e-03</t_state_report>')
-    tag_step   = xml_tag('<t_step>1e-05</t_step>')
     tag_update = xml_tag('<t_update>1e-05</t_update>')
 
     tag_time = xml_tag('<t_end>0.3</t_end>')
     f.replace_xml_tag(tag_time,1e-3)
 
-    f.replace_xml_tag(tag_step, 1e-7)
     f.replace_xml_tag(tag_state, 1e-5)
     f.replace_xml_tag(tag_report,1e-5)
     f.replace_xml_tag(tag_update,1e-5)
@@ -42,7 +40,7 @@ def no_input():
     tag_mu    = xml_tag('<mu>0.0</mu>')
     f.replace_xml_tag(tag_mu,0.5)
 
-    tag_sigma = xml_tag('<sigma>0.0</sigma>') 
+    tag_sigma = xml_tag('<sigma>0.0</sigma>')
     f.replace_xml_tag(tag_sigma,0.1)
 
     tag_screen = xml_tag('<OnScreen>TRUE</OnScreen>')
@@ -67,7 +65,7 @@ def single():
     f.write('response.xml')
 
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
     no_decay()
     no_input()
     single()

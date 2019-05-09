@@ -11,7 +11,7 @@ INCLUDE(require_out_of_src_build)
 MACRO_REQUIRE_OUT_OF_SRC_BUILD("Miind requires out-of-source builds.")
 
 # default install prefix. can be set with ccmake
-set( CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix." ) 
+set( CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix." )
 
 
 set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
@@ -20,9 +20,13 @@ set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 # compile flags
 ##############################################################################
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
-    
+
 #for cross compiling remove the -march=native flag!
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+if (APPLE)
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -fPIC -std=c++11")
+else (APPLE)
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -fext-numeric-literals -fPIC")
+endif(APPLE)
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
 
@@ -31,10 +35,11 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 ##############################################################################
 
 OPTION(ENABLE_OPENMP "Enable OpenMP" ON)
+OPTION(ENABLE_CUDA "Enable CUDA" OFF)
 OPTION(ENABLE_TESTING "Compile tests" OFF)
 OPTION(ENABLE_ROOT "Root Desired" OFF)
 OPTION(ENABLE_MEMORY_TEST "Generate memory test" OFF)
-OPTION(ENABLE_MPI "Enable mpi" FALSE)
+OPTION(ENABLE_MPI "Enable mpi" OFF)
 OPTION(ENABLE_COVERAGE "Enable GCov coverage analysis (defines a 'coverage' target and enforces static build of miind)" OFF)
 
 set(DEBUGLEVEL "logINFO" CACHE STRING "Define the Debug Level")
@@ -44,9 +49,9 @@ add_definitions( -DDEBUGLEVEL=${DEBUGLEVEL})
 # enable MPI dependent build
 ##############################################################################
 
-MESSAGE(STATUS "MPI enabled")
 # Require MPI for this project:
 IF(ENABLE_MPI)
+  MESSAGE(STATUS "MPI enabled")
 	find_package(MPI REQUIRED)
 	add_definitions( -DENABLE_MPI=1 )
 ENDIF(ENABLE_MPI)
@@ -55,33 +60,16 @@ IF(ENABLE_OPENMP)
 	find_package(OpenMP REQUIRED)
 	add_definitions( -DENABLE_OPENMP=1 )
 ENDIF(ENABLE_OPENMP)
-	
- #   add the flags for C++11 
-if(CMAKE_COMPILER_IS_GNUCXX)
-	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
-				OUTPUT_VARIABLE GCC_VERSION)
-	if (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
-		message(STATUS "C++14 activated.")
-		set(CMAKE_CXX_FLAGS "-std=c++14")
-	else ()
-		message(FATAL_ERROR "C++11 needed (Ranged based for). Therefore a gcc compiler with a version higher or equal than 4.7 is needed.")   
-	endif()
-else(CMAKE_COMPILER_IS_GNUCXX)
-	if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")            
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++11")
-	endif()
-	if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
-	        message(STATUS "Using Intel compiler.")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c++14")
-	endif()
 
-endif(CMAKE_COMPILER_IS_GNUCXX)
+
 
 IF(ENABLE_OPENMP)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 ENDIF(ENABLE_OPENMP)
-  
+
+set(GLUT_LIBRARY "-lGL -lGLU -lglut")
+
 IF(ENABLE_MPI)
 	set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
 	set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
@@ -91,9 +79,9 @@ ENDIF(ENABLE_MPI)
 # find boost with mpi
 ##############################################################################
 IF(ENABLE_MPI)
-	find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer system)
+	find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer system python)
 ELSE(ENABLE_MPI)
-	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer system)
+	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer system python)
 ENDIF(ENABLE_MPI)
 if( Boost_FOUND )
    message(STATUS "Boost found setting up directories")
@@ -103,7 +91,7 @@ if( Boost_FOUND )
    include_directories( ${Boost_INCLUDE_DIR} )
    link_directories( ${Boost_LIBRARY_DIR} )
 else ( Boost_FOUND )
-   message(FATAL_ERROR "Boost is mandatory to build the libraries")
+   message("Boost is not found. Non MPI only.")
 endif( Boost_FOUND )
 ##############################################################################
 #
@@ -146,7 +134,7 @@ ELSE()
    MESSAGE(STATUS "Coverage disabled")
 ENDIF()
 
-    
+
 #############################################################################
 # documentation
 #############################################################################
@@ -182,4 +170,8 @@ MESSAGE(STATUS "Compiler cxx debug flags:" ${CMAKE_CXX_FLAGS_DEBUG})
 MESSAGE(STATUS "Compiler cxx release flags:" ${CMAKE_CXX_FLAGS_RELEASE})
 MESSAGE(STATUS "Compiler cxx min size flags:" ${CMAKE_CXX_FLAGS_MINSIZEREL})
 MESSAGE(STATUS "Compiler cxx flags:" ${CMAKE_CXX_FLAGS})
+
+
+ADD_SUBDIRECTORY( python )
+ADD_SUBDIRECTORY( examples )
 

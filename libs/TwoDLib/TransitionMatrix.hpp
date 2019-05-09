@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "Coordinates.hpp"
+#include "Redistribution.hpp"
 namespace TwoDLib {
 
 	class TransitionMatrix {
@@ -37,10 +38,10 @@ namespace TwoDLib {
 			std::vector<Redistribution> _vec_to_line;
 		};
 
+		TransitionMatrix();
 
 		//! Requires a ".mat" file
 		TransitionMatrix(const std::string&);
-
 
 		friend class Master;
 		friend class MasterOMP;
@@ -54,8 +55,6 @@ namespace TwoDLib {
 		double Efficacy() const { return _tr_v ? _tr_v : _tr_w; }
 
 	private:
-
-		TransitionMatrix();
 
 		std::vector<TransferLine>	_vec_line;
 		double						_tr_v;

@@ -7,7 +7,7 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_BINARY_DIR}/../../libs/
 )
 
-
+find_package(gsl REQUIRED)
 include_directories( ../../libs/MPILib )
 include_directories( ../../libs/GeomLib )
 include_directories( ../../libs/TwoDLib )
@@ -21,25 +21,25 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 # UnitGeom source and header files
 #############################################################################
 
-set (UNIT_TWOD_SRC 
-2DUnit.cpp				
+set (UNIT_TWOD_SRC
+2DUnit.cpp
 AdapterTest.cpp
 CSRTest.cpp
-LineSegmentTest.cpp			
-Ode2DSystemTest.cpp			
-Ode2DSystemGroupTest.cpp			
+LineSegmentTest.cpp
+Ode2DSystemTest.cpp
+Ode2DSystemGroupTest.cpp
 FixtureOde2DSystemGroup.cpp
 TransitionMatrixTest.cpp
-FidTest.cpp				
-MasterTest.cpp				
-QuadrilateralTest.cpp			
+FidTest.cpp
+MasterTest.cpp
+QuadrilateralTest.cpp
 TriangleTest.cpp
-GeneratorTest.cpp			
-MeshAlgorithmTest.cpp			
-StatTest.cpp				
+GeneratorTest.cpp
+MeshAlgorithmTest.cpp
+StatTest.cpp
 UniformTest.cpp
-KDTreeTest.cpp				
-MeshTest.cpp				
+KDTreeTest.cpp
+MeshTest.cpp
 TransitionMatrixGeneratorTest.cpp
 )
 
@@ -50,18 +50,18 @@ TransitionMatrixGeneratorTest.cpp
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
-set ( LIBLIST       
+set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}geom
-    ${MIIND_LIBRARY_PREFIX}twod      
-    ${MIIND_LIBRARY_PREFIX}mpi      
-    ${MPI_LIBRARIES} 
+    ${MIIND_LIBRARY_PREFIX}twod
+    ${MIIND_LIBRARY_PREFIX}mpi
+    ${MPI_LIBRARIES}
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
     ${MIIND_LIBRARY_PREFIX}numtools
-    ${gsl_LINK_FLAGS} 
+    ${gsl_LINK_FLAGS}
     gsl
     gslcblas
-
+    ${GLUT_LIBRARY}
 )
 
 
@@ -89,4 +89,3 @@ configure_file( timefactor.mesh ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 #############################################################################
 add_executable(UnitTwoDLib ${UNIT_TWOD_SRC})
 target_link_libraries(UnitTwoDLib ${LIBLIST})
-

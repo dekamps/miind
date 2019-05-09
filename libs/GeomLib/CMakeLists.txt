@@ -49,6 +49,7 @@ GeomLib.hpp
 GeomParameter.hpp
 InitialDensityParameter.hpp  
 InputParameterSet.hpp
+GeomLibException.hpp
 LeakingOdeSystem.hpp
 LifEstimator.hpp
 LifNeuralDynamics.hpp
@@ -74,7 +75,8 @@ add_library( ${MIIND_LIBRARY_PREFIX}geom ${LIB_TYPE} ${GEOM_SRC} ${GEOM_HEADERS}
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}geom
     ${gsl_LINK_FLAGS} )
 
-install( FILES ${numtools_HEADERS}
+
+install( FILES ${GEOM_HEADERS}
     DESTINATION include/miind/GeomLib )
 
 install( TARGETS ${MIIND_LIBRARY_PREFIX}geom

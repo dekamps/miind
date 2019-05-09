@@ -3,12 +3,11 @@ ADD_SUBDIRECTORY( MPILib)
 ADD_SUBDIRECTORY( GeomLib)
 ADD_SUBDIRECTORY( NumtoolsLib )
 ADD_SUBDIRECTORY( TwoDLib )
+if(ENABLE_CUDA)
 if(APPLE)
 message("Ignoring CudaTwoDlib. No good Cuda support for Mac")
 else(APPLE)
 ADD_SUBDIRECTORY( CudaTwoDLib )
+ADD_SUBDIRECTORY( MiindLib )
 endif(APPLE)
-
-
-
-
+endif(ENABLE_CUDA)

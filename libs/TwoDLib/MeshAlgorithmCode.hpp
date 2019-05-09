@@ -27,6 +27,8 @@
 #include "MeshAlgorithm.hpp"
 #include "Stat.hpp"
 #include "TwoDLibException.hpp"
+#include "display.hpp"
+#include "GridReport.hpp"
 
 namespace {
 
@@ -47,7 +49,7 @@ namespace {
 
 namespace TwoDLib {
 
-	template <class WeightValue, class Solver>
+	template <class WeightValue,class Solver>
 	pugi::xml_node MeshAlgorithm<WeightValue,Solver>::CreateRootNode(const string& model_name){
 
 		// document
@@ -116,9 +118,10 @@ namespace TwoDLib {
 	_mesh_vec(CreateMeshObject()),
 	_vec_vec_rev(std::vector<std::vector<Redistribution> >{this->Mapping("Reversal")}),
 	_vec_vec_res(std::vector<std::vector<Redistribution> >{this->Mapping("Reset")}),
+	_vec_tau_refractive(std::vector<MPILib::Time>({tau_refractive})),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive),
 	_n_evolve(0),
 	_n_steps(0),
 	// AvgV method is for Fitzhugh-Nagumo, and other methods that don't have a threshold crossing
@@ -142,9 +145,10 @@ namespace TwoDLib {
 	_mesh_vec(rhs._mesh_vec),
 	_vec_vec_rev(rhs._vec_vec_rev),
 	_vec_vec_res(rhs._vec_vec_res),
+	_vec_tau_refractive(rhs._vec_tau_refractive),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction)
@@ -178,14 +182,20 @@ namespace TwoDLib {
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
 
+		Display::getInstance()->addOdeSystem(_node_id, &_sys);
+		GridReport<WeightValue>::getInstance()->registerObject(_node_id, this);
+
 		// the integration time step, stored in the MasterParameter, is gauged with respect to the
 		// network time step.
 		MPILib::Number n_ode = static_cast<MPILib::Number>(std::floor(t_step/_h));
-		MasterParameter par((n_ode > 1) ? n_ode : 1 );
+		MasterParameter par(40);
 
 		// vec_mat will go out of scope; MasterOMP will convert the matrices
 		// internally and we don't want to keep two versions.
 		std::vector<TransitionMatrix> vec_mat = InitializeMatrices(_mat_names);
+
+		_network_time_step = par_run.getTStep();
+		_sys.InitializeResetRefractive(_network_time_step);
 
 		try {
 			std::unique_ptr<Solver> p_master(new Solver(_sys,std::vector<std::vector<TransitionMatrix > >{vec_mat}, par));
@@ -207,6 +217,11 @@ namespace TwoDLib {
 	}
 
 	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::assignNodeId( MPILib::NodeId nid ) {
+		_node_id = nid;
+	}
+
+	template <class WeightValue,class Solver>
 	MPILib::AlgorithmGrid MeshAlgorithm<WeightValue,Solver>::getGrid(MPILib::NodeId id, bool b_state) const
 	{
 		// An empty grid will lead to crashes
@@ -215,7 +230,7 @@ namespace TwoDLib {
 
 		if (b_state){
 			std::ostringstream ost;
-			ost << id  << "_" << _t_cur;
+			ost << id  << "_" << (_t_cur-_dt);
 			ost << "_" << _sys.P();
 			string fn("mesh_" + ost.str());
 
@@ -237,12 +252,34 @@ namespace TwoDLib {
 	}
 
 	template <class WeightValue, class Solver>
+	void MeshAlgorithm<WeightValue,Solver>::reportDensity() const
+	{
+		std::ostringstream ost;
+		ost << _node_id  << "_" << _t_cur;
+		ost << "_" << _sys.P();
+		string fn("mesh_" + ost.str());
+
+		std::string model_path = _model_name;
+		boost::filesystem::path path(model_path);
+
+		// MdK 27/01/2017. grid file is now created in the cwd of the program and
+		// not in the directory where the mesh resides.
+		const std::string dirname = path.filename().string() + "_mesh";
+
+		if (! boost::filesystem::exists(dirname) ){
+			boost::filesystem::create_directory(dirname);
+		}
+		std::ofstream ofst(dirname + "/" + fn);
+			std::vector<std::ostream*> vec_str{&ofst};
+			_sys.Dump(vec_str);
+	}
+
+	template <class WeightValue, class Solver>
 	void MeshAlgorithm<WeightValue,Solver>::evolveNodeState
 	(
 		const std::vector<MPILib::Rate>& nodeVector,
 		const std::vector<WeightValue>& weightVector,
-		MPILib::Time time,
-		const std::vector<MPILib::NodeType>& typeVector
+		MPILib::Time time
 	)
 	{
 	  // The network time step must be an integer multiple of the network time step; in principle
@@ -252,7 +289,7 @@ namespace TwoDLib {
 		if (_n_steps == 0){
 		  // since n_steps == 0, time is the network time step
 			double n = (time - _t_cur)/_dt;
-		    
+
 			_n_steps = static_cast<MPILib::Number>(round(n));
 			if (_n_steps == 0){
 			  throw TwoDLibException("Network time step is smaller than this grid's time step.");
@@ -268,15 +305,23 @@ namespace TwoDLib {
 
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
-	      _sys.Evolve();
-          _sys.RemapReversal();
+				_sys.Evolve();
+				_sys.RemapReversal();
 	    }
 
-	    // master equation
-	    _p_master->Apply(_n_steps*_dt,_vec_rates,_vec_map);
+			std::vector<std::vector<MPILib::Rate>> vec_rates;
+			for(unsigned int i=0; i<_vec_vec_delay_queues.size(); i++){
+				std::vector<MPILib::Rate> rates;
+				for(unsigned int j=0; j<_vec_vec_delay_queues[i].size(); j++){
+					rates.push_back(_vec_vec_delay_queues[i][j].getCurrentRate());
+				}
+				vec_rates.push_back(rates);
+			}
 
-	    // threshold
-	    _sys.RedistributeProbability();
+	    // master equation
+	    _p_master->Apply(_n_steps*_dt,vec_rates,_vec_map);
+
+			_sys.RedistributeProbability(_n_steps);
 
  	    _t_cur += _n_steps*_dt;
  	    _rate = (_sys.*_sysfunction)()[0];
@@ -311,12 +356,14 @@ namespace TwoDLib {
 			}
 		}
 
- 		_vec_rates = std::vector< std::vector<MPILib::Efficacy> >(0); // MeshAlgorithm really only uses the first array, i.e. the rates it receives in prepareEvole
- 		_vec_rates.push_back( std::vector<MPILib::Efficacy>(vec_weights.size(),0.) );
-
+		_vec_vec_delay_queues = std::vector< std::vector<MPILib::DelayedConnectionQueue> >(0); // MeshAlgorithm really only uses the first array, i.e. the rates it receives in prepareEvole
+ 		_vec_vec_delay_queues.push_back( std::vector<MPILib::DelayedConnectionQueue>(vec_weights.size()));
+		for(unsigned int q = 0; q < vec_weights.size(); q++){
+			_vec_vec_delay_queues[0][q] = MPILib::DelayedConnectionQueue(_network_time_step, vec_weights[q]._delay);
+		}
 	}
 
-	template <class WeightValue, class Solver>
+	template <class WeightValue,class Solver>
 	void MeshAlgorithm<WeightValue,Solver>::prepareEvolve
 	(
 		const std::vector<MPILib::Rate>& nodeVector,
@@ -330,7 +377,7 @@ namespace TwoDLib {
 
 		assert(nodeVector.size() == weightVector.size());
 		for (MPILib::Index i = 0; i < nodeVector.size(); i++){
-			_vec_rates[0][i] = nodeVector[i]*weightVector[i]._number_of_connections;
+			_vec_vec_delay_queues[0][i].updateQueue(nodeVector[i]*weightVector[i]._number_of_connections);
 		}
 	}
 }

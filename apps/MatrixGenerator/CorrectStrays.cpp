@@ -108,3 +108,68 @@ TwoDLib::TransitionList TwoDLib::CorrectStrays
 
 	return list_ret;
 }
+
+TwoDLib::TransitionList TwoDLib::CorrectStraysProportion
+(
+	const TwoDLib::TransitionList& l,               //! list of all hits for a transition
+	const vector<TwoDLib::Coordinates>& ths,     	//! list of cells on threshold
+	const vector<TwoDLib::Coordinates>& above,	    //! list of cells above threshold
+	const Mesh& m 									//! need to be able to find the positions of coordinates
+){
+	// the transition list contains transitions, regardless of whether some of them may be above
+	// threshold. CorrectStrays maps a transition to a cell above back to a cell on threshold. The cleaned
+	// translation list is returned.
+
+	TransitionList list_ret;
+	list_ret._origin = l._origin;
+	list_ret._number = l._number;
+
+
+	std::vector<TwoDLib::Hit> vec_above;
+
+	// we make a list of destinations above threshold; they will have to be remapped onto the threshold
+	for(const TwoDLib::Hit& h: l._destination_list){
+		if ( std::find(above.begin(), above.end(), h._cell) != above.end() ){
+			vec_above.push_back(h);
+		}	else {
+			list_ret._destination_list.push_back(h);
+		}
+	}
+
+	vector<MPILib::Index> vec_close;
+	// for each destination in the above list we must find the threshold cell that is closest
+	for (const auto& h: vec_above){
+		MPILib::Index i_n = find_nearest(ths,h, m);
+		vec_close.push_back(i_n);
+	}
+
+	// now for each above cell check if there is already a hit corresponding to that threshold cell in the destination list
+	for(MPILib::Index i = 0; i < vec_above.size(); i++ ){
+		Coordinates nearest_th = ths[vec_close[i]];
+
+		// if there is, increase the count by the hit of the above cell
+		// if there isn't insert a hit with a count of the above cell
+
+		bool b_hit = false;
+		MPILib::Index i_list = 0;
+		for(MPILib::Index i = 0; i < list_ret._destination_list.size(); i++){
+			const Hit& h = list_ret._destination_list[i];
+			if (h._cell[0] == nearest_th[0] && h._cell[1] == nearest_th[1]){
+				b_hit = true;
+				i_list = i;
+			}
+		}
+		if (b_hit){
+			list_ret._destination_list[i_list]._prop += vec_above[i]._prop;
+		} else {
+			// if there isn't insert a hit with a count of the above cell
+			Hit new_hit;
+			new_hit._cell = nearest_th;
+			new_hit._prop = vec_above[i]._prop;
+			list_ret._destination_list.push_back(new_hit);
+		}
+
+	}
+
+	return list_ret;
+}

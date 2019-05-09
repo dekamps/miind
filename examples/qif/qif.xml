@@ -1,0 +1,67 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithm" name="E" modelfile="qif_excit.model" >
+<TimeStep>0.0001</TimeStep>
+<MatrixFile>qif_excit_0.05_0_0.mat</MatrixFile>
+<MatrixFile>qif_excit_-0.05_0_0.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="MeshAlgorithm" name="I" modelfile="qif_inhib.model" >
+<TimeStep>0.0001</TimeStep>
+<MatrixFile>qif_inhib_0.05_0_0.mat</MatrixFile>
+<MatrixFile>qif_inhib_-0.05_0_0.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="Exc Input">
+<expression>1000.</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="E" name="QIF_E" type="INHIBITORY_DIRECT" />
+<Node algorithm="I" name="QIF_I" type="INHIBITORY_DIRECT" />
+<Node algorithm="Exc Input" name="Inp" type="NEUTRAL" />
+</Nodes>
+<Connections>
+  <Connection In="Inp" Out="QIF_E">2 0.05 0</Connection>
+  <Connection In="Inp" Out="QIF_I">6 0.05 0</Connection>
+  <Connection In="QIF_E" Out="QIF_I">160 -0.05 0</Connection>
+  <!--<Connection In="QIF E" Out="QIF E">5 -0.05 0</Connection>-->
+  <!--<Connection In="QIF I" Out="QIF I">5 -0.05 0</Connection>-->
+  <Connection In="QIF_I" Out="QIF_E">130 -0.05 0</Connection>
+</Connections>
+<Reporting>
+<Density node="QIF_E" t_start="0.0" t_end="10.0" t_interval="0.001" />
+<Density node="QIF_I" t_start="0.0" t_end="10.0" t_interval="0.001" />
+<!--<Display node="QIF_E" />
+<Display node="QIF_I" />-->
+<Rate node="QIF_E" t_interval="0.001" />
+<Rate node="QIF_I" t_interval="0.001" />
+</Reporting>
+<SimulationIO>
+<SimulationName>qif.dat</SimulationName>
+<OnScreen>FALSE</OnScreen>
+<WithState>TRUE</WithState>
+<WriteNet>FALSE</WriteNet>
+<CanvasParameter>
+<T_min>0</T_min>
+<T_max>0.3</T_max>
+<F_min>0</F_min>
+<F_max>20</F_max>
+<State_min>0</State_min>
+<State_max>1.0</State_max>
+<Dense_min>0</Dense_min>
+<Dense_max>2.5</Dense_max>
+</CanvasParameter>
+<CanvasNode Name="QIF_E" />
+<CanvasNode Name="QIF_I" />
+</SimulationIO>
+<SimulationRunParameter>
+<max_iter>1000000</max_iter>
+<t_begin>0</t_begin>
+<t_end>10.0</t_end>
+<t_report>0.001</t_report>
+<t_state_report>0.001</t_state_report>
+<t_step>0.0001</t_step>
+<t_update>0.01</t_update>
+<name_log>qif.log</name_log>
+</SimulationRunParameter>
+</Simulation>
