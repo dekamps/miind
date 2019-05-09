@@ -1,0 +1,5 @@
+usr/share/miind/python/miindio.py usr/bin/miindio.py
+usr/share/miind/apps/Projection usr/bin/MiindProjection
+usr/share/miind/apps/MatrixGenerator usr/bin/MiindMatrixGenerator
+usr/share/miind/apps/Bind usr/bin/MiindBind
+
