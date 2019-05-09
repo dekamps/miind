@@ -35,6 +35,8 @@ set( numtools_HEADERS
     DVIntegratorException.h
     DVIntegratorStateParameter.h
     exponentialdistribution.h
+    ExStateDVIntegrator.h
+    ExStateDVIntegratorCode.h
     GaussianDistribution.h
     GSLObjects.h
     IsApproximatelyEqualTo.h
@@ -42,9 +44,11 @@ set( numtools_HEADERS
     LocalDefinitions.h
     MinMaxTracker.h
     MinMaxTrackerCode.h
+    Modulo.h
     NumtoolsLib.h
     NumtoolsLibException.h
     PoissonDistribution.h
+    Precision.h
     QaDirty.h
     QaDirtyImplementation.h
     RandomGenerator.h

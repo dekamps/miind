@@ -9,7 +9,6 @@ INCLUDE_DIRECTORIES(
 )
 set( LIB_TYPE SHARED )
 
-find_package(gsl REQUIRED)
 include_directories(include)
 
 include_directories( ${GSL_INCLUDE_DIRS} )

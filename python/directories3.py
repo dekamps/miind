@@ -137,7 +137,11 @@ def insert_cmake_template_lib(name, full_path_name, enable_mpi,enable_openmp,ena
             cudatwodir = ''
             shared  = ''
 
+        # If MIIND_INCLUDE_DIR has been defined, we're compiling for a development version (not installed version)
+        # so set link to the development libraries. Otherwise, libraries are in usr/lib where they should be.
+        fout.write('IF (MIIND_INCLUDE_DIR)\n')
         fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ' ' + shared +')\n')
+        fout.write('ENDIF (MIIND_INCLUDE_DIR)\n')
         if cuda == True:
             fout.write('\ncuda_add_library( '+ name + ' ${LIB_TYPE} ${TVB_LIF_SRC} ${PW_HEADERS})\n')
         else:
@@ -185,7 +189,11 @@ def insert_cmake_template(name,full_path_name,enable_mpi,enable_openmp,enable_ro
             cudatwodir = ''
             shared  = ''
 
+        # If MIIND_INCLUDE_DIR has been defined, we're compiling for a development version (not installed version)
+        # so set link to the development libraries. Otherwise, libraries are in usr/lib where they should be.
+        fout.write('IF (MIIND_INCLUDE_DIR)\n')
         fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ' ' + shared +')\n')
+        fout.write('ENDIF (MIIND_INCLUDE_DIR)\n')
 
         if cuda == True:
             fout.write('\ncuda_add_executable( ' + name + ' ' + name + '.cu)\n')
