@@ -20,7 +20,7 @@
 #ifdef WIN32
 // All these warnings relate to ROOT source code
 #pragma warning(disable: 4267 4305 4800 4996)
-#endif 
+#endif
 
 #include <algorithm>
 #include <sstream>

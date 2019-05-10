@@ -1,11 +1,14 @@
 import xml.etree.ElementTree as ET
 
 
-ALGORITHMS = { 'RateAlgorithm'   : {'Connection' : 'double', 'Parameter': '' }, 
-               'RateAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter' : ''}, 
-               'OUAlgorithm'     : {'Connection' : 'DelayedConnection', 'Parameter' : 'NeuronParameter'}, 
-               'GeomAlgorithmDC' : {'Connection' : 'DelayedConnection', 'Parameter' : 'GeomParameter'}, 
-               'MeshAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter': ''} }
+ALGORITHMS = { 'RateAlgorithm'   : {'Connection' : 'double', 'Parameter': '' },
+               'RateAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter' : ''},
+               'OUAlgorithm'     : {'Connection' : 'DelayedConnection', 'Parameter' : 'NeuronParameter'},
+               'GeomAlgorithmDC' : {'Connection' : 'DelayedConnection', 'Parameter' : 'GeomParameter'},
+               'MeshAlgorithm'   : {'Connection' : 'DelayedConnection', 'Parameter': ''},
+               'GridAlgorithm'   : {'Connection' : 'CustomConnectionParameters', 'Parameter': ''},
+               'GridJumpAlgorithm'   : {'Connection' : 'CustomConnectionParameters', 'Parameter': ''} ,
+               'GridSomaDendriteAlgorithm'   : {'Connection' : 'CustomConnectionParameters', 'Parameter': ''}}
 
 ALGORITHM_NAMES = {}
 
@@ -32,11 +35,11 @@ def parse_rate_algorithm(alg, i , weighttype):
     cpp_name = 'rate_alg_' + str(i)
     Register(alg.attrib['name'],cpp_name)
 
-    s += '\tMPILib::RateAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('    
+    s += '\tMPILib::RateAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('
     rt = alg.find('rate')
-    s += rt.text   
+    s += rt.text
     s += ');\n'
-    
+
     return s
 
 def parse_neuron_parameter(np,i):
@@ -59,10 +62,10 @@ def parse_individual_parameters(alg,i):
 
     v_min = alg.find('OdeParameter/V_min')
     s = '\tconst MPILib::Potential v_min_' + str(i) + ' = ' + v_min.text + ';\n'
-    
+
     n_bins = alg.find('OdeParameter/N_bins')
     s += '\tconst MPILib::Number n_bins_' + str(i) + ' = ' + n_bins.text + ';\n'
-    
+
     return s
 
 def parse_initialdensity_parameter(idp,i):
@@ -71,43 +74,43 @@ def parse_initialdensity_parameter(idp,i):
     s += mu.text + ', '
     sigma = idp.find('sigma')
     s += sigma.text + ');\n'
-    
+
     return s
 
 def parse_diffusion_parameter(i,alg):
     s = ''
-    dp=alg.find('DiffusionParameter') 
+    dp=alg.find('DiffusionParameter')
     dl=dp.find('diffusion_limit')
     dj=dp.find('diffusion_jump')
 
     s += '\tGeomLib::DiffusionParameter par_diffusion_' + str(i) +'('
     s += dj.text + ','
     s += dl.text + ');\n'
-    
+
     return s
-    
+
 def parse_current_compensation_parameter(i,alg):
     s = ''
     cc=alg.find('CurrentCompensationParameter')
     mu=cc.find('mu')
     si=cc.find('sigma')
-    
+
     s += '\tGeomLib::CurrentCompensationParameter par_current_' + str(i) + '('
     s += mu.text + ','
     s += si.text + ');\n'
-    
+
     return s
-    
+
 def DetermineSpikingSystem(i,alg):
     sodes = alg.find('GeomAlgorithm/SpikingNeuralDynamics')
 
     s = '\tGeomLib::'  + sodes.attrib['type']
     s += ' dyn_'     + str(i) + '('
     s += 'par_ode_'  + str(i) +','
-    s += 'par_qif_'  + str(i) + ');\n' 
-    
+    s += 'par_qif_'  + str(i) + ');\n'
+
     return s
-    
+
 def parse_current_parameter(i,alg):
     s = ''
     qp=alg.find('SpikingNeuralDynamics/QifParameter')
@@ -116,21 +119,21 @@ def parse_current_parameter(i,alg):
     s += ii.text + ',' + ii.text + ');\n'
 
     return s
-    
+
 def publish_spiking_ode_system(i,alg):
     s=''
     s += parse_current_parameter(i,alg)
     s += parse_diffusion_parameter(i,alg)
     s += parse_current_compensation_parameter(i,alg)
-    s += DetermineSpikingSystem(i,alg)    
+    s += DetermineSpikingSystem(i,alg)
     s += '\tGeomLib::QifOdeSystem sys_ode_' + str(i) + '('
     s += 'dyn_' + str(i) + ');\n'
-    
+
     return s
 
 def publish_leaking_ode_system(lambdavalue,i):
-    s = ''    
-     
+    s = ''
+
     s += '\tGeomLib::LifNeuralDynamics dyn_ode_leak_' + str(i) + '('
     s += 'par_ode_'     + str(i) + ', '
     s += lambdavalue    + ');\n'
@@ -138,12 +141,12 @@ def publish_leaking_ode_system(lambdavalue,i):
     s += '\tGeomLib::LeakingOdeSystem sys_ode_' + str(i) +'('
     s += 'dyn_ode_leak_' + str(i)  + ');\n'
     return s
-    
+
 def  NonDefaultGeomParameterArgs(system, i):
     if system == 'LeakingOdeSystem':
         return ',\"LifNumericalMasterEquation\"'
     if system == 'SpikingOdeSystem':
-        return ', par_diffusion_' + str(i) + ', par_current_' + str(i)  
+        return ', par_diffusion_' + str(i) + ', par_current_' + str(i)
 
 def wrap_up_geom_algorithm(alg, i):
     s = ''
@@ -158,7 +161,7 @@ def wrap_up_geom_algorithm(alg, i):
     s += 'v_min_'       + str(i) + ','
     s += 'par_neur_'    + str(i) + ','
     s += 'par_dense_'   + str(i) + ');\n'
-  
+
     if d['system'] == 'LeakingOdeSystem':
         if not 'lambda' in d.keys():
             raise NameError('LeakingOdeSystem requires a lambda parameter')
@@ -173,41 +176,46 @@ def wrap_up_geom_algorithm(alg, i):
 
     # default parameters must be handled by GeomParameter
     s += '\tGeomLib::GeomParameter par_geom_' + str(i) + '('
-    s += 'sys_ode_'+ str(i) 
-    s +=  NonDefaultGeomParameterArgs(d['system'],i)       
+    s += 'sys_ode_'+ str(i)
+    s +=  NonDefaultGeomParameterArgs(d['system'],i)
     s += ');\n'
     cpp_name = 'alg_geom_' + str(i)
     s += '\tGeomLib::GeomAlgorithm<DelayedConnection> ' + cpp_name + '('
-    s += 'par_geom_' + str(i)  
+    s += 'par_geom_' + str(i)
     s += ');\n'
     s += '\n'
     Register(d['name'], cpp_name)
 
     return s
-    
+
 def parse_geom_algorithm(alg, i, weighttype):
-    
+
     if alg.attrib['type'] != 'GeomAlgorithm':
         raise ValueError
-    s = ''    
+    s = ''
     s += parse_individual_parameters(alg,i)
-    
+
     np=alg.find('OdeParameter/NeuronParameter')
     str_np =  parse_neuron_parameter(np,i)
     s+= str_np
 
-    idp = alg.find('OdeParameter/InitialDensityParameter')    
-    s += parse_initialdensity_parameter(idp,i)    
-    
+    idp = alg.find('OdeParameter/InitialDensityParameter')
+    s += parse_initialdensity_parameter(idp,i)
+
     s += wrap_up_geom_algorithm(alg, i)
-    
+
     return s
 
 def parse_mesh_algorithm(alg, i, weighttype):
     s = ''
     if alg.attrib['type'] != 'MeshAlgorithm':
         raise ValueError
- 
+
+    if weighttype.text ==  "DelayedConnection":
+        type = "MPILib::" + weighttype.text
+    else:
+        type = "double"
+
 
     s += '\tstd::vector<std::string> '
     vec_name = 'vec_mat_' + str(i)
@@ -218,37 +226,167 @@ def parse_mesh_algorithm(alg, i, weighttype):
     for k, fl in enumerate(matfilelist):
         if k > 0:
             s +='\",\"'
-        s += fl.text 
+        s += fl.text
     s += '\"};\n'
 
     timestep = alg.find('TimeStep')
 
     cpp_name = 'alg_mesh_' + str(i)
 
-
     if 'solver' in alg.attrib.keys():
         # solver type must be provided without TwoDLib::
-        s += '\tTwoDLib::MeshAlgorithm<DelayedConnection,TwoDLib::' + alg.attrib['solver'] + '> ' + cpp_name + '(\"'
+        s += '\tTwoDLib::MeshAlgorithm<'+type+',TwoDLib::' + alg.attrib['solver'] + '> ' + cpp_name + '(\"'
     else:
 
-        s += '\tTwoDLib::MeshAlgorithm<DelayedConnection> ' + cpp_name + '(\"'
-    s += alg.attrib['modelfile'] + '\",' + vec_name + ',' + timestep.text 
+        s += '\tTwoDLib::MeshAlgorithm<'+type+'> ' + cpp_name + '(\"'
+    s += alg.attrib['modelfile'] + '\",' + vec_name + ',' + timestep.text
+
     if 'tau_refractive' in alg.keys():
         s += ', '  + alg.attrib['tau_refractive']
     else:
         s += ', 0.0'
     if 'ratemethod' in alg.keys():
-        s += ', '  + "\"" + alg.attrib['ratemethod'] + "\""    
+        s += ', '  + "\"" + alg.attrib['ratemethod'] + "\""
     s += ');\n'
 
-    
+
+    Register(alg.attrib['name'], cpp_name)
+
+    return s
+
+def parse_mesh_algorithm_custom(alg, i, weighttype):
+    s = ''
+    if alg.attrib['type'] != 'MeshAlgorithmCustom':
+        raise ValueError
+
+    if weighttype.text ==  "CustomConnectionParameters":
+        type = "MPILib::" + weighttype.text
+    else:
+        type = "double"
+
+
+    s += '\tstd::vector<std::string> '
+    vec_name = 'vec_mat_' + str(i)
+    s += vec_name + '{\"'
+
+    matfilelist = alg.findall('MatrixFile')
+    # don't use i below
+    for k, fl in enumerate(matfilelist):
+        if k > 0:
+            s +='\",\"'
+        s += fl.text
+    s += '\"};\n'
+
+    timestep = alg.find('TimeStep')
+
+    cpp_name = 'alg_mesh_' + str(i)
+
+    if 'solver' in alg.attrib.keys():
+        # solver type must be provided without TwoDLib::
+        s += '\tTwoDLib::MeshAlgorithmCustom<TwoDLib::' + alg.attrib['solver'] + '> ' + cpp_name + '(\"'
+    else:
+
+        s += '\tTwoDLib::MeshAlgorithmCustom<TwoDLib::MasterOdeint> ' + cpp_name + '(\"'
+    s += alg.attrib['modelfile'] + '\",' + vec_name + ',' + timestep.text
+
+    if 'tau_refractive' in alg.keys():
+        s += ', '  + alg.attrib['tau_refractive']
+    else:
+        s += ', 0.0'
+    if 'ratemethod' in alg.keys():
+        s += ', '  + "\"" + alg.attrib['ratemethod'] + "\""
+    s += ');\n'
+
+
+    Register(alg.attrib['name'], cpp_name)
+
+    return s
+
+
+def parse_grid_algorithm(alg, i, weighttype):
+    s = ''
+    if alg.attrib['type'] != 'GridAlgorithm':
+        raise ValueError
+
+    timestep = alg.find('TimeStep')
+
+    cpp_name = 'alg_mesh_' + str(i)
+    s += '\tTwoDLib::GridAlgorithm ' + cpp_name + '(\"'
+    s += alg.attrib['modelfile'] + '\",'
+    s += '\"' + alg.attrib['transformfile'] + '\",'
+    s += timestep.text + ','
+    s += alg.attrib['start_v'] + "," + alg.attrib['start_w']
+
+    if 'tau_refractive' in alg.keys():
+        s += ', '  + alg.attrib['tau_refractive']
+    else:
+        s += ', 0.0'
+    if 'ratemethod' in alg.keys():
+        s += ', '  + "\"" + alg.attrib['ratemethod'] + "\""
+    s += ');\n'
+
+
+    Register(alg.attrib['name'], cpp_name)
+
+    return s
+
+def parse_grid_jump_algorithm(alg, i, weighttype):
+    s = ''
+    if alg.attrib['type'] != 'GridJumpAlgorithm':
+        raise ValueError
+
+    timestep = alg.find('TimeStep')
+
+    cpp_name = 'alg_mesh_' + str(i)
+    s += '\tTwoDLib::GridJumpAlgorithm ' + cpp_name + '(\"'
+    s += alg.attrib['modelfile'] + '\",'
+    s += '\"' + alg.attrib['transformfile'] + '\",'
+    s += timestep.text + ','
+    s += alg.attrib['start_v'] + "," + alg.attrib['start_w']
+
+    if 'tau_refractive' in alg.keys():
+        s += ', '  + alg.attrib['tau_refractive']
+    else:
+        s += ', 0.0'
+    if 'ratemethod' in alg.keys():
+        s += ', '  + "\"" + alg.attrib['ratemethod'] + "\""
+    s += ');\n'
+
+
+    Register(alg.attrib['name'], cpp_name)
+
+    return s
+
+def parse_grid_soma_dendrite_algorithm(alg, i, weighttype):
+    s = ''
+    if alg.attrib['type'] != 'GridSomaDendriteAlgorithm':
+        raise ValueError
+
+    timestep = alg.find('TimeStep')
+
+    cpp_name = 'alg_mesh_' + str(i)
+    s += '\tTwoDLib::GridSomaDendriteAlgorithm ' + cpp_name + '(\"'
+    s += alg.attrib['modelfile'] + '\",'
+    s += '\"' + alg.attrib['transformfile'] + '\",'
+    s += timestep.text + ','
+    s += alg.attrib['start_v'] + "," + alg.attrib['start_w']
+
+    if 'tau_refractive' in alg.keys():
+        s += ', '  + alg.attrib['tau_refractive']
+    else:
+        s += ', 0.0'
+    if 'ratemethod' in alg.keys():
+        s += ', '  + "\"" + alg.attrib['ratemethod'] + "\""
+    s += ');\n'
+
+
     Register(alg.attrib['name'], cpp_name)
 
     return s
 
 def parse_ou_algorithm(alg, i,  weighttype):
     s = ''
-    
+
     algorithmname=alg.find('OUAlgorithm')
     d=alg.attrib
 
@@ -266,17 +404,17 @@ def parse_ou_algorithm(alg, i,  weighttype):
 def parse_wilsoncowan_parameter(alg, i, weighttype):
     wcpar= alg.find('WilsonCowanParameter')
     s = ''
-       
+
     t_mem = wcpar.find('t_membrane')
     t_name = 't_mem_' + str(i)
     s += '\tconst MPILib::Time ' + t_name
     s += ' = ' + t_mem.text +';\n'
-    
+
     f_noise = wcpar.find('f_noise')
     noise_name ='f_noise_' + str(i)
-    s += '\tconst double ' + noise_name 
+    s += '\tconst double ' + noise_name
     s += ' = ' + f_noise.text +';\n'
-    
+
     f_max = wcpar.find('f_max')
     f_name = 'f_max_' + str(i)
     s += '\tMPILib::Rate ' + f_name
@@ -294,21 +432,21 @@ def parse_wilsoncowan_parameter(alg, i, weighttype):
     s += I_name  +');\n'
 
     return s
-    
+
 def wrapup_wilsoncowan_algorithm(alg,i,weighttype):
     d=alg.attrib
 
     if not 'name' in d.keys():
-        raise NameError('Name tag expected in WilsonCowanAlgorithm')    
+        raise NameError('Name tag expected in WilsonCowanAlgorithm')
 
     s = '\tMPILib::WilsonCowanAlgorithm '
     s += 'alg_wc_' + str(i) + '('
     s += 'par_wil_' + str(i)
     s += ');\n'
     cpp_name = 'alg_wc_' + str(i)
-    Register(d['name'], cpp_name)    
+    Register(d['name'], cpp_name)
     return s
-    
+
 def parse_wilsoncowan_algorithm(alg, i, weighttype):
     s = ''
 
@@ -318,13 +456,13 @@ def parse_wilsoncowan_algorithm(alg, i, weighttype):
 
 def parse_persistant_algorithm(alg, i, weighttype):
     s = ''
-    
+
     dp = alg.find('PersistantAlgorithm')
-    
+
     if not 'Name' in dp.keys():
         raise NameError('Name tag expected')
     cpp_name = 'pers_alg_'  + str(i)
-    Register(dp.attrib['Name'],cpp_name)    
+    Register(dp.attrib['Name'],cpp_name)
     s += '\tMPILib::PersistantAlgorithm ' + cpp_name + ';\n'
     return s
 
@@ -332,36 +470,36 @@ def parse_delay_algorithm(alg,i,weighttype):
     s = ''
     if alg.attrib['type'] != 'DelayAlgorithm':
         raise ValueError
-    
+
     cpp_name = 'delay_alg_' + str(i)
     Register(alg.attrib['name'],cpp_name)
 
     s += '\tMPILib::algorithm::DelayAlgorithm<' + weighttype.text + '> ' + cpp_name +  '('
-    
+
     dt = alg.find('delay')
     s += dt.text
-    
+
     s += ');\n'
-    
+
     return s
 
 def parse_ratefunctor_algorithm(alg, i, weighttype):
     s = ''
     if alg.attrib['type'] != 'RateFunctor':
         raise ValueError
-        
+
     cpp_name = 'rate_functor_' + str(i)
     Register(alg.attrib['name'],cpp_name)
-    
+
 
     s += '\tMPILib::Rate RateFunction_' + str(i) + '(MPILib::Time);\n'
-    
-    s += '\tMPILib::RateFunctor<' + weighttype.text + '> ' + cpp_name + '(' 
+
+    s += '\tMPILib::RateFunctor<' + weighttype.text + '> ' + cpp_name + '('
     s += 'RateFunction_' + str(i) + ');\n'
 
     cd = alg.find('code')
     rb = alg.find('expression')
-    
+
     if (cd != None and rb != None):
         raise ValueError('You cannot use expression and code tags in the same RateFunctor.')
     if cd == None  and rb == 0:
@@ -377,10 +515,42 @@ def parse_ratefunctor_algorithm(alg, i, weighttype):
         t += '}\n\n'
 
     RATEFUNCTIONS.append(t)
-    
+
     return s
-    
-def parse_algorithm(alg,i,weighttype):
+
+def parse_miindmodel_ratefunctor_algorithm(alg, i, weighttype):
+    s = ''
+    if alg.attrib['type'] != 'RateFunctor':
+        raise ValueError
+
+    cpp_name = 'rate_functor_' + str(i)
+    Register(alg.attrib['name'],cpp_name)
+
+    s += '\tMPILib::RateFunctor<' + weighttype.text + '> ' + cpp_name + '('
+    s += 'MiindModel::RateFunction_' + str(i) + ');\n'
+
+    cd = alg.find('code')
+    rb = alg.find('expression')
+
+    if (cd != None and rb != None):
+        raise ValueError('You cannot use expression and code tags in the same RateFunctor.')
+    if cd == None  and rb == 0:
+        raise ValueError('You must use either a code or an expression tag in a rate functor.')
+    if rb != None:
+        body=rb.text
+        t = 'static MPILib::Rate RateFunction_' + str(i) + '(MPILib::Time t){\n'
+        t += '\treturn ' + body + ';\n}\n'
+
+    if cd != None:
+        t = 'static MPILib::Rate RateFunction_' + str(i) + '(MPILib::Time t){\n'
+        t += cd.text
+        t += '}\n\n'
+
+    RATEFUNCTIONS.append(t)
+
+    return s
+
+def parse_algorithm(alg,i,weighttype,for_lib=False):
     algname=alg.get('type')
 
     if algname=='WilsonCowanAlgorithm':
@@ -388,8 +558,10 @@ def parse_algorithm(alg,i,weighttype):
             return parse_wilsoncowan_algorithm(alg,i,weighttype)
         else:
             raise NameError('Wrong type for WilsonCowanAlgorithm')
-    if algname == 'RateFunctor':
+    if algname == 'RateFunctor' and not for_lib:
         return parse_ratefunctor_algorithm(alg,i,weighttype)
+    if algname == 'RateFunctor' and for_lib:
+        return parse_miindmodel_ratefunctor_algorithm(alg,i,weighttype)
     if algname == 'DelayAlgorithm':
         return parse_delay_algorithm(alg,i,weighttype)
     if algname == 'PersistantAlgorithm':
@@ -408,24 +580,43 @@ def parse_algorithm(alg,i,weighttype):
             return parse_mesh_algorithm(alg,i,weighttype)
         else:
             raise NameError('Wrong conection type for MeshAlgorithm')
+    if algname =='MeshAlgorithmCustom':
+        if weighttype.text == 'CustomConnectionParameters':
+            return parse_mesh_algorithm_custom(alg,i,weighttype)
+        else:
+            raise NameError('Wrong conection type for MeshAlgorithmCustom')
+    if algname =='GridAlgorithm':
+        if weighttype.text == 'CustomConnectionParameters':
+            return parse_grid_algorithm(alg,i,weighttype)
+        else:
+            raise NameError('Connection type for GridAlgorithm must be CustomConnectionParameters')
+    if algname =='GridJumpAlgorithm':
+        if weighttype.text == 'CustomConnectionParameters':
+            return  parse_grid_jump_algorithm(alg,i,weighttype)
+        else:
+            raise NameError('Connection type for GridJumpAlgorithm must be CustomConnectionParameters')
+    if algname =='GridSomaDendriteAlgorithm':
+        if weighttype.text == 'CustomConnectionParameters':
+            return  parse_grid_soma_dendrite_algorithm(alg,i,weighttype)
+        else:
+            raise NameError('Connection type for GridSomaDendriteAlgorithm must be CustomConnectionParameters')
     else:
         raise NameError('Wrong algorithm name')
     return ''
-    
-def parse_algorithms(alg_list,weighttype,outfile):
+
+def parse_algorithms(alg_list,weighttype,outfile,for_lib=False):
     '''alg_list is a list of Algorithm elements as found by the parser. Each element
     of the list represents an individual algorithm.'''
     for i, alg in enumerate(alg_list):
-        s = parse_algorithm(alg,i, weighttype)
+        s = parse_algorithm(alg,i, weighttype,for_lib)
         outfile.write(s)
-    return 
+    return
 
 def reset_algorithms():
     ALGORITHM_NAMES.clear()
     del RATEFUNCTIONS[:]
-    
+
 if __name__ == "__main__":
     alg_list, weighttype = setup_test()
     outfile=open('alg.cpp','w')
     parse_algorithms(alg_list,weighttype,outfile)
-

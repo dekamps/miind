@@ -38,21 +38,30 @@ set( GEOM_HEADERS
 AbstractMasterEquation.hpp
 AbstractNeuralDynamics.hpp
 AbstractOdeSystem.hpp
+BasicDefinitions.hpp
 BinEstimator.hpp
 CNZLCache.hpp
 CNZLCacheCode.hpp
+ConnectionSquaredProduct.hpp
 CurrentCompensationParameter.hpp
+CurrentParameter.hpp
+DiffusionParameter.hpp
 GeomInputConvertor.hpp
 GeomAlgorithm.hpp
 GeomAlgorithmCode.hpp
+GeomInputConvertor.hpp
 GeomLib.hpp
+GeomLibException.hpp
 GeomParameter.hpp
 InitialDensityParameter.hpp  
 InputParameterSet.hpp
+GeomLibException.hpp
 LeakingOdeSystem.hpp
 LifEstimator.hpp
 LifNeuralDynamics.hpp
+LifParameter.hpp
 MasterFactory.hpp
+MasterParameter.hpp
 MuSigma.hpp
 MuSigmaScalarProduct.hpp
 NeuronParameter.hpp
@@ -62,8 +71,10 @@ OdeParameter.hpp
 OdeDtParameter.hpp
 OUAlgorithm.hpp
 QifOdeSystem.hpp
+QifParameter.hpp
 Response.hpp
 ResponseParameter.hpp
+SpikingLifNeuralDynamics.hpp
 SpikingNeuralDynamics.hpp
 SpikingOdeSystem.hpp
 SpikingQifNeuralDynamics.hpp
@@ -74,7 +85,8 @@ add_library( ${MIIND_LIBRARY_PREFIX}geom ${LIB_TYPE} ${GEOM_SRC} ${GEOM_HEADERS}
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}geom
     ${gsl_LINK_FLAGS} )
 
-install( FILES ${numtools_HEADERS}
+
+install( FILES ${GEOM_HEADERS}
     DESTINATION include/miind/GeomLib )
 
 install( TARGETS ${MIIND_LIBRARY_PREFIX}geom

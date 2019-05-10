@@ -36,7 +36,7 @@ namespace algorithm {
  * high precision, create a node, configure it with a DelayAlgorithm, connected the output to be delayed
  * to this node and connect the output of this node to the node specified by the original connection. At the
  * moment this is the only way to implement delays. Please note that it is expected that the node that
- * carries this algorithm expects one and only one input node. 
+ * carries this algorithm expects one and only one input node.
  *
  */
 template<class Weight>

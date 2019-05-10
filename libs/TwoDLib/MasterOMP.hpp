@@ -38,7 +38,6 @@ namespace TwoDLib {
 			const MasterParameter&
 		);
 
-
 		//! Number of meshes
 		MPILib::Number  NrMeshes() const { return _vec_vec_csr.size(); }
 
@@ -123,7 +122,7 @@ namespace TwoDLib {
 		const MasterParameter	_par;
 		vector<double>			_dydt;
 		double					_rate;
-	
+
 		Derivative				_derivative;
 	    Add 					_add;
 		double					_h;

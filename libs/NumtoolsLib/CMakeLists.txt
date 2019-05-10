@@ -14,8 +14,6 @@ else( WIN32 )
   set( LIB_TYPE STATIC )
 endif( WIN32 )
 
-include_directories( ${GSL_INCLUDE_DIRS} )
-
 set( numtools_SRC
     Distribution.cpp
     GaussianDistribution.cpp
@@ -37,6 +35,8 @@ set( numtools_HEADERS
     DVIntegratorException.h
     DVIntegratorStateParameter.h
     exponentialdistribution.h
+    ExStateDVIntegrator.h
+    ExStateDVIntegratorCode.h
     GaussianDistribution.h
     GSLObjects.h
     IsApproximatelyEqualTo.h
@@ -44,9 +44,11 @@ set( numtools_HEADERS
     LocalDefinitions.h
     MinMaxTracker.h
     MinMaxTrackerCode.h
+    Modulo.h
     NumtoolsLib.h
     NumtoolsLibException.h
     PoissonDistribution.h
+    Precision.h
     QaDirty.h
     QaDirtyImplementation.h
     RandomGenerator.h
@@ -54,6 +56,7 @@ set( numtools_HEADERS
     TestDefinitions.h
     UniformDistribution.h )
 
+include_directories( ${GSL_INCLUDE_DIRS} )
 add_library( ${MIIND_LIBRARY_PREFIX}numtools ${LIB_TYPE} ${numtools_SRC} ${numtools_HEADERS})
 
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}numtools

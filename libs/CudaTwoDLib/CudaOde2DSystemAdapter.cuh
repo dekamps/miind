@@ -40,11 +40,17 @@ namespace CudaTwoDLib {
 	class CudaOde2DSystemAdapter {
 	public:
 
-		//! Standard Constructor
-		CudaOde2DSystemAdapter	
+		CudaOde2DSystemAdapter
 		(
 	           TwoDLib::Ode2DSystemGroup& group // The group must already be initialized. This will be checked and an exception will be thrown if it is suspected this has not happened
-                                     
+		);
+
+		//! Standard Constructor
+		CudaOde2DSystemAdapter
+		(
+	           TwoDLib::Ode2DSystemGroup& group, // The group must already be initialized. This will be checked and an exception will be thrown if it is suspected this has not happened
+				 		MPILib::Time network_time_step
+
 		);
 
 
@@ -53,17 +59,29 @@ namespace CudaTwoDLib {
 
                 void Evolve();
 
+								void Evolve(std::vector<inttype>& meshes);
+
+								void EvolveWithoutMeshUpdate();
+
                 void Dump(const std::vector<std::ostream*>&, int mode = 0);
 
-                void RemapReversal();        
+                void RemapReversal();
 
-                void RedistributeProbability();     
-  
-                void MapFinish();
+								void RedistributeProbability();
 
-                friend class CSRAdapter;
+								void RedistributeProbability(std::vector<inttype>& meshes);
 
-                const std::vector<fptype>& F() const;
+								void MapFinish();
+
+								void MapFinish(std::vector<inttype>& meshes);
+
+								void updateGroupMass();
+
+								friend class CSRAdapter;
+
+                const std::vector<fptype>& F(unsigned int n_steps = 1) const;
+
+								const TwoDLib::Ode2DSystemGroup& getGroup() { return _group; }
 	private:
 
                CudaOde2DSystemAdapter(const CudaOde2DSystemAdapter&);
@@ -74,7 +92,7 @@ namespace CudaTwoDLib {
                   inttype _from;
                   fptype  _alpha;
                };
-                  
+
 	void Validate() const;
 
         void FillMass();
@@ -83,37 +101,51 @@ namespace CudaTwoDLib {
 
         void FillReversalMap(const std::vector<TwoDLib::Mesh>&, const std::vector<std::vector<TwoDLib::Redistribution> >&);
         void FillResetMap(const std::vector<TwoDLib::Mesh>&, const std::vector<std::vector<TwoDLib::Redistribution> >&);
+				void FillRefractoryTimes(const std::vector<MPILib::Time>&);
 
         void DeleteMass();
-	void DeleteMapData();
-	void DeleteReversalMap();
+				void DeleteMapData();
+				void DeleteReversalMap();
         void DeleteResetMap();
+				void FillDerivative();
+				void DeleteDerivative();
 
-
-	TwoDLib::Ode2DSystemGroup& _group;
+				TwoDLib::Ode2DSystemGroup& _group;
         inttype	 _n;
         inttype _mesh_size;
         fptype _time_step;
+				fptype _network_time_step;
 
-	fptype*  _mass;
+				std::vector<unsigned int> _nr_refractory_steps;
+				std::vector<fptype> _refractory_prop;
+				std::vector<fptype*> _refractory_mass;
+
+				fptype*  _mass;
         std::vector<fptype> _hostmass;
         inttype* _map;
         std::vector<inttype> _hostmap;
-
         std::vector<inttype> _offsets;
- 
+
         // reversal mapping
         inttype  _n_rev;
         inttype* _rev_to;
         inttype* _rev_from;
         fptype*  _rev_alpha;
 
-
         // reset mapping
-        std::vector<inttype> _nr_resets;        
-        std::vector<inttype*> _res_to;
-        std::vector<inttype*> _res_from;
-        std::vector<fptype*>  _res_alpha;
+        std::vector<inttype> _nr_resets;
+				std::vector<inttype>  _nr_minimal_resets;
+				std::vector<inttype*> _res_to_minimal;
+				std::vector<fptype*>  _res_alpha_ordered;
+				std::vector<inttype*> _res_from_ordered;
+				std::vector<inttype*> _res_from_counts;
+				std::vector<inttype*> _res_from_offsets;
+
+				std::vector<fptype*>   _res_to_mass;
+				std::vector<fptype*>   _res_sum;
+
+				int _blockSize;
+				int _numBlocks;
 
         // firing rates
         fptype* _fs;
