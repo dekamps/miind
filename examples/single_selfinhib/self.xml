@@ -1,8 +1,7 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<AbstractAlgorithm type="OUAlgorithm">
-<OUAlgorithm Name="OU_LIF_I">
+<Algorithm name="OU_LIF_I" type="OUAlgorithm">
 <NeuronParameter>
 <t_membrane>20e-3</t_membrane>
 <t_refractive>0</t_refractive>
@@ -10,10 +9,8 @@
 <V_reset>10e-3</V_reset>
 <V_reversal>0</V_reversal>
 </NeuronParameter>
-</OUAlgorithm>
-</AbstractAlgorithm>
-<AbstractAlgorithm type="GeomAlgorithm">
-<GeomAlgorithm Name="LIF_Inhibitory" lambda="0.01" system="LeakingOdeSystem">
+</Algorithm>
+<Algorithm name="LIF_Inhibitory" lambda="0.01" system="LeakingOdeSystem" type="GeomAlgorithm">
 <OdeParameter>
 <NeuronParameter>
 <t_membrane>20e-3</t_membrane>
@@ -22,25 +19,20 @@
 <V_reset>10e-3</V_reset>
 <V_reversal>0</V_reversal>
 </NeuronParameter>
-<InitialDensityParameter> 
+<InitialDensityParameter>
 <mu>0.0</mu>
-<sigma>0.0</sigma> 
+<sigma>0.0</sigma>
 </InitialDensityParameter>
 <V_min>-0.1</V_min>
 <N_bins>2000</N_bins>
 </OdeParameter>
-</GeomAlgorithm>
-</AbstractAlgorithm>
-<AbstractAlgorithm type="RateAlgorithm">
-<RateAlgorithm Name="Cortical Background Algorithm">
+</Algorithm>
+<Algorithm name="Cortical Background Algorithm" type="RateAlgorithm">
 <rate>1.5</rate>
-</RateAlgorithm>
-</AbstractAlgorithm>
-<AbstractAlgorithm type="DelayAlgorithm">
-<DelayAlgorithm Name="delay_I_I">
+</Algorithm>
+<Algorithm name="delay_I_I" type="DelayAlgorithm">
 <delay>1.3e-3</delay>
-</DelayAlgorithm>
-</AbstractAlgorithm>
+</Algorithm>
 </Algorithms>
 <Nodes>
 <Node algorithm="LIF_Inhibitory" name="LIF I" type="EXCITATORY_GAUSSIAN" />
@@ -67,7 +59,7 @@
 <Dense_min>0</Dense_min>
 <Dense_max>100</Dense_max>
 </CanvasParameter>
-<CanvasNode Name="LIF I"></CanvasNode> 
+<CanvasNode Name="LIF I"></CanvasNode>
 </SimulationIO>
 <SimulationRunParameter>
 <max_iter>1000000</max_iter>
@@ -75,7 +67,7 @@
 <t_end>0.2</t_end>
 <t_report>1e-04</t_report>
 <t_state_report>1e-04</t_state_report>
-<t_step>1e-05</t_step>
+<t_step>dyn_ode_leak_1.TStep()</t_step>
 <t_update>1e-04</t_update>
 <name_log>single.log</name_log>
 </SimulationRunParameter>

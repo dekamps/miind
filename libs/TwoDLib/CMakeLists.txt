@@ -1,10 +1,9 @@
-
 project( ${MIIND_LIBRARY_PREFIX}twod )
 
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
-set( LIB_TYPE STATIC )
+set( LIB_TYPE SHARED )
 
 
 #one below that MPILib is included in the paths they are needed for the camke config files
@@ -12,85 +11,132 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_SOURCE_DIR}/../
    ${CMAKE_CURRENT_BINARY_DIR}/../
 )
-				
+
 set( TWOD_SRC
+Cell.cpp
+CheckSystem.cpp
+Mesh.cpp
 CSRAdapter.cpp
-CSRMatrix.cpp			
-Master.cpp			
-TransitionMatrix.cpp	 
-Cell.cpp											
-MasterOMP.cpp		   
-MasterOdeint.cpp		   
-QuadGenerator.cpp  
-PolyGenerator.cpp
-TransitionMatrixGenerator.cpp 
-pugixml.cpp
-CheckSystem.cpp														   		      
-Mesh.cpp			      
-Quadrilateral.cpp  
-Triangle.cpp
-kd.cpp
-Fid.cpp		   				      			  
+MeshTree.cpp
+CSRMatrix.cpp
+Ode2DSystem.cpp
+display.cpp
+Ode2DSystemGroup.cpp
 Euler.cpp
-MeshTree.cpp   
-Redistribution.cpp  
+Fid.cpp
+PolyGenerator.cpp
+pugixml.cpp
+QuadGenerator.cpp
+Quadrilateral.cpp
+Redistribution.cpp
+Stat.cpp
+kd.cpp
+TransitionMatrix.cpp
+LineSegment.cpp
+TransitionMatrixGenerator.cpp
+Master.cpp
+MasterGrid.cpp
+Triangle.cpp
 TriangleGenerator.cpp
-LineSegment.cpp												  		 		     
-Ode2DSystem.cpp   
-Ode2DSystemGroup.cpp   
-Stat.cpp   
-Uniform.cpp 
+MasterGridJump.cpp
+MasterGridSomaDendrite.cpp
+Uniform.cpp
+MasterOdeint.cpp
+MasterOMP.cpp
 )
 
 set( TWOD_HEADERS
 Bin.hpp
-InputCombination.hpp		
-MeshAlgorithmCode.hpp		
-Redistribution.hpp	 
-TwoDLibException.hpp
-CSRMatrix.hpp											
-LineSegment.hpp		  
-MeshTree.hpp   
-Stat.hpp   
-TwoDLib.hpp
-Euler.hpp
-Cell.hpp														   		  
-Master.hpp   
-MasterOdeint.hpp   
-Ode2DSystem.hpp   
-Ode2DSystemGroup.hpp   
-TransitionList.hpp  
-Uniform.hpp
-CheckSystem.hpp																  	       			 
-MasterOMP.hpp	       
-TransitionMatrix.hpp  
+MasterOMP.hpp
+MasterParameter.hpp
+Cell.hpp
+MeshAlgorithmCode.hpp
+MeshAlgorithmCustomCode.hpp
+CheckSystem.hpp
+MeshAlgorithmCustom.hpp
+MeshAlgorithm.hpp
+Coordinates.hpp
+Mesh.hpp
+CSRAdapter.hpp
+MeshTree.hpp
+CSRMatrix.hpp
 modulo.hpp
-Coordinates.hpp										 		       			 
-MasterParameter.hpp    
-Point.hpp   
-TransitionMatrixGenerator.hpp 
-pugiconfig.hpp
-Fid.hpp																		 				
-Mesh.hpp   
+DensityAlgorithmInterface.hpp
+display.hpp
+Ode2DSystemGroup.hpp
+Ode2DSystem.hpp
+Euler.hpp
+Point.hpp
+Fid.hpp
 PolyGenerator.hpp
-QuadGenerator.hpp  
-Triangle.hpp   
+FiducialElement.hpp
+pugiconfig.hpp
+GridAlgorithmCode.hpp
 pugixml.hpp
-FiducialElement.hpp																	  	     
-MeshAlgorithm.hpp		       
-Quadrilateral.hpp  
+GridAlgorithm.hpp
+GridJumpAlgorithmCode.hpp
+QuadGenerator.hpp
+GridJumpAlgorithm.hpp
+GridReport.hpp
+Quadrilateral.hpp
+GridSomaDendriteAlgorithmCode.hpp
+GridSomaDendriteAlgorithm.hpp
+Redistribution.hpp
+InputCombination.hpp
+Stat.hpp
+TransitionList.hpp
+kd.h
+LineSegment.hpp
+TransitionMatrixGenerator.hpp
+TransitionMatrix.hpp
+MasterGrid.hpp
 TriangleGenerator.hpp
+MasterGridJump.hpp
+Triangle.hpp
+TwoDLibException.hpp
+MasterGridSomaDendrite.hpp
+TwoDLib.hpp
+Master.hpp
+Uniform.hpp
+MasterOdeint.hpp
 XML.hpp
 )
 
+set( GL_HEADERS
+include/GL/eglew.h
+include/GL/freeglut.h
+include/GL/freeglut_ext.h
+include/GL/freeglut_std.h
+include/GL/glew.h
+include/GL/glut.h
+include/GL/glxew.h
+include/GL/wglew.h
+)
 
-add_library( ${MIIND_LIBRARY_PREFIX}twod ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS})
+#############################################################################
+# Libraries
+#############################################################################
+if (UNIX)
+   ADD_DEFINITIONS("-fno-strict-aliasing" )
+endif (UNIX)
+set ( LIBLIST
+    ${Boost_LIBRARIES}
+    ${MPI_LIBRARIES}
+    ${MIIND_LIBRARY_PREFIX}numtools
+    ${gsl_LINK_FLAGS}
+    gsl
+)
 
-target_link_libraries( ${MIIND_LIBRARY_PREFIX}twod
-    ${gsl_LINK_FLAGS} )
+add_library( ${MIIND_LIBRARY_PREFIX}twod ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS} ${GL_HEADERS})
 
-install( FILES ${numtools_HEADERS}
+target_link_libraries( ${MIIND_LIBRARY_PREFIX}twod ${LIBLIST}
+    ${gsl_LINK_FLAGS} ${MIIND_LIBRARY_PREFIX}mpi GL glut )
+
+install( FILES ${TWOD_HEADERS}
     DESTINATION include/miind/TwoDLib )
+
+install( FILES ${GL_HEADERS}
+    DESTINATION include/miind/TwoDLib/include/GL )
 
 install( TARGETS ${MIIND_LIBRARY_PREFIX}twod
     LIBRARY DESTINATION lib

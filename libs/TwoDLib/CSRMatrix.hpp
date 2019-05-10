@@ -26,6 +26,8 @@
 
 namespace TwoDLib {
 
+	class Ode2DSystemGroup;
+
 	//! Calculates derivative as a matrix vector multiplication, whilst taking into acoount the
 	//! current mapping of the Ode2DSystemGroup.
 

@@ -22,7 +22,7 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 # UnitGeom source and header files
 #############################################################################
 
-set (UNIT_CUDA_SRC 
+set (UNIT_CUDA_SRC
     CudaUnit.cpp
     AdapterTest.cpp
     FixtureAdapter.cpp
@@ -36,22 +36,19 @@ set (UNIT_CUDA_SRC
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
-set ( LIBLIST       
+set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}geom
-    ${MIIND_LIBRARY_PREFIX}twod      
-<<<<<<< HEAD
+    ${MIIND_LIBRARY_PREFIX}twod
     ${MIIND_LIBRARY_PREFIX}cudatwod      
-=======
->>>>>>> 9a4bdc8d49ec272917a236fdfa6ae5c49574de84
-    ${MIIND_LIBRARY_PREFIX}mpi      
-    ${MPI_LIBRARIES} 
+    ${MIIND_LIBRARY_PREFIX}mpi
+    ${MPI_LIBRARIES}
     ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
     ${MIIND_LIBRARY_PREFIX}numtools
-    ${gsl_LINK_FLAGS} 
+    ${gsl_LINK_FLAGS}
     gsl
     gslcblas
-
+    ${GLUT_LIBRARY}
 )
 #############################################################################
 # Copy Test files to executable directory
@@ -67,4 +64,3 @@ add_executable(UnitCudaLib ${UNIT_CUDA_SRC})
 target_link_libraries(UnitCudaLib ${LIBLIST})
 add_executable(CudaEmulationTest CudaEmulationTest.cpp)
 target_link_libraries(CudaEmulationTest ${LIBLIST})
-

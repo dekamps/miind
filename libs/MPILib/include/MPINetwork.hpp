@@ -43,7 +43,7 @@ namespace MPILib {
    * a single real value that indicates the strength of a connection, or DelayedConnection, a type that determines number of connections; efficacy; delay. NodeDistribution
    * is a type that determines how the network simulation will be parallelized by MPI. At present we use CircularDistribution.
    * It is strongly recommended to look at example programs to see how an MPINetwork is instantiated.
-   * 
+   *
    * Nodes can be added to the network through the MPINetwork.addNode method, which takes two arguments: a reference to an AlgorithmInterface, and a NodeType. The method
    * returns an int, which is a handle to the node that has just been created. The AlgorithmInterface
    * determines which algorithm is run during a simulation on a given node. The network is agnostic with regards to what algorithm runs on which node. When a simulation
@@ -151,7 +151,6 @@ public:
 	 */
 	void makeFirstInputOfSecond(NodeId first, NodeId second,
 			const WeightValue& weight);
-
 	/**
 	 * Configure the next simulation
 	 * @param simParam The Simulation Parameter
@@ -162,6 +161,48 @@ public:
 	 * Envolve the network
 	 */
 	void evolve();
+
+	/**
+	 * Envolve the network by a single timestep
+	 */
+	std::vector<ActivityType> evolveSingleStep(std::vector<ActivityType> activity);
+
+	/**
+	 * Collect activites from all nodes to pass to external simulation
+	 */
+	void getExternalActivities();
+
+	/**
+	 * Receive activities from external simulation and pass to nodes
+	 */
+	void setExternalPrecursorActivities(std::vector<ActivityType> activities);
+
+	/**
+	 * Start simulation for use with evolveSingleStep
+	 */
+	long startSimulation();
+
+	/**
+	 * End Simulation for use with evolveSingleStep
+	 */
+	void endSimulation();
+
+	/**
+	 * Set Node Successor in external simulation
+	 */
+  void setNodeExternalSuccessor(NodeId node);
+
+	/**
+	 * Set Node Precursor in external simulation
+	 */
+  void setNodeExternalPrecursor(NodeId node, const WeightValue& weight);
+
+  /**
+  *
+  */
+  void reportNodeActivities(std::vector<MPILib::NodeId>& node_ids, std::vector<double>& intervals, double time) const;
+
+	SimulationRunParameter& getSimulationParams() { return _parameterSimulationRun; }
 
 private:
 
@@ -208,7 +249,9 @@ private:
 
 	/*Time*/ Index getEndTime() const;
 	/*Time*/ Index getCurrentReportTime() const;
+public:
 	/*Time*/ Index getCurrentSimulationTime() const;
+private:
 	/*Time*/ Index getCurrentStateTime() const;
 
 	/**
@@ -220,6 +263,17 @@ private:
 	 */
 	static NodeDistribution _nodeDistribution;
 
+	/**
+	 * NodeIds of nodes who send and recieve activity to external simulations
+	 */
+  std::vector<NodeId> _externalReceivers;
+  std::vector<NodeId> _externalSenders;
+
+	/**
+	 * For each timestep, all node activities are stored here before being passed
+	 * to the external simulation.
+	 */
+  std::vector<ActivityType> _current_activities;
 	/**
 	 * The max Node number assigned so far.
 	 * @attention This number is only handled by the master node. Therefore never access it direct!
