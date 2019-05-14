@@ -32,7 +32,7 @@ override_dh_auto_configure:
 override_dh_fixperms:
 	dh_fixperms 
 	chmod +x debian/miind/usr/share/miind/python/miindio.py 
-	chmod +x debian/miind/usr/share/miind/apps/Projection
-	chmod +x debian/miind/usr/share/miind/apps/Bind
-	chmod +x debian/miind/usr/share/miind/apps/MatrixGenerator
+	chmod +x debian/miind/usr/share/miind/apps/Projection/Projection
+	chmod +x debian/miind/usr/share/miind/apps/MatrixGenerator/Bind
+	chmod +x debian/miind/usr/share/miind/apps/MatrixGenerator/MatrixGenerator
 
