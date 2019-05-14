@@ -25,7 +25,6 @@ sub.sh
 grid_fn.py
 miind_lib.py
 utilities.py
-codegen_lib0.py
 grid_generate.py
 miind.py
 variables.py
