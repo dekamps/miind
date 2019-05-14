@@ -25,21 +25,23 @@ namespace MPILib {
 //
 //! MPINetwork objects will check Dale's law by default, although this can be switched off. For neuroscience simulations, it has been shown
 //! that uncertainty on whether inhibitory connections should be negatively valued can lead to bugs if Dale's law is not checked.. The convention
-//! is that inhibitory weights should have a negative value.  
+//! is that inhibitory weights should have a negative value.
 //! Ultimately, an Algorithm must do a conversion from its external input contributions to internal parameters that  how to evolve its internal state. So,
 //! it is the responsibility of the developer of the Algorithm to document how it will use this information.
 enum NodeType {
-	NEUTRAL,		//! Indicates that Dale's law should not be checked for this node 
-	EXCITATORY_GAUSSIAN,    //! Indicates that Dale's law should be checked and that the contribution oof this excitatory node is to be interpreted as additive Guassian noise	
+	NEUTRAL,		//! Indicates that Dale's law should not be checked for this node
+	EXCITATORY_GAUSSIAN,    //! Indicates that Dale's law should be checked and that the contribution oof this excitatory node is to be interpreted as additive Guassian noise
 	INHIBITORY_GAUSSIAN, 	//! Check Dale's law; inhibitory; additive Gaussian noise
 	EXCITATORY_DIRECT, 	//! Check Dale's law; excitatory; do not make any attempt to reinterpret input from this node
-	INHIBITORY_DIRECT	//! Check Dale's law; inhibitory; do not make any attempt to reinterpret input
+	INHIBITORY_DIRECT,	//! Check Dale's law; inhibitory; do not make any attempt to reinterpret input
+	EXCITATORY, 	//! Check Dale's law; excitatory; do not make any attempt to reinterpret input from this node
+	INHIBITORY //! Check Dale's law; inhibitory; do not make any attempt to reinterpret input
 };
 	//! Test for excitatoryness
-	inline bool IsExcitatory(NodeType t){ return (t == EXCITATORY_DIRECT || t == EXCITATORY_GAUSSIAN) ? true : false; }
+	inline bool IsExcitatory(NodeType t){ return (t == EXCITATORY || t == EXCITATORY_DIRECT || t == EXCITATORY_GAUSSIAN); }
 
 	//! Test for inhibitoryness
-	inline bool IsInhibitory(NodeType t){ return (t == INHIBITORY_DIRECT || t == INHIBITORY_GAUSSIAN) ? true : false; }
+	inline bool IsInhibitory(NodeType t){ return (t == INHIBITORY || t == INHIBITORY_DIRECT || t == INHIBITORY_GAUSSIAN); }
 } // end of namespace MPILib
 
 #endif // include guard MPILIB_NODETYPE_HPP_

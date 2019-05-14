@@ -31,6 +31,9 @@ def getMiindPythonPath():
 
 def getMiindAppsPath():
     build_path = getMiindBuildPath()
+    # if miind has been installed, important apps are in ../share/miind/apps
+    if not os.path.isdir(build_path):
+        build_path = directories.miind_root()
     return op.join(build_path, 'apps')
 
 def split_fname(fname, ext):

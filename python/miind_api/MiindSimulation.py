@@ -88,9 +88,12 @@ class MiindSimulation:
         self.density_cache = {}
         self.marginal_cache = {}
 
-        simio = self.sim.find('SimulationIO')
-        self.WITH_STATE = simio.find('WithState').text == 'TRUE'
-        self.simulation_name = simio.find('SimulationName').text
+        simio = self.sim.find('SimulationRunParameter')
+        sim_name = simio.find('SimulationName')
+        if sim_name is not None:
+            self.simulation_name = sim_name.text
+        else:
+            self.simulation_name = "unnamed_sim"
 
         # If run using, MPI, there are multiple root files.
         self.root_paths = []
@@ -222,13 +225,11 @@ class MiindSimulation:
         if not op.exists(self.root_paths[0]):
             return False
 
-        # If STATE was TRUE, is there a folder which holds the densities?
-        if self.WITH_STATE:
-            for p in modelfiles:
-                if not op.exists(p + '_mesh'):
-                    return False
-                if len(os.listdir(p + '_mesh')) == 0:
-                    return False
+        for p in modelfiles:
+            if not op.exists(p + '_mesh'):
+                return False
+            if len(os.listdir(p + '_mesh')) == 0:
+                return False
 
         return True
 
