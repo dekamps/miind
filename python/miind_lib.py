@@ -62,7 +62,7 @@ def constructor_override(outfile,tree,typ):
     t_step = tree.find('SimulationRunParameter/t_step')
 
     outfile.write('\tMiindModel(int num_nodes):\n')
-    outfile.write('\t\tMiindTvbModelAbstract(num_nodes,  ' + t_end.text + '-' + t_begin.text + '), vec_network('+ t_step.text +'),_count(0){\n')
+    outfile.write('\t\tMiindTvbModelAbstract(num_nodes,  ' + t_end.text + '), vec_network('+ t_step.text +'),_count(0){\n')
     outfile.write('#ifdef ENABLE_MPI\n')
     outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
     outfile.write('\tboost::mpi::environment env();\n')
@@ -70,7 +70,7 @@ def constructor_override(outfile,tree,typ):
     outfile.write('}\n\n')
 
     outfile.write('\tMiindModel():\n')
-    outfile.write('\t\tMiindTvbModelAbstract(1,  ' + t_end.text + '-' + t_begin.text + '), vec_network('+ t_step.text +'),_count(0){\n')
+    outfile.write('\t\tMiindTvbModelAbstract(1,  ' + t_end.text + '), vec_network('+ t_step.text +'),_count(0){\n')
     outfile.write('#ifdef ENABLE_MPI\n')
     outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
     outfile.write('\tboost::mpi::environment env();\n')
@@ -85,7 +85,7 @@ def constructor_override(outfile,tree,typ):
         outfile.write('\tMiindModel(int num_nodes, \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
-        outfile.write('\t\tMiindTvbModelAbstract(num_nodes,  ' + t_end.text + '-' + t_begin.text + '), vec_network('+ t_step.text +'),_count(0)\n')
+        outfile.write('\t\tMiindTvbModelAbstract(num_nodes,  ' + t_end.text +'), vec_network('+ t_step.text +'),_count(0)\n')
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{\n')
         outfile.write('#ifdef ENABLE_MPI\n')
@@ -98,7 +98,7 @@ def constructor_override(outfile,tree,typ):
         outfile.write('\tMiindModel( \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
-        outfile.write('\t\tMiindTvbModelAbstract(1,  ' + t_end.text + '-' + t_begin.text + '), vec_network('+ t_step.text +'),_count(0)\n')
+        outfile.write('\t\tMiindTvbModelAbstract(1,  ' + t_end.text +'), vec_network('+ t_step.text +'),_count(0)\n')
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{\n')
         outfile.write('#ifdef ENABLE_MPI\n')
@@ -174,7 +174,6 @@ def generate_opening(fn, tree, typ, algorithms, variables):
         outfile.write('\t\tfor(int i=0; i<_num_nodes; i++) {\n')
 
 def generate_closing(fn,parameters,tree,type,prog_name,members):
-    start_time = parameters.find('t_begin').text
     end_time = parameters.find('t_end').text
     time_step = parameters.find('t_step').text
 

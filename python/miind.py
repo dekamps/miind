@@ -74,7 +74,6 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, parameters,
         f.write('\n')
 
 def generate_closing(fn,parameters):
-    start_time = parameters.find('t_begin').text
     end_time = parameters.find('t_end').text
     time_step = parameters.find('t_step').text
 
@@ -91,7 +90,7 @@ def generate_closing(fn,parameters):
         f.write('\n')
         f.write('\tnetwork.initOde2DSystem('+ steps +');\n')
         f.write('\n')
-        f.write('\tnetwork.mainLoop('+ start_time +','+ end_time + ','+ time_step + ', true);\n')
+        f.write('\tnetwork.mainLoop(0.0, '+ end_time + ','+ time_step + ', true);\n')
         f.write('\n')
         f.write('\treturn 0;\n')
         f.write('}\n')

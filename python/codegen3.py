@@ -163,21 +163,18 @@ def generate_outputfile(infile, outfile, enable_root):
     connection_list = tree.findall('Connections/Connection')
     connections.parse_connections(connection_list,weighttype,outfile)
     outfile.write('\t// generation simulation parameter\n')
-    simhand = tree.find('SimulationIO')
-    simulation.parse_simulation(simhand,outfile,enable_root)
     simpar = tree.find('SimulationRunParameter')
-    simulation.parse_parameter(simpar,outfile)
+    simulation.parse_parameter(simpar,outfile,enable_root)
 
     nodemap = node_name_to_node_id(node_list)
     outfile.write(reporting.define_display_nodes(tree,nodemap))
     outfile.write(reporting.define_rate_nodes(tree,nodemap))
     outfile.write(reporting.define_density_nodes(tree,nodemap))
 
-    t_begin = tree.find('SimulationRunParameter/t_begin')
     t_end   = tree.find('SimulationRunParameter/t_end')
     t_step = tree.find('SimulationRunParameter/t_step')
 
-    generate_closing(outfile, '(' + t_end.text + ' - ' + t_begin.text + ') / ' + t_step.text , t_step.text, weighttype)
+    generate_closing(outfile, '(' + t_end.text + ') / ' + t_step.text , t_step.text, weighttype)
 
     algorithms.reset_algorithms()
     nodes.reset_nodes()
