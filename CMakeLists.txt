@@ -178,6 +178,8 @@ ADD_SUBDIRECTORY( python )
 message("======================================== Please update ENV variables ====================================")
 message("")
 message("export PATH=$PATH:${CMAKE_INSTALL_PREFIX}/share/miind/python")
+message("export PYTHONPATH=$PYTHONPATH:${CMAKE_INSTALL_PREFIX}/share/miind/python")
+message("export OMP_NUM_THREADS=<NUMBER OF AVAILABLE CORES>" ) 
 message("")
 message("==========================================================================================================")
 
