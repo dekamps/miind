@@ -164,7 +164,8 @@ def generate_outputfile(infile, outfile, enable_root):
     connections.parse_connections(connection_list,weighttype,outfile)
     outfile.write('\t// generation simulation parameter\n')
     simpar = tree.find('SimulationRunParameter')
-    simulation.parse_parameter(simpar,outfile,enable_root)
+    simio = tree.find('SimulationIO')
+    simulation.parse_parameter(simpar,outfile,enable_root,simio)
 
     nodemap = node_name_to_node_id(node_list)
     outfile.write(reporting.define_display_nodes(tree,nodemap))

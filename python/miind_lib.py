@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import re
+import shutil
 import argparse
 import numpy as np
 import xml.etree.ElementTree as ET
@@ -634,6 +635,8 @@ def produce_mesh_algorithm_version(dirname, filename, modname, root, enable_mpi,
         directories.insert_cmake_template_lib(progname,dirpath,enable_mpi, enable_openmp, enable_root,cuda,SOURCE_FILE)
         create_cpp_file(xmlfile, dirpath, progname, modname, cuda)
         directories.move_model_files(xmlfile,dirpath)
+        xmlfilename = xmlfile.split(os.path.sep)[-1]
+        shutil.copyfile(xmlfile, os.path.join(dirpath,xmlfilename))
 
 def generate_vectorized_network_lib(dirname, filename, modname, enable_mpi, enable_openmp, enable_root, enable_cuda):
     fn = filename[0]

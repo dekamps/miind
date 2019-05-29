@@ -5,6 +5,8 @@ link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
 set( LIB_TYPE SHARED )
+include_directories( ${ROOT_INCLUDE_DIRS} )
+link_directories( ${ROOT_LIBRARY_DIRS} )
 
 
 #one below that MPILib is included in the paths they are needed for the camke config files

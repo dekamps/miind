@@ -132,6 +132,7 @@ if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
 set ( LIBLIST
+    ${ROOT_LIBRARIES}
     ${Boost_LIBRARIES}
     ${MPI_LIBRARIES}
     ${MIIND_LIBRARY_PREFIX}numtools

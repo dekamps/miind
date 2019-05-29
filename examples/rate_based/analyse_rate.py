@@ -2,7 +2,7 @@ import numpy as np
 import ROOT
 import sys
 import os
-import directories
+import directories3 as directories
 '''Analyse the response curve data.'''
 
 # Don't want flashing canvasses.
@@ -12,7 +12,8 @@ POPULATION_DATAFILE  = 'pop.dat'
 
 ROOT.gROOT.SetBatch(True)
 
-jobpath  = os.path.join(directories.miind_root(),'build','jobs','rate','joblist')
+cwd = os.getcwd()
+jobpath  = os.path.join(cwd,'rate','joblist')
 
 f = open(jobpath)
 lines = f.readlines()
@@ -23,8 +24,8 @@ def ExtractPopulationResults():
 
 	for line in lines:
 		path = os.path.split(line.strip())	
-		print path[-1]
-		f=ROOT.TFile(os.path.join(os.path.split(jobpath)[0] ,  path[-1] + '_0.root'))
+		print(path[-1])
+		f=ROOT.TFile(os.path.join(line.strip() ,  path[-1] + '_0.root'))
 
 		# Get the firing rate response of the LIF population
 		g=f.Get('rate_0')
@@ -36,7 +37,8 @@ def ExtractPopulationResults():
 
 		with open(POPULATION_DATAFILE,'a') as fpop:
 			items= path[-1].split('_')
-			print items[2], items[1]
+			print(items[2])
+			print(items[1])
 			fpop.write(items[2] + ' ' + items[1] + ' ' +  str(p[0]) + '\n')
 		c=ROOT.TCanvas('c'+ path[-1])
 		g.Draw('AL')

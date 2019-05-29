@@ -22,7 +22,7 @@ using namespace std;
 TwoDLib::UserTranslationMode InterpretArguments(int argc, char** argv){
 
 	if (argc < 5)
-		throw TwoDLib::TwoDLibException("Incorrect number of arguments. Usage is either: ./MatrixGenerator <mode> <basename>.model <basename>.fid n_points tr_v tr_w tr_reset [n_min] [n_max] [-use_area_calculation], or ./MatrixGenerator <mode> <basename>.model <basename>.fid n_points <basename>.jmp [n_min] [n_max].");
+		throw TwoDLib::TwoDLibException("Incorrect number of arguments. Usage is either: ./MatrixGenerator <mode> <basename>.model <basename>.fid n_points tr_v tr_w tr_reset [n_min] [n_max] [-use_area_calculation], or ./MatrixGenerator <mode> <basename>.model <basename>.fid n_points <basename>.jmp [n_min] [n_max].\n\nWhere mode can be:\nmc : Monte Carlo\narea : Area Calculation\njump : Use a jump file (with Monte Carlo)\nreset : Recalculate reset cells only.\ntransform : Calculate the dynamics transition matrix for the Grid method.\nresettransform : Recalculate reset cells only for Grid method.\n\n");
 	// if argv[4] is the jump file, then argc must be 5 or 7
 
 	std::string mode(argv[1]);

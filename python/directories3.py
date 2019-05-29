@@ -2,6 +2,7 @@ import os
 import errno
 import string
 import inspect
+import shutil
 import codegen3 as codegen
 import codegen_lib3 as codegen_lib
 import subprocess as sp
@@ -266,6 +267,8 @@ def add_shared_library(dirname, xmlfiles, modname, enable_mpi=True, enable_openm
         insert_cmake_template_lib(progname,dirpath,enable_mpi,enable_openmp,enable_root,enable_cuda,SOURCE_FILE)
         create_cpp_lib_file(xmlfile, dirpath, progname, modname, enable_root)
         move_model_files(xmlfile,dirpath)
+        xmlfilename = xmlfile.split(os.path.sep)[-1]
+        shutil.copyfile(xmlfile, os.path.join(dirpath,xmlfilename))
 
 def add_executable(dirname, xmlfiles, modname,enable_mpi=True, enable_openmp=True, enable_root=True, enable_cuda=False):
     ''' Add a user defined executable to the current working directory.
@@ -281,6 +284,8 @@ def add_executable(dirname, xmlfiles, modname,enable_mpi=True, enable_openmp=Tru
         insert_cmake_template(progname,dirpath,enable_mpi,enable_openmp,enable_root,enable_cuda,SOURCE_FILE)
         create_cpp_file(xmlfile, dirpath, progname, modname, enable_root)
         move_model_files(xmlfile,dirpath)
+        xmlfilename = xmlfile.split(os.path.sep)[-1]
+        shutil.copyfile(xmlfile, os.path.join(dirpath,xmlfilename))
 
 if __name__ == "__main__":
     initialize_global_variables()
