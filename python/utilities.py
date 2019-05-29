@@ -7,11 +7,11 @@ import sys
 import visualize
 import ROOT
 
-# the tolerance by which efficacies can be distinguished from their file names                                                                                                     
+# the tolerance by which efficacies can be distinguished from their file names
 tolerance = 1e-8
 
 # use: with cd('...'), returns to the original directory upon encountering exception
-# from: http://stackoverflow.com/questions/431684/how-do-i-cd-in-python 
+# from: http://stackoverflow.com/questions/431684/how-do-i-cd-in-python
 
 @contextmanager
 def cd(newdir):
@@ -36,7 +36,8 @@ def instantiate_jobs(dirname, batch):
         xmlfiles   = glob.glob('*.xml')
         matfiles   = glob.glob('*.mat')
         modelfile  = glob.glob('*model')
-        cmd = ['miind.py','--d',dirname]
+        cmd = ['miind.py', '--d',dirname]
+        cmd.extend(['--mpi','--openmp'])
         cmd.extend(xmlfiles)
         cmd.extend(['--m'])
         cmd.extend(modelfile)
@@ -48,18 +49,18 @@ def instantiate_jobs(dirname, batch):
             sp.call(['submit.py',dirname,sys.path[0]])
 
 def find_results(dir_name):
-    '''This function helps to navigate the standard workflow. In general, an analysis script will create a directory dir_name and write the XML files there.                        
-    For the purpose of the workflow, it is therefore assumed that this directory already exists. The miind.py script will be run from directory dir_name, which                     
-    results in the creation of directory dir_name within dir_name, and the latter directory contains all results directory. Although this appears complex,                          
-    the rationale is that typically, one wants to organise the results of the script in a directory, which is the top level dir_response. miind.py will be run from                 
-    there, which then creates the hiearchy dir_response/[list of result directories]. This routine will return                                                                      
+    '''This function helps to navigate the standard workflow. In general, an analysis script will create a directory dir_name and write the XML files there.
+    For the purpose of the workflow, it is therefore assumed that this directory already exists. The miind.py script will be run from directory dir_name, which
+    results in the creation of directory dir_name within dir_name, and the latter directory contains all results directory. Although this appears complex,
+    the rationale is that typically, one wants to organise the results of the script in a directory, which is the top level dir_response. miind.py will be run from
+    there, which then creates the hiearchy dir_response/[list of result directories]. This routine will return
     the absolute path and a list of directories, each containing the simulation results.'''
     if not os.path.exists(dir_name):
         raise ValueError
 
     respath = os.path.join(dir_name,dir_name)
     with cd(respath):
-        fns=sp.check_output(['ls']).split('\n')
+        fns=str(sp.check_output(['ls'],encoding='UTF-8')).split('\n')
         abspath = os.getcwd()
         retlist = [ d for d in fns if dir_name in d]
         return abspath, retlist
@@ -78,9 +79,9 @@ def extract_rate_graph(root_file, population_list, dstname):
         N = g.GetN()
         x_buff.SetSize(N)
         y_buff.SetSize(N)
-        # Create numpy arrays from buffers, copy to prevent data loss                                                                                                                
-        x_arr = np.array(x_buff, copy=True)
-        y_arr = np.array(y_buff, copy=True)
+        # Create numpy arrays from buffers, copy to prevent data loss
+        x_arr = np.ndarray(N,buffer=x_buff, dtype= np.float32)
+        y_arr = np.ndarray(N,buffer=y_buff, dtype= np.float32)
         ts.append(x_arr)
         fs.append(y_arr)
     return ts, fs
@@ -94,9 +95,9 @@ def find_last_density_file(dense_list):
 
 
 def produce_data_summary(dir_name, population_list, model, simulationname='', mapping_dictionary = None):
-    ''' dir_name is the directory name of the simulation results. The standard workflow is assumed, which produces a hierarchy of three directories deep:                            
-    dir_name/dir_name/[list of result directories]. Only dir_name must be provided, the result directories will be found and listed by the routines.                                 
-    Population list is a list of NodeId's. T directory DST_<dir_name> will be created. The firing rates of the populations in                                                        
+    ''' dir_name is the directory name of the simulation results. The standard workflow is assumed, which produces a hierarchy of three directories deep:
+    dir_name/dir_name/[list of result directories]. Only dir_name must be provided, the result directories will be found and listed by the routines.
+    Population list is a list of NodeId's. T directory DST_<dir_name> will be created. The firing rates of the populations in
     the poplation_list will be extracted, and the steady state density file, i.e. the density with the latest time stamp will be saved there.'''
     dstname = 'DST_' + dir_name
     if not os.path.exists(dstname):
@@ -112,9 +113,8 @@ def produce_data_summary(dir_name, population_list, model, simulationname='', ma
                 rt = simulationname + '_' + '0' + '.root'
             if os.path.exists(rt):
                 ts, fs = extract_rate_graph(rt, population_list, dstname)
-                # create the DST directory in the script directory                                                                                                                   
+                # create the DST directory in the script directory
                 dst_dir_name = os.path.join(curpath,os.path.join(sys.path[0],dstname))
-
                 if not os.path.exists(dst_dir_name):
                     os.makedirs(dst_dir_name)
                 if mapping_dictionary == None:
@@ -125,7 +125,7 @@ def produce_data_summary(dir_name, population_list, model, simulationname='', ma
                         fname += '_' + str(mapping_dictionary[di][i])
 
                 for i, id in enumerate(population_list):
-                    print os.path.join(dst_dir_name, fname + '_' + str(id) +  '.rate')
+                    print(os.path.join(dst_dir_name, fname + '_' + str(id) +  '.rate'))
                     with open(os.path.join(dst_dir_name, fname + '_' + str(id) +  '.rate'),'w') as f:
                         for t in ts[i]:
                             f.write(str(t) + '\t')
@@ -134,9 +134,9 @@ def produce_data_summary(dir_name, population_list, model, simulationname='', ma
                             f.write(str(freq) + '\t')
                         f.write('\n')
             else:
-                print 'Cannot find: ', rt
+                print('Cannot find: ', rt)
 
-                    # the density files reside here:                                                                                                                                 
+                    # the density files reside here:
                     #dir_density = model + '_mesh'
                     #with cd(dir_density):
                     #    dfs = sp.check_output(['ls']).split('\n')

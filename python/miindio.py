@@ -6,6 +6,7 @@
 import argparse
 import codegen3
 import sys
+import glob
 import os
 import os.path as op
 import miind_api as api
@@ -184,15 +185,19 @@ def submit(command, current_sim):
             print('No simulation currently defined. Please call command \'sim\'.')
 
         if len(command) == 1:
-            current_sim.submit(True,
+            current_sim.submit(True, [],
                   settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
-        if len(command) >= 2:
-            current_sim.submit(True,
-                  settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'], *command[1:])
+        if len(command) == 2:
+            current_sim.submit(True, glob.glob(command[1]),
+                  settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+        if len(command) >= 3:
+            current_sim.submit(True, command[1:],
+                  settings['mpi_enabled'], settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print (name + ' : Generate and \'make\' the code from the current simulation xml file. Ensure you have the correct settings (call \'settings\').')
-        print (name + ' [make argument 1] [make argument 2] ... : Generate and \'make (with the provided additional arguments)\' the code from the current simulation xml file.')
+        print (name + ' [xml file] : Generate and \'make\' the code from the given xml file (or xml files matching the a given regular expression).')
+        print (name + ' [xml file 1] [xml file 2] [xml file 3] ... : Generate and \'make\' the code from the given xml files.')
 
 def run(command, current_sim):
     command_name = command[0]

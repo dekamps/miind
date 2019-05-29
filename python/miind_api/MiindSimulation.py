@@ -237,39 +237,73 @@ class MiindSimulation:
     def nodes(self):
         return self.nodenames
 
-    def submit_shared_lib(self, overwrite=False, enable_mpi=False, enable_openmp=False, enable_root=True, enable_cuda=False, *args):
-        if op.exists(self.output_directory) and overwrite:
-            shutil.rmtree(self.output_directory)
-        with cd(self.xml_location):
-            miind_lib.generate_vectorized_network_lib(self.submit_name, [self.xml_path], '',
-            enable_mpi, enable_openmp, enable_root, enable_cuda)
-        fnames = os.listdir(self.output_directory)
-        if 'CMakeLists.txt' in fnames:
-            subprocess.call(['cmake .'] +
-                             [a for a in args],
-                             cwd=self.output_directory, shell=True)
-            subprocess.call(['make'], cwd=self.output_directory)
-            shutil.copyfile(self.xml_path, op.join(self.output_directory,
-                                                        self.xml_fname))
+    def submit_shared_lib(self, overwrite=False, xml_list=[], enable_mpi=False, enable_openmp=False, enable_root=True, enable_cuda=False, *args):
+        if not xml_list:
+            xml_list = [self.xml_path]
 
-    def submit(self, overwrite=False, enable_mpi=False, enable_openmp=False, enable_root=True, enable_cuda=False, *args):
         if op.exists(self.output_directory) and overwrite:
             shutil.rmtree(self.output_directory)
         with cd(self.xml_location):
-            miind.generate_vectorized_network_executable(self.submit_name, [self.xml_path], '',
+            miind_lib.generate_vectorized_network_lib(self.submit_name, xml_list, '',
             enable_mpi, enable_openmp, enable_root, enable_cuda)
-        fnames = os.listdir(self.output_directory)
-        if 'CMakeLists.txt' in fnames:
-            subprocess.call(['cmake .'] +
-                             [a for a in args],
-                             cwd=self.output_directory, shell=True)
-            subprocess.call(['make'], cwd=self.output_directory)
-            shutil.copyfile(self.xml_path, op.join(self.output_directory,
-                                                        self.xml_fname))
+        with cd(self.submit_name):
+            localfiles=subprocess.check_output(["ls"],encoding='UTF-8').split()
+            if 'CMakeLists.txt' in localfiles:
+                subprocess.call(['cmake . '] +
+                                 [a for a in args],
+                                 cwd=self.output_directory, shell=True)
+                subprocess.call(['make'], cwd=self.output_directory)
+            else:
+                # all directories in this one should contain a CMakeLists.txt
+                for fi in localfiles:
+                    if os.path.isdir(fi):
+                        with cd(fi):
+                            localfiles=subprocess.check_output(["ls"],encoding='UTF-8').split()
+                            # subprocess returns bytes, and this difference is important in Python 3
+                            if 'CMakeLists.txt' in localfiles:
+                                subprocess.call(['cmake . ']+[a for a in args],shell=True)
+                                subprocess.call(['make'])
+
+    def submit(self, overwrite=False, xml_list=[], enable_mpi=False, enable_openmp=False, enable_root=True, enable_cuda=False, *args):
+        if not xml_list:
+            xml_list = [self.xml_path]
+
+        if op.exists(self.output_directory) and overwrite:
+            shutil.rmtree(self.output_directory)
+        with cd(self.xml_location):
+            miind.generate_vectorized_network_executable(self.submit_name, xml_list, '',
+            enable_mpi, enable_openmp, enable_root, enable_cuda)
+        with cd(self.submit_name):
+            localfiles=subprocess.check_output(["ls"],encoding='UTF-8').split()
+            if 'CMakeLists.txt' in localfiles:
+                subprocess.call(['cmake . '] +
+                                 [a for a in args],
+                                 cwd=self.output_directory, shell=True)
+                subprocess.call(['make'], cwd=self.output_directory)
+            else:
+                # all directories in this one should contain a CMakeLists.txt
+                for fi in localfiles:
+                    if os.path.isdir(fi):
+                        with cd(fi):
+                            localfiles=subprocess.check_output(["ls"],encoding='UTF-8').split()
+                            # subprocess returns bytes, and this difference is important in Python 3
+                            if 'CMakeLists.txt' in localfiles:
+                                subprocess.call(['cmake . ']+[a for a in args],shell=True)
+                                subprocess.call(['make'])
 
     def run(self):
-        subprocess.call('./' + self.miind_executable, cwd=self.output_directory)
+        with cd(self.submit_name):
+            localfiles=subprocess.check_output(["ls"],encoding='UTF-8').split()
+            for fi in localfiles:
+                if os.path.isdir(fi):
+                    with cd(fi):
+                        subprocess.call('./' + fi)
 
     def run_mpi(self, cores):
-        subprocess.call(['mpiexec', '--bind-to', 'core', '-n', str(cores),
-                        self.miind_executable], cwd=self.output_directory)
+        with cd(self.submit_name):
+            localfiles=subprocess.check_output(["ls"],encoding='UTF-8').split()
+            for fi in localfiles:
+                if os.path.isdir(fi):
+                    with cd(fi):
+                        subprocess.call(['mpiexec', '--bind-to', 'core', '-n', str(cores),
+                            fi])

@@ -1,4 +1,5 @@
 import numpy as np
+import jobs
 from parametersweep import *
 
 THETA     = 20e-3
@@ -48,7 +49,7 @@ def generate_xml_file(base_file_name, element):
     f_xml.replace_xml_tag(tag_log, base_file_name + '.log')
 
     tag_time = xml_tag('<t_end>0.3</t_end>')
-    f_xml.replace_xml_tag(tag_time,1.0)
+    f_xml.replace_xml_tag(tag_time,0.5)
 
     tag_screen = xml_tag('<OnScreen>TRUE</OnScreen>')
     f_xml.replace_xml_tag(tag_screen,'FALSE')
@@ -60,6 +61,7 @@ def generate_xml_sequence(base_file_name):
     l = generate_h_rate_sequence()
     for element in l:
         generate_xml_file(base_file_name, element)
+    jobs.write_out_jobs(base_file_name,[base_file_name+element[2]+'.xml' for element in l])
 
 if __name__ == "__main__":
     generate_xml_sequence('response')

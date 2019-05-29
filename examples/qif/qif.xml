@@ -1,45 +1,28 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<Algorithm type="MeshAlgorithm" name="E" modelfile="qif_excit.model" >
+<Algorithm type="MeshAlgorithm" name="E" modelfile="qif.model" >
 <TimeStep>0.0001</TimeStep>
-<MatrixFile>qif_excit_0.05_0_0.mat</MatrixFile>
-<MatrixFile>qif_excit_-0.05_0_0.mat</MatrixFile>
-</Algorithm>
-<Algorithm type="MeshAlgorithm" name="I" modelfile="qif_inhib.model" >
-<TimeStep>0.0001</TimeStep>
-<MatrixFile>qif_inhib_0.05_0_0.mat</MatrixFile>
-<MatrixFile>qif_inhib_-0.05_0_0.mat</MatrixFile>
+<MatrixFile>qif_0.01_0_0_0_.mat</MatrixFile>
 </Algorithm>
 <Algorithm type="RateFunctor" name="ExcInput">
-<expression>1000.</expression>
+<expression>1500.</expression>
 </Algorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="E" name="QIF_E" type="INHIBITORY_DIRECT" />
-<Node algorithm="I" name="QIF_I" type="INHIBITORY_DIRECT" />
+<Node algorithm="E" name="QIF" type="EXCITATORY_DIRECT" />
 <Node algorithm="ExcInput" name="Inp" type="NEUTRAL" />
 </Nodes>
 <Connections>
-  <Connection In="Inp" Out="QIF_E">2 0.05 0</Connection>
-  <Connection In="Inp" Out="QIF_I">6 0.05 0</Connection>
-  <Connection In="QIF_E" Out="QIF_I">160 -0.05 0</Connection>
-  <!--<Connection In="QIF E" Out="QIF E">5 -0.05 0</Connection>-->
-  <!--<Connection In="QIF I" Out="QIF I">5 -0.05 0</Connection>-->
-  <Connection In="QIF_I" Out="QIF_E">130 -0.05 0</Connection>
+<Connection In="Inp" Out="QIF">1 0.01 0</Connection>
 </Connections>
 <Reporting>
-<Density node="QIF_E" t_start="0.0" t_end="10.0" t_interval="0.001" />
-<Density node="QIF_I" t_start="0.0" t_end="10.0" t_interval="0.001" />
-<!--<Display node="QIF_E" />
-<Display node="QIF_I" />-->
-<Rate node="QIF_E" t_interval="0.001" />
-<Rate node="QIF_I" t_interval="0.001" />
+<Rate node="QIF" t_interval="0.0001"/>
 </Reporting>
 <SimulationRunParameter>
-<SimulationName>qif</SimulationName>
-<t_end>10.0</t_end>
+<SimulationName>lif</SimulationName>
+<t_end>3.0</t_end>
 <t_step>0.0001</t_step>
-<name_log>qif.log</name_log>
+<name_log>lif.log</name_log>
 </SimulationRunParameter>
 </Simulation>

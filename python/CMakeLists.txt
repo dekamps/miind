@@ -18,7 +18,6 @@ cmake_template
 meshtest3.py
 cmake_template_lib
 grid_adex.py
-submit.py
 codegen3.py
 grid_cond.py
 sub.sh
@@ -26,7 +25,6 @@ grid_fn.py
 miind_lib.py
 utilities.py
 grid_generate.py
-miind.py
 variables.py
 codegen_lib3.py
 grid_rybak.py
@@ -66,6 +64,8 @@ xml/wilsoncowan.xml
 
 set( PYTHON_SCRIPTS_MIINDIO
 miindio.py
+miind.py
+submit.py
 )
 
 install( FILES ${PYTHON_SCRIPTS}
