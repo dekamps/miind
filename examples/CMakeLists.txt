@@ -40,20 +40,9 @@ lif_python/runlif.py
 )
 
 set( QIF
-qif/qif_0.005_0_0.mat
 qif/qifanalysis.py
-qif/qif_inhib_0.05_0_0.mat
-qif/qif_0.03_0_0.mat
-qif/qif_excit_-0.05_0_0.mat
-qif/qif_inhib.model
-qif/qif_-0.05_0_0.mat
-qif/qif_excit_0.05_0_0.mat
 qif/qif.model
-qif/qif_0.05_0_0.mat
-qif/qif_excit.model
 qif/qif.xml
-qif/qif_0.15_0_0.mat
-qif/qif_inhib_-0.05_0_0.mat
 qif/show_qif_gain.py
 )
 
@@ -73,8 +62,6 @@ response_curve_lif/response.xml
 
 set( SINGLE
 single_lif/analyse_single_lif.py
-single_lif/no_decay.xml
-single_lif/no_input.xml
 single_lif/response.xml
 single_lif/single_lif.py
 )
