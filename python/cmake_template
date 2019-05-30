@@ -121,7 +121,11 @@ ENDIF(ENABLE_OPENMP)
 # Libraries
 #############################################################################
 
+if (APPLE)
+set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
+else (APPLE)
 set(GLUT_LIBRARY "-lGL -lGLU -lglut")
+endif(APPLE)
 
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )

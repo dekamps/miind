@@ -10,8 +10,8 @@
 </Algorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="ConductanceNeuron" name="CondNode" type="EXCITATORY" />
-<Node algorithm="ExcitatoryInput" name="Drive" type="EXCITATORY" />
+<Node algorithm="ConductanceNeuron" name="CondNode" type="EXCITATORY_DIRECT" />
+<Node algorithm="ExcitatoryInput" name="Drive" type="EXCITATORY_DIRECT" />
 </Nodes>
 <Connections>
 <Connection In="Drive" Out="CondNode">1   0.05 0</Connection>
