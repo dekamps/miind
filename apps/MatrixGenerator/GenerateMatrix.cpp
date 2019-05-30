@@ -156,6 +156,7 @@ void GenerateResetTransitionsOnly(
 	MPILib::Index l_max,
 	TwoDLib::UserTranslationMode mode
 ) {
+	std::cout << "zopa" << std::endl;
 	vector<TwoDLib::Coordinates> ths   = mesh.findV(V_th,TwoDLib::Mesh::EQUAL);
 	vector<TwoDLib::Coordinates> above = mesh.findV(V_th,TwoDLib::Mesh::ABOVE);
 	vector<TwoDLib::Coordinates> below = mesh.findV(V_th,TwoDLib::Mesh::BELOW);
