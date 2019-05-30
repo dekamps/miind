@@ -38,7 +38,7 @@ def parse_connection(connection, weighttype):
         for ak,av in connection.attrib.items():
             if ak == 'In' or ak == 'Out':
                 continue
-            s += '\tcon_' + i + '_' + o + tally + '.setParam(\"' + ak + '\", std::to_string(' + av +'));\n'
+            s += '\tcon_' + i + '_' + o + tally + '.setParam(\"' + ak + '\", \"' + av +'\");\n'
     else:
         if weighttype.text == 'double':
             s += '\tdouble con_' + i + '_' + o + tally + '('
@@ -174,7 +174,7 @@ def parse_incoming_connection(connection, weighttype):
         for ak,av in connection.attrib.items():
             if ak == 'Node':
                 continue
-            s += '\tcon_EXTERNAL_' + node + tally + '.setParam(\"' + ak + '\", std::to_string(' + av +'));\n'
+            s += '\tcon_EXTERNAL_' + node + tally + '.setParam(\"' + ak + '\", \"' + av +'\");\n'
     else:
         if weighttype.text == 'double':
             s += '\tdouble con_EXTERNAL_' + node + tally + '('

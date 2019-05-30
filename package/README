@@ -5,14 +5,13 @@ In working directory:
 git clone <miind git repo link> miind-1.05
 cd miind-1.05
 rm -r .git
+rm -r .gitignore
 cd ..
 tar -cvzf miind-1.05.tar.gz miind-1.05
 cd miind-1.05
 dh_make -f ../miind-1.05.tar.gz
 (When prompted) answer i and y
-cp package/control debian/
-cp package/miind.links debian/
-cp package/rules debian/
+cp package/control package/miind.links package/rules debian/
 dpkg-buildpackage -us -uc --source-option=--include-binaries
 cd ..
 

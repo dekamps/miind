@@ -40,6 +40,8 @@ ENDIF (MIIND_INCLUDE_DIR_DEFAULT)
 
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
+include_directories( ${ROOT_INCLUDE_DIRS} )
+link_directories( ${ROOT_LIBRARY_DIRS} )
 
 OPTION(ENABLE_MPI "MPI Desired" ${TOKEN_ENABLE_MPI})
 OPTION(ENABLE_OPENMP "OpenMP Desired" ${TOKEN_ENABLE_OPENMP})
@@ -64,6 +66,12 @@ IF (ENABLE_ROOT)
 
    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
    ROOT_GENERATE_DICTIONARY(G__Event Event.h LINKDEF EventLinkDef.h)
+
+   message(STATUS "Building Root dependent parts")
+   message(STATUS "Root include directories:" ${ROOT_INCLUDE_DIRS})
+   message(STATUS "Root library directories:" ${ROOT_LIBRARY_DIR})
+   include_directories( ${ROOT_INCLUDE_DIRS} )
+   link_directories( ${ROOT_LIBRARY_DIR} )
 
    #---Create a shared library with geneated dictionary (don't want to do that now; maybe not ever)
    # add_library(Event SHARED Event.cxx G__Event.cxx)

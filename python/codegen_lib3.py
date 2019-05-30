@@ -61,9 +61,7 @@ def generate_closing(outfile, steps, t_step, weighttype, tree, prog_name):
     outfile.write('\tSimulationRunParameter par_run( *report_handler,(_simulation_length/_time_step)+1,0,\n')
     name=tree.find('SimulationRunParameter/name_log')
     log_name = name.text
-    report_t_step = tree.find('SimulationRunParameter/t_report')
-    report_state_t_step = tree.find('SimulationRunParameter/t_state_report')
-    outfile.write('\t\t\t_simulation_length,' + report_t_step.text + ',_time_step,\"' + log_name + '\",'+ report_state_t_step.text + ');\n')
+    outfile.write('\t\t\t_simulation_length,_time_step,_time_step,\"' + log_name + '\");\n')
     outfile.write('\t\n')
     outfile.write('\tnetwork.configureSimulation(par_run);\n')
     outfile.write('\t}\n')
@@ -100,18 +98,18 @@ def constructor_override(outfile,tree,typ):
     variables.parse_variables(variable_list,outfile)
 
     outfile.write('\tMiindModel(int num_nodes):\n')
-    outfile.write('\t\tMiindTvbModelAbstract(num_nodes, ' + t_end.text + '-' + t_begin.text + '),_count(0){\n')
+    outfile.write('\t\tMiindTvbModelAbstract(num_nodes, ' + t_end.text + '),_count(0){\n')
     outfile.write('}\n\n')
 
     outfile.write('\tMiindModel():\n')
-    outfile.write('\t\tMiindTvbModelAbstract(1, ' + t_end.text + '-' + t_begin.text + '),_count(0){\n')
+    outfile.write('\t\tMiindTvbModelAbstract(1, ' + t_end.text + '),_count(0){\n')
     outfile.write('}\n\n')
 
     if len(variable_list) > 0:
         outfile.write('\tMiindModel(int num_nodes, \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
-        outfile.write('\t\tMiindTvbModelAbstract(num_nodes, ' + t_end.text + '-' + t_begin.text + '),_count(0)\n')
+        outfile.write('\t\tMiindTvbModelAbstract(num_nodes, ' + t_end.text + '),_count(0)\n')
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{\n')
         outfile.write('}\n\n')
@@ -120,7 +118,7 @@ def constructor_override(outfile,tree,typ):
         outfile.write('\tMiindModel( \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
-        outfile.write('\t\tMiindTvbModelAbstract(1, ' + t_end.text + '-' + t_begin.text + '),_count(0)\n')
+        outfile.write('\t\tMiindTvbModelAbstract(1, ' + t_end.text + '),_count(0)\n')
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{\n')
         outfile.write('}\n\n')
@@ -345,11 +343,10 @@ def generate_outputfile(infile, outfile, prog_name):
     connection_list = tree.findall('Connections/OutgoingConnection')
     connections.parse_outgoing_connections(connection_list,outfile)
 
-    t_begin = tree.find('SimulationRunParameter/t_begin')
     t_end   = tree.find('SimulationRunParameter/t_end')
     t_step = tree.find('SimulationRunParameter/t_step')
 
-    generate_closing(outfile, '(' + t_end.text + ' - ' + t_begin.text + ') / ' + t_step.text , t_step.text, weighttype, tree, prog_name)
+    generate_closing(outfile, '(' + t_end.text + ') / ' + t_step.text , t_step.text, weighttype, tree, prog_name)
 
     python_wrapper(outfile, prog_name)
 

@@ -1,51 +1,30 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<Algorithm type="MeshAlgorithm" name="E" modelfile="cond.model" >
+<Algorithm type="MeshAlgorithm" name="ConductanceNeuron" modelfile="cond.model" >
 <TimeStep>0.00001</TimeStep>
 <MatrixFile>cond_0_0.05_0.mat</MatrixFile>
 </Algorithm>
-<Algorithm type="RateFunctor" name="ExcInput">
+<Algorithm type="RateFunctor" name="ExcitatoryInput">
 <expression>1000.</expression>
 </Algorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="E" name="CondE" type="EXCITATORY_DIRECT" />
-<Node algorithm="ExcInput" name="Inp" type="NEUTRAL" />
+<Node algorithm="ConductanceNeuron" name="CondNode" type="EXCITATORY" />
+<Node algorithm="ExcitatoryInput" name="Drive" type="EXCITATORY" />
 </Nodes>
 <Connections>
-<Connection In="Inp" Out="CondE">1   0.05 0</Connection>
+<Connection In="Drive" Out="CondNode">1   0.05 0</Connection>
 </Connections>
 <Reporting>
-<Density node="CondE" t_start="0.0" t_end="0.1" t_interval="0.001" />
-<!--<Display node="CondE" />-->
-<Rate node="CondE" t_interval="0.001"/>
+<Density node="CondNode" t_start="0.0" t_end="0.1" t_interval="0.001" />
+<Display node="CondNode" />
+<Rate node="CondNode" t_interval="0.001"/>
 </Reporting>
-<SimulationIO>
-<SimulationName>cond.dat</SimulationName>
-<OnScreen>FALSE</OnScreen>
-<WithState>TRUE</WithState>
-<WriteNet>FALSE</WriteNet>
-<CanvasParameter>
-<T_min>0</T_min>
-<T_max>0.3</T_max>
-<F_min>0</F_min>
-<F_max>20</F_max>
-<State_min>0</State_min>
-<State_max>1.0</State_max>
-<Dense_min>0</Dense_min>
-<Dense_max>2.5</Dense_max>
-</CanvasParameter>
-<CanvasNode Name="CondE" />
-</SimulationIO>
 <SimulationRunParameter>
-<max_iter>1000000</max_iter>
-<t_begin>0</t_begin>
+<SimulationName>CondSim</SimulationName>
 <t_end>0.1</t_end>
-<t_report>0.001</t_report>
-<t_state_report>0.001</t_state_report>
 <t_step>0.0001</t_step>
-<t_update>0.01</t_update>
 <name_log>twopop.log</name_log>
 </SimulationRunParameter>
 </Simulation>

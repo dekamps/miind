@@ -27,7 +27,7 @@ def list_files(dir):
     su1 = []
     su2 = []
     su5 = []
-    files= sp.check_output(['ls', dir]).split('\n')
+    files= str(sp.check_output(['ls', dir],encoding='UTF-8')).split('\n')
     ratefiles = [ f for f in files if 'rate' in f]
     return ratefiles
 
@@ -36,9 +36,8 @@ def show_curve():
     su1 = []
     su2 = []
     su5 = []
-    files= sp.check_output(['ls', dst_resp_dir]).split('\n')
+    files= str(sp.check_output(['ls', dst_resp_dir],encoding='UTF-8')).split('\n')
     ratefiles = list_files(dst_resp_dir)
-    
     
     for f in ratefiles:
         m, s, f = process_file(os.path.join(dst_resp_dir,f))
@@ -53,7 +52,7 @@ def show_curve():
     s2 = sorted(su2, key = lambda entry: entry[0])
     s5 = sorted(su5, key = lambda entry: entry[0])
 
-    print s2
+    print(s2)
     c=ROOT.TCanvas()
     h=ROOT.TH2F("h","Gain curve (QIF)",500, 0., 10., 500, 0., 25.)    
     h.SetXTitle('\mu (V)')
@@ -90,13 +89,14 @@ def sinusoid(x, base, a, omega, delta):
     return a*np.sin(2*np.pi*omega*x+delta) + base
 
 def process_spect_file(f):
-    print f
+    print(f)
     om = float(f.split('/')[1].split('_')[1])/(2*np.pi)
     with open(f) as fin:
         lines = fin.readlines()
         ts = [float(x) for x in lines[0].split()]
         fs = [float(x) for x in lines[1].split()]
-    popt, pcov = curve_fit(sinusoid, ts[len(ts)/2:], fs[len(fs)/2:],bounds = ([0., 0, 0.9*om,-np.pi],[20., 10.,1.1*om,np.pi]) )
+
+    popt, pcov = curve_fit(sinusoid, ts[int(len(ts)/2):], fs[int(len(ts)/2):],bounds = ([0., 0, 0.9*om,-np.pi],[20., 10.,1.1*om,np.pi]) )
     plt.plot(ts,fs)
 
 
@@ -115,7 +115,7 @@ def show_spectrum():
     ass=[]
     ratefiles = list_files(dst_spec_dir)
     for f in ratefiles:
-        print f 
+        print(f)
         om = float(f.split('_')[1])
         oss.append(om)
         a, delta = process_spect_file(os.path.join(dst_spec_dir,f))

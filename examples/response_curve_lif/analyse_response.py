@@ -2,7 +2,7 @@ import numpy as np
 import ROOT
 import sys
 import os
-import directories
+import directories3 as directories
 import glob
 import utilities as ut
 import subprocess as sp
@@ -11,7 +11,7 @@ import subprocess as sp
 
 # Don't want flashing canvasses.
 
-ANALYTIC_DATAFILE    = 'analytic.dat'
+ANALYTIC_DATAFILE    = 'response.dat'
 POPULATION_DATAFILE  = 'pop.dat'
 
 ROOT.gROOT.SetBatch(True)
@@ -43,10 +43,11 @@ def ExtractPopResults():
 	with ut.cd('response'):
 		dirs = sp.check_output(['ls']).split()
 		for f in dirs:
-			with ut.cd(f):
-				files = glob.glob("*.root")
-				f, m, s = AnalyseROOTFile(files[0]) # glob returns  a list, even if it has only one member
-				res.append([f,m,s])
+			if os.path.isdir(f):
+				with ut.cd(f):
+					files = glob.glob("*.root")
+					f, m, s = AnalyseROOTFile(files[0]) # glob returns  a list, even if it has only one member
+					res.append([f,m,s])
 
 	with open(POPULATION_DATAFILE,'w') as fpop:
 		for r in res:
@@ -105,7 +106,8 @@ def ParsePopResponse():
 			items = [float(x) for x in line.split()]
 			m.append(items[1])
 			f.append(items[0])
-			print items[0], items[2]
+			print(items[0])
+			print(items[2])
 	g=ROOT.TGraph(len(m),np.array(m),np.array(f))
 	return g
 

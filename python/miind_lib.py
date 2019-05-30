@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import re
+import shutil
 import argparse
 import numpy as np
 import xml.etree.ElementTree as ET
@@ -62,7 +63,7 @@ def constructor_override(outfile,tree,typ):
     t_step = tree.find('SimulationRunParameter/t_step')
 
     outfile.write('\tMiindModel(int num_nodes):\n')
-    outfile.write('\t\tMiindTvbModelAbstract(num_nodes,  ' + t_end.text + '-' + t_begin.text + '), vec_network('+ t_step.text +'),_count(0){\n')
+    outfile.write('\t\tMiindTvbModelAbstract(num_nodes,  ' + t_end.text + '), vec_network('+ t_step.text +'),_count(0){\n')
     outfile.write('#ifdef ENABLE_MPI\n')
     outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
     outfile.write('\tboost::mpi::environment env();\n')
@@ -70,7 +71,7 @@ def constructor_override(outfile,tree,typ):
     outfile.write('}\n\n')
 
     outfile.write('\tMiindModel():\n')
-    outfile.write('\t\tMiindTvbModelAbstract(1,  ' + t_end.text + '-' + t_begin.text + '), vec_network('+ t_step.text +'),_count(0){\n')
+    outfile.write('\t\tMiindTvbModelAbstract(1,  ' + t_end.text + '), vec_network('+ t_step.text +'),_count(0){\n')
     outfile.write('#ifdef ENABLE_MPI\n')
     outfile.write('\t// initialise the mpi environment this cannot be forwarded to a class\n')
     outfile.write('\tboost::mpi::environment env();\n')
@@ -85,7 +86,7 @@ def constructor_override(outfile,tree,typ):
         outfile.write('\tMiindModel(int num_nodes, \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
-        outfile.write('\t\tMiindTvbModelAbstract(num_nodes,  ' + t_end.text + '-' + t_begin.text + '), vec_network('+ t_step.text +'),_count(0)\n')
+        outfile.write('\t\tMiindTvbModelAbstract(num_nodes,  ' + t_end.text +'), vec_network('+ t_step.text +'),_count(0)\n')
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{\n')
         outfile.write('#ifdef ENABLE_MPI\n')
@@ -98,7 +99,7 @@ def constructor_override(outfile,tree,typ):
         outfile.write('\tMiindModel( \n')
         variables.parse_variables_as_parameters(variable_list,outfile)
         outfile.write('):\n')
-        outfile.write('\t\tMiindTvbModelAbstract(1,  ' + t_end.text + '-' + t_begin.text + '), vec_network('+ t_step.text +'),_count(0)\n')
+        outfile.write('\t\tMiindTvbModelAbstract(1,  ' + t_end.text +'), vec_network('+ t_step.text +'),_count(0)\n')
         variables.parse_variables_as_constructor_defaults(variable_list, outfile)
         outfile.write('{\n')
         outfile.write('#ifdef ENABLE_MPI\n')
@@ -174,7 +175,6 @@ def generate_opening(fn, tree, typ, algorithms, variables):
         outfile.write('\t\tfor(int i=0; i<_num_nodes; i++) {\n')
 
 def generate_closing(fn,parameters,tree,type,prog_name,members):
-    start_time = parameters.find('t_begin').text
     end_time = parameters.find('t_end').text
     time_step = parameters.find('t_step').text
 
@@ -635,6 +635,8 @@ def produce_mesh_algorithm_version(dirname, filename, modname, root, enable_mpi,
         directories.insert_cmake_template_lib(progname,dirpath,enable_mpi, enable_openmp, enable_root,cuda,SOURCE_FILE)
         create_cpp_file(xmlfile, dirpath, progname, modname, cuda)
         directories.move_model_files(xmlfile,dirpath)
+        xmlfilename = xmlfile.split(os.path.sep)[-1]
+        shutil.copyfile(xmlfile, os.path.join(dirpath,xmlfilename))
 
 def generate_vectorized_network_lib(dirname, filename, modname, enable_mpi, enable_openmp, enable_root, enable_cuda):
     fn = filename[0]

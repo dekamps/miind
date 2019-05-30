@@ -1,5 +1,5 @@
 import numpy as np
-import mesh
+import mesh3
 import ROOT
 
 class ScoopList:
@@ -70,7 +70,7 @@ class Ode2DSystem:
 
             to   = self.map(pair[1][0],pair[1][1])
             fr   = self.map(pair[0][0],pair[0][1])
-        
+
             self.mass[to] += self.mass[fr]
             self.mass[fr] = 0
 
@@ -78,18 +78,18 @@ class Ode2DSystem:
         for triplet in self.threshold_list:
             to   = self.map(triplet[1][0],triplet[1][1])
             fr   = self.map(triplet[0][0],triplet[0][1])
- 
-    
+
+
             alpha = triplet[2]
-            
+
             self.f += alpha*self.mass[fr]
             self.mass[to] += alpha*self.mass[fr]
- 
+
             if fr != oldfr:
                 if oldfr != []:
                     self.mass[oldfr] = 0.
                 oldfr = fr
-                
+
         self.mass[fr] = 0.
 
 
@@ -105,7 +105,7 @@ class Ode2DSystem:
         crossing the the threshold.'''
         self.f = 0
         self.t += 1
-        
+
     def grid(self):
         ''' Produce a tuple suitable for ROOT.TGraph2D from the density.'''
 
@@ -122,6 +122,6 @@ class Ode2DSystem:
                 f.write(str(i) + '\t' + str(j) + '\t' + str(dens) + ' ')
 
         f.close()
-        
+
 if __name__ == "__main__":
-    print 'not designed for single use. import as a module.'
+    print ('not designed for single use. import as a module.')

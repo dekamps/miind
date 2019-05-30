@@ -1,4 +1,4 @@
-	
+
 set( PYTHON_SCRIPTS
 algorithms.py
 connections.py
@@ -18,17 +18,13 @@ cmake_template
 meshtest3.py
 cmake_template_lib
 grid_adex.py
-submit.py
 codegen3.py
 grid_cond.py
-miindio.py
 sub.sh
 grid_fn.py
 miind_lib.py
 utilities.py
-codegen_lib0.py
 grid_generate.py
-miind.py
 variables.py
 codegen_lib3.py
 grid_rybak.py
@@ -66,9 +62,18 @@ xml/twopop.xml
 xml/wilsoncowan.xml
 )
 
+set( PYTHON_SCRIPTS_MIINDIO
+miindio.py
+miind.py
+submit.py
+)
+
 install( FILES ${PYTHON_SCRIPTS}
     DESTINATION share/miind/python )
 install( FILES ${PYTHON_SCRIPTS_API}
     DESTINATION share/miind/python/miind_api )
 install( FILES ${PYTHON_SCRIPTS_XML}
     DESTINATION share/miind/python/xml )
+		install( FILES ${PYTHON_SCRIPTS_MIINDIO}
+		    DESTINATION share/miind/python/
+				PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE )

@@ -10,18 +10,18 @@ class xml_tag_convertor:
         for replacement. This tag line can be convereted into a tag, attribute tuple which
         is the internal representation used by XML file to modify tags.'''
         self.tree = ET.fromstring(tag)
-    
-            
+
+
     def convert(self):
         return  self.tree.tag, self.tree.attrib
-    
+
 class xml_tag:
 
     def __init__(self,tag):
         self.convertor = xml_tag_convertor(tag)
         self.name = self.convertor.convert()[0]
         self.dict = self.convertor.convert()[1]
-    
+
 
 class xml_file:
     '''Represents an XML file as a parsed tree. One can present an XML tag in
@@ -47,7 +47,7 @@ class xml_file:
         if split == True:
             return [ x.text.split() for x in hits]
         else:
-            return [ [x] for x in hits ] # always return a list of lists 
+            return [ [x] for x in hits ] # always return a list of lists
 
     def join(self,l):
         ''' Joins text elements of list l with white space, returns the resulting string.'''
@@ -59,7 +59,7 @@ class xml_file:
 
         return s
 
-    def insert_text_attribute(self, xml_tag, text_list, order):        
+    def insert_text_attribute(self, xml_tag, text_list, order):
         root = self.tree.getroot()
         l=root.iter(xml_tag.name)
 
@@ -79,7 +79,7 @@ class xml_file:
 
     def replace_xml_tag(self, xml_tag, value, position = -1, order = -1, split = True):
         '''It is assumed that there are one or more instances of this tag. Tags with different dictionary values, are considered to be different. For example,
-        <Variable Name="zopa">42</Variable> will only lead to replacement of Variable tags with the name "zopa", but no others. 
+        <Variable Name="zopa">42</Variable> will only lead to replacement of Variable tags with the name "zopa", but no others.
         No instances results in a no-op. This function replaces the text value of a text by
         a desired value. This value can be numerical or a string. If there is only one version of the text, order parameter need
         not be set. If there are more you must use the order parameter to indicate which tag - in order of appearance - should be modified.
@@ -89,12 +89,12 @@ class xml_file:
         text_list = self.get_text_attribute(xml_tag, split)
         if len(text_list) == 0:
             return
-            
+
 
         if len(text_list) > 1 and order == -1:
             raise ValueError('There are multiple instances of this tag and you need to specify which one to replace with the order parameter')
-    
-    
+
+
         for item in text_list:
             if len(item) > 1 and position == -1:
                 raise ValueError('You have a text line split into items. A position parameter is required.')
@@ -102,7 +102,7 @@ class xml_file:
             if position >= len(item):
                 raise ValueError('Position parameter required if you require splitting.')
 
-            item[position]=str(value)      
+            item[position]=str(value)
 
             self.insert_text_attribute(xml_tag, item, order)
         return
@@ -110,9 +110,7 @@ class xml_file:
 
     def write(self,file_name):
         self.tree.write(file_name)
- 
+
 
 if __name__ == "__main__":
-    print 'Not intended to run as a standlone script.'
-    
-       
+    print('Not intended to run as a standlone script.')

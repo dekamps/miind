@@ -45,5 +45,5 @@ add_executable(Bind Bind.cpp Bind.hpp)
 target_link_libraries(Bind            ${LIBLIST})
 target_link_libraries(MatrixGenerator ${LIBLIST})
 
-install( TARGETS Bind DESTINATION share/miind/apps/)
-install( TARGETS MatrixGenerator DESTINATION share/miind/apps/)
+install( TARGETS Bind DESTINATION share/miind/apps/MatrixGenerator/ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+install( TARGETS MatrixGenerator DESTINATION share/miind/apps/MatrixGenerator/ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
