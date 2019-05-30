@@ -127,8 +127,7 @@ set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}numtools
     ${gsl_LINK_FLAGS}
     gsl
-    GL
-    GLUT
+    ${GLUT_LIBRARY}
 )
 
 add_library( ${MIIND_LIBRARY_PREFIX}twod ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS} ${GL_HEADERS})
