@@ -79,9 +79,9 @@ ENDIF(ENABLE_MPI)
 # find boost with mpi
 ##############################################################################
 IF(ENABLE_MPI)
-	find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer system python)
+	find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer system)
 ELSE(ENABLE_MPI)
-	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer system python)
+	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer system)
 ENDIF(ENABLE_MPI)
 if( Boost_FOUND )
    message(STATUS "Boost found setting up directories")
