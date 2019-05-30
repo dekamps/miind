@@ -1,4 +1,5 @@
 import numpy as np
+import jobs
 from parametersweep import *
 
 THETA     = 20e-3
@@ -29,9 +30,11 @@ def generate_xml_file(base_file_name, element):
     f_xml = xml_file(base_file_name +'.xml')
     # adapt threshold
     tag_th  = xml_tag('<V_threshold>1.0</V_threshold>')
-    f_xml.replace_xml_tag(tag_th,THETA)
+    f_xml.replace_xml_tag(tag_th,THETA,order=0)
+    f_xml.replace_xml_tag(tag_th,THETA,order=1)
     tag_tau = xml_tag('<t_membrane>50e-3</t_membrane>')
-    f_xml.replace_xml_tag(tag_tau,TAU)
+    f_xml.replace_xml_tag(tag_tau,TAU,order=0)
+    f_xml.replace_xml_tag(tag_tau,TAU,order=1)
 
     tag_con=xml_tag('<Connection In="Cortical Background" Out="LIF E">800 0.03 0</Connection>')
     f_xml.replace_xml_tag(tag_con,element[1],0)
@@ -60,6 +63,7 @@ def generate_xml_sequence(base_file_name):
     l = generate_h_rate_sequence()
     for element in l:
         generate_xml_file(base_file_name, element)
+    jobs.write_out_jobs(base_file_name,[base_file_name+element[2]+'.xml' for element in l])
 
 if __name__ == "__main__":
     generate_xml_sequence('rate')

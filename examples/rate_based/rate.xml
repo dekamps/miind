@@ -32,38 +32,20 @@
 </Algorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="OULIF_excitatory Algorithm" name="LIF E" type="EXCITATORY_GAUSSIAN" />
+<Node algorithm="OULIF_excitatory Algorithm" name="LIF_E" type="EXCITATORY_GAUSSIAN" />
 <Node algorithm="Cortical Background Algorithm" name="Cortical Background" type="EXCITATORY_GAUSSIAN" />
 </Nodes>
 <Connections>
-<Connection In="Cortical Background" Out="LIF E">800 0.03 0</Connection>
+<Connection In="Cortical Background" Out="LIF_E">800 0.03 0</Connection>
 </Connections>
-<SimulationIO>
-<SimulationName>single</SimulationName>
-<OnScreen>TRUE</OnScreen>
-<WithState>TRUE</WithState>
-<WriteNet>FALSE</WriteNet>
-<CanvasParameter>
-<T_min>0</T_min>
-<T_max>0.3</T_max>
-<F_min>0</F_min>
-<F_max>20</F_max>
-<State_min>0</State_min>
-<State_max>1.0</State_max>
-<Dense_min>0</Dense_min>
-<Dense_max>2.5</Dense_max>
-</CanvasParameter>
-<CanvasNode Name="LIF E" />
-</SimulationIO>
+<Reporting>
+<Rate node="LIF_E" t_interval="0.001"/>
+</Reporting>
 <SimulationRunParameter>
-<max_iter>1000000</max_iter>
-<t_begin>0</t_begin>
+<SimulationName>single</SimulationName>
 <t_end>0.3</t_end>
-<t_report>1e-03</t_report>
-<t_state_report>1e-03</t_state_report>
 <!--<t_step>dyn_ode_leak_1.TStep()</t_step>-->
 <t_step>1e-03</t_step>
-<t_update>1e-05</t_update>
 <name_log>single.log</name_log>
 </SimulationRunParameter>
 </Simulation>

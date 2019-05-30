@@ -43,4 +43,4 @@ set ( LIBLIST
 add_executable(Projection Projection.cpp)
 target_link_libraries(Projection            ${LIBLIST})
 
-install( TARGETS Projection DESTINATION share/miind/apps/)
+install( TARGETS Projection DESTINATION share/miind/apps/Projection/ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)

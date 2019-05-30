@@ -175,3 +175,11 @@ MESSAGE(STATUS "Compiler cxx flags:" ${CMAKE_CXX_FLAGS})
 ADD_SUBDIRECTORY( python )
 ADD_SUBDIRECTORY( examples )
 
+message("======================================== Please update ENV variables ====================================")
+message("")
+message("export PATH=$PATH:${CMAKE_INSTALL_PREFIX}/share/miind/python")
+message("export PYTHONPATH=$PYTHONPATH:${CMAKE_INSTALL_PREFIX}/share/miind/python")
+message("export OMP_NUM_THREADS=<NUMBER OF AVAILABLE CORES>" ) 
+message("")
+message("==========================================================================================================")
+

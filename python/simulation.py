@@ -60,65 +60,56 @@ def add_nodes(tree):
         s += '\thandler.addNodeToCanvas(id_' +  str(NODE_NAMES[node.attrib['Name']]) + ');\n'
     return s
 
-def parse_simulation(tree,outfile,enable_root):
-    name=tree.find('SimulationName')
-    name_str = name.text
-    state=tree.find('WithState')
-
-    state_bool = ''
-    if state.text == 'TRUE':
-        state_bool='true'
+def parse_parameter(tree, outfile, enable_root, simio_tree=None):
+    sim_name = tree.find('SimulationName')
+    if sim_name is not None:
+        name_str = sim_name.text
     else:
-        if state.text == 'FALSE':
-            state_bool='false'
-        else:
-            raise NameError('Cannot interpret WithState')
+        name_str = "unnamed_sim"
 
-    screen=tree.find('OnScreen')
-    if screen.text == 'TRUE':
-        s = parse_canvas_handler(tree)
-        if(enable_root):
+    if(enable_root):
+        s = ''
+        if simio_tree:
+            s += parse_canvas_handler(simio_tree)
             s += '\tMPILib::report::handler::RootReportHandler handler(\"'
-            s += name_str + '\",'
-            s += state_bool + ','
-            s += 'true, par_canvas);\n'
-            s += add_nodes(tree)
-        else:
-            s += '\tMPILib::report::handler::InactiveReportHandler handler;\n'
-    else:
-        if(enable_root):
-            s  = '\tMPILib::report::handler::RootReportHandler handler(\"'
             s += name_str   + '\",'
-            s += state_bool + ');\n\n'
+            s += 'true,true,par_canvas);\n\n'
+            s += add_nodes(simio_tree)
         else:
-            s  = '\tMPILib::report::handler::InactiveReportHandler handler;\n'
+            s += '\tMPILib::report::handler::RootReportHandler handler(\"'
+            s += name_str   + '\",'
+            s += 'false);\n\n'
+    else:
+        s  = '\tMPILib::report::handler::InactiveReportHandler handler;\n'
 
     outfile.write(s)
-    return
 
-def parse_parameter(tree,outfile):
     max_iter = tree.find('max_iter')
-
-    s  = '\tSimulationRunParameter par_run( handler,'
-    s += max_iter.text + ','
-
     t_begin = tree.find('t_begin')
-    s += t_begin.text + ','
-
     t_end   = tree.find('t_end')
-    s += t_end.text + ','
-
     t_report = tree.find('t_report')
-    s += t_report.text + ','
-
     t_step = tree.find('t_step')
-    s += t_step.text + ','
-
     name_log = tree.find('name_log')
-    s += '\"' + name_log.text + '\",'
-
     t_state = tree.find('t_state_report')
-    s += t_state.text + ');\n'
+
+    if max_iter is not None and t_begin is not None and t_report is not None and t_state is not None:
+
+        s  = '\tSimulationRunParameter par_run( handler,'
+        s += max_iter.text + ','
+        s += t_begin.text + ','
+        s += t_end.text + ','
+        s += t_report.text + ','
+        s += t_step.text + ','
+        s += '\"' + name_log.text + '\",'
+        s += t_state.text + ');\n'
+    else:
+        s  = '\tSimulationRunParameter par_run( handler,'
+        s += '(unsigned int)(' + t_end.text + '/' + t_step.text + '), '
+        s += '0.0, '
+        s += t_end.text + ', '
+        s += t_step.text + ', '
+        s += t_step.text + ', '
+        s += '\"' + name_log.text + '\");\n'
 
     outfile.write(s)
     return

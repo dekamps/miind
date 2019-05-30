@@ -1,9 +1,10 @@
-project( ${MIIND_LIBRARY_PREFIX}twod )
-
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
 set( LIB_TYPE SHARED )
+
+include_directories( ${ROOT_INCLUDE_DIRS} )
+link_directories( ${ROOT_LIBRARY_DIRS} )
 
 
 #one below that MPILib is included in the paths they are needed for the camke config files
@@ -120,6 +121,7 @@ if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
 set ( LIBLIST
+    ${MIIND_LIBRARY_PREFIX}mpi
     ${Boost_LIBRARIES}
     ${MPI_LIBRARIES}
     ${MIIND_LIBRARY_PREFIX}numtools
@@ -129,8 +131,7 @@ set ( LIBLIST
 
 add_library( ${MIIND_LIBRARY_PREFIX}twod ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS} ${GL_HEADERS})
 
-target_link_libraries( ${MIIND_LIBRARY_PREFIX}twod ${LIBLIST}
-    ${gsl_LINK_FLAGS} ${MIIND_LIBRARY_PREFIX}mpi GL glut )
+target_link_libraries( ${MIIND_LIBRARY_PREFIX}twod ${LIBLIST})
 
 install( FILES ${TWOD_HEADERS}
     DESTINATION include/miind/TwoDLib )

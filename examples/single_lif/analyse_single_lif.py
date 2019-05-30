@@ -1,7 +1,7 @@
 import ROOT
 import sys
 import os
-import directories
+import directories3 as directories
 import numpy as np
 
 '''Analyse the response curve data.'''
@@ -110,13 +110,13 @@ def single():
 def parsejoblist():
 	if os.path.exists("single/response"):
 		singlestate()
-        if os.path.exists("single/no_decay"):
+	if os.path.exists("single/no_decay"):
 		nodecay()
-        if os.path.exists("single/no_input"):
+	if os.path.exists("single/no_input"):
 		noinput()
 
 if __name__ == '__main__':
-	print 'zopa'
+	print('zopa')
 	if not os.path.exists('single'):
 		raise NameError('Directory single does not exist. Did you call miind.py correctly?')
 	parsejoblist()

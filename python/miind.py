@@ -2,6 +2,7 @@
 import os
 import re
 import argparse
+import shutil
 import numpy as np
 import xml.etree.ElementTree as ET
 import directories3 as directories
@@ -74,7 +75,6 @@ def generate_preamble(fn, variables, nodes, algorithms, connections, parameters,
         f.write('\n')
 
 def generate_closing(fn,parameters):
-    start_time = parameters.find('t_begin').text
     end_time = parameters.find('t_end').text
     time_step = parameters.find('t_step').text
 
@@ -91,7 +91,7 @@ def generate_closing(fn,parameters):
         f.write('\n')
         f.write('\tnetwork.initOde2DSystem('+ steps +');\n')
         f.write('\n')
-        f.write('\tnetwork.mainLoop('+ start_time +','+ end_time + ','+ time_step + ', true);\n')
+        f.write('\tnetwork.mainLoop(0.0, '+ end_time + ','+ time_step + ', true);\n')
         f.write('\n')
         f.write('\treturn 0;\n')
         f.write('}\n')
@@ -111,10 +111,10 @@ def parse(fn):
     try:
         tree = ET.parse(fn)
         root = tree.getroot()
-
+        return root
     except FileNotFoundError:
         print('No file ' + fn)
-    return root
+
 
 def generate_model_files(fn, nodes,algorithms):
      with open(fn,'a') as f:
@@ -310,6 +310,9 @@ def produce_mesh_algorithm_version(dirname, filename, modname, root, enable_mpi,
         directories.insert_cmake_template(progname,dirpath,enable_mpi, enable_openmp, enable_root,cuda,SOURCE_FILE)
         create_cpp_file(xmlfile, dirpath, progname, modname, cuda)
         directories.move_model_files(xmlfile,dirpath)
+        xmlfilename = xmlfile.split(os.path.sep)[-1]
+        shutil.copyfile(xmlfile, os.path.join(dirpath,xmlfilename))
+
 
 def generate_vectorized_network_executable(dirname, filename, modname, enable_mpi, enable_openmp, enable_root, enable_cuda):
     fn = filename[0]
@@ -354,6 +357,6 @@ if __name__ == "__main__":
         if dirname == None:
             raise ValueError("This option is deprecated")
             fn = filename[0]
-            directories.add_executable(fn,modname, enable_mpi, enable_openmp, disable_root)
+            directories.add_executable(fn,modname, enable_mpi, enable_openmp, not disable_root)
         else:
-            directories.add_executable(dirname, filename, modname, enable_mpi, enable_openmp, disable_root, enable_cuda)
+            directories.add_executable(dirname, filename, modname, enable_mpi, enable_openmp, not disable_root, enable_cuda)
