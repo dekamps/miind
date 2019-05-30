@@ -34,8 +34,6 @@ if (ENABLE_CUDA)
    endif (NOT APPLE)
 endif(ENABLE_CUDA)
 
-set(GLUT_LIBRARY "-lGL -lGLU -lglut")
-
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
