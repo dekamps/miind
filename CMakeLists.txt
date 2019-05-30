@@ -24,8 +24,10 @@ set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unuse
 #for cross compiling remove the -march=native flag!
 if (APPLE)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -fPIC -std=c++11")
+set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
 else (APPLE)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -fext-numeric-literals -fPIC")
+set(GLUT_LIBRARY "-lGL -lGLU -lglut")
 endif(APPLE)
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
@@ -68,7 +70,7 @@ IF(ENABLE_OPENMP)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 ENDIF(ENABLE_OPENMP)
 
-set(GLUT_LIBRARY "-lGL -lGLU -lglut")
+
 
 IF(ENABLE_MPI)
 	set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
