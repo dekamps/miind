@@ -173,7 +173,7 @@ MESSAGE(STATUS "Compiler cxx flags:" ${CMAKE_CXX_FLAGS})
 
 
 ADD_SUBDIRECTORY( python )
-#ADD_SUBDIRECTORY( examples )
+ADD_SUBDIRECTORY( examples )
 
 message("======================================== Please update ENV variables ====================================")
 message("")
