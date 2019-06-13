@@ -1,0 +1,30 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithm" name="ALG_ADEX" modelfile="adex.model" >
+<TimeStep>0.0002</TimeStep>
+<MatrixFile>adex_1_0_0_0_.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="ExcInput">
+<expression>1500</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="ALG_ADEX" name="ADEX" type="EXCITATORY_DIRECT" />
+<Node algorithm="ExcInput" name="Excit" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="Excit" Out="ADEX">1 1 0</Connection>
+</Connections>
+<Reporting>
+<Density node="ADEX" t_start="0.0" t_end="1.0" t_interval="0.001" />
+<Display node="ADEX" />
+<Rate node="ADEX" t_interval="0.001"/>
+</Reporting>
+<SimulationRunParameter>
+<SimulationName>single</SimulationName>
+<t_end>1.0</t_end>
+<t_step>0.001</t_step>
+<name_log>single.log</name_log>
+</SimulationRunParameter>
+</Simulation>
