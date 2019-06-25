@@ -153,21 +153,30 @@ class Marginal(Result):
             'N_W': int(self._proj.find('W_limit/N_W').text),
         }
 
-    def plotV(self, time, ax=None):
-        if not ax:
-            fig, ax = plt.subplots()
-            ax.plot(self['bins_v'], self['v'][self['times'].index(time), :])
-            fig.show()
-        else:
-            ax.plot(self['bins_v'], self['v'][self['times'].index(time), :])
+    def plotV(self, time, ax=None, showplot=True):
+        v = self['bins_v']
+        d = self['v'][self['times'].index(time), :]
+        if showplot:
+            if not ax:
+                fig, ax = plt.subplots()
+                ax.plot(v,d)
+                fig.show()
+            else:
+                ax.plot(v,d)
+        return v, d
 
-    def plotW(self, time, ax=None):
-        if not ax:
-            fig, ax = plt.subplots()
-            ax.plot(self['bins_w'], self['w'][self['times'].index(time), :])
-            fig.show()
-        else:
-            ax.plot(self['bins_w'], self['w'][self['times'].index(time), :])
+    def plotW(self, time, ax=None, showplot=True):
+        w = self['bins_w']
+        d = self['w'][self['times'].index(time), :]
+
+        if showplot:
+            if not ax:
+                fig, ax = plt.subplots()
+                ax.plot(w, d)
+                fig.show()
+            else:
+                ax.plot(w, d)
+        return w, d
 
     def generatePlotImages(self, image_size=300):
         if not op.exists(self.path):
