@@ -199,17 +199,22 @@ class MiindSimulation:
                     return index
         return None
 
-    def plotRate(self, node, ax=None):
+    def plotRate(self, node, ax=None, showplot = True):
         node_index = self.getIndexFromNode(node)
-        if not ax:
-            fig, ax = plt.subplots()
-            plt.title(node)
+        rate_length = min(len(self.rates['times']), len(self.rates[node_index]))
 
-            rate_length = min(len(self.rates['times']), len(self.rates[node_index]))
-            ax.plot(self.rates['times'][0:rate_length], self.rates[node_index][0:rate_length])
-            fig.show()
-        else:
-            ax.plot(self.rates['times'][0:rate_length], self.rates[node_index][0:rate_length])
+        ts = self.rates['times'][0:rate_length]
+        fs = self.rates[node_index][0:rate_length]
+        if showplot:
+            if not ax:
+                fig, ax = plt.subplots()
+                plt.title(node)
+
+                ax.plot(ts , fs)
+                fig.show()
+            else:
+                ax.plot(ts , fs)
+        return ts, fs
 
     # Check if this particular simulation has been run previously
     @property
