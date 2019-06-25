@@ -224,3 +224,9 @@ class Density(Result):
                 '{}'.format(time)).replace('.', '-')
             plt.gcf().savefig(figname + ext, res=image_size, bbox_inches='tight')
             plt.close(plt.gcf())
+
+    # find all times for which a density file was generated
+    def findDensityTimes(self):
+        ts=[ float(os.path.split(name)[-1].split('_')[2]) for name in self.fnames]
+        return ts
+
