@@ -236,12 +236,12 @@ namespace TwoDLib {
 	}
 
 	template <class Solver>
-	void MeshAlgorithmCustom<Solver>::reportDensity() const
+	void MeshAlgorithmCustom<Solver>::reportDensity(MPILib::Time t) const
 	{
 		std::ostringstream ost;
-		ost << _node_id  << "_" << _t_cur;
+		ost << _node_id  << "_" << t;
 		ost << "_" << _sys.P();
-		string fn("mesh_" + ost.str());
+		string fn("density_mesh_" + ost.str());
 
 		std::string model_path = _model_name;
 		boost::filesystem::path path(model_path);
