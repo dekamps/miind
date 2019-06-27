@@ -55,7 +55,7 @@ _offsets(group.Offsets()),
 _nr_refractory_steps(group.MeshObjects().size(),0),
 _refractory_prop(group.MeshObjects().size(),0),
 _refractory_mass(group.MeshObjects().size(),0),
-
+_refractory_mass_local(group.MeshObjects().size()),
 _nr_minimal_resets(_group.MeshObjects().size(),0),
 _res_to_minimal(_group.MeshObjects().size(),0),
 _res_from_ordered(_group.MeshObjects().size(),0),
@@ -134,7 +134,6 @@ void CudaOde2DSystemAdapter::FillMass()
      checkCudaErrors(cudaMemcpy(_mass,&_hostmass[0],_n*sizeof(fptype),cudaMemcpyHostToDevice));
 }
 
-
 void CudaOde2DSystemAdapter::Validate() const
 {
     // check wether the mass array of the Ode2DSystemGroup has been initialized properly. This means the mass must
@@ -185,6 +184,23 @@ void CudaOde2DSystemAdapter::updateGroupMass()
 		 }
 }
 
+void CudaOde2DSystemAdapter::updateRefractory()
+{
+	for (unsigned int m = 0; m < _refractory_mass_local.size(); m++)
+     checkCudaErrors(cudaMemcpy(&_refractory_mass_local[m][0],_refractory_mass[m],_nr_refractory_steps[m]*_nr_resets[m]*sizeof(fptype),cudaMemcpyDeviceToHost));
+}
+
+fptype CudaOde2DSystemAdapter::sumRefractory()
+{
+	fptype total = 0.0;
+	for (unsigned int m = 0; m < _refractory_mass_local.size(); m++){
+		total += std::accumulate(_refractory_mass_local[m].begin()+_nr_resets[m],_refractory_mass_local[m].end()-(_nr_resets[m]*2),0.0)/2.0;
+		total += (1.0-_refractory_prop[m])*std::accumulate(_refractory_mass_local[m].end()-(_nr_resets[m]*2),_refractory_mass_local[m].end()-(_nr_resets[m]),0.0)/2.0;
+	}
+
+	return total;
+}
+
 const std::vector<fptype>& CudaOde2DSystemAdapter::F(unsigned int n_steps) const
 {
 	_host_fs.clear();
@@ -224,6 +240,7 @@ void CudaOde2DSystemAdapter::FillResetMap
 
 			 _nr_minimal_resets[m] = reset_map.size();
 			 _nr_resets.push_back(vec_vec_reset[m].size());
+			 _refractory_mass_local[m] = std::vector<fptype>(_nr_refractory_steps[m]*vec_vec_reset[m].size());
 
 			 checkCudaErrors(cudaMalloc((fptype**)&_refractory_mass[m], _nr_refractory_steps[m]*vec_vec_reset[m].size()*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((inttype**)&_res_to_minimal[m], _nr_minimal_resets[m]*sizeof(inttype)));

@@ -54,7 +54,7 @@ namespace TwoDLib {
 
 	  virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId, bool b_state = true) const;
 
-		virtual void reportDensity() const;
+		virtual void reportDensity(MPILib::Time t) const;
 
 		virtual void setupMasterSolver(double cell_width);
 

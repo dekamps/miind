@@ -86,7 +86,7 @@ namespace TwoDLib {
 		 */
 	  virtual MPILib::AlgorithmGrid getGrid(MPILib::NodeId, bool b_state = true) const;
 
-		virtual void reportDensity() const;
+		virtual void reportDensity(MPILib::Time t) const;
 
 		/**
 		 * Evolve the node state. In the default case it simply calls envolveNodeState

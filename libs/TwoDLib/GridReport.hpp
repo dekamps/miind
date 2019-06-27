@@ -28,13 +28,15 @@ public:
     _obs.insert(std::pair<MPILib::NodeId, DensityAlgorithmInterface<WeightValue>*>(id,obj));
   }
 
-  void reportDensity(const std::vector<MPILib::NodeId>& node_ids, const std::vector<MPILib::Time>& start_times,
+  void reportDensity(const std::vector<MPILib::NodeId>& node_ids, std::vector<MPILib::Time>& start_times,
     const std::vector<MPILib::Time>& end_times, const std::vector<MPILib::Time>& intervals,  MPILib::Time time ) const {
     for (int i=0; i<node_ids.size(); i++){
       if ( _obs.find(node_ids[i]) == _obs.end() )
         continue;
-      if(time >= start_times[i] && time <= end_times[i] && std::fabs(std::remainder(time, intervals[i])) < 0.00000001 ){
-        _obs.at(node_ids[i])->reportDensity();
+      // Bit of a nasty hack here : using start_times to track the current time.
+      if(time >= start_times[i]+intervals[i] && time <= end_times[i]){
+        start_times[i] += intervals[i];
+        _obs.at(node_ids[i])->reportDensity(start_times[i]);
       }
     }
   }
