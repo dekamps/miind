@@ -181,6 +181,7 @@ __global__ void MapResetShiftRefractory(unsigned int n_reset, fptype* refactory_
   for (int i = offset+index; i < offset+n_reset; i+=stride){
     refactory_mass[i+n_reset] = refactory_mass[i];
   }
+
 }
 
 __global__ void MapResetThreaded(unsigned int n_reset, fptype* mass, fptype* refactory_mass, inttype ref_offset,

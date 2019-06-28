@@ -55,7 +55,7 @@ _offsets(group.Offsets()),
 _nr_refractory_steps(group.MeshObjects().size(),0),
 _refractory_prop(group.MeshObjects().size(),0),
 _refractory_mass(group.MeshObjects().size(),0),
-
+_refractory_mass_local(group.MeshObjects().size()),
 _nr_minimal_resets(_group.MeshObjects().size(),0),
 _res_to_minimal(_group.MeshObjects().size(),0),
 _res_from_ordered(_group.MeshObjects().size(),0),
@@ -133,7 +133,6 @@ void CudaOde2DSystemAdapter::FillMass()
     this->Validate();
      checkCudaErrors(cudaMemcpy(_mass,&_hostmass[0],_n*sizeof(fptype),cudaMemcpyHostToDevice));
 }
-
 
 void CudaOde2DSystemAdapter::Validate() const
 {
@@ -249,6 +248,7 @@ void CudaOde2DSystemAdapter::FillResetMap
 
 			 _nr_minimal_resets[m] = reset_map.size();
 			 _nr_resets.push_back(vec_vec_reset[m].size());
+			 _refractory_mass_local[m] = std::vector<fptype>(_nr_refractory_steps[m]*vec_vec_reset[m].size());
 
 			 checkCudaErrors(cudaMalloc((fptype**)&_refractory_mass[m], _nr_refractory_steps[m]*vec_vec_reset[m].size()*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((inttype**)&_res_to_minimal[m], _nr_minimal_resets[m]*sizeof(inttype)));
@@ -374,7 +374,7 @@ void CudaOde2DSystemAdapter::FillReversalMap
               _rev_to[index]   = _group.Map(m,r._to[0],r._to[1]);
               _rev_from[index] = _group.Map(m,r._from[0],r._from[1]);
               _rev_alpha[index] = r._alpha;
-              index++;)
+              index++;
           }
      }
 }
@@ -384,6 +384,7 @@ void CudaOde2DSystemAdapter::RemapReversal()
     MapReversal<<<1,1>>>(_n_rev, _rev_from, _rev_to, _rev_alpha, _mass, _map);
 		cudaDeviceSynchronize();
 }
+
 
 
 void CudaOde2DSystemAdapter::DeleteResetMap()

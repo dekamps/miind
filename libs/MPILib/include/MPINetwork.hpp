@@ -200,7 +200,7 @@ public:
   /**
   *
   */
-  void reportNodeActivities(std::vector<MPILib::NodeId>& node_ids, std::vector<double>& intervals, double time) const;
+  void reportNodeActivities(std::vector<MPILib::NodeId>& node_ids, std::vector<double>& intervals, double time) ;
 
 	SimulationRunParameter& getSimulationParams() { return _parameterSimulationRun; }
 
@@ -268,6 +268,8 @@ private:
 	 */
   std::vector<NodeId> _externalReceivers;
   std::vector<NodeId> _externalSenders;
+
+	std::vector<MPILib::Time> _node_rate_current_time;
 
 	/**
 	 * For each timestep, all node activities are stored here before being passed

@@ -70,6 +70,7 @@ public:
   void setRateNodes(std::vector<MPILib::NodeId> ids, std::vector<MPILib::Time> intervals){
     _rate_nodes = ids;
     _rate_intervals = intervals;
+    _rate_current_time = std::vector<MPILib::Time>(intervals.size());
   }
   void setDisplayNodes(std::vector<MPILib::NodeId> ids){
     _display_nodes = ids;
@@ -80,6 +81,7 @@ public:
     _density_start_times = start_times;
     _density_end_times = end_times;
     _density_intervals = intervals;
+    _density_current_time = std::vector<MPILib::Time>(intervals.size());
   }
 
   void addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w,
@@ -163,6 +165,9 @@ protected:
   std::vector<MPILib::Time> _density_start_times;
   std::vector<MPILib::Time> _density_end_times;
   std::vector<MPILib::Time> _density_intervals;
+
+  std::vector<MPILib::Time> _density_current_time;
+  std::vector<MPILib::Time> _rate_current_time;
 
   std::vector<inttype> _connection_out_group_mesh;
   std::vector<MPILib::DelayedConnectionQueue> _connection_queue;

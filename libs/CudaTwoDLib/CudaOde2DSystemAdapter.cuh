@@ -77,6 +77,10 @@ namespace CudaTwoDLib {
 
 								void updateGroupMass();
 
+								void updateRefractory();
+
+								fptype sumRefractory();
+
 								friend class CSRAdapter;
 
                 const std::vector<fptype>& F(unsigned int n_steps = 1) const;

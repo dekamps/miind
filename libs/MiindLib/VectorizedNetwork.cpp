@@ -95,25 +95,29 @@ void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps){
 
 void VectorizedNetwork::reportNodeActivities(MPILib::Time sim_time){
   for (int i=0; i<_rate_nodes.size(); i++){
-    if(std::fabs(std::remainder(sim_time, _rate_intervals[i])) > 0.00000001 )
+    if(sim_time < _rate_current_time[i] + _rate_intervals[i])
       continue;
+    _rate_current_time[i] += _rate_intervals[i];
 		std::ostringstream ost2;
 		ost2 << "rate_" << _rate_nodes[i];
 		std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
 		ofst_rate.precision(10);
-    ofst_rate << sim_time << "\t" << _current_node_rates[_rate_nodes[i]] << std::endl;
+    ofst_rate << _rate_current_time[i] << "\t" << _current_node_rates[_rate_nodes[i]] << std::endl;
 		ofst_rate.close();
 	}
 }
 
 void VectorizedNetwork::reportNodeDensities(MPILib::Time sim_time){
   for (int i=0; i<_density_nodes.size(); i++){
-    if(sim_time < _density_start_times[i] || sim_time > _density_end_times[i] || std::fabs(std::remainder(sim_time, _density_intervals[i])) > 0.00000001 )
+    if(sim_time < _density_start_times[i] || sim_time > _density_end_times[i]
+       || sim_time < _density_current_time[i] + _density_intervals[i])
       continue;
 
+    _density_current_time[i] +=  _density_intervals[i];
     std::ostringstream ost;
-    ost << _density_nodes[i]  << "_" << sim_time;
-    string fn("node_" + ost.str());
+    ost << _density_nodes[i]  << "_" << _density_current_time[i] << "_"
+    <<  _group->P() + _group_adapter->sumRefractory();
+    string fn("density_node_" + ost.str());
 
     std::string model_path("densities");
     boost::filesystem::path path(model_path);
@@ -327,6 +331,7 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
 
   if(_density_nodes.size() > 0){
     _group_adapter->updateGroupMass();
+    _group_adapter->updateRefractory();
     reportNodeDensities(time);
   }
 

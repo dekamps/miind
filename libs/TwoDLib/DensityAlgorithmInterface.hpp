@@ -9,7 +9,7 @@ template<class WeightValue>
 class DensityAlgorithmInterface : public MPILib::AlgorithmInterface<WeightValue> {
 public:
 
-  virtual void reportDensity() const = 0;
+  virtual void reportDensity(MPILib::Time t) const = 0;
 
 };
 
