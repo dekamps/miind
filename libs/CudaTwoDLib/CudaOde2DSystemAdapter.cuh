@@ -119,6 +119,8 @@ namespace CudaTwoDLib {
 				std::vector<unsigned int> _nr_refractory_steps;
 				std::vector<fptype> _refractory_prop;
 				std::vector<fptype*> _refractory_mass;
+				std::vector<std::vector<fptype>> _refractory_mass_local;
+				std::vector<fptype>  _vec_alpha_ord;
 
 				fptype*  _mass;
         std::vector<fptype> _hostmass;
