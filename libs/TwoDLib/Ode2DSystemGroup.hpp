@@ -104,7 +104,12 @@ namespace TwoDLib {
 		const vector<MPILib::Rate>& F() const {return _fs;}
 
 		//! total probability mass in the system, should not be too far away from 1.0
-		MPILib::Mass P() const { return std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0); }
+		MPILib::Mass P() const {
+			double total = std::accumulate(_vec_mass.begin(),_vec_mass.end(),0.0);
+			for(ResetRefractive r : _reset_refractive)
+				total += r.getTotalProbInRefract();
+			return total;
+		}
 
 		//! average membrane potential, used for non-threshold crossing models such as Fitzhugh-Nagumo
 		const vector<MPILib::Potential>& AvgV() const ;
