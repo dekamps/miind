@@ -69,7 +69,8 @@ def parse_parameter(tree, outfile, enable_root, simio_tree=None):
 
     if(enable_root):
         s = ''
-        if simio_tree:
+        par_check = tree.find('CanvasParameter')
+        if simio_tree and par_check:
             s += parse_canvas_handler(simio_tree)
             s += '\tMPILib::report::handler::RootReportHandler handler(\"'
             s += name_str   + '\",'

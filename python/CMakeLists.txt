@@ -1,4 +1,6 @@
 
+configure_file(miind_settings_template ${CMAKE_CURRENT_SOURCE_DIR}/miind_settings)
+
 set( PYTHON_SCRIPTS
 algorithms.py
 connections.py
@@ -39,6 +41,7 @@ codegen.py
 ode2dsystem.py
 launch.py
 palette.py
+miind_settings
 )
 
 set( PYTHON_SCRIPTS_API

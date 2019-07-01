@@ -120,10 +120,14 @@ def generate_model_files(fn, nodes,algorithms):
      with open(fn,'a') as f:
          node_id = 0
          for node in nodes:
+              algorithm = None
               algname = node.attrib['algorithm']
               for alg in algorithms:
                    if alg.attrib['name'] == algname: # here we assume the name is unique
                         algorithm = alg
+
+              if not algorithm:
+                  raise Exception('No algorithm named \'' + algname + '\' for node \'' + node.attrib['name'] + '\'')
 
               if algorithm.attrib['type'] == 'MeshAlgorithmGroup':
                   ref = 0.0
@@ -318,6 +322,8 @@ def generate_vectorized_network_executable(dirname, filename, modname, enable_mp
     fn = filename[0]
     root=parse(fn)
     if mesh_algorithm_group(root) == True:
+        if not enable_cuda:
+            raise Exception('Vectorised mode (for MeshAlgorithmGroup/GridAlgorithmGroup) currently not supported without a CUDA enabled MIIND installation. ')
         # Run the MeshAlgorithm version
         produce_mesh_algorithm_version(dirname, filename, modname, root, enable_mpi, enable_openmp, enable_root, enable_cuda)
     else:
@@ -350,6 +356,8 @@ if __name__ == "__main__":
     fn = filename[0]
     root=parse(fn)
     if mesh_algorithm_group(root) == True:
+        if not enable_cuda:
+            raise Exception('Vectorised mode (for MeshAlgorithmGroup/GridAlgorithmGroup) currently not supported without a CUDA enabled MIIND installation. ')
         # Run the MeshAlgorithm version
         produce_mesh_algorithm_version(dirname, filename, modname, root, vars(args)['cuda'])
     else:
