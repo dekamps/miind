@@ -1,0 +1,4 @@
+mpi_enabled=${ENABLE_MPI}
+openmp_enabled=${ENABLE_OPENMP}
+root_enabled=${ENABLE_ROOT}
+cuda_enabled=${ENABLE_CUDA}
