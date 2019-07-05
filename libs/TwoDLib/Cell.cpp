@@ -34,6 +34,19 @@ std::pair< vector<double>,vector<double> > Cell::Vec(const vector<Point>& vec_po
 	}
 	return std::pair<std::vector<double>, std::vector<double> >(vec_v,vec_w);
 }
+
+Cell::Cell
+(
+):
+  _n_points(0),
+  _vec_v(0),
+  _vec_w(0),
+  _vec_points(0),
+  _signed_area(0)
+{
+}
+
+
 Cell::Cell
 (
 	const vector<TwoDLib::Point>& vec_points
