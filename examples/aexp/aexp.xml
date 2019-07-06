@@ -23,7 +23,6 @@
 <!--<Connection In="Inhib" Out="ADEX">1 -1. 0</Connection>-->
 </Connections>
 <Reporting>
-<Density node="ADEX" t_start="0.0" t_end="1.0" t_interval="0.001" />
 <Display node="ADEX" />
 <Rate node="ADEX" t_interval="0.001"/>
 </Reporting>
