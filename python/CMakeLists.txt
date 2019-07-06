@@ -54,6 +54,7 @@ miind_api/tools_lost.py
 miind_api/MeshTools.py
 miind_api/tools.py
 miind_api/LifMeshGenerator.py
+miind_api/QifMeshGenerator.py
 miind_api/Result.py
 )
 

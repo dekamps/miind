@@ -43,7 +43,7 @@ def _help(command):
         print('')
         print('sim                      : Set the current simulation from an xml file or generate a new xml file.')
         print('models                   : List all model files used by the current simulation.')
-        print('settings                 : Set certain persistent parameters to match your MIIND installation (ENABLE MPI, OPENMP, ROOT).')
+        print('settings                 : Set certain persistent parameters to match your MIIND installation (ENABLE ROOT, CUDA).')
         print('submit                   : Generate and build (make) the code from the current simulation.')
         print('run                      : Run the current submitted simulation.')
         print('submit-python            : Generate and build (make) a shared library for use with python from the current simulation.')
@@ -63,7 +63,8 @@ def _help(command):
         print('generate-matrix          : Generate a matrix file from existing model and fid files.')
         print('regenerate-reset         : Regenerate the reset mapping for an existing model.')
         print('lost                     : Open the fiducial tool for capturing lost points.')
-        print('generate-lif-mesh        : Example to illustrate a mesh generation script to build a LIF neuron mesh.')
+        print('generate-lif-mesh        : Helper command to build a LIF neuron mesh.')
+        print('generate-qif-mesh        : Helper command to build a QIF neuron mesh.')
         print('draw-mesh                : Draw the mesh described in an existing .mesh file.')
         print('')
 
@@ -397,12 +398,56 @@ def generateLifMesh(command):
             gen.generateLifMesh()
             gen.generateLifStationary()
             gen.generateLifReversal()
+        elif len(command) == 8:
+            gen = api.LifMeshGenerator(command[1], float(command[2]), float(command[3]), float(command[4]), float(command[5]), float(command[6]), int(command[7]))
+            gen.generateLifMesh()
+            gen.generateLifStationary()
+            gen.generateLifReversal()
         else:
-            print (name + ' expects one parameter.')
+            print (name + ' expects one or seven parameters.')
             generateLifMesh(name+'?')
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print (name + ' [Basename] : Generate a new Basename.mesh, Basename.stat and Basename.rev file for a Leaky Integrate and Fire Neuron.')
+        print ('Defaults : Time Scale = 10e-3, Threshold Potential = -50.0, Resting Potential = -65.0, Min Potential = -80.0, Time step = 0.0001, Bin Count = 300')
+        print (name + ' [Basename] [Time Scale] [Threshold Potential] [Resting Potential] [Min Potential] [Time step] [Bin Count] : Generate a new Basename.mesh, Basename.stat and Basename.rev file for a Leaky Integrate and Fire Neuron.')
+
+def generateQifMesh(command):
+    command_name = command[0]
+    name = 'generate-qif-mesh'
+
+    if command_name in [name]:
+        if len(command) == 2:
+            gen = api.QifMeshGenerator(command[1])
+            gen.generateQifMesh()
+            gen.generateQifStationary()
+            gen.generateQifReversal()
+        elif len(command) == 3:
+            if (float(command[2]) == 0.0):
+                print ('An I value of 0.0 is not allowed for this mesh. Use a very small epsilon if no current is required.')
+            else:
+                gen = api.QifMeshGenerator(command[1], I=float(command[2]))
+                gen.generateQifMesh()
+                gen.generateQifStationary()
+                gen.generateQifReversal()
+        elif len(command) == 7:
+            if (float(command[6]) == 0.0):
+                print ('An I value of 0.0 is not allowed for this mesh. Use a very small epsilon if no current is required.')
+            else:
+                gen = api.QifMeshGenerator(command[1], float(command[2]), float(command[3]), float(command[4]), float(command[5]), float(command[6]))
+                gen.generateQifMesh()
+                gen.generateQifStationary()
+                gen.generateQifReversal()
+        else:
+            print (name + ' expects one, two or six parameters.')
+            generateLifMesh(name+'?')
+
+    if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
+        print (name + ' [Basename] : Generate a new Basename.mesh, Basename.stat and Basename.rev file for a Quadratic Integrate and Fire Neuron (with constant input current I=1.0).')
+        print (name + ' [Basename] : Generate a new Basename.mesh, Basename.stat and Basename.rev file for a Quadratic Integrate and Fire Neuron (with constant input current I=-1.0).')
+        print ('Defaults : Time Scale = 10e-3, Min Potential = -10.0, Max Potential = 10.0, Time step = 0.0001')
+        print (name + ' [Basename] [Time Scale] [Min Potential] [Max Potential] [Time step] [I (Non-zero Current)] : Generate a new Basename.mesh, Basename.stat and Basename.rev file for a Quadratic Integrate and Fire Neuron.')
+
 
 def generateModel(command):
     command_name = command[0]
@@ -572,6 +617,8 @@ def checkCommands(command, current_sim):
     plotMarginals(command, current_sim)
 
     generateLifMesh(command)
+
+    generateQifMesh(command)
 
     generateModel(command)
 
