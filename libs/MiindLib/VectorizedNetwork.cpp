@@ -80,8 +80,6 @@ void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps){
   }
 
   for(MPILib::Index i=0; i < _mesh_meshes.size(); i++){
- //   _group->Initialize(_mesh_meshes[i],0,0);
-
 
 	// default initialization is (0,0); if there is no strip 0, it's down to the user
 	if (_vec_mesh[i].NrCellsInStrip(0) > 0 )
