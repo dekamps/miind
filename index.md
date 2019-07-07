@@ -5,8 +5,8 @@ with MIIND preinstalled, so if you can run Virtual Box or similar, you will be a
 that will run faster.
 
 
-Inline-style: 
-![alt text](https://github.com/dekamps/miind/images/AdExp.gif "An evolving density profile of a neural population.")
+The evolution of a population of neurons through state space: 
+![alt text](https://github.com/dekamps/miind/blob/master/images/AdExp.gif "An evolving density profile of a neural population.")
 
 
 ## MIIND: a population level simulator.
