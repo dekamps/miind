@@ -5,9 +5,8 @@ with MIIND preinstalled, so if you can run Virtual Box or similar, you will be a
 that will run faster.
 
 
-<!-- Fitzhugh Nagumo Mesh -->
-<iframe width="600" height="300" src="https://www.youtube.com/embed/vv9lgntZhYQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
+Inline-style: 
+![alt text](https://github.com/dekamps/miind/images/AdExp.gif "An evolving density profile of a neural population.")
 
 
 ## MIIND: a population level simulator.
@@ -20,14 +19,23 @@ We calculate this distribution in terms of a density function, and from this den
 By modeling large-scale networks as homogeneous populations that exchange firing rate statistics, rather than spikes, remarkable efficiency can be achieved, whilst retaining
 a connection to spiking neurons that is not present in neural mass models.
 
+## Getting started
+### Obtaining and Installing MIIND
 
+### 
+The <a href="https://docs.google.com/document/d/1e9OK_9YiG7MusgeuAgGj_JiIOZPyh1mj7Mqh-D-Nszo/edit#">CNS Tutorial Materials</a> provide an introduction.
 
-<!-- Izhikevich -->
-<iframe width="1218" height="685" src="https://www.youtube.com/embed/8p7jEz-qWTY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-<!-- Rybak Half Centre -->
-<iframe width="1280" height="640" src="https://www.youtube.com/embed/9pC4MOWQ-Ho" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-
+## Gallery
+### Single Population: Fitzhugh-Nagumo (Grid method)
 <!-- Fitzhugh Nagumo Grid -->
-<iframe width="1218" height="685" src="https://www.youtube.com/embed/ivzc3kD2vas" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="600" height="300" src="https://www.youtube.com/embed/ivzc3kD2vas" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+### Izhikevich
+<!-- Izhikevich -->
+<iframe width="600" height="300" src="https://www.youtube.com/embed/8p7jEz-qWTY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+### Replication of Half Center Central Pattern Generator
+<!-- Rybak Half Centre -->
+<iframe width="600" height="300" src="https://www.youtube.com/embed/9pC4MOWQ-Ho" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
