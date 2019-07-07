@@ -6,7 +6,7 @@ that will run faster.
 
 
 The evolution of a population of neurons through state space: 
-![alt text](https://github.com/dekamps/miind/blob/master/images/AdExp.gif "An evolving density profile of a neural population.")
+<img src="https://github.com/dekamps/miind/blob/master/images/AdExp.gif" alt="drawing" width="200"/>
 
 
 ## MIIND: a population level simulator.
