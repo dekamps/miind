@@ -5,8 +5,7 @@ with MIIND preinstalled, so if you can run Virtual Box or similar, you will be a
 that will run faster.
 
 
-The evolution of a population of neurons through state space: 
-<img src="https://github.com/dekamps/miind/blob/master/images/AdExp.gif" alt="drawing" width="200"/>
+<img src="https://github.com/dekamps/miind/blob/master/images/AdExp.gif" alt="drawing" width="400"/>
 
 
 ## MIIND: a population level simulator.
