@@ -128,7 +128,6 @@ namespace TwoDLib {
 	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystemGroup::AvgV : &TwoDLib::Ode2DSystemGroup::F)
 	// master parameter can only be calculated on configuration
 	{
-		std::cout << "zopa:" << _mesh_vec[0].NrCellsInStrip(0) << " " << _mesh_vec[0].NrCellsInStrip(1) << std::endl;
 		// default initialization is (0,0); if there is no strip 0, it's down to the user
 		if (_mesh_vec[0].NrCellsInStrip(0) > 0 )
 			_sys.Initialize(0,0,0);
