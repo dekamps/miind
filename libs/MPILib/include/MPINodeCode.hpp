@@ -134,6 +134,7 @@ void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 			simParam.getHandler().clone());
 
 	_pHandler->initializeHandler(_nodeId);
+
 }
 
 template<class Weight, class NodeDistribution>
