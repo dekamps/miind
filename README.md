@@ -27,7 +27,7 @@ If you have any problems with your installation, please raise an issue ticket at
 
 ### Installing the .deb package (Admin rights required)
 
-The debian packages can be found in the package directory of this repository. If your system has a CUDA enabled graphics card, you can choose *miind_1.05-1_all_cuda.deb*. Otherwise, download *miind_1.05-1_all.deb*. With admin rights, use apt or your preferred package installer to install miind. There are some additional python libraries which need to be installed using pip or conda:
+The debian packages can be found in the package directory of this repository. If your system has a CUDA enabled graphics card, you can choose [*miind_1.05-1_all_cuda.deb*](https://github.com/dekamps/miind/blob/master/package/miind_1.05-1_all.deb). Otherwise, download *miind_1.05-1_all.deb*. With admin rights, use apt or your preferred package installer to install miind. There are some additional python libraries which need to be installed using pip or conda:
 
 matplotlib
 shapely
