@@ -589,8 +589,8 @@ class Mesh:
 
     def dimensions(self):
         '''Returns minv, maxv, minw, maxw'''
-        vs =  [point[0]  for celllist in self.cells[1:] for cell in celllist for point in cell.points]
-        ws =  [point[1]  for celllist in self.cells[1:] for cell in celllist for point in cell.points]
+        vs =  [point[0]  for celllist in self.cells for cell in celllist for point in cell.points]
+        ws =  [point[1]  for celllist in self.cells for cell in celllist for point in cell.points]
         return np.array([[min(vs), max(vs)], [min(ws), max(ws)]])
 
     def bbox(self,i,j):
@@ -854,7 +854,7 @@ class Mesh:
                 if len(coords)%8 != 0:
                     raise ValueError
                 n_chunck = len(coords)/8
-                
+
                 for i in range(0,int(n_chunck)):
                     vs=[]
                     ws=[]
