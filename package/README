@@ -21,6 +21,8 @@ sudo apt install ./miind_1.05-1_all.deb
 
 This package has MPI, OPENMP and CUDA enabled. ROOT is disabled. To change this, edit the dh_auto_configure line in rules and set the required CMAKE flags. 
 
+WHEN producing the non-cuda version, remove the cuda dependencies in control as well as set CUDA=OFF in rules
+
 Note also that by default, miindio.py sets MPI, OPENMP and CUDA to enabled and ROOT to disabled - can be changed with the 'settings' command.
 
 ######################################################################################################
