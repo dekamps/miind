@@ -16,7 +16,7 @@ from .tools import *
 import mesh3 as meshmod
 
 class Marginal(Result):
-    def __init__(self, io, nodename, vn=1000, wn=1000):
+    def __init__(self, io, nodename, vn=500, wn=200):
         super(Marginal, self).__init__(io, nodename)
         self.path = op.join(self.io.output_directory,
                             self.nodename + '_marginal_density')
@@ -206,7 +206,7 @@ class Marginal(Result):
             # note ffmpeg must be installed
             # example : ffmpeg -r 1000 -f image2 -pattern_type glob -i "*.png" test.mp4
             process = ['ffmpeg',
-                '-r', str(int((1.0 / time_scale) * (len(files) / self.times[-1]))),
+                '-r', str(int((1.0 / time_scale) * (len(files) / float(self.times[-1])))),
                 '-f', 'image2',
                 '-pattern_type', 'glob',
                 '-i', op.join(self.path, '*.png')]

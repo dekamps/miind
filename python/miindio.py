@@ -368,16 +368,16 @@ def plotMarginals(command, current_sim):
         if len(command) == 3:
             current_marginal = current_sim.getMarginalByNodeName(command[1])
             fig, axis = plt.subplots(1,2)
-            current_marginal.plotV(float(command[2]), axis[0])
-            current_marginal.plotW(float(command[2]), axis[1])
+            current_marginal.plotV(command[2], axis[0])
+            current_marginal.plotW(command[2], axis[1])
             plt.show(block=False)
         elif len(command) == 5:
             current_marginal = current_sim.getMarginalByNodeName(command[1])
             current_marginal.vn = int(command[2])
             current_marginal.wn = int(command[3])
             fig, axis = plt.subplots(1,2)
-            current_marginal.plotV(float(command[4]), axis[0])
-            current_marginal.plotW(float(command[4]), axis[1])
+            current_marginal.plotV(command[4], axis[0])
+            current_marginal.plotW(command[4], axis[1])
             plt.show(block=False)
         else:
             print (name + ' expects two or four parameters.')

@@ -12,7 +12,7 @@
 #include <algorithm>
 #include "TwoDLib.hpp"
 
-const int N_POINTS = 1000;
+const int N_POINTS = 10;
 
 namespace TwoDLib {
 
