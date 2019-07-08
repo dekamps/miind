@@ -227,5 +227,5 @@ class Density(Result):
 
     # find all times for which a density file was generated
     def findDensityTimes(self):
-        ts=[ float(os.path.split(name)[-1].split('_')[2]) for name in self.fnames]
+        ts=[ float(os.path.split(name)[-1].split('_')[3]) for name in self.fnames]
         return ts
