@@ -68,7 +68,7 @@ def read_fiducial(fn):
         vs = [ float(x) for x in  babys[0].text.split() ]
         ws = [ float(x) for x in  babys[1].text.split() ]
 
-        points = zip(vs,ws)
+        points = list(zip(vs,ws))
         patches.append(points)
     return patches
 
