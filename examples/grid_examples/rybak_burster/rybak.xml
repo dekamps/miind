@@ -2,7 +2,7 @@
  <Variable Name="IN_EFF" type="double">0.1</Variable>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="GridAlgorithm" name="OSC" tau_refractive="0.003" modelfile="grid.model" transformfile="grid_0_0_0_0_.tmat" start_v="-65" start_w="0.6" >
+<Algorithm type="GridAlgorithmGroup" name="OSC" tau_refractive="0.003" modelfile="grid.model" transformfile="grid_0_0_0_0_.tmat" start_v="-65" start_w="0.6" >
 <TimeStep>0.001</TimeStep>
 </Algorithm>
 <Algorithm type="RateFunctor" name="MLR_1">
