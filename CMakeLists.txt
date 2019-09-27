@@ -21,12 +21,12 @@ set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 ##############################################################################
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
 
-#for cross compiling remove the -march=native flag!
+
 if (APPLE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fPIC -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fPIC -std=c++11")
 set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
 else (APPLE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fext-numeric-literals -fPIC -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fext-numeric-literals -fPIC -std=c++11")
 set(GLUT_LIBRARY "-lGL -lGLU -lglut")
 endif(APPLE)
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
