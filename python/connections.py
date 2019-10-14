@@ -125,7 +125,7 @@ def parse_mesh_vectorized_connection(connection, nodemap, mat_name, network_name
             continue
         s += '\tparams_' + i  + '_' + o + '[\"' + ak + '\"] = std::to_string(' + av + ');\n'
 
-    s += '\t' + network_name + '.addGridConnection('+ i +','+ o +', params_' + i  + '_' + o + ',&'+ mat_name +');\n'
+    s += '\t' + network_name + '.addMeshCustomConnection('+ i +','+ o +', params_' + i  + '_' + o + ',&'+ mat_name +');\n'
     return s
 
 def parse_external_incoming_mesh_vectorized_connection(connection, nodemap, mat_name, id, network_name='network'):

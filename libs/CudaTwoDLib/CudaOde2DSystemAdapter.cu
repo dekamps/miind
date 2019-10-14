@@ -220,7 +220,6 @@ const std::vector<fptype>& CudaOde2DSystemAdapter::F(unsigned int n_steps) const
 		fptype sum = 0.0;
 		for (auto& rate: host_sum)
 			sum += rate;
-
 		_host_fs.push_back(sum/(_time_step*n_steps));
 	}
 

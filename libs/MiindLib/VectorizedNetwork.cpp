@@ -237,7 +237,7 @@ void VectorizedNetwork::setupLoop(bool write_displays){
     // for each connection, which of group's meshes is being affected
     _connection_out_group_mesh.push_back(_node_id_to_group_mesh[_mesh_custom_connections[i]._out]);
 
-    _csrs.push_back(TwoDLib::CSRMatrix(*(_mesh_custom_connections[i]._transition), *(_group), _node_id_to_group_mesh[_mesh_connections[i]._out]));
+    _csrs.push_back(TwoDLib::CSRMatrix(*(_mesh_custom_connections[i]._transition), *(_group), _node_id_to_group_mesh[_mesh_custom_connections[i]._out]));
     // _csrs contains all the grid transforms first (see initOde2DSystem)
     // now we're adding all the mesh transition matrices so set the correct index value
     _mesh_transform_indexes.push_back(_grid_meshes.size()+i);
@@ -297,7 +297,6 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
     connection_count++;
   }
 
-
   for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++ ){
     _group_adapter->Evolve(_mesh_meshes);
     _group_adapter->RemapReversal();
@@ -326,6 +325,7 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
     for(unsigned int j=0; j<_node_to_connection_queue[_group_mesh_to_node_id[i]].size(); j++){
       _connection_queue[_node_to_connection_queue[_group_mesh_to_node_id[i]][j]].updateQueue(group_rates[i]);
     }
+
   }
 
   std::vector<double> monitored_rates(_monitored_nodes.size());
