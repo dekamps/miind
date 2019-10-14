@@ -1,7 +1,12 @@
+import sys
+
+args = sys.argv
+
+print(args)
+
 # Once the Python Shared Library has been built in MIIND,
 # copy this file to the results directory (where the .cpp and .so files were
 # created).
-
 import pylab
 import numpy
 import matplotlib.pyplot as plt
@@ -33,9 +38,8 @@ for i in range(int(simulation_length/timestep)): #0.001 is the time step defined
 
 miind.endSimulation()
 
-plt.figure()
-plt.plot(activities)
-plt.title("Firing Rate.")
-
-plt.show()
-
+# plt.figure()
+# plt.plot(activities)
+# plt.title("Firing Rate.")
+#
+# plt.show()

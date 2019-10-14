@@ -34,7 +34,7 @@ class Marginal(Result):
         # If there's no new projection and we've already calculated everything,
         # just return the existing calculated marginals
         if op.exists(self.data_path) and not self.new_projection:
-            load_data = np.load(self.data_path)['data'][()]
+            load_data = np.load(self.data_path,allow_pickle=True)['data'][()]
             if self.modelname in load_data:
                 return load_data[self.modelname]
 
@@ -62,7 +62,7 @@ class Marginal(Result):
 
         # Save 'data' into a compressed file
         if op.exists(self.data_path):
-            other = np.load(self.data_path)['data'][()]
+            other = np.load(self.data_path,allow_pickle=True)['data'][()]
             other.update({self.modelname: data})
             save_data = other
         else:

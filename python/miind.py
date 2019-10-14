@@ -179,7 +179,7 @@ def extract_efficacy(fn):
                     raise ValueError('Expected at least one non-zero value')
                return nrs[0]
 
-def construct_CSR_map(nodes,algorithms,connections):
+def construct_CSR_map(nodes,algorithms,connections, connection_type):
      '''Creates a list that corresponds one-to-one with the connection structure. Returns a tuple: [0] node name of receiving node,[1] matrix file name for this connection  '''
      csrlist=[]
      combi = []
@@ -194,7 +194,11 @@ def construct_CSR_map(nodes,algorithms,connections):
 
                                    mfs=algorithm.findall('MatrixFile')
                                    mfn= [ mf.text for mf in mfs]
-                                   efficacy=float(connection.text.split()[1])
+                                   efficacy = None
+                                   if connection_type == "DelayedConnection":
+                                       efficacy=float(connection.text.split()[1])
+                                   elif connection_type == "CustomConnectionParameters":
+                                       efficacy=float(connection.attrib['efficacy'])
                                    effs= [extract_efficacy(fn) for fn in mfn]
 
                                    candidates=[]
@@ -235,7 +239,7 @@ def node_name_to_node_id(nodes):
 
 def generate_connections(fn,conns, nodes, algorithms, weighttype):
     grid_cons = construct_grid_connection_map(nodes, algorithms, conns)
-    mesh_cons = construct_CSR_map(nodes, algorithms, conns)
+    mesh_cons = construct_CSR_map(nodes, algorithms, conns, weighttype.text)
     nodemap = node_name_to_node_id(nodes)
 
     with open(fn,'a') as f:
