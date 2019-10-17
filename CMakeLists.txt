@@ -1,6 +1,9 @@
 project( miind )
 cmake_minimum_required(VERSION 2.6)
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake-modules )
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 # include cmake scripts
 #############################################################################
@@ -23,10 +26,10 @@ set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unuse
 
 
 if (APPLE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fPIC -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fPIC")
 set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
 else (APPLE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fext-numeric-literals -fPIC -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fext-numeric-literals -fPIC")
 set(GLUT_LIBRARY "-lGL -lGLU -lglut")
 endif(APPLE)
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
