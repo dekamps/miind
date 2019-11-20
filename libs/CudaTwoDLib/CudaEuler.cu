@@ -40,13 +40,9 @@ __global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* m
     }
 }
 
-
-// Performing this calculation per iteration doubles the simulation time.
-// This function shouldn't be used in that way but it a good example in case you want to
-// include some kind of variable efficacy.
 __global__ void CudaCalculateGridEfficacies(inttype N,
   fptype efficacy, fptype grid_cell_width,
-  fptype* stays, fptype* goes, int* offset1s, int* offset2s)
+  fptype* val, inttype* ia, inttype* ja)
 {
   int index  = blockIdx.x * blockDim.x + threadIdx.x;
   int stride = blockDim.x * gridDim.x;
@@ -59,75 +55,11 @@ __global__ void CudaCalculateGridEfficacies(inttype N,
     int o1 = efficacy > 0 ? ofs : -ofs;
     int o2 = efficacy > 0 ? (ofs+1) : (ofs-1);
 
-    stays[modulo(i+o1,N)] = s;
-    goes[modulo(i+o2,N)] = g;
-    offset1s[modulo(i+o1,N)] = -o1;
-    offset2s[modulo(i+o2,N)] = -o2;
-  }
-}
-
-// As above, this function should not be used per iteration as the efficacy doesn't
-// change during simulation.
-__global__ void CudaCalculateGridEfficaciesWithConductance(inttype N,
-  fptype efficacy, fptype grid_cell_width, fptype* cell_vs, fptype cond_stable,
-  fptype* stays, fptype* goes, int* offset1s, int* offset2s, inttype vs_offset)
-{
-  int index  = blockIdx.x * blockDim.x + threadIdx.x;
-  int stride = blockDim.x * gridDim.x;
-
-  for (int i = index; i < N; i+= stride ){
-    // WARNING! If the offset changes from, say, 0 and 1 to 1 and 2 along
-    // a strip (due to changing V), there will be an overwrite of goes and stays
-    // which will lead to mass loss.
-    // Solution must be to allow multiple stays and goes into each cell. There
-    // should be a github bug report for this.
-    fptype eff = efficacy * (cell_vs[i + vs_offset] - cond_stable);
-    inttype ofs = (inttype)abs(eff / grid_cell_width);
-    fptype g = (fptype)fabs(eff / grid_cell_width) - ofs;
-    fptype s = 1.0 - g;
-
-    int o1 = efficacy > 0 ? ofs : -ofs;
-    int o2 = efficacy > 0 ? (ofs+1) : (ofs-1);
-
-    stays[modulo(i+o1,N)] = s;
-    goes[modulo(i+o2,N)] = g;
-    offset1s[modulo(i+o1,N)] = -o1;
-    offset2s[modulo(i+o2,N)] = -o2;
-  }
-}
-
-__global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays,
-  fptype goes, int offset_1, int offset_2,
-  fptype* derivative, fptype* mass, inttype offset)
-{
-    int index  = blockIdx.x * blockDim.x + threadIdx.x;
-    int stride = blockDim.x * gridDim.x;
-
-    for (int i = index; i < N; i+= stride ){
-      int io = i+offset;
-      fptype dr = 0.;
-
-      dr += stays*mass[(modulo(io+offset_1,N))+offset];
-  		dr += goes*mass[(modulo(io+offset_2,N))+offset];
-      dr -= mass[io];
-      derivative[io] += rate*dr;
-    }
-}
-
-__global__ void CudaCalculateGridDerivativeWithEfficacy(inttype N, fptype rate, fptype* stays,
-  fptype* goes, int* offset_1, int* offset_2,
-  fptype* derivative, fptype* mass, inttype offset)
-{
-  int index  = blockIdx.x * blockDim.x + threadIdx.x;
-  int stride = blockDim.x * gridDim.x;
-
-  for (int i = index; i < N; i+= stride ){
-    int io = i+offset;
-    fptype dr = 0.;
-    dr += stays[i]*mass[(modulo(io+offset_1[i],N))+offset];
-    dr += goes[i]*mass[(modulo(io+offset_2[i],N))+offset];
-    dr -= mass[io];
-    derivative[io] += rate*dr;
+    ia[i] = 2*i;
+    ja[2*i] = modulo(i-o2,N);
+    ja[2*i+1] = modulo(i-o1,N);
+    val[2*i] = g;
+    val[2*i+1] = s;
   }
 }
 
