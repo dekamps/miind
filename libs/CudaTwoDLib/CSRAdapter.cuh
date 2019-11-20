@@ -56,17 +56,15 @@ namespace CudaTwoDLib {
 
               void CalculateDerivative(const std::vector<fptype>&);
 
-							void CalculateMeshGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<int>&, const std::vector<int>&);
+				void InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy);
 
-							void CalculateGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<int>&, const std::vector<int>&);
+				void UpdateGridEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy);
 
-							void InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy);
+				void InitializeStaticGridVDependentEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy, const std::vector<fptype>& rest_vs);
 
-							void InitializeStaticGridConductanceEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy, const std::vector<fptype>& rest_vs);
+				void CalculateMeshGridDerivative(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates);
 
-							void CalculateMeshGridDerivativeWithEfficacy(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates);
-
-							void SingleTransformStep();
+				void SingleTransformStep();
 
               void AddDerivative();
 
@@ -94,7 +92,6 @@ namespace CudaTwoDLib {
               inttype                 _nr_iterations;
               inttype                 _nr_m;
 							inttype									_nr_streams;
-							inttype									_nr_grid_connections;
 
 							std::vector<inttype>		_grid_transforms;
 							std::vector<inttype> 		_vecmats;
@@ -104,19 +101,15 @@ namespace CudaTwoDLib {
               std::vector<inttype>   _nia;
               std::vector<inttype*>  _ia;
               std::vector<inttype>   _nja;
-              std::vector<inttype*>  _ja;
+			  std::vector<inttype*>  _ja;
+			  
+			  std::vector<fptype>	 _cell_widths;
 
               std::vector<inttype> _offsets;
               std::vector<inttype> _nr_rows;
 
-							std::vector<fptype>	 _cell_widths;
-							std::vector<fptype*> _goes;
-							std::vector<fptype*> _stays;
-							std::vector<int*> _offset1s;
-							std::vector<int*> _offset2s;
-
               fptype* _dydt;
-							fptype* _cell_vs;
+			  fptype* _cell_vs;
 
               int _blockSize;
               int _numBlocks;

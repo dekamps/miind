@@ -6,7 +6,6 @@ typedef float fptype;
 
 __global__ void CudaCalculateDerivative(inttype N, fptype rate, fptype* derivative, fptype* mass, fptype* val, inttype* ia, inttype* ja, inttype* map, inttype offset);
 __global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* mass, fptype* val, inttype* ia, inttype* ja, inttype* map, inttype offset);
-__global__ void CudaCalculateGridDerivative(inttype N, fptype rate, fptype stays, fptype goes, int offset_1, int offset_2, fptype* derivative, fptype* mass, inttype offset);
 __global__ void EulerStep(inttype N, fptype* derivative, fptype* mass, fptype timestep);
 __global__ void MapReversal(unsigned int n_reversal, unsigned int* rev_from, unsigned int* rev_to, fptype* rev_alpha, fptype* mass, unsigned int* map);
 __global__ void MapResetToRefractory(unsigned int n_reset, unsigned int* res_from, fptype* mass, unsigned int* map, fptype* refactory_mass);
@@ -20,7 +19,5 @@ __global__ void CudaClearDerivative(inttype N, fptype* dydt, fptype* mass);
 __global__ void CheckDerivativeEqualsZero(inttype N, fptype* derivative);
 __device__ int modulo(int a, int b);
 
-__global__ void CudaCalculateGridDerivativeWithEfficacy(inttype N, fptype rate, fptype* stays, fptype* goes, int* offset_1, int* offset_2, fptype* derivative, fptype* mass, inttype offset);
-__global__ void CudaCalculateGridEfficaciesWithConductance(inttype N, fptype efficacy, fptype grid_cell_width, fptype* cell_vs, fptype cond_stable, fptype* stays, fptype* goes, int* offset1s, int* offset2s, inttype vs_offset);
-__global__ void CudaCalculateGridEfficacies(inttype N, fptype efficacy, fptype grid_cell_width, fptype* stays, fptype* goes, int* offset1s, int* offset2s);
+__global__ void CudaCalculateGridEfficacies(inttype N, fptype efficacy, fptype grid_cell_width, fptype* val, inttype* ia, inttype* ja);
 #endif

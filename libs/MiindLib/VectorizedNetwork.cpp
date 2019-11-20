@@ -188,6 +188,9 @@ void VectorizedNetwork::setupLoop(bool write_displays){
     _connection_out_group_mesh.push_back(_node_id_to_group_mesh[_grid_connections[i]._out]);
     _effs.push_back(std::stod(_grid_connections[i]._params["efficacy"]));
 
+    // grid transition offsets in _csrs. Grid transforms go first (see initOde2DSystem).
+    _mesh_transform_indexes.push_back(_grid_meshes.size()+i);
+
     _connection_queue.push_back(MPILib::DelayedConnectionQueue(_network_time_step,std::stod(_grid_connections[i]._params["delay"])));
     if ( _grid_connections[i]._external )
       if (_external_to_connection_queue.find(_grid_connections[i]._external_id) == _external_to_connection_queue.end()){
@@ -207,12 +210,14 @@ void VectorizedNetwork::setupLoop(bool write_displays){
       }
     }
 
+
+  // NOTE, WE'RE EITHER USING MESH_CONNECTIONS *XOR* MESH_CUSTOM_CONNECTIONS
   for (unsigned int i=0; i<_mesh_connections.size(); i++){
     _connection_out_group_mesh.push_back(_node_id_to_group_mesh[_mesh_connections[i]._out]);
     _csrs.push_back(TwoDLib::CSRMatrix(*(_mesh_connections[i]._transition), *(_group), _node_id_to_group_mesh[_mesh_connections[i]._out]));
-    // _csrs contains all the grid transforms first (see initOde2DSystem)
+    // _csrs contains all the grid transforms first (see initOde2DSystem) then we need space for the generated Grid transitions.
     // now we're adding all the mesh transition matrices so set the correct index value
-    _mesh_transform_indexes.push_back(_grid_meshes.size()+i);
+    _mesh_transform_indexes.push_back(_grid_meshes.size()+_grid_connections.size()+i);
 
     _connection_queue.push_back(MPILib::DelayedConnectionQueue(_network_time_step,_mesh_connections[i]._delay));
     if ( _mesh_connections[i]._external )
@@ -233,14 +238,15 @@ void VectorizedNetwork::setupLoop(bool write_displays){
       }
   }
 
+  // NOTE, WE'RE EITHER USING MESH_CONNECTIONS *XOR* MESH_CUSTOM_CONNECTIONS
   for (unsigned int i=0; i<_mesh_custom_connections.size(); i++){
     // for each connection, which of group's meshes is being affected
     _connection_out_group_mesh.push_back(_node_id_to_group_mesh[_mesh_custom_connections[i]._out]);
 
     _csrs.push_back(TwoDLib::CSRMatrix(*(_mesh_custom_connections[i]._transition), *(_group), _node_id_to_group_mesh[_mesh_custom_connections[i]._out]));
-    // _csrs contains all the grid transforms first (see initOde2DSystem)
+    // _csrs contains all the grid transforms first (see initOde2DSystem) then we need space for the generated Grid transitions.
     // now we're adding all the mesh transition matrices so set the correct index value
-    _mesh_transform_indexes.push_back(_grid_meshes.size()+i);
+    _mesh_transform_indexes.push_back(_grid_meshes.size()+_grid_connections.size()+i);
 
     _connection_queue.push_back(MPILib::DelayedConnectionQueue(_network_time_step,std::stod(_mesh_custom_connections[i]._params["delay"])));
     if ( _mesh_custom_connections[i]._external )
@@ -311,7 +317,7 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
 
   for (MPILib::Index i_part = 0; i_part < _n_steps*_master_steps; i_part++ ){
     _csr_adapter->ClearDerivative();
-    _csr_adapter->CalculateMeshGridDerivativeWithEfficacy(_connection_out_group_mesh,rates);
+    _csr_adapter->CalculateMeshGridDerivative(_connection_out_group_mesh,rates);
     _csr_adapter->AddDerivative();
   }
 
