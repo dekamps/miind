@@ -9,7 +9,6 @@ set( LIB_TYPE STATIC )
 
 set(CUDA_NVCC_FLAGS
 ${CUDA_NVCC_FLAGS};
--std=c++11
 -arch=sm_60 #adapt this to the GPU on your system
 )
 

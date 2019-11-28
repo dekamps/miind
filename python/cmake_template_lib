@@ -165,7 +165,7 @@ endif(ENABLE_CUDA)
 #############################################################################
  #   add the flags for C++11
 if(CMAKE_COMPILER_IS_GNUCXX)
-add_definitions("-std=c++14 -fext-numeric-literals ${GLUT_LIBRARY}")
+add_definitions("-fext-numeric-literals ${GLUT_LIBRARY}")
 else(CMAKE_COMPILER_IS_GNUCXX)
-add_definitions("-std=c++14 ${GLUT_LIBRARY}")
+add_definitions("${GLUT_LIBRARY}")
 endif(CMAKE_COMPILER_IS_GNUCXX)
