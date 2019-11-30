@@ -599,7 +599,7 @@ def generate_connections(fn,conns, external_incoming_connections, external_outgo
             external_node_id = external_node_id + 1
 
         for cn in mesh_ext:
-            f.write(connections.parse_external_outgoing_connection(cn[1],nodemap, 'vec_network',looped_definition=True,id=str(total_external_conns)+'*i+'+str(external_node_id)))
+            f.write(connections.parse_external_outgoing_connection(cn[1],nodemap, 'vec_network',looped_definition=True))
 
         f.write('\n')
 

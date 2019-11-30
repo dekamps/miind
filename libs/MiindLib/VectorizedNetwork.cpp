@@ -113,6 +113,13 @@ void VectorizedNetwork::reportNodeActivities(MPILib::Time sim_time){
 		ofst_rate.precision(10);
     ofst_rate << _rate_current_time[i] << "\t" << _current_node_rates[_rate_nodes[i]] << std::endl;
 		ofst_rate.close();
+
+    std::ostringstream ost3;
+		ost3 << "avg_v_" << _rate_nodes[i];
+		std::ofstream ofst_avg(ost3.str(), std::ofstream::app);
+		ofst_avg.precision(10);
+    ofst_avg << _rate_current_time[i] << "\t" << _group_adapter->getAvgV(_rate_nodes[i]) << std::endl;
+		ofst_avg.close();
 	}
 }
 
@@ -186,7 +193,6 @@ void VectorizedNetwork::setupLoop(bool write_displays){
   for (unsigned int i=0; i<_grid_connections.size(); i++){
     // for each connection, which of group's meshes is being affected
     _connection_out_group_mesh.push_back(_node_id_to_group_mesh[_grid_connections[i]._out]);
-    _effs.push_back(std::stod(_grid_connections[i]._params["efficacy"]));
 
     // grid transition offsets in _csrs. Grid transforms go first (see initOde2DSystem).
     _mesh_transform_indexes.push_back(_grid_meshes.size()+i);
@@ -270,7 +276,17 @@ void VectorizedNetwork::setupLoop(bool write_displays){
   _csr_adapter = new CudaTwoDLib::CSRAdapter(*_group_adapter,_csrs,
   _mesh_connections.size()+_grid_connections.size()+_mesh_custom_connections.size(),h,_mesh_transform_indexes,_grid_transform_indexes);
 
-  _csr_adapter->InitializeStaticGridEfficacies(_connection_out_group_mesh, _effs);
+  for (unsigned int i=0; i<_grid_connections.size(); i++){
+    std::map<std::string,std::string>::iterator it = _grid_connections[i]._params.find("type");
+    if (it != _grid_connections[i]._params.end()) { // we have a connection type
+      if (_grid_connections[i]._params["type"] == "lateral") 
+        _csr_adapter->InitializeStaticGridEfficacySlowLateral(_connection_out_group_mesh[i], i, std::stod(_grid_connections[i]._params["efficacy"]));
+      else if (_grid_connections[i]._params["type"] == "epileptor") 
+        _csr_adapter->InitializeStaticGridEfficacySlowLateralEpileptor(_connection_out_group_mesh[i], i, std::stod(_grid_connections[i]._params["efficacy"]), std::stod(_grid_connections[i]._params["tau"]), std::stod(_grid_connections[i]._params["K"]), 0.0);
+    } else { // if there's no type, assume it's standard efficacy
+      _csr_adapter->InitializeStaticGridEfficacySlow(_connection_out_group_mesh[i], i, std::stod(_grid_connections[i]._params["efficacy"]));
+    }
+  }
 }
 
 std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities, unsigned int i_loop){
@@ -293,6 +309,23 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
     rates.push_back(_connection_queue[connection_count].getCurrentRate()*std::stod(_grid_connections[i]._params["num_connections"]));
     connection_count++;
   }
+
+  // Update the grid connections now we have new incoming rates
+  for (unsigned int i=0; i<_grid_connections.size(); i++){
+    std::map<std::string,std::string>::iterator it = _grid_connections[i]._params.find("type");
+    if (it != _grid_connections[i]._params.end()) { // we have a connection type
+      if (_grid_connections[i]._params["type"] == "lateral"){  // We actually, don't update anything here.
+        // _csr_adapter->UpdateGridEfficacySlowLateral(_connection_out_group_mesh[i], i, std::stod(_grid_connections[i]._params["efficacy"]));
+      }
+      else if (_grid_connections[i]._params["type"] == "epileptor")  {
+        _csr_adapter->UpdateGridEfficacySlowLateralEpileptor(_connection_out_group_mesh[i], i, std::stod(_grid_connections[i]._params["efficacy"]), std::stod(_grid_connections[i]._params["tau"]), std::stod(_grid_connections[i]._params["K"]), rates[i]);
+        rates[i] = 1000;
+      }
+    } else { // if there's no type, assume it's standard efficacy : actually, we don't want to do anything.
+      //_csr_adapter->UpdateGridEfficacySlow(_connection_out_group_mesh[i], i, std::stod(_grid_connections[i]._params["efficacy"]));
+    }
+  }
+
   for (unsigned int i=0; i<_mesh_connections.size(); i++){
     rates.push_back(_connection_queue[connection_count].getCurrentRate()*_mesh_connections[i]._n_connections);
     connection_count++;
@@ -326,31 +359,52 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
 
   const std::vector<fptype>& group_rates = _group_adapter->F(_n_steps);
 
+  _group_adapter->updateGroupMass();
+
+  // AvgV
   for(unsigned int i=0; i<group_rates.size(); i++){
     _current_node_rates[_group_mesh_to_node_id[i]] = group_rates[i];
     for(unsigned int j=0; j<_node_to_connection_queue[_group_mesh_to_node_id[i]].size(); j++){
-      _connection_queue[_node_to_connection_queue[_group_mesh_to_node_id[i]][j]].updateQueue(group_rates[i]);
+      _connection_queue[_node_to_connection_queue[_group_mesh_to_node_id[i]][j]].updateQueue(_group_adapter->getAvgV(_rate_nodes[_group_mesh_to_node_id[i]]));   
     }
 
   }
 
   std::vector<double> monitored_rates(_monitored_nodes.size());
   for(unsigned int i=0; i<_monitored_nodes.size(); i++){
-    monitored_rates[i] = group_rates[_node_id_to_group_mesh[_monitored_nodes[i]]];
+    monitored_rates[i] = _group_adapter->getAvgV(_monitored_nodes[i]);
   }
 
+  ////
+  // Rate
+
+  // for(unsigned int i=0; i<group_rates.size(); i++){
+  //   _current_node_rates[_group_mesh_to_node_id[i]] = group_rates[i];
+  //   for(unsigned int j=0; j<_node_to_connection_queue[_group_mesh_to_node_id[i]].size(); j++){
+  //     _connection_queue[_node_to_connection_queue[_group_mesh_to_node_id[i]][j]].updateQueue(group_rates[i]);
+  //   }
+
+  // }
+
+  // std::vector<double> monitored_rates(_monitored_nodes.size());
+  // for(unsigned int i=0; i<_monitored_nodes.size(); i++){
+  //   monitored_rates[i] = group_rates[_node_id_to_group_mesh[_monitored_nodes[i]]];
+  // }
+
+  //
+
   if(_display_nodes.size() > 0){
-    _group_adapter->updateGroupMass();
     TwoDLib::Display::getInstance()->updateDisplay(i_loop);
   }
 
   if(_density_nodes.size() > 0){
-    _group_adapter->updateGroupMass();
     _group_adapter->updateRefractory();
     reportNodeDensities(time);
   }
 
-  reportNodeActivities(time);
+  if(_rate_nodes.size() > 0){
+    reportNodeActivities(time);
+  }
 
   return monitored_rates;
 }

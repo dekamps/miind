@@ -51,6 +51,7 @@ def _help(command):
         print('***** Commands for Analysing and Presenting Completed Simulations *****')
         print('')
         print('rate                     : Plot the mean firing rate of a given node in the current simulation.')
+        print('avgv                     : Plot the mean membrane potential of a given node in the current simulation.')
         print('plot-density             : Plot the 2D density of a given node at a given time in the simulation.')
         print('plot-marginals           : Plot the marginal densities of a given node at a given time in the simulation.')
         print('generate-density-movie   : Generate a movie of the 2D density for a given node in the simulation.')
@@ -275,6 +276,25 @@ def rate(command, current_sim):
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print (name + ' : List the nodes for which a rate plot is available in the current simulation. The current simulation must have been submitted and run.')
         print (name + ' [Node name] : Plot the mean firing rate against time for the given node.')
+
+def avgv(command, current_sim):
+    command_name = command[0]
+    name = 'avgv'
+
+    if command_name in [name]:
+        if not current_sim:
+            print('No simulation currently defined. Please call command \'sim\'.')
+
+        if len(command) == 1:
+            print('The following nodes can be queried for a mean membrane potential :')
+            for (name,_) in current_sim.nodenames:
+                print (str(current_sim.getIndexFromNode(name)) + ' : ' + name)
+        if len(command) == 2:
+            current_sim.plotAvgV(command[1])
+
+    if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
+        print (name + ' : List the nodes for which an average membrane potentaial plot is available in the current simulation. The current simulation must have been submitted and run.')
+        print (name + ' [Node name] : Plot the mean membrane potential against time for the given node.')
 
 def densityMovie(command, current_sim):
     command_name = command[0]
@@ -607,6 +627,8 @@ def checkCommands(command, current_sim):
     buildSharedLib(command, current_sim)
 
     rate(command, current_sim)
+
+    avgv(command, current_sim)
 
     densityMovie(command, current_sim)
 

@@ -173,7 +173,6 @@ protected:
   std::vector<MPILib::DelayedConnectionQueue> _connection_queue;
   std::map<MPILib::NodeId, std::vector<MPILib::NodeId>> _node_to_connection_queue;
   std::map<MPILib::NodeId, std::vector<MPILib::NodeId>> _external_to_connection_queue;
-  std::vector<fptype> _effs;
 
   std::map<MPILib::NodeId, fptype> _current_node_rates;
 

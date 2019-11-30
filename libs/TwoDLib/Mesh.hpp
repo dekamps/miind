@@ -110,6 +110,7 @@ namespace TwoDLib {
 
 		// Get the grid cell width (only useful if the mesh is a grid)
 		double getCellWidth() const;
+		double getCellHeight() const;
 
 		class GridCellTransition{
 		public:
@@ -165,6 +166,7 @@ namespace TwoDLib {
 		vector<unsigned int>              	_vec_timefactor;
 		double								_t_step;
 		double										_grid_cell_width;
+		double										_grid_cell_height;
 
 		// It is sometimes necessary to find out to which cells a given mesh point belongs.
 		// A mesh point will be mapped to an index position in a list of a list of coordinates.
