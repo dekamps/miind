@@ -125,6 +125,8 @@ def generate(func, timestep, timescale, tolerance, basename, threshold_v, reset_
         progress = 0
         count = 0
         ten_percent = (int)((grid_d1_res) / 10)
+        if ten_percent == 0:
+            ten_percent = 1
 
         for i in (np.array(range(grid_d1_res))) * (1.0/(grid_d1_res)):
             svs_1 = [];

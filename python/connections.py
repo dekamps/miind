@@ -51,10 +51,10 @@ def parse_connection(connection, weighttype):
 
     return s
 
-def parse_external_outgoing_connection(connection, nodemap, network_name='network',looped_definition=False,id=0):
+def parse_external_outgoing_connection(connection, nodemap, network_name='network',looped_definition=False):
     o = str(nodemap[connection.attrib['Node']])
     if looped_definition:
-        o = str(id)
+         o = str(len(nodemap))+'*i+'+o
 
     return '\t\t\t' + network_name + '.addExternalMonitor('+ o +');\n'
 
@@ -90,11 +90,14 @@ def parse_grid_vectorized_connection(connection, nodemap, network_name='network'
     for ak,av in connection.attrib.items():
         if ak in ['In', 'Out']:
             continue
-        s += '\t\t\tparams_' + node_i  + '_' + node_o + '[\"' + ak + '\"] = std::to_string(' + av + ');\n'
+        s += '\t\t\tparams_' + node_i  + '_' + node_o + '[\"' + ak + '\"] = \"' + av + '\";\n'
 
     if looped_definition:
         i = str(len(nodemap))+'*i+'+node_i
         o = str(len(nodemap))+'*i+'+node_o
+    else:
+        i = node_i
+        o = node_o
     s += '\t\t\t' + network_name + '.addGridConnection('+ i +','+ o +', params_' + node_i  + '_' + node_o + ');\n'
     return s
 
@@ -105,11 +108,13 @@ def parse_external_incoming_grid_vectorized_connection(connection, nodemap, id, 
     for ak,av in connection.attrib.items():
         if ak in ['Node']:
             continue
-        s += '\t\t\tparams_extern_' + node_o + '[\"' + ak + '\"] = std::to_string(' + av + ');\n'
+        s += '\t\t\tparams_extern_' + node_o + '[\"' + ak + '\"] = \"' + av + '\";\n'
 
     nid = str(id)
     if looped_definition:
         o = str(len(nodemap))+'*i+'+node_o
+    else:
+        o = node_o
     s += '\t\t\t' + network_name + '.addGridConnection('+ o +', params_extern_' + node_o + ',' + nid + ');\n'
     return s
 
@@ -144,10 +149,13 @@ def parse_mesh_vectorized_connection(connection, nodemap, mat_name, network_name
     if looped_definition:
         i = str(len(nodemap))+'*i+'+node_i
         o = str(len(nodemap))+'*i+'+node_o
+    else:
+        i = node_i
+        o = node_o
     for ak,av in connection.attrib.items():
         if ak in ['In', 'Out']:
             continue
-        s += '\t\t\tparams_' + node_i  + '_' + node_o + '[\"' + ak + '\"] = std::to_string(' + av + ');\n'
+        s += '\t\t\tparams_' + node_i  + '_' + node_o + '[\"' + ak + '\"] = \"' + av + '\";\n'
 
     s += '\t\t\t' + network_name + '.addMeshCustomConnection('+ i +','+ o +', params_' + node_i  + '_' + node_o + ',&'+ mat_name +');\n'
     return s
@@ -159,11 +167,13 @@ def parse_external_incoming_mesh_vectorized_connection(connection, nodemap, mat_
     for ak,av in connection.attrib.items():
         if ak in ['Node']:
             continue
-        s += '\t\t\tparams_extern_' + node_o + '[\"' + ak + '\"] = std::to_string(' + av + ');\n'
+        s += '\t\t\tparams_extern_' + node_o + '[\"' + ak + '\"] = \"' + av + '\";\n'
 
     nid = str(id)
     if looped_definition:
         o = str(len(nodemap))+'*i+'+node_o
+    else:
+        o = node_o
 
     s += '\t\t\t' + network_name + '.addMeshCustomConnection('+ o +', params_extern_' + node_o + ',&'+ mat_name +',' + nid + ');\n'
     return s

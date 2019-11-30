@@ -209,6 +209,11 @@ fptype CudaOde2DSystemAdapter::sumRefractory()
 	return total;
 }
 
+MPILib::Potential CudaOde2DSystemAdapter::getAvgV(unsigned int m){
+	vector<MPILib::Potential> pots = _group.AvgV();
+	return pots[m];
+}
+
 const std::vector<fptype>& CudaOde2DSystemAdapter::F(unsigned int n_steps) const
 {
 	_host_fs.clear();

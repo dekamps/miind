@@ -82,6 +82,8 @@ namespace CudaTwoDLib {
 								fptype sumRefractory();
 
 								friend class CSRAdapter;
+								
+				MPILib::Potential getAvgV(unsigned int m);
 
                 const std::vector<fptype>& F(unsigned int n_steps = 1) const;
 

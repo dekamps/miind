@@ -58,8 +58,20 @@ namespace CudaTwoDLib {
 
 				void InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy);
 
-				void UpdateGridEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy);
+				void InitializeStaticGridEfficacySlow(const inttype vecindex, const inttype connindex, const fptype efficacy);
 
+				void InitializeStaticGridEfficacySlowLateral(const inttype vecindex, const inttype connindex, const fptype efficacy);
+
+				void InitializeStaticGridEfficacySlowLateralEpileptor(const inttype vecindex, const inttype connindex, const fptype efficacy, const fptype tau, const fptype K, const fptype v_in);
+
+				void UpdateGridEfficacySlow(const inttype vecindex, const inttype connindex, const fptype efficacy);
+
+				void UpdateGridEfficacySlowLateral(const inttype vecindex, const inttype connindex, const fptype efficacy);
+
+				void UpdateGridEfficacySlowLateralEpileptor(const inttype vecindex, const inttype connindex, const fptype efficacy, const fptype tau, const fptype K, const fptype v_in);
+
+				void UpdateGridEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy);
+				
 				void InitializeStaticGridVDependentEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy, const std::vector<fptype>& rest_vs);
 
 				void CalculateMeshGridDerivative(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates);
@@ -86,6 +98,7 @@ namespace CudaTwoDLib {
 	          	std::vector<inttype> Offsets(const std::vector<TwoDLib::CSRMatrix>&) const;
 	          	std::vector<inttype> NrRows(const std::vector<TwoDLib::CSRMatrix>&) const;
 							std::vector<fptype> CellWidths(const std::vector<TwoDLib::CSRMatrix>&) const;
+							std::vector<fptype> CellHeights(const std::vector<TwoDLib::CSRMatrix>&) const;
 
 	      			CudaOde2DSystemAdapter& _group;
               fptype                  _euler_timestep;
@@ -104,6 +117,7 @@ namespace CudaTwoDLib {
 			  std::vector<inttype*>  _ja;
 			  
 			  std::vector<fptype>	 _cell_widths;
+			  std::vector<fptype>	 _cell_heights;
 
               std::vector<inttype> _offsets;
               std::vector<inttype> _nr_rows;
