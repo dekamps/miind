@@ -48,6 +48,8 @@ namespace TwoDLib {
 		//!< Files produced by mesh.py
 		//!< or MatrixGenerator conform to this requirement.
 
+		Mesh(double width) : _grid_cell_width(width) {}
+
 		//!< construction from a disk representation via stream. Beware: The disk representation must be in XML format
 		Mesh
 		(
@@ -68,12 +70,12 @@ namespace TwoDLib {
 		~Mesh(){}
 
 		//!< number of strips in the grid
-		unsigned int NrStrips() const { return _vec_vec_quad.size(); }
+		virtual unsigned int NrStrips() const { return _vec_vec_quad.size(); }
 
 		//!< number of cells in strip i
-		unsigned int NrCellsInStrip(unsigned int i) const { assert( i < _vec_vec_quad.size()); return _vec_vec_quad[i].size();}
+		virtual unsigned int NrCellsInStrip(unsigned int i) const { assert( i < _vec_vec_quad.size()); return _vec_vec_quad[i].size();}
 
-		const Cell& Quad(unsigned int i, unsigned int j) const { return _vec_vec_quad[i][j]; }
+		virtual const Cell& Quad(unsigned int i, unsigned int j) const { return _vec_vec_quad[i][j]; }
 
 		//!< Provide a mesh point, the function returns a list of Coordinates that this point belongs to
 		//!< Caution! Stationary points will not show up in the returned list and must be tested separately
@@ -125,7 +127,7 @@ namespace TwoDLib {
 
 		GridCellTransition calculateCellTransition(double efficacy) const;
 
-	private:
+	protected:
 
 		void FromXML(std::istream&);
 		std::vector<Cell> FromVals(const std::vector<double>&) const;
