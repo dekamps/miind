@@ -361,35 +361,37 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
 
   _group_adapter->updateGroupMass();
 
+  // TODO URGENT! : ALLOW CONNECTION DEPENDENT AVGV or RATE
+
   // AvgV
-  for(unsigned int i=0; i<group_rates.size(); i++){
-    _current_node_rates[_group_mesh_to_node_id[i]] = group_rates[i];
-    for(unsigned int j=0; j<_node_to_connection_queue[_group_mesh_to_node_id[i]].size(); j++){
-      _connection_queue[_node_to_connection_queue[_group_mesh_to_node_id[i]][j]].updateQueue(_group_adapter->getAvgV(_rate_nodes[_group_mesh_to_node_id[i]]));   
-    }
-
-  }
-
-  std::vector<double> monitored_rates(_monitored_nodes.size());
-  for(unsigned int i=0; i<_monitored_nodes.size(); i++){
-    monitored_rates[i] = _group_adapter->getAvgV(_monitored_nodes[i]);
-  }
-
-  ////
-  // Rate
-
   // for(unsigned int i=0; i<group_rates.size(); i++){
   //   _current_node_rates[_group_mesh_to_node_id[i]] = group_rates[i];
   //   for(unsigned int j=0; j<_node_to_connection_queue[_group_mesh_to_node_id[i]].size(); j++){
-  //     _connection_queue[_node_to_connection_queue[_group_mesh_to_node_id[i]][j]].updateQueue(group_rates[i]);
+  //     _connection_queue[_node_to_connection_queue[_group_mesh_to_node_id[i]][j]].updateQueue(_group_adapter->getAvgV(_rate_nodes[_group_mesh_to_node_id[i]]));   
   //   }
 
   // }
 
   // std::vector<double> monitored_rates(_monitored_nodes.size());
   // for(unsigned int i=0; i<_monitored_nodes.size(); i++){
-  //   monitored_rates[i] = group_rates[_node_id_to_group_mesh[_monitored_nodes[i]]];
+  //   monitored_rates[i] = _group_adapter->getAvgV(_monitored_nodes[i]);
   // }
+
+  ////
+  // Rate
+
+  for(unsigned int i=0; i<group_rates.size(); i++){
+    _current_node_rates[_group_mesh_to_node_id[i]] = group_rates[i];
+    for(unsigned int j=0; j<_node_to_connection_queue[_group_mesh_to_node_id[i]].size(); j++){
+      _connection_queue[_node_to_connection_queue[_group_mesh_to_node_id[i]][j]].updateQueue(group_rates[i]);
+    }
+
+  }
+
+  std::vector<double> monitored_rates(_monitored_nodes.size());
+  for(unsigned int i=0; i<_monitored_nodes.size(); i++){
+    monitored_rates[i] = group_rates[_node_id_to_group_mesh[_monitored_nodes[i]]];
+  }
 
   //
 

@@ -16,7 +16,7 @@ from .tools import *
 import mesh3 as meshmod
 
 class Marginal(Result):
-    def __init__(self, io, nodename, vn=500, wn=200):
+    def __init__(self, io, nodename, vn=100, wn=100):
         super(Marginal, self).__init__(io, nodename)
         self.path = op.join(self.io.output_directory,
                             self.nodename + '_marginal_density')
@@ -54,11 +54,15 @@ class Marginal(Result):
         masses = np.vstack(masses)
         assert masses.shape[0] == len(self.fnames)
 
+        print('Calculating marginal densities...')
+
         # Calculate the merginals for each frame and store in 'data'
         v, w, bins_v, bins_w = self.calc_marginal_density(
             v, w, masses, coords, self.projection)
         data = {'v': v, 'w': w, 'bins_v': bins_v,
                 'bins_w': bins_w, 'times': self.times}
+
+        print('Saving to compressed file...')
 
         # Save 'data' into a compressed file
         if op.exists(self.data_path):
@@ -126,6 +130,7 @@ class Marginal(Result):
         # Does the pojection file exist? If not, generate it.
         if not op.exists(proj_pathname):
             print('No projection file found, generating...')
+            print('This is a slow but one-shot process.')
             self.make_projection_file()
             self.new_projection = True
 
