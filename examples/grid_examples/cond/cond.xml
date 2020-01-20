@@ -1,7 +1,7 @@
 <Simulation>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="GridAlgorithm" name="OSC" modelfile="cond.model" tau_refractive="0.0" transformfile="cond_0_0_0_0_.tmat" start_v="-0.065" start_w="0.0" >
+<Algorithm type="GridAlgorithmGroup" name="OSC" modelfile="cond.model" tau_refractive="0.0" transformfile="cond_0_0_0_0_.tmat" start_v="-0.065" start_w="0.0" >
 <TimeStep>1e-05</TimeStep>
 </Algorithm>
 <Algorithm type="RateFunctor" name="MLR_1">
