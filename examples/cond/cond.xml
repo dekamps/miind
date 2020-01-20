@@ -1,7 +1,7 @@
 <Simulation>
-<WeightType>DelayedConnection</WeightType>
+<WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="MeshAlgorithm" name="ConductanceNeuron" modelfile="cond.model" >
+<Algorithm type="MeshAlgorithmCustom" name="ConductanceNeuron" modelfile="cond.model" >
 <TimeStep>0.00001</TimeStep>
 <MatrixFile>cond_0_0.05_0.mat</MatrixFile>
 </Algorithm>
@@ -14,7 +14,7 @@
 <Node algorithm="ExcitatoryInput" name="Drive" type="EXCITATORY_DIRECT" />
 </Nodes>
 <Connections>
-<Connection In="Drive" Out="CondNode">1   0.05 0</Connection>
+<Connection In="Drive" Out="CondNode" num_connections="1" efficacy="0.05" delay="0.0"/>
 </Connections>
 <Reporting>
 <Density node="CondNode" t_start="0.0" t_end="0.1" t_interval="0.001" />

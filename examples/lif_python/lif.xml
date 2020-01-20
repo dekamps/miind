@@ -1,7 +1,7 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<Algorithm type="MeshAlgorithm" name="E" modelfile="lif.model" >
+<Algorithm type="MeshAlgorithmGroup" name="E" modelfile="lif.model" >
 <TimeStep>0.001</TimeStep>
 <MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
 </Algorithm>
@@ -20,7 +20,7 @@
 </Connections>
 <Reporting>
 <Density node="LIF" t_start="0.0" t_end="3.0" t_interval="0.001" />
-<!--<Display node="LIF" />-->
+<Display node="LIF" />
 <Rate node="LIF" t_interval="0.001" />
 </Reporting>
 <SimulationRunParameter>

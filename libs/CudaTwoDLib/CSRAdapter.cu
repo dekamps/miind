@@ -124,7 +124,7 @@ void CSRAdapter::InitializeStaticGridEfficacySlow(const inttype vecindex, const 
     fptype s = 1.0 - g;
 
     int o1 = efficacy > 0 ? ofs : -ofs;
-    int o2 = efficacy > 0 ? (ofs+1) : (ofs-1);
+    int o2 = efficacy > 0 ? (ofs+1) : (-ofs-1);
 
     int r1 = (i+o1)%_nr_rows[vecindex];
     unsigned int ind_1 = r1< 0 ? r1 + _nr_rows[vecindex] : r1;
@@ -134,8 +134,8 @@ void CSRAdapter::InitializeStaticGridEfficacySlow(const inttype vecindex, const 
 
     inds[ind_1].push_back(i);
     inds[ind_2].push_back(i);
-    vals[ind_1].push_back(g);
-    vals[ind_2].push_back(s);
+    vals[ind_1].push_back(s);
+    vals[ind_2].push_back(g);
   }
 
   std::vector<inttype> ia;
@@ -180,7 +180,7 @@ void CSRAdapter::UpdateGridEfficacySlow(const inttype vecindex, const inttype co
     fptype s = 1.0 - g;
 
     int o1 = efficacy > 0 ? ofs : -ofs;
-    int o2 = efficacy > 0 ? (ofs+1) : (ofs-1);
+    int o2 = efficacy > 0 ? (ofs+1) : (-ofs-1);
 
     int r1 = (i+o1)%_nr_rows[vecindex];
     unsigned int ind_1 = r1< 0 ? r1 + _nr_rows[vecindex] : r1;
@@ -190,8 +190,8 @@ void CSRAdapter::UpdateGridEfficacySlow(const inttype vecindex, const inttype co
 
     inds[ind_1].push_back(i);
     inds[ind_2].push_back(i);
-    vals[ind_1].push_back(g);
-    vals[ind_2].push_back(s);
+    vals[ind_1].push_back(s);
+    vals[ind_2].push_back(g);
   }
 
   std::vector<inttype> ia;
@@ -238,7 +238,7 @@ void CSRAdapter::InitializeStaticGridEfficacySlowLateralEpileptor(const inttype 
     fptype s = 1.0 - g;
 
     int o1 = eff > 0 ? ofs : -ofs;
-    int o2 = eff > 0 ? (ofs+1) : (ofs-1);
+    int o2 = eff > 0 ? (ofs+1) : (-ofs-1);
 
     int r1 = (i+(o1*strip_length))%_nr_rows[vecindex];
     unsigned int ind_1 = r1< 0 ? r1 + _nr_rows[vecindex] : r1;

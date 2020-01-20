@@ -10,6 +10,8 @@
 #include <sstream>
 #include <limits>
 #include <algorithm>
+#include <omp.h>
+#include <iomanip>
 #include "TwoDLib.hpp"
 
 const int N_POINTS = 10;
@@ -100,6 +102,8 @@ void CalculateProjectionsGeometric(std::ofstream& ofst,
       l._number = gen.N();
       l._origin = TwoDLib::Coordinates(i,j);
       l._destination_list = gen.HitList();
+
+      std::cout << '\r' << std::setw(10) << 100.0 * ((float)(j+(i*mesh.NrCellsInStrip(1)))/(float)(mesh.NrStrips()*mesh.NrCellsInStrip(1))) << "%" << std::setfill(' ') << std::flush;
 
       transitions.push_back(l);
       
@@ -227,6 +231,8 @@ void CreateProjections
   ofst << "</W_limit>\n";
 
   CalculateProjectionsGeometric(ofst, mesh, v_min, v_max, nv, w_min, w_max, nw);
+
+  std::cout << "\nComplete.\n";
 
   ofst << "</Projection>\n";
 }

@@ -5,6 +5,7 @@ import glob
 import subprocess
 import time
 import matplotlib.pyplot as plt
+import sys
 
 from collections import OrderedDict as odict
 from shapely.geometry import Polygon
@@ -42,9 +43,13 @@ class Marginal(Result):
         v = np.zeros((len(self.times), self.projection['N_V']))
         w = np.zeros((len(self.times), self.projection['N_W']))
 
+        print('Loading mass from densities...')
+
         # Load in the masses from the densities
         masses, coords_ = [], None
         for ii, fname in enumerate(self.fnames):
+            sys.stdout.write("%d%%   \r" % (100*(ii / len(self.fnames))))
+            sys.stdout.flush()
             density, coords = read_density(fname)
             if coords_ is None:
                 coords_ = coords
@@ -62,8 +67,6 @@ class Marginal(Result):
         data = {'v': v, 'w': w, 'bins_v': bins_v,
                 'bins_w': bins_w, 'times': self.times}
 
-        print('Saving to compressed file...')
-
         # Save 'data' into a compressed file
         if op.exists(self.data_path):
             other = np.load(self.data_path,allow_pickle=True)['data'][()]
@@ -72,6 +75,8 @@ class Marginal(Result):
         else:
             save_data = {self.modelname: data}
         np.savez(self.data_path, data=save_data)
+
+        print('Done.')
         return data
 
     # Using the projection file, the mass from in each cell of the mesh
@@ -90,10 +95,16 @@ class Marginal(Result):
             return var
 
         # Each cell in the mesh has a transition row in the projection file
-        for trans in proj['transitions'].findall('cell'):
+        cells = proj['transitions'].findall('cell')
+        cell_num = 0
+        for trans in cells:
+            cell_num += 1
             # Get the coordinates of this cell and its mass each time
             i, j = [int(a) for a in trans.find('coordinates').text.split(',')]
             cell_mass = masses[:, coords.index((i, j))]
+
+            sys.stdout.write("%d%%   \r" % (100*(cell_num / len(cells))))
+            sys.stdout.flush()
 
             # Calculate and add the density values for each bin
             v = scale(v, trans.find('vbins').text, cell_mass)

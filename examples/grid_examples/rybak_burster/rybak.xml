@@ -1,8 +1,7 @@
 <Simulation>
- <Variable Name="IN_EFF" type="double">0.1</Variable>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="GridAlgorithm" name="OSC" tau_refractive="0.003" modelfile="grid.model" transformfile="grid_0_0_0_0_.tmat" start_v="-65" start_w="0.6" >
+<Algorithm type="GridAlgorithmGroup" name="OSC" tau_refractive="0.003" modelfile="grid.model" transformfile="grid_0_0_0_0_.tmat" start_v="-65" start_w="0.6" >
 <TimeStep>0.001</TimeStep>
 </Algorithm>
 <Algorithm type="RateFunctor" name="MLR_1">
@@ -33,6 +32,7 @@
 	<Rate node="RG_F" t_interval="0.002" />
 </Reporting>
 <SimulationRunParameter>
+<master_steps>50</master_steps>
 <SimulationName>grid</SimulationName>
 <t_end>30.0</t_end>
 <t_step>0.002</t_step>
