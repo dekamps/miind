@@ -62,7 +62,7 @@ _res_from_ordered(_group.MeshObjects().size(),0),
 _res_alpha_ordered(_group.MeshObjects().size(),0),
 _res_from_counts(_group.MeshObjects().size(),0),
 _res_from_offsets(_group.MeshObjects().size(),0),
-_vec_alpha_ord(),
+_vec_alpha_ord(_group.MeshObjects().size()),
 _res_sum(group.MeshObjects().size(),0),
 _res_to_mass(group.MeshObjects().size(),0),
 _host_fs(group.MeshObjects().size(),0),
@@ -195,13 +195,13 @@ fptype CudaOde2DSystemAdapter::sumRefractory()
 	fptype total = 0.0;
 	for (unsigned int m = 0; m < _refractory_mass_local.size(); m++){
 		for(unsigned int i=0; i<((int)_refractory_mass_local[m].size()/_nr_resets[m])-2; i++){
-			for(unsigned int j=0; j<_vec_alpha_ord.size(); j++){
-				total += _refractory_mass_local[m][i*_nr_resets[m]+j] * _vec_alpha_ord[j];
+			for(unsigned int j=0; j<_vec_alpha_ord[m].size(); j++){
+				total += _refractory_mass_local[m][i*_nr_resets[m]+j] * _vec_alpha_ord[m][j];
 			}
 		}
 		for(unsigned int i=((int)_refractory_mass_local[m].size()/_nr_resets[m])-2; i<((int)_refractory_mass_local[m].size()/_nr_resets[m])-1; i++){
-			for(unsigned int j=0; j<_vec_alpha_ord.size(); j++){
-				total += _refractory_prop[m] * _refractory_mass_local[m][i*_nr_resets[m]+j] * _vec_alpha_ord[j];
+			for(unsigned int j=0; j<_vec_alpha_ord[m].size(); j++){
+				total += _refractory_prop[m] * _refractory_mass_local[m][i*_nr_resets[m]+j] * _vec_alpha_ord[m][j];
 			}
 		}
 	}
@@ -277,7 +277,7 @@ void CudaOde2DSystemAdapter::FillResetMap
 				 offset_count += it->second.size();
 				 for(int i=0; i<it->second.size(); i++){
 					 vec_from_ord.push_back(it->second[i].first);
-					 _vec_alpha_ord.push_back(it->second[i].second);
+					 _vec_alpha_ord[m].push_back(it->second[i].second);
 				 }
 			 }
 
@@ -285,7 +285,7 @@ void CudaOde2DSystemAdapter::FillResetMap
 
 			 checkCudaErrors(cudaMemcpy(_res_to_minimal[m],&vec_to_min[0],vec_to_min.size()*sizeof(inttype),cudaMemcpyHostToDevice));
        checkCudaErrors(cudaMemcpy(_res_from_ordered[m],&vec_from_ord[0],vec_from_ord.size()*sizeof(inttype),cudaMemcpyHostToDevice));
-       checkCudaErrors(cudaMemcpy(_res_alpha_ordered[m],&_vec_alpha_ord[0],_vec_alpha_ord.size()*sizeof(fptype),cudaMemcpyHostToDevice));
+       checkCudaErrors(cudaMemcpy(_res_alpha_ordered[m],&_vec_alpha_ord[m][0],_vec_alpha_ord[m].size()*sizeof(fptype),cudaMemcpyHostToDevice));
 			 checkCudaErrors(cudaMemcpy(_res_from_counts[m],&counts[0],counts.size()*sizeof(inttype),cudaMemcpyHostToDevice));
 			 checkCudaErrors(cudaMemcpy(_res_from_offsets[m],&offsets[0],offsets.size()*sizeof(inttype),cudaMemcpyHostToDevice));
 	  }

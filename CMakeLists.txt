@@ -1,6 +1,9 @@
 project( miind )
 cmake_minimum_required(VERSION 2.6)
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake-modules )
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 # include cmake scripts
 #############################################################################
@@ -21,12 +24,12 @@ set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 ##############################################################################
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
 
-#for cross compiling remove the -march=native flag!
+
 if (APPLE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fPIC -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fPIC")
 set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
 else (APPLE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fext-numeric-literals -fPIC -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fext-numeric-literals -fPIC")
 set(GLUT_LIBRARY "-lGL -lGLU -lglut")
 endif(APPLE)
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
