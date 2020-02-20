@@ -19,6 +19,8 @@ available_settingsfilename = os.path.join(directories3.miind_root(),'python','mi
 debug = False
 settings = {}
 available_settings = {}
+c_compiler = None
+cxx_compiler = None
 
 def getMiindPythonPath():
     return os.path.join(directories3.miind_root(), 'python')
@@ -202,15 +204,19 @@ def submit(command, current_sim):
         if not current_sim:
             print('No simulation currently defined. Please call command \'sim\'.')
 
+        cmake_args = []
+        if c_compiler and cxx_compiler:
+            cmake_args = ['-DCMAKE_C_COMPILER={}'.format(c_compiler), '-DCMAKE_CXX_COMPILER={}'.format(cxx_compiler)]
+
         if len(command) == 1:
             current_sim.submit(True, [],
-                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'],*cmake_args)
         if len(command) == 2:
             current_sim.submit(True, glob.glob(command[1]),
-                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'],*cmake_args)
         if len(command) >= 3:
             current_sim.submit(True, command[1:],
-                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'],*cmake_args)
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print (name + ' : Generate and \'make\' the code from the current simulation xml file. Ensure you have the correct settings (call \'settings\').')
@@ -243,15 +249,19 @@ def buildSharedLib(command, current_sim):
         if not current_sim:
             print('No simulation currently defined. Please call command \'sim\'.')
 
+        cmake_args = []
+        if c_compiler and cxx_compiler:
+            cmake_args = ['-DCMAKE_C_COMPILER={}'.format(c_compiler), '-DCMAKE_CXX_COMPILER={}'.format(cxx_compiler)]
+
         if len(command) == 1:
             current_sim.submit_shared_lib(True, [],
-                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'],*cmake_args)
         if len(command) == 2:
             current_sim.submit_shared_lib(True, glob.glob(command[1]),
-                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'],*cmake_args)
         if len(command) >= 3:
             current_sim.submit(True, command[1:],
-                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'],*cmake_args)
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print (name + ' : Generate and \'make\' a shared library for use with python from the current simulation xml file. Ensure you have the correct settings (call \'settings\').')
@@ -679,7 +689,12 @@ if __name__ == "__main__":
       with open(available_settingsfilename, 'r') as settingsfile:
           for line in settingsfile:
               tokens = line.split('=')
-              available_settings[tokens[0].strip()] = (tokens[1].strip() == 'ON')
+              if tokens[0].strip() == 'c_compiler':
+                  c_compiler = tokens[1].strip()
+              elif tokens[0].strip() == 'cxx_compiler':
+                  cxx_compiler = tokens[1].strip()
+              else:
+                  available_settings[tokens[0].strip()] = (tokens[1].strip() in ['YES','Y','ON','1','TRUE'])
 
       # Read or create settings as long as they're available in the installation.
       if not op.exists(settingsfilename):

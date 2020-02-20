@@ -8,12 +8,25 @@ cmake_minimum_required(VERSION 2.8)
 FIND_PACKAGE(GSL REQUIRED)
 FIND_PACKAGE(CUDA QUIET)
 
-find_package(PythonLibs REQUIRED)
+find_package (Python3 COMPONENTS Interpreter Development)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(MIIND_LIBRARY_PREFIX miind)
 
-# Use GeomLib as identifier for include directories
+# FIND MIIND INCLUDE DIRECTORY, START BY CHECKING ENVIRONMENT VARIABLE MIIND_INCLUDE_DIR
 
+IF (DEFINED ENV{MIIND_INCLUDE_DIR})
+MESSAGE( " Miind include directory (MIIND_INCLUDE_DIR) : $ENV{MIIND_INCLUDE_DIR}" )
+include_directories( $ENV{MIIND_INCLUDE_DIR} )
+include_directories( $ENV{MIIND_INCLUDE_DIR}/GeomLib )
+include_directories( $ENV{MIIND_INCLUDE_DIR}/TwoDLib )
+include_directories( $ENV{MIIND_INCLUDE_DIR}/CudaTwoDLib )
+include_directories( $ENV{MIIND_INCLUDE_DIR}/MiindLib )
+ELSE ()
+
+# Check default include directory if MIIND was installed somewhere normal
 find_path(MIIND_INCLUDE_DIR_DEFAULT NAMES "miind/GeomLib/GeomLib.hpp")
 IF (MIIND_INCLUDE_DIR_DEFAULT)
 set (MIIND_INCLUDE_DIR_DEFAULT "${MIIND_INCLUDE_DIR_DEFAULT}/miind")
@@ -24,7 +37,7 @@ include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/TwoDLib )
 include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/CudaTwoDLib )
 include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/MiindLib )
 
-ELSE (MIIND_INCLUDE_DIR_DEFAULT) # Miind isn't installed, so see if we can find a the dev location
+ELSE (MIIND_INCLUDE_DIR_DEFAULT) # Miind isn't installed, so see if we can find at the dev location
 
 find_path(MIIND_INCLUDE_DIR NAMES "GeomLib/GeomLib.hpp" PATHS "${CMAKE_SOURCE_DIR}/libs/")
 MESSAGE( " Miind include directory : ${MIIND_INCLUDE_DIR} " )
@@ -37,6 +50,8 @@ include_directories( ${MIIND_INCLUDE_DIR}/MiindLib )
 ENDIF (MIIND_INCLUDE_DIR)
 
 ENDIF (MIIND_INCLUDE_DIR_DEFAULT)
+
+ENDIF()
 
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
@@ -157,7 +172,7 @@ endif(ENABLE_CUDA)
 #############################################################################
  #   add the flags for C++11
 if(CMAKE_COMPILER_IS_GNUCXX)
-add_definitions("-std=c++14 -fext-numeric-literals ${GLUT_LIBRARY}")
+add_definitions("-fext-numeric-literals ${GLUT_LIBRARY}")
 else(CMAKE_COMPILER_IS_GNUCXX)
-add_definitions("-std=c++14 ${GLUT_LIBRARY}")
+add_definitions("${GLUT_LIBRARY}")
 endif(CMAKE_COMPILER_IS_GNUCXX)
