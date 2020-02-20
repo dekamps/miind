@@ -1,0 +1,37 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithm" name="ADEX_ALG" modelfile="adex.model" >
+<TimeStep>0.0002</TimeStep>
+<MatrixFile>adex_1_0_0_0_.mat</MatrixFile>
+<MatrixFile>adex_-1_0_0_0_.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="ExcInput">
+<expression>3000.</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="ADEX_ALG" name="Pop1" type="NEUTRAL" />
+<Node algorithm="ADEX_ALG" name="Pop2" type="NEUTRAL" />
+<Node algorithm="ExcInput" name="Drive" type="EXCITATORY_DIRECT" />
+</Nodes>
+<Connections>
+<Connection In="Drive" Out="Pop1">1 1 0</Connection>
+<Connection In="Pop1" Out="Pop2">50 1 0</Connection>
+<Connection In="Pop2" Out="Pop1">10 -1 0</Connection>
+</Connections>
+<Reporting>
+<Density node="Pop1" t_start="0.0" t_end="1.0" t_interval="0.0002" />
+<Density node="Pop2" t_start="0.0" t_end="1.0" t_interval="0.0002" />
+<Rate node="Pop1" t_interval="0.0002"/>
+<Rate node="Pop2" t_interval="0.0002"/>
+<Display node="Pop1" />
+<Display node="Pop2" />
+</Reporting>
+<SimulationRunParameter>
+<SimulationName>t1</SimulationName>
+<t_end>0.35</t_end>
+<t_step>0.0002</t_step>
+<name_log>t1.log</name_log>
+</SimulationRunParameter>
+</Simulation>

@@ -1,0 +1,67 @@
+<Simulation>
+ <Variable Name='TIME_END'>400</Variable>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="GridAlgorithmGroup" name="INTICT" modelfile="epileptor_intict.model" tau_refractive="0.0" transformfile="epileptor_intict_0_0_0_0_.tmat" start_v="-1.51" start_w="4.01" >
+<TimeStep>0.0001</TimeStep>
+</Algorithm>
+<Algorithm type="GridAlgorithmGroup" name="ICT" modelfile="epileptor_ict.model" tau_refractive="0.0" transformfile="epileptor_ict_0_0_0_0_.tmat" start_v="-1.51" start_w="4.01" >
+<TimeStep>0.0001</TimeStep>
+</Algorithm>
+<Algorithm type="RateFunctor" name="IN_1">
+<expression>300</expression>
+</Algorithm>
+<Algorithm type="RateFunctor" name="IN_2">
+<expression>300</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="ICT" name="ICT_POP" type="NEUTRAL" />
+<Node algorithm="INTICT" name="INTICT_POP" type="NEUTRAL" />
+<Node algorithm="IN_1" name="IN_POP_1" type="NEUTRAL" />
+<Node algorithm="IN_2" name="IN_POP_2" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="IN_POP_1" Out="ICT_POP" num_connections="1" efficacy="0.01" delay="0.0"/>
+<Connection In="IN_POP_2" Out="ICT_POP" num_connections="1" efficacy="-0.01" delay="0.0"/>
+<Connection In="IN_POP_1" Out="INTICT_POP" num_connections="1" efficacy="0.01" delay="0.0"/>
+<Connection In="IN_POP_2" Out="INTICT_POP" num_connections="1" efficacy="-0.01" delay="0.0"/>
+<Connection In="ICT_POP" Out="INTICT_POP" num_connections="1" efficacy="1" delay="0.0" K="1.0" tau="2857.0" type="epileptor" />
+<Connection In="INTICT_POP" Out="ICT_POP" num_connections="1" efficacy="1" delay="0.0" K="1.0" tau="2857.0" type="epileptor" />
+</Connections>
+<Reporting>
+	<!--<Density node="RG_E" t_start="0.0" t_end="6.0" t_interval="0.001" />
+	<Density node="RG_F" t_start="0.0" t_end="6.0" t_interval="0.001" />-->
+	<!--<Display node="ICT_POP" />
+	<Display node="INTICT_POP" />-->
+	<Rate node="ICT_POP" t_interval="0.01" />
+	<Rate node="INTICT_POP" t_interval="0.01" />
+</Reporting>
+<SimulationIO>
+<SimulationName>epileptor</SimulationName>
+<OnScreen>FALSE</OnScreen>
+<WithState>TRUE</WithState>
+<WriteNet>FALSE</WriteNet>
+<CanvasParameter>
+<T_min>0</T_min>
+<T_max>5.0</T_max>
+<F_min>0</F_min>
+<F_max>20</F_max>
+<State_min>0</State_min>
+<State_max>1.0</State_max>
+<Dense_min>0</Dense_min>
+<Dense_max>2.5</Dense_max>
+</CanvasParameter>
+<CanvasNode Name="ICT_POP" />
+</SimulationIO>
+<SimulationRunParameter>
+<max_iter>1000000</max_iter>
+<t_begin>0</t_begin>
+<t_end>TIME_END</t_end>
+<t_report>0.01</t_report>
+<master_steps>10</master_steps>
+<t_state_report>0.01</t_state_report>
+<t_step>0.01</t_step>
+<name_log>epileptor.log</name_log>
+</SimulationRunParameter>
+</Simulation>

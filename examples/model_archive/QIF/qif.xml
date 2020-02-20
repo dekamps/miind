@@ -1,0 +1,28 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithm" name="QIF" modelfile="qif.model" >
+<TimeStep>0.0001</TimeStep>
+<MatrixFile>qif_0.01_0_0_0_.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="ExcInput">
+<expression>1500.</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="QIF" name="E" type="EXCITATORY_DIRECT" />
+<Node algorithm="ExcInput" name="Inp" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="Inp" Out="E">1 0.01 0</Connection>
+</Connections>
+<Reporting>
+<Rate node="E" t_interval="0.0001"/>
+</Reporting>
+<SimulationRunParameter>
+<SimulationName>qif</SimulationName>
+<t_end>3.0</t_end>
+<t_step>0.0001</t_step>
+<name_log>qif.log</name_log>
+</SimulationRunParameter>
+</Simulation>

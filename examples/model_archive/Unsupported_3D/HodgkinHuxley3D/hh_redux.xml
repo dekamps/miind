@@ -1,0 +1,49 @@
+<Simulation>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="GridAlgorithmGroup" name="OSC" tau_refractive="0.005" modelfile="hh_redux.model" transformfile="hh_redux.tmat" start_v="0.1" start_w="0.1" >
+<TimeStep>0.0001</TimeStep>
+</Algorithm>
+<Algorithm type="RateFunctor" name="MLR_1">
+<expression>t > 0.0 ? 5000 : 0</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="OSC" name="RG_E" type="NEUTRAL" />
+<Node algorithm="MLR_1" name="MLR_RG_E" type="NEUTRAL" />
+</Nodes>
+<Connections>
+  <Connection In="MLR_RG_E" Out="RG_E" num_connections="1" efficacy="0.1" delay="0.0"/>
+</Connections>
+<Reporting>
+	<Display node="RG_E" />
+	<Rate node="RG_E" t_interval="0.0002" />
+</Reporting>
+<SimulationIO>
+<SimulationName>grid</SimulationName>
+<OnScreen>FALSE</OnScreen>
+<WithState>TRUE</WithState>
+<WriteNet>FALSE</WriteNet>
+<CanvasParameter>
+<T_min>0</T_min>
+<T_max>5.0</T_max>
+<F_min>0</F_min>
+<F_max>20</F_max>
+<State_min>0</State_min>
+<State_max>1.0</State_max>
+<Dense_min>0</Dense_min>
+<Dense_max>2.5</Dense_max>
+</CanvasParameter>
+<CanvasNode Name="RG_E" />
+</SimulationIO>
+<SimulationRunParameter>
+<master_steps>10</master_steps>
+<max_iter>1000000</max_iter>
+<t_begin>0</t_begin>
+<t_end>1.5</t_end>
+<t_report>0.0001</t_report>
+<t_state_report>0.0001</t_state_report>
+<t_step>0.0001</t_step>
+<name_log>rinzel.log</name_log>
+</SimulationRunParameter>
+</Simulation>

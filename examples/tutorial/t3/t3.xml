@@ -1,0 +1,30 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithm" name="T3_ALG" modelfile="t3.model" >
+<TimeStep>0.0001</TimeStep>
+<MatrixFile>t3_0.1_0_0_0_.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="ExcInput">
+<expression>50</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="T3_ALG" name="Pop" type="EXCITATORY_DIRECT" />
+<Node algorithm="ExcInput" name="Drive" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="Drive" Out="Pop">10 0.1 0</Connection>
+</Connections>
+<Reporting>
+<Density node="Pop" t_start="0.0" t_end="1.0" t_interval="0.0002" />
+<Display node="Pop" />
+<Rate node="Pop" t_interval="0.0002"/>
+</Reporting>
+<SimulationRunParameter>
+<SimulationName>t3</SimulationName>
+<t_end>0.35</t_end>
+<t_step>0.0001</t_step>
+<name_log>t3.log</name_log>
+</SimulationRunParameter>
+</Simulation>
