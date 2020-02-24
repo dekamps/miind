@@ -281,11 +281,11 @@ void CudaOde2DSystemAdapter::FillResetMap
 				 }
 			 }
 
-			 checkCudaErrors(cudaMalloc((fptype**)&_res_alpha_ordered[m], _vec_alpha_ord.size()*sizeof(fptype)));
+			 checkCudaErrors(cudaMalloc((fptype**)&_res_alpha_ordered[m], _vec_alpha_ord[m].size()*sizeof(fptype)));
 
 			 checkCudaErrors(cudaMemcpy(_res_to_minimal[m],&vec_to_min[0],vec_to_min.size()*sizeof(inttype),cudaMemcpyHostToDevice));
        		 checkCudaErrors(cudaMemcpy(_res_from_ordered[m],&vec_from_ord[0],vec_from_ord.size()*sizeof(inttype),cudaMemcpyHostToDevice));
-       		 checkCudaErrors(cudaMemcpy(_res_alpha_ordered[m],&_vec_alpha_ord[0],_vec_alpha_ord.size()*sizeof(fptype),cudaMemcpyHostToDevice));
+       		 checkCudaErrors(cudaMemcpy(_res_alpha_ordered[m],&_vec_alpha_ord[m][0],_vec_alpha_ord[m].size()*sizeof(fptype),cudaMemcpyHostToDevice));
 			 checkCudaErrors(cudaMemcpy(_res_from_counts[m],&counts[0],counts.size()*sizeof(inttype),cudaMemcpyHostToDevice));
 			 checkCudaErrors(cudaMemcpy(_res_from_offsets[m],&offsets[0],offsets.size()*sizeof(inttype),cudaMemcpyHostToDevice));
 	  }

@@ -8,13 +8,15 @@ cmake_minimum_required(VERSION 2.8)
 FIND_PACKAGE(GSL REQUIRED)
 FIND_PACKAGE(CUDA QUIET)
 
-find_package (Python3 COMPONENTS Interpreter Development)
+find_package (Python3 COMPONENTS Development)
+include_directories(${Python3_INCLUDE_DIRS})
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(MIIND_LIBRARY_PREFIX miind)
+
 FIND_PACKAGE(GSL REQUIRED)
-find_package(PythonLibs REQUIRED)
 link_directories( ${GSL_LIBRARY_DIRS} )
 
 include_directories(${PYTHON_INCLUDE_DIRS})
