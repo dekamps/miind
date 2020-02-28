@@ -6,6 +6,7 @@ Created on Sat Jan 17 16:51:56 2015
 """
 
 import nodes
+import variables
 
 TALLY = {}
 
@@ -38,7 +39,7 @@ def parse_connection(connection, weighttype):
         for ak,av in connection.attrib.items():
             if ak == 'In' or ak == 'Out':
                 continue
-            s += '\tcon_' + i + '_' + o + tally + '.setParam(\"' + ak + '\", \"' + av +'\");\n'
+            s += '\tcon_' + i + '_' + o + tally + '.setParam(\"' + ak + '\", std::to_string(' + av +'));\n'
     else:
         if weighttype.text == 'double':
             s += '\tdouble con_' + i + '_' + o + tally + '('
@@ -90,7 +91,7 @@ def parse_grid_vectorized_connection(connection, nodemap, network_name='network'
     for ak,av in connection.attrib.items():
         if ak in ['In', 'Out']:
             continue
-        s += '\t\t\tparams_' + node_i  + '_' + node_o + '[\"' + ak + '\"] = \"' + av + '\";\n'
+        s += '\t\t\tparams_' + node_i  + '_' + node_o + '[\"' + ak + '\"] = std::to_string(' + av + ');\n'
 
     if looped_definition:
         i = str(len(nodemap))+'*i+'+node_i
@@ -108,7 +109,7 @@ def parse_external_incoming_grid_vectorized_connection(connection, nodemap, id, 
     for ak,av in connection.attrib.items():
         if ak in ['Node']:
             continue
-        s += '\t\t\tparams_extern_' + node_o + '[\"' + ak + '\"] = \"' + av + '\";\n'
+        s += '\t\t\tparams_extern_' + node_o + '[\"' + ak + '\"] = std::to_string(' + av + ');\n'
 
     nid = str(id)
     if looped_definition:
@@ -155,7 +156,7 @@ def parse_mesh_vectorized_connection(connection, nodemap, mat_name, network_name
     for ak,av in connection.attrib.items():
         if ak in ['In', 'Out']:
             continue
-        s += '\t\t\tparams_' + node_i  + '_' + node_o + '[\"' + ak + '\"] = \"' + av + '\";\n'
+        s += '\t\t\tparams_' + node_i  + '_' + node_o + '[\"' + ak + '\"] = std::to_string(' + av + ');\n'
 
     s += '\t\t\t' + network_name + '.addMeshCustomConnection('+ i +','+ o +', params_' + node_i  + '_' + node_o + ',&'+ mat_name +');\n'
     return s
@@ -212,7 +213,7 @@ def parse_incoming_connection(connection, weighttype):
         for ak,av in connection.attrib.items():
             if ak == 'Node':
                 continue
-            s += '\tcon_EXTERNAL_' + node + tally + '.setParam(\"' + ak + '\", \"' + av +'\");\n'
+            s += '\tcon_EXTERNAL_' + node + tally + '.setParam(\"' + ak + '\", std::to_string(' + av +'));\n'
     else:
         if weighttype.text == 'double':
             s += '\tdouble con_EXTERNAL_' + node + tally + '('

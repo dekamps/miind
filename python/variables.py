@@ -1,10 +1,15 @@
 import algorithms
 
+VARIABLES = []
+
 def parse_variables(variable_list,outfile):
+    global VARIABLES
     s = ''
     for variable in variable_list:
         name  = variable.attrib['Name']
         value = variable.text
+        if name not in VARIABLES:
+            VARIABLES = VARIABLES + [name]
 
         val_type = None
         if 'Type' in variable.attrib :
@@ -23,10 +28,13 @@ def parse_variables(variable_list,outfile):
     outfile.write(s)
 
 def parse_variables_as_parameters(variable_list, outfile):
+    global VARIABLES
     s = ''
     for variable in variable_list:
         name  = variable.attrib['Name']
         value = variable.text
+        if name not in VARIABLES:
+            VARIABLES = VARIABLES + [name]
 
         val_type = None
         if 'Type' in variable.attrib :
@@ -44,9 +52,12 @@ def parse_variables_as_parameters(variable_list, outfile):
     outfile.write(s[5:])
 
 def parse_variables_as_constructor_defaults(variable_list, outfile):
+    global VARIABLES
     s = ''
     for variable in variable_list:
         name  = variable.attrib['Name']
+        if name not in VARIABLES:
+            VARIABLES = VARIABLES + [name]
         s += '\n\t\t\t,' + name + '(_' + name + ')'
     outfile.write(s)
 
@@ -69,3 +80,43 @@ def parse_variable_types(variable_list):
             s += ',const std::string'
 
     return s
+
+def parse_variable_python_def(variable_list):
+    s = ''
+    fmt = 'i'
+    for variable in variable_list:
+        name  = variable.attrib['Name']
+        value = variable.text
+
+        if value.replace('.','',1).isdigit() :
+            fmt += 'd'
+            s += '\tdouble ' + name + ';\n'
+        # Otherwise, assume it's a string
+        else :
+            fmt = fmt + 's'
+            s += '\tstd::string ' + name + ';\n'
+
+    write = ''
+    write += s
+    write += '\tint nodes;'
+    write += '\n'
+    write += '\tif (!PyArg_ParseTuple(args, \"' + fmt + '\", &nodes'
+    for variable in variable_list:
+        name  = variable.attrib['Name']
+        write += ',&'+ name
+    write += '\t))\n'
+    write += '\t\tmodel = new MiindModel();\n'
+    write += '\telse\n'
+    write += '\t\tmodel = new MiindModel(nodes'
+    for variable in variable_list:
+        name  = variable.attrib['Name']
+        write += ',' + name
+    write += ');\n'
+    write += '\tmodel->init();\n'
+    return write
+
+def variable_or_string(s):
+    global VARIABLES
+    if s in VARIABLES:
+        return s
+    return "\"" + s + "\""

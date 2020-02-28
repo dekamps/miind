@@ -1,0 +1,37 @@
+<Simulation>
+<Variable Name="efficacy">0.01</Variable>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithmGroup" name="E" modelfile="lif.model" >
+<TimeStep>0.001</TimeStep>
+<MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
+<MatrixFile>lif_0.02_0_0_0_.mat</MatrixFile>
+<MatrixFile>lif_0.03_0_0_0_.mat</MatrixFile>
+<MatrixFile>lif_0.04_0_0_0_.mat</MatrixFile>
+<MatrixFile>lif_0.05_0_0_0_.mat</MatrixFile>
+<MatrixFile>lif_0.06_0_0_0_.mat</MatrixFile>
+<MatrixFile>lif_0.07_0_0_0_.mat</MatrixFile>
+<MatrixFile>lif_0.08_0_0_0_.mat</MatrixFile>
+<MatrixFile>lif_0.09_0_0_0_.mat</MatrixFile>
+<MatrixFile>lif_0.1_0_0_0_.mat</MatrixFile>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="E" name="LIF" type="EXCITATORY_DIRECT" />
+</Nodes>
+<Connections>
+<IncomingConnection Node="LIF">1 efficacy 0</IncomingConnection>
+<OutgoingConnection Node="LIF"/>
+</Connections>
+<Reporting>
+<Density node="LIF" t_start="0.0" t_end="3.0" t_interval="0.001" />
+<!--<Display node="LIF" />-->
+<Rate node="LIF" t_interval="0.001" />
+</Reporting>
+<SimulationRunParameter>
+<SimulationName>lif</SimulationName>
+<t_end>3.0</t_end>
+<t_step>0.001</t_step>
+<name_log>lif.log</name_log>
+</SimulationRunParameter>
+</Simulation>

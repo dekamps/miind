@@ -221,20 +221,18 @@ def generate_closing(fn,parameters,tree,type,prog_name,members):
         f.write(members)
         f.write('};\n\n')
 
-def python_wrapper(outfile, prog_name):
+def python_wrapper(outfile, prog_name, variable_list):
     addition = """
 static MiindModel *model;
 
 static PyObject *miind_init(PyObject *self, PyObject *args)
 {{
-    int command;
+    if (model) {{
+        delete model;
+        model = NULL;
+    }}
 
-    if (!PyArg_ParseTuple(args, "i", &command))
-	model = new MiindModel();
-    else
-	model = new MiindModel(command);
-
-    model->init();
+{variable_constructors}
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -321,7 +319,7 @@ PyInit_lib{name}(void)
     return PyModule_Create(&miindmodule);
 }}
 """
-    context = { "name" : prog_name }
+    context = { "name" : prog_name, "variable_constructors" : variables.parse_variable_python_def(variable_list) }
 
     with open(outfile,'a') as f:
         f.write(addition.format(**context))
@@ -438,22 +436,27 @@ def construct_CSR_map_external(nodes,algorithms,connections,connection_type):
                                   mfs=algorithm.findall('MatrixFile')
                                   mfn= [ mf.text for mf in mfs]
                                   if connection_type == "DelayedConnection":
-                                       efficacy=float(connection.text.split()[1])
+                                       efficacy=connection.text.split()[1]
                                   elif connection_type == "CustomConnectionParameters":
-                                       efficacy=float(connection.attrib['efficacy'])
+                                       efficacy=connection.attrib['efficacy']
                                   effs= [extract_efficacy(fn) for fn in mfn]
-
-                                  candidates=[]
-                                  for i, eff in enumerate(effs):
-                                       if np.isclose(eff,efficacy):
-                                            candidates.append(i)
-                                  if len(candidates) == 0: raise ValueError('No efficacy found that corresponds to the connection efficacy ' + str(efficacy))
-                                  if len(candidates) > 1: raise ValueError('Same efficacy found twice')
 
                                   count = Counter(combi)
                                   combi.append((connection.attrib['Node']))
                                   nr_connection = count[(connection.attrib['Node'])]
-                                  csrlist.append([node.attrib['name'],mfn[candidates[0]], effs[candidates[0]],nr_connection,connection])
+
+                                  if efficacy.isnumeric():
+                                      efficacy = float(efficacy)
+                                      candidates=[]
+                                      for i, eff in enumerate(effs):
+                                          if np.isclose(eff,efficacy):
+                                              candidates.append(i)
+                                      if len(candidates) == 0: raise ValueError('No efficacy found that corresponds to the connection efficacy ' + str(efficacy))
+                                      if len(candidates) > 1: raise ValueError('Same efficacy found twice')
+                                      csrlist.append([node.attrib['name'],mfn[candidates[0]], effs[candidates[0]],nr_connection,connection])
+                                  else:
+                                      csrlist.append([node.attrib['name'],None, efficacy,nr_connection,connection])
+                                  
     return csrlist
 
 def construct_CSR_map(nodes,algorithms,connections, connection_type):
@@ -473,24 +476,72 @@ def construct_CSR_map(nodes,algorithms,connections, connection_type):
                                    mfn= [ mf.text for mf in mfs]
                                    efficacy = None
                                    if connection_type == "DelayedConnection":
-                                       efficacy=float(connection.text.split()[1])
+                                       efficacy=connection.text.split()[1]
                                    elif connection_type == "CustomConnectionParameters":
-                                       efficacy=float(connection.attrib['efficacy'])
+                                       efficacy=connection.attrib['efficacy']
                                    effs= [extract_efficacy(fn) for fn in mfn]
-
-                                   candidates=[]
-                                   for i, eff in enumerate(effs):
-                                        if np.isclose(eff,efficacy):
-                                             candidates.append(i)
-                                   if len(candidates) == 0: raise ValueError('No efficacy found that corresponds to the connection efficacy ' + str(efficacy))
-                                   if len(candidates) > 1: raise ValueError('Same efficacy found twice')
 
                                    count = Counter(combi)
                                    combi.append((connection.attrib['Out'],connection.attrib['In']))
                                    nr_connection = count[(connection.attrib['Out'],connection.attrib['In'])]
-                                   csrlist.append([node.attrib['name'],mfn[candidates[0]], effs[candidates[0]],connection.attrib['In'],nr_connection,connection])
+
+                                   if efficacy.isnumeric():
+                                       efficacy = float(efficacy)
+                                       candidates=[]
+                                       for i, eff in enumerate(effs):
+                                           if np.isclose(eff,efficacy):
+                                               candidates.append(i)
+                                       if len(candidates) == 0: raise ValueError('No efficacy found that corresponds to the connection efficacy ' + str(efficacy))
+                                       if len(candidates) > 1: raise ValueError('Same efficacy found twice')
+
+                                       csrlist.append([node.attrib['name'],mfn[candidates[0]], effs[candidates[0]],connection.attrib['In'],nr_connection,connection])
+                                   else:
+                                       csrlist.append([node.attrib['name'],None, efficacy,connection.attrib['In'],nr_connection,connection])
+                                
 
      return csrlist
+
+def GenerateAllMatrixFiles(nodes,algorithms,connections, connection_type):
+    csrlist=[]
+    combi = []
+    for connection in connections:
+          for node in nodes:
+               if connection.attrib['Out'] == node.attrib['name']:
+                    # we have the right node, now see if it's a MeshAlgorithmGroup
+                    nodealgorithm=node.attrib['algorithm']
+                    for algorithm in algorithms:
+                         if nodealgorithm == algorithm.attrib['name']:
+                              if algorithm.attrib['type'] == 'MeshAlgorithmGroup':
+
+                                   mfs=algorithm.findall('MatrixFile')
+                                   mfn= [ mf.text for mf in mfs]
+                                   effs= [extract_efficacy(fn) for fn in mfn]
+                                   count = Counter(combi)
+                                   combi.append((connection.attrib['Out'],connection.attrib['In']))
+                                   nr_connection = count[(connection.attrib['Out'],connection.attrib['In'])]
+                                   csrlist.append([node.attrib['name'],mfn, effs,connection.attrib['In'],nr_connection,connection])
+    return csrlist
+
+def GenerateAllMatrixFilesExternal(nodes,algorithms,connections, connection_type):
+    csrlist=[]
+    combi = []
+    for connection in connections:
+          for node in nodes:
+               if connection.attrib['Node'] == node.attrib['name']:
+                    # we have the right node, now see if it's a MeshAlgorithmGroup
+                    nodealgorithm=node.attrib['algorithm']
+                    for algorithm in algorithms:
+                         if nodealgorithm == algorithm.attrib['name']:
+                              if algorithm.attrib['type'] == 'MeshAlgorithmGroup':
+
+                                   mfs=algorithm.findall('MatrixFile')
+                                   mfn= [ mf.text for mf in mfs]
+                                   effs= [extract_efficacy(fn) for fn in mfn]
+                                   count = Counter(combi)
+                                   combi.append((connection.attrib['Node']))
+                                   nr_connection = count[(connection.attrib['Node'])]
+                                   csrlist.append([node.attrib['name'],mfn, effs,nr_connection,connection])
+    return csrlist
 
 def construct_grid_connection_map_external(nodes,algorithms,connections):
     '''Creates a list that corresponds one-to-one with the connection structure. Returns a tuple: [0] node name of receiving node,[1] matrix file name for this connection  '''
@@ -557,38 +608,47 @@ def generate_connections(fn,conns, external_incoming_connections, external_outgo
 
     total_external_conns = len(mesh_cons_ext) + len(grid_cons_ext)
 
+    all_mats = GenerateAllMatrixFiles(nodes, algorithms, conns, weighttype.text)
+    all_mats_ext = GenerateAllMatrixFilesExternal(nodes, algorithms, external_incoming_connections, weighttype.text)
+
     external_node_id = 0
     with open(fn,'a') as f:
+        for cn in all_mats:
+            cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
+            members += 'std::map<float,std::vector<TwoDLib::TransitionMatrix>> '+ cpp_name + ';\n'
+            for mfn in range(len(cn[1])):
+                f.write('\t' + cpp_name + '[' + str(cn[2][mfn]) + '] = std::vector<TwoDLib::TransitionMatrix>(_num_nodes);\n')
+                f.write('\t' + cpp_name + '[' + str(cn[2][mfn]) + '][i] = TwoDLib::TransitionMatrix(\"' + cn[1][mfn] + '\");\n')
+                
+        for cn in all_mats_ext:
+            cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_ext_' + str(cn[3])
+            members += 'std::map<float,std::vector<TwoDLib::TransitionMatrix>> '+ cpp_name + ';\n'
+            for mfn in range(len(cn[1])):
+                f.write('\t' + cpp_name + '[' + str(cn[2][mfn]) + '] = std::vector<TwoDLib::TransitionMatrix>(_num_nodes);\n')
+                f.write('\t' + cpp_name + '[' + str(cn[2][mfn]) + '][i] = TwoDLib::TransitionMatrix(\"' + cn[1][mfn] + '\");\n')
+
         if weighttype.text ==  "DelayedConnection":
             for cn in mesh_cons:
                 cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
-                members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
-                f.write('\t\t\tif (' + cpp_name + '.size() == 0) ' + cpp_name + ' = std::vector<TwoDLib::TransitionMatrix>(_num_nodes);\n')
-                f.write('\t\t\t' + cpp_name + '[i] = TwoDLib::TransitionMatrix(\"' + cn[1] + '\");\n')
-                f.write(connections.parse_mesh_connection(cn[5], nodemap, cpp_name +'[i]', 'vec_network',looped_definition=True))
+                mat_name = cpp_name + '.at(' + str(cn[2]) + ')'
+                f.write(connections.parse_mesh_connection(cn[5], nodemap, mat_name +'[i]', 'vec_network',looped_definition=True))
 
             for cn in mesh_cons_ext:
                 cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_ext_' + str(cn[3])
-                members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
-                f.write('\t\t\tif (' + cpp_name + '.size() == 0) ' + cpp_name + ' = std::vector<TwoDLib::TransitionMatrix>(_num_nodes);\n')
-                f.write('\t\t\t' + cpp_name + '[i] = TwoDLib::TransitionMatrix(\"' + cn[1] + '\");\n')
-                f.write(connections.parse_external_incoming_mesh_connection(cn[4], nodemap, cpp_name +'[i]', str(total_external_conns)+'*i+'+str(external_node_id), 'vec_network',looped_definition=True))
+                mat_name = cpp_name + '.at(' + str(cn[2]) + ')'
+                f.write(connections.parse_external_incoming_mesh_connection(cn[4], nodemap, mat_name +'[i]', str(total_external_conns)+'*i+'+str(external_node_id), 'vec_network',looped_definition=True))
                 external_node_id = external_node_id + 1
 
         if weighttype.text ==  "CustomConnectionParameters":
             for cn in mesh_cons:
                 cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
-                members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
-                f.write('\t\t\tif (' + cpp_name + '.size() == 0) ' + cpp_name + ' = std::vector<TwoDLib::TransitionMatrix>(_num_nodes);\n')
-                f.write('\t\t\t' + cpp_name + '[i] = TwoDLib::TransitionMatrix(\"' + cn[1] + '\");\n')
-                f.write(connections.parse_mesh_vectorized_connection(cn[5], nodemap, cpp_name +'[i]', 'vec_network',looped_definition=True))
+                mat_name = cpp_name + '.at(' + str(cn[2]) + ')'
+                f.write(connections.parse_mesh_vectorized_connection(cn[5], nodemap, mat_name +'[i]', 'vec_network',looped_definition=True))
 
             for cn in mesh_cons_ext:
                 cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_ext_' + str(cn[3])
-                members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
-                f.write('\t\t\tif (' + cpp_name + '.size() == 0) ' + cpp_name + ' = std::vector<TwoDLib::TransitionMatrix>(_num_nodes);\n')
-                f.write('\t\t\t' + cpp_name + '[i] = TwoDLib::TransitionMatrix(\"' + cn[1] + '\");\n')
-                f.write(connections.parse_external_incoming_mesh_vectorized_connection(cn[4], nodemap, cpp_name +'[i]', str(total_external_conns)+'*i+'+str(external_node_id), 'vec_network',looped_definition=True))
+                mat_name = cpp_name + '.at(' + str(cn[2]) + ')'
+                f.write(connections.parse_external_incoming_mesh_vectorized_connection(cn[4], nodemap, mat_name +'[i]', str(total_external_conns)+'*i+'+str(external_node_id), 'vec_network',looped_definition=True))
                 external_node_id = external_node_id + 1
 
         for cn in grid_cons:
@@ -615,14 +675,15 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
          fn=os.path.join(dirpath, progname)+'.cu'
     else:
          fn=os.path.join(dirpath, progname)+'.cpp'
-
+    
     generate_preamble(fn, variables, nodes, algorithms,connections,parameter, cuda)
     weighttype = root.find('WeightType')
     generate_opening(fn, root, weighttype.text, algorithms, variables)
     members = generate_model_files(fn,nodes,algorithms)
     members += generate_connections(fn,connections,external_incoming_connections, external_outgoing_connections,nodes,algorithms,weighttype)
     generate_closing(fn,parameter,root,weighttype.text,progname,members)
-    python_wrapper(fn, progname)
+    variable_list = root.findall('Variable')
+    python_wrapper(fn, progname, variable_list)
 
 def sanity_check(algorithms):
     '''Check if only the allowd algorithms feature in this simulation. Returns True if so, False otherwise.'''
