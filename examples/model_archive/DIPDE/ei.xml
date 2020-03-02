@@ -1,0 +1,32 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithm" name="E" modelfile="lifdipde.model" >
+<TimeStep>1e-5</TimeStep>
+<MatrixFile>lifdipde_0.005.mat</MatrixFile>
+<MatrixFile>lifdipde_-0.005.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="ExcInput">
+<expression>100.</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="E" name="LIF" type="EXCITATORY_DIRECT" />
+<Node algorithm="ExcInput" name="Inp" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="Inp" Out="LIF">1   0.005 0</Connection>
+<Connection In="Inp" Out="LIF">1  -0.005 0</Connection>
+</Connections>
+<Reporting>
+<Density node="LIF" t_start="0.0" t_end="2.0" t_interval="0.001" />
+<!--<Display node="LIF E" />-->
+<Rate node="LIF" t_interval="0.001"/>
+</Reporting>
+<SimulationRunParameter>
+<SimulationName>lif</SimulationName>
+<t_end>0.2</t_end>
+<t_step>9.2195599319081e-05</t_step>
+<name_log>lif.log</name_log>
+</SimulationRunParameter>
+</Simulation>
