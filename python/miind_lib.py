@@ -221,7 +221,7 @@ def generate_closing(fn,parameters,tree,type,prog_name,members):
         f.write(members)
         f.write('};\n\n')
 
-def python_wrapper(outfile, prog_name, variable_list):
+def python_wrapper(outfile, prog_name, variable_list, num_outputs):
     addition = """
 static MiindModel *model;
 
@@ -278,9 +278,9 @@ static PyObject *miind_evolveSingleStep(PyObject *self, PyObject *args)
 
     std::vector<double> out_activities = model->evolveSingleStep(activities);
 
-    PyObject* tuple = PyTuple_New(pr_length);
+    PyObject* tuple = PyTuple_New(model->getNumNodes() * {num_external_outputs});
 
-    for (int index = 0; index < pr_length; index++) {{
+    for (int index = 0; index < model->getNumNodes() * {num_external_outputs}; index++) {{
         PyTuple_SetItem(tuple, index, Py_BuildValue("d", out_activities[index]));
     }}
 
@@ -319,7 +319,7 @@ PyInit_lib{name}(void)
     return PyModule_Create(&miindmodule);
 }}
 """
-    context = { "name" : prog_name, "variable_constructors" : variables.parse_variable_python_def(variable_list) }
+    context = { "name" : prog_name, "variable_constructors" : variables.parse_variable_python_def(variable_list), "num_external_outputs" : num_outputs }
 
     with open(outfile,'a') as f:
         f.write(addition.format(**context))
@@ -683,7 +683,7 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
     members += generate_connections(fn,connections,external_incoming_connections, external_outgoing_connections,nodes,algorithms,weighttype)
     generate_closing(fn,parameter,root,weighttype.text,progname,members)
     variable_list = root.findall('Variable')
-    python_wrapper(fn, progname, variable_list)
+    python_wrapper(fn, progname, variable_list,len(external_outgoing_connections))
 
 def sanity_check(algorithms):
     '''Check if only the allowd algorithms feature in this simulation. Returns True if so, False otherwise.'''

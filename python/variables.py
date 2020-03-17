@@ -88,7 +88,13 @@ def parse_variable_python_def(variable_list):
         name  = variable.attrib['Name']
         value = variable.text
 
-        if value.replace('.','',1).isdigit() :
+        var_type = variable.attrib['Type']
+
+        if var_type == 'int':
+            fmt += 'i'
+            s += '\tint ' + name + ';\n'
+        ### Add further types here as they come up...
+        elif value.replace('.','',1).isdigit() :
             fmt += 'd'
             s += '\tdouble ' + name + ';\n'
         # Otherwise, assume it's a string

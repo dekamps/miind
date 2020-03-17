@@ -1,7 +1,7 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<Algorithm type="MeshAlgorithm" name="E" modelfile="lif.model" >
+<Algorithm type="MeshAlgorithmGroup" name="E" modelfile="lif.model" >
 <TimeStep>0.001</TimeStep>
 <MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
 </Algorithm>

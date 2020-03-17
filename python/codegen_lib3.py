@@ -194,20 +194,18 @@ def matrix_transform_name(fn):
             tmatnames.append(a.attrib['transformfile'])
     return tmatnames
 
-def python_wrapper(outfile, prog_name):
+def python_wrapper(outfile, prog_name, variable_list, num_outputs):
     addition = """
 static MiindModel *model;
 
 static PyObject *miind_init(PyObject *self, PyObject *args)
 {{
-    int command;
+    if (model) {{
+        delete model;
+        model = NULL;
+    }}
 
-    if (!PyArg_ParseTuple(args, "i", &command))
-	model = new MiindModel();
-    else
-	model = new MiindModel(command);
-
-    model->init();
+{variable_constructors}
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -253,9 +251,9 @@ static PyObject *miind_evolveSingleStep(PyObject *self, PyObject *args)
 
     std::vector<double> out_activities = model->evolveSingleStep(activities);
 
-    PyObject* tuple = PyTuple_New(pr_length);
+    PyObject* tuple = PyTuple_New(model->getNumNodes() * {num_external_outputs});
 
-    for (int index = 0; index < pr_length; index++) {{
+    for (int index = 0; index < model->getNumNodes() * {num_external_outputs}; index++) {{
         PyTuple_SetItem(tuple, index, Py_BuildValue("d", out_activities[index]));
     }}
 
@@ -294,7 +292,7 @@ PyInit_lib{name}(void)
     return PyModule_Create(&miindmodule);
 }}
 """
-    context = { "name" : prog_name }
+    context = { "name" : prog_name, "variable_constructors" : variables.parse_variable_python_def(variable_list), "num_external_outputs" : num_outputs }
 
     outfile.write(addition.format(**context))
 
@@ -349,15 +347,15 @@ def generate_outputfile(infile, outfile, prog_name):
     connections.parse_connections(connection_list,weighttype,outfile)
     connection_list = tree.findall('Connections/IncomingConnection')
     connections.parse_incoming_connections(connection_list,weighttype,outfile)
-    connection_list = tree.findall('Connections/OutgoingConnection')
-    connections.parse_outgoing_connections(connection_list,outfile)
+    outgoing_connection_list = tree.findall('Connections/OutgoingConnection')
+    connections.parse_outgoing_connections(outgoing_connection_list,outfile)
 
     t_end   = tree.find('SimulationRunParameter/t_end')
     t_step = tree.find('SimulationRunParameter/t_step')
 
     generate_closing(outfile, '(' + t_end.text + ') / ' + t_step.text , t_step.text, weighttype, tree, prog_name)
-
-    python_wrapper(outfile, prog_name)
+    variable_list = tree.findall('Variable')
+    python_wrapper(outfile, prog_name,variable_list,len(outgoing_connection_list))
 
     algorithms.reset_algorithms()
     nodes.reset_nodes()

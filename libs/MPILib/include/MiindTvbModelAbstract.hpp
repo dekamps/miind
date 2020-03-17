@@ -51,6 +51,10 @@ public:
 		return _simulation_length;
 	}
 
+	int getNumNodes() {
+		return _num_nodes;
+	}
+
 protected:
 	MPINetwork<Weight, NodeDistribution> network;
 	report::handler::AbstractReportHandler *report_handler;
