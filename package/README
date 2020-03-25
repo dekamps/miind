@@ -19,7 +19,8 @@ Working directory contains miind_1.05-1_all.deb which can be installed using
 
 sudo apt install ./miind_1.05-1_all.deb
 
-This package has MPI, OPENMP and CUDA enabled. ROOT is disabled. To change this, edit the dh_auto_configure line in rules and set the required CMAKE flags. 
+This package has MPI, OPENMP and CUDA enabled. ROOT is disabled. To change this, edit the dh_auto_configure line in rules and set the required CMAKE flags. Also, remove the dependency for 
+nvidia-cuda-toolkit from control file.
 
 WHEN producing the non-cuda version, remove the cuda dependencies in control as well as set CUDA=OFF in rules
 

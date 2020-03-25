@@ -245,7 +245,7 @@ void GenerateResetTransitionsOnly(
 					TwoDLib::Translation tr = translation_list[i][j];
 
 					if(mode == TwoDLib::AreaCalculation || mode == TwoDLib::JumpFile){
-						gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w, mesh.allCoords());
+						gen.GenerateTransitionUsingQuadTranslation(i,j,tr._v,tr._w, mesh.allCoords(),ths);
 					}
 					else {
 						gen.GenerateTransition(i,j,tr._v,tr._w);
