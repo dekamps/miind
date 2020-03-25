@@ -10,6 +10,8 @@
 #include <sstream>
 #include <limits>
 #include <algorithm>
+#include <omp.h>
+#include <iomanip>
 #include "TwoDLib.hpp"
 
 const int N_POINTS = 10;
@@ -65,6 +67,81 @@ unsigned int  Bin(double x,  double x_min, double x_max, unsigned int n_x){
 
   return bin;
 }
+
+void CalculateProjectionsGeometric(std::ofstream& ofst,
+ const TwoDLib::Mesh& mesh,
+ double v_min,
+ double v_max,
+ unsigned int nv,
+ double w_min,
+ double w_max,
+ unsigned int nw
+ ) {
+  ofst << "<transitions>\n";
+  
+  std::vector<double> dimensions = {(w_max-w_min),(v_max-v_min)};
+  std::vector<double> base = {w_min, v_min};
+  std::vector<unsigned int> resolution = {nw, nv};
+  
+  TwoDLib::MeshNd bins(0.1, 2, resolution, dimensions, base);
+  TwoDLib::MeshTree tree(mesh);
+  TwoDLib::MeshTree tree_bins(bins);
+  TwoDLib::Uniform uni(123456);
+
+  std::vector<TwoDLib::FiducialElement> list;
+  TwoDLib::TransitionMatrixGenerator gen(tree_bins,uni,1000,list);
+
+  std::vector<TwoDLib::TransitionList> transitions;
+  TwoDLib::TransitionList l;
+
+  for( unsigned int i = 0; i < mesh.NrStrips(); i++ ){
+    for (unsigned int j = 0; j < mesh.NrCellsInStrip(i); j++ ){
+      gen.Reset(1000);
+      gen.GenerateTransformUsingQuadTranslation(i,j,tree,bins.allCoords());
+
+      l._number = gen.N();
+      l._origin = TwoDLib::Coordinates(i,j);
+      l._destination_list = gen.HitList();
+
+      std::cout << '\r' << std::setw(10) << 100.0 * ((float)(j+(i*mesh.NrCellsInStrip(1)))/(float)(mesh.NrStrips()*mesh.NrCellsInStrip(1))) << "%" << std::setfill(' ') << std::flush;
+
+      transitions.push_back(l);
+      
+      ofst << "<cell>";
+      	  ofst << "<coordinates>";
+      	  	  ofst << i << "," << j;
+      	  ofst << "</coordinates>";
+      	  ofst << "<vbins>";
+          std::map<unsigned int, double> props;
+      	  for (auto h : l._destination_list){
+            if (h._prop > 0.) {
+              if (!props.count( h._cell[0] ))
+                props[h._cell[0]] = h._prop;
+              else
+                props[h._cell[0]] += h._prop;
+            }
+      	  }
+          for( std::map<unsigned int, double>::const_iterator it = props.begin(); it != props.end(); ++it )
+            ofst << it->first << "," << it->second << ";";
+      	  ofst << "</vbins>";
+      	  ofst << "<wbins>";
+      	  props.clear();
+      	  for (auto h : l._destination_list){
+            if (h._prop > 0.) {
+              if (!props.count( h._cell[1] ))
+                props[h._cell[1]] = h._prop;
+              else
+                props[h._cell[1]] += h._prop;
+            }
+      	  }
+          for( std::map<unsigned int, double>::const_iterator it = props.begin(); it != props.end(); ++it )
+            ofst << it->first << "," << it->second << ";";
+      	  ofst << "</wbins>";
+      ofst << "</cell>\n";
+    }
+  }
+  	ofst << "</transitions>\n";
+ }
 
 void CalculateProjections
 (
@@ -153,7 +230,9 @@ void CreateProjections
   ofst << "</N_W>\n";
   ofst << "</W_limit>\n";
 
-  CalculateProjections(ofst, mesh, v_min, v_max, nv, w_min, w_max, nw);
+  CalculateProjectionsGeometric(ofst, mesh, v_min, v_max, nv, w_min, w_max, nw);
+
+  std::cout << "\nComplete.\n";
 
   ofst << "</Projection>\n";
 }

@@ -1,0 +1,30 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithmGroup" name="EIF" modelfile="eif.model" >
+<TimeStep>0.001</TimeStep>
+<MatrixFile>eif_0.1_0_0_0_.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="ExcInput">
+<expression>1500.</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="EIF" name="E" type="EXCITATORY_DIRECT" />
+<Node algorithm="ExcInput" name="Inp" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="Inp" Out="E">1 0.1 0</Connection>
+</Connections>
+<Reporting>
+<!--<Density node="E" t_start="0.0" t_end="2.0" t_interval="0.001" />-->
+<!--<Display node="E" />-->
+<Rate node="E" t_interval="0.001"/>
+</Reporting>
+<SimulationRunParameter>
+<SimulationName>eif</SimulationName>
+<t_end>3.0</t_end>
+<t_step>0.001</t_step>
+<name_log>eif.log</name_log>
+</SimulationRunParameter>
+</Simulation>

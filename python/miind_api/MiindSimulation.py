@@ -168,6 +168,24 @@ class MiindSimulation:
         self._rates = _rates
         return _rates
 
+    @property
+    def avgvs(self):
+        _avgs = {}
+        _avgs['times'] = []
+
+        for i in range(len(self.nodenames)):
+            if not op.exists(self.output_directory + "/avg_v_" + str(i)):
+                continue
+            with open(self.output_directory + "/avg_v_" + str(i)) as rate_file:
+                _avgs[i] = []
+                for line in rate_file:
+                    tokens = line.split('\t')
+                    _avgs[i] = _avgs[i] + [float(tokens[1])]
+                    _avgs['times'] = _avgs['times'] + [float(tokens[0])]
+
+        self._avgs = _avgs
+        return _avgs
+
     def getModelFilenameAndIndexFromNode(self, nodename):
         if nodename.isdigit():
             (i,m) = self.meshnodenames[int(nodename)]
@@ -205,6 +223,23 @@ class MiindSimulation:
 
         ts = self.rates['times'][0:rate_length]
         fs = self.rates[node_index][0:rate_length]
+        if showplot:
+            if not ax:
+                fig, ax = plt.subplots()
+                plt.title(node)
+
+                ax.plot(ts , fs)
+                fig.show()
+            else:
+                ax.plot(ts , fs)
+        return ts, fs
+
+    def plotAvgV(self, node, ax=None, showplot = True):
+        node_index = self.getIndexFromNode(node)
+        avgv_length = min(len(self.avgvs['times']), len(self.avgvs[node_index]))
+
+        ts = self.avgvs['times'][0:avgv_length]
+        fs = self.avgvs[node_index][0:avgv_length]
         if showplot:
             if not ax:
                 fig, ax = plt.subplots()

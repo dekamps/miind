@@ -5,6 +5,7 @@ import glob
 import subprocess
 import time
 import matplotlib.pyplot as plt
+import sys
 
 from collections import OrderedDict as odict
 from shapely.geometry import Polygon
@@ -16,7 +17,7 @@ from .tools import *
 import mesh3 as meshmod
 
 class Marginal(Result):
-    def __init__(self, io, nodename, vn=500, wn=200):
+    def __init__(self, io, nodename, vn=100, wn=100):
         super(Marginal, self).__init__(io, nodename)
         self.path = op.join(self.io.output_directory,
                             self.nodename + '_marginal_density')
@@ -34,7 +35,7 @@ class Marginal(Result):
         # If there's no new projection and we've already calculated everything,
         # just return the existing calculated marginals
         if op.exists(self.data_path) and not self.new_projection:
-            load_data = np.load(self.data_path)['data'][()]
+            load_data = np.load(self.data_path,allow_pickle=True)['data'][()]
             if self.modelname in load_data:
                 return load_data[self.modelname]
 
@@ -42,9 +43,13 @@ class Marginal(Result):
         v = np.zeros((len(self.times), self.projection['N_V']))
         w = np.zeros((len(self.times), self.projection['N_W']))
 
+        print('Loading mass from densities...')
+
         # Load in the masses from the densities
         masses, coords_ = [], None
         for ii, fname in enumerate(self.fnames):
+            sys.stdout.write("%d%%   \r" % (100*(ii / len(self.fnames))))
+            sys.stdout.flush()
             density, coords = read_density(fname)
             if coords_ is None:
                 coords_ = coords
@@ -54,6 +59,8 @@ class Marginal(Result):
         masses = np.vstack(masses)
         assert masses.shape[0] == len(self.fnames)
 
+        print('Calculating marginal densities...')
+
         # Calculate the merginals for each frame and store in 'data'
         v, w, bins_v, bins_w = self.calc_marginal_density(
             v, w, masses, coords, self.projection)
@@ -62,12 +69,14 @@ class Marginal(Result):
 
         # Save 'data' into a compressed file
         if op.exists(self.data_path):
-            other = np.load(self.data_path)['data'][()]
+            other = np.load(self.data_path,allow_pickle=True)['data'][()]
             other.update({self.modelname: data})
             save_data = other
         else:
             save_data = {self.modelname: data}
         np.savez(self.data_path, data=save_data)
+
+        print('Done.')
         return data
 
     # Using the projection file, the mass from in each cell of the mesh
@@ -86,10 +95,16 @@ class Marginal(Result):
             return var
 
         # Each cell in the mesh has a transition row in the projection file
-        for trans in proj['transitions'].findall('cell'):
+        cells = proj['transitions'].findall('cell')
+        cell_num = 0
+        for trans in cells:
+            cell_num += 1
             # Get the coordinates of this cell and its mass each time
             i, j = [int(a) for a in trans.find('coordinates').text.split(',')]
             cell_mass = masses[:, coords.index((i, j))]
+
+            sys.stdout.write("%d%%   \r" % (100*(cell_num / len(cells))))
+            sys.stdout.flush()
 
             # Calculate and add the density values for each bin
             v = scale(v, trans.find('vbins').text, cell_mass)
@@ -126,6 +141,7 @@ class Marginal(Result):
         # Does the pojection file exist? If not, generate it.
         if not op.exists(proj_pathname):
             print('No projection file found, generating...')
+            print('This is a slow but one-shot process.')
             self.make_projection_file()
             self.new_projection = True
 

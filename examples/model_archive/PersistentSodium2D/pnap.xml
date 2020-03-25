@@ -1,0 +1,61 @@
+<Simulation>
+ <Variable Name="IN_EFF" type="double">0.1</Variable>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="GridAlgorithm" name="OSC" tau_refractive="0.003" modelfile="pnap.model" transformfile="pnap.tmat" start_v="-65" start_w="0.6" >
+<TimeStep>0.0001</TimeStep>
+</Algorithm>
+<Algorithm type="RateFunctor" name="MLR_1">
+<expression>500</expression>
+</Algorithm>
+<Algorithm type="RateFunctor" name="MLR_2">
+<expression>t > 0.3 ? 500 : 0</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="OSC" name="RG_E" type="NEUTRAL" />
+<!--<Node algorithm="OSC" name="RG_F" type="NEUTRAL" />-->
+<Node algorithm="MLR_1" name="MLR_RG_E" type="NEUTRAL" />
+<!--<Node algorithm="MLR_2" name="MLR_RG_F" type="NEUTRAL" />-->
+</Nodes>
+<Connections>
+  <!--<Connection In="MLR_RG_F" Out="RG_F" num_connections="1" efficacy="0.1" delay="0.0"/>-->
+  <Connection In="MLR_RG_E" Out="RG_E" num_connections="1" efficacy="0.1" delay="0.0"/>
+  <!--<Connection In="RG_E" Out="RG_F" num_connections="100" efficacy="-0.1" delay="0.0"/>
+  <Connection In="RG_F" Out="RG_E" num_connections="100" efficacy="-0.1" delay="0.0"/>-->
+</Connections>
+<Reporting>
+	<!--<Density node="RG_E" t_start="0.0" t_end="6.0" t_interval="0.001" />
+	<Density node="RG_F" t_start="0.0" t_end="6.0" t_interval="0.001" />-->
+	<!--<Display node="RG_E" />-->
+	<!--<Display node="RG_F" />-->
+	<Rate node="RG_E" t_interval="0.0002" />
+	<!--<Rate node="RG_F" t_interval="0.002" />-->
+</Reporting>
+<SimulationIO>
+<SimulationName>grid</SimulationName>
+<OnScreen>FALSE</OnScreen>
+<WithState>TRUE</WithState>
+<WriteNet>FALSE</WriteNet>
+<CanvasParameter>
+<T_min>0</T_min>
+<T_max>5.0</T_max>
+<F_min>0</F_min>
+<F_max>20</F_max>
+<State_min>0</State_min>
+<State_max>1.0</State_max>
+<Dense_min>0</Dense_min>
+<Dense_max>2.5</Dense_max>
+</CanvasParameter>
+<CanvasNode Name="RG_E" />
+</SimulationIO>
+<SimulationRunParameter>
+<max_iter>1000000</max_iter>
+<t_begin>0</t_begin>
+<t_end>30.0</t_end>
+<t_report>0.0001</t_report>
+<t_state_report>0.0001</t_state_report>
+<t_step>0.0002</t_step>
+<name_log>rinzel.log</name_log>
+</SimulationRunParameter>
+</Simulation>

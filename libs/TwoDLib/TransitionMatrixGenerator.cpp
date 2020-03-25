@@ -273,36 +273,36 @@ void TransitionMatrixGenerator::GenerateTransformUsingQuadTranslation(unsigned i
 
 	// if the cell range is entirely out of the grid, then clamp to the nearest and return
 	if (start_cell[0] > _tree.MeshRef().NrStrips()-1 && end_cell[0] > _tree.MeshRef().NrStrips()-1){
-		// int mid_cell = start_cell[1] + std::floor((end_cell[1] - start_cell[1])/2.0);
+		int mid_cell = start_cell[1] + std::floor((end_cell[1] - start_cell[1])/2.0);
 		Hit h;
-		h._cell = Coordinates(_tree.MeshRef().NrStrips()-1,cell_no);
+		h._cell = Coordinates(_tree.MeshRef().NrStrips()-1,mid_cell);
 		h._prop = 1.0;
 		_hit_list.push_back(h);
 		return;
 	}
 
 	if (start_cell[0] < 0 && end_cell[0] < 0){
-		// int mid_cell = start_cell[1] + std::floor((end_cell[1] - start_cell[1])/2.0);
+		int mid_cell = start_cell[1] + std::floor((end_cell[1] - start_cell[1])/2.0);
 		Hit h;
-		h._cell = Coordinates(0,cell_no);
+		h._cell = Coordinates(0,mid_cell);
 		h._prop = 1.0;
 		_hit_list.push_back(h);
 		return;
 	}
 
 	if (start_cell[1] > _tree.MeshRef().NrCellsInStrip(1)-1 && end_cell[1] > _tree.MeshRef().NrCellsInStrip(1)-1){
-		// int mid_cell = start_cell[0] + std::floor((end_cell[0] - start_cell[0])/2.0);
+		int mid_cell = start_cell[0] + std::floor((end_cell[0] - start_cell[0])/2.0);
 		Hit h;
-		h._cell = Coordinates(strip_no,_tree.MeshRef().NrCellsInStrip(1)-1);
+		h._cell = Coordinates(mid_cell,_tree.MeshRef().NrCellsInStrip(1)-1);
 		h._prop = 1.0;
 		_hit_list.push_back(h);
 		return;
 	}
 
 	if (start_cell[1] < 0 && end_cell[1] < 0){
-		// int mid_cell = start_cell[0] + std::floor((end_cell[0] - start_cell[0])/2.0);
+		int mid_cell = start_cell[0] + std::floor((end_cell[0] - start_cell[0])/2.0);
 		Hit h;
-		h._cell = Coordinates(strip_no,0);
+		h._cell = Coordinates(mid_cell,0);
 		h._prop = 1.0;
 		_hit_list.push_back(h);
 		return;
@@ -326,6 +326,8 @@ void TransitionMatrixGenerator::GenerateTransformUsingQuadTranslation(unsigned i
 			Quadrilateral quad_scaled = Quadrilateral((ps[0]), (ps[1]), (ps[2]), (ps[3]));
 			std::vector<Point> ps_scaled = quad_scaled.Points();
 
+			std::vector<Point> ps_trans = quad_trans.Points();
+
 			double area = Quadrilateral::get_overlap_area(quad_trans,quad_scaled);
 
 			total_area_full += area;
@@ -342,8 +344,10 @@ void TransitionMatrixGenerator::GenerateTransformUsingQuadTranslation(unsigned i
 	}
 
 	if(_hit_list.size() == 0) {
+		int mid_cell0 = start_cell[0] + std::floor((end_cell[0] - start_cell[0])/2.0);
+		int mid_cell1 = start_cell[1] + std::floor((end_cell[1] - start_cell[1])/2.0);
 		Hit h;
-		h._cell = Coordinates(strip_no,cell_no);
+		h._cell = Coordinates(mid_cell0,mid_cell1);
 		h._prop = 1.0;
 		total_area = 1.0;
 		_hit_list.push_back(h);

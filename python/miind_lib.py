@@ -150,15 +150,15 @@ def generate_opening(fn, tree, typ, algorithms, variables):
     with open(fn,'a') as outfile:
         outfile.write('class MiindModel : public ' + abstract_type(typ) + ' {\n')
         outfile.write('public:\n\n')
-        outfile.write('\tMiindLib::VectorizedNetwork vec_network;\n')
-        outfile.write('\tpugi::xml_document doc;\n')
-        outfile.write('\tstd::vector<MPILib::NodeId> _display_nodes;\n')
-        outfile.write('\tstd::vector<MPILib::NodeId> _rate_nodes;\n')
-        outfile.write('\tstd::vector<MPILib::Time> _rate_node_intervals;\n')
-        outfile.write('\tstd::vector<MPILib::NodeId> _density_nodes;\n')
-        outfile.write('\tstd::vector<MPILib::Time> _density_node_start_times;\n')
-        outfile.write('\tstd::vector<MPILib::Time> _density_node_end_times;\n')
-        outfile.write('\tstd::vector<MPILib::Time> _density_node_intervals;\n')
+        outfile.write('\t\tMiindLib::VectorizedNetwork vec_network;\n')
+        outfile.write('\t\tpugi::xml_document doc;\n')
+        outfile.write('\t\tstd::vector<MPILib::NodeId> _display_nodes;\n')
+        outfile.write('\t\tstd::vector<MPILib::NodeId> _rate_nodes;\n')
+        outfile.write('\t\tstd::vector<MPILib::Time> _rate_node_intervals;\n')
+        outfile.write('\t\tstd::vector<MPILib::NodeId> _density_nodes;\n')
+        outfile.write('\t\tstd::vector<MPILib::Time> _density_node_start_times;\n')
+        outfile.write('\t\tstd::vector<MPILib::Time> _density_node_end_times;\n')
+        outfile.write('\t\tstd::vector<MPILib::Time> _density_node_intervals;\n')
         outfile.write('\tunsigned int _count;\n')
         outfile.write('\n')
 
@@ -172,6 +172,13 @@ def generate_opening(fn, tree, typ, algorithms, variables):
         outfile.write('\t{\n')
         t_step = tree.find('SimulationRunParameter/t_step')
         outfile.write('\t\t_time_step = ' + t_step.text + ';\n')
+        outfile.write('\t\tstd::vector<MPILib::NodeId> density_nodes;\n')
+        outfile.write('\t\tstd::vector<MPILib::Time> density_node_start_times;\n')
+        outfile.write('\t\tstd::vector<MPILib::Time> density_node_end_times;\n')
+        outfile.write('\t\tstd::vector<MPILib::Time> density_node_intervals;\n')
+        outfile.write('\t\tstd::vector<MPILib::NodeId> rate_nodes;\n')
+        outfile.write('\t\tstd::vector<MPILib::Time> rate_node_intervals;\n')
+        outfile.write('\t\tstd::vector<MPILib::NodeId> display_nodes;\n')
         outfile.write('\t\tfor(int i=0; i<_num_nodes; i++) {\n')
 
 def generate_closing(fn,parameters,tree,type,prog_name,members):
@@ -188,10 +195,12 @@ def generate_closing(fn,parameters,tree,type,prog_name,members):
 
     '''Generates the closing statements in the C++ file.'''
     with open(fn,'a') as f:
-        f.write(reporting.define_display_nodes(tree,nodemap))
-        f.write(reporting.define_rate_nodes(tree,nodemap))
-        f.write(reporting.define_density_nodes(tree,nodemap))
+        f.write(reporting.define_display_nodes(tree,nodemap,unscoped_vectors=True,looped_definition=True))
+        f.write(reporting.define_rate_nodes(tree,nodemap, unscoped_vectors=True,looped_definition=True))
+        f.write(reporting.define_density_nodes(tree,nodemap, unscoped_vectors=True,looped_definition=True))
         f.write('\n')
+        f.write('\t\t\n')
+        f.write('\t\t}\n')
         f.write('\t\t_rate_nodes = rate_nodes;\n')
         f.write('\t\t_rate_node_intervals = rate_node_intervals;\n')
         f.write('\t\t_display_nodes = display_nodes;\n')
@@ -199,14 +208,12 @@ def generate_closing(fn,parameters,tree,type,prog_name,members):
         f.write('\t\t_density_node_start_times = density_node_start_times;\n')
         f.write('\t\t_density_node_end_times = density_node_end_times;\n')
         f.write('\t\t_density_node_intervals = density_node_intervals;\n')
-        f.write('\t\t\n')
-        f.write('\tvec_network.setDisplayNodes(_display_nodes);\n')
-        f.write('\tvec_network.setRateNodes(_rate_nodes, _rate_node_intervals);\n')
-        f.write('\tvec_network.setDensityNodes(_density_nodes,_density_node_start_times,_density_node_end_times,_density_node_intervals);\n')
+        f.write('\t\tvec_network.setDisplayNodes(_display_nodes);\n')
+        f.write('\t\tvec_network.setRateNodes(_rate_nodes, _rate_node_intervals);\n')
+        f.write('\t\tvec_network.setDensityNodes(_density_nodes,_density_node_start_times,_density_node_end_times,_density_node_intervals);\n')
         f.write('\n')
-        f.write('\tvec_network.initOde2DSystem('+ steps +');\n')
-        f.write('}\n')
-        f.write('}\n')
+        f.write('\t\tvec_network.initOde2DSystem('+ steps +');\n')
+        f.write('\t}\n')
         f.write('\n')
         for t in algorithms.RATEFUNCTIONS:
             f.write(t)
@@ -214,20 +221,18 @@ def generate_closing(fn,parameters,tree,type,prog_name,members):
         f.write(members)
         f.write('};\n\n')
 
-def python_wrapper(outfile, prog_name):
+def python_wrapper(outfile, prog_name, variable_list, num_outputs):
     addition = """
 static MiindModel *model;
 
 static PyObject *miind_init(PyObject *self, PyObject *args)
 {{
-    int command;
+    if (model) {{
+        delete model;
+        model = NULL;
+    }}
 
-    if (!PyArg_ParseTuple(args, "i", &command))
-	model = new MiindModel();
-    else
-	model = new MiindModel(command);
-
-    model->init();
+{variable_constructors}
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -273,9 +278,9 @@ static PyObject *miind_evolveSingleStep(PyObject *self, PyObject *args)
 
     std::vector<double> out_activities = model->evolveSingleStep(activities);
 
-    PyObject* tuple = PyTuple_New(pr_length);
+    PyObject* tuple = PyTuple_New(model->getNumNodes() * {num_external_outputs});
 
-    for (int index = 0; index < pr_length; index++) {{
+    for (int index = 0; index < model->getNumNodes() * {num_external_outputs}; index++) {{
         PyTuple_SetItem(tuple, index, Py_BuildValue("d", out_activities[index]));
     }}
 
@@ -314,7 +319,7 @@ PyInit_lib{name}(void)
     return PyModule_Create(&miindmodule);
 }}
 """
-    context = { "name" : prog_name }
+    context = { "name" : prog_name, "variable_constructors" : variables.parse_variable_python_def(variable_list), "num_external_outputs" : num_outputs }
 
     with open(outfile,'a') as f:
         f.write(addition.format(**context))
@@ -360,15 +365,15 @@ def generate_model_files(fn, nodes,algorithms):
               if 'tau_refractive' in algorithm.attrib.keys():
                    ref = algorithm.attrib['tau_refractive']
 
-              f.write('\tpugi::xml_parse_result result' + str(node_id) + ' = doc.load_file(\"' + algorithm.attrib['modelfile'] +'\");\n')
-              f.write('\tpugi::xml_node  root' + str(node_id) + ' = doc.first_child();\n\n')
-              members += '\tstd::vector<TwoDLib::Mesh> mesh' + str(node_id) +';\n'
-              f.write('\tmesh' + str(node_id) +'.push_back(TwoDLib::RetrieveMeshFromXML(root' + str(node_id) + '));\n')
-              members += '\tstd::vector<std::vector<TwoDLib::Redistribution>> vec_rev' + str(node_id) + ';\n'
-              f.write('\tvec_rev' + str(node_id) + '.push_back(TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(node_id) + '));\n')
-              members += '\tstd::vector<std::vector<TwoDLib::Redistribution>> vec_res' + str(node_id) + ';\n'
-              f.write('\tvec_res' + str(node_id) + '.push_back(TwoDLib::RetrieveMappingFromXML("Reset",root' + str(node_id) + '));\n\n')
-              f.write('\tvec_network.addMeshNode(mesh'+ str(node_id) +'[i], vec_rev'+ str(node_id) +'[i], vec_res'+ str(node_id) +'[i], ' + ref + ');\n')
+              f.write('\t\t\tpugi::xml_parse_result result' + str(node_id) + ' = doc.load_file(\"' + algorithm.attrib['modelfile'] +'\");\n')
+              f.write('\t\t\tpugi::xml_node  root' + str(node_id) + ' = doc.first_child();\n\n')
+              members += '\t\t\tstd::vector<TwoDLib::Mesh> mesh' + str(node_id) +';\n'
+              f.write('\t\t\tmesh' + str(node_id) +'.push_back(TwoDLib::RetrieveMeshFromXML(root' + str(node_id) + '));\n')
+              members += '\t\t\tstd::vector<std::vector<TwoDLib::Redistribution>> vec_rev' + str(node_id) + ';\n'
+              f.write('\t\t\tvec_rev' + str(node_id) + '.push_back(TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(node_id) + '));\n')
+              members += '\t\t\tstd::vector<std::vector<TwoDLib::Redistribution>> vec_res' + str(node_id) + ';\n'
+              f.write('\t\t\tvec_res' + str(node_id) + '.push_back(TwoDLib::RetrieveMappingFromXML("Reset",root' + str(node_id) + '));\n\n')
+              f.write('\t\t\tvec_network.addMeshNode(mesh'+ str(node_id) +'[i], vec_rev'+ str(node_id) +'[i], vec_res'+ str(node_id) +'[i], ' + ref + ');\n')
               f.write('\n')
 
               node_id = node_id + 1
@@ -378,24 +383,24 @@ def generate_model_files(fn, nodes,algorithms):
               if 'tau_refractive' in algorithm.attrib.keys():
                  ref = algorithm.attrib['tau_refractive']
 
-              f.write('\tpugi::xml_parse_result result' + str(node_id) + ' = doc.load_file(\"' + algorithm.attrib['modelfile'] +'\");\n')
-              f.write('\tpugi::xml_node  root' + str(node_id) + ' = doc.first_child();\n\n')
-              members += '\tstd::vector<TwoDLib::Mesh> mesh' + str(node_id) +';\n'
-              f.write('\tmesh' + str(node_id) +'.push_back(TwoDLib::RetrieveMeshFromXML(root' + str(node_id) + '));\n')
-              members += '\tstd::vector<std::vector<TwoDLib::Redistribution>> vec_rev' + str(node_id) + ';\n'
-              f.write('\tvec_rev' + str(node_id) + '.push_back(TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(node_id) + '));\n')
-              members += '\tstd::vector<std::vector<TwoDLib::Redistribution>> vec_res' + str(node_id) + ';\n'
-              f.write('\tvec_res' + str(node_id) + '.push_back(TwoDLib::RetrieveMappingFromXML("Reset",root' + str(node_id) + '));\n\n')
-              members += '\tstd::vector<TwoDLib::TransitionMatrix> transform' + str(node_id) + ';\n'
-              f.write('\ttransform' + str(node_id) + '.push_back(TwoDLib::TransitionMatrix(\"' + algorithm.attrib['transformfile'] + '\"));\n')
-              f.write('\tvec_network.addGridNode(mesh'+ str(node_id) +'[i], transform'+ str(node_id) +'[i], ' + str(algorithm.attrib['start_v']) + ', ' + str(algorithm.attrib['start_w']) +', vec_rev'+ str(node_id) +'[i], vec_res'+ str(node_id) +'[i], '+ ref +');\n')
+              f.write('\t\t\tpugi::xml_parse_result result' + str(node_id) + ' = doc.load_file(\"' + algorithm.attrib['modelfile'] +'\");\n')
+              f.write('\t\t\tpugi::xml_node  root' + str(node_id) + ' = doc.first_child();\n\n')
+              members += '\t\t\tstd::vector<TwoDLib::Mesh> mesh' + str(node_id) +';\n'
+              f.write('\t\t\tmesh' + str(node_id) +'.push_back(TwoDLib::RetrieveMeshFromXML(root' + str(node_id) + '));\n')
+              members += '\t\t\tstd::vector<std::vector<TwoDLib::Redistribution>> vec_rev' + str(node_id) + ';\n'
+              f.write('\t\t\tvec_rev' + str(node_id) + '.push_back(TwoDLib::RetrieveMappingFromXML("Reversal",root' + str(node_id) + '));\n')
+              members += '\t\t\tstd::vector<std::vector<TwoDLib::Redistribution>> vec_res' + str(node_id) + ';\n'
+              f.write('\t\t\tvec_res' + str(node_id) + '.push_back(TwoDLib::RetrieveMappingFromXML("Reset",root' + str(node_id) + '));\n\n')
+              members += '\t\t\tstd::vector<TwoDLib::TransitionMatrix> transform' + str(node_id) + ';\n'
+              f.write('\t\t\ttransform' + str(node_id) + '.push_back(TwoDLib::TransitionMatrix(\"' + algorithm.attrib['transformfile'] + '\"));\n')
+              f.write('\t\t\tvec_network.addGridNode(mesh'+ str(node_id) +'[i], transform'+ str(node_id) +'[i], ' + str(algorithm.attrib['start_v']) + ', ' + str(algorithm.attrib['start_w']) +', vec_rev'+ str(node_id) +'[i], vec_res'+ str(node_id) +'[i], '+ ref +');\n')
               f.write('\n')
 
               node_id = node_id + 1
 
             elif algorithm.attrib['type'] == 'RateFunctor':
                 rn = 'MiindModel::' + algorithm.attrib['name']
-                f.write('\tvec_network.addRateNode(' + rn + ');\n')
+                f.write('\t\t\tvec_network.addRateNode(' + rn + ');\n')
                 node_id = node_id + 1
 
     return members
@@ -415,7 +420,7 @@ def extract_efficacy(fn):
                     raise ValueError('Expected at least one non-zero value')
                return nrs[0]
 
-def construct_CSR_map_external(nodes,algorithms,connections):
+def construct_CSR_map_external(nodes,algorithms,connections,connection_type):
     '''Creates a list that corresponds one-to-one with the connection structure. Returns a tuple: [0] node name of receiving node,[1] matrix file name for this connection  '''
     csrlist=[]
     combi = []
@@ -430,23 +435,31 @@ def construct_CSR_map_external(nodes,algorithms,connections):
 
                                   mfs=algorithm.findall('MatrixFile')
                                   mfn= [ mf.text for mf in mfs]
-                                  efficacy=float(connection.text.split()[1])
+                                  if connection_type == "DelayedConnection":
+                                       efficacy=connection.text.split()[1]
+                                  elif connection_type == "CustomConnectionParameters":
+                                       efficacy=connection.attrib['efficacy']
                                   effs= [extract_efficacy(fn) for fn in mfn]
-
-                                  candidates=[]
-                                  for i, eff in enumerate(effs):
-                                       if np.isclose(eff,efficacy):
-                                            candidates.append(i)
-                                  if len(candidates) == 0: raise ValueError('No efficacy found that corresponds to the connection efficacy ' + str(efficacy))
-                                  if len(candidates) > 1: raise ValueError('Same efficacy found twice')
 
                                   count = Counter(combi)
                                   combi.append((connection.attrib['Node']))
                                   nr_connection = count[(connection.attrib['Node'])]
-                                  csrlist.append([node.attrib['name'],mfn[candidates[0]], effs[candidates[0]],nr_connection,connection])
+
+                                  if efficacy.isnumeric():
+                                      efficacy = float(efficacy)
+                                      candidates=[]
+                                      for i, eff in enumerate(effs):
+                                          if np.isclose(eff,efficacy):
+                                              candidates.append(i)
+                                      if len(candidates) == 0: raise ValueError('No efficacy found that corresponds to the connection efficacy ' + str(efficacy))
+                                      if len(candidates) > 1: raise ValueError('Same efficacy found twice')
+                                      csrlist.append([node.attrib['name'],mfn[candidates[0]], effs[candidates[0]],nr_connection,connection])
+                                  else:
+                                      csrlist.append([node.attrib['name'],None, efficacy,nr_connection,connection])
+                                  
     return csrlist
 
-def construct_CSR_map(nodes,algorithms,connections):
+def construct_CSR_map(nodes,algorithms,connections, connection_type):
      '''Creates a list that corresponds one-to-one with the connection structure. Returns a tuple: [0] node name of receiving node,[1] matrix file name for this connection  '''
      csrlist=[]
      combi = []
@@ -461,22 +474,74 @@ def construct_CSR_map(nodes,algorithms,connections):
 
                                    mfs=algorithm.findall('MatrixFile')
                                    mfn= [ mf.text for mf in mfs]
-                                   efficacy=float(connection.text.split()[1])
+                                   efficacy = None
+                                   if connection_type == "DelayedConnection":
+                                       efficacy=connection.text.split()[1]
+                                   elif connection_type == "CustomConnectionParameters":
+                                       efficacy=connection.attrib['efficacy']
                                    effs= [extract_efficacy(fn) for fn in mfn]
-
-                                   candidates=[]
-                                   for i, eff in enumerate(effs):
-                                        if np.isclose(eff,efficacy):
-                                             candidates.append(i)
-                                   if len(candidates) == 0: raise ValueError('No efficacy found that corresponds to the connection efficacy ' + str(efficacy))
-                                   if len(candidates) > 1: raise ValueError('Same efficacy found twice')
 
                                    count = Counter(combi)
                                    combi.append((connection.attrib['Out'],connection.attrib['In']))
                                    nr_connection = count[(connection.attrib['Out'],connection.attrib['In'])]
-                                   csrlist.append([node.attrib['name'],mfn[candidates[0]], effs[candidates[0]],connection.attrib['In'],nr_connection,connection])
+
+                                   if efficacy.isnumeric():
+                                       efficacy = float(efficacy)
+                                       candidates=[]
+                                       for i, eff in enumerate(effs):
+                                           if np.isclose(eff,efficacy):
+                                               candidates.append(i)
+                                       if len(candidates) == 0: raise ValueError('No efficacy found that corresponds to the connection efficacy ' + str(efficacy))
+                                       if len(candidates) > 1: raise ValueError('Same efficacy found twice')
+
+                                       csrlist.append([node.attrib['name'],mfn[candidates[0]], effs[candidates[0]],connection.attrib['In'],nr_connection,connection])
+                                   else:
+                                       csrlist.append([node.attrib['name'],None, efficacy,connection.attrib['In'],nr_connection,connection])
+                                
 
      return csrlist
+
+def GenerateAllMatrixFiles(nodes,algorithms,connections, connection_type):
+    csrlist=[]
+    combi = []
+    for connection in connections:
+          for node in nodes:
+               if connection.attrib['Out'] == node.attrib['name']:
+                    # we have the right node, now see if it's a MeshAlgorithmGroup
+                    nodealgorithm=node.attrib['algorithm']
+                    for algorithm in algorithms:
+                         if nodealgorithm == algorithm.attrib['name']:
+                              if algorithm.attrib['type'] == 'MeshAlgorithmGroup':
+
+                                   mfs=algorithm.findall('MatrixFile')
+                                   mfn= [ mf.text for mf in mfs]
+                                   effs= [extract_efficacy(fn) for fn in mfn]
+                                   count = Counter(combi)
+                                   combi.append((connection.attrib['Out'],connection.attrib['In']))
+                                   nr_connection = count[(connection.attrib['Out'],connection.attrib['In'])]
+                                   csrlist.append([node.attrib['name'],mfn, effs,connection.attrib['In'],nr_connection,connection])
+    return csrlist
+
+def GenerateAllMatrixFilesExternal(nodes,algorithms,connections, connection_type):
+    csrlist=[]
+    combi = []
+    for connection in connections:
+          for node in nodes:
+               if connection.attrib['Node'] == node.attrib['name']:
+                    # we have the right node, now see if it's a MeshAlgorithmGroup
+                    nodealgorithm=node.attrib['algorithm']
+                    for algorithm in algorithms:
+                         if nodealgorithm == algorithm.attrib['name']:
+                              if algorithm.attrib['type'] == 'MeshAlgorithmGroup':
+
+                                   mfs=algorithm.findall('MatrixFile')
+                                   mfn= [ mf.text for mf in mfs]
+                                   effs= [extract_efficacy(fn) for fn in mfn]
+                                   count = Counter(combi)
+                                   combi.append((connection.attrib['Node']))
+                                   nr_connection = count[(connection.attrib['Node'])]
+                                   csrlist.append([node.attrib['name'],mfn, effs,nr_connection,connection])
+    return csrlist
 
 def construct_grid_connection_map_external(nodes,algorithms,connections):
     '''Creates a list that corresponds one-to-one with the connection structure. Returns a tuple: [0] node name of receiving node,[1] matrix file name for this connection  '''
@@ -536,50 +601,65 @@ def generate_connections(fn,conns, external_incoming_connections, external_outgo
     members = ''
     grid_cons = construct_grid_connection_map(nodes, algorithms, conns)
     grid_cons_ext = construct_grid_connection_map_external(nodes, algorithms, external_incoming_connections)
-    mesh_cons = construct_CSR_map(nodes, algorithms, conns)
-    mesh_cons_ext = construct_CSR_map_external(nodes, algorithms, external_incoming_connections)
+    mesh_cons = construct_CSR_map(nodes, algorithms, conns, weighttype.text)
+    mesh_cons_ext = construct_CSR_map_external(nodes, algorithms, external_incoming_connections, weighttype.text)
     mesh_ext = construct_monitor_external(nodes, algorithms, external_outgoing_connections)
     nodemap = node_name_to_node_id(nodes)
 
+    total_external_conns = len(mesh_cons_ext) + len(grid_cons_ext)
+
+    all_mats = GenerateAllMatrixFiles(nodes, algorithms, conns, weighttype.text)
+    all_mats_ext = GenerateAllMatrixFilesExternal(nodes, algorithms, external_incoming_connections, weighttype.text)
+
     external_node_id = 0
     with open(fn,'a') as f:
+        for cn in all_mats:
+            cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
+            members += 'std::map<float,std::vector<TwoDLib::TransitionMatrix>> '+ cpp_name + ';\n'
+            for mfn in range(len(cn[1])):
+                f.write('\t' + cpp_name + '[' + str(cn[2][mfn]) + '] = std::vector<TwoDLib::TransitionMatrix>(_num_nodes);\n')
+                f.write('\t' + cpp_name + '[' + str(cn[2][mfn]) + '][i] = TwoDLib::TransitionMatrix(\"' + cn[1][mfn] + '\");\n')
+                
+        for cn in all_mats_ext:
+            cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_ext_' + str(cn[3])
+            members += 'std::map<float,std::vector<TwoDLib::TransitionMatrix>> '+ cpp_name + ';\n'
+            for mfn in range(len(cn[1])):
+                f.write('\t' + cpp_name + '[' + str(cn[2][mfn]) + '] = std::vector<TwoDLib::TransitionMatrix>(_num_nodes);\n')
+                f.write('\t' + cpp_name + '[' + str(cn[2][mfn]) + '][i] = TwoDLib::TransitionMatrix(\"' + cn[1][mfn] + '\");\n')
+
         if weighttype.text ==  "DelayedConnection":
             for cn in mesh_cons:
                 cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
-                members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
-                f.write('\t' + cpp_name + '.push_back(TwoDLib::TransitionMatrix(\"' + cn[1] + '\"));\n')
-                f.write(connections.parse_mesh_connection(cn[5], nodemap, cpp_name +'[i]', 'vec_network'))
+                mat_name = cpp_name + '.at(' + str(cn[2]) + ')'
+                f.write(connections.parse_mesh_connection(cn[5], nodemap, mat_name +'[i]', 'vec_network',looped_definition=True))
 
             for cn in mesh_cons_ext:
                 cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_ext_' + str(cn[3])
-                members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
-                f.write('\t' + cpp_name + '.push_back(TwoDLib::TransitionMatrix(\"' + cn[1] + '\"));\n')
-                f.write(connections.parse_external_incoming_mesh_connection(cn[4], nodemap, cpp_name +'[i]', external_node_id, 'vec_network'))
+                mat_name = cpp_name + '.at(' + str(cn[2]) + ')'
+                f.write(connections.parse_external_incoming_mesh_connection(cn[4], nodemap, mat_name +'[i]', str(total_external_conns)+'*i+'+str(external_node_id), 'vec_network',looped_definition=True))
                 external_node_id = external_node_id + 1
 
         if weighttype.text ==  "CustomConnectionParameters":
             for cn in mesh_cons:
                 cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
-                members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
-                f.write('\t' + cpp_name + '.push_back(TwoDLib::TransitionMatrix(\"' + cn[1] + '\"));\n')
-                f.write(connections.parse_mesh_vectorized_connection(cn[5], nodemap, cpp_name +'[i]', 'vec_network'))
+                mat_name = cpp_name + '.at(' + str(cn[2]) + ')'
+                f.write(connections.parse_mesh_vectorized_connection(cn[5], nodemap, mat_name +'[i]', 'vec_network',looped_definition=True))
 
             for cn in mesh_cons_ext:
                 cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_ext_' + str(cn[3])
-                members += 'std::vector<TwoDLib::TransitionMatrix> ' + cpp_name + ';\n'
-                f.write('\t' + cpp_name + '.push_back(TwoDLib::TransitionMatrix(\"' + cn[1] + '\"));\n')
-                f.write(connections.parse_external_incoming_mesh_vectorized_connection(cn[4], nodemap, cpp_name +'[i]', external_node_id, 'vec_network'))
+                mat_name = cpp_name + '.at(' + str(cn[2]) + ')'
+                f.write(connections.parse_external_incoming_mesh_vectorized_connection(cn[4], nodemap, mat_name +'[i]', str(total_external_conns)+'*i+'+str(external_node_id), 'vec_network',looped_definition=True))
                 external_node_id = external_node_id + 1
 
         for cn in grid_cons:
-            f.write(connections.parse_grid_vectorized_connection(cn[1],nodemap, 'vec_network'))
+            f.write(connections.parse_grid_vectorized_connection(cn[1],nodemap, 'vec_network',looped_definition=True))
 
         for cn in grid_cons_ext:
-            f.write(connections.parse_external_incoming_grid_vectorized_connection(cn[1],nodemap, external_node_id, 'vec_network'))
+            f.write(connections.parse_external_incoming_grid_vectorized_connection(cn[1],nodemap, str(total_external_conns)+'*i+'+str(external_node_id), 'vec_network',looped_definition=True))
             external_node_id = external_node_id + 1
 
         for cn in mesh_ext:
-            f.write(connections.parse_external_outgoing_connection(cn[1],nodemap, 'vec_network'))
+            f.write(connections.parse_external_outgoing_connection(cn[1],nodemap, 'vec_network',looped_definition=True))
 
         f.write('\n')
 
@@ -595,14 +675,15 @@ def create_cpp_file(xmlfile, dirpath, progname, modname, cuda):
          fn=os.path.join(dirpath, progname)+'.cu'
     else:
          fn=os.path.join(dirpath, progname)+'.cpp'
-
+    
     generate_preamble(fn, variables, nodes, algorithms,connections,parameter, cuda)
     weighttype = root.find('WeightType')
     generate_opening(fn, root, weighttype.text, algorithms, variables)
     members = generate_model_files(fn,nodes,algorithms)
     members += generate_connections(fn,connections,external_incoming_connections, external_outgoing_connections,nodes,algorithms,weighttype)
     generate_closing(fn,parameter,root,weighttype.text,progname,members)
-    python_wrapper(fn, progname)
+    variable_list = root.findall('Variable')
+    python_wrapper(fn, progname, variable_list,len(external_outgoing_connections))
 
 def sanity_check(algorithms):
     '''Check if only the allowd algorithms feature in this simulation. Returns True if so, False otherwise.'''

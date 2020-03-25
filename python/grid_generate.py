@@ -125,9 +125,11 @@ def generate(func, timestep, timescale, tolerance, basename, threshold_v, reset_
         progress = 0
         count = 0
         ten_percent = (int)((grid_d1_res) / 10)
+        if ten_percent == 0:
+            ten_percent = 1
 
         for i in (np.array(range(grid_d1_res))) * (1.0/(grid_d1_res)):
-            svs_1 = [];((1.0/grid_d1_res)*(grid_d1_max-grid_d1_min))
+            svs_1 = [];
             sus_1 = [];
             svs_2 = [];
             sus_2 = [];
@@ -209,17 +211,17 @@ def generate(func, timestep, timescale, tolerance, basename, threshold_v, reset_
     api.MeshTools.buildTransformFileFromModel(basename, 1000000000)
     api.MeshTools.buildTransformFileFromModel(basename, reset_shift_w=reset_shift_h, mode='resettransform')
 
-    filename = basename + '.mesh'
-    if os.path.exists(filename):
-        os.remove(filename)
+    # filename = basename + '.mesh'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
 
-    filename = basename + '.rev'
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    filename = basename + '.stat'
-    if os.path.exists(filename):
-        os.remove(filename)
+    # filename = basename + '.rev'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
+    #
+    # filename = basename + '.stat'
+    # if os.path.exists(filename):
+    #     os.remove(filename)
 
     filename = basename + '.res'
     if os.path.exists(filename):

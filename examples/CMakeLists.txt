@@ -74,16 +74,108 @@ set( TWO
 twopop/twopop.xml
 )
 
-set( GRID_COND
-grid_examples/cond/cond.model
-grid_examples/cond/cond.xml
-grid_examples/cond/cond_0_0_0_0_.tmat
+set( MA_ADEX
+model_archive/Adex/adex.xml
+model_archive/Adex/adex.model
+model_archive/Adex/adex_0_0_0_0_.tmat
 )
 
-set( GRID_FN
-grid_examples/fn/fn.model
-grid_examples/fn/fn.xml
-grid_examples/fn/fn_0_0_0_0_.tmat
+set( MA_COND
+model_archive/Conductance2D/cond.xml
+model_archive/Conductance2D/cond.model
+model_archive/Conductance2D/cond_0_0_0_0_.tmat
+)
+
+set( MA_EIF
+model_archive/EIF/eif.xml
+model_archive/EIF/eif.model
+model_archive/EIF/eif_0.1_0_0_0_.mat
+)
+
+set( MA_EPILEPTOR
+model_archive/Epileptor/epi.xml
+model_archive/Epileptor/epileptor_ict.model
+model_archive/Epileptor/epileptor_ict_0_0_0_0_.tmat
+model_archive/Epileptor/epileptor_intict.model
+model_archive/Epileptor/epileptor_intict_0_0_0_0_.tmat
+)
+
+set( MA_FN
+model_archive/FitzhughNagumo/fn.xml
+model_archive/FitzhughNagumo/fn.model
+model_archive/FitzhughNagumo/fn_0_0_0_0_.tmat
+)
+
+set( MA_IZH
+model_archive/Izhikevich/izh.xml
+model_archive/Izhikevich/izh.model
+model_archive/Izhikevich/izh_0_0_0_0_.tmat
+)
+
+set( MA_LIF
+model_archive/LIF/lif.xml
+model_archive/LIF/lif.model
+model_archive/LIF/lif_0.01_0_0_0_.mat
+)
+
+set( MA_MN
+model_archive/MinimalMotorneuron/mn.xml
+model_archive/MinimalMotorneuron/mn_dendrite.model
+model_archive/MinimalMotorneuron/mn_dendrite_0_0_0_0_.tmat
+model_archive/MinimalMotorneuron/mn_soma.model
+model_archive/MinimalMotorneuron/mn_soma_0_0_0_0_.tmat
+)
+
+set( MA_PNAP
+model_archive/PersistentSodium2D/pnap.xml
+model_archive/PersistentSodium2D/pnap.model
+model_archive/PersistentSodium2D/pnap.tmat
+)
+
+set( MA_QIF
+model_archive/QIF/qif.xml
+model_archive/QIF/qif.model
+model_archive/QIF/qif_0.01_0_0_0_.mat
+)
+
+set( TUTORIAL
+tutorial/Tutorial\ MIIND.pdf
+)
+
+set( TUTORIAL_GRID
+tutorial/grid/izh.xml
+tutorial/grid/izhikevich.py
+)
+
+set( TUTORIAL_T1
+tutorial/t1/t1.mesh
+tutorial/t1/t1.model
+tutorial/t1/t1.projection
+tutorial/t1/t1.xml
+tutorial/t1/t1_1_0_0_0_.mat
+)
+
+set( TUTORIAL_T2
+tutorial/t2/t2.mesh
+tutorial/t2/t2.model
+tutorial/t2/t2.projection
+tutorial/t2/t2.xml
+tutorial/t2/t2_0_0.05_0.mat
+)
+
+set( TUTORIAL_T3
+tutorial/t3/t3.mesh
+tutorial/t3/t3.model
+tutorial/t3/t3.projection
+tutorial/t3/t3.xml
+tutorial/t3/t3_0.1_0_0_0_.mat
+)
+
+set( TUTORIAL_VECTOR
+tutorial/vectorised/adex.model
+tutorial/vectorised/adex_1_0_0_0_.mat
+tutorial/vectorised/adex_-1_0_0_0_.mat
+tutorial/vectorised/vector.xml
 )
 
 install( FILES ${AEXP}
@@ -106,7 +198,35 @@ install( FILES ${SELF}
     DESTINATION share/miind/examples/single_selfinhib )
 install( FILES ${TWO}
     DESTINATION share/miind/examples/twopop )
-install( FILES ${GRID_COND}
-    DESTINATION share/miind/examples/grid_examples/cond )
-install( FILES ${GRID_FN}
-    DESTINATION share/miind/examples/grid_examples/fn )
+install( FILES ${MA_ADEX}
+    DESTINATION share/miind/examples/model_archive/Adex )
+install( FILES ${MA_COND}
+    DESTINATION share/miind/examples/model_archive/Conductance2D )
+install( FILES ${MA_EIF}
+    DESTINATION share/miind/examples/model_archive/EIF )
+install( FILES ${MA_EPILEPTOR}
+    DESTINATION share/miind/examples/model_archive/Epileptor )
+install( FILES ${MA_FN}
+    DESTINATION share/miind/examples/model_archive/FitzhughNagumo )
+install( FILES ${MA_IZH}
+    DESTINATION share/miind/examples/model_archive/Izhikevich )
+install( FILES ${MA_LIF}
+    DESTINATION share/miind/examples/model_archive/LIF )
+install( FILES ${MA_MN}
+    DESTINATION share/miind/examples/model_archive/MinimalMotorneuron )
+install( FILES ${MA_PNAP}
+    DESTINATION share/miind/examples/model_archive/PersistentSodium2D )
+install( FILES ${MA_QIF}
+    DESTINATION share/miind/examples/model_archive/QIF )
+install( FILES ${TUTORIAL}
+    DESTINATION share/miind/examples/tutorial )
+install( FILES ${TUTORIAL_GRID}
+    DESTINATION share/miind/examples/tutorial/grid )
+install( FILES ${TUTORIAL_T1}
+    DESTINATION share/miind/examples/tutorial/t1 )
+install( FILES ${TUTORIAL_T2}
+    DESTINATION share/miind/examples/tutorial/t2 )
+install( FILES ${TUTORIAL_T3}
+    DESTINATION share/miind/examples/tutorial/t3 )
+install( FILES ${TUTORIAL_VECTOR}
+    DESTINATION share/miind/examples/tutorial/vectorised )

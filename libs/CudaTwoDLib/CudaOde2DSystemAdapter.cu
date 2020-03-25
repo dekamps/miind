@@ -209,6 +209,11 @@ fptype CudaOde2DSystemAdapter::sumRefractory()
 	return total;
 }
 
+MPILib::Potential CudaOde2DSystemAdapter::getAvgV(unsigned int m){
+	vector<MPILib::Potential> pots = _group.AvgV();
+	return pots[m];
+}
+
 const std::vector<fptype>& CudaOde2DSystemAdapter::F(unsigned int n_steps) const
 {
 	_host_fs.clear();
@@ -220,7 +225,6 @@ const std::vector<fptype>& CudaOde2DSystemAdapter::F(unsigned int n_steps) const
 		fptype sum = 0.0;
 		for (auto& rate: host_sum)
 			sum += rate;
-
 		_host_fs.push_back(sum/(_time_step*n_steps));
 	}
 
@@ -253,7 +257,7 @@ void CudaOde2DSystemAdapter::FillResetMap
 			 checkCudaErrors(cudaMalloc((fptype**)&_refractory_mass[m], _nr_refractory_steps[m]*vec_vec_reset[m].size()*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((inttype**)&_res_to_minimal[m], _nr_minimal_resets[m]*sizeof(inttype)));
        checkCudaErrors(cudaMalloc((inttype**)&_res_from_ordered[m], vec_vec_reset[m].size()*sizeof(inttype)));
-       checkCudaErrors(cudaMalloc((fptype**)&_res_alpha_ordered[m], vec_vec_reset[m].size()*sizeof(fptype)));
+       
 			 checkCudaErrors(cudaMalloc((fptype**)&_res_from_counts[m], _nr_minimal_resets[m]*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((fptype**)&_res_from_offsets[m], _nr_minimal_resets[m]*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((fptype**)&_res_to_mass[m],_nr_minimal_resets[m]*sizeof(fptype)));
@@ -277,9 +281,11 @@ void CudaOde2DSystemAdapter::FillResetMap
 				 }
 			 }
 
+			 checkCudaErrors(cudaMalloc((fptype**)&_res_alpha_ordered[m], _vec_alpha_ord[m].size()*sizeof(fptype)));
+
 			 checkCudaErrors(cudaMemcpy(_res_to_minimal[m],&vec_to_min[0],vec_to_min.size()*sizeof(inttype),cudaMemcpyHostToDevice));
-       checkCudaErrors(cudaMemcpy(_res_from_ordered[m],&vec_from_ord[0],vec_from_ord.size()*sizeof(inttype),cudaMemcpyHostToDevice));
-       checkCudaErrors(cudaMemcpy(_res_alpha_ordered[m],&_vec_alpha_ord[m][0],_vec_alpha_ord[m].size()*sizeof(fptype),cudaMemcpyHostToDevice));
+       		 checkCudaErrors(cudaMemcpy(_res_from_ordered[m],&vec_from_ord[0],vec_from_ord.size()*sizeof(inttype),cudaMemcpyHostToDevice));
+       		 checkCudaErrors(cudaMemcpy(_res_alpha_ordered[m],&_vec_alpha_ord[m][0],_vec_alpha_ord[m].size()*sizeof(fptype),cudaMemcpyHostToDevice));
 			 checkCudaErrors(cudaMemcpy(_res_from_counts[m],&counts[0],counts.size()*sizeof(inttype),cudaMemcpyHostToDevice));
 			 checkCudaErrors(cudaMemcpy(_res_from_offsets[m],&offsets[0],offsets.size()*sizeof(inttype),cudaMemcpyHostToDevice));
 	  }

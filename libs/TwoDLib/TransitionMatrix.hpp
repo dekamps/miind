@@ -43,6 +43,13 @@ namespace TwoDLib {
 		//! Requires a ".mat" file
 		TransitionMatrix(const std::string&);
 
+		TransitionMatrix& operator=(const TransitionMatrix &other) {
+			_vec_line = other._vec_line;
+			_tr_v = other._tr_v;
+			_tr_w = other._tr_w;
+        	return *this;
+    	}
+
 		friend class Master;
 		friend class MasterOMP;
 

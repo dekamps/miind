@@ -19,6 +19,8 @@ available_settingsfilename = os.path.join(directories3.miind_root(),'python','mi
 debug = False
 settings = {}
 available_settings = {}
+c_compiler = None
+cxx_compiler = None
 
 def getMiindPythonPath():
     return os.path.join(directories3.miind_root(), 'python')
@@ -51,6 +53,7 @@ def _help(command):
         print('***** Commands for Analysing and Presenting Completed Simulations *****')
         print('')
         print('rate                     : Plot the mean firing rate of a given node in the current simulation.')
+        print('avgv                     : Plot the mean membrane potential of a given node in the current simulation.')
         print('plot-density             : Plot the 2D density of a given node at a given time in the simulation.')
         print('plot-marginals           : Plot the marginal densities of a given node at a given time in the simulation.')
         print('generate-density-movie   : Generate a movie of the 2D density for a given node in the simulation.')
@@ -201,15 +204,19 @@ def submit(command, current_sim):
         if not current_sim:
             print('No simulation currently defined. Please call command \'sim\'.')
 
+        cmake_args = []
+        if c_compiler and cxx_compiler:
+            cmake_args = ['-DCMAKE_C_COMPILER={}'.format(c_compiler), '-DCMAKE_CXX_COMPILER={}'.format(cxx_compiler)]
+
         if len(command) == 1:
             current_sim.submit(True, [],
-                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'],*cmake_args)
         if len(command) == 2:
             current_sim.submit(True, glob.glob(command[1]),
-                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'],*cmake_args)
         if len(command) >= 3:
             current_sim.submit(True, command[1:],
-                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'],*cmake_args)
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print (name + ' : Generate and \'make\' the code from the current simulation xml file. Ensure you have the correct settings (call \'settings\').')
@@ -242,15 +249,19 @@ def buildSharedLib(command, current_sim):
         if not current_sim:
             print('No simulation currently defined. Please call command \'sim\'.')
 
+        cmake_args = []
+        if c_compiler and cxx_compiler:
+            cmake_args = ['-DCMAKE_C_COMPILER={}'.format(c_compiler), '-DCMAKE_CXX_COMPILER={}'.format(cxx_compiler)]
+
         if len(command) == 1:
             current_sim.submit_shared_lib(True, [],
-                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'],*cmake_args)
         if len(command) == 2:
             current_sim.submit_shared_lib(True, glob.glob(command[1]),
-                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'],*cmake_args)
         if len(command) >= 3:
             current_sim.submit(True, command[1:],
-                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'])
+                  available_settings['mpi_enabled'], available_settings['openmp_enabled'], settings['root_enabled'], settings['cuda_enabled'],*cmake_args)
 
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print (name + ' : Generate and \'make\' a shared library for use with python from the current simulation xml file. Ensure you have the correct settings (call \'settings\').')
@@ -275,6 +286,25 @@ def rate(command, current_sim):
     if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
         print (name + ' : List the nodes for which a rate plot is available in the current simulation. The current simulation must have been submitted and run.')
         print (name + ' [Node name] : Plot the mean firing rate against time for the given node.')
+
+def avgv(command, current_sim):
+    command_name = command[0]
+    name = 'avgv'
+
+    if command_name in [name]:
+        if not current_sim:
+            print('No simulation currently defined. Please call command \'sim\'.')
+
+        if len(command) == 1:
+            print('The following nodes can be queried for a mean membrane potential :')
+            for (name,_) in current_sim.nodenames:
+                print (str(current_sim.getIndexFromNode(name)) + ' : ' + name)
+        if len(command) == 2:
+            current_sim.plotAvgV(command[1])
+
+    if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
+        print (name + ' : List the nodes for which an average membrane potentaial plot is available in the current simulation. The current simulation must have been submitted and run.')
+        print (name + ' [Node name] : Plot the mean membrane potential against time for the given node.')
 
 def densityMovie(command, current_sim):
     command_name = command[0]
@@ -608,6 +638,8 @@ def checkCommands(command, current_sim):
 
     rate(command, current_sim)
 
+    avgv(command, current_sim)
+
     densityMovie(command, current_sim)
 
     plotDensity(command, current_sim)
@@ -657,7 +689,12 @@ if __name__ == "__main__":
       with open(available_settingsfilename, 'r') as settingsfile:
           for line in settingsfile:
               tokens = line.split('=')
-              available_settings[tokens[0].strip()] = (tokens[1].strip() == 'ON')
+              if tokens[0].strip() == 'c_compiler':
+                  c_compiler = tokens[1].strip()
+              elif tokens[0].strip() == 'cxx_compiler':
+                  cxx_compiler = tokens[1].strip()
+              else:
+                  available_settings[tokens[0].strip()] = (tokens[1].strip() in ['YES','Y','ON','1','TRUE'])
 
       # Read or create settings as long as they're available in the installation.
       if not op.exists(settingsfilename):

@@ -42,18 +42,35 @@ _vec_vec_gen(0),
 _vec_timefactor(0){
 	this->FromXML(s);
 
-	// If this mesh is a grid, calculate the cell width.
-	// If it's not a mesh, _grid_cell_width is meaningless.
-	Quadrilateral q1 = Quad(1,0);
-	Quadrilateral q2 = Quad(1,1);
+	if (NrStrips() > 3) {// this is a 2D mesh and if it's a grid, we want to know the cell dimensions
 
-	double cell_h_dist = std::fabs(q2.Centroid()[0] - q1.Centroid()[0]);
-	double cell_v_dist = std::fabs(q2.Centroid()[1] - q1.Centroid()[1]);
+		// If this mesh is a grid, calculate the cell width.
+		// If it's not a mesh, _grid_cell_width is meaningless.
+		Quadrilateral q1 = Quad(1,0);
+		Quadrilateral q2 = Quad(1,1);
 
-	// one of these distances should be close to zero, so pick the other one
-	// we do this because we don't know if this is a v- or h- efficacy
+		double cell_h_dist = std::fabs(q2.Centroid()[0] - q1.Centroid()[0]);
+		double cell_v_dist = std::fabs(q2.Centroid()[1] - q1.Centroid()[1]);
 
-	_grid_cell_width = std::max(cell_h_dist, cell_v_dist);
+		// one of these distances should be close to zero, so pick the other one
+		// we do this because we don't know if this is a v- or h- efficacy
+
+		_grid_cell_width = std::max(cell_h_dist, cell_v_dist);
+
+		Quadrilateral q3 = Quad(1,1);
+		Quadrilateral q4 = Quad(2,1);
+
+		cell_h_dist = std::fabs(q4.Centroid()[0] - q3.Centroid()[0]);
+		cell_v_dist = std::fabs(q4.Centroid()[1] - q3.Centroid()[1]);
+
+		// one of these distances should be close to zero, so pick the other one
+		// we do this because we don't know if this is a v- or h- efficacy
+
+		_grid_cell_height = std::max(cell_h_dist, cell_v_dist);
+	} else {
+		_grid_cell_width = 0.0;
+		_grid_cell_height = 0.0;
+	}
 }
 
 Mesh::Mesh(const Mesh& m):
@@ -64,12 +81,17 @@ _vec_timefactor(m._vec_timefactor),
 _t_step(m._t_step),
 _map(m._map),
 _vec_vec_cell(m._vec_vec_cell),
-_grid_cell_width(m._grid_cell_width)
+_grid_cell_width(m._grid_cell_width),
+_grid_cell_height(m._grid_cell_height)
 {
 }
 
 double Mesh::getCellWidth() const {
 	return _grid_cell_width;
+}
+
+double Mesh::getCellHeight() const {
+	return _grid_cell_height;
 }
 
 Mesh::GridCellTransition Mesh::calculateCellTransition(double efficacy) const{

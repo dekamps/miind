@@ -74,7 +74,7 @@ _cell_width(cell_width)
         double stays = 1.0 - goes;
 
         int offset_1 = eff > 0 ? -offset : offset;
-        int offset_2 = eff > 0 ? -(offset+1) : -(offset-1);
+        int offset_2 = eff > 0 ? -(offset+1) : (offset+1);
 
         if(_stays[i].find(offset_1) == _stays[i].end()){
           _stays[i][offset_1] = vector<double>(_dydt.size());

@@ -198,7 +198,7 @@ namespace TwoDLib {
 		// the integration time step, stored in the MasterParameter, is gauged with respect to the
 		// network time step.
 		MPILib::Number n_ode = static_cast<MPILib::Number>(std::floor(t_step/_h));
-		MasterParameter par(40);
+		MasterParameter par(10);
 
 		// vec_mat will go out of scope; MasterOMP will convert the matrices
 		// internally and we don't want to keep two versions.
