@@ -1,5 +1,10 @@
 # MIIND website
 
+## Version 1.06 (25/03/2020)
+We have created version 1.06, which contains some updates for the GPU impementation.
+This version can be retrieved using tag 1.06. The debian images and the docker
+containers will be updated shortly.
+
 ## Three dimensional population density methods! (26/11/2019)
 They said it could not be done, but we have created an efficient version of the Hindmarsh rose model,
 a neural model with three state variables.
