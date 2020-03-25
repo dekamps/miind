@@ -10,9 +10,11 @@
 #include <sstream>
 #include <limits>
 #include <algorithm>
-#include <omp.h>
 #include <iomanip>
 #include "TwoDLib.hpp"
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
 
 const int N_POINTS = 10;
 
