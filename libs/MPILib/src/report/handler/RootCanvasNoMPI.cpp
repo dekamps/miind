@@ -25,6 +25,7 @@
 #include <cassert>
 #include <algorithm>
 #include <MPILib/include/report/handler/RootCanvasNoMPI.hpp>
+#include <TSystem.h>
 #include <TCanvas.h>
 #include <TH2F.h>
 #include <TApplication.h>
@@ -68,29 +69,32 @@ int RootCanvas::PadId(NodeId id) const
 }
 
 void RootCanvas::Render(report::ReportType type, NodeId id, TGraph* p_graph){
+  gSystem->ProcessEvents();
+  
+  if (! _b_rendering_started){
+    initializeCanvas();
+    _b_rendering_started = true;
+  }
 
-	if (! _b_rendering_started){
-		initializeCanvas();
-		_b_rendering_started = true;
-	}
+  int index = PadId(id);
 
-	int index = PadId(id);
+  if (type == report::STATE && index >= 0){
+    _p_pad_state->cd(index);
+    _p_hist_state->Draw();
+    p_graph->Draw("L");
+  }
 
-	if (type == report::STATE && index >= 0){
-		_p_pad_state->cd(index);
-		_p_hist_state->Draw();
-		p_graph->Draw("L");
-	}
+  if (type == report::RATE && index >= 0){
+    _p_pad_rate->cd(index);
+    _p_hist_rate->Draw();
+    p_graph->Draw("L");
+  }
 
-	if (type == report::RATE && index >= 0){
-		_p_pad_rate->cd(index);
-		_p_hist_rate->Draw();
-		p_graph->Draw("L");
-	}
-
-	AddToCycle(id);
-	if (IsCycleComplete() )
-		_p_canvas->Update();
+  AddToCycle(id);
+  if (IsCycleComplete() ){
+    _p_canvas->Modified();
+    _p_canvas->Update();
+  }
 }
 
 void RootCanvas::AddToCycle(NodeId id)
@@ -178,22 +182,23 @@ void RootCanvas::SetMaximumDensity() const
 
 void RootCanvas::SetMaximumRate() const
 {
-	if ( _par_canvas._f_max > 0 )
-	{
-		int n_x      = _p_hist_rate->GetXaxis()->GetNbins();
-        int n_y      = _p_hist_rate->GetYaxis()->GetNbins();
-        double y_min = _p_hist_rate->GetYaxis()->GetXmin();
+  if ( _par_canvas._f_max > 0 )	{
 
-        _p_hist_rate->SetBins
-        (
-        	n_x,
-			_par_canvas._t_min,
-			_par_canvas._t_max,
-			n_y,
-			y_min,
-			_par_canvas._f_max
-        );
-	}
+    int n_x      = _p_hist_rate->GetXaxis()->GetNbins();
+    int n_y      = _p_hist_rate->GetYaxis()->GetNbins();
+    double y_min = _p_hist_rate->GetYaxis()->GetXmin();
+
+
+    _p_hist_rate->SetBins
+      (
+       n_x,
+       _par_canvas._t_min,
+       _par_canvas._t_max,
+       n_y,
+       y_min,
+       _par_canvas._f_max
+       );
+  }
 }
 
 #endif // ENABLE_MPI
