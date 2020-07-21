@@ -713,6 +713,5 @@ TestMeshAlgorithmTwoNodesSelfConnections()
 TestMeshAlgorithmGroupTwoNodesSelfConnectionsGPU()
 TestGenerateFidAndMatrix()
 TestGenerateMatrixMC()
-TestGenerateMeshModel()
 print('All tests successful.')
 

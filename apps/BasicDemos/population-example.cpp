@@ -53,7 +53,11 @@ Rate Opl(Time t){
   return (t > 0.5 && t < 1.5) ? 20.0 : 0;
 }
 
-int main(){
+int main(int argc, char *argv[]){
+#ifdef ENABLE_MPI
+	// initialise the mpi environment this cannot be forwarded to a class
+	boost::mpi::environment env(argc, argv);
+#endif
   
   Rate rate_ext = 0;
 
