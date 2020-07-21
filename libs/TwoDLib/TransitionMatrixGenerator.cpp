@@ -146,7 +146,7 @@ void TransitionMatrixGenerator::GenerateTransition(unsigned int strip_no, unsign
 	ProcessTranslatedPoints(vec_point);
 }
 
-void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned int strip_no, unsigned int cell_no, double v, double w, std::vector<Coordinates> cells)
+void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned int strip_no, unsigned int cell_no, double v, double w, std::vector<Coordinates> cells, vector<TwoDLib::Coordinates>& threshold_cells)
 {
 	const Quadrilateral& quad = _tree.MeshRef().Quad(strip_no,cell_no);
 	Point p(v,w);
@@ -188,6 +188,22 @@ void TransitionMatrixGenerator::GenerateTransitionUsingQuadTranslation(unsigned 
 			all_points_left &= p[0] < search_min_x;
 			all_points_above &= p[1] > search_max_y;
 			all_points_below &= p[1] < search_min_y;
+		}
+
+		// if the translated cell is entirely to the right of and not entirely above or below the cell, and the cell is a threshold cell,
+		// set the transition to 1 for the threshold cell. If there are more than one threshold cells, then the mass will
+		// get shared out equally later. This is a hacky approximation as the share of mass across threshold cells will dictate where
+		// the mass gets reset to (slightly higher or lower in the second dimension).
+		if(all_points_left && !all_points_above && !all_points_below){
+			TwoDLib::Coordinates c(i,j);
+			if (std::find(threshold_cells.begin(),threshold_cells.end(),c) != threshold_cells.end() ){
+				total_area += 1.0;
+				Hit h;
+				h._cell = Coordinates(i,j);
+				h._count = (int)(_N);
+				_hit_list.push_back(h);
+				continue;
+			}
 		}
 
 		if(all_points_right || all_points_left || all_points_above || all_points_below)

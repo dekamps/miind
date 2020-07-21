@@ -19,6 +19,9 @@ link_directories( ${ROOT_LIBRARY_DIRS} )
 #############################################################################
 # UnitGeom source and header files
 #############################################################################
+set (CANVAS_TEST_SRC
+    CanvasTest.cpp
+)
 
 set (ONEPOP_TWOD_SRC
 	OnePop.cpp
@@ -74,6 +77,9 @@ set ( LIBLIST
 #############################################################################
 # executables
 #############################################################################
+add_executable(CanvasTest ${CANVAS_TEST_SRC} )
+target_link_libraries(CanvasTest ${LIBLIST} )
+
 add_executable(OnePop ${ONEPOP_TWOD_SRC})
 target_link_libraries(OnePop ${LIBLIST})
 

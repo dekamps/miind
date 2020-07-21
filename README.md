@@ -1,5 +1,10 @@
 # MIIND website
 
+## Version 1.06 (25/03/2020)
+We have created version 1.06, which contains some updates for the GPU impementation.
+This version can be retrieved using tag 1.06. The debian images and the docker
+containers will be updated shortly.
+
 ## Three dimensional population density methods! (26/11/2019)
 They said it could not be done, but we have created an efficient version of the Hindmarsh rose model,
 a neural model with three state variables.
@@ -33,7 +38,7 @@ If you have any problems with your installation, please raise an issue ticket at
 
 ### Installing the .deb package (Admin rights required)
 
-The debian packages can be found in the package directory of this repository. If your system has a CUDA enabled graphics card, you can choose [*miind_1.05-1_all_cuda.deb*](https://github.com/dekamps/miind/blob/master/package/miind_1.05-1_all_cuda.deb). Otherwise, download [*miind_1.05-1_all.deb*](https://github.com/dekamps/miind/blob/master/package/miind_1.05-1_all.deb). With admin rights, use apt or your preferred package installer to install miind. There are some additional python libraries which need to be installed using pip or conda:
+The debian packages can be found in the package directory of this repository. If your system has a CUDA enabled graphics card, you can choose [*miind_1.06-1_all_cuda.deb*](https://github.com/dekamps/miind/blob/master/package/miind_1.06-1_all_cuda.deb). Otherwise, download [*miind_1.06-1_all.deb*](https://github.com/dekamps/miind/blob/master/package/miind_1.06-1_all.deb). With admin rights, use apt or your preferred package installer to install miind. There are some additional python libraries which need to be installed using pip or conda:
 
 matplotlib
 shapely

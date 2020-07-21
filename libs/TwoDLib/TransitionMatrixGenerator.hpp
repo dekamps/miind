@@ -85,7 +85,8 @@ namespace TwoDLib {
 			  unsigned int,	//!< cell no
 			  double,		//!< translation in the v direction
 			  double,    	//!< translation in the w direction
-        std::vector<Coordinates>  //!< above threshold cells
+        	  std::vector<Coordinates>,  //!< above threshold cells
+			  vector<TwoDLib::Coordinates>& //!< threshold cells
 	  	  );
 
     void GenerateTransformUsingQuadTranslation
