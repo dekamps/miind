@@ -617,14 +617,16 @@ def generate_connections(fn,conns, external_incoming_connections, external_outgo
             cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_' + str(nodemap[cn[3]]) + '_' + str(cn[4])
             members += 'std::map<float,std::vector<TwoDLib::TransitionMatrix>> '+ cpp_name + ';\n'
             for mfn in range(len(cn[1])):
-                f.write('\t' + cpp_name + '[' + str(cn[2][mfn]) + '] = std::vector<TwoDLib::TransitionMatrix>(_num_nodes);\n')
+                f.write('\tif (' + cpp_name + '.find(' + str(cn[2][mfn]) + ') == ' + cpp_name + '.end())\n')
+                f.write('\t\t' + cpp_name + '[' + str(cn[2][mfn]) + '] = std::vector<TwoDLib::TransitionMatrix>(_num_nodes);\n')
                 f.write('\t' + cpp_name + '[' + str(cn[2][mfn]) + '][i] = TwoDLib::TransitionMatrix(\"' + cn[1][mfn] + '\");\n')
                 
         for cn in all_mats_ext:
             cpp_name = 'mat_' + str(nodemap[cn[0]]) + '_ext_' + str(cn[3])
             members += 'std::map<float,std::vector<TwoDLib::TransitionMatrix>> '+ cpp_name + ';\n'
             for mfn in range(len(cn[1])):
-                f.write('\t' + cpp_name + '[' + str(cn[2][mfn]) + '] = std::vector<TwoDLib::TransitionMatrix>(_num_nodes);\n')
+                f.write('\tif (' + cpp_name + '.find(' + str(cn[2][mfn]) + ') == ' + cpp_name + '.end())\n')
+                f.write('\t\t' + cpp_name + '[' + str(cn[2][mfn]) + '] = std::vector<TwoDLib::TransitionMatrix>(_num_nodes);\n')
                 f.write('\t' + cpp_name + '[' + str(cn[2][mfn]) + '][i] = TwoDLib::TransitionMatrix(\"' + cn[1][mfn] + '\");\n')
 
         if weighttype.text ==  "DelayedConnection":

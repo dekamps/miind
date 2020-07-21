@@ -1,21 +1,20 @@
 <Simulation>
-<WeightType>DelayedConnection</WeightType>
+<WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="MeshAlgorithmGroup" name="E" modelfile="lif.model" >
-<TimeStep>0.001</TimeStep>
-<MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
+<Algorithm type="GridAlgorithm" name="OSC" modelfile="izh.model" tau_refractive="0.0" transformfile="izh_0_0_0_0_.tmat" start_v="-70.000001" start_w="0.0000001" >
+<TimeStep>0.0001</TimeStep>
 </Algorithm>
 <Algorithm type="RateFunctor" name="ExcInput">
 <expression>0</expression>
 </Algorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="E" name="LIF" type="EXCITATORY_DIRECT" />
+<Node algorithm="OSC" name="LIF" type="EXCITATORY_DIRECT" />
 <Node algorithm="ExcInput" name="Inp" type="NEUTRAL" />
 </Nodes>
 <Connections>
-<Connection In="Inp" Out="LIF">1 0.01 0</Connection>
-<IncomingConnection Node="LIF">1 0.01 0</IncomingConnection>
+<Connection In="Inp" Out="LIF" num_connections="1" efficacy="0.05" delay="0.0"/>
+<IncomingConnection Node="LIF" num_connections="1" efficacy="0.05" delay="0.0"/>
 <OutgoingConnection Node="LIF"/>
 </Connections>
 <Reporting>
@@ -26,7 +25,7 @@
 <SimulationRunParameter>
 <SimulationName>lif</SimulationName>
 <t_end>3.0</t_end>
-<t_step>0.001</t_step>
+<t_step>0.0001</t_step>
 <name_log>lif.log</name_log>
 </SimulationRunParameter>
 </Simulation>

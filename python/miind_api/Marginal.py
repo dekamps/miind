@@ -17,7 +17,7 @@ from .tools import *
 import mesh3 as meshmod
 
 class Marginal(Result):
-    def __init__(self, io, nodename, vn=100, wn=100):
+    def __init__(self, io, nodename, vn=1000, wn=1000):
         super(Marginal, self).__init__(io, nodename)
         self.path = op.join(self.io.output_directory,
                             self.nodename + '_marginal_density')
@@ -27,6 +27,50 @@ class Marginal(Result):
 
     def __getitem__(self, name):
         return self.density[name]
+
+    def uncached_density(self, time):
+        self.read_projection()
+
+        v = np.zeros(self.projection['N_V'])
+        w = np.zeros(self.projection['N_W'])
+
+        time_index = [i[0] for i in enumerate(self.times) if i[1] == time]
+        assert len(time_index) == 1
+
+        density, coords = read_density(self.fnames[time_index[0]])
+        mass = calc_mass(self.mesh, density, coords)
+
+        return self.uncached_calc_marginal_density(v, w, mass, coords, self.projection)
+
+    def uncached_calc_marginal_density(self, v, w, masses, coords, proj):
+        # temp function 'scale' to parse a transition row
+        # in the projection file
+        def scale(var, proj, mass):
+            bins = [marg.split(',') for marg in proj.split(';')
+                    if len(marg) > 0]
+            for jj, dd in bins:
+                var[int(jj)] += mass * float(dd)
+            return var
+
+        cells = proj['transitions'].findall('cell')
+        cell_num = 0
+        for trans in cells:
+            cell_num += 1
+            # Get the coordinates of this cell and its mass each time
+            i, j = [int(a) for a in trans.find('coordinates').text.split(',')]
+            cell_mass = masses[coords.index((i, j))]
+
+            sys.stdout.write("%d%%   \r" % (100*(cell_num / len(cells))))
+            sys.stdout.flush()
+
+            # Calculate and add the density values for each bin
+            v = scale(v, trans.find('vbins').text, cell_mass)
+            w = scale(w, trans.find('wbins').text, cell_mass)
+
+        # Generate the linspace values for plotting
+        bins_v = np.linspace(proj['V_min'], proj['V_max'], proj['N_V'])
+        bins_w = np.linspace(proj['W_min'], proj['W_max'], proj['N_W'])
+        return v, w, bins_v, bins_w
 
     @property
     def density(self):
@@ -170,29 +214,27 @@ class Marginal(Result):
         }
 
     def plotV(self, time, ax=None, showplot=True):
-        v = self['bins_v']
-        d = self['v'][self['times'].index(time), :]
+        v,w,bins_v,bins_w = self.uncached_density(time)
         if showplot:
             if not ax:
                 fig, ax = plt.subplots()
-                ax.plot(v,d)
+                ax.plot(bins_v,v)
                 fig.show()
             else:
-                ax.plot(v,d)
-        return v, d
+                ax.plot(bins_v,v)
+        return bins_v, v
 
     def plotW(self, time, ax=None, showplot=True):
-        w = self['bins_w']
-        d = self['w'][self['times'].index(time), :]
+        v,w,bins_v,bins_w = self.uncached_density(time)
 
         if showplot:
             if not ax:
                 fig, ax = plt.subplots()
-                ax.plot(w, d)
+                ax.plot(bins_w, w)
                 fig.show()
             else:
-                ax.plot(w, d)
-        return w, d
+                ax.plot(bins_w, w)
+        return bins_w, w
 
     def generatePlotImages(self, image_size=300):
         if not op.exists(self.path):

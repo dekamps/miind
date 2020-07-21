@@ -170,6 +170,7 @@ namespace TwoDLib {
 	template <class Solver>
 	void MeshAlgorithmCustom<Solver>::configure(const MPILib::SimulationRunParameter& par_run)
 	{
+		_vec_map.clear();
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
 
@@ -362,8 +363,9 @@ namespace TwoDLib {
 		const std::vector<MPILib::NodeType>& typeVector
 	)
 	{
-		if (_vec_map.size() == 0)
+		if (_vec_map.size() == 0) {
 			FillMap(weightVector);
+		}
 		// take into account the number of connections
 
 		assert(nodeVector.size() == weightVector.size());

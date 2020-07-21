@@ -25,7 +25,11 @@ using std::endl;
 typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 
-int main(){
+int main(int argc, char *argv[]){
+#ifdef ENABLE_MPI
+	// initialise the mpi environment this cannot be forwarded to a class
+	boost::mpi::environment env(argc, argv);
+#endif
 
   InitialDensityParameter dense(0.0,0.0);
   double lambda = 0.01;

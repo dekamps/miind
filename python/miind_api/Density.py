@@ -222,7 +222,7 @@ class Density(Result):
             figname = op.join(
                 self.path, (padding_format_code).format(idx) + '_' +
                 '{}'.format(time)).replace('.', '-')
-            plt.gcf().savefig(figname + ext, res=image_size, bbox_inches='tight')
+            plt.gcf().savefig(figname + ext, dpi=image_size, bbox_inches='tight')
             plt.close(plt.gcf())
 
     # find all times for which a density file was generated

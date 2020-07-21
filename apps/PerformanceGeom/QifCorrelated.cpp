@@ -46,7 +46,11 @@ using std::endl;
 typedef MPILib::MPINetwork<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution> Network;
 typedef GeomLib::GeomAlgorithm<MPILib::DelayedConnection> GeomDelayAlg;
 
-int main(){
+int main(int argc, char *argv[]){
+#ifdef ENABLE_MPI
+	// initialise the mpi environment this cannot be forwarded to a class
+	boost::mpi::environment env(argc, argv);
+#endif
 
 	cout << "Demonstrating Quadratic-Integrate-and-Fire under jump response" << endl;
 	Number    n_bins = 1000;
@@ -126,7 +130,7 @@ int main(){
 			0.0,
 			1.0,
 			2e-3,
-			1e-4,
+			10e-3,
 			"test/singlepoptest.log"
 		);
 

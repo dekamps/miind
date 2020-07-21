@@ -146,7 +146,7 @@ def  NonDefaultGeomParameterArgs(system, i):
     if system == 'LeakingOdeSystem':
         return ',\"LifNumericalMasterEquation\"'
     if system == 'SpikingOdeSystem':
-        return ', par_diffusion_' + str(i) + ', par_current_' + str(i)
+        return ',\"SpikingSystemMasterEquation\", par_diffusion_' + str(i) + ', par_current_' + str(i)
 
 def wrap_up_geom_algorithm(alg, i):
     s = ''

@@ -27,7 +27,7 @@ using GeomLib::ResponseParameter;
 using std::ofstream;
 using std::vector;
 
-int main(){
+int main(int argc, char *argv[]){
 
   ResponseParameter par_resp;
   par_resp.tau            = 20e-3;

@@ -116,7 +116,7 @@ class MiindSimulation:
     @staticmethod
     def generateShaFromParameters(**kwargs) :
         seed_string = ''.join('{}{}'.format(key, val) for key, val in kwargs.items())
-        return hashlib.sha1(seed_string).hexdigest()
+        return hashlib.sha1(seed_string.encode('utf-8')).hexdigest()
 
     # Unwinding a dictionary into keyword arguments might confuse users
     # so provide a definitive dictionary param version
@@ -140,8 +140,8 @@ class MiindSimulation:
                     raise(BaseException("Found more than one Variable with Name=\'" + key + "\'."))
                 var[0].text = str(value)
 
-            with open(template_xml_with_sha, 'w') as new :
-                new.write(ET.tostring(template_sim))
+            with open(template_xml_with_sha, 'w', encoding='utf-8') as new :
+                new.write(ET.tostring(template_sim).decode())
         return op.abspath(template_xml_with_sha)
 
     # Unwinding a dictionary into keyword arguments might confuse users
