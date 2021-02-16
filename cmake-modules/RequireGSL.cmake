@@ -1,3 +1,9 @@
+if (WIN32)
+find_package( gsl )
+else (WIN32)
+include( RequireGSL )
+
+
 include( UsePkgConfig )
 
 pkgconfig( gsl gsl_INCLUDE_DIR gsl_LINK_DIR gsl_LINK_FLAGS gsl_CFLAGS )
@@ -13,3 +19,4 @@ if( NOT gsl_CFLAGS OR NOT gsl_LINK_DIR )
     message( FATAL_ERROR "Gnu Scientific Library not found." )
 endif( NOT gsl_CFLAGS OR NOT gsl_LINK_DIR )
 
+endif (WIN32)

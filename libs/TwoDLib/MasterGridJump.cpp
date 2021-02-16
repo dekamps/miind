@@ -92,7 +92,7 @@ _cell_width(cell_width)
  ) const
  {
  #pragma omp parallel for
- 	for (MPILib::Index i = 0; i < dydt.size(); i++){
+ 	for (int i = 0; i < dydt.size(); i++){
  		 dydt[i] += rate*_stays[efficiacy_index][i]*vec_mass[(((int)i+_offset1[efficiacy_index][i])%(int)dydt.size()+(int)dydt.size()) % (int)dydt.size()];
  		 dydt[i] += rate*_goes[efficiacy_index][i]*vec_mass[(((int)i+_offset2[efficiacy_index][i])%(int)dydt.size()+(int)dydt.size()) % (int)dydt.size()];
      dydt[i] -= rate*vec_mass[i];
@@ -116,7 +116,7 @@ void MasterGridJump::operator()(const vector<double>& vec_mass, vector<double>& 
 
 
 #pragma omp parallel for
-  for(unsigned int id = 0; id < dydt.size(); id++)
+  for(int id = 0; id < dydt.size(); id++)
     dydt[id] = 0.;
 
   for (unsigned int irate = 0; irate < rates.size(); irate++){

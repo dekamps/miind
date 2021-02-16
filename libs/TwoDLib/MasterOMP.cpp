@@ -57,7 +57,7 @@ _init(_rate)
 	 for (unsigned int j = 0; j < _par._N_steps; j++){
 
 #pragma omp parallel for
-		 for(unsigned int id = 0; id < _dydt.size(); id++)
+		 for(int id = 0; id < _dydt.size(); id++)
 			 _dydt[id] = 0.;
 		 for(MPILib::Index mesh_index = 0; mesh_index < n_mesh; mesh_index++){
 			 for (unsigned int irate = 0; irate < vec_vec_rates[mesh_index].size(); irate++){
@@ -74,7 +74,7 @@ _init(_rate)
 		 }
 
 #pragma omp parallel for
-		 for (MPILib::Index imass = 0; imass < _sys._vec_mass.size(); imass++)
+		 for (int imass = 0; imass < _sys._vec_mass.size(); imass++)
 			 _sys._vec_mass[imass] += _add._h*t_step*_dydt[imass]; // the mult
 	 }
  }

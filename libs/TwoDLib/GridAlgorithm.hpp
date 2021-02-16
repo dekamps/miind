@@ -12,6 +12,7 @@
 #include "pugixml.hpp"
 #include "display.hpp"
 #include "MasterGrid.hpp"
+#include "DensityAlgorithmInterface.hpp"
 
 namespace TwoDLib {
 
@@ -21,7 +22,8 @@ namespace TwoDLib {
  * This class simulates the evolution of a neural population density function on a 2D grid.
  */
 
-	class GridAlgorithm : public DensityAlgorithmInterface<CustomConnectionParameters>{
+	class GridAlgorithm : public DensityAlgorithmInterface<MPILib::CustomConnectionParameters>{
+		friend DensityAlgorithmInterface<MPILib::CustomConnectionParameters>;
 
 	public:
     GridAlgorithm
@@ -59,12 +61,12 @@ namespace TwoDLib {
 		virtual void setupMasterSolver(double cell_width);
 
 		virtual void prepareEvolve(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<CustomConnectionParameters>& weightVector,
+				const std::vector<MPILib::CustomConnectionParameters>& weightVector,
 				const std::vector<MPILib::NodeType>& typeVector);
 
-		using MPILib::AlgorithmInterface<CustomConnectionParameters>::evolveNodeState;
+		using MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>::evolveNodeState;
 		virtual void evolveNodeState(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<CustomConnectionParameters>& weightVector, MPILib::Time time);
+				const std::vector<MPILib::CustomConnectionParameters>& weightVector, MPILib::Time time);
 
 		virtual void applyMasterSolver(std::vector<MPILib::Rate> rates);
 
@@ -121,7 +123,7 @@ namespace TwoDLib {
 
 	protected:
 
-		virtual void FillMap(const std::vector<CustomConnectionParameters>& weightVector);
+		virtual void FillMap(const std::vector<MPILib::CustomConnectionParameters>& weightVector);
 		std::vector<Mesh> CreateMeshObject();
 		pugi::xml_node CreateRootNode(const std::string&);
 		std::vector<TwoDLib::Redistribution> Mapping(const std::string&);

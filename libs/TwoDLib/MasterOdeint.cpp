@@ -97,7 +97,7 @@ std::vector<std::vector<CSRMatrix> > MasterOdeint::InitializeCSR(const std::vect
 
 
 #pragma omp parallel for
-	for(unsigned int id = 0; id < dydt.size(); id++)
+	for(int id = 0; id < dydt.size(); id++)
 		dydt[id] = 0.;
 
 	MPILib::Number nr_meshes = _p_vec_rates->size();

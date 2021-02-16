@@ -1,3 +1,5 @@
+#ifdef WANTROOT
+
 #include <TSystem.h>
 #include <TRandom.h>
 #include <TApplication.h>
@@ -73,4 +75,15 @@ int main ( int argc, char* argv[] )
 }
 */
 
+#else 
+
+#include <iostream>
+
+int main(int argc, char* argv[])
+{
+    std::cout << "ROOT has been disabled in this build so this test cannot be performed. Exiting.\n";
+    return 0;
+}
+
+#endif
 

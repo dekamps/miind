@@ -30,11 +30,11 @@ CircularDistribution::CircularDistribution() {
 CircularDistribution::~CircularDistribution() throw(){
 }
 
-bool CircularDistribution::isLocalNode(NodeId nodeId) const {
+bool CircularDistribution::isLocalNode(MPILib::NodeId nodeId) const {
 	return getResponsibleProcessor(nodeId) == utilities::MPIProxy().getRank();
 }
 
-int CircularDistribution::getResponsibleProcessor(NodeId nodeId) const {
+int CircularDistribution::getResponsibleProcessor(MPILib::NodeId nodeId) const {
 	return nodeId % utilities::MPIProxy().getSize();
 }
 

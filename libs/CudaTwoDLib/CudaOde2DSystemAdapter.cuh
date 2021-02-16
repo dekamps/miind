@@ -22,10 +22,11 @@
 #define _CODE_CUDA2DLIB_CudaOde2DSystemAdapter_INCLUDE_GUARD
 
 #include <cassert>
-#include "../TwoDLib/TwoDLib.hpp"
-
+#include <TwoDLib/Ode2DSystemGroup.hpp>
+#include <map>
 
 namespace CudaTwoDLib {
+
 
 	  /**
 	   * \brief  Responsible for maintaining the mirror of an Ode2DSystemGroup on a GPGPU device
@@ -42,14 +43,14 @@ namespace CudaTwoDLib {
 
 		CudaOde2DSystemAdapter
 		(
-	           TwoDLib::Ode2DSystemGroup& group // The group must already be initialized. This will be checked and an exception will be thrown if it is suspected this has not happened
+			TwoDLib::Ode2DSystemGroup& group // The group must already be initialized. This will be checked and an exception will be thrown if it is suspected this has not happened
 		);
 
 		//! Standard Constructor
 		CudaOde2DSystemAdapter
 		(
-	           TwoDLib::Ode2DSystemGroup& group, // The group must already be initialized. This will be checked and an exception will be thrown if it is suspected this has not happened
-				 		MPILib::Time network_time_step
+			TwoDLib::Ode2DSystemGroup& group, // The group must already be initialized. This will be checked and an exception will be thrown if it is suspected this has not happened
+				 		double network_time_step
 
 		);
 

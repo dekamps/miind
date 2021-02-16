@@ -23,112 +23,104 @@
 
 #include <cassert>
 #include <cuda_runtime.h>
-#include "../TwoDLib/TwoDLib.hpp"
 #include "CudaOde2DSystemAdapter.cuh"
 
 
 namespace CudaTwoDLib {
 
-	  /**
-	   * \brief  Responsible for maintaining the mirror of Master equation calls  on a GPGPU device
-	   *
-	   * Executes the Master equation solver on the GPU device
-	   */
+	/**
+	 * \brief  Responsible for maintaining the mirror of Master equation calls  on a GPGPU device
+	 *
+	 * Executes the Master equation solver on the GPU device
+	 */
 
-        //! floating point type for cuda system
+	 //! floating point type for cuda system
 	typedef float fptype;
 	typedef unsigned int inttype;
 
 	class CSRAdapter {
 	public:
 
-							CSRAdapter(CudaOde2DSystemAdapter& adapter, const std::vector<TwoDLib::CSRMatrix>& matrixvector, fptype euler_timestep );
+		CSRAdapter(CudaOde2DSystemAdapter& adapter, const std::vector<TwoDLib::CSRMatrix>& matrixvector, fptype euler_timestep);
 
-							CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib::CSRMatrix>& vecmat,
-							 inttype nr_connections, fptype euler_timestep,
-							 const std::vector<inttype>& vecmat_indexes, const std::vector<inttype>& grid_transforms);
+		CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib::CSRMatrix>& vecmat,
+			inttype nr_connections, fptype euler_timestep,
+			const std::vector<inttype>& vecmat_indexes, const std::vector<inttype>& grid_transforms);
 
-              ~CSRAdapter();
+		~CSRAdapter();
 
-              void InspectMass(inttype);
+		void InspectMass(inttype);
 
-              void ClearDerivative();
+		void ClearDerivative();
 
-              void CalculateDerivative(const std::vector<fptype>&);
+		void CalculateDerivative(const std::vector<fptype>&);
 
-				void InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy);
+		void CalculateMeshGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<int>&, const std::vector<int>&);
 
-				void InitializeStaticGridEfficacySlow(const inttype vecindex, const inttype connindex, const fptype efficacy);
+		void CalculateGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<int>&, const std::vector<int>&);
 
-				void InitializeStaticGridEfficacySlowLateral(const inttype vecindex, const inttype connindex, const fptype efficacy);
+		void InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex, const std::vector<fptype>& efficacy);
 
-				void InitializeStaticGridEfficacySlowLateralEpileptor(const inttype vecindex, const inttype connindex, const fptype efficacy, const fptype tau, const fptype K, const fptype v_in);
+		void InitializeStaticGridConductanceEfficacies(const std::vector<inttype>& vecindex, const std::vector<fptype>& efficacy, const std::vector<fptype>& rest_vs);
 
-				void UpdateGridEfficacySlow(const inttype vecindex, const inttype connindex, const fptype efficacy);
+		void CalculateMeshGridDerivativeWithEfficacy(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates);
 
-				void UpdateGridEfficacySlowLateral(const inttype vecindex, const inttype connindex, const fptype efficacy);
+		void SingleTransformStep();
 
-				void UpdateGridEfficacySlowLateralEpileptor(const inttype vecindex, const inttype connindex, const fptype efficacy, const fptype tau, const fptype K, const fptype v_in);
+		void AddDerivative();
 
-				void UpdateGridEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy);
-				
-				void InitializeStaticGridVDependentEfficacies(const std::vector<inttype>& vecindex,const std::vector<fptype>& efficacy, const std::vector<fptype>& rest_vs);
+		void AddDerivativeFull();
 
-				void CalculateMeshGridDerivative(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates);
+		inttype NrIterations() const { return _nr_iterations; }
 
-				void SingleTransformStep();
+	private:
 
-              void AddDerivative();
+		inttype NumberIterations(const CudaOde2DSystemAdapter&, fptype) const;
 
-							void AddDerivativeFull();
+		void FillMatrixMaps(const std::vector<TwoDLib::CSRMatrix>&);
+		void DeleteMatrixMaps();
+		void FillDerivative();
+		void DeleteDerivative();
+		void CreateStreams();
+		void DeleteStreams();
 
-              inttype NrIterations() const { return _nr_iterations; }
+		std::vector<inttype> Offsets(const std::vector<TwoDLib::CSRMatrix>&) const;
+		std::vector<inttype> NrRows(const std::vector<TwoDLib::CSRMatrix>&) const;
+		std::vector<fptype> CellWidths(const std::vector<TwoDLib::CSRMatrix>&) const;
 
-        private:
+		CudaOde2DSystemAdapter& _group;
+		fptype                  _euler_timestep;
+		inttype                 _nr_iterations;
+		inttype                 _nr_m;
+		inttype									_nr_streams;
+		inttype									_nr_grid_connections;
 
-              inttype NumberIterations(const CudaOde2DSystemAdapter&, fptype) const;
+		std::vector<inttype>		_grid_transforms;
+		std::vector<inttype> 		_vecmats;
 
-              void FillMatrixMaps(const std::vector<TwoDLib::CSRMatrix>&);
-              void DeleteMatrixMaps();
-              void FillDerivative();
-              void DeleteDerivative();
-              void CreateStreams();
-              void DeleteStreams();
+		std::vector<inttype>   _nval;
+		std::vector<fptype*>   _val;
+		std::vector<inttype>   _nia;
+		std::vector<inttype*>  _ia;
+		std::vector<inttype>   _nja;
+		std::vector<inttype*>  _ja;
 
-	          	std::vector<inttype> Offsets(const std::vector<TwoDLib::CSRMatrix>&) const;
-	          	std::vector<inttype> NrRows(const std::vector<TwoDLib::CSRMatrix>&) const;
-							std::vector<fptype> CellWidths(const std::vector<TwoDLib::CSRMatrix>&) const;
-							std::vector<fptype> CellHeights(const std::vector<TwoDLib::CSRMatrix>&) const;
+		std::vector<inttype> _offsets;
+		std::vector<inttype> _nr_rows;
 
-	      			CudaOde2DSystemAdapter& _group;
-              fptype                  _euler_timestep;
-              inttype                 _nr_iterations;
-              inttype                 _nr_m;
-							inttype									_nr_streams;
+		std::vector<fptype>	 _cell_widths;
+		std::vector<fptype*> _goes;
+		std::vector<fptype*> _stays;
+		std::vector<int*> _offset1s;
+		std::vector<int*> _offset2s;
 
-							std::vector<inttype>		_grid_transforms;
-							std::vector<inttype> 		_vecmats;
+		fptype* _dydt;
+		fptype* _cell_vs;
 
-              std::vector<inttype>   _nval;
-              std::vector<fptype*>   _val;
-              std::vector<inttype>   _nia;
-              std::vector<inttype*>  _ia;
-              std::vector<inttype>   _nja;
-			  std::vector<inttype*>  _ja;
-			  
-			  std::vector<fptype>	 _cell_widths;
-			  std::vector<fptype>	 _cell_heights;
+		int _blockSize;
+		int _numBlocks;
 
-              std::vector<inttype> _offsets;
-              std::vector<inttype> _nr_rows;
-
-              fptype* _dydt;
-			  fptype* _cell_vs;
-
-              int _blockSize;
-              int _numBlocks;
-
-              cudaStream_t* _streams;
+		cudaStream_t* _streams;
 	};
 }
 #endif // include guard

@@ -178,55 +178,57 @@ tutorial/vectorised/adex_-1_0_0_0_.mat
 tutorial/vectorised/vector.xml
 )
 
+set(EXAMPLES_BASE_DIR share/miind/examples)
+
 install( FILES ${AEXP}
-    DESTINATION share/miind/examples/aexp )
+    DESTINATION ${EXAMPLES_BASE_DIR}/aexp )
 install( FILES ${COND}
-    DESTINATION share/miind/examples/cond )
+    DESTINATION ${EXAMPLES_BASE_DIR}/cond )
 install( FILES ${LIF}
-    DESTINATION share/miind/examples/lif )
+    DESTINATION ${EXAMPLES_BASE_DIR}/lif )
 install( FILES ${LIF_PYTHON}
-    DESTINATION share/miind/examples/lif_python )
+    DESTINATION ${EXAMPLES_BASE_DIR}/lif_python )
 install( FILES ${QIF}
-    DESTINATION share/miind/examples/qif )
+    DESTINATION ${EXAMPLES_BASE_DIR}/qif )
 install( FILES ${RATE}
-    DESTINATION share/miind/examples/rate_based )
+    DESTINATION ${EXAMPLES_BASE_DIR}/rate_based )
 install( FILES ${RESP}
-    DESTINATION share/miind/examples/response_curve_lif )
+    DESTINATION ${EXAMPLES_BASE_DIR}/response_curve_lif )
 install( FILES ${SINGLE}
-    DESTINATION share/miind/examples/single_lif )
+    DESTINATION ${EXAMPLES_BASE_DIR}/single_lif )
 install( FILES ${SELF}
-    DESTINATION share/miind/examples/single_selfinhib )
+    DESTINATION ${EXAMPLES_BASE_DIR}/single_selfinhib )
 install( FILES ${TWO}
-    DESTINATION share/miind/examples/twopop )
+    DESTINATION ${EXAMPLES_BASE_DIR}/twopop )
 install( FILES ${MA_ADEX}
-    DESTINATION share/miind/examples/model_archive/Adex )
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Adex )
 install( FILES ${MA_COND}
-    DESTINATION share/miind/examples/model_archive/Conductance2D )
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Conductance2D )
 install( FILES ${MA_EIF}
-    DESTINATION share/miind/examples/model_archive/EIF )
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/EIF )
 install( FILES ${MA_EPILEPTOR}
-    DESTINATION share/miind/examples/model_archive/Epileptor )
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Epileptor )
 install( FILES ${MA_FN}
-    DESTINATION share/miind/examples/model_archive/FitzhughNagumo )
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/FitzhughNagumo )
 install( FILES ${MA_IZH}
-    DESTINATION share/miind/examples/model_archive/Izhikevich )
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Izhikevich )
 install( FILES ${MA_LIF}
-    DESTINATION share/miind/examples/model_archive/LIF )
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/LIF )
 install( FILES ${MA_MN}
-    DESTINATION share/miind/examples/model_archive/MinimalMotorneuron )
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/MinimalMotorneuron )
 install( FILES ${MA_PNAP}
-    DESTINATION share/miind/examples/model_archive/PersistentSodium2D )
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/PersistentSodium2D )
 install( FILES ${MA_QIF}
-    DESTINATION share/miind/examples/model_archive/QIF )
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/QIF )
 install( FILES ${TUTORIAL}
-    DESTINATION share/miind/examples/tutorial )
+    DESTINATION ${EXAMPLES_BASE_DIR}/tutorial )
 install( FILES ${TUTORIAL_GRID}
-    DESTINATION share/miind/examples/tutorial/grid )
+    DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/grid )
 install( FILES ${TUTORIAL_T1}
-    DESTINATION share/miind/examples/tutorial/t1 )
+    DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t1 )
 install( FILES ${TUTORIAL_T2}
-    DESTINATION share/miind/examples/tutorial/t2 )
+    DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t2 )
 install( FILES ${TUTORIAL_T3}
-    DESTINATION share/miind/examples/tutorial/t3 )
+    DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t3 )
 install( FILES ${TUTORIAL_VECTOR}
-    DESTINATION share/miind/examples/tutorial/vectorised )
+    DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/vectorised )

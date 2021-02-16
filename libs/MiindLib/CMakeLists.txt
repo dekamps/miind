@@ -4,7 +4,12 @@ project( ${MIIND_LIBRARY_PREFIX}shared )
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
+if (WIN32)
+set( LIB_TYPE STATIC )
+else (WIN32)
 set( LIB_TYPE SHARED )
+endif (WIN32)
+
 include_directories( ${ROOT_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
 
@@ -15,21 +20,15 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_BINARY_DIR}/../
 )
 
-set( TWOD_SRC
-VectorizedNetwork.cpp
-)
-
-set( TWOD_HEADERS
-VectorizedNetwork.hpp
-)
-
 if (ENABLE_CUDA)
    if (NOT APPLE)
    list(APPEND TWOD_SRC
 	VectorizedNetwork.cpp
+    SimulationParserGPU.cpp
    )
    list(APPEND TWOD_HEADERS
 	VectorizedNetwork.hpp
+    SimulationParserGPU.h
    )
    endif (NOT APPLE)
 endif(ENABLE_CUDA)

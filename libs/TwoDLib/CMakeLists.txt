@@ -1,7 +1,11 @@
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
+if (WIN32)
+set( LIB_TYPE STATIC )
+else (WIN32)
 set( LIB_TYPE SHARED )
+endif (WIN32)
 
 include_directories( ${ROOT_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
@@ -44,6 +48,9 @@ MasterGridSomaDendrite.cpp
 Uniform.cpp
 MasterOdeint.cpp
 MasterOMP.cpp
+SimulationParserCPU.cpp
+MeshAlgorithmCustomCode.cpp
+GridAlgorithmCode.cpp
 )
 
 set( TWOD_HEADERS
@@ -52,7 +59,6 @@ MasterOMP.hpp
 MasterParameter.hpp
 Cell.hpp
 MeshAlgorithmCode.hpp
-MeshAlgorithmCustomCode.hpp
 CheckSystem.hpp
 MeshAlgorithmCustom.hpp
 MeshAlgorithm.hpp
@@ -73,7 +79,6 @@ Fid.hpp
 PolyGenerator.hpp
 FiducialElement.hpp
 pugiconfig.hpp
-GridAlgorithmCode.hpp
 pugixml.hpp
 GridAlgorithm.hpp
 GridJumpAlgorithmCode.hpp
@@ -102,6 +107,7 @@ Master.hpp
 Uniform.hpp
 MasterOdeint.hpp
 XML.hpp
+SimulationParserCPU.h
 )
 
 set( GL_HEADERS

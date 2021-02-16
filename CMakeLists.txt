@@ -1,4 +1,5 @@
 project( miind )
+
 cmake_minimum_required(VERSION 2.6)
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake-modules )
 set(CMAKE_CXX_STANDARD 11)
@@ -16,21 +17,34 @@ MACRO_REQUIRE_OUT_OF_SRC_BUILD("Miind requires out-of-source builds.")
 # default install prefix. can be set with ccmake
 set( CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix." )
 
-
 set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
+
+# On linux, we define all libs as shared so they can be used in
+# generated python import libraries. On windows, we don't need to do that.
+# If we need dlls in windows instead of static lib files, 
+# we need to set DLL export macro here and will need to go through *ALL*
+# classes we want to export... yeesh...
+#if (WIN32)
+#add_compile_definitions("DllExport=__declspec(dllexport)")
+#else(WIN32)
+#add_compile_definitions("DllExport=")
+#endif(WIN32)
 
 ##############################################################################
 # compile flags
 ##############################################################################
+if(CMAKE_COMPILER_IS_GNUCXX)
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
-
+endif(CMAKE_COMPILER_IS_GNUCXX)
 
 if (APPLE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fPIC")
 set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
 else (APPLE)
+if(CMAKE_COMPILER_IS_GNUCXX)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fext-numeric-literals -fPIC")
-set(GLUT_LIBRARY "-lGL -lGLU -lglut")
+set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
+endif(CMAKE_COMPILER_IS_GNUCXX)
 endif(APPLE)
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
@@ -66,6 +80,13 @@ IF(ENABLE_OPENMP)
 	add_definitions( -DENABLE_OPENMP=1 )
 ENDIF(ENABLE_OPENMP)
 
+IF (WIN32) # For windows packaging, we want to include the glut dll so we need FindGLUT to find it during install
+find_package(GLUT REQUIRED)
+ENDIF (WIN32)
+
+IF(ENABLE_CUDA)
+set(CMAKE_CUDA_ARCHITECTURES "sm_60") #adapt this to the GPU on your system
+ENDIF(ENABLE_CUDA)
 
 
 IF(ENABLE_OPENMP)
@@ -161,8 +182,6 @@ ELSE(ENABLE_TESTING AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
 	MESSAGE(STATUS "Testing disabled, enable testing and Debug build")
 ENDIF(ENABLE_TESTING AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
 
-
-
 include_directories( ./libs )
 message("========================================Common settings done going on with libs===================================")
 ADD_SUBDIRECTORY( libs )
@@ -180,11 +199,13 @@ MESSAGE(STATUS "Compiler cxx flags:" ${CMAKE_CXX_FLAGS})
 ADD_SUBDIRECTORY( python )
 ADD_SUBDIRECTORY( examples )
 
+if (NOT SKBUILD) # If miind is being built as a standalone (not a pip wheel)
 message("======================================== Please update ENV variables ====================================")
 message("")
-message("export PATH=$PATH:${CMAKE_INSTALL_PREFIX}/share/miind/python")
-message("export PYTHONPATH=$PYTHONPATH:${CMAKE_INSTALL_PREFIX}/share/miind/python")
+message("export PATH=$PATH:${CMAKE_INSTALL_PREFIX}/share/miind/python/miind")
+message("export PYTHONPATH=$PYTHONPATH:${CMAKE_INSTALL_PREFIX}/share/miind/python/")
 message("export OMP_NUM_THREADS=<NUMBER OF AVAILABLE CORES>" ) 
 message("")
 message("==========================================================================================================")
+endif (NOT SKBUILD)
 

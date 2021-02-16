@@ -1,5 +1,9 @@
 project( ${MIIND_LIBRARY_PREFIX}cudatwod )
 
+#if (WIN32) # When cmake generates the VS files, it needs to know this is a cuda project
+#enable_language(CUDA)
+#endif (WIN32)
+
 find_package(CUDA  REQUIRED)
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )

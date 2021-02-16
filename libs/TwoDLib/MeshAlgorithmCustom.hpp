@@ -39,7 +39,7 @@ namespace TwoDLib {
  */
 
 	template <class Solver=TwoDLib::MasterOdeint>
-	class MeshAlgorithmCustom : public DensityAlgorithmInterface<CustomConnectionParameters>  {
+	class MeshAlgorithmCustom : public DensityAlgorithmInterface<MPILib::CustomConnectionParameters>  {
 
 	public:
 
@@ -98,9 +98,9 @@ namespace TwoDLib {
 		 * @param time Time point of the algorithm
 		 * @param typeVector Vector of the NodeTypes of the precursors
 		 */
-		using MPILib::AlgorithmInterface<CustomConnectionParameters>::evolveNodeState;
+		using MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>::evolveNodeState;
 		virtual void evolveNodeState(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<CustomConnectionParameters>& weightVector, MPILib::Time time);
+				const std::vector<MPILib::CustomConnectionParameters>& weightVector, MPILib::Time time);
 
 		/**
 		 * prepare the Evolve method
@@ -109,7 +109,7 @@ namespace TwoDLib {
 		 * @param typeVector Vector of the NodeTypes of the precursors
 		 */
 		virtual void prepareEvolve(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<CustomConnectionParameters>& weightVector,
+				const std::vector<MPILib::CustomConnectionParameters>& weightVector,
 				const std::vector<MPILib::NodeType>& typeVector);
 
 
@@ -153,7 +153,7 @@ namespace TwoDLib {
 		std::vector<TwoDLib::Mesh>              CreateMeshObject();
 		std::vector<TwoDLib::Redistribution>    Mapping(const std::string&);
 		std::vector<TwoDLib::TransitionMatrix>  InitializeMatrices(const std::vector<std::string>&);
-		void                                    FillMap(const std::vector<CustomConnectionParameters>& weightVector);
+		void                                    FillMap(const std::vector<MPILib::CustomConnectionParameters>& weightVector);
 
 		double _tolerance;
 

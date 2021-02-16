@@ -131,7 +131,7 @@ void CSRMatrix::MV(vector<double>& out, const vector<double>& in){
 	MPILib::Index nr_rows = _ia.size();
 
 #pragma omp parallel for
-	for (MPILib::Index i = 0; i < nr_rows ; i++){
+	for (int i = 0; i < nr_rows ; i++){
 	  for(MPILib::Index j = _ia[i]; j < _ia[i+1]; j++){
 			out[i] += _val[j]*in[_ja[j]];
 		}
@@ -149,7 +149,7 @@ void CSRMatrix::MVMapped
 	unsigned int nr_rows = _ia.size() - 1;
 
 #pragma omp parallel for
-	for (MPILib::Index i = 0; i < nr_rows; i++){
+	for (int i = 0; i < nr_rows; i++){
 		MPILib::Index i_r =_sys.Map(i+_i_offset);
 		for( MPILib::Index j = _ia[i]; j < _ia[i+1]; j++){
 			 int j_m = _sys.Map(_ja[j]+_i_offset);
