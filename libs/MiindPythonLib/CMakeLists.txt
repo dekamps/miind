@@ -57,7 +57,10 @@ install( FILES ${GLUT_RUNTIME_LIBRARY}/${glut_lib_basename}.dll DESTINATION bin)
 # Let's set up a few directories to search. Also add the location of the glut dll above just
 # in case they're in the same place... cough VCPKG cough
 set(MY_DEPENDENCY_PATHS ${Boost_LIBRARY_DIR_RELEASE} ${Boost_LIBRARY_DIR_RELEASE}/../bin/ ${GLUT_RUNTIME_LIBRARY} ${ADDITIONAL_DLL_DEPENDENCY_DIRS} ) 
+cmake_policy(PUSH)
+cmake_policy(SET CMP0026 OLD)
 GET_TARGET_PROPERTY(OUTPUT_PATH ${MIIND_LIBRARY_PREFIX}sim LOCATION )
+cmake_policy(POP)
 # Transfer the value of ${OUTPUT_PATH} into the install script
 install(CODE "set(MY_DEPENDENCY_PATHS \"${MY_DEPENDENCY_PATHS}\")")
 install(CODE "set(TARGET_LOCATION \"${OUTPUT_PATH}\")")

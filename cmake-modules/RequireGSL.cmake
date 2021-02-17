@@ -1,9 +1,6 @@
 if (WIN32)
-find_package( gsl )
+find_package( GSL )
 else (WIN32)
-include( RequireGSL )
-
-
 include( UsePkgConfig )
 
 pkgconfig( gsl gsl_INCLUDE_DIR gsl_LINK_DIR gsl_LINK_FLAGS gsl_CFLAGS )
