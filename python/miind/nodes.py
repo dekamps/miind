@@ -4,7 +4,7 @@ Created on Sat Jan 17 12:24:06 2015
 
 @author: scsmdk
 """
-import miind.algorithms
+import miind.algorithms as algorithms
 
 NODE_NAMES = {}
 

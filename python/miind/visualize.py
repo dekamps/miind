@@ -1,8 +1,8 @@
 import numpy as np
 import ROOT
-from miind.palette import *
-from ode2dsystem import *
-from miind.mesh3 import *
+import miind.palette as palette
+import miind.ode2dsystem as ode2dsystem 
+import miind.mesh3 as mesh
 try:
     from StringIO import StringIO
 except ImportError:

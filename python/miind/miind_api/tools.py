@@ -23,18 +23,21 @@ class cd:
     def __exit__(self, etype, value, traceback):
         os.chdir(self.savedPath)
 
-def getMiindBuildPath():
-    return os.path.join(directories.miind_root(), 'build')
+def getMiindBuildPath(): #Used in development mode
+    return os.path.join(directories.miind_python_dir(), '../../build')
 
 def getMiindPythonPath():
-    return os.path.join(directories.miind_root(), 'python')
+    return os.path.join(directories.miind_python_dir())
 
 def getMiindAppsPath():
     build_path = getMiindBuildPath()
-    # if miind has been installed, important apps are in ../share/miind/apps
+    # if this is python miind, try to find apps in .../miind/build/apps
     if not os.path.isdir(build_path):
-        build_path = directories.miind_root()
-    return op.join(build_path, 'apps')
+        build_path = os.path.join(directories.miind_python_dir(), 'build/apps')
+    # if miind has been installed, try to find apps in .../share/python/miind/apps
+    if not os.path.isdir(build_path):
+        build_path = os.path.join(directories.miind_python_dir(), '../../apps')
+    return build_path
 
 def split_fname(fname, ext):
     fname = op.split(fname)[1]

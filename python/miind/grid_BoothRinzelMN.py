@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
-import miind.grid_generate
+import miind.grid_generate as grid_generate
 
 def BoothRinzelMNSoma(y, t):
     V_na = 1;

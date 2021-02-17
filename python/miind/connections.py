@@ -5,8 +5,8 @@ Created on Sat Jan 17 16:51:56 2015
 @author: scsmdk
 """
 
-import miind.nodes
-import miind.variables
+import miind.nodes as nodes
+import miind.variables as variables
 
 TALLY = {}
 

@@ -1,5 +1,5 @@
 import miind.mesh3 as mesh
-import miind.writemesh
+import miind.writemesh as writemesh
 import numpy as np
 
 class LifMeshGenerator:

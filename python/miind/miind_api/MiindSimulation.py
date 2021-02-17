@@ -16,8 +16,8 @@ from .Marginal import Marginal
 
 # From MIIND
 import miind.directories3 as directories
-import miind.miind
-import miind.miind_lib
+import miind.miindrun as miind
+import miind.miind_lib as miind_lib
 
 class MiindSimulation:
     def __init__(self, xml_path, submit_name=None, **kwargs):
@@ -287,9 +287,9 @@ class MiindSimulation:
             miind_lib.generate_vectorized_network_lib(self.submit_name, xml_list, '',
             enable_mpi, enable_openmp, enable_root, enable_cuda)
         with cd(self.submit_name):
-            localfiles=subprocess.check_output(["ls"],encoding='UTF-8').split()
+            localfiles=os.listdir()
             if 'CMakeLists.txt' in localfiles:
-                subprocess.call(['cmake . '] +
+                subprocess.call(['cmake']+['.'] +
                                  [a for a in args],
                                  cwd=self.output_directory, shell=True)
                 subprocess.call(['make'], cwd=self.output_directory)
@@ -298,10 +298,10 @@ class MiindSimulation:
                 for fi in localfiles:
                     if os.path.isdir(fi):
                         with cd(fi):
-                            localfiles=subprocess.check_output(["ls"],encoding='UTF-8').split()
+                            localfiles=os.listdir()
                             # subprocess returns bytes, and this difference is important in Python 3
                             if 'CMakeLists.txt' in localfiles:
-                                subprocess.call(['cmake . ']+[a for a in args],shell=True)
+                                subprocess.call(['cmake']+['.']+[a for a in args],shell=True)
                                 subprocess.call(['make'])
 
     def submit(self, overwrite=False, xml_list=[], enable_mpi=False, enable_openmp=False, enable_root=True, enable_cuda=False, *args):
@@ -314,9 +314,9 @@ class MiindSimulation:
             miind.generate_vectorized_network_executable(self.submit_name, xml_list, '',
             enable_mpi, enable_openmp, enable_root, enable_cuda)
         with cd(self.submit_name):
-            localfiles=subprocess.check_output(["ls"],encoding='UTF-8').split()
+            localfiles=os.listdir()
             if 'CMakeLists.txt' in localfiles:
-                subprocess.call(['cmake . '] +
+                subprocess.call(['cmake']+['.'] +
                                  [a for a in args],
                                  cwd=self.output_directory, shell=True)
                 subprocess.call(['make'], cwd=self.output_directory)
@@ -325,15 +325,15 @@ class MiindSimulation:
                 for fi in localfiles:
                     if os.path.isdir(fi):
                         with cd(fi):
-                            localfiles=subprocess.check_output(["ls"],encoding='UTF-8').split()
+                            localfiles=os.listdir()
                             # subprocess returns bytes, and this difference is important in Python 3
                             if 'CMakeLists.txt' in localfiles:
-                                subprocess.call(['cmake . ']+[a for a in args],shell=True)
+                                subprocess.call(['cmake']+['.']+[a for a in args],shell=True)
                                 subprocess.call(['make'])
 
     def run(self):
         with cd(self.submit_name):
-            localfiles=subprocess.check_output(["ls"],encoding='UTF-8').split()
+            localfiles=os.listdir()
             for fi in localfiles:
                 if os.path.isdir(fi):
                     with cd(fi):
@@ -341,7 +341,7 @@ class MiindSimulation:
 
     def run_mpi(self, cores):
         with cd(self.submit_name):
-            localfiles=subprocess.check_output(["ls"],encoding='UTF-8').split()
+            localfiles=os.listdir()
             for fi in localfiles:
                 if os.path.isdir(fi):
                     with cd(fi):

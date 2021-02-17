@@ -4,7 +4,7 @@ import os
 import numpy as np
 import subprocess as sp
 import sys
-import miind.visualize
+import miind.visualize as visualize
 import ROOT
 
 # the tolerance by which efficacies can be distinguished from their file names

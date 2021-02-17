@@ -4,7 +4,7 @@ from aexpdevelop import *
 from miind.bary import isinsidequadrilateral
 from matplotlib.path import Path
 from scipy.spatial import KDTree
-import miind.mesh
+import miind.mesh as mesh
 
 mesh.MAX_NEIGHBOURS=16
 TEST_MESH = 'aexp.mesh'

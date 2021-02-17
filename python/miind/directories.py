@@ -2,8 +2,8 @@ import os
 import errno
 import string
 import inspect
-import miind.codegen
-import miind.codegen_lib
+import miind.codegen as codegen
+import miind.codegen_lib as codegen_lib
 import subprocess as sp
 
 # global variable to hold absolute path

@@ -1,4 +1,4 @@
-import miind.algorithms
+import miind.algorithms as algorithms
 
 VARIABLES = []
 

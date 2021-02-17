@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 import subprocess 
-import miind.submit
+import miind.submit as submit
 import sys
 import os
-import miind.directories
+import miind.directories as directories
 
 dir=sys.argv[1]
 

@@ -5,15 +5,10 @@ import inspect
 import shutil
 import miind.codegen3 as codegen
 import miind.codegen_lib3 as codegen_lib
-import subprocess as sp
+from shutil import copyfile, copy2
 
 # global variable to hold absolute path
 ABS_PATH=''
-
-# global variable to hold the root of the miind tree, i.e. the absolute
-# path name of the directory that hold the 'miind-git' directory
-MIIND_ROOT=''
-
 
 PATH_VARS_DEFINED=False
 
@@ -24,8 +19,6 @@ def initialize_global_variables():
     filename = inspect.getframeinfo(inspect.currentframe()).filename
     path = os.path.dirname(os.path.abspath(filename))
     ABS_PATH=path
-    global MIIND_ROOT
-    MIIND_ROOT =  ABS_PATH[0:-6]
     global PATH_VARS_DEFINED
     PATH_VARS_DEFINED=True
 
@@ -39,16 +32,12 @@ def check_and_strip_name(full_path_name):
     else:
         return name[:-4]
 
-def miind_root():
-    global MIIND_ROOT
+def miind_python_dir():
+    global ABS_PATH
     initialize_global_variables()
-    return MIIND_ROOT
+    return ABS_PATH
 
 def create_dir(name):
-    ''' Name of the executable to be generated. Should not end in '.xml'. The directory will be created relative to the calling directory. '''
-    initialize_global_variables()
-    global MIIND_ROOT
-
     abs_path=os.path.join('.',name)
     try:
         os.makedirs(abs_path)
@@ -79,7 +68,9 @@ def filter(lines,enable_mpi,enable_openmp,enable_root, source_file_name):
     nw = []
     for line in lines:
         if '${CMAKE_SOURCE_DIR}' in line:
-            hh=line.replace('${CMAKE_SOURCE_DIR}',MIIND_ROOT)
+            p = os.path.join(miind_python_dir(), '..','..')
+            miind_root = p.replace('\\', '/')
+            hh=line.replace('${CMAKE_SOURCE_DIR}',miind_root)
             nw.append(hh)
         elif '${TOKEN_ENABLE_MPI}' in line:
     	    hh=line.replace('${TOKEN_ENABLE_MPI}',ENABLE_MPI)
@@ -108,7 +99,7 @@ def insert_cmake_template_lib(name, full_path_name, enable_mpi,enable_openmp,ena
 	       os.remove(cachefile)
 
     outname = os.path.join(full_path_name, 'CMakeLists.txt')
-    template_path = os.path.join(miind_root(),'python','cmake_template_lib')
+    template_path = os.path.join(miind_python_dir(),'cmake_template_lib')
     with open(template_path) as f:
         lines=f.readlines()
 
@@ -124,16 +115,16 @@ def insert_cmake_template_lib(name, full_path_name, enable_mpi,enable_openmp,ena
         for line in replace:
             fout.write(line)
 
-        libbase = MIIND_ROOT + '/build/libs'
-        numdir  = libbase + '/NumtoolsLib'
-        geomdir = libbase + '/GeomLib'
-        mpidir  = libbase + '/MPILib'
-        twodir  = libbase + '/TwoDLib'
+        libbase = os.path.join(miind_python_dir(), '..', '..', 'build','libs')
+        numdir  = os.path.join(libbase,'NumtoolsLib')
+        geomdir = os.path.join(libbase,'GeomLib')
+        mpidir  = os.path.join(libbase,'MPILib')
+        twodir  = os.path.join(libbase,'TwoDLib')
 
 
         if cuda == True:
-            cudatwodir = libbase + '/CudaTwoDLib'
-            shared  = libbase + '/MiindLib'
+            cudatwodir = os.path.join(libbase,'CudaTwoDLib')
+            shared  = os.path.join(libbase,'MiindLib')
         else:
             cudatwodir = ''
             shared  = ''
@@ -141,7 +132,11 @@ def insert_cmake_template_lib(name, full_path_name, enable_mpi,enable_openmp,ena
         # If MIIND_INCLUDE_DIR has been defined, we're compiling for a development version (not installed version)
         # so set link to the development libraries. Otherwise, libraries are in usr/lib where they should be.
         fout.write('IF (MIIND_INCLUDE_DIR)\n')
-        fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ' ' + shared +')\n')
+        if(os.path.isfile(libbase)): # maybe we're in python...
+            fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ' ' + shared +')\n')
+        else:
+            libbase = os.path.join(miind_python_dir(), 'build','libs')
+            fout.write('link_directories('+ libbase +')\n')
         fout.write('ENDIF (MIIND_INCLUDE_DIR)\n')
         if cuda == True:
             fout.write('\ncuda_add_library( '+ name + ' ${LIB_TYPE} ${TVB_LIF_SRC} ${PW_HEADERS})\n')
@@ -159,7 +154,7 @@ def insert_cmake_template(name,full_path_name,enable_mpi,enable_openmp,enable_ro
     outname = os.path.join(full_path_name, 'CMakeLists.txt')
     if os.path.exists(outname):
         return
-    template_path = os.path.join(miind_root(),'python','cmake_template')
+    template_path = os.path.join(miind_python_dir(),'cmake_template')
     with open(template_path) as f:
         lines=f.readlines()
 
@@ -177,15 +172,16 @@ def insert_cmake_template(name,full_path_name,enable_mpi,enable_openmp,enable_ro
 
 
         # add  the miind libraries explicitly
-        libbase = MIIND_ROOT + '/build/libs'
-        numdir  = libbase + '/NumtoolsLib'
-        geomdir = libbase + '/GeomLib'
-        mpidir  = libbase + '/MPILib'
-        twodir  = libbase + '/TwoDLib'
+        
+        libbase = os.path.join(miind_python_dir(), '..', '..', 'build','libs')
+        numdir  = os.path.join(libbase,'NumtoolsLib')
+        geomdir = os.path.join(libbase,'GeomLib')
+        mpidir  = os.path.join(libbase,'MPILib')
+        twodir  = os.path.join(libbase,'TwoDLib')
 
         if cuda == True:
-            cudatwodir = libbase + '/CudaTwoDLib'
-            shared  = libbase + '/MiindLib'
+            cudatwodir = os.path.join(libbase,'CudaTwoDLib')
+            shared  = os.path.join(libbase,'MiindLib')
         else:
             cudatwodir = ''
             shared  = ''
@@ -193,7 +189,11 @@ def insert_cmake_template(name,full_path_name,enable_mpi,enable_openmp,enable_ro
         # If MIIND_INCLUDE_DIR has been defined, we're compiling for a development version (not installed version)
         # so set link to the development libraries. Otherwise, libraries are in usr/lib where they should be.
         fout.write('IF (MIIND_INCLUDE_DIR)\n')
-        fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ' ' + shared +')\n')
+        if(os.path.isfile(libbase)): # maybe we're in python...
+            fout.write('link_directories(' + numdir + ' ' + geomdir + ' ' + mpidir + ' ' + twodir + ' ' + cudatwodir + ' ' + shared +')\n')
+        else:
+            libbase = os.path.join(miind_python_dir(), 'build','libs')
+            fout.write('link_directories('+ libbase +')\n')
         fout.write('ENDIF (MIIND_INCLUDE_DIR)\n')
 
         if cuda == True:
@@ -212,7 +212,7 @@ def create_cpp_lib_file(name, dir_path, prog_name, mod_name, enable_root):
 
     if mod_name != None:
         for f in mod_name:
-            sp.call(['cp',f,dir_path])
+            copyfile(f,dir_path)
     return
 
 def create_cpp_file(name, dir_path, prog_name, mod_name, enable_root):
@@ -225,7 +225,7 @@ def create_cpp_file(name, dir_path, prog_name, mod_name, enable_root):
 
     if mod_name != None:
         for f in mod_name:
-            sp.call(['cp',f,dir_path])
+            shutil.copy2(f,dir_path)
     return
 
 
@@ -250,7 +250,7 @@ def move_model_files(xmlfile,dirpath):
 
     fls = mans + mns + tms
     for fi in fls:
-        sp.call(['cp',fi,dirpath])
+        shutil.copy2(fi,dirpath)
 
 def add_shared_library(dirname, xmlfiles, modname, enable_mpi=True, enable_openmp=True, enable_root=True, enable_cuda=False):
 
@@ -268,7 +268,7 @@ def add_shared_library(dirname, xmlfiles, modname, enable_mpi=True, enable_openm
         create_cpp_lib_file(xmlfile, dirpath, progname, modname, enable_root)
         move_model_files(xmlfile,dirpath)
         xmlfilename = xmlfile.split(os.path.sep)[-1]
-        shutil.copyfile(xmlfile, os.path.join(dirpath,xmlfilename))
+        shutil.copy2(xmlfile, os.path.join(dirpath,xmlfilename))
 
 def add_executable(dirname, xmlfiles, modname,enable_mpi=True, enable_openmp=True, enable_root=True, enable_cuda=False):
     ''' Add a user defined executable to the current working directory.

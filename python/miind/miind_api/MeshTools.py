@@ -15,7 +15,7 @@ from matplotlib.collections import PatchCollection
 
 from .tools import *
 
-import miind.lost
+import miind.lost as lost
 import miind.mesh3 as meshmod
 
 class MeshTools:

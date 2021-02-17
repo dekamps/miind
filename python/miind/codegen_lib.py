@@ -1,14 +1,14 @@
 #import os
 import sys
-import miind.include
-import miind.algorithms
-import miind.nodes
-import miind.connections
-import miind.simulation
-import miind.variables
+import miind.include as include
+import miind.algorithms as algorithms
+import miind.nodes as nodes
+import miind.connections as connections
+import miind.simulation as simulation
+import miind.variables as variables
 import xml.etree.ElementTree as ET
 import argparse
-import miind.directories
+import miind.directories as directories
 
 XML_EXTENSION = '.xml'
 

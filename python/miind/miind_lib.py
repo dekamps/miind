@@ -7,10 +7,10 @@ import numpy as np
 import xml.etree.ElementTree as ET
 import miind.directories3 as directories
 from collections import Counter
-import miind.reporting
-import miind.connections
-import miind.variables
-import miind.algorithms
+import miind.reporting as reporting
+import miind.connections as connections
+import miind.variables as variables
+import miind.algorithms as algorithms
 
 # These algorithms can feature in a MeshAlgorithmGroup simulation, and no others
 MESH_ALGORITHM_GROUP_LIST = ['GridAlgorithmGroup', 'MeshAlgorithmGroup', 'DelayAlgorithm', 'RateFunctor' ]

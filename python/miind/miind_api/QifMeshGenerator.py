@@ -1,5 +1,5 @@
-import miind.mesh3
-import miind.writemesh
+import miind.mesh3 as mesh3
+import miind.writemesh as writemesh
 import numpy as np
 import uuid
 

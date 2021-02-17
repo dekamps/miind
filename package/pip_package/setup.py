@@ -1,6 +1,7 @@
 import io
 import os
 import os.path
+import pathlib
 import sys
 import runpy
 import subprocess
@@ -38,7 +39,7 @@ def main():
                 ["submodule", "update", "--init", "--recursive", "opencv_contrib"]
             )
 
-    package_version = "0.0.6"
+    package_version = "0.0.8"
 
     package_name = "miind-test-hugh-osborne"
 
@@ -49,15 +50,27 @@ def main():
 
     package_data = {
         "miind": [],
-        "miind.miind_api": []
+        "miind.testfiles": [],
+        "miind.miind_api": [],
+        "miind.build": [],
+        "miind.build.apps": [],
+        "miind.build.include": [],
+        "miind.build.lib": [],
+        "miind.build.examples": []
     }
 
     # Files from CMake output to copy to package.
     # Path regexes with forward slashes relative to CMake install dir.
     
     rearrange_cmake_output_data = {
-        "miind": (["bin/miindpythoncpu.pyd"] if os.name == 'nt' else []) + (["bin/miindpythoncpu.so"] if sys.platform.startswith("linux") else []) + ["bin\/.+\.dll", "share\/miind\/python\/.+"],
-        "miind.miind_api": ["share\/miind\/python\/miind_api\/.+"]
+        "miind": (["bin/miindsim.pyd"] if os.name == 'nt' else []) + (["bin/miindsim.so"] if os.name != 'nt' else []) + (["bin\/.+\.dll"] if os.name == 'nt' else []) + ["share\/miind\/python\/miind\/.+"],
+        "miind.miind_api": ["share\/miind\/python\/miind\/miind_api\/.+"],
+        "miind.build": [],
+        "miind.build.apps": ["share\/miind\/apps\/MatrixGenerator\/.+","share\/miind\/apps\/Projection\/.+"],
+        "miind.build.include": ["include\/.+"],
+        "miind.build.lib": ["lib\/.+"],
+        "miind.build.examples": ["share\/miind\/examples\/.+"],
+        "miind.testfiles": ["share\/miind\/python\/miind\/testfiles\/.+"]
     }
 
     # Files in sourcetree outside package dir that should be copied to package.
@@ -96,7 +109,8 @@ def main():
               'shapely',
               'descartes',
               'numpy',
-              'matplotlib'
+              'matplotlib<=3.2',
+              'scipy'
         ],
         python_requires=">=3.6",
         classifiers=[
@@ -213,9 +227,17 @@ class RearrangeCMakeOutput(object):
                     if not m:
                         continue
                     found = True
-                    new_install_relpath = os.path.join(
-                        package_dest_reldir, os.path.basename(relpath)
-                    )
+                    # We want to keep directory structure as we find it.
+                    try:
+                        num_dirs_to_remove = len(relpath_re.split('/'))-1
+                        new_install_relpath = os.path.join(
+                            package_dest_reldir, *pathlib.Path(relpath).parts[num_dirs_to_remove:]
+                        )
+                        
+                    except:
+                        new_install_relpath = os.path.join(
+                            package_dest_reldir, os.path.basename(relpath)
+                        )
                     cls._setuptools_wrap._copy_file(
                         os.path.join(cmake_install_dir, relpath),
                         os.path.join(cmake_install_dir, new_install_relpath),

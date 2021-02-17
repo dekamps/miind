@@ -1,5 +1,5 @@
 import numpy as np
-import miind.mesh3
+import miind.mesh3 as mesh3
 import ROOT
 
 class ScoopList:

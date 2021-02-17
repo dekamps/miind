@@ -40,15 +40,15 @@ if (ENABLE_CUDA)
    endif (NOT APPLE)
 endif(ENABLE_CUDA)
 
-add_library( ${MIIND_LIBRARY_PREFIX}pythongpu ${LIB_TYPE} MiindPython.cpp)
+add_library( ${MIIND_LIBRARY_PREFIX}simv ${LIB_TYPE} MiindPython.cpp)
 
-target_link_libraries( ${MIIND_LIBRARY_PREFIX}pythongpu ${LIBLIST})
+target_link_libraries( ${MIIND_LIBRARY_PREFIX}simv ${LIBLIST})
 
 if (WIN32) # for windows, we want to set the ending to .pyd. In linux, the ending is just .so
-SET_TARGET_PROPERTIES(${MIIND_LIBRARY_PREFIX}pythongpu   PROPERTIES SUFFIX .pyd)
+SET_TARGET_PROPERTIES(${MIIND_LIBRARY_PREFIX}simv   PROPERTIES SUFFIX .pyd)
 endif (WIN32)
 
-install( TARGETS ${MIIND_LIBRARY_PREFIX}pythongpu)
+install( TARGETS ${MIIND_LIBRARY_PREFIX}simv)
 
 
 

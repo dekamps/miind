@@ -2,7 +2,7 @@
 
 import ROOT
 import os
-import miind.visualize
+import miind.visualize as visualize
 import sys
 import time
 import subprocess

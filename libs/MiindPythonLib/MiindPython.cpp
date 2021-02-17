@@ -13,10 +13,10 @@ PyObject* miind_init(PyObject* self, PyObject* args)
 
     int nodes;
     char* filename;
-    if (PyArg_ParseTuple(args, "is", &nodes, &filename))
-        model = new SimulationParserCPU<MPILib::CustomConnectionParameters>(nodes, std::string(filename));
-    else if (PyArg_ParseTuple(args, "s", &filename))
+	if (PyArg_ParseTuple(args, "s", &filename))
         model = new SimulationParserCPU<MPILib::CustomConnectionParameters>(std::string(filename));
+    else if (PyArg_ParseTuple(args, "is", &nodes, &filename))
+        model = new SimulationParserCPU<MPILib::CustomConnectionParameters>(nodes, std::string(filename));
     else
         return NULL;
         
@@ -82,9 +82,9 @@ PyObject* miind_endSimulation(PyObject* self, PyObject* args)
 }
 
 /*
- * List of functions to add to miindpythoncpu in exec_miindpythoncpu().
+ * List of functions to add to miindsim in exec_miindsim().
  */
-static PyMethodDef miindpythoncpu_functions[] = {
+static PyMethodDef miindsim_functions[] = {
     {"init",  miind_init, METH_VARARGS, "Init Miind Model."},
     {"getTimeStep",  miind_getTimeStep, METH_VARARGS, "Get time step."},
     {"getSimulationLength",  miind_getSimulationLength, METH_VARARGS, "Get sim time."},
@@ -95,11 +95,11 @@ static PyMethodDef miindpythoncpu_functions[] = {
 };
 
 /*
- * Initialize miindpythoncpu. May be called multiple times, so avoid
+ * Initialize miindsim. May be called multiple times, so avoid
  * using static state. "oops." - Hugh
  */
-int exec_miindpythoncpu(PyObject *module) {
-    PyModule_AddFunctions(module, miindpythoncpu_functions);
+int exec_miindsim(PyObject *module) {
+    PyModule_AddFunctions(module, miindsim_functions);
 
     PyModule_AddStringConstant(module, "__author__", "Hugh");
     PyModule_AddStringConstant(module, "__version__", "1.0.0");
@@ -109,28 +109,28 @@ int exec_miindpythoncpu(PyObject *module) {
 }
 
 /*
- * Documentation for miindpythoncpu.
+ * Documentation for miindsim.
  */
-PyDoc_STRVAR(miindpythoncpu_doc, "The miindpythoncpu module");
+PyDoc_STRVAR(miindsim_doc, "The miindsim module");
 
 
-static PyModuleDef_Slot miindpythoncpu_slots[] = {
-    { Py_mod_exec, exec_miindpythoncpu },
+static PyModuleDef_Slot miindsim_slots[] = {
+    { Py_mod_exec, exec_miindsim },
     { 0, NULL }
 };
 
-static PyModuleDef miindpythoncpu_def = {
+static PyModuleDef miindsim_def = {
     PyModuleDef_HEAD_INIT,
-    "miindpythoncpu",
-    miindpythoncpu_doc,
+    "miindsim",
+    miindsim_doc,
     0,              /* m_size */
     NULL,           /* m_methods */
-    miindpythoncpu_slots,
+    miindsim_slots,
     NULL,           /* m_traverse */
     NULL,           /* m_clear */
     NULL,           /* m_free */
 };
 
-PyMODINIT_FUNC PyInit_miindpythoncpu() {
-    return PyModuleDef_Init(&miindpythoncpu_def);
+PyMODINIT_FUNC PyInit_miindsim() {
+    return PyModuleDef_Init(&miindsim_def);
 }

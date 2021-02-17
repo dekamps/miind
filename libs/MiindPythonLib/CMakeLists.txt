@@ -33,15 +33,15 @@ set ( LIBLIST
     ${GLUT_LIBRARY}
 )
 
-add_library( ${MIIND_LIBRARY_PREFIX}pythoncpu ${LIB_TYPE} MiindPython.cpp)
+add_library( ${MIIND_LIBRARY_PREFIX}sim ${LIB_TYPE} MiindPython.cpp)
 
-target_link_libraries( ${MIIND_LIBRARY_PREFIX}pythoncpu ${LIBLIST})
+target_link_libraries( ${MIIND_LIBRARY_PREFIX}sim ${LIBLIST})
 
 if (WIN32) # for windows, we want to set the ending to .pyd. In linux, the ending is just .so
-SET_TARGET_PROPERTIES(${MIIND_LIBRARY_PREFIX}pythoncpu   PROPERTIES SUFFIX .pyd)
+SET_TARGET_PROPERTIES(${MIIND_LIBRARY_PREFIX}sim   PROPERTIES SUFFIX .pyd)
 endif (WIN32)
 
-install( TARGETS ${MIIND_LIBRARY_PREFIX}pythoncpu)
+install( TARGETS ${MIIND_LIBRARY_PREFIX}sim)
   
 # In Windows, we want to redistribute the dependent dlls (Boost_CHRONO, Boost_FILESYSTEM, Boost_TIMER, and freeglut). 
 # The following will find all dependencies of the output file and search for boost_chrono, boost_filesystem, boost_timer, and
@@ -57,7 +57,7 @@ install( FILES ${GLUT_RUNTIME_LIBRARY}/${glut_lib_basename}.dll DESTINATION bin)
 # Let's set up a few directories to search. Also add the location of the glut dll above just
 # in case they're in the same place... cough VCPKG cough
 set(MY_DEPENDENCY_PATHS ${Boost_LIBRARY_DIR_RELEASE} ${Boost_LIBRARY_DIR_RELEASE}/../bin/ ${GLUT_RUNTIME_LIBRARY} ${ADDITIONAL_DLL_DEPENDENCY_DIRS} ) 
-GET_TARGET_PROPERTY(OUTPUT_PATH ${MIIND_LIBRARY_PREFIX}pythoncpu LOCATION )
+GET_TARGET_PROPERTY(OUTPUT_PATH ${MIIND_LIBRARY_PREFIX}sim LOCATION )
 # Transfer the value of ${OUTPUT_PATH} into the install script
 install(CODE "set(MY_DEPENDENCY_PATHS \"${MY_DEPENDENCY_PATHS}\")")
 install(CODE "set(TARGET_LOCATION \"${OUTPUT_PATH}\")")

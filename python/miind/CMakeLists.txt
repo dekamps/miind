@@ -42,6 +42,7 @@ codegen.py
 ode2dsystem.py
 launch.py
 palette.py
+system_tests.py
 miind_settings
 )
 
@@ -69,7 +70,7 @@ xml/wilsoncowan.xml
 
 set( PYTHON_SCRIPTS_MIINDIO
 miindio.py
-miind.py
+miindrun.py
 submit.py
 )
 
@@ -84,3 +85,5 @@ install( FILES ${PYTHON_SCRIPTS_XML}
 install( FILES ${PYTHON_SCRIPTS_MIINDIO}
 	DESTINATION ${PYTHON_BASE_DIR}
 		PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE )
+		
+ADD_SUBDIRECTORY(testfiles)
