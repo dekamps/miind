@@ -63,7 +63,7 @@ def main():
     # Path regexes with forward slashes relative to CMake install dir.
     
     rearrange_cmake_output_data = {
-        "miind": (["bin/miindsim.pyd"] if os.name == 'nt' else []) + (["lib/libmiindsim.so"] if os.name != 'nt' else []) + (["bin\/.+\.dll"] if os.name == 'nt' else []) + ["share\/miind\/python\/miind\/.+"],
+        "miind": (["lib/miindsim.pyd"] if os.name == 'nt' else []) + (["lib/libmiindsim.so"] if os.name != 'nt' else []) + (["bin\/.+\.dll"] if os.name == 'nt' else []) + ["share\/miind\/python\/miind\/.+"],
         "miind.miind_api": ["share\/miind\/python\/miind\/miind_api\/.+"],
         "miind.build": [],
         "miind.build.apps": ["share\/miind\/apps\/MatrixGenerator\/.+","share\/miind\/apps\/Projection\/.+"],

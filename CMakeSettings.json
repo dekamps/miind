@@ -1,0 +1,28 @@
+﻿{
+    "configurations": [
+        {
+            "name": "x64-Release",
+            "generator": "Ninja",
+            "configurationType": "RelWithDebInfo",
+            "inheritEnvironments": [ "msvc_x64_x64" ],
+            "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+            "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+            "cmakeCommandArgs": "",
+            "buildCommandArgs": "-v",
+            "ctestCommandArgs": "",
+            "cmakeToolchain": "D:/dev/miind_windows_basic/vcpkg/scripts/buildsystems/vcpkg.cmake",
+            "variables": [
+                {
+                    "name": "VCPKG_MANIFEST_INSTALL",
+                    "value": "true",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "VCPKG_MANIFEST_MODE",
+                    "value": "true",
+                    "type": "BOOL"
+                }
+            ]
+        }
+    ]
+}

@@ -41,7 +41,7 @@ if (WIN32) # for windows, we want to set the ending to .pyd. In linux, the endin
 SET_TARGET_PROPERTIES(${MIIND_LIBRARY_PREFIX}sim   PROPERTIES SUFFIX .pyd)
 endif (WIN32)
 
-install( TARGETS ${MIIND_LIBRARY_PREFIX}sim)
+install( TARGETS ${MIIND_LIBRARY_PREFIX}sim DESTINATION lib)
   
 # In Windows, we want to redistribute the dependent dlls (Boost_CHRONO, Boost_FILESYSTEM, Boost_TIMER, and freeglut). 
 # The following will find all dependencies of the output file and search for boost_chrono, boost_filesystem, boost_timer, and
