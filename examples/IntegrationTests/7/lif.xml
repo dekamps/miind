@@ -1,0 +1,30 @@
+<Simulation>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithmCustom" name="E" modelfile="lif.model" >
+<TimeStep>0.001</TimeStep>
+<MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="ExcInput">
+<expression>750.</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="E" name="LIF" type="EXCITATORY_DIRECT" />
+<Node algorithm="ExcInput" name="Inp" type="NEUTRAL" />
+<Node algorithm="ExcInput" name="Inp2" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="Inp" Out="LIF" num_connections="1" efficacy="0.01" delay="0.1"/>
+<Connection In="Inp2" Out="LIF" num_connections="1" efficacy="0.01" delay="0.1045"/>
+</Connections>
+<Reporting>
+<Rate node="LIF" t_interval="0.001"/>
+</Reporting>
+<SimulationRunParameter>
+<SimulationName>lif</SimulationName>
+<t_end>1.0</t_end>
+<t_step>0.001</t_step>
+<name_log>lif.log</name_log>
+</SimulationRunParameter>
+</Simulation>

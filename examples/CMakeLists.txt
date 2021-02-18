@@ -178,6 +178,8 @@ tutorial/vectorised/adex_-1_0_0_0_.mat
 tutorial/vectorised/vector.xml
 )
 
+ADD_SUBDIRECTORY(IntegrationTests)
+
 set(EXAMPLES_BASE_DIR share/miind/examples)
 
 install( FILES ${AEXP}

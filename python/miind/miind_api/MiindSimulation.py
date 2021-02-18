@@ -289,7 +289,7 @@ class MiindSimulation:
         with cd(self.submit_name):
             localfiles=os.listdir()
             if 'CMakeLists.txt' in localfiles:
-                subprocess.call(['cmake']+['.'] +
+                subprocess.call(['cmake .']+
                                  [a for a in args],
                                  cwd=self.output_directory, shell=True)
                 subprocess.call(['make'], cwd=self.output_directory)
@@ -301,7 +301,7 @@ class MiindSimulation:
                             localfiles=os.listdir()
                             # subprocess returns bytes, and this difference is important in Python 3
                             if 'CMakeLists.txt' in localfiles:
-                                subprocess.call(['cmake']+['.']+[a for a in args],shell=True)
+                                subprocess.call(['cmake .']+[a for a in args],shell=True)
                                 subprocess.call(['make'])
 
     def submit(self, overwrite=False, xml_list=[], enable_mpi=False, enable_openmp=False, enable_root=True, enable_cuda=False, *args):
@@ -316,7 +316,7 @@ class MiindSimulation:
         with cd(self.submit_name):
             localfiles=os.listdir()
             if 'CMakeLists.txt' in localfiles:
-                subprocess.call(['cmake']+['.'] +
+                subprocess.call(['cmake .']+
                                  [a for a in args],
                                  cwd=self.output_directory, shell=True)
                 subprocess.call(['make'], cwd=self.output_directory)
@@ -328,7 +328,7 @@ class MiindSimulation:
                             localfiles=os.listdir()
                             # subprocess returns bytes, and this difference is important in Python 3
                             if 'CMakeLists.txt' in localfiles:
-                                subprocess.call(['cmake']+['.']+[a for a in args],shell=True)
+                                subprocess.call(['cmake .']+[a for a in args],shell=True)
                                 subprocess.call(['make'])
 
     def run(self):
