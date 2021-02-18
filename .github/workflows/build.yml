@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   check_build_and_test:
-    runs-on: ubuntu-18-04
+    runs-on: ubuntu-latest
     name: Check Build and Test
     steps:
       - name: Checkout
