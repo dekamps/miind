@@ -61,6 +61,7 @@ namespace TwoDLib {
 		return vec_rev;
 	}
 
+	template<>
 	MeshAlgorithmCustom<TwoDLib::MasterOdeint>::MeshAlgorithmCustom
 	(
 		const std::string& model_name,
@@ -102,6 +103,7 @@ namespace TwoDLib {
 				}
 	}
 
+	template<>
 	MeshAlgorithmCustom<TwoDLib::MasterOdeint>::MeshAlgorithmCustom(const MeshAlgorithmCustom<TwoDLib::MasterOdeint>& rhs):
 	_tolerance(rhs._tolerance),
 	_model_name(rhs._model_name),

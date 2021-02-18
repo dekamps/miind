@@ -3,19 +3,23 @@
 #include <memory>
 #include <TwoDLib/GridReport.hpp>
 
+template<>
 SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(int num_nodes, const std::string xml_filename) :
 	// For now we don't allow num_nodes : override to 1 node only.
 	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
 }
 
+template<>
 SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(const std::string xml_filename) :
 	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
 }
 
+template<>
 void SimulationParserCPU<MPILib::CustomConnectionParameters>::endSimulation() {
 	MPILib::MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::endSimulation();
 }
 
+template<>
 void SimulationParserCPU<MPILib::CustomConnectionParameters>::addConnectionCCP(pugi::xml_node& xml_conn) {
 	MPILib::CustomConnectionParameters connection;
 
@@ -33,6 +37,7 @@ void SimulationParserCPU<MPILib::CustomConnectionParameters>::addConnectionCCP(p
 	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], connection);
 }
 
+template<>
 void SimulationParserCPU<MPILib::CustomConnectionParameters>::addIncomingConnectionCCP(pugi::xml_node& xml_conn) {
 	MPILib::CustomConnectionParameters connection;
 
@@ -50,10 +55,12 @@ void SimulationParserCPU<MPILib::CustomConnectionParameters>::addIncomingConnect
 	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], connection);
 }
 
+template<>
 double SimulationParserCPU<MPILib::CustomConnectionParameters>::getCurrentSimTime() {
 	return _count * MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step;
 }
 
+template<>
 void SimulationParserCPU<MPILib::CustomConnectionParameters>::parseXmlFile() {
 	pugi::xml_document doc;
 	if (!doc.load_file(_xml_filename.c_str())) {
@@ -213,16 +220,19 @@ void SimulationParserCPU<MPILib::CustomConnectionParameters>::parseXmlFile() {
 
 }
 
+template<>
 void SimulationParserCPU<MPILib::CustomConnectionParameters>::startSimulation() {
 	if (_display_nodes.size() > 0)
 		TwoDLib::Display::getInstance()->animate(true, _display_nodes, MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step);
 	MPILib::MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::startSimulation();
 }
 
+template<>
 void SimulationParserCPU<MPILib::CustomConnectionParameters>::init() {
 	parseXmlFile();
 }
 
+template<>
 std::vector<double> SimulationParserCPU<MPILib::CustomConnectionParameters>::evolveSingleStep(std::vector<double> activity) {
 	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.reportNodeActivities(_rate_nodes, _rate_node_intervals,
 		(_count * MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step));
@@ -238,6 +248,7 @@ std::vector<double> SimulationParserCPU<MPILib::CustomConnectionParameters>::evo
 	return MPILib::MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::evolveSingleStep(activity);
 }
 
+template<>
 bool SimulationParserCPU<MPILib::CustomConnectionParameters>::simulationComplete() {
 	return (_count * MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step >=
 		MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_simulation_length);

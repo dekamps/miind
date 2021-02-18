@@ -95,40 +95,16 @@ static PyMethodDef miindsim_functions[] = {
 };
 
 /*
- * Initialize miindsim. May be called multiple times, so avoid
- * using static state. "oops." - Hugh
- */
-int exec_miindsim(PyObject *module) {
-    PyModule_AddFunctions(module, miindsim_functions);
-
-    PyModule_AddStringConstant(module, "__author__", "Hugh");
-    PyModule_AddStringConstant(module, "__version__", "1.0.0");
-    PyModule_AddIntConstant(module, "year", 2020);
-
-    return 0; /* success */
-}
-
-/*
  * Documentation for miindsim.
  */
 PyDoc_STRVAR(miindsim_doc, "The miindsim module");
-
-
-static PyModuleDef_Slot miindsim_slots[] = {
-    { Py_mod_exec, exec_miindsim },
-    { 0, NULL }
-};
 
 static PyModuleDef miindsim_def = {
     PyModuleDef_HEAD_INIT,
     "miindsim",
     miindsim_doc,
-    0,              /* m_size */
-    NULL,           /* m_methods */
-    miindsim_slots,
-    NULL,           /* m_traverse */
-    NULL,           /* m_clear */
-    NULL,           /* m_free */
+    -1,             
+    miindsim_functions
 };
 
 PyMODINIT_FUNC PyInit_miindsim() {

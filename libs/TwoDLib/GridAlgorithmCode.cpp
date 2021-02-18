@@ -7,7 +7,7 @@
 #include "TwoDLibException.hpp"
 #include "display.hpp"
 #include "GridReport.hpp"
-#include <TwoDLib\MeshAlgorithmCode.hpp>
+#include "MeshAlgorithmCode.hpp"
 
 namespace TwoDLib {
 

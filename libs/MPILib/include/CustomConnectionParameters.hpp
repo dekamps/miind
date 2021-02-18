@@ -20,6 +20,7 @@
 #define MPILIB_CUSTOMCONNECTIONPARAMETERS_HPP_
 
 #include <limits>
+#include <map>
 #include <MPILib/include/TypeDefinitions.hpp>
 
 namespace MPILib {
@@ -29,8 +30,8 @@ namespace MPILib {
  * need two parameters: a number parameter, which is not squared in the
  * calculation of sigma, and an efficacy, which is squared.
  */
-struct CustomConnectionParameters {
-
+class CustomConnectionParameters {
+	public:
   std::map<std::string, std::string> _params;
 
 	/**
