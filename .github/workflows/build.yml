@@ -4,13 +4,19 @@ on: [push]
 
 jobs:
   check_build_and_test:
-    name: Check Build and Test
     runs-on: ubuntu-18-04
+    name: Check Build and Test
     steps:
-      - uses: actions/checkout@windows_pip_support
+      - name: Checkout
+        uses: actions/checkout@v2.0.0
       - name: Create Build Directory
-      - working-directory: ./
-      - run: mkdir build
+        run: mkdir build
+        working-directory: ./build
+      - name: CMake
+        uses: nicledomaS/cmake_build_action@v1.3
+        
+      
+      
   #build_wheels:
     #name: Build wheels on ${{ matrix.os }}
     # For running on multiple platforms
