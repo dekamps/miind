@@ -2,14 +2,8 @@
   "name": "miind",
   "version-string": "0.0.8"
   "dependencies": [
-    "boost-chrono",
-    "boost-filesystem",
-    "boost-timer",
+
     "fftw3",
-	"gsl",
-	"python3",
-	"freeglut",
-	"pugixml",
-	"glew"
+	"gsl"
   ]
 }
