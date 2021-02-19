@@ -45,6 +45,11 @@
                     "name": "MIIND_LIBRARY_PREFIX",
                     "value": "miind",
                     "type": "STRING"
+                },
+                {
+                    "name": "CMAKE_BUILD_TYPE",
+                    "value": "Release",
+                    "type": "STRING"
                 }
             ]
         }

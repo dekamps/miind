@@ -1,4 +1,4 @@
-if (WIN32)
+if (WIN32 OR APPLE)
 find_package( GSL )
 else (WIN32)
 include( UsePkgConfig )

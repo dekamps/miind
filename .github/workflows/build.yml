@@ -65,7 +65,7 @@ jobs:
           CC: ${{ matrix.desiredCC}}
         uses: lukka/run-cmake@main
         with:
-          cmakeBuildType: Release
+          cmakeBuildType: "Release"
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           useVcpkgToolchainFile: true
