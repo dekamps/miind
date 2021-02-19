@@ -14,12 +14,15 @@ jobs:
           - os: windows-latest
             triplet: x64-windows
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
+            desiredCC: msvc
           - os: ubuntu-latest
             triplet: x64-linux
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
+            desiredCC: gcc
           - os: macos-latest
             triplet: x64-osx
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
+            desiredCC: clang-omp
             
     env:
       buildDir: '${{ github.workspace }}/build'
@@ -38,11 +41,6 @@ jobs:
         
       - name: MacOS - install xquartz for GL support, fftw, and llvm for OpenMP support
         run: brew install xquartz fftw llvm
-        if: contains( matrix.os, 'macos')
-        
-      - name: MacOS - Set cc as clang-omp
-        env:
-        CC: clang-omp
         if: contains( matrix.os, 'macos')
 
       - name: dir
@@ -72,5 +70,5 @@ jobs:
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           useVcpkgToolchainFile: true
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja Multi-Config" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}} '
+          cmakeAppendedArgs: '"-GNinja Multi-Config" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}} -DCMAKE_CXX_COMPILER=${{ matrix.desiredCC}}'
           buildWithCMake: true
