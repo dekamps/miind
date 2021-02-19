@@ -63,10 +63,9 @@ jobs:
       - name: Run CMake with vcpkg.json manifest
         uses: lukka/run-cmake@main
         with:
-          cmakeBuildType: "Release"
-          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+          cmakeListsOrSettingsJson: CMakeSettingsJson
+          cmakeSettingsJsonPath: '${{ github.workspace }}/cmakesettings.json/CMakeSettings.json'
           useVcpkgToolchainFile: true
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
+          cmakeAppendedArgs: '"-GNinja Multi-Config" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
           buildWithCMake: true
