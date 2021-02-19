@@ -61,8 +61,6 @@ jobs:
       - name: Prints output of run-vcpkg's action
         run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_TRIPLET_OUT }}'"
       - name: Run CMake with vcpkg.json manifest
-        env:
-          CC: ${{ matrix.desiredCC}}
         uses: lukka/run-cmake@main
         with:
           cmakeBuildType: "Release"
@@ -70,5 +68,5 @@ jobs:
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           useVcpkgToolchainFile: true
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja Multi-Config" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
+          cmakeAppendedArgs: '"-GNinja --config Release" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
           buildWithCMake: true
