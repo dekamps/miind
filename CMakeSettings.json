@@ -10,7 +10,6 @@
             "cmakeCommandArgs": "",
             "buildCommandArgs": "-v",
             "ctestCommandArgs": "",
-            "cmakeToolchain": "D:/dev/miind_windows_basic/vcpkg/scripts/buildsystems/vcpkg.cmake",
             "variables": [
                 {
                     "name": "VCPKG_MANIFEST_INSTALL",
@@ -21,6 +20,36 @@
                     "name": "VCPKG_MANIFEST_MODE",
                     "value": "true",
                     "type": "BOOL"
+                },
+                {
+                    "name": "CMAKE_BUILD_TYPE",
+                    "value": "Release",
+                    "type": "UNINITIALIZED"
+                },
+                {
+                    "name": "DEBUGLEVEL",
+                    "value": "logINFO",
+                    "type": "STRING"
+                },
+                {
+                    "name": "ENABLE_OPENMP",
+                    "value": "true",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "VCPKG_APPLOCAL_DEPS",
+                    "value": "true",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "VCPKG_TARGET_TRIPLET",
+                    "value": "x64-windows",
+                    "type": "STRING"
+                },
+                {
+                    "name": "MIIND_LIBRARY_PREFIX",
+                    "value": "miind",
+                    "type": "STRING"
                 }
             ]
         }

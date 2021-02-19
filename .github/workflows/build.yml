@@ -40,6 +40,11 @@ jobs:
         run: brew install xquartz fftw llvm
         if: contains( matrix.os, 'macos')
         
+      - name: MacOS - Set cc as clang-omp
+        env:
+        CC: clang-omp
+        if: contains( matrix.os, 'macos')
+
       - name: dir
         run: find $RUNNER_TEMP
         shell: bash
