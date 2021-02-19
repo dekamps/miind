@@ -2,7 +2,7 @@
   "name": "miind",
   "version-string": "0.0.8",
   "dependencies": [
-    "boost"
+    "boost",
     "fftw3",
 	"gsl",
 	"python3",
