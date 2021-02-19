@@ -20,6 +20,7 @@
 #include "AlgorithmGrid.hpp"
 #include <cassert>
 #include <functional>
+#include <iterator>
 
 using namespace MPILib; 
 
@@ -81,7 +82,7 @@ std::vector<Value> AlgorithmGrid::toVector(const std::valarray<Value>& array,
 	auto p_end = p_begin + number_to_be_copied;
 
 	std::vector<Value> vector_return(0);
-	std::copy(p_begin, p_end, back_inserter(vector_return));
+	std::copy(p_begin, p_end, std::back_inserter(vector_return));
 
 	return vector_return;
 }

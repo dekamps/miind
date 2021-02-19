@@ -36,8 +36,8 @@ jobs:
           sudo apt-get install fftw3-dev
         if: contains( matrix.os, 'ubuntu')
         
-      - name: MacOS - install luajit pkgconfig
-        run: brew install xquartz fftw
+      - name: MacOS - install xquartz for GL support, fftw, and llvm for OpenMP support
+        run: brew install xquartz fftw llvm
         if: contains( matrix.os, 'macos')
         
       - name: dir
