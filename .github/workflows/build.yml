@@ -30,13 +30,14 @@ jobs:
       
       - uses: lukka/get-cmake@latest
       
-      - name: Ubuntu - install packages required for freeglut
+      - name: Ubuntu - install packages required for freeglut and fftw3
         run: |
           sudo apt-get install libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev
+          sudo apt-get install fftw3-dev
         if: contains( matrix.os, 'ubuntu')
         
       - name: MacOS - install luajit pkgconfig
-        run: brew install --cask xquartz
+        run: brew install xquartz fftw
         if: contains( matrix.os, 'macos')
         
       - name: dir
