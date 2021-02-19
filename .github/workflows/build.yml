@@ -61,6 +61,8 @@ jobs:
       - name: Prints output of run-vcpkg's action
         run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_TRIPLET_OUT }}'"
       - name: Run CMake with vcpkg.json manifest
+        env:
+          CC: ${{ matrix.desiredCC}}
         uses: lukka/run-cmake@main
         with:
           cmakeBuildType: Release
