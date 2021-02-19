@@ -14,15 +14,12 @@ jobs:
           - os: windows-latest
             triplet: x64-windows
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
-            desiredCC: msvc
           - os: ubuntu-latest
             triplet: x64-linux
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
-            desiredCC: gcc
           - os: macos-latest
             triplet: x64-osx
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
-            desiredCC: clang-omp
             
     env:
       buildDir: '${{ github.workspace }}/build'
@@ -66,9 +63,10 @@ jobs:
       - name: Run CMake with vcpkg.json manifest
         uses: lukka/run-cmake@main
         with:
+          cmakeBuildType: Release
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           useVcpkgToolchainFile: true
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja Multi-Config" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}} -DCMAKE_CXX_COMPILER=${{ matrix.desiredCC}}'
+          cmakeAppendedArgs: '"-GNinja Multi-Config" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
           buildWithCMake: true

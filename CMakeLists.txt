@@ -31,25 +31,6 @@ set( MIIND_LIBRARY_PREFIX "miind" CACHE STRING "prefix string for all libs" )
 #endif(WIN32)
 
 ##############################################################################
-# compile flags
-##############################################################################
-if(CMAKE_COMPILER_IS_GNUCXX)
-set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
-endif(CMAKE_COMPILER_IS_GNUCXX)
-
-if (APPLE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fPIC")
-set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
-else (APPLE)
-if(CMAKE_COMPILER_IS_GNUCXX)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fext-numeric-literals -fPIC")
-set(GLUT_LIBRARY "-lGL -lGLU -lglut")
-endif(CMAKE_COMPILER_IS_GNUCXX)
-endif(APPLE)
-set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
-
-
-##############################################################################
 # cmake options
 ##############################################################################
 
@@ -63,6 +44,43 @@ OPTION(ENABLE_COVERAGE "Enable GCov coverage analysis (defines a 'coverage' targ
 
 set(DEBUGLEVEL "logINFO" CACHE STRING "Define the Debug Level")
 add_definitions( -DDEBUGLEVEL=${DEBUGLEVEL})
+
+##############################################################################
+# compile flags
+##############################################################################
+if(CMAKE_COMPILER_IS_GNUCXX)
+set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
+if (APPLE)
+	if(ENABLE_OPENMP)
+		if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+			set(OpenMP_C "${CMAKE_C_COMPILER}")
+			set(OpenMP_C_FLAGS "-fopenmp=libomp -Wno-unused-command-line-argument")
+			set(OpenMP_C_LIB_NAMES "libomp" "libgomp" "libiomp5")
+			set(OpenMP_libomp_LIBRARY ${OpenMP_C_LIB_NAMES})
+			set(OpenMP_libgomp_LIBRARY ${OpenMP_C_LIB_NAMES})
+			set(OpenMP_libiomp5_LIBRARY ${OpenMP_C_LIB_NAMES})
+		endif()
+		if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		  set(OpenMP_CXX "${CMAKE_CXX_COMPILER}")
+		  set(OpenMP_CXX_FLAGS "-fopenmp=libomp -Wno-unused-command-line-argument")
+		  set(OpenMP_CXX_LIB_NAMES "libomp" "libgomp" "libiomp5")
+		  set(OpenMP_libomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+		  set(OpenMP_libgomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+		  set(OpenMP_libiomp5_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+		endif()
+	endif()
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fPIC")
+	set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
+else (APPLE)
+	if(CMAKE_COMPILER_IS_GNUCXX)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fext-numeric-literals -fPIC")
+		set(GLUT_LIBRARY "-lGL -lGLU -lglut")
+	endif(CMAKE_COMPILER_IS_GNUCXX)
+endif(APPLE)
+set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
 ##############################################################################
 # enable MPI dependent build

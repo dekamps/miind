@@ -22,11 +22,6 @@
                     "type": "BOOL"
                 },
                 {
-                    "name": "CMAKE_BUILD_TYPE",
-                    "value": "Release",
-                    "type": "UNINITIALIZED"
-                },
-                {
                     "name": "DEBUGLEVEL",
                     "value": "logINFO",
                     "type": "STRING"
