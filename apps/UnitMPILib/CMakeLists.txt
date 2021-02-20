@@ -48,7 +48,7 @@ set ( LIBLIST
     gslcblas
 )
 
-ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
+#ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
 
 #############################################################################
 # executables
