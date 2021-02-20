@@ -37,11 +37,6 @@
                     "type": "BOOL"
                 },
                 {
-                    "name": "VCPKG_TARGET_TRIPLET",
-                    "value": "x64-windows",
-                    "type": "STRING"
-                },
-                {
                     "name": "MIIND_LIBRARY_PREFIX",
                     "value": "miind",
                     "type": "STRING"
