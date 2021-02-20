@@ -6,7 +6,6 @@
     "fftw3",
 	"gsl",
 	"python3",
-	"freeglut",
 	"pugixml",
 	"glew"
   ]

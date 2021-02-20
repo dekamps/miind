@@ -12,13 +12,16 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: windows-latest
-            triplet: x64-windows
+            tripletDynamic: x64-windows
+            tripletStatic: x64-windows-static
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
           - os: ubuntu-latest
-            triplet: x64-linux
+            tripletDynamic: x64-linux-dynamic
+            tripletStatic: x64-linux
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
           - os: macos-latest
-            triplet: x64-osx
+            tripletDynamic: x64-osx-dynamic
+            tripletStatic: x64-osx
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
             
     env:
@@ -46,16 +49,30 @@ jobs:
       - name: dir
         run: find $RUNNER_WORKSPACE
         shell: bash
-      - name: Restore artifacts, or setup vcpkg (do not install any package)
+      - name: Restore artifacts, or setup vcpkg (do not install any package) DYNAMIC LIBS
         uses: lukka/run-vcpkg@main
         id: runvcpkg
         with:
           setupOnly: true
+          vcpkgArguments: '--overlay-triplets=custom-triplets'
           vcpkgDirectory: '${{ runner.workspace }}/vcpkg'
           vcpkgGitCommitId: '${{ matrix.vcpkgCommitId }}'
           # Ensure the cache key changes any time the content of the manifest file changes.
-          appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
-          vcpkgTriplet: ${{ matrix.triplet }}
+          appendedCacheKey: ${{ hashFiles( '**/vcpkgDynamic.json' ) }}
+          vcpkgTriplet: ${{ matrix.tripletDynamic }}
+          # Ensure the vcpkg artifacts are cached, they are generated in the 'CMAKE_BINARY_DIR/vcpkg_installed'.
+          additionalCachedPaths: ${{ env.buildDir }}
+      - name: Restore artifacts, or setup vcpkg (do not install any package) STATIC LIBS
+        uses: lukka/run-vcpkg@main
+        id: runvcpkg
+        with:
+          setupOnly: true
+          vcpkgArguments: '--overlay-triplets=custom-triplets'
+          vcpkgDirectory: '${{ runner.workspace }}/vcpkg'
+          vcpkgGitCommitId: '${{ matrix.vcpkgCommitId }}'
+          # Ensure the cache key changes any time the content of the manifest file changes.
+          appendedCacheKey: ${{ hashFiles( '**/vcpkgStatic.json' ) }}
+          vcpkgTriplet: ${{ matrix.tripletStatic }}
           # Ensure the vcpkg artifacts are cached, they are generated in the 'CMAKE_BINARY_DIR/vcpkg_installed'.
           additionalCachedPaths: ${{ env.buildDir }}
       - name: Prints output of run-vcpkg's action
@@ -67,5 +84,5 @@ jobs:
           cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
           useVcpkgToolchainFile: true
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja Multi-Config" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
+          cmakeAppendedArgs: '"-GNinja Multi-Config" -DVCPKG_TARGET_TRIPLET=${{ matrix.tripletStatic}}'
           buildWithCMake: true

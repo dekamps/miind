@@ -1,0 +1,9 @@
+{
+  "name": "miind",
+  "version-string": "0.0.8",
+  "dependencies": [
+    "boost-test",
+	"freeglut",
+	"glew"
+  ]
+}

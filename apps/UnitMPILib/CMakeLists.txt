@@ -7,8 +7,6 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_BINARY_DIR}/../../libs/
 )
 
-set( LIB_TYPE SHARED )
-
 include_directories( ../../libs/MPILib )
 include_directories( ../../libs/GeomLib )
 
@@ -48,7 +46,6 @@ set ( LIBLIST
     gslcblas
 )
 
-#ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
 
 #############################################################################
 # executables
