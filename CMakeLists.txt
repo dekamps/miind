@@ -96,7 +96,7 @@ ENDIF(ENABLE_MPI)
 IF(ENABLE_OPENMP)
 	find_package(OpenMP REQUIRED)
 	
-	if (OpenMP_C_FOUND AND OpenMP_CXX_FOUND AND APPLE)
+	if (OpenMP_FOUND AND APPLE)
     include_directories("${OpenMP_C_INCLUDE_DIRS} ${OpenMP_CXX_INCLUDE_DIRS}")
     link_directories("${OpenMP_C_LIBRARIES} ${OpenMP_CXX_LIBRARIES}" )
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
