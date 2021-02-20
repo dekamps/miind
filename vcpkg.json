@@ -8,7 +8,6 @@
 	"python3",
 	"pugixml",
 	"glew",
-	"freeglut",
-	"glew"
+	"freeglut"
   ]
 }
