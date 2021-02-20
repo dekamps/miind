@@ -46,15 +46,18 @@ jobs:
       - name: dir
         run: find $RUNNER_WORKSPACE
         shell: bash
-      - name: Install vcpkg
-        # Download and build vcpkg, without installing any port. If content is cached already, it is a no-op.
-        uses: lukka/run-vcpkg@v6
+      - name: Restore artifacts, or setup vcpkg (do not install any package) DYNAMIC LIBS
+        uses: lukka/run-vcpkg@main
+        id: runvcpkg
         with:
           setupOnly: true
-      # Now that vcpkg is installed, it is being used to run with the desired arguments.
-      - run: |
-            $VCPKG_ROOT/vcpkg install --overlay-triplets=custom-triplets boost:${{matrix.triplet}} fftw3:${{matrix.triplet}} gsl:${{matrix.triplet}} python3:${{matrix.triplet}} pugixml:${{matrix.triplet}} glew:${{matrix.triplet}} freeglut:${{matrix.triplet}}
-        shell: bash
+          vcpkgArguments: '--overlay-triplets=custom-triplets'
+          vcpkgDirectory: '${{ runner.workspace }}/vcpkg'
+          vcpkgGitCommitId: '${{ matrix.vcpkgCommitId }}'
+          # Ensure the cache key changes any time the content of the manifest file changes.
+          appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
+          # Ensure the vcpkg artifacts are cached, they are generated in the 'CMAKE_BINARY_DIR/vcpkg_installed'.
+          additionalCachedPaths: ${{ env.buildDir }}
       - name: Prints output of run-vcpkg's action
         run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}'"
       - name: Run CMake with vcpkg.json manifest
