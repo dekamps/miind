@@ -1,6 +1,6 @@
 mpi_enabled=OFF
-openmp_enabled=ON
+openmp_enabled=true
 root_enabled=OFF
 cuda_enabled=OFF
-c_compiler=/usr/bin/cc
-cxx_compiler=/usr/bin/c++
+c_compiler=C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.26.28801/bin/HostX64/x64/cl.exe
+cxx_compiler=C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.26.28801/bin/HostX64/x64/cl.exe
