@@ -7,7 +7,7 @@
 	"gsl",
 	"python3",
 	"pugixml",
-	"glew"
+	"glew",
 	"freeglut",
 	"glew"
   ]
