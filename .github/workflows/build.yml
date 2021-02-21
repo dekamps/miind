@@ -55,7 +55,7 @@ jobs:
       # Now that vcpkg is installed, it is being used to run with the desired arguments.
       - run: |
             $VCPKG_ROOT/vcpkg install --overlay-triplets=custom-triplets boost:${{matrix.triplet}} fftw3:${{matrix.triplet}} gsl:${{matrix.triplet}} python3:${{matrix.triplet}} pugixml:${{matrix.triplet}} glew:${{matrix.triplet}} freeglut:${{matrix.triplet}}
-            cp ${{ github.workspace }}/custom-triplets/*.cmake $VCPKG_ROOT/triplets
+            cp custom-triplets/*.cmake $VCPKG_ROOT/triplets
         shell: bash
       - name: Prints output of run-vcpkg's action
         run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}'"
@@ -65,7 +65,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeSettingsJson
           cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
           useVcpkgToolchainFile: true
-          cmakeBuildType: "Release"
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja Multi-Config" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
+          cmakeAppendedArgs: '"-GNinja --install" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
           buildWithCMake: true
+        
