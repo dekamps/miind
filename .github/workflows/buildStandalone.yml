@@ -24,6 +24,7 @@ jobs:
     env:
       buildDir: '${{ github.workspace }}/build'
       CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -55,12 +56,16 @@ jobs:
           doNotCache: true
         if: contains( matrix.os, 'windows')
       # Now that vcpkg is installed, it is being used to run with the desired arguments.
-      - name: Install vcpkg on windows
+      - name: Install vcpkg dependencies on windows
         run: |
             $VCPKG_ROOT/vcpkg install boost fftw3 gsl python3 pugixml glew freeglut
         shell: bash
         if: contains( matrix.os, 'windows')
+        
       - name: Run CMake with vcpkg.json manifest on windows
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
         uses: lukka/run-cmake@main
         with:
           cmakeListsOrSettingsJson: CMakeSettingsJson
@@ -72,6 +77,9 @@ jobs:
           buildWithCMake: true
         if: contains( matrix.os, 'windows')
       - name: Run CMake
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
         uses: lukka/run-cmake@main
         with:
           cmakeListsOrSettingsJson: CMakeSettingsJson
@@ -84,7 +92,10 @@ jobs:
         run: echo "$VCPKG_ROOT/installed/x64-windows/bin" >> $GITHUB_PATH
         if: contains( matrix.os, 'windows')
       - name: Install MIIND
-        run: cmake --install .
+        run: |
+          cd ${{ env.buildDir }}
+          ninja install
+        shell: bash
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
