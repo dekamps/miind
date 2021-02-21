@@ -51,6 +51,7 @@ jobs:
         uses: lukka/run-vcpkg@v6
         with:
           setupOnly: true
+          appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
           doNotCache: true
       # Now that vcpkg is installed, it is being used to run with the desired arguments.
       - run: |
@@ -65,8 +66,9 @@ jobs:
           cmakeListsOrSettingsJson: CMakeSettingsJson
           cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
           useVcpkgToolchainFile: true
+          key: gradle-cache-${{ hashFiles('**/*.kt*') }}
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja Multi-Config" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
+          cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
           buildWithCMake: true
       - name: Add python directory to path ready for tests
         run: echo "${{ github.workspace }}/python/" >> $GITHUB_PATH
@@ -77,10 +79,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install twine scikit-build build numpy matplotlib==3.2 scipy shapely descartes
+          pip install twine scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
         shell: bash
       - name: Run Integration Tests
-        run: python examples/IntegrationTests/system_tests.py
+        run: |
+          cd examples/IntegrationTests
+          python system_tests.py
+        shell: bash
       - name: Run scikit-build
         run: |
           cd package/pip_package
