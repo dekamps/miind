@@ -73,6 +73,9 @@ jobs:
           cmakeAppendedArgs: '"-GNinja"'
           buildWithCMake: true
         if: contains( matrix.os, 'macos') || contains( matrix.os, 'ubuntu')
+      - name: Add vcpkg installed bin to path so windows can find files when using MIIND
+        run: echo "$VCPKG_ROOT/installed/x64-windows/bin" >> $GITHUB_PATH
+        if: contains( matrix.os, 'windows')
       - name: Add python directory to path ready for tests
         run: echo "${{ github.workspace }}/python/" >> $GITHUB_PATH
       - name: Set up Python
