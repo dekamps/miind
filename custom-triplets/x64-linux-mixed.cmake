@@ -6,10 +6,11 @@ set(VCPKG_CMAKE_SYSTEM_NAME Linux)
 
 message( "Testing PORT ${PORT}." )
 
-if(PORT STREQUAL "boost")
+if(PORT MATCHES "boost")
 	message ( " This boost lib should be dynamic.")
     set(VCPKG_LIBRARY_LINKAGE dynamic)
 endif()
+
 if(PORT STREQUAL "freeglut")
 	message ( " This freeglut lib should be dynamic.")
     set(VCPKG_LIBRARY_LINKAGE dynamic)
