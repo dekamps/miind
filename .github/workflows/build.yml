@@ -66,6 +66,11 @@ jobs:
           cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
           useVcpkgToolchainFile: true
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja --install" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
+          cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
           buildWithCMake: true
+      - name: Add python directory to path ready for tests
+        run: echo "${{ github.workspace }}/python/" >> $GITHUB_PATH
+      - name: Run Integration Tests
+        run: python examples/IntegrationTests/system_tests.py
+        
         
