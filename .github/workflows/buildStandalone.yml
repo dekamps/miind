@@ -94,6 +94,7 @@ jobs:
       - name: Install MIIND
         run: |
           cd ${{ env.buildDir }}
+          ninja
           ninja install
         shell: bash
       - name: Set up Python
