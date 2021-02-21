@@ -37,7 +37,7 @@ jobs:
         if: contains( matrix.os, 'ubuntu')
         
       - name: MacOS - install xquartz for GL support, fftw, and llvm for OpenMP support
-        run: brew install xquartz fftw llvm libomp pkg-config
+        run: brew install gcc xquartz fftw llvm libomp pkg-config
         if: contains( matrix.os, 'macos')
 
       - name: dir
@@ -66,12 +66,12 @@ jobs:
           cmakeListsOrSettingsJson: CMakeSettingsJson
           cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
           useVcpkgToolchainFile: true
-          key: gradle-cache-${{ hashFiles('**/*.kt*') }}
+          appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
           buildDirectory: '${{ env.buildDir }}'
           cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
           buildWithCMake: true
-      - name: Add python directory to path ready for tests
-        run: echo "${{ github.workspace }}/python/" >> $GITHUB_PATH
+      #- name: Add python directory to path ready for tests
+      #  run: echo "${{ github.workspace }}/python/" >> $GITHUB_PATH
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
@@ -81,14 +81,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install twine scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
         shell: bash
-      - name: Run Integration Tests
-        run: |
-          cd examples/IntegrationTests
-          python system_tests.py
-        shell: bash
       - name: Run scikit-build
         run: |
           cd package/pip_package
-          python -m build
+          python setup.py bdist_wheel
+        shell: bash
+      - name: Run auditwheel on linux and osx
+        run: |
+          cd package/pip_package/dist
+          ls
+        shell: bash
         
         
