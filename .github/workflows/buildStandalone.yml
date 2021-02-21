@@ -23,6 +23,7 @@ jobs:
             
     env:
       buildDir: '${{ github.workspace }}/build'
+      CC: ${{ matrix.cc }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -38,12 +39,7 @@ jobs:
       - name: MacOS - install xquartz for GL support, fftw, and llvm for OpenMP support
         run: brew install gcc pugixml boost freeglut gsl boost-python xquartz fftw llvm libomp pkg-config
         if: contains( matrix.os, 'macos')
-        
-      - name: Set appropriate C and CXX Compilers
-        run : |
-          set(ENV{CC} ${{ matrix.cc }})
-          set(ENV{CXX} ${{ matrix.cxx }})
-
+      
       - name: dir
         run: find $RUNNER_TEMP
         shell: bash
