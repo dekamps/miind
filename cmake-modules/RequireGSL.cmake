@@ -1,4 +1,4 @@
-if (WIN32 OR APPLE)
+if (WIN32)
 find_package( GSL )
 else (WIN32)
 include( UsePkgConfig )
@@ -16,4 +16,4 @@ if( NOT gsl_CFLAGS OR NOT gsl_LINK_DIR )
     message( FATAL_ERROR "Gnu Scientific Library not found." )
 endif( NOT gsl_CFLAGS OR NOT gsl_LINK_DIR )
 
-endif (WIN32 OR APPLE)
+endif (WIN32)
