@@ -50,8 +50,7 @@ jobs:
       # Now that vcpkg is installed, it is being used to run with the desired arguments.
       - name: Install vcpkg on windows
         run: |
-            $VCPKG_ROOT/vcpkg install --overlay-triplets=custom-triplets boost:${{matrix.triplet}} fftw3:${{matrix.triplet}} gsl:${{matrix.triplet}} python3:${{matrix.triplet}} pugixml:${{matrix.triplet}} glew:${{matrix.triplet}} freeglut:${{matrix.triplet}}
-            cp custom-triplets/*.cmake $VCPKG_ROOT/triplets
+            $VCPKG_ROOT/vcpkg install boost fftw3 gsl python3 pugixml glew freeglut
         shell: bash
         if: contains( matrix.os, 'windows')
       - name: Run CMake with vcpkg.json manifest on windows
@@ -62,7 +61,7 @@ jobs:
           useVcpkgToolchainFile: true
           appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
+          cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=x64-windows'
           buildWithCMake: true
         if: contains( matrix.os, 'windows')
       - name: Run CMake
@@ -84,6 +83,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install twine scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
+        shell: bash
+      - name: Run Integration Tests
+        run: |
+          cd examples/IntegrationTests
+          python system_tests.py
         shell: bash
       
         
