@@ -29,8 +29,8 @@ jobs:
           sudo apt-get install libboost-all-dev libpugixml-dev fftw3-dev freeglut3-dev libgsl0-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev
         if: contains( matrix.os, 'ubuntu')
         
-      - name: MacOS - install xquartz for GL support, fftw, and llvm for OpenMP support
-        run: brew install gcc pugixml boost freeglut gsl boost-python xquartz fftw llvm libomp pkg-config
+      - name: MacOS - install xquartz for GL support, fftw, and OpenMP support
+        run: brew install gcc pugixml boost freeglut gsl boost-python xquartz fftw libomp pkg-config
         if: contains( matrix.os, 'macos')
       
       - name: dir
@@ -54,15 +54,16 @@ jobs:
         shell: bash
         if: contains( matrix.os, 'windows')
         
-      - name: Run CMake with vcpkg.json manifest on windows
+      - name: Run CMake with vcpkg.json manifest
+        env:
+          CC: ${{ matrix.desiredCC}}
         uses: lukka/run-cmake@main
         with:
-          cmakeListsOrSettingsJson: CMakeSettingsJson
-          cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
+          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           useVcpkgToolchainFile: true
-          appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=x64-windows'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x64-windows'
           buildWithCMake: true
         if: contains( matrix.os, 'windows')
         
@@ -70,10 +71,10 @@ jobs:
       - name: Run CMake
         uses: lukka/run-cmake@main
         with:
-          cmakeListsOrSettingsJson: CMakeSettingsJson
-          cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
+          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja"'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_BUILD_TYPE=Release'
           buildWithCMake: true
         if: contains( matrix.os, 'macos') || contains( matrix.os, 'ubuntu')
         
