@@ -72,7 +72,7 @@ jobs:
           buildDirectory: '${{ env.buildDir }}'
           cmakeAppendedArgs: '"-GNinja"'
           buildWithCMake: true
-        if: contains( matrix.os, 'macos') or contains( matrix.os, 'ubuntu')
+        if: contains( matrix.os, 'macos') || contains( matrix.os, 'ubuntu')
       - name: Add python directory to path ready for tests
         run: echo "${{ github.workspace }}/python/" >> $GITHUB_PATH
       - name: Set up Python
