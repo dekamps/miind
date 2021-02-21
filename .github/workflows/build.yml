@@ -65,6 +65,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeSettingsJson
           cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
           useVcpkgToolchainFile: true
+          cmakeBuildType: "Release"
           buildDirectory: '${{ env.buildDir }}'
           cmakeAppendedArgs: '"-GNinja Multi-Config" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
           buildWithCMake: true
