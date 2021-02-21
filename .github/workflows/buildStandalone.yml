@@ -12,8 +12,14 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: windows-latest
+            cc: "cl"
+            cxx: "cl"
           - os: ubuntu-latest
+            cc: "gcc"
+            cxx: "g++"
           - os: macos-latest
+            cc: "gcc"
+            cxx: "g++"
             
     env:
       buildDir: '${{ github.workspace }}/build'
@@ -32,6 +38,11 @@ jobs:
       - name: MacOS - install xquartz for GL support, fftw, and llvm for OpenMP support
         run: brew install gcc pugixml boost freeglut gsl boost-python xquartz fftw llvm libomp pkg-config
         if: contains( matrix.os, 'macos')
+        
+      - name: Set appropriate C and CXX Compilers
+        run : |
+          set(ENV{CC} ${{ matrix.cc }})
+          set(ENV{CXX} ${{ matrix.cxx }})
 
       - name: dir
         run: find $RUNNER_TEMP
@@ -76,8 +87,8 @@ jobs:
       - name: Add vcpkg installed bin to path so windows can find files when using MIIND
         run: echo "$VCPKG_ROOT/installed/x64-windows/bin" >> $GITHUB_PATH
         if: contains( matrix.os, 'windows')
-      - name: Add python directory to path ready for tests
-        run: echo "${{ github.workspace }}/python/" >> $GITHUB_PATH
+      - name: Install MIIND
+        run: cmake --install .
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
