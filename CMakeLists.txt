@@ -73,7 +73,7 @@ if (APPLE)
 	endif()
 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fPIC")
-	set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
+	set(GLUT_LIBRARY "-framework OpenGL -framework GLUT")
 else (APPLE)
 	if(CMAKE_COMPILER_IS_GNUCXX)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fext-numeric-literals -fPIC")
