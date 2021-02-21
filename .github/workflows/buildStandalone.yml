@@ -66,7 +66,8 @@ jobs:
           buildWithCMake: true
         if: contains( matrix.os, 'windows')
         
-      - name: Run CMake on Linux
+        
+      - name: Run CMake
         uses: lukka/run-cmake@main
         with:
           cmakeListsOrSettingsJson: CMakeSettingsJson
@@ -74,25 +75,19 @@ jobs:
           buildDirectory: '${{ env.buildDir }}'
           cmakeAppendedArgs: '"-GNinja"'
           buildWithCMake: true
-        if: contains( matrix.os, 'ubuntu')
+        if: contains( matrix.os, 'macos') || contains( matrix.os, 'ubuntu')
         
-      - name: Run CMake on OSX
-        uses: lukka/run-cmake@main
-        with:
-          cmakeListsOrSettingsJson: CMakeSettingsJson
-          cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
-          buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++'
-          buildWithCMake: true
-        if: contains( matrix.os, 'macos')
         
       - name: Add vcpkg installed bin to path so windows can find files when using MIIND
         run: echo "$VCPKG_ROOT/installed/x64-windows/bin" >> $GITHUB_PATH
         if: contains( matrix.os, 'windows')
-      - name: Install MIIND
+      - name: Install MIIND 1
         run: |
           cd ${{ env.buildDir }}
           ninja
+      - name: Install MIIND 2
+        run: |
+          cd ${{ env.buildDir }}
           ninja install
         shell: bash
       - name: Set up Python
