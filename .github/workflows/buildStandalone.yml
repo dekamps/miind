@@ -82,7 +82,7 @@ jobs:
 
       - name: Install MIIND
         run: |
-          cd ${{ env.buildDir }}
+          cd build
           ninja install
         shell: bash
         
@@ -92,7 +92,7 @@ jobs:
       - name: Add miind libs to LD_LIBRARY_PATH
         run: |
           export LD_LIBRARY_PATH=${{ env.installDir }}/lib
-          export CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind
+          export CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind:${{ env.installDir }}/include/miind/GeomLib
         shell: bash
         
       - name: Set up Python

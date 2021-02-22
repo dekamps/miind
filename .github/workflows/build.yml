@@ -13,12 +13,18 @@ jobs:
         include:
           - os: windows-latest
             triplet: x64-windows
+            scikitCc: msvc
+            scikitCxx: msvc
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
           - os: ubuntu-latest
             triplet: x64-linux-mixed
+            scikitCc: gcc
+            scikitCxx: g++
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
           - os: macos-latest
             triplet: x64-osx-mixed
+            scikitCc: gcc
+            scikitCxx: g++
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
             
     env:
@@ -87,6 +93,9 @@ jobs:
           pip install twine scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
         shell: bash
       - name: Run scikit-build
+        env:
+            CC: ${{ matrix.scikitCc }}
+            CXX: ${{ matric.scikitCxx }}
         run: |
           cd package/pip_package
           python setup.py bdist_wheel

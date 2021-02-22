@@ -76,6 +76,9 @@ def main():
     # Files in sourcetree outside package dir that should be copied to package.
     # Raw paths relative to sourcetree root.
     files_outside_package_dir = {"miind": []}
+    
+    # Copy triplet files to vcpkg from custom-triplets to vcpkg
+    shutil.copy2(os.path.dirname(os.path.abspath(__file__))+'../../custom-triplets/*.cmake', os.path.abspath(__file__))+'../../vcpkg/triplets/')
 
     cmake_args = (
         [
@@ -83,6 +86,7 @@ def main():
             '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
             '-DVCPKG_MANIFEST_MODE:BOOL=ON',
             '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
+            '-DVCPKG_TARGET_TRIPLET=x64-linux-mixed',
             '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/../../vcpkg/scripts/buildsystems/vcpkg.cmake'
         ]
     )
