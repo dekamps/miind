@@ -94,8 +94,7 @@ jobs:
 
       - name: Build wheels
         run: |
-          cd package/pip_package
-          python -m cibuildwheel --output-dir wheelhouse
+          python -m cibuildwheel --output-dir wheelhouse package/pip_package
 
       - uses: actions/upload-artifact@v2
         with:

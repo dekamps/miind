@@ -80,11 +80,19 @@ jobs:
         run: echo "$VCPKG_ROOT/installed/x64-windows/bin" >> $GITHUB_PATH
         if: contains( matrix.os, 'windows')
 
-      - name: Install MIIND
+      - name: Install MIIND on Linux
         run: |
           cd build
           ninja install
         shell: bash
+        if: contains( matrix.os, 'ubuntu')
+        
+      - name: Install MIIND on Windows
+        run: |
+          cd build
+          cmake --install .
+        shell: bash
+        if: contains( matrix.os, 'windows')
         
       - name: Add miindio.py to path
         run: echo '${{ env.installDir }}/share/miind/python' >> $GITHUB_PATH
@@ -98,6 +106,10 @@ jobs:
         run: echo "CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind:${{ env.installDir }}/include/miind/GeomLib" >> $GITHUB_ENV
       - name: Add MIIND_INCLUDE_DIR to ENV
         run: echo "MIIND_INCLUDE_DIR=${{ env.installDir }}/include/miind" >> $GITHUB_ENV
+      - name: Run updatedb on linux to allow locate to find miind libraries
+        run: updatedb
+        shell: bash
+        if: contains( matrix.os, 'ubuntu')
         
       - name: Set up Python
         uses: actions/setup-python@v1
