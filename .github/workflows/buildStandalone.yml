@@ -70,6 +70,9 @@ jobs:
         
       - name: Run CMake
         uses: lukka/run-cmake@main
+        env:
+          CC: gcc
+          CXX: g++
         with:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
