@@ -95,7 +95,7 @@ jobs:
       - name: Run scikit-build
         env:
             CC: ${{ matrix.scikitCc }}
-            CXX: ${{ matric.scikitCxx }}
+            CXX: ${{ matrix.scikitCxx }}
         run: |
           cd package/pip_package
           python setup.py bdist_wheel
