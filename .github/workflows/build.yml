@@ -56,7 +56,7 @@ jobs:
 
       # Now that vcpkg is installed, it is being used to run with the desired arguments.
       - run: |
-            $VCPKG_ROOT/vcpkg install --overlay-triplets=custom-triplets boost-test:${{matrix.triplet}} boost-odeint:${{matrix.triplet}} boost-numeric-conversion:${{matrix.triplet}} boost-filesystem:${{matrix.triplet}} boost-program-options:${{matrix.triplet}} boost-system:${{matrix.triplet}} boost-thread:${{matrix.triplet}} boost-timer:${{matrix.triplet}} boost-serialization:${{matrix.triplet}} boost-chrono:${{matrix.triplet}} boost-date-time:${{matrix.triplet}} boost-atomic:${{matrix.triplet}} boost-core:${{matrix.triplet}} boost-python:${{matrix.triplet}} fftw3:${{matrix.triplet}} gsl:${{matrix.triplet}} python3:${{matrix.triplet}} pugixml:${{matrix.triplet}} glew:${{matrix.triplet}} freeglut:${{matrix.triplet}}
+            $VCPKG_ROOT/vcpkg install --overlay-triplets=custom-triplets boost:${{matrix.triplet}} fftw3:${{matrix.triplet}} gsl:${{matrix.triplet}} python3:${{matrix.triplet}} pugixml:${{matrix.triplet}} glew:${{matrix.triplet}} freeglut:${{matrix.triplet}}
             cp custom-triplets/*.cmake $VCPKG_ROOT/triplets
         shell: bash
       - name: Prints output of run-vcpkg's action
