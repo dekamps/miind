@@ -44,25 +44,19 @@ jobs:
         uses: lukka/run-vcpkg@v6
         with:
           setupOnly: true
-          appendedCacheKey: ${{matrix.os}}-buildstandalone-vcpkg-v1-${{ hashFiles( '**/vcpkg.json' ) }}
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
+          appendedCacheKey: ${{matrix.os}}-buildstandalone-vcpkg-v2-${{ hashFiles( '**/vcpkg.json' ) }}
+          vcpkgTriplet: ${{ matrix.triplet }}
           doNotCache: true
-        if: contains( matrix.os, 'windows')
-      # Now that vcpkg is installed, it is being used to run with the desired arguments.
-      - name: Install vcpkg dependencies on windows
-        run: |
-            $VCPKG_ROOT/vcpkg install boost fftw3 gsl python3 pugixml glew freeglut
-        shell: bash
         if: contains( matrix.os, 'windows')
         
       - name: Run CMake with vcpkg.json manifest
-        env:
-          CC: ${{ matrix.desiredCC}}
         uses: lukka/run-cmake@main
         with:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           useVcpkgToolchainFile: true
-          appendedCacheKey: ${{matrix.os}}-buildstandalone-cmake-v1
           buildDirectory: '${{ env.buildDir }}'
           cmakeAppendedArgs: '"-GNinja" -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x64-windows'
           buildWithCMake: true
@@ -71,13 +65,9 @@ jobs:
         
       - name: Run CMake
         uses: lukka/run-cmake@main
-        env:
-          CC: gcc
-          CXX: g++
         with:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-          appendedCacheKey: ${{matrix.os}}-buildstandalone-cmake-v1
           buildDirectory: '${{ env.buildDir }}'
           cmakeAppendedArgs: '"-GNinja" -DCMAKE_BUILD_TYPE=Release'
           buildWithCMake: true

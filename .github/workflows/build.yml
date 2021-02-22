@@ -12,7 +12,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: windows-latest
-            triplet: x64-windows-mixed
+            triplet: x64-windows
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
           - os: ubuntu-latest
             triplet: x64-linux-mixed
@@ -51,26 +51,25 @@ jobs:
         uses: lukka/run-vcpkg@v6
         with:
           setupOnly: true
-          appendedCacheKey: ${{matrix.os}}-build-vcpkg-v1-${{ hashFiles( '**/vcpkg.json' ) }}
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
+          appendedCacheKey: ${{matrix.os}}-build-vcpkg-v2-${{ hashFiles( '**/vcpkg.json' ) }}
+          vcpkgTriplet: ${{ matrix.triplet }}
           doNotCache: true
-
-      # Now that vcpkg is installed, it is being used to run with the desired arguments.
-      - run: |
-            $VCPKG_ROOT/vcpkg install --overlay-triplets=custom-triplets boost:${{matrix.triplet}} fftw3:${{matrix.triplet}} gsl:${{matrix.triplet}} python3:${{matrix.triplet}} pugixml:${{matrix.triplet}} glew:${{matrix.triplet}} freeglut:${{matrix.triplet}}
-            cp custom-triplets/*.cmake $VCPKG_ROOT/triplets
-        shell: bash
+        
       - name: Prints output of run-vcpkg's action
         run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}'"
+        
       - name: Run CMake with vcpkg.json manifest
         uses: lukka/run-cmake@main
         with:
           cmakeListsOrSettingsJson: CMakeSettingsJson
           cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
           useVcpkgToolchainFile: true
-          appendedCacheKey: ${{matrix.os}}-build-cmake-v1-${{ hashFiles( '**/vcpkg.json' ) }}
           buildDirectory: '${{ env.buildDir }}'
           cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
           buildWithCMake: true
+      
       #- name: Add python directory to path ready for tests
       #  run: echo "${{ github.workspace }}/python/" >> $GITHUB_PATH
       - name: Set up Python

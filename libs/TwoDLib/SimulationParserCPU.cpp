@@ -60,8 +60,8 @@ double SimulationParserCPU<MPILib::CustomConnectionParameters>::getCurrentSimTim
 	return _count * MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step;
 }
 
-template<>
-void SimulationParserCPU<MPILib::CustomConnectionParameters>::parseXmlFile() {
+template<WeightType>
+void SimulationParserCPU<WeightType>::parseXmlFile() {
 	pugi::xml_document doc;
 	if (!doc.load_file(_xml_filename.c_str())) {
 		std::cout << "Failed to load XML simulation file.\n";
