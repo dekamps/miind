@@ -88,7 +88,6 @@ jobs:
         
       - name: Add miindio.py to path
         run: echo '${{ env.installDir }}/share/miind/python' >> $GITHUB_PATH
-        MIIND_LIBRARY_DIR
       - name: Add miind libs to LD_LIBRARY_PATH
         run: echo "LD_LIBRARY_PATH=${{ env.installDir }}/lib" >> $GITHUB_ENV
       - name: Add MIIND_LIBRARY_DIR to ENV
