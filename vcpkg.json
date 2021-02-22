@@ -2,7 +2,18 @@
   "name": "miind",
   "version-string": "0.0.8",
   "dependencies": [
-	"boost",
+	"boost-test",
+	"boost-filesystem",
+	"boost-program-options",
+	"boost-system",
+	"boost-thread",
+	"boost-timer",
+	"boost-serialization",
+	"boost-chrono",
+	"boost-date-time",
+	"boost-atomic",
+	"boost-core",
+	"boost-python",
     "fftw3",
 	"gsl",
 	"python3",
@@ -11,3 +22,4 @@
 	"freeglut"
   ]
 }
+
