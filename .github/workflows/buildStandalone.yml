@@ -83,7 +83,6 @@ jobs:
       - name: Install MIIND
         run: |
           cd build
-          ls
           ninja install
         shell: bash
         
@@ -91,11 +90,11 @@ jobs:
         run: echo '${{ env.installDir }}/share/miind/python' >> $GITHUB_PATH
         
       - name: Add miind libs to LD_LIBRARY_PATH
-        run: |
-          export LD_LIBRARY_PATH=${{ env.installDir }}/lib
-          export CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind:${{ env.installDir }}/include/miind/GeomLib
-          export MIIND_INCLUDE_DIR=${{ env.installDir }}/include/miind
-        shell: bash
+        run: echo "LD_LIBRARY_PATH=${{ env.installDir }}/lib" >> $GITHUB_ENV
+      - name: Add miind includes to CPLUS_INCLUDE_PATH
+        run: echo "CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind:${{ env.installDir }}/include/miind/GeomLib" >> $GITHUB_ENV
+      - name: Add MIIND_INCLUDE_DIR to ENV
+        run: echo "MIIND_INCLUDE_DIR=${{ env.installDir }}/include/miind" >> $GITHUB_ENV
         
       - name: Set up Python
         uses: actions/setup-python@v1

@@ -13,22 +13,17 @@ jobs:
         include:
           - os: windows-latest
             triplet: x64-windows
-            scikitCc: msvc
-            scikitCxx: msvc
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
           - os: ubuntu-latest
             triplet: x64-linux-mixed
-            scikitCc: gcc
-            scikitCxx: g++
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
           #- os: macos-latest
           #  triplet: x64-osx-mixed
-          #  scikitCc: gcc
-          #  scikitCxx: g++
           #  vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
             
     env:
       buildDir: '${{ github.workspace }}/build'
+      CIBW_BUILD: cp38-manylinux_x86_64	cp38-win_amd64
     steps:
       - uses: actions/checkout@v2
         with:
@@ -87,23 +82,50 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
-      - name: Install dependencies
+          
+      - name: Install cibuildwheel
         run: |
-          python -m pip install --upgrade pip
-          pip install twine scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
-        shell: bash
-      - name: Run scikit-build
-        env:
-            CC: ${{ matrix.scikitCc }}
-            CXX: ${{ matrix.scikitCxx }}
+          python -m pip install cibuildwheel==1.8.0
+
+      - name: Install Visual C++ for Python 2.7
+        if: runner.os == 'Windows'
         run: |
-          cd package/pip_package
-          python setup.py bdist_wheel
-        shell: bash
-      - name: Run auditwheel on linux and osx
+          choco install vcpython27 -f -y
+
+      - name: Build wheels
         run: |
-          cd package/pip_package/dist
-          ls
-        shell: bash
-        if: contains( matrix.os, 'macos') || contains( matrix.os, 'ubuntu')
+          python -m cibuildwheel --output-dir wheelhouse
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./wheelhouse/*.whl    
+          
+          
+          
+      # old stuff id cibuildwheel doesn't work
+        #if: contains( matrix.os, 'windows')
+      #- name: Install dependencies
+      #  run: |
+       #   python -m pip install --upgrade pip
+        #  pip install twine scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
+        #shell: bash
+        #if: contains( matrix.os, 'windows')
+      #- name: Run scikit-build
+      #  run: |
+       #   cd package/pip_package
+        #  python setup.py bdist_wheel
+        #shell: bash
+       # if: contains( matrix.os, 'windows')
+        
+     # - name: Run auditwheel for manylinux on linux
+      #  uses: RalfG/python-wheels-manylinux-build@v0.2.2-manylinux2010_x86_64
+       # with:
+        #  python-versions: 'cp36-cp36m cp37-cp37m'
+         # build-requirements: 'twine scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes'
+         # system-packages: 'libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev fftw3-dev'
+         # package-path: 'package/pip_package'
+         # pip-wheel-args: '--no-deps'
+        #if: contains( matrix.os, 'ubuntu')
+        
+      # Now upload many linux wheel and windows wheel
         
