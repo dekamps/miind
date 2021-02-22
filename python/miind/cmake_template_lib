@@ -60,6 +60,13 @@ ENDIF (MIIND_INCLUDE_DIR_DEFAULT)
 
 ENDIF()
 
+IF (DEFINED ENV{MIIND_LIBRARY_DIR})
+MESSAGE( " Miind library directory (MIIND_LIBRARY_DIR) : $ENV{MIIND_LIBRARY_DIR}" )
+link_directories( ${MIIND_LIBRARY_DIR} )
+ELSE()
+MESSAGE( " No Miind library directory defined." )
+ENDIF()
+
 set( LIB_TYPE SHARED )
 
 OPTION(ENABLE_MPI "MPI Desired" ${TOKEN_ENABLE_MPI})

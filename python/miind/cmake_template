@@ -54,6 +54,14 @@ ENDIF (MIIND_INCLUDE_DIR_DEFAULT)
 
 ENDIF()
 
+IF (DEFINED ENV{MIIND_LIBRARY_DIR})
+MESSAGE( " Miind library directory (MIIND_LIBRARY_DIR) : $ENV{MIIND_LIBRARY_DIR}" )
+link_directories( ${MIIND_LIBRARY_DIR} )
+ELSE()
+MESSAGE( " No Miind library directory defined." )
+ENDIF()
+
+
 include_directories( ${GSL_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
 include_directories( ${ROOT_INCLUDE_DIRS} )

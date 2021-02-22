@@ -9,15 +9,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest] # macos-latest
+        os: [ubuntu-18.04, windows-2019] # macos-10.15
         include:
-          - os: windows-latest
+          - os: windows-2019
             triplet: x64-windows
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
-          - os: ubuntu-latest
+          - os: ubuntu-18.04
             triplet: x64-linux-mixed
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
-          #- os: macos-latest
+          #- os: macos-10.15
           #  triplet: x64-osx-mixed
           #  vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
             
@@ -94,6 +94,7 @@ jobs:
 
       - name: Build wheels
         run: |
+          cd package/pip_package
           python -m cibuildwheel --output-dir wheelhouse
 
       - uses: actions/upload-artifact@v2

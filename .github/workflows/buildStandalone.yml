@@ -88,9 +88,13 @@ jobs:
         
       - name: Add miindio.py to path
         run: echo '${{ env.installDir }}/share/miind/python' >> $GITHUB_PATH
-        
+        MIIND_LIBRARY_DIR
       - name: Add miind libs to LD_LIBRARY_PATH
         run: echo "LD_LIBRARY_PATH=${{ env.installDir }}/lib" >> $GITHUB_ENV
+      - name: Add MIIND_LIBRARY_DIR to ENV
+        run: echo "MIIND_LIBRARY_DIR=${{ env.installDir }}/lib" >> $GITHUB_ENV
+      - name: Add miind python to PYTHONPATH
+        run: echo "PYTHONPATH=${{ env.installDir }}/share/miind/python" >> $GITHUB_ENV
       - name: Add miind includes to CPLUS_INCLUDE_PATH
         run: echo "CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind:${{ env.installDir }}/include/miind/GeomLib" >> $GITHUB_ENV
       - name: Add MIIND_INCLUDE_DIR to ENV
