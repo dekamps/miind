@@ -48,7 +48,7 @@ jobs:
         shell: bash
         
       - run: |
-            cp custom-triplets/*.cmake $VCPKG_ROOT/triplets
+            cp custom-triplets/*.cmake vcpkg/triplets
         shell: bash
         
       - name: Install vcpkg

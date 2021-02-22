@@ -14,9 +14,9 @@ SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(con
 	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
 }
 
-template<>
-void SimulationParserCPU<MPILib::CustomConnectionParameters>::endSimulation() {
-	MPILib::MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::endSimulation();
+template<class WeightType>
+void SimulationParserCPU<WeightType>::endSimulation() {
+	MPILib::MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::endSimulation();
 }
 
 template<>
@@ -55,9 +55,9 @@ void SimulationParserCPU<MPILib::CustomConnectionParameters>::addIncomingConnect
 	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], connection);
 }
 
-template<>
-double SimulationParserCPU<MPILib::CustomConnectionParameters>::getCurrentSimTime() {
-	return _count * MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step;
+template<class WeightType>
+double SimulationParserCPU<WeightType>::getCurrentSimTime() {
+	return _count * MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_time_step;
 }
 
 template<>
@@ -236,36 +236,36 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 
 }
 
-template<>
-void SimulationParserCPU<MPILib::CustomConnectionParameters>::startSimulation() {
+template<class WeightType>
+void SimulationParserCPU<WeightType>::startSimulation() {
 	if (_display_nodes.size() > 0)
-		TwoDLib::Display::getInstance()->animate(true, _display_nodes, MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step);
-	MPILib::MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::startSimulation();
+		TwoDLib::Display::getInstance()->animate(true, _display_nodes, MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_time_step);
+	MPILib::MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::startSimulation();
 }
 
-template<>
-void SimulationParserCPU<MPILib::CustomConnectionParameters>::init() {
+template<class WeightType>
+void SimulationParserCPU<WeightType>::init() {
 	parseXmlFile();
 }
 
-template<>
-std::vector<double> SimulationParserCPU<MPILib::CustomConnectionParameters>::evolveSingleStep(std::vector<double> activity) {
-	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.reportNodeActivities(_rate_nodes, _rate_node_intervals,
-		(_count * MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step));
+template<class WeightType>
+std::vector<double> SimulationParserCPU<WeightType>::evolveSingleStep(std::vector<double> activity) {
+	MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.reportNodeActivities(_rate_nodes, _rate_node_intervals,
+		(_count * MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_time_step));
 
 	if (_display_nodes.size() > 0)
 		TwoDLib::Display::getInstance()->updateDisplay(_count);
 
-	TwoDLib::GridReport<MPILib::CustomConnectionParameters>::getInstance()->reportDensity(_density_nodes, _density_node_start_times, _density_node_end_times, _density_node_intervals,
-		(_count * MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step));
+	TwoDLib::GridReport<WeightType>::getInstance()->reportDensity(_density_nodes, _density_node_start_times, _density_node_end_times, _density_node_intervals,
+		(_count * MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_time_step));
 
 	_count++;
 
-	return MPILib::MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::evolveSingleStep(activity);
+	return MPILib::MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::evolveSingleStep(activity);
 }
 
-template<>
-bool SimulationParserCPU<MPILib::CustomConnectionParameters>::simulationComplete() {
-	return (_count * MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step >=
-		MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_simulation_length);
+template<class WeightType>
+bool SimulationParserCPU<WeightType>::simulationComplete() {
+	return (_count * MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_time_step >=
+		MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_simulation_length);
 }
