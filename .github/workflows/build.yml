@@ -46,6 +46,11 @@ jobs:
       - name: dir
         run: find $RUNNER_WORKSPACE
         shell: bash
+        
+      - run: |
+            cp custom-triplets/*.cmake $VCPKG_ROOT/triplets
+        shell: bash
+        
       - name: Install vcpkg
         # Download and build vcpkg, without installing any port. If content is cached already, it is a no-op.
         uses: lukka/run-vcpkg@v6

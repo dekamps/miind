@@ -60,25 +60,10 @@ double SimulationParserCPU<MPILib::CustomConnectionParameters>::getCurrentSimTim
 	return _count * MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step;
 }
 
-template<WeightType>
-void SimulationParserCPU<WeightType>::parseXmlFile() {
-	pugi::xml_document doc;
-	if (!doc.load_file(_xml_filename.c_str())) {
-		std::cout << "Failed to load XML simulation file.\n";
-		return; //better to throw...
-	}
-
-	//check Weight Type matches this class
-	if (std::string("CustomConnectionParameters") != std::string(doc.child("Simulation").child_value("WeightType"))) {
-		std::cout << "The weight type of the SimulationParser (" << "CustomConnectionParameters" << ") doesn't match the WeightType in the XML file (" << doc.child("Simulation").child_value("WeightType") << "). Exiting.\n";
-		return;
-	}
-
-	//Algorithms
-	//Ignore "Group" algorithms - this is the non-cuda version of WinMiind (for now)
-
-	_algorithms = std::map<std::string, std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>>();
-	_node_ids = std::map<std::string, MPILib::NodeId>();
+template<>
+void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithms(pugi::xml_document& doc,
+	std::map<std::string, std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>>& _algorithms,
+	std::map<std::string, MPILib::NodeId>& _node_ids) {
 
 	for (pugi::xml_node algorithm = doc.child("Simulation").child("Algorithms").child("Algorithm"); algorithm; algorithm = algorithm.next_sibling("Algorithm")) {
 		//Check all possible Algorithm types
@@ -127,6 +112,37 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 		//... todo : AvgV or no?
 	}
 
+}
+
+template<>
+bool SimulationParserCPU< MPILib::CustomConnectionParameters>::checkWeightType(pugi::xml_document& doc) {
+	if (std::string("CustomConnectionParameters") != std::string(doc.child("Simulation").child_value("WeightType"))) {
+		std::cout << "The weight type of the SimulationParser (" << "CustomConnectionParameters" << ") doesn't match the WeightType in the XML file (" << doc.child("Simulation").child_value("WeightType") << "). Exiting.\n";
+		return false;
+	}
+	return true;
+}
+
+template<class WeightType>
+void SimulationParserCPU<WeightType>::parseXmlFile() {
+	pugi::xml_document doc;
+	if (!doc.load_file(_xml_filename.c_str())) {
+		std::cout << "Failed to load XML simulation file.\n";
+		return; //better to throw...
+	}
+
+	//check Weight Type matches this class
+	if (!checkWeightType(doc))
+		return;
+
+	//Algorithms
+	//Ignore "Group" algorithms - this is the non-cuda version of WinMiind (for now)
+
+	_algorithms = std::map<std::string, std::unique_ptr<MPILib::AlgorithmInterface<WeightType>>>();
+	_node_ids = std::map<std::string, MPILib::NodeId>();
+
+	parseXMLAlgorithms(doc, _algorithms, _node_ids);
+
 	//Nodes
 	for (pugi::xml_node node = doc.child("Simulation").child("Nodes").child("Node"); node; node = node.next_sibling("Node")) {
 		std::string node_name = std::string(node.attribute("name").value());
@@ -146,7 +162,7 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 
 		std::string algorithm_name = std::string(node.attribute("algorithm").value());
 
-		MPILib::NodeId id = MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.addNode(*_algorithms[algorithm_name], node_type);
+		MPILib::NodeId id = MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.addNode(*_algorithms[algorithm_name], node_type);
 		_node_ids[node_name] = id;
 	}
 
@@ -169,7 +185,7 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 	//Outgoing Connections
 	for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("OutgoingConnection"); conn; conn = conn.next_sibling("OutgoingConnection")) {
 		std::string node = std::string(conn.attribute("Node").value());
-		MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.setNodeExternalSuccessor(_node_ids[node]);
+		MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.setNodeExternalSuccessor(_node_ids[node]);
 		_ordered_output_nodes.push_back(node);
 	}
 
@@ -208,15 +224,15 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 	double time_step = std::stod(std::string(doc.child("Simulation").child("SimulationRunParameter").child_value("t_step")));
 	std::string log_filename = std::string(doc.child("Simulation").child("SimulationRunParameter").child_value("name_log"));
 
-	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_simulation_length = simulation_length;
-	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step = time_step;
+	MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_simulation_length = simulation_length;
+	MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_time_step = time_step;
 
-	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::report_handler = new MPILib::report::handler::InactiveReportHandler();
+	MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::report_handler = new MPILib::report::handler::InactiveReportHandler();
 
-	MPILib::SimulationRunParameter par_run(*MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::report_handler, (simulation_length / time_step) + 1, 0,
+	MPILib::SimulationRunParameter par_run(*MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::report_handler, (simulation_length / time_step) + 1, 0,
 		simulation_length, time_step, time_step, log_filename);
 
-	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.configureSimulation(par_run);
+	MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.configureSimulation(par_run);
 
 }
 

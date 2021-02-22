@@ -29,6 +29,12 @@ public:
 
 protected:
 
+	void parseXMLAlgorithms(pugi::xml_document& doc,
+		std::map<std::string, std::unique_ptr<MPILib::AlgorithmInterface<WeightType>>>& _algorithms,
+		std::map<std::string, MPILib::NodeId>& _node_ids);
+
+	bool checkWeightType(pugi::xml_document& doc);
+
 	std::string _xml_filename;
 
 	std::map<std::string, std::unique_ptr<MPILib::AlgorithmInterface<WeightType>>> _algorithms;
