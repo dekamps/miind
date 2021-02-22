@@ -17,6 +17,16 @@ if(PORT MATCHES "boost-test")
     set(VCPKG_LIBRARY_LINKAGE dynamic)
 endif()
 
+if(PORT MATCHES "boost-numeric-conversion")
+	message ( " This boost-numeric-conversion lib should be dynamic.")
+    set(VCPKG_LIBRARY_LINKAGE dynamic)
+endif()
+
+if(PORT MATCHES "boost-odeint")
+	message ( " This boost-odeint lib should be dynamic.")
+    set(VCPKG_LIBRARY_LINKAGE dynamic)
+endif()
+
 if(PORT MATCHES "boost-filesystem")
 	message ( " This boost-filesystem lib should be dynamic.")
     set(VCPKG_LIBRARY_LINKAGE dynamic)

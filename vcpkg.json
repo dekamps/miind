@@ -3,6 +3,8 @@
   "version-string": "0.0.8",
   "dependencies": [
 	"boost-test",
+	"boost-numeric-conversion",
+	"boost-odeint",
 	"boost-filesystem",
 	"boost-program-options",
 	"boost-system",

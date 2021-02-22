@@ -44,7 +44,7 @@ jobs:
         uses: lukka/run-vcpkg@v6
         with:
           setupOnly: true
-          appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
+          appendedCacheKey: ${{matrix.os}}-buildstandalone-vcpkg-v1-${{ hashFiles( '**/vcpkg.json' ) }}
           doNotCache: true
         if: contains( matrix.os, 'windows')
       # Now that vcpkg is installed, it is being used to run with the desired arguments.
@@ -62,6 +62,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           useVcpkgToolchainFile: true
+          appendedCacheKey: ${{matrix.os}}-buildstandalone-cmake-v1
           buildDirectory: '${{ env.buildDir }}'
           cmakeAppendedArgs: '"-GNinja" -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x64-windows'
           buildWithCMake: true
@@ -76,6 +77,7 @@ jobs:
         with:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+          appendedCacheKey: ${{matrix.os}}-buildstandalone-cmake-v1
           buildDirectory: '${{ env.buildDir }}'
           cmakeAppendedArgs: '"-GNinja" -DCMAKE_BUILD_TYPE=Release'
           buildWithCMake: true
