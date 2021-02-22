@@ -62,7 +62,7 @@ ENDIF()
 
 IF (DEFINED ENV{MIIND_LIBRARY_DIR})
 MESSAGE( " Miind library directory (MIIND_LIBRARY_DIR) : $ENV{MIIND_LIBRARY_DIR}" )
-link_directories( ${MIIND_LIBRARY_DIR} )
+link_directories( $ENV{MIIND_LIBRARY_DIR} )
 ELSE()
 MESSAGE( " No Miind library directory defined." )
 ENDIF()
