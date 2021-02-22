@@ -14,13 +14,35 @@ SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(con
 	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
 }
 
+template<>
+SimulationParserCPU<MPILib::DelayedConnection>::SimulationParserCPU(int num_nodes, const std::string xml_filename) :
+	// For now we don't allow num_nodes : override to 1 node only.
+	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
+}
+
+template<>
+SimulationParserCPU<MPILib::DelayedConnection>::SimulationParserCPU(const std::string xml_filename) :
+	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
+}
+
+template<>
+SimulationParserCPU<double>::SimulationParserCPU(int num_nodes, const std::string xml_filename) :
+	// For now we don't allow num_nodes : override to 1 node only.
+	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
+}
+
+template<>
+SimulationParserCPU<double>::SimulationParserCPU(const std::string xml_filename) :
+	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
+}
+
 template<class WeightType>
 void SimulationParserCPU<WeightType>::endSimulation() {
 	MPILib::MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::endSimulation();
 }
 
 template<>
-void SimulationParserCPU<MPILib::CustomConnectionParameters>::addConnectionCCP(pugi::xml_node& xml_conn) {
+void SimulationParserCPU<MPILib::CustomConnectionParameters>::addConnection(pugi::xml_node& xml_conn) {
 	MPILib::CustomConnectionParameters connection;
 
 	std::string in = std::string(xml_conn.attribute("In").value());
@@ -38,7 +60,36 @@ void SimulationParserCPU<MPILib::CustomConnectionParameters>::addConnectionCCP(p
 }
 
 template<>
-void SimulationParserCPU<MPILib::CustomConnectionParameters>::addIncomingConnectionCCP(pugi::xml_node& xml_conn) {
+void SimulationParserCPU<MPILib::DelayedConnection>::addConnection(pugi::xml_node& xml_conn) {
+	
+
+	std::string in = std::string(xml_conn.attribute("In").value());
+	std::string out = std::string(xml_conn.attribute("Out").value());
+
+	std::string values = std::string(xml_conn.text().as_string());
+	double num_connections;
+	double efficacy;
+	double delay;
+	std::sscanf(values.c_str(), "%d %d %d", &num_connections, &efficacy, &delay);
+
+	MPILib::DelayedConnection connection(num_connections, efficacy, delay);
+
+	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], connection);
+}
+
+template<>
+void SimulationParserCPU<double>::addConnection(pugi::xml_node& xml_conn) {
+
+	std::string in = std::string(xml_conn.attribute("In").value());
+	std::string out = std::string(xml_conn.attribute("Out").value());
+
+	double value = xml_conn.text().as_double();
+	
+	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], value);
+}
+
+template<>
+void SimulationParserCPU<MPILib::CustomConnectionParameters>::addIncomingConnection(pugi::xml_node& xml_conn) {
 	MPILib::CustomConnectionParameters connection;
 
 	std::string node = std::string(xml_conn.attribute("Node").value());
@@ -53,6 +104,30 @@ void SimulationParserCPU<MPILib::CustomConnectionParameters>::addIncomingConnect
 	}
 
 	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], connection);
+}
+
+template<>
+void SimulationParserCPU<MPILib::DelayedConnection>::addIncomingConnection(pugi::xml_node& xml_conn) {
+	std::string node = std::string(xml_conn.attribute("Node").value());
+
+	std::string values = std::string(xml_conn.text().as_string());
+	double num_connections;
+	double efficacy;
+	double delay;
+	std::sscanf(values.c_str(), "%d %d %d", &num_connections, &efficacy, &delay);
+
+	MPILib::DelayedConnection connection(num_connections, efficacy, delay);
+
+	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], connection);
+}
+
+template<>
+void SimulationParserCPU<double>::addIncomingConnection(pugi::xml_node& xml_conn) {
+	std::string node = std::string(xml_conn.attribute("Node").value());
+
+	double value = xml_conn.text().as_double();
+
+	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], value);
 }
 
 template<class WeightType>
@@ -115,9 +190,90 @@ void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithm
 }
 
 template<>
-bool SimulationParserCPU< MPILib::CustomConnectionParameters>::checkWeightType(pugi::xml_document& doc) {
+void SimulationParserCPU< MPILib::DelayedConnection>::parseXMLAlgorithms(pugi::xml_document& doc,
+	std::map<std::string, std::unique_ptr<MPILib::AlgorithmInterface<MPILib::DelayedConnection>>>& _algorithms,
+	std::map<std::string, MPILib::NodeId>& _node_ids) {
+
+	for (pugi::xml_node algorithm = doc.child("Simulation").child("Algorithms").child("Algorithm"); algorithm; algorithm = algorithm.next_sibling("Algorithm")) {
+		//Check all possible Algorithm types
+		if (std::string("MeshAlgorithm") == std::string(algorithm.attribute("type").value())) {
+			std::string algorithm_name = std::string(algorithm.attribute("name").value());
+			std::cout << "Found MeshAlgorithm " << algorithm_name << ".\n" << std::flush;
+
+			std::string model_filename = std::string(algorithm.attribute("modelfile").value());
+			double tau_refractive = std::stod(std::string(algorithm.attribute("tau_refractive").value()));
+			double time_step = std::stod(std::string(algorithm.child_value("TimeStep")));
+
+			std::vector<std::string> matrix_files;
+			for (pugi::xml_node matrix_file = algorithm.child("MatrixFile"); matrix_file; matrix_file = matrix_file.next_sibling("MatrixFile")) {
+				matrix_files.push_back(std::string(matrix_file.child_value()));
+			}
+
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::DelayedConnection>>(new TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOdeint>(model_filename, matrix_files, time_step, tau_refractive));
+		}
+
+		if (std::string("RateFunctor") == std::string(algorithm.attribute("type").value())) {
+			// As we can't use the "expression" part properly here because we're not doing an intemediate cpp translation step
+			// Let's just use RateAlgorithm for RateFunctor for now.
+			std::string algorithm_name = std::string(algorithm.attribute("name").value());
+			std::cout << "Found RateFunctor (Using a RateAlgorithm) " << algorithm_name << ".\n";
+
+			double rate = std::stod(std::string(algorithm.child_value("expression")));
+
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::DelayedConnection>>(new MPILib::RateAlgorithm<MPILib::DelayedConnection>(rate));
+		}
+
+		//... todo : AvgV or no?
+	}
+
+}
+
+template<>
+void SimulationParserCPU<double>::parseXMLAlgorithms(pugi::xml_document& doc,
+	std::map<std::string, std::unique_ptr<MPILib::AlgorithmInterface<double>>>& _algorithms,
+	std::map<std::string, MPILib::NodeId>& _node_ids) {
+
+	for (pugi::xml_node algorithm = doc.child("Simulation").child("Algorithms").child("Algorithm"); algorithm; algorithm = algorithm.next_sibling("Algorithm")) {
+		//Check all possible Algorithm types
+
+		if (std::string("RateFunctor") == std::string(algorithm.attribute("type").value())) {
+			// As we can't use the "expression" part properly here because we're not doing an intemediate cpp translation step
+			// Let's just use RateAlgorithm for RateFunctor for now.
+			std::string algorithm_name = std::string(algorithm.attribute("name").value());
+			std::cout << "Found RateFunctor (Using a RateAlgorithm) " << algorithm_name << ".\n";
+
+			double rate = std::stod(std::string(algorithm.child_value("expression")));
+
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<double>>(new MPILib::RateAlgorithm<double>(rate));
+		}
+
+		//... todo : AvgV or no?
+	}
+
+}
+
+template<>
+bool SimulationParserCPU<MPILib::CustomConnectionParameters>::checkWeightType(pugi::xml_document& doc) {
 	if (std::string("CustomConnectionParameters") != std::string(doc.child("Simulation").child_value("WeightType"))) {
 		std::cout << "The weight type of the SimulationParser (" << "CustomConnectionParameters" << ") doesn't match the WeightType in the XML file (" << doc.child("Simulation").child_value("WeightType") << "). Exiting.\n";
+		return false;
+	}
+	return true;
+}
+
+template<>
+bool SimulationParserCPU<MPILib::DelayedConnection>::checkWeightType(pugi::xml_document& doc) {
+	if (std::string("DelayedConnection") != std::string(doc.child("Simulation").child_value("WeightType"))) {
+		std::cout << "The weight type of the SimulationParser (" << "DelayedConnection" << ") doesn't match the WeightType in the XML file (" << doc.child("Simulation").child_value("WeightType") << "). Exiting.\n";
+		return false;
+	}
+	return true;
+}
+
+template<>
+bool SimulationParserCPU<double>::checkWeightType(pugi::xml_document& doc) {
+	if (std::string("double") != std::string(doc.child("Simulation").child_value("WeightType"))) {
+		std::cout << "The weight type of the SimulationParser (" << "double" << ") doesn't match the WeightType in the XML file (" << doc.child("Simulation").child_value("WeightType") << "). Exiting.\n";
 		return false;
 	}
 	return true;
@@ -170,7 +326,7 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 	for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("Connection"); conn; conn = conn.next_sibling("Connection")) {
 		// A better way to do this is to move the connection building to a separate concrete non-templated class
 		// too lazy right now...
-		addConnectionCCP(conn);
+		addConnection(conn);
 		// todo : Deal with other connection types - DelayedConnection, double
 	}
 
@@ -178,7 +334,7 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 	for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("IncomingConnection"); conn; conn = conn.next_sibling("IncomingConnection")) {
 		// A better way to do this is to move the connection building to a separate concrete non-templated class
 		// too lazy right now...
-		addIncomingConnectionCCP(conn);
+		addIncomingConnection(conn);
 		// todo : Deal with other connection types - DelayedConnection, double
 	}
 

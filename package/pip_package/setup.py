@@ -79,7 +79,11 @@ def main():
 
     cmake_args = (
         [
-            '-DENABLE_OPENMP:BOOL=ON'
+            '-DENABLE_OPENMP:BOOL=ON',
+            '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
+            '-DVCPKG_MANIFEST_MODE:BOOL=ON',
+            '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
+            '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/../../vcpkg/scripts/buildsystems/vcpkg.cmake'
         ]
     )
 

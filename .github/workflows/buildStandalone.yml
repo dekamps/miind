@@ -17,6 +17,7 @@ jobs:
             
     env:
       buildDir: '${{ github.workspace }}/build'
+      installDir: '${{ github.workspace }}/miind_install'
     steps:
       - uses: actions/checkout@v2
         with:
@@ -47,19 +48,19 @@ jobs:
           setupOnly: true
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
           additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
-          appendedCacheKey: ${{matrix.os}}-buildstandalone-vcpkg-v2-${{ hashFiles( '**/vcpkg.json' ) }}
-          vcpkgTriplet: ${{ matrix.triplet }}
+          appendedCacheKey: ${{matrix.os}}-build-vcpkg-v2-${{ hashFiles( '**/vcpkg.json' ) }}
+          vcpkgTriplet: x64-windows
           doNotCache: true
         if: contains( matrix.os, 'windows')
         
       - name: Run CMake with vcpkg.json manifest
         uses: lukka/run-cmake@main
         with:
-          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+          cmakeListsOrSettingsJson: CMakeSettingsJson
+          cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
           useVcpkgToolchainFile: true
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x64-windows'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DVCPKG_TARGET_TRIPLET=x64-windows'
           buildWithCMake: true
         if: contains( matrix.os, 'windows')
         
@@ -70,7 +71,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_BUILD_TYPE=Release'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release'
           buildWithCMake: true
         if: contains( matrix.os, 'macos') || contains( matrix.os, 'ubuntu')
         
@@ -78,15 +79,22 @@ jobs:
       - name: Add vcpkg installed bin to path so windows can find files when using MIIND
         run: echo "$VCPKG_ROOT/installed/x64-windows/bin" >> $GITHUB_PATH
         if: contains( matrix.os, 'windows')
-      - name: Install MIIND 1
-        run: |
-          cd ${{ env.buildDir }}
-          ninja
-      - name: Install MIIND 2
+
+      - name: Install MIIND
         run: |
           cd ${{ env.buildDir }}
           ninja install
         shell: bash
+        
+      - name: Add miindio.py to path
+        run: echo '${{ env.installDir }}/share/miind/python' >> $GITHUB_PATH
+        
+      - name: Add miind libs to LD_LIBRARY_PATH
+        run: |
+          export LD_LIBRARY_PATH=${{ env.installDir }}/lib
+          export CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind
+        shell: bash
+        
       - name: Set up Python
         uses: actions/setup-python@v1
         with:

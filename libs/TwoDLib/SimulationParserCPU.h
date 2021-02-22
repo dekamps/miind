@@ -15,8 +15,8 @@ public:
 	SimulationParserCPU(int num_nodes, const std::string xml_filename);
 	SimulationParserCPU(const std::string xml_filename);
 	void endSimulation();
-	void addConnectionCCP(pugi::xml_node& xml_conn);
-	void addIncomingConnectionCCP(pugi::xml_node& xml_conn);
+	void addConnection(pugi::xml_node& xml_conn);
+	void addIncomingConnection(pugi::xml_node& xml_conn);
 	void parseXmlFile();
 	void startSimulation();
 	void init();
