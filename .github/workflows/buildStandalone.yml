@@ -9,11 +9,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest] # macos-latest
         include:
           - os: windows-latest
           - os: ubuntu-latest
-          - os: macos-latest
+          #- os: macos-latest
             
     env:
       buildDir: '${{ github.workspace }}/build'
@@ -83,6 +83,7 @@ jobs:
       - name: Install MIIND
         run: |
           cd build
+          ls
           ninja install
         shell: bash
         
@@ -93,6 +94,7 @@ jobs:
         run: |
           export LD_LIBRARY_PATH=${{ env.installDir }}/lib
           export CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind:${{ env.installDir }}/include/miind/GeomLib
+          export MIIND_INCLUDE_DIR=${{ env.installDir }}/include/miind
         shell: bash
         
       - name: Set up Python

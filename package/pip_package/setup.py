@@ -7,7 +7,9 @@ import runpy
 import subprocess
 import re
 import sysconfig
+import shutil
 import platform
+from sys import platform
 import skbuild
 from skbuild import cmaker
 
@@ -78,8 +80,12 @@ def main():
     files_outside_package_dir = {"miind": []}
     
     # Copy triplet files to vcpkg from custom-triplets to vcpkg
-    shutil.copy2(os.path.dirname(os.path.abspath(__file__))+'../../custom-triplets/*.cmake', os.path.abspath(__file__))+'../../vcpkg/triplets/')
-
+    src_linux = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../custom-triplets/x64-linux-mixed.cmake')
+    src_osx = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../custom-triplets/x64-osx-mixed.cmake')
+    dst = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../vcpkg/triplets/')
+    shutil.copy2(src_linux, dst)
+    shutil.copy2(src_osx, dst)
+    
     cmake_args = (
         [
             '-DENABLE_OPENMP:BOOL=ON',
@@ -90,6 +96,31 @@ def main():
             '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/../../vcpkg/scripts/buildsystems/vcpkg.cmake'
         ]
     )
+        
+    if platform == "win32":
+        cmake_args = (
+            [
+                '-DENABLE_OPENMP:BOOL=ON',
+                '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
+                '-DVCPKG_MANIFEST_MODE:BOOL=ON',
+                '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
+                '-DVCPKG_TARGET_TRIPLET=x64-windows',
+                '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/../../vcpkg/scripts/buildsystems/vcpkg.cmake'
+            ]
+        )
+        
+    if platform == "darwin":
+        cmake_args = (
+            [
+                '-DENABLE_OPENMP:BOOL=ON',
+                '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
+                '-DVCPKG_MANIFEST_MODE:BOOL=ON',
+                '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
+                '-DVCPKG_TARGET_TRIPLET=x64-osx-mixed',
+                '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/../../vcpkg/scripts/buildsystems/vcpkg.cmake'
+            ]
+        )
+    
 
     # https://github.com/scikit-build/scikit-build/issues/479
     if "CMAKE_ARGS" in os.environ:

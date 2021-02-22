@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest] # macos-latest
         include:
           - os: windows-latest
             triplet: x64-windows
@@ -21,11 +21,11 @@ jobs:
             scikitCc: gcc
             scikitCxx: g++
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
-          - os: macos-latest
-            triplet: x64-osx-mixed
-            scikitCc: gcc
-            scikitCxx: g++
-            vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
+          #- os: macos-latest
+          #  triplet: x64-osx-mixed
+          #  scikitCc: gcc
+          #  scikitCxx: g++
+          #  vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
             
     env:
       buildDir: '${{ github.workspace }}/build'
@@ -105,5 +105,5 @@ jobs:
           cd package/pip_package/dist
           ls
         shell: bash
-        
+        if: contains( matrix.os, 'macos') || contains( matrix.os, 'ubuntu')
         
