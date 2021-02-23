@@ -39,7 +39,7 @@ def TestMeshAlgorithmLIF():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate + " between " + lif_steady_lower_bound + " and " + lif_steady_upper_bound + "?")
+		print("Steady state rate is " + str(steady_rate) + " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -64,7 +64,7 @@ def TestMeshAlgorithmLIFCustomConnectionParameters():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate + " between " + lif_steady_lower_bound + " and " + lif_steady_upper_bound + "?")
+		print("Steady state rate is " + str(steady_rate) + " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -93,7 +93,7 @@ def TestMeshAlgorithmLIFCustomConnectionParametersGPU():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate + " between " + lif_steady_lower_bound + " and " + lif_steady_upper_bound + "?")
+		print("Steady state rate is " + str(steady_rate) + " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -122,7 +122,7 @@ def TestMeshAlgorithmLIFGPU():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate + " between " + lif_steady_lower_bound + " and " + lif_steady_upper_bound + "?")
+		print("Steady state rate is " + str(steady_rate) + " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -147,7 +147,7 @@ def TestVariables():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate + " between " + lif_steady_lower_bound + " and " + lif_steady_upper_bound + "?")
+		print("Steady state rate is " + str(steady_rate) + " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -172,7 +172,7 @@ def TestDelayMeshAlgorithmDelayedConnection():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate + " between " + lif_steady_lower_bound + " and " + lif_steady_upper_bound + "?")
+		print("Steady state rate is " + str(steady_rate) + " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -197,7 +197,7 @@ def TestDelayMeshAlgorithmCustomConnectionParameters():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate + " between " + lif_steady_lower_bound + " and " + lif_steady_upper_bound + "?")
+		print("Steady state rate is " + str(steady_rate) + " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -226,7 +226,7 @@ def TestDelayMeshAlgorithmCustomConnectionParametersGPU():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate + " between " + lif_steady_lower_bound + " and " + lif_steady_upper_bound + "?")
+		print("Steady state rate is " + str(steady_rate) + " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -255,7 +255,7 @@ def TestDelayMeshAlgorithmDelayedConnectionGPU():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate + " between " + lif_steady_lower_bound + " and " + lif_steady_upper_bound + "?")
+		print("Steady state rate is " + str(steady_rate) + " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -280,7 +280,7 @@ def TestMeshAlgorithmRefractive():
 		assert len(lines) == 1998
 		assert lines[-1].split('\t')[0] == "1.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate + " between " + lif_steady_lower_bound_refract + " and " + lif_steady_upper_bound_refract + "?")
+		print("Steady state rate is " + str(steady_rate) + " between " + str(lif_steady_lower_bound_refract) + " and " + str(lif_steady_upper_bound_refract) + "?")
 		assert steady_rate > lif_steady_lower_bound_refract and steady_rate < lif_steady_upper_bound_refract # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -309,7 +309,7 @@ def TestMeshAlgorithmRefractiveGPU():
 		assert len(lines) == 1998
 		assert lines[-1].split('\t')[0] == "1.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate + " between " + lif_steady_lower_bound_refract + " and " + lif_steady_upper_bound_refract + "?")
+		print("Steady state rate is " + str(steady_rate) + " between " + str(lif_steady_lower_bound_refract) + " and " + str(lif_steady_upper_bound_refract) + "?")
 		assert steady_rate > lif_steady_lower_bound_refract and steady_rate < lif_steady_upper_bound_refract # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -334,7 +334,7 @@ def TestMeshAlgorithmTimeStepMultiple():
 		assert len(lines) == 999
 		assert lines[-1].split('\t')[0] == "0.999"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate, " between 0.39 and 0.41?")
+		print("Steady state rate is " + str(steady_rate), " between 0.39 and 0.41?")
 		assert steady_rate > 0.39 and steady_rate < 0.41 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -363,7 +363,7 @@ def TestMeshAlgorithmTimeStepMultipleGPU():
 		assert len(lines) == 999
 		assert lines[-1].split('\t')[0] == "0.999"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate, " between 0.39 and 0.41?")
+		print("Steady state rate is " + str(steady_rate), " between 0.39 and 0.41?")
 		assert steady_rate > 0.39 and steady_rate < 0.41 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -388,7 +388,7 @@ def TestMeshAlgorithmMultipleConnections():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate, " between 2.11 and 2.13?")
+		print("Steady state rate is " + str(steady_rate), " between 2.11 and 2.13?")
 		assert steady_rate > 2.11 and steady_rate < 2.13 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -417,7 +417,7 @@ def TestMeshAlgorithmMultipleConnectionsGPU():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + steady_rate, " between 2.11 and 2.13?")
+		print("Steady state rate is " + str(steady_rate), " between 2.11 and 2.13?")
 		assert steady_rate > 2.11 and steady_rate < 2.13 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
