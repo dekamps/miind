@@ -60,7 +60,7 @@ jobs:
           cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
           useVcpkgToolchainFile: true
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DVCPKG_TARGET_TRIPLET=x64-windows'
+          cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=x64-windows'
           buildWithCMake: true
         if: contains( matrix.os, 'windows')
         
@@ -71,7 +71,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_BUILD_TYPE=Release'
           buildWithCMake: true
         if: contains( matrix.os, 'macos') || contains( matrix.os, 'ubuntu')
         
@@ -82,7 +82,7 @@ jobs:
 
       - name: Install MIIND on Linux
         working-directory: ${{ env.buildDir }}  
-        run: ninja install
+        run: sudo ninja install
         shell: bash
         if: contains( matrix.os, 'ubuntu')
         
