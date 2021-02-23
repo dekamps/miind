@@ -15,13 +15,6 @@ from skbuild import cmaker
 
 def main():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    
-    # Build empty miind and miind_api directories in root folder. 
-    # We don't want them there in the repo as they're just placeholders.
-    miind_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'miind')
-    os.mkdir(miind_dir)
-    miind_api_dir = os.path.join(miind_dir, 'miind_api')
-    os.mkdir(miind_api_dir)
 
     cmake_source_dir = "."
     
@@ -31,6 +24,18 @@ def main():
     print('working directory path:', os.path.dirname(os.path.abspath(__file__)))
     print('working directory:', os.listdir(os.path.dirname(os.path.abspath(__file__))))
     
+    # Build empty miind and miind_api directories in root folder. 
+    # We don't want them there in the repo as they're just placeholders.
+    miind_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'miind')
+    try:
+        os.mkdir(miind_dir)
+    except:
+        print("Could not create miind directory", miind_dir)
+    miind_api_dir = os.path.join(miind_dir, 'miind_api')
+    try:
+        os.mkdir(miind_api_dir)
+    except:
+        print("Could not create miind_api directory", miind_api_dir)
 
     python_version = cmaker.CMaker.get_python_version()
     python_lib_path = cmaker.CMaker.get_python_library(python_version).replace(
