@@ -28,7 +28,7 @@
                 },
                 {
                     "name": "ENABLE_OPENMP",
-                    "value": "true",
+                    "value": "false",
                     "type": "BOOL"
                 },
                 {
