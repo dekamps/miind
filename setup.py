@@ -45,7 +45,7 @@ def main():
         "\\", "/"
     )
 
-    package_version = "0.0.8"
+    package_version = "0.0.9"
 
     package_name = "miind-test-hugh-osborne"
 
@@ -164,7 +164,7 @@ def main():
             "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
             "License :: OSI Approved :: MIT License",
-            "Operating System :: MacOS",
+            #"Operating System :: MacOS",
             "Operating System :: Unix",
             "Operating System :: Microsoft :: Windows",
         ],

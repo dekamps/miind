@@ -26,7 +26,7 @@ jobs:
       CIBW_BUILD: cp38-manylinux_x86_64	cp38-win_amd64
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
-      CIBW_BEFORE_BUILD_LINUX: yum install -y ninja-build libxi-devel mesa-libGL-devel mesa-libGLU-devel mesa-common-devel libxrandr-devel libxxf86vm-devel fftw-devel
+      CIBW_BEFORE_BUILD_LINUX: yum install -y ninja-build libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel
       
       CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017community visualstudio2017-workload-nativedesktop ninja -f -y
     steps:
@@ -90,7 +90,7 @@ jobs:
           
       - name: Install cibuildwheel
         run: |
-          python -m pip install cibuildwheel==1.8.0
+          python -m pip install twine cibuildwheel==1.8.0
 
       - name: Install Visual C++ for Python 2.7
         if: runner.os == 'Windows'
@@ -105,32 +105,12 @@ jobs:
         with:
           path: ./wheelhouse/*.whl    
           
-          
-          
-      # old stuff id cibuildwheel doesn't work
-        #if: contains( matrix.os, 'windows')
-      #- name: Install dependencies
-      #  run: |
-       #   python -m pip install --upgrade pip
-        #  pip install twine scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
-        #shell: bash
-        #if: contains( matrix.os, 'windows')
-      #- name: Run scikit-build
-      #  run: |
-       #   cd package/pip_package
-        #  python setup.py bdist_wheel
-        #shell: bash
-       # if: contains( matrix.os, 'windows')
-        
-     # - name: Run auditwheel for manylinux on linux
-      #  uses: RalfG/python-wheels-manylinux-build@v0.2.2-manylinux2010_x86_64
-       # with:
-        #  python-versions: 'cp36-cp36m cp37-cp37m'
-         # build-requirements: 'twine scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes'
-         # system-packages: 'libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev fftw3-dev'
-         # package-path: 'package/pip_package'
-         # pip-wheel-args: '--no-deps'
-        #if: contains( matrix.os, 'ubuntu')
-        
-      # Now upload many linux wheel and windows wheel
-        
+      - name: Publish package
+        if: github.event_name == 'push' # && startsWith(github.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          #password: ${{ secrets.PYPI_TEST_API_TOKEN }} Add once we can create a secret
+          password: pypi-AgENdGVzdC5weXBpLm9yZwIkOGUzMWI0OGYtZjE0ZS00ZGUzLTkxNjEtZmYzZWJkODEyYzgwAAIleyJwZXJtaXNzaW9ucyI6ICJ1c2VyIiwgInZlcnNpb24iOiAxfQAABiA5aJXbljJQ0NQRu5Wn9f3v4CB35xhwzauoq72exCLs4A
+          packages_dir: ./wheelhouse/
+          repository_url: https://test.pypi.org/legacy/

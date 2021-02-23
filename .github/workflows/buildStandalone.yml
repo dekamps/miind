@@ -9,10 +9,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest] # macos-latest
+        os: [ubuntu-latest] # macos-latest
         include:
-          - os: windows-latest
-            installDir: ${{ github.workspace }}/miind_install
           - os: ubuntu-latest
             installDir: /usr/local
           #- os: macos-latest
@@ -22,8 +20,6 @@ jobs:
       installDir: '${{ matrix.installDir }}'
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: true
       
       - uses: lukka/get-cmake@latest
       
@@ -43,30 +39,6 @@ jobs:
         run: find $RUNNER_WORKSPACE
         shell: bash
         
-      - name: Install vcpkg on windows
-        # Download and build vcpkg, without installing any port. If content is cached already, it is a no-op.
-        uses: lukka/run-vcpkg@v6
-        with:
-          setupOnly: true
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
-          appendedCacheKey: ${{matrix.os}}-build-vcpkg-v2-${{ hashFiles( '**/vcpkg.json' ) }}
-          vcpkgTriplet: x64-windows
-          doNotCache: true
-        if: contains( matrix.os, 'windows')
-        
-      - name: Run CMake with vcpkg.json manifest
-        uses: lukka/run-cmake@main
-        with:
-          cmakeListsOrSettingsJson: CMakeSettingsJson
-          cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
-          useVcpkgToolchainFile: true
-          buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DVCPKG_TARGET_TRIPLET=x64-windows'
-          buildWithCMake: true
-        if: contains( matrix.os, 'windows')
-        
-        
       - name: Run CMake
         uses: lukka/run-cmake@main
         with:
@@ -77,28 +49,11 @@ jobs:
           buildWithCMake: true
         if: contains( matrix.os, 'macos') || contains( matrix.os, 'ubuntu')
         
-        
-      - name: Add vcpkg installed bin to path so windows can find files when using MIIND
-        run: echo "$VCPKG_ROOT/installed/x64-windows/bin" >> $GITHUB_PATH
-        if: contains( matrix.os, 'windows')
-
-      - name: Install MIIND on Linux
+      - name: Install MIIND
         working-directory: ${{ env.buildDir }}  
         run: sudo ninja install
         shell: bash
         if: contains( matrix.os, 'ubuntu')
-        
-      - name: Check files in Windows install directory
-        working-directory: ${{ env.buildDir }}/x64-Release
-        run: ls -la 
-        shell: bash
-        if: contains( matrix.os, 'windows')
-        
-      - name: Install MIIND on Windows
-        working-directory: ${{ env.buildDir }}/x64-Release  
-        run: cmake --install .
-        shell: bash
-        if: contains( matrix.os, 'windows')
         
       - name: Add miindio.py to path
         run: echo '${{ env.installDir }}/share/miind/python' >> $GITHUB_PATH
@@ -121,13 +76,14 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
-      - name: Install dependencies
+        
+      - name: Install python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install twine scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
+          pip install numpy matplotlib==3.2 scipy shapely descartes
         shell: bash
         
-      - name: Run Integration Tests on Linux
+      - name: Run Integration Tests
         working-directory: ${{ github.workspace }}/examples/IntegrationTests 
         run: python system_tests.py
         shell: bash
