@@ -17,6 +17,13 @@ def main():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     cmake_source_dir = "../.."
+    
+    print('Checking environment...')
+    print('cmake_source_dir path:', cmake_source_dir)
+    print('cmake_source_dir:', os.listdir(cmake_source_dir))
+    print('working directory path:', os.path.dirname(os.path.abspath(__file__)))
+    print('working directory:', os.listdir(os.path.dirname(os.path.abspath(__file__))))
+    
 
     python_version = cmaker.CMaker.get_python_version()
     python_lib_path = cmaker.CMaker.get_python_library(python_version).replace(

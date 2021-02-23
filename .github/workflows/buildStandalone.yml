@@ -81,16 +81,19 @@ jobs:
         if: contains( matrix.os, 'windows')
 
       - name: Install MIIND on Linux
-        run: |
-          cd build
-          ninja install
+        working-directory: ${{ env.installDir }}  
+        run: ninja install
         shell: bash
         if: contains( matrix.os, 'ubuntu')
         
+      - name: Check files in Windows install directory
+        working-directory: ${{ env.installDir }}  
+        run: ls -la 
+        if: contains( matrix.os, 'windows')
+        
       - name: Install MIIND on Windows
-        run: |
-          cd build
-          cmake --install .
+        working-directory: ${{ env.installDir }}  
+        run: cmake --install .
         shell: bash
         if: contains( matrix.os, 'windows')
         
@@ -115,9 +118,8 @@ jobs:
           pip install twine scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
         shell: bash
       - name: Run Integration Tests
-        run: |
-          cd examples/IntegrationTests
-          python system_tests.py
+        working-directory: ${{ github.workspace }}/examples/IntegrationTests 
+        run: python system_tests.py
         shell: bash
       
         
