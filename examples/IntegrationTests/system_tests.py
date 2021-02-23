@@ -36,11 +36,17 @@ def TestMeshAlgorithmLIF():
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
-		assert len(lines) == 998
-		assert lines[-1].split('\t')[0] == "0.998"
-		steady_rate = float(lines[-1].split('\t')[1])
-		print("Steady state rate is " + str(steady_rate) + " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
-		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
+        try:
+            assert len(lines) == 998, "The rate file rate_0 did not contain 998 lines as expected."
+            assert lines[-1].split('\t')[0] == "0.998", "The final line of rate file rate_0 did not correspond to time = 0.998."
+            steady_rate = float(lines[-1].split('\t')[1])
+            assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound, "Steady state rate " + str(steady_rate) + " is not between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "."
+        except AssertionError msg:
+            print(msg)
+            print("What was in rate_0?")
+            print(lines)
+            raise
+            
 	print('Success. Clean up.\n')
 	os.chdir('../..')
 	shutil.rmtree('lif')

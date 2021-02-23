@@ -89,13 +89,13 @@ jobs:
         if: contains( matrix.os, 'ubuntu')
         
       - name: Check files in Windows install directory
-        working-directory: ${{ env.buildDir }}  
+        working-directory: ${{ env.buildDir }}/x64-Release
         run: ls -la 
         shell: bash
         if: contains( matrix.os, 'windows')
         
       - name: Install MIIND on Windows
-        working-directory: ${{ env.buildDir }}  
+        working-directory: ${{ env.buildDir }}/x64-Release  
         run: cmake --install .
         shell: bash
         if: contains( matrix.os, 'windows')
