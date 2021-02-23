@@ -12,12 +12,14 @@ jobs:
         os: [ubuntu-latest, windows-latest] # macos-latest
         include:
           - os: windows-latest
+            installDir: ${{ github.workspace }}/miind_install
           - os: ubuntu-latest
+            installDir: /usr/local
           #- os: macos-latest
             
     env:
       buildDir: '${{ github.workspace }}/build'
-      installDir: '${{ github.workspace }}/miind_install'
+      installDir: '${{ matrix.installDir }}'
     steps:
       - uses: actions/checkout@v2
         with:
@@ -60,7 +62,7 @@ jobs:
           cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
           useVcpkgToolchainFile: true
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=x64-windows'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DVCPKG_TARGET_TRIPLET=x64-windows'
           buildWithCMake: true
         if: contains( matrix.os, 'windows')
         
@@ -71,7 +73,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_BUILD_TYPE=Release'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release'
           buildWithCMake: true
         if: contains( matrix.os, 'macos') || contains( matrix.os, 'ubuntu')
         
