@@ -97,7 +97,6 @@ jobs:
 
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
-        with:
             
 
       - uses: actions/upload-artifact@v2
