@@ -67,7 +67,7 @@ def main():
         "miind": (["lib/miindsim.pyd"] if os.name == 'nt' else []) + (["lib/libmiindsim.so"] if os.name != 'nt' else []) + (["bin\/.+\.dll"] if os.name == 'nt' else []) + ["share\/miind\/python\/miind\/.+"],
         "miind.miind_api": ["share\/miind\/python\/miind\/miind_api\/.+"],
         "miind.build": [],
-        "miind.build.apps": ["share\/miind\/apps\/MatrixGenerator\/.+","share\/miind\/apps\/Projection\/.+"],
+        "miind.build.apps":  (["lib\/.+\.so"]if os.name != 'nt' else []) + ["share\/miind\/apps\/MatrixGenerator\/.+","share\/miind\/apps\/Projection\/.+"],
         "miind.build.include": ["include\/.+"],
         "miind.build.lib": ["lib\/.+"],
         "miind.build.examples": ["share\/miind\/examples\/.+"],
