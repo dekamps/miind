@@ -104,12 +104,18 @@ jobs:
         run: echo '${{ env.installDir }}/share/miind/python' >> $GITHUB_PATH
       - name: Add MIIND_LIBRARY_DIR to ENV
         run: echo "MIIND_LIBRARY_DIR=${{ env.installDir }}/lib" >> $GITHUB_ENV
+      - name: Add LD_LIBRARY_PATH to ENV
+        run: echo "LD_LIBRARY_PATH=${{ env.installDir }}/lib" >> $GITHUB_ENV
       - name: Add miind python to PYTHONPATH
         run: echo "PYTHONPATH=${{ env.installDir }}/share/miind/python" >> $GITHUB_ENV
       - name: Add miind includes to CPLUS_INCLUDE_PATH
         run: echo "CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind:${{ env.installDir }}/include/miind/GeomLib" >> $GITHUB_ENV
       - name: Add MIIND_INCLUDE_DIR to ENV
         run: echo "MIIND_INCLUDE_DIR=${{ env.installDir }}/include/miind" >> $GITHUB_ENV
+      - name: Update locate database
+        run: sudo updatedb
+        shell: bash
+        if: contains( matrix.os, 'ubuntu')
         
       - name: Set up Python
         uses: actions/setup-python@v1
