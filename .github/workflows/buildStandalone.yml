@@ -126,10 +126,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install twine scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
         shell: bash
-      - name: Run Integration Tests
+        
+      - name: Run Integration Tests on Linux
         working-directory: ${{ github.workspace }}/examples/IntegrationTests 
         run: python system_tests.py
         shell: bash
+        if: contains( matrix.os, 'ubuntu')
+        
+      - name: Run Integration Tests on Windows
+        working-directory: ${{ github.workspace }}/examples/IntegrationTests 
+        run: python system_tests.py ${{ env.installDir }}/share/miind/python/miindio.py
+        shell: bash
+        if: contains( matrix.os, 'windows')
       
         
         
