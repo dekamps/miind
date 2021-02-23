@@ -132,12 +132,6 @@ jobs:
         run: python system_tests.py
         shell: bash
         if: contains( matrix.os, 'ubuntu')
-        
-      - name: Run Integration Tests on Windows
-        working-directory: ${{ github.workspace }}/examples/IntegrationTests 
-        run: python system_tests.py ${{ env.installDir }}/share/miind/python/miindio.py
-        shell: bash
-        if: contains( matrix.os, 'windows')
       
         
         
