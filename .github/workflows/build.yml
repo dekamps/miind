@@ -24,6 +24,7 @@ jobs:
     env:
       buildDir: '${{ github.workspace }}/build'
       CIBW_BUILD: cp38-manylinux_x86_64	cp38-win_amd64
+      CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
       CIBW_BEFORE_BUILD_LINUX: yum install -y ninja-build libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev fftw3-dev
       
       CIBW_BEFORE_BUILD_WINDOWS: choco install ninja vcpython27 -f -y
