@@ -81,18 +81,18 @@ jobs:
         if: contains( matrix.os, 'windows')
 
       - name: Install MIIND on Linux
-        working-directory: ${{ env.installDir }}  
+        working-directory: ${{ env.buildDir }}  
         run: ninja install
         shell: bash
         if: contains( matrix.os, 'ubuntu')
         
       - name: Check files in Windows install directory
-        working-directory: ${{ env.installDir }}  
+        working-directory: ${{ env.buildDir }}  
         run: ls -la 
         if: contains( matrix.os, 'windows')
         
       - name: Install MIIND on Windows
-        working-directory: ${{ env.installDir }}  
+        working-directory: ${{ env.buildDir }}  
         run: cmake --install .
         shell: bash
         if: contains( matrix.os, 'windows')
