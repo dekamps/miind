@@ -89,6 +89,7 @@ jobs:
       - name: Check files in Windows install directory
         working-directory: ${{ env.buildDir }}  
         run: ls -la 
+        shell: bash
         if: contains( matrix.os, 'windows')
         
       - name: Install MIIND on Windows
