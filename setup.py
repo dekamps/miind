@@ -16,7 +16,7 @@ from skbuild import cmaker
 def main():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-    cmake_source_dir = "../.."
+    cmake_source_dir = "."
     
     print('Checking environment...')
     print('cmake_source_dir path:', cmake_source_dir)
@@ -33,26 +33,11 @@ def main():
         "\\", "/"
     )
 
-    if os.path.exists(".git"):
-        import pip._internal.vcs.git as git
-
-        g = git.Git()  # NOTE: pip API's are internal, this has to be refactored
-
-        g.run_command(["submodule", "sync"])
-        g.run_command(
-            ["submodule", "update", "--init", "--recursive", cmake_source_dir]
-        )
-
-        if build_contrib:
-            g.run_command(
-                ["submodule", "update", "--init", "--recursive", "opencv_contrib"]
-            )
-
     package_version = "0.0.8"
 
     package_name = "miind-test-hugh-osborne"
 
-    with open("../../README.md", "r", encoding="utf-8") as fh:
+    with open("README.md", "r", encoding="utf-8") as fh:
         long_description = fh.read()
 
     packages = ["miind", "miind.miind_api"]
@@ -87,9 +72,9 @@ def main():
     files_outside_package_dir = {"miind": []}
     
     # Copy triplet files to vcpkg from custom-triplets to vcpkg
-    src_linux = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../custom-triplets/x64-linux-mixed.cmake')
-    src_osx = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../custom-triplets/x64-osx-mixed.cmake')
-    dst = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../vcpkg/triplets/')
+    src_linux = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'custom-triplets/x64-linux-mixed.cmake')
+    src_osx = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'custom-triplets/x64-osx-mixed.cmake')
+    dst = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'vcpkg/triplets/')
     shutil.copy2(src_linux, dst)
     shutil.copy2(src_osx, dst)
     
@@ -100,7 +85,7 @@ def main():
             '-DVCPKG_MANIFEST_MODE:BOOL=ON',
             '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
             '-DVCPKG_TARGET_TRIPLET=x64-linux-mixed',
-            '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/../../vcpkg/scripts/buildsystems/vcpkg.cmake'
+            '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/vcpkg/scripts/buildsystems/vcpkg.cmake'
         ]
     )
         
@@ -112,7 +97,7 @@ def main():
                 '-DVCPKG_MANIFEST_MODE:BOOL=ON',
                 '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
                 '-DVCPKG_TARGET_TRIPLET=x64-windows',
-                '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/../../vcpkg/scripts/buildsystems/vcpkg.cmake'
+                '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/vcpkg/scripts/buildsystems/vcpkg.cmake'
             ]
         )
         
@@ -124,7 +109,7 @@ def main():
                 '-DVCPKG_MANIFEST_MODE:BOOL=ON',
                 '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
                 '-DVCPKG_TARGET_TRIPLET=x64-osx-mixed',
-                '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/../../vcpkg/scripts/buildsystems/vcpkg.cmake'
+                '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/vcpkg/scripts/buildsystems/vcpkg.cmake'
             ]
         )
     

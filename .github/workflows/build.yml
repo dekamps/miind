@@ -93,8 +93,7 @@ jobs:
           choco install vcpython27 -f -y
 
       - name: Build wheels
-        run: |
-          python -m cibuildwheel --output-dir wheelhouse package/pip_package
+        run: python -m cibuildwheel --output-dir wheelhouse
 
       - uses: actions/upload-artifact@v2
         with:
