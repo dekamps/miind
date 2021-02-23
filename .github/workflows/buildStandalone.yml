@@ -27,7 +27,7 @@ jobs:
       
       - name: Ubuntu - install dependencies
         run: |
-          sudo apt-get install libboost-all-dev libpugixml-dev fftw3-dev freeglut3-dev libgsl0-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev
+          sudo apt-get install ninja-build libboost-all-dev libpugixml-dev fftw3-dev freeglut3-dev libgsl0-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev
         if: contains( matrix.os, 'ubuntu')
         
       - name: MacOS - install xquartz for GL support, fftw, and OpenMP support
