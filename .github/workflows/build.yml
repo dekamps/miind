@@ -25,7 +25,9 @@ jobs:
       CIBW_BEFORE_BUILD_LINUX: |
         yum install -y wget python36-devel ninja-build boost-devel pugixml-devel freeglut-devel yum install centos-release-scl-rh
         yum --enablerepo=centos-sclo-rh-testing install rh-python38-python-devel
-      CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017buildtools visualstudio2017-workload-nativedesktop ninja -f -y
+      CIBW_BEFORE_BUILD_WINDOWS: |
+        choco install visualstudio2017community -f -y
+        choco install visualstudio2017-workload-nativedesktop -f -y
     steps:
       - uses: actions/checkout@v2
         with:
