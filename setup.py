@@ -101,6 +101,7 @@ def main():
     if platform == "win32":
         cmake_args = (
             [
+                '-DCMAKE_BUILD_TYPE=Release',
                 '-DENABLE_OPENMP:BOOL=ON',
                 '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 '-DVCPKG_MANIFEST_MODE:BOOL=ON',
@@ -113,6 +114,7 @@ def main():
     if platform == "darwin":
         cmake_args = (
             [
+                '-DCMAKE_BUILD_TYPE=Release',
                 '-DENABLE_OPENMP:BOOL=ON',
                 '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 '-DVCPKG_MANIFEST_MODE:BOOL=ON',
