@@ -34,6 +34,50 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+          
+      - uses: lukka/get-cmake@latest
+
+      - name: Ubuntu - install packages required for freeglut and fftw3
+        run: |
+          sudo apt-get install libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev
+          sudo apt-get install fftw3-dev
+        if: contains( matrix.os, 'ubuntu')
+
+      - name: MacOS - install xquartz for GL support, fftw, and llvm for OpenMP support
+        run: brew install gcc xquartz fftw llvm libomp pkg-config
+        if: contains( matrix.os, 'macos')
+
+      - name: dir
+        run: find $RUNNER_TEMP
+        shell: bash
+      - name: dir
+        run: find $RUNNER_WORKSPACE
+        shell: bash
+
+      - run: |
+            cp custom-triplets/*.cmake vcpkg/triplets
+        shell: bash
+        
+      - name: Install vcpkg
+        # Download and build vcpkg, without installing any port. If content is cached already, it is a no-op.
+        uses: lukka/run-vcpkg@v6
+        with:
+          setupOnly: true
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
+          appendedCacheKey: ${{matrix.os}}-build-vcpkg-v2-${{ hashFiles( '**/vcpkg.json' ) }}
+          vcpkgTriplet: ${{ matrix.triplet }}
+          doNotCache: true
+
+      - name: Run CMake with vcpkg.json manifest
+        uses: lukka/run-cmake@main
+        with:
+          cmakeListsOrSettingsJson: CMakeSettingsJson
+          cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
+          useVcpkgToolchainFile: true
+          buildDirectory: '${{ env.buildDir }}'
+          cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
+          buildWithCMake: true
 
       - name: Set up Python
         uses: actions/setup-python@v1
