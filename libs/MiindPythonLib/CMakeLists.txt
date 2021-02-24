@@ -4,6 +4,8 @@ include_directories( ${GSL_INCLUDE_DIRS} )
 
 set( LIB_TYPE SHARED )
 
+# This is apparently deprecated but on manylinux2014 we need to say what versions are available
+set(Python_ADDITIONAL_VERSIONS 3.9 3.8 3.7 3.6)
 find_package (Python3 COMPONENTS Development)
 include_directories(${Python3_INCLUDE_DIRS})
 
