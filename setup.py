@@ -82,11 +82,11 @@ def main():
     # Copy triplet files to vcpkg from custom-triplets to vcpkg
     src_linux = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'custom-triplets/x64-linux-mixed.cmake')
     src_osx = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'custom-triplets/x64-osx-mixed.cmake')
-    src_windows = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'custom-triplets/x64-windows-mixed.cmake')
+    #src_windows = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'custom-triplets/x64-windows-mixed.cmake')
     dst = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'vcpkg/triplets/')
     shutil.copy2(src_linux, dst)
     shutil.copy2(src_osx, dst)
-    shutil.copy2(src_windows, dst)
+    #shutil.copy2(src_windows, dst)
     
     cmake_args = (
         [
@@ -108,7 +108,7 @@ def main():
                 '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 '-DVCPKG_MANIFEST_MODE:BOOL=ON',
                 '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
-                '-DVCPKG_TARGET_TRIPLET=x64-windows-mixed',
+                '-DVCPKG_TARGET_TRIPLET=x64-windows',
                 '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/vcpkg/scripts/buildsystems/vcpkg.cmake'
             ]
         )
