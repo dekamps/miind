@@ -28,6 +28,7 @@ jobs:
       CIBW_BEFORE_BUILD_WINDOWS: |
         choco install visualstudio2017community ninja -f -y
         choco install visualstudio2017-workload-nativedesktop -f -y
+      CIBW_BUILD_VERBOSITY: 3
     steps:
       - uses: actions/checkout@v2
         with:
