@@ -23,16 +23,11 @@ jobs:
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
       CIBW_BEFORE_BUILD_LINUX: yum install -y python36-devel ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel
-      
       CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017community visualstudio2017-workload-nativedesktop ninja -f -y
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: true
-
-      - run: |
-            cp custom-triplets/*.cmake vcpkg/triplets
-        shell: bash
 
       - name: Set up Python
         uses: actions/setup-python@v1
@@ -46,7 +41,6 @@ jobs:
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
             
-
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl    
