@@ -24,16 +24,15 @@ jobs:
     env:
       buildDir: '${{ github.workspace }}/build'
       #CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64
-      CIBW_BUILD: cp38-manylinux_x86_64 cp38-win_amd64
+      CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
       CIBW_BEFORE_BUILD_LINUX: |
         yum install -y wget python36-devel ninja-build boost-devel pugixml-devel freeglut-devel yum install centos-release-scl-rh
         yum --enablerepo=centos-sclo-rh-testing install rh-python38-python-devel
       CIBW_BEFORE_BUILD_WINDOWS: |
-        choco install visualstudio2017community ninja -f -y
-        choco install visualstudio2017-workload-nativedesktop -f -y
-      CIBW_BUILD_VERBOSITY: 1
+        choco install visualstudio2017community visualstudio2017-workload-nativedesktop ninja -f -y
+      CIBW_BUILD_VERBOSITY: 0
     steps:
       - uses: actions/checkout@v2
         with:
@@ -69,7 +68,7 @@ jobs:
           setupOnly: true
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
           additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
-          appendedCacheKey: ${{matrix.os}}-build-vcpkg-v2-${{ hashFiles( '**/vcpkg.json' ) }}
+          appendedCacheKey: ${{matrix.os}}-build-vcpkg-v3-${{ hashFiles( '**/vcpkg.json' ) }}
           vcpkgTriplet: ${{ matrix.triplet }}
           doNotCache: true
 
