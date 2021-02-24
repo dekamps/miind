@@ -60,7 +60,6 @@ def main():
         "miind.miind_api": [],
         "miind.build": [],
         "miind.build.apps": [],
-        "miind.build.lib": [],
         "miind.build.examples": []
     }
 
@@ -68,10 +67,9 @@ def main():
     # Path regexes with forward slashes relative to CMake install dir.
     
     rearrange_cmake_output_data = {
-        "miind": (["lib/miindsim.pyd"] if os.name == 'nt' else []) + (["lib/libmiindtwod.so"] if os.name != 'nt' else []) + (["bin\/.+\.dll"] if os.name == 'nt' else []) + ["share\/miind\/python\/miind\/.+"],
+        "miind": (["lib/miindsim.pyd"] if os.name == 'nt' else []) + (["bin\/.+\.dll"] if os.name == 'nt' else []) + ["share\/miind\/python\/miind\/.+"],
         "miind.miind_api": ["share\/miind\/python\/miind\/miind_api\/.+"],
         "miind.build": [],
-        "miind.build.lib": ["lib\/.+"],
         "miind.build.apps": ["share\/miind\/apps\/MatrixGenerator\/.+","share\/miind\/apps\/Projection\/.+"],
         "miind.build.examples": ["share\/miind\/examples\/.+"],
         "miind.testfiles": ["share\/miind\/python\/miind\/testfiles\/.+"]
