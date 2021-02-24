@@ -24,7 +24,7 @@ jobs:
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
       CIBW_BEFORE_BUILD_LINUX: yum install -y python36-devel ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel
       CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017community visualstudio2017-workload-nativedesktop ninja -f -y
-      CIBW_REPAIR_WHEEL_COMMAND_LINUX: "auditwheel repair --lib-sdir /miind/build/lib -w {dest_dir} {wheel}"
+      CIBW_REPAIR_WHEEL_COMMAND_LINUX: "auditwheel repair --lib-sdir /build/lib -w {dest_dir} {wheel}"
     steps:
       - uses: actions/checkout@v2
         with:
