@@ -35,12 +35,8 @@ def TestMiindio():
 def TestMeshAlgorithmLIF():
 	print('Checking LIF MeshAlgorithm test 1...')
 	os.chdir(testfile_dir+'1')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -59,12 +55,8 @@ def TestMeshAlgorithmLIF():
 def TestMeshAlgorithmLIFCustomConnectionParameters():
 	print('Checking LIF MeshAlgorithm with CustomConnectionParameters test 2...')
 	os.chdir(testfile_dir+'2')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -87,12 +79,8 @@ def TestMeshAlgorithmLIFCustomConnectionParametersGPU():
 
 	print('Checking LIF MeshAlgorithm with CustomConnectionParameters GPU test 3...')
 	os.chdir(testfile_dir+'3')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -115,12 +103,8 @@ def TestMeshAlgorithmLIFGPU():
 
 	print('Checking LIF MeshAlgorithm with DelayedConnection GPU test 4...')
 	os.chdir(testfile_dir+'4')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -139,12 +123,8 @@ def TestMeshAlgorithmLIFGPU():
 def TestVariables():
 	print('Checking Variables test 5...')
 	os.chdir(testfile_dir+'5')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -163,12 +143,8 @@ def TestVariables():
 def TestDelayMeshAlgorithmDelayedConnection():
 	print('Checking MeshAlgorithm DelayedConnection Delay test 6...')
 	os.chdir(testfile_dir+'6')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -187,12 +163,8 @@ def TestDelayMeshAlgorithmDelayedConnection():
 def TestDelayMeshAlgorithmCustomConnectionParameters():
 	print('Checking MeshAlgorithm CustomConnectionParameters Delay test 7...')
 	os.chdir(testfile_dir+'7')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -215,12 +187,8 @@ def TestDelayMeshAlgorithmCustomConnectionParametersGPU():
 
 	print('Checking MeshAlgorithmGroup CustomConnectionParameters Delay test 8...')
 	os.chdir(testfile_dir+'8')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -243,12 +211,8 @@ def TestDelayMeshAlgorithmDelayedConnectionGPU():
 
 	print('Checking MeshAlgorithmGroup DelayedConnection Delay GPU test 9...')
 	os.chdir(testfile_dir+'9')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -267,12 +231,8 @@ def TestDelayMeshAlgorithmDelayedConnectionGPU():
 def TestMeshAlgorithmRefractive():
 	print('Checking LIF MeshAlgorithm with Refractive test 10...')
 	os.chdir(testfile_dir+'10')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -295,12 +255,8 @@ def TestMeshAlgorithmRefractiveGPU():
 
 	print('Checking LIF MeshAlgorithmGroup with Refractive test 11...')
 	os.chdir(testfile_dir+'11')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -319,12 +275,8 @@ def TestMeshAlgorithmRefractiveGPU():
 def TestMeshAlgorithmTimeStepMultiple():
 	print('Checking LIF MeshAlgorithm with network timestep multiple test 12...')
 	os.chdir(testfile_dir+'12')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -347,12 +299,8 @@ def TestMeshAlgorithmTimeStepMultipleGPU():
 
 	print('Checking LIF MeshAlgorithmGroup with network timestep multiple test 13...')
 	os.chdir(testfile_dir+'13')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -371,12 +319,8 @@ def TestMeshAlgorithmTimeStepMultipleGPU():
 def TestMeshAlgorithmMultipleConnections():
 	print('Checking LIF MeshAlgorithm with multiple connections test 14...')
 	os.chdir(testfile_dir+'14')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -399,12 +343,8 @@ def TestMeshAlgorithmMultipleConnectionsGPU():
 
 	print('Checking LIF MeshAlgorithmGroup with multiple connections test 15...')
 	os.chdir(testfile_dir+'15')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -423,12 +363,8 @@ def TestMeshAlgorithmMultipleConnectionsGPU():
 def TestMeshAlgorithmDensityRecording():
 	print('Checking LIF MeshAlgorithm with density recording test 16...')
 	os.chdir(testfile_dir+'16')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif/lif.model_mesh')
 	assert len([name for name in os.listdir('.') if os.path.isfile(name)]) == 499
@@ -447,12 +383,8 @@ def TestMeshAlgorithmGroupDensityRecordingGPU():
 
 	print('Checking LIF MeshAlgorithmGroup with density recording test 17...')
 	os.chdir(testfile_dir+'17')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif/densities')
 	assert len([name for name in os.listdir('.') if os.path.isfile(name)]) == 499
@@ -467,12 +399,8 @@ def TestMeshAlgorithmGroupDensityRecordingGPU():
 def TestMeshAlgorithmTwoNodes():
 	print('Checking LIF MeshAlgorithm two nodes one algorithm test 18...')
 	os.chdir(testfile_dir+'18')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -501,12 +429,8 @@ def TestMeshAlgorithmGroupTwoNodesGPU():
 
 	print('Checking LIF MeshAlgorithmGroup two nodes one algorithm test 19...')
 	os.chdir(testfile_dir+'19')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -531,12 +455,8 @@ def TestMeshAlgorithmGroupTwoNodesGPU():
 def TestMeshAlgorithmTwoNodesSelfConnections():
 	print('Checking LIF MeshAlgorithm two nodes one algorithm self connections test 20...')
 	os.chdir(testfile_dir+'20')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -565,12 +485,8 @@ def TestMeshAlgorithmGroupTwoNodesSelfConnectionsGPU():
 
 	print('Checking LIF MeshAlgorithmGroup two nodes one algorithm self connections test 21...')
 	os.chdir(testfile_dir+'21')
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -605,10 +521,8 @@ def TestGenerateFidAndMatrix():
 	results = subprocess.run("python -m miind.miindio generate-matrix lif 0.01 10000 0.0 0.0 True", shell=True, check=True)
 	with open('lif_0.01_0_0_0_.mat', 'r') as f:
 		assert f
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
 	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -637,10 +551,8 @@ def TestGenerateMatrixMC():
 	results = subprocess.run("python -m miind.miindio generate-matrix lif 0.01 10 0.0 0.0 False", shell=True, check=True)
 	with open('lif_0.01_0_0_0_.mat', 'r') as f:
 		assert f
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
 	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:
@@ -670,12 +582,8 @@ def TestGenerateMeshModel():
 	results = subprocess.run("python -m miind.miindio generate-empty-fid lif", shell=True, check=True)
 	print('generate-matrix lif 1 10000 0.0 0.0 True.')
 	results = subprocess.run("python -m miind.miindio generate-matrix lif 1 10000 0.0 0.0 True", shell=True, check=True)
-	print('sim lif.xml.')
-	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
-	print('submit.')
-	results = subprocess.run("python -m miind.miindio submit", shell=True, check=True)
-	print('run.')
-	results = subprocess.run("python -m miind.miindio run", shell=True, check=True)
+	print('run lif.xml.')
+	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
 	os.chdir('lif/lif')
 	with open('rate_0', 'r') as ratefile:

@@ -30,11 +30,13 @@ utilities.py
 grid_generate.py
 variables.py
 codegen_lib3.py
+loadExamples.py
 grid_rybak.py
 include.py
 miindTVBlibs.py
 visualize.py
 codegen_lib.py
+run.py
 nodes.py
 writemesh.py
 jobs.py

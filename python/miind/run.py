@@ -3,7 +3,7 @@
 import pylab
 import numpy
 import matplotlib.pyplot as plt
-from miind import miindsim as miind
+import miind.miindsim as miind
 
 if len(sys.argv) != 2:
     print("run expects a simulation file name as parameter.")

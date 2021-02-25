@@ -1,6 +1,6 @@
 {
   "name": "miind",
-  "version-string": "0.0.10",
+  "version-string": "0.0.11",
   "dependencies": [
 	"boost",
     "fftw3",
