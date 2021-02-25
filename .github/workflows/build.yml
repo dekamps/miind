@@ -27,7 +27,7 @@ jobs:
       CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
-      CIBW_BEFORE_BUILD_LINUX: yum install -y wget ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel
+      CIBW_BEFORE_BUILD_LINUX: yum install -y wget python36-devel ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel
       CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017community visualstudio2017-workload-nativedesktop ninja -y
       CIBW_BUILD_VERBOSITY: 0
     steps:
@@ -79,10 +79,13 @@ jobs:
             
       - uses: actions/upload-artifact@v2
         with:
-          path: ./wheelhouse/*.whl    
+          path: ./wheelhouse/*.whl 
+
+      - name: Publish package on Windows  
+        run: python -m twine upload -u __token__ -p pypi-AgENdGVzdC5weXBpLm9yZwIkOGUzMWI0OGYtZjE0ZS00ZGUzLTkxNjEtZmYzZWJkODEyYzgwAAIleyJwZXJtaXNzaW9ucyI6ICJ1c2VyIiwgInZlcnNpb24iOiAxfQAABiA5aJXbljJQ0NQRu5Wn9f3v4CB35xhwzauoq72exCLs4A --repository testpypi ./wheelhouse/*
+        if: contains( matrix.os, 'windows') && github.event_name == 'push' # && startsWith(github.ref, 'refs/tags')
           
       - name: Publish package
-        if: github.event_name == 'push' # && startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
@@ -90,6 +93,7 @@ jobs:
           password: pypi-AgENdGVzdC5weXBpLm9yZwIkOGUzMWI0OGYtZjE0ZS00ZGUzLTkxNjEtZmYzZWJkODEyYzgwAAIleyJwZXJtaXNzaW9ucyI6ICJ1c2VyIiwgInZlcnNpb24iOiAxfQAABiA5aJXbljJQ0NQRu5Wn9f3v4CB35xhwzauoq72exCLs4A
           packages_dir: ./wheelhouse/
           repository_url: https://test.pypi.org/legacy/
+        if: contains( matrix.os, 'ubuntu') && github.event_name == 'push' # && startsWith(github.ref, 'refs/tags')
           
       - name: pip install miind
         run: pip install --index-url https://test.pypi.org/simple/ --no-deps miind-test-hugh-osborne
