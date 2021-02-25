@@ -7,15 +7,6 @@ set( LIB_TYPE SHARED )
 find_package (Python3 COMPONENTS Development)
 include_directories(${Python3_INCLUDE_DIRS})
 
-message( "Found Python3. Include directory: ${Python3_INCLUDE_DIRS}.")
-
-if (${Python3_INCLUDE_DIRS} STREQUAL "" )
-message( "Counld not find Python.h. Try to find another.")
-find_file(Python3_INCLUDE_DIRS "Python.h" HINTS "/opt/python/cp36-cp36m/" "/opt/python/cp38-cp38/" "/opt/python/cp36-cp36m/include" "/opt/python/cp38-cp38/include")
-include_directories(${Python3_INCLUDE_DIRS})
-message ("Found: ${Python3_INCLUDE_DIRS} ")
-endif()
-
 include_directories( ${ROOT_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
 

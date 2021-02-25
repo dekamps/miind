@@ -27,7 +27,7 @@ jobs:
       CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
-      CIBW_BEFORE_BUILD_LINUX: yum install -y wget python36-devel ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel
+      CIBW_BEFORE_BUILD_LINUX: yum install -y wget python36-devel ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel ; curl -O https://www.python.org/ftp/python/3.8.1/Python-3.8.1.tgz ; tar -xzf Python-3.8.1.tgz ; cd Python-3.8.1/ ; make altinstall ; 
       CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017community visualstudio2017-workload-nativedesktop ninja -y
       CIBW_BUILD_VERBOSITY: 0
     steps:
