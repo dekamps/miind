@@ -27,13 +27,9 @@ jobs:
       CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
-      CIBW_BEFORE_BUILD_LINUX: yum install -y wget ninja-build boost-devel pugixml-devel freeglut-devel ;yum install centos-release-scl-rh ; yum --enablerepo=centos-sclo-rh-testing install rh-python38-python-devel
       CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017community visualstudio2017-workload-nativedesktop ninja -y
       CIBW_BUILD_VERBOSITY: 0
     steps:
-    
-      - name: Delete all previous workspace files
-        run: rm -rf *
     
       - uses: actions/checkout@v2
         with:
