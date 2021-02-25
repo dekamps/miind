@@ -24,9 +24,10 @@ jobs:
     env:
       buildDir: '${{ github.workspace }}/build'
       #CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64
-      CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64
+      CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
+      CIBW_BEFORE_BUILD_LINUX: yum install -y wget ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel
       CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017community visualstudio2017-workload-nativedesktop ninja -y
       CIBW_BUILD_VERBOSITY: 0
     steps:
@@ -36,24 +37,7 @@ jobs:
           submodules: true
           
       - uses: lukka/get-cmake@latest
-
-      - name: Ubuntu - install packages required for freeglut and fftw3
-        run: |
-          sudo apt-get install libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev
-          sudo apt-get install fftw3-dev
-        if: contains( matrix.os, 'ubuntu')
-
-      - name: MacOS - install xquartz for GL support, fftw, and llvm for OpenMP support
-        run: brew install gcc xquartz fftw llvm libomp pkg-config
-        if: contains( matrix.os, 'macos')
-
-      - name: dir
-        run: find $RUNNER_TEMP
-        shell: bash
-      - name: dir
-        run: find $RUNNER_WORKSPACE
-        shell: bash
-
+      
       - run: |
             cp custom-triplets/*.cmake vcpkg/triplets
         shell: bash
@@ -68,6 +52,7 @@ jobs:
           appendedCacheKey: ${{matrix.os}}-build-vcpkg-v3-${{ hashFiles( '**/vcpkg.json' ) }}
           vcpkgTriplet: ${{ matrix.triplet }}
           doNotCache: true
+        if: contains( matrix.os, 'windows')
 
       - name: Run CMake with vcpkg.json manifest
         uses: lukka/run-cmake@main
@@ -78,6 +63,7 @@ jobs:
           buildDirectory: '${{ env.buildDir }}'
           cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
           buildWithCMake: true
+        if: contains( matrix.os, 'windows')
 
       - name: Set up Python
         uses: actions/setup-python@v1
