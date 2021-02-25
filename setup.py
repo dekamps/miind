@@ -39,7 +39,7 @@ def main():
         "\\", "/"
     )
 
-    package_version = "0.0.9"
+    package_version = "0.0.10"
 
     package_name = "miind-test-hugh-osborne"
 
