@@ -18,12 +18,6 @@ def main():
 
     cmake_source_dir = "."
     
-    print('Checking environment...')
-    print('cmake_source_dir path:', cmake_source_dir)
-    print('cmake_source_dir:', os.listdir(cmake_source_dir))
-    print('working directory path:', os.path.dirname(os.path.abspath(__file__)))
-    print('working directory:', os.listdir(os.path.dirname(os.path.abspath(__file__))))
-    
     # Build empty miind and miind_api directories in root folder. 
     # We don't want them there in the repo as they're just placeholders.
     miind_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'miind')
@@ -173,14 +167,6 @@ def main():
         cmake_args=cmake_args,
         cmake_source_dir=cmake_source_dir,
     )
-    
-    # Once build is complete, copy the built libraries to an external directory so we can tell auditwheel where to look.
-    
-    #lib_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'auditwheel_libs')
-    #try:
-    #    os.mkdir(lib_dir)
-    #except:
-    #    print("Could not create auditwheel_libs directory", lib_dir)
     
 
 
