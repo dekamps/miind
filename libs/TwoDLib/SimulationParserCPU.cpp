@@ -70,9 +70,9 @@ void SimulationParserCPU<MPILib::DelayedConnection>::addConnection(pugi::xml_nod
 	double num_connections;
 	double efficacy;
 	double delay;
-	std::sscanf(values.c_str(), "%d %d %d", &num_connections, &efficacy, &delay);
+	std::sscanf(values.c_str(), "%lf %lf %lf", &num_connections, &efficacy, &delay);
 
-	std::cout << "connection values: " << num_connections << " " << efficacy << " " << delay << " \n";
+	std::cout << values << " connection values: " << num_connections << " " << efficacy << " " << delay << " \n";
 
 	MPILib::DelayedConnection connection(num_connections, efficacy, delay);
 
@@ -209,7 +209,6 @@ void SimulationParserCPU< MPILib::DelayedConnection>::parseXMLAlgorithms(pugi::x
 			std::vector<std::string> matrix_files;
 			for (pugi::xml_node matrix_file = algorithm.child("MatrixFile"); matrix_file; matrix_file = matrix_file.next_sibling("MatrixFile")) {
 				matrix_files.push_back(std::string(matrix_file.child_value()));
-				std::cout << "Matrix file found: " << std::string(matrix_file.child_value()) << "\n";
 			}
 
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::DelayedConnection>>(new TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOdeint>(model_filename, matrix_files, time_step, tau_refractive));
