@@ -9,7 +9,6 @@
 #include <MPILib/include/utilities/ProgressBar.hpp>
 #include <MPILib/include/BasicDefinitions.hpp>
 #include <MPILib/include/report/handler/AbstractReportHandler.hpp>
-#include <MPILib/include/MiindSimulationInterface.hpp>
 
 #ifndef MPILIB_MIINDTVBMODELABSTRACT_HPP_
 #define MPILIB_MIINDTVBMODELABSTRACT_HPP_
@@ -17,7 +16,7 @@
 namespace MPILib {
 
 template<class Weight, class NodeDistribution>
-class MiindTvbModelAbstract : public MiindSimulationInterface {
+class MiindTvbModelAbstract {
 public:
 
 	MiindTvbModelAbstract(int num_nodes, double simulation_length) :
