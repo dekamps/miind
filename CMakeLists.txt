@@ -55,7 +55,7 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 if (APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 	
-	if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+	if(CMAKE_COMPILER_IS_GNUCXX)
 		set(GLUT_LIBRARY "-framework OpenGL -framework GLUT")
 	else()
 		set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")

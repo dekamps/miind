@@ -33,6 +33,9 @@ set ( LIBLIST
     ${GLUT_LIBRARY}
 )
 
+# On all platforms this should be called miindsim (not libmiindsim)
+SET_TARGET_PROPERTIES(${MIIND_LIBRARY_PREFIX}sim PROPERTIES PREFIX "")
+
 add_library( ${MIIND_LIBRARY_PREFIX}sim ${LIB_TYPE} MiindPython.cpp)
 
 target_link_libraries( ${MIIND_LIBRARY_PREFIX}sim ${LIBLIST})

@@ -7,6 +7,7 @@ import shutil
 import copy
 import collections
 import hashlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
 
