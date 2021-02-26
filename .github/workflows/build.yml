@@ -28,7 +28,7 @@ jobs:
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
       CIBW_BEFORE_BUILD_LINUX: bash setupCiBuildPython.sh ; yum install -y python36-devel ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel
       CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017community visualstudio2017-workload-nativedesktop ninja -y
-      CIBW_BEFORE_BUILD_MACOS: brew install gcc6 pugixml boost boost-python3 freeglut gsl xquartz fftw libomp pkg-config
+      CIBW_BEFORE_BUILD_MACOS: brew install gcc6 pugixml boost boost-python3 freeglut gsl xquartz fftw libomp pkg-config ninja
       CIBW_ENVIRONMENT_MACOS: "CC=gcc-6 CXX=g++-6"
       CIBW_BUILD_VERBOSITY: 0
       CIBW_TEST_COMMAND: python -m miind.system_tests
