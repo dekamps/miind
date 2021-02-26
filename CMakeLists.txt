@@ -54,12 +54,7 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 
 if (APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-	
-	if(CMAKE_COMPILER_IS_GNUCXX)
-		set(GLUT_LIBRARY "-framework OpenGL -framework GLUT")
-	else()
-		set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
-	endif()
+	set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
 else (APPLE)
 	if(CMAKE_COMPILER_IS_GNUCXX)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals -fPIC")
@@ -121,9 +116,9 @@ IF(ENABLE_OPENMP)
 	add_definitions( -DENABLE_OPENMP=1 )
 ENDIF(ENABLE_OPENMP)
 
-IF (WIN32) # For windows packaging, we want to include the glut dll so we need FindGLUT to find it during install
+IF (WIN32 OR APPLE) # For windows packaging, we want to include the glut dll so we need FindGLUT to find it during install
 find_package(GLUT REQUIRED)
-ENDIF (WIN32)
+ENDIF (WIN32 OR APPLE)
 
 IF(ENABLE_CUDA)
 set(CMAKE_CUDA_ARCHITECTURES "sm_60") #adapt this to the GPU on your system
