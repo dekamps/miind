@@ -23,7 +23,7 @@ jobs:
             
     env:
       buildDir: '${{ github.workspace }}/build'
-      CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64
+      CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64 cp36-macosx_x86_64 cp37-macosx_x86_64 cp38-macosx_x86_64 cp39-macosx_x86_64
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
       CIBW_BEFORE_BUILD_LINUX: bash setupCiBuildPython.sh ; yum install -y python36-devel ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel
@@ -44,28 +44,28 @@ jobs:
             cp custom-triplets/*.cmake vcpkg/triplets
         shell: bash
         
-      - name: Install vcpkg
-        # Download and build vcpkg, without installing any port. If content is cached already, it is a no-op.
-        uses: lukka/run-vcpkg@v6
-        with:
-          setupOnly: true
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
-          appendedCacheKey: ${{matrix.os}}-build-vcpkg-v3-${{ hashFiles( '**/vcpkg.json' ) }}
-          vcpkgTriplet: ${{ matrix.triplet }}
-          doNotCache: true
-        if: contains( matrix.os, 'windows')
+      #- name: Install vcpkg
+      #  # Download and build vcpkg, without installing any port. If content is cached already, it is a no-op.
+      #  uses: lukka/run-vcpkg@v6
+      #  with:
+      #    setupOnly: true
+      #    vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+      #    additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
+      #    appendedCacheKey: ${{matrix.os}}-build-vcpkg-v3-${{ hashFiles( '**/vcpkg.json' ) }}
+      #    vcpkgTriplet: ${{ matrix.triplet }}
+      #    doNotCache: true
+      #  if: contains( matrix.os, 'windows')
 
-      - name: Run CMake with vcpkg.json manifest
-        uses: lukka/run-cmake@main
-        with:
-          cmakeListsOrSettingsJson: CMakeSettingsJson
-          cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
-          useVcpkgToolchainFile: true
-          buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
-          buildWithCMake: true
-        if: contains( matrix.os, 'windows')
+      #- name: Run CMake with vcpkg.json manifest
+      #  uses: lukka/run-cmake@main
+      #  with:
+      #    cmakeListsOrSettingsJson: CMakeSettingsJson
+      #    cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
+      #    useVcpkgToolchainFile: true
+      #    buildDirectory: '${{ env.buildDir }}'
+      #    cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
+      #    buildWithCMake: true
+      #  if: contains( matrix.os, 'windows')
 
       - name: Set up Python
         uses: actions/setup-python@v1

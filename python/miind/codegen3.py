@@ -9,7 +9,6 @@ import miind.simulation as simulation
 import miind.variables as variables
 import xml.etree.ElementTree as ET
 import argparse
-import miind.directories3 as directories3
 
 XML_EXTENSION = '.xml'
 
