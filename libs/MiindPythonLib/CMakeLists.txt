@@ -5,9 +5,10 @@ include_directories( ${GSL_INCLUDE_DIRS} )
 set( LIB_TYPE SHARED )
 
 if (APPLE)
-
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
 else (APPLE)
-find_package (Python3 COMPONENTS Development)
+find_package (Python3 COMPONENTS Interpreter Development)
 include_directories(${Python3_INCLUDE_DIRS})
 endif(APPLE)
 
@@ -27,10 +28,6 @@ if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
 
-if (APPLE)
-	ADD_DEFINITIONS("-lpython3" )
-endif(APPLE)
-
 set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}mpi
     ${Boost_LIBRARIES}
@@ -40,6 +37,8 @@ set ( LIBLIST
     ${gsl_LINK_FLAGS}
     gsl
     ${GLUT_LIBRARY}
+	${PYTHON_LIBRARIES}
+	${Python3_LIBRARIES}
 )
 
 
