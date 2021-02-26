@@ -4,8 +4,12 @@ include_directories( ${GSL_INCLUDE_DIRS} )
 
 set( LIB_TYPE SHARED )
 
+if (APPLE)
+
+else (APPLE)
 find_package (Python3 COMPONENTS Development)
 include_directories(${Python3_INCLUDE_DIRS})
+endif(APPLE)
 
 include_directories( ${ROOT_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
@@ -22,6 +26,11 @@ INCLUDE_DIRECTORIES(
 if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
+
+if (APPLE)
+	ADD_DEFINITIONS("-lpython" )
+endif(APPLE)
+
 set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}mpi
     ${Boost_LIBRARIES}
@@ -80,7 +89,7 @@ install(CODE [[
   
   #The GET_RUNTIME_DEPENDENCIES function has a filtering mechanism which would be better instead of the following filter
   foreach(_file ${_r_deps})
-	if (NOT (${_file} MATCHES "boost_chrono" OR ${_file} MATCHES "boost_filesystem" OR ${_file} MATCHES "boost_timer" OR ${_file} MATCHES "python") )
+	if (NOT (${_file} MATCHES "boost_chrono" OR ${_file} MATCHES "boost_filesystem" OR ${_file} MATCHES "boost_timer") )
 		continue()
 	endif() 
 	

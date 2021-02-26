@@ -44,6 +44,10 @@ jobs:
             cp custom-triplets/*.cmake vcpkg/triplets
         shell: bash
         
+      - name: One time delete vcpkg
+        run: rm -rf vcpkg_installed
+        shell: bash
+        
       #- name: Install vcpkg
       #  # Download and build vcpkg, without installing any port. If content is cached already, it is a no-op.
       #  uses: lukka/run-vcpkg@v6
