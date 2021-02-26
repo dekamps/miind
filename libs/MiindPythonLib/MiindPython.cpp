@@ -112,5 +112,5 @@ static PyModuleDef miindsim_def = {
 };
 
 PyMODINIT_FUNC PyInit_miindsim() {
-    return PyModuleDef_Init(&miindsim_def);
+    return PyModule_Create(&miindsim_def);
 }
