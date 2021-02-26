@@ -9,11 +9,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, windows-2019, macos-10.15]
+        os: [ubuntu-18.04, macos-10.15]
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-18.04
             installDir: /usr/local
-          - os: macos-latest
+          - os: macos-10.15
             installDir: /usr/local
             
     env:
