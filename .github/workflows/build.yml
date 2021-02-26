@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, windows-2019] # macos-10.15 windows-2019
+        os: [ubuntu-18.04, windows-2019, macos-10.15]
         include:
           - os: windows-2019
             triplet: x64-windows
@@ -17,19 +17,21 @@ jobs:
           - os: ubuntu-18.04
             triplet: x64-linux-mixed
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
-          #- os: macos-10.15
-          #  triplet: x64-osx-mixed
-          #  vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
+          - os: macos-10.15
+            triplet: x64-osx-mixed
+            vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
             
     env:
       buildDir: '${{ github.workspace }}/build'
-      #CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64
       CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib==3.2 scipy shapely descartes
       CIBW_BEFORE_BUILD_LINUX: bash setupCiBuildPython.sh ; yum install -y python36-devel ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel
       CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017community visualstudio2017-workload-nativedesktop ninja -y
-      CIBW_BUILD_VERBOSITY: 1
+      CIBW_BEFORE_BUILD_MACOS: brew install gcc6 pugixml boost freeglut gsl boost-python xquartz fftw libomp pkg-config
+      CIBW_ENVIRONMENT_MACOS: "CC=gcc-6 CXX=g++-6"
+      CIBW_BUILD_VERBOSITY: 0
+      CIBW_TEST_COMMAND: python -m miind.system_tests
     steps:
     
       - uses: actions/checkout@v2
@@ -81,24 +83,7 @@ jobs:
         with:
           path: ./wheelhouse/*.whl 
 
-      - name: Publish package on Windows  
-        run: python -m twine upload -u __token__ -p pypi-AgENdGVzdC5weXBpLm9yZwIkOGUzMWI0OGYtZjE0ZS00ZGUzLTkxNjEtZmYzZWJkODEyYzgwAAIleyJwZXJtaXNzaW9ucyI6ICJ1c2VyIiwgInZlcnNpb24iOiAxfQAABiA5aJXbljJQ0NQRu5Wn9f3v4CB35xhwzauoq72exCLs4A --repository testpypi ./wheelhouse/*
-        if: contains( matrix.os, 'windows') && github.event_name == 'push' # && startsWith(github.ref, 'refs/tags')
-          
-      - name: Publish package
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          #password: ${{ secrets.PYPI_TEST_API_TOKEN }} Add once we can create a secret
-          password: pypi-AgENdGVzdC5weXBpLm9yZwIkOGUzMWI0OGYtZjE0ZS00ZGUzLTkxNjEtZmYzZWJkODEyYzgwAAIleyJwZXJtaXNzaW9ucyI6ICJ1c2VyIiwgInZlcnNpb24iOiAxfQAABiA5aJXbljJQ0NQRu5Wn9f3v4CB35xhwzauoq72exCLs4A
-          packages_dir: ./wheelhouse/
-          repository_url: https://test.pypi.org/legacy/
-        if: contains( matrix.os, 'ubuntu') && github.event_name == 'push' # && startsWith(github.ref, 'refs/tags')
-          
-      - name: pip install miind
-        run: pip install --index-url https://test.pypi.org/simple/ miind-test-hugh-osborne
-        shell: bash
+      - name: Publish package  
+        run: python -m twine upload -u __token__ -p pypi-AgENdGVzdC5weXBpLm9yZwIkOGUzMWI0OGYtZjE0ZS00ZGUzLTkxNjEtZmYzZWJkODEyYzgwAAIleyJwZXJtaXNzaW9ucyI6ICJ1c2VyIiwgInZlcnNpb24iOiAxfQAABiA5aJXbljJQ0NQRu5Wn9f3v4CB35xhwzauoq72exCLs4A --skip-existing --repository testpypi ./wheelhouse/*
+        if: github.event_name == 'push' # && startsWith(github.ref, 'refs/tags')
         
-      - name: Integration Tests
-        run: python -m miind.system_tests
-        shell: bash

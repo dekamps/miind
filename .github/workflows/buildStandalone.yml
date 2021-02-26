@@ -9,11 +9,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest] # macos-latest
+        os: [ubuntu-latest, macos-latest]
         include:
           - os: ubuntu-latest
             installDir: /usr/local
-          #- os: macos-latest
+          - os: macos-latest
+            installDir: /usr/local
             
     env:
       buildDir: '${{ github.workspace }}/build'
@@ -29,7 +30,7 @@ jobs:
         if: contains( matrix.os, 'ubuntu')
         
       - name: MacOS - install xquartz for GL support, fftw, and OpenMP support
-        run: brew install gcc pugixml boost freeglut gsl boost-python xquartz fftw libomp pkg-config
+        run: brew install gcc6 pugixml boost freeglut gsl boost-python xquartz fftw libomp pkg-config ninja
         if: contains( matrix.os, 'macos')
       
       - name: dir
@@ -41,19 +42,31 @@ jobs:
         
       - name: Run CMake
         uses: lukka/run-cmake@main
+        env:
+          CC: gcc-6
+          CXX: g++-6
         with:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildDirectory: '${{ env.buildDir }}'
           cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release'
           buildWithCMake: true
-        if: contains( matrix.os, 'macos') || contains( matrix.os, 'ubuntu')
+        if: contains( matrix.os, 'macos')
+        
+      - name: Run CMake on Linux
+        uses: lukka/run-cmake@main
+        with:
+          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+          buildDirectory: '${{ env.buildDir }}'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release'
+          buildWithCMake: true
+        if: contains( matrix.os, 'ubuntu')
         
       - name: Install MIIND
         working-directory: ${{ env.buildDir }}  
         run: sudo ninja install
         shell: bash
-        if: contains( matrix.os, 'ubuntu')
         
       - name: Add miindio.py to path
         run: echo '${{ env.installDir }}/share/miind/python' >> $GITHUB_PATH
@@ -61,16 +74,24 @@ jobs:
         run: echo "MIIND_LIBRARY_DIR=${{ env.installDir }}/lib" >> $GITHUB_ENV
       - name: Add LD_LIBRARY_PATH to ENV
         run: echo "LD_LIBRARY_PATH=${{ env.installDir }}/lib" >> $GITHUB_ENV
+        if: contains( matrix.os, 'ubuntu')
+      - name: Add DYLD_LIBRARY_PATH to ENV
+        run: echo "LD_LIBRARY_PATH=${{ env.installDir }}/lib" >> $GITHUB_ENV
+        if: contains( matrix.os, 'macos')
       - name: Add miind python to PYTHONPATH
         run: echo "PYTHONPATH=${{ env.installDir }}/share/miind/python" >> $GITHUB_ENV
       - name: Add miind includes to CPLUS_INCLUDE_PATH
         run: echo "CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind:${{ env.installDir }}/include/miind/GeomLib" >> $GITHUB_ENV
       - name: Add MIIND_INCLUDE_DIR to ENV
         run: echo "MIIND_INCLUDE_DIR=${{ env.installDir }}/include/miind" >> $GITHUB_ENV
-      - name: Update locate database
+      - name: Update locate database on Linux
         run: sudo updatedb
         shell: bash
         if: contains( matrix.os, 'ubuntu')
+      - name: Update locate database on MACOS
+        run: sudo /usr/libexec/locate.updatedb
+        shell: bash
+        if: contains( matrix.os, 'macos')
         
       - name: Set up Python
         uses: actions/setup-python@v1
@@ -87,7 +108,6 @@ jobs:
         working-directory: ${{ github.workspace }}/examples/IntegrationTests 
         run: python system_tests.py
         shell: bash
-        if: contains( matrix.os, 'ubuntu')
       
         
         

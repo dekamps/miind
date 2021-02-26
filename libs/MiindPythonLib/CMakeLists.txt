@@ -76,7 +76,7 @@ install(CODE [[
   
   #The GET_RUNTIME_DEPENDENCIES function has a filtering mechanism which would be better instead of the following filter
   foreach(_file ${_r_deps})
-	if (NOT (${_file} MATCHES "boost_chrono" OR ${_file} MATCHES "boost_filesystem" OR ${_file} MATCHES "boost_timer") OR ${_file} MATCHES "python") )
+	if (NOT (${_file} MATCHES "boost_chrono" OR ${_file} MATCHES "boost_filesystem" OR ${_file} MATCHES "boost_timer" OR ${_file} MATCHES "python") )
 		continue()
 	endif() 
 	
