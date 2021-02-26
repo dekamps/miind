@@ -22,15 +22,18 @@ void InitialiseModel(int num_nodes, std::string filename) {
         return;
     }
 
-    if (std::string("CustomConnectionParameters") != std::string(doc.child("Simulation").child_value("WeightType"))) {
+    if (std::string("CustomConnectionParameters") == std::string(doc.child("Simulation").child_value("WeightType"))) {
+        std::cout << "Loading simulation with WeightType: CustomConnectionParameters.\n";
         modelCcp = new SimulationParserCPU<MPILib::CustomConnectionParameters>(num_nodes, filename);
         modelCcp->init();
     }
-    else if (std::string("DelayedConnection") != std::string(doc.child("Simulation").child_value("WeightType"))) {
+    else if (std::string("DelayedConnection") == std::string(doc.child("Simulation").child_value("WeightType"))) {
+        std::cout << "Loading simulation with WeightType: DelayedConnection.\n";
         modelDc = new SimulationParserCPU<MPILib::DelayedConnection>(num_nodes, filename);
         modelDc->init();
     }
-    else if (std::string("double") != std::string(doc.child("Simulation").child_value("WeightType"))) {
+    else if (std::string("double") == std::string(doc.child("Simulation").child_value("WeightType"))) {
+        std::cout << "Loading simulation with WeightType: double.\n";
         modelDouble = new SimulationParserCPU<double>(num_nodes, filename);
         modelDouble->init();
     }
