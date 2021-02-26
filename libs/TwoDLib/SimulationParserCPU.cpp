@@ -72,8 +72,6 @@ void SimulationParserCPU<MPILib::DelayedConnection>::addConnection(pugi::xml_nod
 	double delay;
 	std::sscanf(values.c_str(), "%lf %lf %lf", &num_connections, &efficacy, &delay);
 
-	std::cout << values << " connection values: " << num_connections << " " << efficacy << " " << delay << " \n";
-
 	MPILib::DelayedConnection connection(num_connections, efficacy, delay);
 
 	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], connection);
@@ -116,7 +114,7 @@ void SimulationParserCPU<MPILib::DelayedConnection>::addIncomingConnection(pugi:
 	double num_connections;
 	double efficacy;
 	double delay;
-	std::sscanf(values.c_str(), "%d %d %d", &num_connections, &efficacy, &delay);
+	std::sscanf(values.c_str(), "%lf %lf %lf", &num_connections, &efficacy, &delay);
 
 	MPILib::DelayedConnection connection(num_connections, efficacy, delay);
 
