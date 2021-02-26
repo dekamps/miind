@@ -147,10 +147,10 @@ void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithm
 			std::cout << "Found GridAlgorithm " << algorithm_name << ".\n";
 
 			std::string model_filename = std::string(algorithm.attribute("modelfile").value());
-			double tau_refractive = std::stod(std::string(algorithm.attribute("tau_refractive").value()));
+			double tau_refractive = algorithm.attribute("tau_refractive").as_double();
 			std::string transform_filename = std::string(algorithm.attribute("transformfile").value());
-			double start_v = std::stod(std::string(algorithm.attribute("start_v").value()));
-			double start_w = std::stod(std::string(algorithm.attribute("start_w").value()));
+			double start_v = algorithm.attribute("start_v").as_double();
+			double start_w = algorithm.attribute("start_w").as_double();
 			double time_step = std::stod(std::string(algorithm.child_value("TimeStep")));
 
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::GridAlgorithm(model_filename, transform_filename, time_step, start_v, start_w, tau_refractive));
@@ -161,7 +161,7 @@ void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithm
 			std::cout << "Found MeshAlgorithmCustom " << algorithm_name << ".\n" << std::flush;
 
 			std::string model_filename = std::string(algorithm.attribute("modelfile").value());
-			double tau_refractive = std::stod(std::string(algorithm.attribute("tau_refractive").value()));
+			double tau_refractive = algorithm.attribute("tau_refractive").as_double();
 			double time_step = std::stod(std::string(algorithm.child_value("TimeStep")));
 
 			std::vector<std::string> matrix_files;
@@ -201,7 +201,7 @@ void SimulationParserCPU< MPILib::DelayedConnection>::parseXMLAlgorithms(pugi::x
 			std::cout << "Found MeshAlgorithm " << algorithm_name << ".\n" << std::flush;
 
 			std::string model_filename = std::string(algorithm.attribute("modelfile").value());
-			double tau_refractive = std::stod(std::string(algorithm.attribute("tau_refractive").value()));
+			double tau_refractive = algorithm.attribute("tau_refractive").as_double();
 			double time_step = std::stod(std::string(algorithm.child_value("TimeStep")));
 
 			std::vector<std::string> matrix_files;

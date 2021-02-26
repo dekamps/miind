@@ -28,7 +28,7 @@ if (UNIX)
 endif (UNIX)
 
 if (APPLE)
-	ADD_DEFINITIONS("-lpython" )
+	ADD_DEFINITIONS("-lpython3" )
 endif(APPLE)
 
 set ( LIBLIST
@@ -89,7 +89,7 @@ install(CODE [[
   
   #The GET_RUNTIME_DEPENDENCIES function has a filtering mechanism which would be better instead of the following filter
   foreach(_file ${_r_deps})
-	if (NOT (${_file} MATCHES "boost_chrono" OR ${_file} MATCHES "boost_filesystem" OR ${_file} MATCHES "boost_timer") )
+	if (NOT (${_file} MATCHES "boost_chrono" OR ${_file} MATCHES "boost_filesystem" OR ${_file} MATCHES "boost_timer" OR ${_file} MATCHES "python") )
 		continue()
 	endif() 
 	
