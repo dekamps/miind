@@ -118,6 +118,10 @@ ENDIF(ENABLE_OPENMP)
 
 IF (WIN32 OR APPLE) # For windows packaging, we want to include the glut dll so we need FindGLUT to find it during install
 find_package(GLUT REQUIRED)
+if (GLUT_FOUND)
+	message("Found GLUT.")
+	message("Setting GLUT lib: ${GLUT_LIBRARIES})
+endif(GLUT_FOUND)
 ENDIF (WIN32 OR APPLE)
 
 IF(ENABLE_CUDA)

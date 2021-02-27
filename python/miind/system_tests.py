@@ -46,7 +46,7 @@ def TestMeshAlgorithmLIF():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.remove('miind_cwd')
-    os.remove('rate_0')
+	os.remove('rate_0')
 	os.chdir('..')
 		
 # 2. MeshAlgorithmCustom CustomConnectionParameters
@@ -64,7 +64,7 @@ def TestMeshAlgorithmLIFCustomConnectionParameters():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.remove('miind_cwd')
-    os.remove('rate_0')
+	os.remove('rate_0')
 	os.chdir('..')
 
 # 3. MeshAlgorithmGroup CustomConnectionParameters Vectorised
@@ -86,7 +86,7 @@ def TestMeshAlgorithmLIFCustomConnectionParametersGPU():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.remove('miind_cwd')
-    os.remove('rate_0')
+	os.remove('rate_0')
 	os.chdir('..')
 
 # 4. MeshAlgorithmGroup DelayedConnection Vectorised
@@ -365,8 +365,7 @@ def TestMeshAlgorithmDensityRecording():
 	assert all([float(name.split('_')[4]) > 0.99998 and float(name.split('_')[4]) < 1.0001 for name in os.listdir('.') if os.path.isfile(name)])
 	print('Success. Clean up.\n')
 	os.chdir('..')
-    shutil.rmtree('lif.model_mesh')
-	os.remove('rate_0')
+	shutil.rmtree('lif.model_mesh_0')
 	os.remove('miind_cwd')
 	os.chdir('..')
 
@@ -386,7 +385,7 @@ def TestMeshAlgorithmGroupDensityRecordingGPU():
 	assert all([float(name.split('_')[4]) > 0.99998 and float(name.split('_')[4]) < 1.0001 for name in os.listdir('.') if os.path.isfile(name)])
 	print('Success. Clean up.\n')
 	os.chdir('..')
-    shutil.rmtree('densities')
+	shutil.rmtree('densities')
 	os.remove('rate_0')
 	os.remove('miind_cwd')
 	os.chdir('..')
@@ -414,7 +413,7 @@ def TestMeshAlgorithmTwoNodes():
 	print('Success. Clean up.\n')
 	
 	os.remove('rate_0')
-    os.remove('rate_1')
+	os.remove('rate_1')
 	os.remove('miind_cwd')
 	os.chdir('..')
 
@@ -445,7 +444,7 @@ def TestMeshAlgorithmGroupTwoNodesGPU():
 	print('Success. Clean up.\n')
 	
 	os.remove('rate_0')
-    os.remove('rate_1')
+	os.remove('rate_1')
 	os.remove('miind_cwd')
 	os.chdir('..')
 
@@ -472,7 +471,7 @@ def TestMeshAlgorithmTwoNodesSelfConnections():
 	print('Success. Clean up.\n')
 	
 	os.remove('rate_0')
-    os.remove('rate_1')
+	os.remove('rate_1')
 	os.remove('miind_cwd')
 	os.chdir('..')
 
@@ -503,7 +502,7 @@ def TestMeshAlgorithmGroupTwoNodesSelfConnectionsGPU():
 	print('Success. Clean up.\n')
 	
 	os.remove('rate_0')
-    os.remove('rate_1')
+	os.remove('rate_1')
 	os.remove('miind_cwd')
 	os.chdir('..')
 
