@@ -46,12 +46,14 @@ def TestMeshAlgorithmLIF():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
-
+	print("now in " + os.getcwd())
 	os.chdir('..')
+	print("now in " + os.getcwd())
 		
 # 2. MeshAlgorithmCustom CustomConnectionParameters
 def TestMeshAlgorithmLIFCustomConnectionParameters():
 	print('Checking LIF MeshAlgorithm with CustomConnectionParameters test 2...')
+	print("now in " + os.getcwd())
 	testdir = os.path.join(testfile_dir, '2')
 	os.chdir(testdir)
 	print('run lif.xml.')
