@@ -17,7 +17,7 @@ lif_steady_lower_bound_refract = 0.3
 lif_steady_upper_bound_refract = 0.32
 
 # Copy test files to current directory
-shutil.rmtree(os.getcwd() + '/testfiles', ignore_errors=True) 
+shutil.rmtree(os.getcwd() + '/testfiles') 
 print('Copying testfiles to: ', os.getcwd() + '/testfiles') 
 testfile_dir = miind.directories3.miind_python_dir() + '/testfiles/'
 shutil.copytree(testfile_dir, os.getcwd() + '/testfiles')
@@ -29,7 +29,6 @@ def TestMiindio():
 	print('Checking miindio.py can be found and runs...')
 	results = subprocess.run("python -m miind.miindio quit", shell=True, check=True)
 	print('Success. Clean up.\n')
-	os.remove('miind_cwd')
 
 # 1. Basic MeshAlgorithm LIF simulation
 def TestMeshAlgorithmLIF():
@@ -45,8 +44,7 @@ def TestMeshAlgorithmLIF():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
-	os.remove('miind_cwd')
-	os.remove('rate_0')
+
 	os.chdir('..')
 		
 # 2. MeshAlgorithmCustom CustomConnectionParameters
@@ -63,8 +61,7 @@ def TestMeshAlgorithmLIFCustomConnectionParameters():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
-	os.remove('miind_cwd')
-	os.remove('rate_0')
+
 	os.chdir('..')
 
 # 3. MeshAlgorithmGroup CustomConnectionParameters Vectorised
@@ -85,8 +82,7 @@ def TestMeshAlgorithmLIFCustomConnectionParametersGPU():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
-	os.remove('miind_cwd')
-	os.remove('rate_0')
+
 	os.chdir('..')
 
 # 4. MeshAlgorithmGroup DelayedConnection Vectorised
@@ -109,8 +105,6 @@ def TestMeshAlgorithmLIFGPU():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 5. Variables
@@ -129,8 +123,6 @@ def TestVariables():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 6. Delay MeshAlgorithm DelayedConnection
@@ -149,8 +141,6 @@ def TestDelayMeshAlgorithmDelayedConnection():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 7. Delay MeshAlgorithmCustom CustomConnectionParameters
@@ -169,8 +159,6 @@ def TestDelayMeshAlgorithmCustomConnectionParameters():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 8. Delay MeshAlgorithmGroup CustomConnectionParameters
@@ -193,8 +181,6 @@ def TestDelayMeshAlgorithmCustomConnectionParametersGPU():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 9. Delay MeshAlgorithmGroup DelayedConnection
@@ -217,8 +203,6 @@ def TestDelayMeshAlgorithmDelayedConnectionGPU():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 10. MeshAlgorithm DelayeConnection tau_refractive
@@ -237,8 +221,6 @@ def TestMeshAlgorithmRefractive():
 		assert steady_rate > lif_steady_lower_bound_refract and steady_rate < lif_steady_upper_bound_refract # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 11. MeshAlgorithm DelayeConnection tau_refractive
@@ -261,8 +243,6 @@ def TestMeshAlgorithmRefractiveGPU():
 		assert steady_rate > lif_steady_lower_bound_refract and steady_rate < lif_steady_upper_bound_refract # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 12. MeshAlgorithm DelayeConnection with network timestep multiple
@@ -281,8 +261,6 @@ def TestMeshAlgorithmTimeStepMultiple():
 		assert steady_rate > 0.39 and steady_rate < 0.41 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 13. MeshAlgorithmGroup DelayeConnection with network timestep multiple 
@@ -305,8 +283,6 @@ def TestMeshAlgorithmTimeStepMultipleGPU():
 		assert steady_rate > 0.39 and steady_rate < 0.41 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 14. MeshAlgorithm DelayeConnection multiple connections 
@@ -325,8 +301,6 @@ def TestMeshAlgorithmMultipleConnections():
 		assert steady_rate > 2.11 and steady_rate < 2.13 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 15. MeshAlgorithm DelayeConnection multiple connections 
@@ -348,9 +322,7 @@ def TestMeshAlgorithmMultipleConnectionsGPU():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > 2.11 and steady_rate < 2.13 # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
+
 	os.chdir('..')
 
 # 16. MeshAlgorithm DelayeConnection density recording
@@ -366,7 +338,6 @@ def TestMeshAlgorithmDensityRecording():
 	print('Success. Clean up.\n')
 	os.chdir('..')
 	shutil.rmtree('lif.model_mesh_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 17. MeshAlgorithm DelayeConnection density recording
@@ -386,8 +357,6 @@ def TestMeshAlgorithmGroupDensityRecordingGPU():
 	print('Success. Clean up.\n')
 	os.chdir('..')
 	shutil.rmtree('densities')
-	os.remove('rate_0')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 18. MeshAlgorithm Two nodes One Algorithm
@@ -412,9 +381,6 @@ def TestMeshAlgorithmTwoNodes():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('rate_1')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 19. MeshAlgorithmGroup Two nodes One Algorithm
@@ -443,9 +409,6 @@ def TestMeshAlgorithmGroupTwoNodesGPU():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('rate_1')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 20. MeshAlgorithm Two nodes One Algorithm
@@ -470,9 +433,6 @@ def TestMeshAlgorithmTwoNodesSelfConnections():
 		assert steady_rate > 0.375 and steady_rate < 0.385 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('rate_1')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 21. MeshAlgorithmGroup Two nodes One Algorithm Self Connections
@@ -501,9 +461,6 @@ def TestMeshAlgorithmGroupTwoNodesSelfConnectionsGPU():
 		assert steady_rate > 0.365 and steady_rate < 0.375 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('rate_1')
-	os.remove('miind_cwd')
 	os.chdir('..')
 
 # 22. Generate Fid File and Matrix
@@ -531,13 +488,7 @@ def TestGenerateFidAndMatrix():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
-	os.remove('lif.fid')
-	os.remove('lif.res')
-	os.remove('lif_0.01_0_0_0_.mat')
-	os.remove('lif_0.01_0_0_0_.lost')
+
 	os.chdir('..')
 
 # 23. Generate Matrix Monte Carlo
@@ -562,11 +513,6 @@ def TestGenerateMatrixMC():
 		assert steady_rate > 0.245 and steady_rate < 0.255 # Obviously this range is wrong but that's because we used MC=10
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
-	os.remove('lif.res')
-	os.remove('lif_0.01_0_0_0_.mat')
-	os.remove('lif_0.01_0_0_0_.lost')
 	os.chdir('..')
 
 # 24. Generate LIF Mesh and Model
@@ -593,16 +539,6 @@ def TestGenerateMeshModel():
 		assert steady_rate > 6.9 and steady_rate < 6.91 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
-	os.remove('rate_0')
-	os.remove('miind_cwd')
-	os.remove('lif.res')
-	os.remove('lif.stat')
-	os.remove('lif.rev')
-	os.remove('lif.model')
-	os.remove('lif.mesh')
-	os.remove('lif.fid')
-	os.remove('lif_1_0_0_0_.mat')
-	os.remove('lif_1_0_0_0_.lost')
 	os.chdir('..')
 
 TestMiindio()

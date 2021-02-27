@@ -19,14 +19,14 @@ then
 	make install
 fi
 
-#if [[ "$parsedVersion" -gt "390" ]]
-#then 
-#    yum install gcc openssl-devel bzip2-devel libffi-devel -y
-#	curl -O https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tgz
-#	tar -xzf Python-3.9.1.tgz
-#	cd Python-3.9.1/
-#	./configure --enable-optimizations
-#	make install
-#fi
+if [[ "$parsedVersion" -gt "390" ]]
+then 
+    yum install gcc openssl-devel bzip2-devel libffi-devel -y
+	curl -O https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tgz
+	tar -xzf Python-3.9.1.tgz
+	cd Python-3.9.1/
+	./configure --enable-optimizations
+	make install
+fi
 
 

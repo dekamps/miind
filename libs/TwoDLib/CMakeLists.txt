@@ -132,7 +132,6 @@ set ( LIBLIST
     ${gsl_LINK_FLAGS}
     gsl
     ${GLUT_LIBRARY}
-	${GLUT_LIBRARIES}
 )
 
 add_library( ${MIIND_LIBRARY_PREFIX}twod ${LIB_TYPE} ${TWOD_SRC} ${TWOD_HEADERS} ${GL_HEADERS})

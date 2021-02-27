@@ -5,7 +5,6 @@
 	"boost",
     "fftw3",
 	"gsl",
-	"python3",
 	"pugixml",
 	"glew",
 	"freeglut"

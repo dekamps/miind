@@ -121,6 +121,7 @@ find_package(GLUT REQUIRED)
 if (GLUT_FOUND)
 	message("Found GLUT.")
 	message("Setting GLUT lib: ${GLUT_LIBRARIES}")
+	link_directories(${GLUT_LIBRARIES})
 endif(GLUT_FOUND)
 ENDIF (WIN32 OR APPLE)
 
