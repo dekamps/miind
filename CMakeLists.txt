@@ -52,8 +52,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
-if (APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+if (APPLE) 
+	# -D_GLIBCXX_USE_CXX11_ABI=0 sets the ABI to match older boost unit test framework on mac
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0 -fPIC")
 	set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
 else (APPLE)
 	if(CMAKE_COMPILER_IS_GNUCXX)
