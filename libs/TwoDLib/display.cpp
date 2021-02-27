@@ -351,7 +351,7 @@ void Display::updateDisplay(long current_sim_it) {
 	}
 #ifndef USING_APPLE_GLUT
 	glutMainLoopEvent();
-#elif
+#else
 	glutCheckLoop();
 #endif
 

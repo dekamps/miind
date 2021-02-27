@@ -18,7 +18,7 @@ lif_steady_upper_bound_refract = 0.32
 
 # Copy test files to current directory
 testdir_path = os.path.join(os.getcwd(), 'testfiles')
-shutil.rmtree(testdir_path) 
+shutil.rmtree(testdir_path, ignore_errors=True) 
 print('Copying testfiles to: ', testdir_path) 
 testfile_dir = os.path.join(miind.directories3.miind_python_dir(), 'testfiles')
 shutil.copytree(testfile_dir,testdir_path)
