@@ -31,7 +31,9 @@ Display::~Display(){
 		Display::getInstance()->updateDisplay(1);
 		glutDestroyWindow(glutGetWindow());
 	}
+#ifndef USING_APPLE_GLUT // Hack to avoid issues with OSX glut version
 	glutExit();
+#endif
 }
 
 unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys) {
@@ -347,13 +349,18 @@ void Display::updateDisplay(long current_sim_it) {
 		glutSetWindow(_dws[_nodes_to_display[id]]._window_index);
 		glutPostRedisplay();
 	}
-
+#ifndef USING_APPLE_GLUT
 	glutMainLoopEvent();
+#elif
+	glutCheckLoop();
+#endif
 
 }
 
 void Display::shutdown() const {
+#ifndef USING_APPLE_GLUT // Hack to avoid issues with OSX glut version
 	glutExit();
+#endif
 
 	// Nice new line if we quit early.
 	std::cout << "\n";
@@ -380,9 +387,12 @@ void Display::animate(bool _write_frames, std::vector<MPILib::NodeId> nodes_to_d
 	}
 
 	atexit(Display::stat_shutdown);
-
+// glutSetOption is not available in OSX glut - on other OSs (using freeglut), this allows us to keep running the simulation 
+// even though the window is closed
+// I don't know what will happen on OSX because I don't live and work in Shoreditch. 
+#ifndef USING_APPLE_GLUT
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
-
+#endif
 	init();
 }
 

@@ -17,12 +17,13 @@ lif_steady_lower_bound_refract = 0.3
 lif_steady_upper_bound_refract = 0.32
 
 # Copy test files to current directory
-shutil.rmtree(os.getcwd() + '/testfiles') 
-print('Copying testfiles to: ', os.getcwd() + '/testfiles') 
-testfile_dir = miind.directories3.miind_python_dir() + '/testfiles/'
-shutil.copytree(testfile_dir, os.getcwd() + '/testfiles')
+testdir_path = os.path.join(os.getcwd(), 'testfiles')
+shutil.rmtree(testdir_path) 
+print('Copying testfiles to: ', testdir_path) 
+testfile_dir = os.path.join(miind.directories3.miind_python_dir(), 'testfiles')
+shutil.copytree(testfile_dir,testdir_path)
 # Now set testfile_dir to just testfiles
-testfile_dir = 'testfiles/'
+testfile_dir = 'testfiles'
 
 # Check miindio.py can be found and runs
 def TestMiindio():
@@ -33,7 +34,8 @@ def TestMiindio():
 # 1. Basic MeshAlgorithm LIF simulation
 def TestMeshAlgorithmLIF():
 	print('Checking LIF MeshAlgorithm test 1...')
-	os.chdir(testfile_dir+'1')
+	testdir = os.path.join(testfile_dir, '1')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -50,7 +52,8 @@ def TestMeshAlgorithmLIF():
 # 2. MeshAlgorithmCustom CustomConnectionParameters
 def TestMeshAlgorithmLIFCustomConnectionParameters():
 	print('Checking LIF MeshAlgorithm with CustomConnectionParameters test 2...')
-	os.chdir(testfile_dir+'2')
+	testdir = os.path.join(testfile_dir, '2')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -71,7 +74,8 @@ def TestMeshAlgorithmLIFCustomConnectionParametersGPU():
 		return
 
 	print('Checking LIF MeshAlgorithm with CustomConnectionParameters GPU test 3...')
-	os.chdir(testfile_dir+'3')
+	testdir = os.path.join(testfile_dir, '3')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -92,7 +96,8 @@ def TestMeshAlgorithmLIFGPU():
 		return
 
 	print('Checking LIF MeshAlgorithm with DelayedConnection GPU test 4...')
-	os.chdir(testfile_dir+'4')
+	testdir = os.path.join(testfile_dir, '4')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -110,7 +115,8 @@ def TestMeshAlgorithmLIFGPU():
 # 5. Variables
 def TestVariables():
 	print('Checking Variables test 5...')
-	os.chdir(testfile_dir+'5')
+	testdir = os.path.join(testfile_dir, '5')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -128,7 +134,8 @@ def TestVariables():
 # 6. Delay MeshAlgorithm DelayedConnection
 def TestDelayMeshAlgorithmDelayedConnection():
 	print('Checking MeshAlgorithm DelayedConnection Delay test 6...')
-	os.chdir(testfile_dir+'6')
+	testdir = os.path.join(testfile_dir, '6')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -146,7 +153,8 @@ def TestDelayMeshAlgorithmDelayedConnection():
 # 7. Delay MeshAlgorithmCustom CustomConnectionParameters
 def TestDelayMeshAlgorithmCustomConnectionParameters():
 	print('Checking MeshAlgorithm CustomConnectionParameters Delay test 7...')
-	os.chdir(testfile_dir+'7')
+	testdir = os.path.join(testfile_dir, '7')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -168,7 +176,8 @@ def TestDelayMeshAlgorithmCustomConnectionParametersGPU():
 		return
 
 	print('Checking MeshAlgorithmGroup CustomConnectionParameters Delay test 8...')
-	os.chdir(testfile_dir+'8')
+	testdir = os.path.join(testfile_dir, '8')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -190,7 +199,8 @@ def TestDelayMeshAlgorithmDelayedConnectionGPU():
 		return
 
 	print('Checking MeshAlgorithmGroup DelayedConnection Delay GPU test 9...')
-	os.chdir(testfile_dir+'9')
+	testdir = os.path.join(testfile_dir, '9')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -208,7 +218,8 @@ def TestDelayMeshAlgorithmDelayedConnectionGPU():
 # 10. MeshAlgorithm DelayeConnection tau_refractive
 def TestMeshAlgorithmRefractive():
 	print('Checking LIF MeshAlgorithm with Refractive test 10...')
-	os.chdir(testfile_dir+'10')
+	testdir = os.path.join(testfile_dir, '10')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -230,7 +241,8 @@ def TestMeshAlgorithmRefractiveGPU():
 		return
 
 	print('Checking LIF MeshAlgorithmGroup with Refractive test 11...')
-	os.chdir(testfile_dir+'11')
+	testdir = os.path.join(testfile_dir, '11')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -248,7 +260,8 @@ def TestMeshAlgorithmRefractiveGPU():
 # 12. MeshAlgorithm DelayeConnection with network timestep multiple
 def TestMeshAlgorithmTimeStepMultiple():
 	print('Checking LIF MeshAlgorithm with network timestep multiple test 12...')
-	os.chdir(testfile_dir+'12')
+	testdir = os.path.join(testfile_dir, '12')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -270,7 +283,8 @@ def TestMeshAlgorithmTimeStepMultipleGPU():
 		return
 
 	print('Checking LIF MeshAlgorithmGroup with network timestep multiple test 13...')
-	os.chdir(testfile_dir+'13')
+	testdir = os.path.join(testfile_dir, '13')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -288,7 +302,8 @@ def TestMeshAlgorithmTimeStepMultipleGPU():
 # 14. MeshAlgorithm DelayeConnection multiple connections 
 def TestMeshAlgorithmMultipleConnections():
 	print('Checking LIF MeshAlgorithm with multiple connections test 14...')
-	os.chdir(testfile_dir+'14')
+	testdir = os.path.join(testfile_dir, '14')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -310,7 +325,8 @@ def TestMeshAlgorithmMultipleConnectionsGPU():
 		return
 
 	print('Checking LIF MeshAlgorithmGroup with multiple connections test 15...')
-	os.chdir(testfile_dir+'15')
+	testdir = os.path.join(testfile_dir, '15')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -328,7 +344,8 @@ def TestMeshAlgorithmMultipleConnectionsGPU():
 # 16. MeshAlgorithm DelayeConnection density recording
 def TestMeshAlgorithmDensityRecording():
 	print('Checking LIF MeshAlgorithm with density recording test 16...')
-	os.chdir(testfile_dir+'16')
+	testdir = os.path.join(testfile_dir, '16')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -347,7 +364,8 @@ def TestMeshAlgorithmGroupDensityRecordingGPU():
 		return
 
 	print('Checking LIF MeshAlgorithmGroup with density recording test 17...')
-	os.chdir(testfile_dir+'17')
+	testdir = os.path.join(testfile_dir, '17')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -362,7 +380,8 @@ def TestMeshAlgorithmGroupDensityRecordingGPU():
 # 18. MeshAlgorithm Two nodes One Algorithm
 def TestMeshAlgorithmTwoNodes():
 	print('Checking LIF MeshAlgorithm two nodes one algorithm test 18...')
-	os.chdir(testfile_dir+'18')
+	testdir = os.path.join(testfile_dir, '18')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -390,7 +409,8 @@ def TestMeshAlgorithmGroupTwoNodesGPU():
 		return
 
 	print('Checking LIF MeshAlgorithmGroup two nodes one algorithm test 19...')
-	os.chdir(testfile_dir+'19')
+	testdir = os.path.join(testfile_dir, '19')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -414,7 +434,8 @@ def TestMeshAlgorithmGroupTwoNodesGPU():
 # 20. MeshAlgorithm Two nodes One Algorithm
 def TestMeshAlgorithmTwoNodesSelfConnections():
 	print('Checking LIF MeshAlgorithm two nodes one algorithm self connections test 20...')
-	os.chdir(testfile_dir+'20')
+	testdir = os.path.join(testfile_dir, '20')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -442,7 +463,8 @@ def TestMeshAlgorithmGroupTwoNodesSelfConnectionsGPU():
 		return
 
 	print('Checking LIF MeshAlgorithmGroup two nodes one algorithm self connections test 21...')
-	os.chdir(testfile_dir+'21')
+	testdir = os.path.join(testfile_dir, '21')
+	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
@@ -466,7 +488,8 @@ def TestMeshAlgorithmGroupTwoNodesSelfConnectionsGPU():
 # 22. Generate Fid File and Matrix
 def TestGenerateFidAndMatrix():
 	print('Checking Generate Fid file and Matrix 22...')
-	os.chdir(testfile_dir+'22')
+	testdir = os.path.join(testfile_dir, '22')
+	os.chdir(testdir)
 	print('sim lif.xml.')
 	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
 	print('generate-empty-fid lif.')
@@ -494,7 +517,8 @@ def TestGenerateFidAndMatrix():
 # 23. Generate Matrix Monte Carlo
 def TestGenerateMatrixMC():
 	print('Checking Generate Matrix Monte Carlo 23...')
-	os.chdir(testfile_dir+'23')
+	testdir = os.path.join(testfile_dir, '23')
+	os.chdir(testdir)
 	print('sim lif.xml.')
 	results = subprocess.run("python -m miind.miindio sim lif.xml", shell=True, check=True)
 	print('generate-matrix lif 0.01 10 0.0 0.0 False.')
@@ -518,7 +542,8 @@ def TestGenerateMatrixMC():
 # 24. Generate LIF Mesh and Model
 def TestGenerateMeshModel():
 	print('Checking Generate LIF Mesh and Model 24...')
-	os.chdir(testfile_dir+'24')
+	testdir = os.path.join(testfile_dir, '24')
+	os.chdir(testdir)
 	print('generate-lif-mesh lif.')
 	results = subprocess.run("python -m miind.miindio generate-lif-mesh lif", shell=True, check=True)
 	print('generate-model lif 0.0 1.0.')
@@ -568,5 +593,5 @@ TestGenerateMatrixMC()
 print('All tests successful.')
 
 print('Deleting local testfiles.')
-shutil.rmtree(os.getcwd() + '/testfiles', ignore_errors=True)
+shutil.rmtree(testdir_path)
 
