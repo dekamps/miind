@@ -8,8 +8,13 @@ cmake_minimum_required(VERSION 2.8)
 FIND_PACKAGE(GSL REQUIRED)
 FIND_PACKAGE(CUDA QUIET)
 
-find_package (Python3 COMPONENTS Development)
+if (APPLE)
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
+else (APPLE)
+find_package (Python3 COMPONENTS Interpreter Development)
 include_directories(${Python3_INCLUDE_DIRS})
+endif(APPLE)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -229,7 +234,12 @@ set ( LIBLIST
     gsl
     gslcblas
     ${GLUT_LIBRARY}
+	${PYTHON_LIBRARIES}
 )
+
+if (APPLE)
+set( LIBLIST ${LIBLIST} ${Python3_LIBRARIES} )
+endif (APPLE)
 
 if (ENABLE_CUDA)
    if (NOT APPLE)

@@ -105,6 +105,9 @@ jobs:
         shell: bash
         
       - name: Run Integration Tests
+        env:
+          CC: gcc-6
+          CXX: g++-6
         working-directory: ${{ github.workspace }}/examples/IntegrationTests 
         run: python system_tests.py
         shell: bash

@@ -40,6 +40,8 @@ set ( LIBLIST
 	${PYTHON_LIBRARIES}
 )
 
+message ( "Using python libraries: ${PYTHON_LIBRARIES} ")
+
 if (APPLE)
 set( LIBLIST ${LIBLIST} ${Python3_LIBRARIES} )
 endif (APPLE)
