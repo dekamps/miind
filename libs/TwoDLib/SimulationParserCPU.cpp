@@ -36,6 +36,50 @@ SimulationParserCPU<double>::SimulationParserCPU(const std::string xml_filename)
 	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
 }
 
+
+template<class WeightType >
+std::string SimulationParserCPU<WeightType>::interpretValueAsString(std::string value) {
+	
+	if (_variables.find(value) == _variables.end()) // If the string isn't in the map, then assume it's just a string.
+		return value;
+
+	// todo: Do a sanity check that the variable was defined with type=String.
+
+	return _variables[value];
+}
+
+template<class WeightType >
+double SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string value) {
+
+	if (value == "")
+		return 0.0;
+
+	// todo: Do some checking to see if this is an actual double
+
+	if (_variables.find(value) == _variables.end()) // If the string isn't in the map, assume it's just a value
+		return std::stod(value);
+
+	if (_variables[value] == "")
+		std::cout << "Warning: The value of variable " << value << " in xml file is empty and cannot be converted to a number.\n";
+
+	return std::stod(_variables[value]);
+}
+
+template<class WeightType >
+int SimulationParserCPU<WeightType>::interpretValueAsInt(std::string value) {
+
+	if (value == "")
+		return 0;
+
+	if (_variables.find(value) == _variables.end()) // If the string isn't in the map, assume it's just a value
+		return std::stoi(value);
+
+	if (_variables[value] == "")
+		std::cout << "Warning: The value of variable " << value << " in xml file is empty and cannot be converted to a number.\n";
+
+	return std::stoi(_variables[value]);
+}
+
 template<class WeightType>
 void SimulationParserCPU<WeightType>::endSimulation() {
 	MPILib::MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::endSimulation();
@@ -45,15 +89,15 @@ template<>
 void SimulationParserCPU<MPILib::CustomConnectionParameters>::addConnection(pugi::xml_node& xml_conn) {
 	MPILib::CustomConnectionParameters connection;
 
-	std::string in = std::string(xml_conn.attribute("In").value());
-	std::string out = std::string(xml_conn.attribute("Out").value());
+	std::string in = interpretValueAsString(std::string(xml_conn.attribute("In").value()));
+	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
 
 	for (pugi::xml_attribute_iterator ait = xml_conn.attributes_begin(); ait != xml_conn.attributes_end(); ++ait) {
 
 		if ((std::string("In") == std::string(ait->name())) || (std::string("Out") == std::string(ait->name())))
 			continue;
 
-		connection.setParam(std::string(ait->name()), std::string(ait->value()));
+		connection.setParam(std::string(ait->name()), interpretValueAsString(std::string(ait->value())));
 		// todo : Check the value for a variable definition - need a special function for checking all inputs really
 	}
 	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], connection);
@@ -63,16 +107,16 @@ template<>
 void SimulationParserCPU<MPILib::DelayedConnection>::addConnection(pugi::xml_node& xml_conn) {
 	
 
-	std::string in = std::string(xml_conn.attribute("In").value());
-	std::string out = std::string(xml_conn.attribute("Out").value());
+	std::string in = interpretValueAsString(std::string(xml_conn.attribute("In").value()));
+	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
 
 	std::string values = std::string(xml_conn.text().as_string());
-	double num_connections;
-	double efficacy;
-	double delay;
-	std::sscanf(values.c_str(), "%lf %lf %lf", &num_connections, &efficacy, &delay);
+	std::string num_connections;
+	std::string efficacy;
+	std::string delay;
+	std::sscanf(values.c_str(), "%s %s %s", &num_connections, &efficacy, &delay);
 
-	MPILib::DelayedConnection connection(num_connections, efficacy, delay);
+	MPILib::DelayedConnection connection(interpretValueAsDouble(num_connections), interpretValueAsDouble(efficacy), interpretValueAsDouble(delay));
 
 	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], connection);
 }
@@ -80,10 +124,10 @@ void SimulationParserCPU<MPILib::DelayedConnection>::addConnection(pugi::xml_nod
 template<>
 void SimulationParserCPU<double>::addConnection(pugi::xml_node& xml_conn) {
 
-	std::string in = std::string(xml_conn.attribute("In").value());
-	std::string out = std::string(xml_conn.attribute("Out").value());
+	std::string in = interpretValueAsString(std::string(xml_conn.attribute("In").value()));
+	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
 
-	double value = xml_conn.text().as_double();
+	double value = interpretValueAsDouble(xml_conn.text().as_string());
 	
 	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], value);
 }
@@ -92,14 +136,14 @@ template<>
 void SimulationParserCPU<MPILib::CustomConnectionParameters>::addIncomingConnection(pugi::xml_node& xml_conn) {
 	MPILib::CustomConnectionParameters connection;
 
-	std::string node = std::string(xml_conn.attribute("Node").value());
+	std::string node = interpretValueAsString(std::string(xml_conn.attribute("Node").value()));
 
 	for (pugi::xml_attribute_iterator ait = xml_conn.attributes_begin(); ait != xml_conn.attributes_end(); ++ait) {
 
 		if (std::string("Node") == std::string(ait->name()))
 			continue;
 
-		connection.setParam(std::string(ait->name()), std::string(ait->value()));
+		connection.setParam(std::string(ait->name()), interpretValueAsString(std::string(ait->value())));
 		// todo : Check the value for a variable definition - need a special function for checking all inputs really
 	}
 
@@ -108,24 +152,25 @@ void SimulationParserCPU<MPILib::CustomConnectionParameters>::addIncomingConnect
 
 template<>
 void SimulationParserCPU<MPILib::DelayedConnection>::addIncomingConnection(pugi::xml_node& xml_conn) {
-	std::string node = std::string(xml_conn.attribute("Node").value());
+	std::string node = interpretValueAsString(std::string(xml_conn.attribute("Node").value()));
+
 
 	std::string values = std::string(xml_conn.text().as_string());
-	double num_connections;
-	double efficacy;
-	double delay;
-	std::sscanf(values.c_str(), "%lf %lf %lf", &num_connections, &efficacy, &delay);
+	std::string num_connections;
+	std::string efficacy;
+	std::string delay;
+	std::sscanf(values.c_str(), "%s %s %s", &num_connections, &efficacy, &delay);
 
-	MPILib::DelayedConnection connection(num_connections, efficacy, delay);
+	MPILib::DelayedConnection connection(interpretValueAsDouble(num_connections), interpretValueAsDouble(efficacy), interpretValueAsDouble(delay));
 
 	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], connection);
 }
 
 template<>
 void SimulationParserCPU<double>::addIncomingConnection(pugi::xml_node& xml_conn) {
-	std::string node = std::string(xml_conn.attribute("Node").value());
+	std::string node = interpretValueAsString(std::string(xml_conn.attribute("Node").value()));
 
-	double value = xml_conn.text().as_double();
+	double value = interpretValueAsDouble(xml_conn.text().as_string());
 
 	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], value);
 }
@@ -142,43 +187,43 @@ void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithm
 
 	for (pugi::xml_node algorithm = doc.child("Simulation").child("Algorithms").child("Algorithm"); algorithm; algorithm = algorithm.next_sibling("Algorithm")) {
 		//Check all possible Algorithm types
-		if (std::string("GridAlgorithm") == std::string(algorithm.attribute("type").value())) {
-			std::string algorithm_name = std::string(algorithm.attribute("name").value());
+		if (std::string("GridAlgorithm") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
 			std::cout << "Found GridAlgorithm " << algorithm_name << ".\n";
 
-			std::string model_filename = std::string(algorithm.attribute("modelfile").value());
-			double tau_refractive = algorithm.attribute("tau_refractive").as_double();
-			std::string transform_filename = std::string(algorithm.attribute("transformfile").value());
-			double start_v = algorithm.attribute("start_v").as_double();
-			double start_w = algorithm.attribute("start_w").as_double();
-			double time_step = std::stod(std::string(algorithm.child_value("TimeStep")));
+			std::string model_filename = interpretValueAsString(std::string(algorithm.attribute("modelfile").value()));
+			double tau_refractive = interpretValueAsDouble(algorithm.attribute("tau_refractive").as_string());
+			std::string transform_filename = interpretValueAsString(std::string(algorithm.attribute("transformfile").value()));
+			double start_v = interpretValueAsDouble(algorithm.attribute("start_v").as_string());
+			double start_w = interpretValueAsDouble(algorithm.attribute("start_w").as_string());
+			double time_step = interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
 
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::GridAlgorithm(model_filename, transform_filename, time_step, start_v, start_w, tau_refractive));
 		}
 
-		if (std::string("MeshAlgorithmCustom") == std::string(algorithm.attribute("type").value())) {
-			std::string algorithm_name = std::string(algorithm.attribute("name").value());
+		if (std::string("MeshAlgorithmCustom") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
 			std::cout << "Found MeshAlgorithmCustom " << algorithm_name << ".\n" << std::flush;
 
-			std::string model_filename = std::string(algorithm.attribute("modelfile").value());
-			double tau_refractive = algorithm.attribute("tau_refractive").as_double();
-			double time_step = std::stod(std::string(algorithm.child_value("TimeStep")));
+			std::string model_filename = interpretValueAsString(std::string(algorithm.attribute("modelfile").value()));
+			double tau_refractive = interpretValueAsDouble(algorithm.attribute("tau_refractive").as_string());
+			double time_step = interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
 
 			std::vector<std::string> matrix_files;
 			for (pugi::xml_node matrix_file = algorithm.child("MatrixFile"); matrix_file; matrix_file = matrix_file.next_sibling("MatrixFile")) {
-				matrix_files.push_back(std::string(matrix_file.child_value()));
+				matrix_files.push_back(interpretValueAsString(std::string(matrix_file.child_value())));
 			}
 
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::MeshAlgorithmCustom<TwoDLib::MasterOdeint>(model_filename, matrix_files, time_step, tau_refractive));
 		}
 
-		if (std::string("RateFunctor") == std::string(algorithm.attribute("type").value())) {
+		if (std::string("RateFunctor") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
 			// As we can't use the "expression" part properly here because we're not doing an intemediate cpp translation step
 			// Let's just use RateAlgorithm for RateFunctor for now.
-			std::string algorithm_name = std::string(algorithm.attribute("name").value());
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
 			std::cout << "Found RateFunctor (Using a RateAlgorithm) " << algorithm_name << ".\n";
 
-			double rate = std::stod(std::string(algorithm.child_value("expression")));
+			double rate = interpretValueAsDouble(std::string(algorithm.child_value("expression")));
 
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new MPILib::RateAlgorithm<MPILib::CustomConnectionParameters>(rate));
 		}
@@ -196,29 +241,29 @@ void SimulationParserCPU< MPILib::DelayedConnection>::parseXMLAlgorithms(pugi::x
 
 	for (pugi::xml_node algorithm = doc.child("Simulation").child("Algorithms").child("Algorithm"); algorithm; algorithm = algorithm.next_sibling("Algorithm")) {
 		//Check all possible Algorithm types
-		if (std::string("MeshAlgorithm") == std::string(algorithm.attribute("type").value())) {
-			std::string algorithm_name = std::string(algorithm.attribute("name").value());
+		if (std::string("MeshAlgorithm") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
 			std::cout << "Found MeshAlgorithm " << algorithm_name << ".\n" << std::flush;
 
-			std::string model_filename = std::string(algorithm.attribute("modelfile").value());
-			double tau_refractive = algorithm.attribute("tau_refractive").as_double();
-			double time_step = std::stod(std::string(algorithm.child_value("TimeStep")));
+			std::string model_filename = interpretValueAsString(std::string(algorithm.attribute("modelfile").value()));
+			double tau_refractive = interpretValueAsDouble(algorithm.attribute("tau_refractive").as_string());
+			double time_step = interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
 
 			std::vector<std::string> matrix_files;
 			for (pugi::xml_node matrix_file = algorithm.child("MatrixFile"); matrix_file; matrix_file = matrix_file.next_sibling("MatrixFile")) {
-				matrix_files.push_back(std::string(matrix_file.child_value()));
+				matrix_files.push_back(interpretValueAsString(std::string(matrix_file.child_value())));
 			}
 
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::DelayedConnection>>(new TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOdeint>(model_filename, matrix_files, time_step, tau_refractive));
 		}
 
-		if (std::string("RateFunctor") == std::string(algorithm.attribute("type").value())) {
+		if (std::string("RateFunctor") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
 			// As we can't use the "expression" part properly here because we're not doing an intemediate cpp translation step
 			// Let's just use RateAlgorithm for RateFunctor for now.
-			std::string algorithm_name = std::string(algorithm.attribute("name").value());
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
 			std::cout << "Found RateFunctor (Using a RateAlgorithm) " << algorithm_name << ".\n";
 
-			double rate = std::stod(std::string(algorithm.child_value("expression")));
+			double rate = interpretValueAsDouble(std::string(algorithm.child_value("expression")));
 
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::DelayedConnection>>(new MPILib::RateAlgorithm<MPILib::DelayedConnection>(rate));
 		}
@@ -236,13 +281,13 @@ void SimulationParserCPU<double>::parseXMLAlgorithms(pugi::xml_document& doc,
 	for (pugi::xml_node algorithm = doc.child("Simulation").child("Algorithms").child("Algorithm"); algorithm; algorithm = algorithm.next_sibling("Algorithm")) {
 		//Check all possible Algorithm types
 
-		if (std::string("RateFunctor") == std::string(algorithm.attribute("type").value())) {
+		if (std::string("RateFunctor") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
 			// As we can't use the "expression" part properly here because we're not doing an intemediate cpp translation step
 			// Let's just use RateAlgorithm for RateFunctor for now.
-			std::string algorithm_name = std::string(algorithm.attribute("name").value());
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
 			std::cout << "Found RateFunctor (Using a RateAlgorithm) " << algorithm_name << ".\n";
 
-			double rate = std::stod(std::string(algorithm.child_value("expression")));
+			double rate = interpretValueAsDouble(std::string(algorithm.child_value("expression")));
 
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<double>>(new MPILib::RateAlgorithm<double>(rate));
 		}
@@ -291,6 +336,11 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 	if (!checkWeightType(doc))
 		return;
 
+	// Load Variables into map
+	for (pugi::xml_node var = doc.child("Simulation").child("Variable"); var; var = var.next_sibling("Variable")) {
+		_variables[std::string(var.attribute("Name").value())] = std::string(var.text().as_string());
+	}
+
 	//Algorithms
 	//Ignore "Group" algorithms - this is the non-cuda version of WinMiind (for now)
 
@@ -301,22 +351,22 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 
 	//Nodes
 	for (pugi::xml_node node = doc.child("Simulation").child("Nodes").child("Node"); node; node = node.next_sibling("Node")) {
-		std::string node_name = std::string(node.attribute("name").value());
+		std::string node_name = interpretValueAsString(std::string(node.attribute("name").value()));
 		std::cout << "Found Node " << node_name << ".\n";
 
 		// Check what type the node is
 		MPILib::NodeType node_type = MPILib::NEUTRAL;
-		if (std::string("EXCITATORY_DIRECT") == std::string(node.attribute("type").value()))
+		if (std::string("EXCITATORY_DIRECT") == interpretValueAsString(std::string(node.attribute("type").value())))
 			node_type = MPILib::EXCITATORY_DIRECT;
-		if (std::string("INHIBITORY_DIRECT") == std::string(node.attribute("type").value()))
+		if (std::string("INHIBITORY_DIRECT") == interpretValueAsString(std::string(node.attribute("type").value())))
 			node_type = MPILib::INHIBITORY_DIRECT;
-		if (std::string("INHIBITORY") == std::string(node.attribute("type").value()))
+		if (std::string("INHIBITORY") == interpretValueAsString(std::string(node.attribute("type").value())))
 			node_type = MPILib::INHIBITORY_DIRECT;
-		if (std::string("EXCITATORY") == std::string(node.attribute("type").value()))
+		if (std::string("EXCITATORY") == interpretValueAsString(std::string(node.attribute("type").value())))
 			node_type = MPILib::EXCITATORY_DIRECT;
 		// todo : Add gaussian node types when required.
 
-		std::string algorithm_name = std::string(node.attribute("algorithm").value());
+		std::string algorithm_name = interpretValueAsString(std::string(node.attribute("algorithm").value()));
 
 		MPILib::NodeId id = MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.addNode(*_algorithms[algorithm_name], node_type);
 		_node_ids[node_name] = id;
@@ -340,17 +390,17 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 
 	//Outgoing Connections
 	for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("OutgoingConnection"); conn; conn = conn.next_sibling("OutgoingConnection")) {
-		std::string node = std::string(conn.attribute("Node").value());
+		std::string node = interpretValueAsString(std::string(conn.attribute("Node").value()));
 		MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.setNodeExternalSuccessor(_node_ids[node]);
 		_ordered_output_nodes.push_back(node);
 	}
 
 	//Reporting Densities
 	for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Density"); conn; conn = conn.next_sibling("Density")) {
-		std::string node = std::string(conn.attribute("node").value());
-		double t_start = std::stod(std::string(conn.attribute("t_start").value()));
-		double t_end = std::stod(std::string(conn.attribute("t_end").value()));
-		double t_interval = std::stod(std::string(conn.attribute("t_interval").value()));
+		std::string node = interpretValueAsString(std::string(conn.attribute("node").value()));
+		double t_start = interpretValueAsDouble(std::string(conn.attribute("t_start").value()));
+		double t_end = interpretValueAsDouble(std::string(conn.attribute("t_end").value()));
+		double t_interval = interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
 
 		_density_nodes.push_back(_node_ids[node]);
 		_density_node_start_times.push_back(t_start);
@@ -360,8 +410,8 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 
 	//Reporting Rates
 	for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Rate"); conn; conn = conn.next_sibling("Rate")) {
-		std::string node = std::string(conn.attribute("node").value());
-		double t_interval = std::stod(std::string(conn.attribute("t_interval").value()));
+		std::string node = interpretValueAsString(std::string(conn.attribute("node").value()));
+		double t_interval = interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
 
 		_rate_nodes.push_back(_node_ids[node]);
 		_rate_node_intervals.push_back(t_interval);
@@ -369,16 +419,16 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 
 	//Reporting Display
 	for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Display"); conn; conn = conn.next_sibling("Display")) {
-		std::string node = std::string(conn.attribute("node").value());
+		std::string node = interpretValueAsString(std::string(conn.attribute("node").value()));
 
 		_display_nodes.push_back(_node_ids[node]);
 	}
 
 
 	//Simulation Parameters
-	double simulation_length = std::stod(std::string(doc.child("Simulation").child("SimulationRunParameter").child_value("t_end")));
-	double time_step = std::stod(std::string(doc.child("Simulation").child("SimulationRunParameter").child_value("t_step")));
-	std::string log_filename = std::string(doc.child("Simulation").child("SimulationRunParameter").child_value("name_log"));
+	double simulation_length = interpretValueAsDouble(std::string(doc.child("Simulation").child("SimulationRunParameter").child_value("t_end")));
+	double time_step = interpretValueAsDouble(std::string(doc.child("Simulation").child("SimulationRunParameter").child_value("t_step")));
+	std::string log_filename = interpretValueAsString(std::string(doc.child("Simulation").child("SimulationRunParameter").child_value("name_log")));
 
 	MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_simulation_length = simulation_length;
 	MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_time_step = time_step;

@@ -16,6 +16,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(MIIND_LIBRARY_PREFIX miind)
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
+if (APPLE) 
+	# -D_GLIBCXX_USE_CXX11_ABI=0 sets the ABI to match older boost unit test framework on mac
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0 -fPIC")
+	set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
+else (APPLE)
+	if(CMAKE_COMPILER_IS_GNUCXX)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals -fPIC")
+		set(GLUT_LIBRARY "-lGL -lGLU -lglut")
+	endif(CMAKE_COMPILER_IS_GNUCXX)
+endif(APPLE)
+set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
+
 # FIND MIIND INCLUDE DIRECTORY, START BY CHECKING ENVIRONMENT VARIABLE MIIND_INCLUDE_DIR
 
 IF (DEFINED ENV{MIIND_INCLUDE_DIR})
@@ -135,8 +151,55 @@ endif( Boost_FOUND )
 ##############################################################################
 
 IF(ENABLE_OPENMP)
-    find_package(OpenMP REQUIRED)
-    add_definitions( -DENABLE_OPENMP=1 )
+	if (APPLE)
+		if(ENABLE_OPENMP)
+			if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+			  message ( "Setting OpenMP_C_FLAGS for Clang.")
+			  set(OpenMP_C "${CMAKE_C_COMPILER}")
+			  set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -Wno-unused-command-line-argument")
+			  set(OpenMP_C_LIB_NAMES "libomp" "libgomp" "libiomp5")
+			  set(OpenMP_libomp_LIBRARY ${OpenMP_C_LIB_NAMES})
+		      set(OpenMP_libgomp_LIBRARY ${OpenMP_C_LIB_NAMES})
+			  set(OpenMP_libiomp5_LIBRARY ${OpenMP_C_LIB_NAMES})
+			endif()
+			if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+			  message ( "Setting OpenMP_CXX_FLAGS for Clang.")
+			  set(OpenMP_CXX "${CMAKE_CXX_COMPILER}")
+			  set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -Wno-unused-command-line-argument")
+			  set(OpenMP_CXX_LIB_NAMES "libomp" "libgomp" "libiomp5")
+			  set(OpenMP_libomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+			  set(OpenMP_libgomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+			  set(OpenMP_libiomp5_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+			endif()
+		endif()
+	endif()
+	
+	find_package(OpenMP REQUIRED)
+	
+	if (OpenMP_FOUND AND APPLE)
+		message ( "Found OpenMP. Try to find omp.h..." )
+		find_path(OpenMP_INCLUDE_DIR
+			omp.h
+		)
+		
+		message ( "Adding include directories: ${OpenMP_INCLUDE_DIR} ")
+		include_directories("${OpenMP_INCLUDE_DIR}")
+		set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    # set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+	endif(OpenMP_FOUND AND APPLE)
+	
+	add_definitions( -DENABLE_OPENMP=1 )
+ENDIF(ENABLE_OPENMP)
+
+IF (WIN32 OR APPLE) # For windows packaging, we want to include the glut dll so we need FindGLUT to find it during install
+find_package(GLUT REQUIRED)
+if (GLUT_FOUND AND APPLE)
+add_definitions( -DUSING_APPLE_GLUT=1 ) # this tells TwoDLib/display.cpp to avoid non mac-glut functions.
+endif(GLUT_FOUND AND APPLE)
+ENDIF (WIN32 OR APPLE)
+
+IF(ENABLE_OPENMP)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 ENDIF(ENABLE_OPENMP)
@@ -144,12 +207,6 @@ ENDIF(ENABLE_OPENMP)
 #############################################################################
 # Libraries
 #############################################################################
-
-if (APPLE)
-set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
-else (APPLE)
-set(GLUT_LIBRARY "-lGL -lGLU -lglut")
-endif(APPLE)
 
 
 if (UNIX)

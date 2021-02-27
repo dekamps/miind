@@ -29,6 +29,12 @@ public:
 
 protected:
 
+	std::string interpretValueAsString(std::string value);
+	double interpretValueAsDouble(std::string value);
+	int interpretValueAsInt(std::string value);
+
+	std::map<std::string, std::string> _variables;
+
 	void parseXMLAlgorithms(pugi::xml_document& doc,
 		std::map<std::string, std::unique_ptr<MPILib::AlgorithmInterface<WeightType>>>& _algorithms,
 		std::map<std::string, MPILib::NodeId>& _node_ids);
