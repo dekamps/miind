@@ -65,8 +65,8 @@ def main():
         "miind": (["lib/miindsim.pyd"] if platform == "win32" else []) + (["bin\/.+\.dll"] if platform == "win32" else []) +(["lib/miindsim.dylib"] if platform == "darwin" else []) + (["lib/miindsim.so"] if platform not in ["win32","darwin"] else []) + ["share\/miind\/python\/miind\/.+"],
         "miind.miind_api": ["share\/miind\/python\/miind\/miind_api\/.+"],
         "miind.build": [],
-        "miind.build.apps.MatrixGenerator": ["share\/miind\/apps\/MatrixGenerator\/.+"],
-        "miind.build.apps.Projection": ["share\/miind\/apps\/Projection\/.+"],
+        "miind.build.apps.MatrixGenerator": ["bin\/MatrixGenerator", "bin\/Bind"],
+        "miind.build.apps.Projection": ["bin\/Projection"],
         "miind.build.examples": ["share\/miind\/examples\/.+"],
         "miind.testfiles": ["share\/miind\/python\/miind\/testfiles\/.+"]
     }
@@ -162,7 +162,7 @@ def main():
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
             "License :: OSI Approved :: MIT License",
-            #"Operating System :: MacOS",
+            "Operating System :: MacOS",
             "Operating System :: Unix",
             "Operating System :: Microsoft :: Windows",
         ],
