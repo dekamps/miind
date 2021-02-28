@@ -41,7 +41,7 @@ def main():
 
     package_version = "0.0.11"
 
-    package_name = "miind-test-hugh-osborne"
+    package_name = "miind"
 
     with open("README.md", "r", encoding="utf-8") as fh:
         long_description = fh.read()
@@ -65,8 +65,8 @@ def main():
         "miind": (["lib/miindsim.pyd"] if platform == "win32" else []) + (["bin\/.+\.dll"] if platform == "win32" else []) +(["lib/miindsim.dylib"] if platform == "darwin" else []) + (["lib/miindsim.so"] if platform not in ["win32","darwin"] else []) + ["share\/miind\/python\/miind\/.+"],
         "miind.miind_api": ["share\/miind\/python\/miind\/miind_api\/.+"],
         "miind.build": [],
-        "miind.build.apps.MatrixGenerator": ["bin\/MatrixGenerator", "bin\/Bind"],
-        "miind.build.apps.Projection": ["bin\/Projection"],
+        "miind.build.apps.MatrixGenerator": ["bin\/MatrixGenerator.+", "bin\/Bind.+"],
+        "miind.build.apps.Projection": ["bin\/Projection.+"],
         "miind.build.examples": ["share\/miind\/examples\/.+"],
         "miind.testfiles": ["share\/miind\/python\/miind\/testfiles\/.+"]
     }
@@ -140,7 +140,7 @@ def main():
         version=package_version,
         url="https://github.com/dekamps/miind",
         license="MIT",
-        description="MIIND : ADD A SHORT DESCRIPTION",
+        description="MIIND",
         long_description=long_description,
         long_description_content_type="text/markdown",
         packages=packages,

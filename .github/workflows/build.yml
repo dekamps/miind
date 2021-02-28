@@ -45,32 +45,9 @@ jobs:
             cp custom-triplets/*.cmake vcpkg/triplets
         shell: bash
         
-      - name: One time delete vcpkg
-        run: rm -rf vcpkg_installed
-        shell: bash
-        
-      #- name: Install vcpkg
-      #  # Download and build vcpkg, without installing any port. If content is cached already, it is a no-op.
-      #  uses: lukka/run-vcpkg@v6
-      #  with:
-      #    setupOnly: true
-      #    vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-      #    additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
-      #    appendedCacheKey: ${{matrix.os}}-build-vcpkg-v3-${{ hashFiles( '**/vcpkg.json' ) }}
-      #    vcpkgTriplet: ${{ matrix.triplet }}
-      #    doNotCache: true
-      #  if: contains( matrix.os, 'windows')
-
-      #- name: Run CMake with vcpkg.json manifest
-      #  uses: lukka/run-cmake@main
-      #  with:
-      #    cmakeListsOrSettingsJson: CMakeSettingsJson
-      #    cmakeSettingsJsonPath: '${{ github.workspace }}/CMakeSettings.json'
-      #    useVcpkgToolchainFile: true
-      #    buildDirectory: '${{ env.buildDir }}'
-      #    cmakeAppendedArgs: '"-GNinja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet}}'
-      #    buildWithCMake: true
-      #  if: contains( matrix.os, 'windows')
+      #- name: One time delete vcpkg
+      #  run: rm -rf vcpkg_installed
+      #  shell: bash
 
       - name: Set up Python
         uses: actions/setup-python@v1
@@ -88,7 +65,11 @@ jobs:
         with:
           path: ./wheelhouse/*.whl 
 
-      - name: Publish package  
+      - name: Publish package to test pypi
         run: python -m twine upload -u __token__ -p pypi-AgENdGVzdC5weXBpLm9yZwIkOGUzMWI0OGYtZjE0ZS00ZGUzLTkxNjEtZmYzZWJkODEyYzgwAAIleyJwZXJtaXNzaW9ucyI6ICJ1c2VyIiwgInZlcnNpb24iOiAxfQAABiA5aJXbljJQ0NQRu5Wn9f3v4CB35xhwzauoq72exCLs4A --skip-existing --repository testpypi ./wheelhouse/*
+        if: github.event_name == 'push' # && startsWith(github.ref, 'refs/tags')
+        
+      - name: Publish package to pypi
+        run: python -m twine upload -u __token__ -p ${{ secrets.PYPI_MIIND_API_TOKEN }} --skip-existing  ./wheelhouse/*
         if: github.event_name == 'push' # && startsWith(github.ref, 'refs/tags')
         

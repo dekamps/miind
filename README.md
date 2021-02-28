@@ -1,4 +1,4 @@
-# MIIND website
+# MIIND
 
 ## Version 1.06 (25/03/2020)
 We have created version 1.06, which contains some updates for the GPU impementation.
