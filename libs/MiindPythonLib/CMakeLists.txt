@@ -56,9 +56,9 @@ set ( LIBLIST
 
 message ( "Using python libraries: ${PYTHON_LIBRARIES} and ${Python3_LIBRARIES}")
 
-if (APPLE)
-set( LIBLIST ${LIBLIST} ${Python3_LIBRARIES} )
-endif (APPLE)
+#if (APPLE)
+#set( LIBLIST ${LIBLIST} ${Python3_LIBRARIES} )
+#endif (APPLE)
 
 
 add_library( ${MIIND_LIBRARY_PREFIX}sim ${LIB_TYPE} MiindPython.cpp)
