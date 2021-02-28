@@ -236,7 +236,7 @@ set ( LIBLIST
 )
 
 if (APPLE)
-set( LIBLIST ${LIBLIST} ${Python3_LIBRARIES} )
+set( LIBLIST ${LIBLIST} ${OPENGL_LIBRARIES} ${Python3_LIBRARIES} )
 endif (APPLE)
 
 
