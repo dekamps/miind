@@ -43,6 +43,8 @@ TwoDLib::UserTranslationMode InterpretArguments(int argc, char** argv){
 
 int main(int argc, char** argv){
 
+	std::cout << "Running MatrixGenerator.\n" << std::flush;
+
 	try {
 		TwoDLib::UserTranslationMode mode = InterpretArguments(argc, argv);
 		TwoDLib::GenerateMatrix(argc,argv,mode);
