@@ -111,6 +111,13 @@ jobs:
         working-directory: ${{ github.workspace }}/examples/IntegrationTests 
         run: python system_tests.py
         shell: bash
+        if: contains( matrix.os, 'macos')
+        
+      - name: Run Integration Tests
+        working-directory: ${{ github.workspace }}/examples/IntegrationTests 
+        run: python system_tests.py
+        shell: bash
+        if: contains( matrix.os, 'ubuntu')
       
         
         

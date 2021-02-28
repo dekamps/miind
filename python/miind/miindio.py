@@ -776,11 +776,11 @@ class MiindIO:
           print('\nWARNING : No Simulation currently set. Please call \'sim\' to set it. \n')
           current_sim = None
 
-        if len(sys.argv) > 1 and sys.argv[1] != '-self.debug':
+        if len(sys.argv) > 1 and sys.argv[1] != '-debug':
           command = sys.argv[1:]
           self.checkCommands(command, current_sim)
         else:
-          self.debug = len(sys.argv) > 1 and sys.argv[1] == '-self.debug'
+          self.debug = len(sys.argv) > 1 and sys.argv[1] == '-debug'
 
           try:
               import gnureadline as readline

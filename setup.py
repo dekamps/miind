@@ -53,7 +53,8 @@ def main():
         "miind.testfiles": [],
         "miind.miind_api": [],
         "miind.build": [],
-        "miind.build.apps": [],
+        "miind.build.apps.MatrixGenerator": [],
+        "miind.build.apps.Projection": [],
         "miind.build.examples": []
     }
 
@@ -64,7 +65,8 @@ def main():
         "miind": (["lib/miindsim.pyd"] if os.name == 'nt' else []) + (["bin\/.+\.dll"] if os.name == 'nt' else []) + (["lib/miindsim.so"] if os.name != 'nt' else []) + ["share\/miind\/python\/miind\/.+"],
         "miind.miind_api": ["share\/miind\/python\/miind\/miind_api\/.+"],
         "miind.build": [],
-        "miind.build.apps": ["share\/miind\/apps\/MatrixGenerator\/.+","share\/miind\/apps\/Projection\/.+"],
+        "miind.build.apps.MatrixGenerator": ["share\/miind\/apps\/MatrixGenerator\/.+"],
+        "miind.build.apps.Projection": ["share\/miind\/apps\/Projection\/.+"],
         "miind.build.examples": ["share\/miind\/examples\/.+"],
         "miind.testfiles": ["share\/miind\/python\/miind\/testfiles\/.+"]
     }

@@ -370,7 +370,7 @@ def TestMeshAlgorithmDensityRecording():
 	assert all([float(name.split('_')[4]) > 0.99998 and float(name.split('_')[4]) < 1.0001 for name in os.listdir('.') if os.path.isfile(name)])
 	print('Success. Clean up.\n')
 	os.chdir('..')
-	shutil.rmtree('lif.model_mesh_0')
+	shutil.rmtree('lif.model_mesh')
 	os.chdir('..')
 	os.chdir('..')
 

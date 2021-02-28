@@ -4,7 +4,9 @@
 
 #############################################################################
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.6)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 FIND_PACKAGE(GSL REQUIRED)
 FIND_PACKAGE(CUDA QUIET)
 
@@ -253,8 +255,8 @@ endif(ENABLE_CUDA)
 # executables
 #############################################################################
  #   add the flags for C++11
-if(CMAKE_COMPILER_IS_GNUCXX)
-add_definitions("-fext-numeric-literals ${GLUT_LIBRARY}")
-else(CMAKE_COMPILER_IS_GNUCXX)
-add_definitions("${GLUT_LIBRARY}")
-endif(CMAKE_COMPILER_IS_GNUCXX)
+#if(CMAKE_COMPILER_IS_GNUCXX)
+#add_definitions("-fext-numeric-literals ${GLUT_LIBRARY}")
+#else(CMAKE_COMPILER_IS_GNUCXX)
+#add_definitions("${GLUT_LIBRARY}")
+#endif(CMAKE_COMPILER_IS_GNUCXX)

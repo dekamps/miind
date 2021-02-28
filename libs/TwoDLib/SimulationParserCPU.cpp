@@ -50,7 +50,7 @@ std::string SimulationParserCPU<WeightType>::interpretValueAsString(std::string 
 
 template<class WeightType >
 double SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string value) {
-
+	
 	if (value == "")
 		return 0.0;
 
@@ -111,12 +111,12 @@ void SimulationParserCPU<MPILib::DelayedConnection>::addConnection(pugi::xml_nod
 	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
 
 	std::string values = std::string(xml_conn.text().as_string());
-	std::string num_connections;
-	std::string efficacy;
-	std::string delay;
-	std::sscanf(values.c_str(), "%s %s %s", &num_connections, &efficacy, &delay);
-
-	MPILib::DelayedConnection connection(interpretValueAsDouble(num_connections), interpretValueAsDouble(efficacy), interpretValueAsDouble(delay));
+	char num_connections[255];
+	char efficacy[255];
+	char delay[255];
+	std::sscanf(values.c_str(), "%s %s %s", num_connections, efficacy, delay);
+	std::cout << "Strings : " << num_connections << " " << efficacy << " " << delay << "\n";
+	MPILib::DelayedConnection connection(interpretValueAsDouble(std::string(num_connections)), interpretValueAsDouble(std::string(efficacy)), interpretValueAsDouble(std::string(delay)));
 
 	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], connection);
 }
@@ -156,12 +156,12 @@ void SimulationParserCPU<MPILib::DelayedConnection>::addIncomingConnection(pugi:
 
 
 	std::string values = std::string(xml_conn.text().as_string());
-	std::string num_connections;
-	std::string efficacy;
-	std::string delay;
-	std::sscanf(values.c_str(), "%s %s %s", &num_connections, &efficacy, &delay);
-
-	MPILib::DelayedConnection connection(interpretValueAsDouble(num_connections), interpretValueAsDouble(efficacy), interpretValueAsDouble(delay));
+	char* num_connections;
+	char* efficacy;
+	char* delay;
+	std::sscanf(values.c_str(), "%s%s%s", num_connections, efficacy, delay);
+	std::cout << "Strings : " << num_connections << " " << efficacy << " " << delay << "\n";
+	MPILib::DelayedConnection connection(interpretValueAsDouble(std::string(num_connections)), interpretValueAsDouble(std::string(efficacy)), interpretValueAsDouble(std::string(delay)));
 
 	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], connection);
 }

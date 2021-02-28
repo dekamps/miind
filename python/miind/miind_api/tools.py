@@ -24,19 +24,25 @@ class cd:
         os.chdir(self.savedPath)
 
 def getMiindBuildPath(): #Used in development mode
-    return os.path.join(directories.miind_python_dir(), '../../build')
+    return os.path.join(directories.miind_python_dir(), '..', '..', 'build')
 
 def getMiindPythonPath():
     return os.path.join(directories.miind_python_dir())
 
 def getMiindAppsPath():
-    build_path = getMiindBuildPath()
+    print(directories.miind_python_dir())
+    print(getMiindBuildPath())
+    
+    # if miind has been installed, try to find apps in .../share/python/miind/apps
+    build_path = os.path.join(directories.miind_python_dir(), '..', '..', 'apps')
+
     # if this is python miind, try to find apps in .../miind/build/apps
     if not os.path.isdir(build_path):
-        build_path = os.path.join(directories.miind_python_dir(), 'build/apps')
-    # if miind has been installed, try to find apps in .../share/python/miind/apps
+        build_path = os.path.join(directories.miind_python_dir(), 'build', 'apps')
+    # otherwise, we're in dev mode (build directory)
     if not os.path.isdir(build_path):
-        build_path = os.path.join(directories.miind_python_dir(), '../../apps')
+        build_path = os.path.join(getMiindBuildPath(), 'apps')
+    print(build_path)
     return build_path
 
 def split_fname(fname, ext):

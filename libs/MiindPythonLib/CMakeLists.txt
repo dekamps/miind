@@ -8,8 +8,15 @@ if (APPLE)
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 else (APPLE)
+if (WIN32 AND SKBUILD) # We're building using SKBUILD which means the correct python lib is passed as a flag! Hooray!
+set(Python3_INCLUDE_DIRS ${PYTHON_INCLUDE_DIR} )
+set(PYTHON_LIBRARIES ${PYTHON_LIBRARY})
+set(Python3_LIBRARIES ${PYTHON_LIBRARY})
+include_directories(${Python3_INCLUDE_DIRS})
+else (WIN32 AND SKBUILD)
 find_package (Python3 COMPONENTS Interpreter Development)
 include_directories(${Python3_INCLUDE_DIRS})
+endif (WIN32)
 endif(APPLE)
 
 include_directories( ${ROOT_INCLUDE_DIRS} )
@@ -40,7 +47,7 @@ set ( LIBLIST
 	${PYTHON_LIBRARIES}
 )
 
-message ( "Using python libraries: ${PYTHON_LIBRARIES} ")
+message ( "Using python libraries: ${PYTHON_LIBRARIES} and ${Python3_LIBRARIES}")
 
 if (APPLE)
 set( LIBLIST ${LIBLIST} ${Python3_LIBRARIES} )
