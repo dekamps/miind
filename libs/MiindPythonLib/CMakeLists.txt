@@ -65,6 +65,10 @@ if (WIN32) # for windows, we want to set the ending to .pyd. In linux, the endin
 SET_TARGET_PROPERTIES(${MIIND_LIBRARY_PREFIX}sim   PROPERTIES SUFFIX .pyd)
 endif (WIN32)
 
+if (APPLE) # for osx, we want to force the ending to .so instead of .dylib.
+SET_TARGET_PROPERTIES(${MIIND_LIBRARY_PREFIX}sim   PROPERTIES SUFFIX .so)
+endif (APPLE)
+
 install( TARGETS ${MIIND_LIBRARY_PREFIX}sim DESTINATION lib)
   
 # In Windows, we want to redistribute the dependent dlls (Boost_CHRONO, Boost_FILESYSTEM, Boost_TIMER, and freeglut). 

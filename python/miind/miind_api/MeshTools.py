@@ -74,6 +74,8 @@ class MeshTools:
                                     spike_shift_w=0, reset_shift_w=0, use_area_calculation=False,
                                     jump_file=None, mode=None):
         matrix_generator_exe = op.join(getMiindAppsPath(), 'MatrixGenerator', 'MatrixGenerator')
+        
+        print("Calling MatrixGenerator at: " + matrix_generator_exe)
 
         if not fidfile:
             fidfile = MeshTools.generateStubFidFile(basename)

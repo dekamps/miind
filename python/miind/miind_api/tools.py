@@ -40,7 +40,9 @@ def getMiindAppsPath():
     # otherwise, we're in dev mode (build directory)
     if not os.path.isdir(build_path):
         build_path = os.path.join(getMiindBuildPath(), 'apps')
-
+    
+    print("Miind python dir is: " + directories.miind_python_dir())
+    print("getMiindAppsPath called. returning: " + build_path)
     return build_path
 
 def split_fname(fname, ext):

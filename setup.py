@@ -62,7 +62,7 @@ def main():
     # Path regexes with forward slashes relative to CMake install dir.
     
     rearrange_cmake_output_data = {
-        "miind": (["lib/miindsim.pyd"] if platform == "win32" else []) + (["bin\/.+\.dll"] if platform == "win32" else []) +(["lib/miindsim.dylib"] if platform == "darwin" else []) + (["lib/miindsim.so"] if platform not in ["win32","darwin"] else []) + ["share\/miind\/python\/miind\/.+"],
+        "miind": (["lib/miindsim.pyd"] if platform == "win32" else []) + (["bin\/.+\.dll"] if platform == "win32" else []) + (["lib/miindsim.so"] if platform not in ["win32"] else []) + ["share\/miind\/python\/miind\/.+"],
         "miind.miind_api": ["share\/miind\/python\/miind\/miind_api\/.+"],
         "miind.build": [],
         "miind.build.apps.MatrixGenerator": (["bin\/MatrixGenerator.+", "bin\/Bind.+"] if platform == "win32" else []) + (["share\/miind\/apps\/MatrixGenerator\/.+"] if platform != "win32" else []),
