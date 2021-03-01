@@ -9,7 +9,6 @@ if (SKBUILD) # We're building using SKBUILD which means the correct python lib i
 set(Python3_INCLUDE_DIRS ${PYTHON_INCLUDE_DIR} )
 set(PYTHON_LIBRARIES ${PYTHON_LIBRARY})
 set(Python3_LIBRARIES ${PYTHON_LIBRARY})
-message( "OSX Python libraries passed from scikit-build: ${PYTHON_LIBRARY}")
 include_directories(${Python3_INCLUDE_DIRS})
 else (SKBUILD)
 find_package(PythonLibs REQUIRED)
