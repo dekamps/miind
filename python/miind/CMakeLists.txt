@@ -37,7 +37,6 @@ miindTVBlibs.py
 visualize.py
 codegen_lib.py
 run.py
-checkMatrixGenerator.py
 nodes.py
 writemesh.py
 jobs.py
