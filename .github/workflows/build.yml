@@ -31,8 +31,9 @@ jobs:
       CIBW_REPAIR_WHEEL_COMMAND_MACOS: delocate-listdeps -d -a {wheel} && delocate-wheel -w {dest_dir} -v {wheel}
       CIBW_ENVIRONMENT_MACOS: "CC=gcc-6 CXX=g++-6"
       CIBW_BUILD_VERBOSITY: 0
-      CIBW_BEFORE_TEST_MACOS: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja
-      CIBW_TEST_COMMAND: python -m miind.system_tests
+      CIBW_TEST_COMMAND_MACOS: python -m miind.system_tests
+      CIBW_TEST_COMMAND_LINUX: python -m miind.system_tests
+      CIBW_TEST_COMMAND_WINDOWS: python -m miind.checkMatrixGenerator
     steps:
     
       - uses: actions/checkout@v2
