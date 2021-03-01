@@ -84,7 +84,7 @@ install(CODE [[
   
   #The GET_RUNTIME_DEPENDENCIES function has a filtering mechanism which would be better instead of the following filter
   foreach(_file ${_r_deps})
-	if (NOT (${_file} MATCHES "gsl.dll" OR ${_file} MATCHES "vcruntime140.dll" OR ${_file} MATCHES "VCRUNTIME140.dll" OR ${_file} MATCHES "vcruntime140_1.dll" OR ${_file} MATCHES "VCRUNTIME140_1.dll" OR ${_file} MATCHES "msvcp140.dll" OR ${_file} MATCHES "MSVCP140.dll"))
+	if (NOT (${_file} MATCHES "gsl" OR ${_file} MATCHES "vcruntime140.dll" OR ${_file} MATCHES "VCRUNTIME140.dll" OR ${_file} MATCHES "vcruntime140_1.dll" OR ${_file} MATCHES "VCRUNTIME140_1.dll" OR ${_file} MATCHES "msvcp140.dll" OR ${_file} MATCHES "MSVCP140.dll"))
 		continue()
 	endif() 
 	
