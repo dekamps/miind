@@ -65,8 +65,8 @@ def main():
         "miind": (["lib/miindsim.pyd"] if platform == "win32" else []) + (["bin\/.+\.dll"] if platform == "win32" else []) + (["lib/miindsim.so"] if platform not in ["win32"] else []) + ["share\/miind\/python\/miind\/.+"],
         "miind.miind_api": ["share\/miind\/python\/miind\/miind_api\/.+"],
         "miind.build": [],
-        "miind.build.apps.MatrixGenerator": (["bin\/gsl.dll", "bin\/VCRUNTIME140.dll", "bin\/VCRUNTIME140_1.dll", "bin\/MSVCP140.dll"] if platform == "win32" else []) + (["bin\/MatrixGenerator.+", "bin\/Bind.+"] if platform == "win32" else []) + (["share\/miind\/apps\/MatrixGenerator\/.+"] if platform != "win32" else []),
-        "miind.build.apps.Projection": (["bin\/gsl.dll", "bin\/VCRUNTIME140.dll", "bin\/VCRUNTIME140_1.dll", "bin\/MSVCP140.dll"] if platform == "win32" else []) + (["bin\/Projection.+"] if platform == "win32" else []) + (["share\/miind\/apps\/Projection\/.+"] if platform != "win32" else []),
+        "miind.build.apps.MatrixGenerator": (["bin\/gsl.dll", "bin\/vcruntime140.dll", "bin\/vcruntime140_1.dll", "bin\/msvcp140.dll"] if platform == "win32" else []) + (["bin\/MatrixGenerator.+", "bin\/Bind.+"] if platform == "win32" else []) + (["share\/miind\/apps\/MatrixGenerator\/.+"] if platform != "win32" else []),
+        "miind.build.apps.Projection": (["bin\/gsl.dll", "bin\/vcruntime140.dll", "bin\/vcruntime140_1.dll", "bin\/msvcp140.dll"] if platform == "win32" else []) + (["bin\/Projection.+"] if platform == "win32" else []) + (["share\/miind\/apps\/Projection\/.+"] if platform != "win32" else []),
         "miind.build.examples": ["share\/miind\/examples\/.+"],
         "miind.testfiles": ["share\/miind\/python\/miind\/testfiles\/.+"]
     }

@@ -55,10 +55,16 @@ install( TARGETS Bind DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_E
 install( TARGETS MatrixGenerator DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 if (WIN32)
+# Find vcruntime140.dll
+find_path( VCRUNTIMEDIR vcruntime140.dll HINTS $ENV{Path} REQUIRED)
+find_path( VCRUNTIME_1DIR vcruntime140_1.dll HINTS $ENV{Path} REQUIRED)
+find_path( MSVCP140DIR msvcp140.dll HINTS $ENV{Path} REQUIRED)
+message("Found VCRuntimes: ${VCRUNTIMEDIR} ${VCRUNTIME_1DIR} ${MSVCP140DIR} " )
+
 # Now get the boost dlls - more difficult to get these because we only know where the libs are.
 # Let's set up a few directories to search. Also add the location of the glut dll above just
 # in case they're in the same place... cough VCPKG cough
-set(MY_DEPENDENCY_PATHS ${GSL_LIBRARY_DIRS} ${GSL_LIBRARY_DIRS}/../bin/) 
+set(MY_DEPENDENCY_PATHS ${GSL_LIBRARY_DIRS} ${GSL_LIBRARY_DIRS}/../bin/ ${VCRUNTIMEDIR} ${VCRUNTIME_1DIR} ${MSVCP140DIR}) 
 cmake_policy(PUSH)
 cmake_policy(SET CMP0026 OLD)
 GET_TARGET_PROPERTY(OUTPUT_PATH MatrixGenerator LOCATION )
@@ -78,7 +84,7 @@ install(CODE [[
   
   #The GET_RUNTIME_DEPENDENCIES function has a filtering mechanism which would be better instead of the following filter
   foreach(_file ${_r_deps})
-	if (NOT (${_file} MATCHES "gsl.dll" OR ${_file} MATCHES "VCRUNTIME140.dll") OR ${_file} MATCHES "VCRUNTIME140_1.dll" OR ${_file} MATCHES "MSVCP140.dll")
+	if (NOT (${_file} MATCHES "gsl.dll" OR ${_file} MATCHES "vcruntime140.dll" OR ${_file} MATCHES "VCRUNTIME140.dll" OR ${_file} MATCHES "vcruntime140_1.dll" OR ${_file} MATCHES "VCRUNTIME140_1.dll" OR ${_file} MATCHES "msvcp140.dll" OR ${_file} MATCHES "MSVCP140.dll"))
 		continue()
 	endif() 
 	
