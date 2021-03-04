@@ -26,8 +26,8 @@ jobs:
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib scipy shapely descartes
       CIBW_BEFORE_BUILD_LINUX: bash setupCiBuildPython.sh ; yum install -y python36-devel ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel openmpi-devel
-      CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017community -y ; choco install visualstudio2017-workload-nativedesktop ninja -y
-      CIBW_BEFORE_BUILD_MACOS: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja open-mpi
+      CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017community --package-parameters "--installPath C:\msvc17" -y ; choco install visualstudio2017-workload-nativedesktop --package-parameters "--installPath C:\msvc17" -y ; choco install ninja -y
+      CIBW_BEFORE_BUILD_MACOS: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja open-mpi boost-mpi
       CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" #delocate-listdeps -d -a {wheel} && delocate-wheel -w {dest_dir} -v {wheel}
       CIBW_ENVIRONMENT_MACOS: "CC=gcc-6 CXX=g++-6"
       CIBW_BUILD_VERBOSITY: 0

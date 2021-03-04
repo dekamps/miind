@@ -30,7 +30,7 @@ jobs:
         if: contains( matrix.os, 'ubuntu')
         
       - name: MacOS - install dependencies
-        run: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja open-mpi
+        run: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja open-mpi boost-mpi
         if: contains( matrix.os, 'macos')
       
       - name: dir
@@ -49,7 +49,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=OFF -DENABLE_MPI:BOOL=ON'
           buildWithCMake: true
         if: contains( matrix.os, 'macos')
         
@@ -59,7 +59,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=OFF'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=ON -DENABLE_OPENMP:BOOL=ON'
           buildWithCMake: true
         if: contains( matrix.os, 'ubuntu')
         
@@ -80,6 +80,8 @@ jobs:
         if: contains( matrix.os, 'macos')
       - name: Add miind python to PYTHONPATH
         run: echo "PYTHONPATH=${{ env.installDir }}/share/miind/python" >> $GITHUB_ENV
+      - name: Add OMP_NUM_THREADS to ENV
+        run: echo "OMP_NUM_THREADS=1" >> $GITHUB_ENV
       - name: Add miind includes to CPLUS_INCLUDE_PATH
         run: echo "CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind:${{ env.installDir }}/include/miind/GeomLib" >> $GITHUB_ENV
       - name: Add MIIND_INCLUDE_DIR to ENV
