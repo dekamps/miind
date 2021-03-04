@@ -7,7 +7,7 @@ include_directories( ${GSL_INCLUDE_DIRS} )
 set( LIB_TYPE STATIC )
 
 find_package(FFTW REQUIRED)
-include_directories(${FFTW_INCLUDE_DIR})
+include_directories(${FFTW_INCLUDES})
 
 #one below that MPILib is included in the paths they are needed for the camke config files
 INCLUDE_DIRECTORIES(
