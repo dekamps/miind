@@ -59,7 +59,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=OFF -DENABLE_OPENMP:BOOL=ON'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=OFF -DENABLE_MPI:BOOL=ON'
           buildWithCMake: true
         if: contains( matrix.os, 'ubuntu')
         

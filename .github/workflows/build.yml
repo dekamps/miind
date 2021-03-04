@@ -25,10 +25,11 @@ jobs:
       CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64 cp36-macosx_x86_64 cp37-macosx_x86_64 cp38-macosx_x86_64 cp39-macosx_x86_64
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib scipy shapely descartes
-      CIBW_BEFORE_BUILD_LINUX: bash setupCiBuildPython.sh ; yum install -y python36-devel ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel openmpi-devel ; export MPI_C=`which mpicc` ; export MPI_CXX=`which mpicxx`
-      CIBW_BEFORE_BUILD_WINDOWS: choco uninstall visualstudio2017community -y ; choco install visualstudio2017community visualstudio2017-workload-nativedesktop ninja -y
-      CIBW_BEFORE_BUILD_MACOS: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja open-mpi boost-mpi
+      CIBW_BEFORE_BUILD_LINUX: bash setupCiBuildPython.sh ; yum install -y python36-devel ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel openmpi-devel
+      CIBW_BEFORE_BUILD_WINDOWS: choco install visualstudio2017community visualstudio2017-workload-nativedesktop ninja -y
+      CIBW_BEFORE_BUILD_MACOS: brew install gcc6 pugixml boost --with-mpi freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja open-mpi
       CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" #delocate-listdeps -d -a {wheel} && delocate-wheel -w {dest_dir} -v {wheel}
+      CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/usr/lib64/openmpi/bin/"
       CIBW_ENVIRONMENT_MACOS: "CC=gcc-6 CXX=g++-6"
       CIBW_BUILD_VERBOSITY: 0
       CIBW_TEST_COMMAND: python -m miind.system_tests
