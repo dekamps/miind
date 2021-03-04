@@ -4,6 +4,7 @@
   "dependencies": [
 	"boost",
     "fftw3",
+	"openmpi",
 	"gsl",
 	"pugixml",
 	"glew",

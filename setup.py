@@ -87,7 +87,8 @@ def main():
     cmake_args = (
         [
             '-DCMAKE_BUILD_TYPE=Release',
-            '-DENABLE_OPENMP:BOOL=ON'#, VCPkg installs libraries which are too new for manylinux2014 so we have to do it the old fashioned way. sucks.
+            '-DENABLE_OPENMP:BOOL=ON',
+            '-DENABLE_MPI:BOOL=ON'#, VCPkg installs libraries which are too new for manylinux2014 so we have to do it the old fashioned way. sucks.
             #'-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
             #'-DVCPKG_MANIFEST_MODE:BOOL=ON',
             #'-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
@@ -101,6 +102,7 @@ def main():
             [
                 '-DCMAKE_BUILD_TYPE=Release',
                 '-DENABLE_OPENMP:BOOL=ON',
+                '-DENABLE_MPI:BOOL=ON',
                 '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 '-DVCPKG_MANIFEST_MODE:BOOL=ON',
                 '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
@@ -113,7 +115,8 @@ def main():
         cmake_args = (
             [
                 '-DCMAKE_BUILD_TYPE=Release',
-                '-DENABLE_OPENMP:BOOL=OFF'#,
+                '-DENABLE_OPENMP:BOOL=ON',
+                '-DENABLE_MPI:BOOL=ON'#,
                 #'-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 #'-DVCPKG_MANIFEST_MODE:BOOL=ON',
                 #'-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
