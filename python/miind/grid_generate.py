@@ -3,7 +3,6 @@ import miind.codegen3 as codegen
 import sys
 import os
 import os.path as op
-import jobs
 import miind.miind_api as api
 import matplotlib.pyplot as plt
 import miind.directories3 as directories
@@ -223,22 +222,22 @@ def generate(func, timestep, timescale, tolerance, basename, threshold_v, reset_
     # if os.path.exists(filename):
     #     os.remove(filename)
 
-    filename = basename + '.res'
-    if os.path.exists(filename):
-        os.remove(filename)
+    #filename = basename + '.res'
+    #if os.path.exists(filename):
+    #    os.remove(filename)
 
-    filename = basename + '_transform.mesh'
-    if os.path.exists(filename):
-        os.remove(filename)
+    #filename = basename + '_transform.mesh'
+    #if os.path.exists(filename):
+    #    os.remove(filename)
 
-    filename = basename + '_transform.rev'
-    if os.path.exists(filename):
-        os.remove(filename)
+    #filename = basename + '_transform.rev'
+    #if os.path.exists(filename):
+    #    os.remove(filename)
 
-    filename = basename + '_transform.stat'
-    if os.path.exists(filename):
-        os.remove(filename)
+    #filename = basename + '_transform.stat'
+    #if os.path.exists(filename):
+    #    os.remove(filename)
 
-    filename = basename + '_transform.model'
-    if os.path.exists(filename):
-        os.remove(filename)
+    #filename = basename + '_transform.model'
+    #if os.path.exists(filename):
+    #    os.remove(filename)

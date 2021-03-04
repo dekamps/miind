@@ -24,6 +24,7 @@ class MiindIO:
         self.available_settings = {}
         self.c_compiler = None
         self.cxx_compiler = None
+        self.single_shot_command = False # If miindio is being called with just a single command (not using the CLI)
 
     def getMiindPythonPath(self):
         return os.path.join(directories3.miind_python_dir())
@@ -37,7 +38,7 @@ class MiindIO:
             print('')
             print('MIIND UI')
             print('')
-            print('(To self.debug errors, call miindio.py -self.debug for the full python stack trace.)')
+            print('(To debug errors, call miindio.py -debug for the full python stack trace.)')
             print('')
             print('For more information on any command type the command name and a \'?\' [eg. sim?]')
             print('')
@@ -284,7 +285,7 @@ class MiindIO:
                 for (name,_) in current_sim.nodenames:
                     print (str(current_sim.getIndexFromNode(name)) + ' : ' + name)
             if len(command) == 2:
-                current_sim.plotRate(command[1])
+                current_sim.plotRate(command[1], wait_on_show=self.single_shot_command)
 
         if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
             print (name + ' : List the nodes for which a rate plot is available in the current simulation. The current simulation must have been submitted and run.')
@@ -303,7 +304,7 @@ class MiindIO:
                 for (name,_) in current_sim.nodenames:
                     print (str(current_sim.getIndexFromNode(name)) + ' : ' + name)
             if len(command) == 2:
-                current_sim.plotAvgV(command[1])
+                current_sim.plotAvgV(command[1], wait_on_show=self.single_shot_command)
 
         if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
             print (name + ' : List the nodes for which an average membrane potentaial plot is available in the current simulation. The current simulation must have been submitted and run.')
@@ -349,7 +350,7 @@ class MiindIO:
 
                 fig, axis = plt.subplots()
                 current_density.plotDensity(filename, ax=axis)
-                plt.show(block=False)
+                plt.show(block=self.single_shot_command)
             else:
                 print (name + ' expects two parameters.')
                 self.plotDensity(name+'?', current_sim)
@@ -403,7 +404,7 @@ class MiindIO:
                 fig, axis = plt.subplots(1,2)
                 current_marginal.plotV(command[2], axis[0])
                 current_marginal.plotW(command[2], axis[1])
-                plt.show(block=False)
+                plt.show(block=self.single_shot_command)
             elif len(command) == 5:
                 current_marginal = current_sim.getMarginalByNodeName(command[1])
                 current_marginal.vn = int(command[2])
@@ -411,7 +412,7 @@ class MiindIO:
                 fig, axis = plt.subplots(1,2)
                 current_marginal.plotV(command[4], axis[0])
                 current_marginal.plotW(command[4], axis[1])
-                plt.show(block=False)
+                plt.show(block=self.single_shot_command)
             else:
                 print (name + ' expects two or four parameters.')
                 self.plotMarginals(name+'?', current_sim)
@@ -778,10 +779,11 @@ class MiindIO:
 
         if len(sys.argv) > 1 and sys.argv[1] != '-debug':
           command = sys.argv[1:]
+          self.single_shot_command = True
           self.checkCommands(command, current_sim)
         else:
           self.debug = len(sys.argv) > 1 and sys.argv[1] == '-debug'
-
+          self.single_shot_command = False
           try:
               import gnureadline as readline
           except ImportError:
@@ -807,7 +809,7 @@ class MiindIO:
 
                   except BaseException as e:
                       print (e)
-                      print('For a more meaningful error (!), re-run miindio.py with argument -self.debug and call this command to get the full python stack trace.')
+                      print('For a more meaningful error (!), re-run miindio.py with argument -debug and call this command to get the full python stack trace.')
                       continue
 
 if __name__ == "__main__":

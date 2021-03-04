@@ -8,7 +8,6 @@ import copy
 import collections
 import hashlib
 import matplotlib
-matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
 
@@ -46,9 +45,8 @@ class MiindSimulation:
 
         xml_base_fname, _ = op.splitext(self.xml_fname)
         self.submit_name = submit_name or xml_base_fname
-        self.output_directory = op.join(self.xml_location, self.submit_name, xml_base_fname)
         self.miind_executable = xml_base_fname
-
+        self.output_directory = op.join(self.xml_location, self.submit_name, xml_base_fname)
         # grab the names of the model files used and whether we should expect
         # state files with this simulation run
         with open(self.xml_path) as xml_file:
@@ -158,9 +156,9 @@ class MiindSimulation:
         _rates['times'] = []
 
         for i in range(len(self.nodenames)):
-            if not op.exists(self.output_directory + "/rate_" + str(i)):
+            if not op.exists(self.getOutputDirectory() + "/rate_" + str(i)):
                 continue
-            with open(self.output_directory + "/rate_" + str(i)) as rate_file:
+            with open(self.getOutputDirectory() + "/rate_" + str(i)) as rate_file:
                 _rates[i] = []
                 for line in rate_file:
                     tokens = line.split('\t')
@@ -176,9 +174,9 @@ class MiindSimulation:
         _avgs['times'] = []
 
         for i in range(len(self.nodenames)):
-            if not op.exists(self.output_directory + "/avg_v_" + str(i)):
+            if not op.exists(self.getOutputDirectory() + "/avg_v_" + str(i)):
                 continue
-            with open(self.output_directory + "/avg_v_" + str(i)) as rate_file:
+            with open(self.getOutputDirectory() + "/avg_v_" + str(i)) as rate_file:
                 _avgs[i] = []
                 for line in rate_file:
                     tokens = line.split('\t')
@@ -187,6 +185,12 @@ class MiindSimulation:
 
         self._avgs = _avgs
         return _avgs
+
+    def getOutputDirectory(self):
+        if op.exists(self.output_directory):
+            return self.output_directory
+        else: # If there was no output directory in the form of lif/lif.. then hopefully we're using the pip package and it's just the current dir (XML dir).
+            return self.xml_location
 
     def getModelFilenameAndIndexFromNode(self, nodename):
         if nodename.isdigit():
@@ -219,7 +223,7 @@ class MiindSimulation:
                     return index
         return None
 
-    def plotRate(self, node, ax=None, showplot = True):
+    def plotRate(self, node, ax=None, showplot = True, wait_on_show = False):
         node_index = self.getIndexFromNode(node)
         rate_length = min(len(self.rates['times']), len(self.rates[node_index]))
 
@@ -229,14 +233,18 @@ class MiindSimulation:
             if not ax:
                 fig, ax = plt.subplots()
                 plt.title(node)
-
+                plt.xlabel('Time (s)')
+                plt.ylabel('Frequency (Hz)')
                 ax.plot(ts , fs)
-                fig.show()
+                if wait_on_show:
+                    plt.show()
+                else:
+                    fig.show()
             else:
                 ax.plot(ts , fs)
         return ts, fs
 
-    def plotAvgV(self, node, ax=None, showplot = True):
+    def plotAvgV(self, node, ax=None, showplot = True, wait_on_show = False):
         node_index = self.getIndexFromNode(node)
         avgv_length = min(len(self.avgvs['times']), len(self.avgvs[node_index]))
 
@@ -246,9 +254,12 @@ class MiindSimulation:
             if not ax:
                 fig, ax = plt.subplots()
                 plt.title(node)
-
+                
                 ax.plot(ts , fs)
-                fig.show()
+                if wait_on_show:
+                    plt.show()
+                else:
+                    fig.show()
             else:
                 ax.plot(ts , fs)
         return ts, fs

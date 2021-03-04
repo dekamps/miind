@@ -113,7 +113,7 @@ def main():
         cmake_args = (
             [
                 '-DCMAKE_BUILD_TYPE=Release',
-                '-DENABLE_OPENMP:BOOL=ON'#,
+                '-DENABLE_OPENMP:BOOL=OFF'#,
                 #'-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 #'-DVCPKG_MANIFEST_MODE:BOOL=ON',
                 #'-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
