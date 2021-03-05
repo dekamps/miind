@@ -27,11 +27,10 @@ public:
 	std::vector<std::string>& getOrderedOutputNodes() { return _ordered_output_nodes; }
 	unsigned int getIndexOfOutputNode(std::string node) { return find(_ordered_output_nodes.begin(), _ordered_output_nodes.end(), node) - _ordered_output_nodes.begin(); }
 
-protected:
-
 	std::string interpretValueAsString(std::string value);
 	double interpretValueAsDouble(std::string value);
-	int interpretValueAsInt(std::string value);
+
+protected:
 
 	std::map<std::string, std::string> _variables;
 

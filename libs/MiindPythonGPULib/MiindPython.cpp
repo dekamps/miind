@@ -2,42 +2,80 @@
 #include <Python.h>
 #include <MiindLib/SimulationParserGPU.h>
 
-SimulationParserGPU<MPILib::CustomConnectionParameters>* model;
+SimulationParserGPU<MPILib::CustomConnectionParameters>* modelCcp;
+SimulationParserGPU<MPILib::DelayedConnection>* modelDc;
+
+void InitialiseModel(int num_nodes, std::string filename) {
+    pugi::xml_document doc;
+    if (!doc.load_file(filename.c_str())) {
+        std::cout << "Failed to load XML simulation file.\n";
+        return;
+    }
+
+    if (std::string("CustomConnectionParameters") == std::string(doc.child("Simulation").child_value("WeightType"))) {
+        std::cout << "Loading simulation with WeightType: CustomConnectionParameters.\n";
+        modelCcp = new SimulationParserGPU<MPILib::CustomConnectionParameters>(num_nodes, filename);
+        modelCcp->init();
+    }
+    else if (std::string("DelayedConnection") == std::string(doc.child("Simulation").child_value("WeightType"))) {
+        std::cout << "Loading simulation with WeightType: DelayedConnection.\n";
+        modelDc = new SimulationParserGPU<MPILib::DelayedConnection>(num_nodes, filename);
+        modelDc->init();
+    }
+}
+
+void InitialiseModel(std::string filename) {
+    InitialiseModel(1, filename);
+}
 
 PyObject* miind_init(PyObject* self, PyObject* args)
 {
-    if (model) {
-        delete model;
-        model = NULL;
+    if (modelCcp) {
+        delete modelCcp;
+        modelCcp = NULL;
+    }
+
+    if (modelDc) {
+        delete modelDc;
+        modelDc = NULL;
     }
 
     int nodes;
     char* filename;
-	if (PyArg_ParseTuple(args, "s", &filename))
-        model = new SimulationParserGPU<MPILib::CustomConnectionParameters>(std::string(filename));
-    else if (PyArg_ParseTuple(args, "is", &nodes, &filename))
-        model = new SimulationParserGPU<MPILib::CustomConnectionParameters>(nodes, std::string(filename));
+    if (PyArg_ParseTuple(args, "s", &filename)) {
+        InitialiseModel(std::string(filename));
+    }
+    else if (PyArg_ParseTuple(args, "is", &nodes, &filename)) {
+        InitialiseModel(nodes, std::string(filename));
+    }
     else
         return NULL;
-
-    model->init();
 
     Py_RETURN_NONE;
 }
 
 PyObject* miind_getTimeStep(PyObject* self, PyObject* args)
 {
-    return Py_BuildValue("d", model->getTimeStep());
+    if (modelCcp)
+        return Py_BuildValue("d", modelCcp->getTimeStep());
+    if (modelDc)
+        return Py_BuildValue("d", modelDc->getTimeStep());
 }
 
 PyObject* miind_getSimulationLength(PyObject* self, PyObject* args)
 {
-    return Py_BuildValue("d", model->getSimulationLength());
+    if (modelCcp)
+        return Py_BuildValue("d", modelCcp->getSimulationLength());
+    if (modelDc)
+        return Py_BuildValue("d", modelDc->getSimulationLength());
 }
 
 PyObject* miind_startSimulation(PyObject* self, PyObject* args)
 {
-    model->startSimulation();
+    if (modelCcp)
+        modelCcp->startSimulation();
+    else if (modelDc)
+        modelDc->startSimulation();
 
     Py_RETURN_NONE;
 }
@@ -63,7 +101,12 @@ PyObject* miind_evolveSingleStep(PyObject* self, PyObject* args)
         activities[index] = PyFloat_AsDouble(item);
     }
 
-    std::vector<double> out_activities = model->evolveSingleStep(activities);
+    std::vector<double> out_activities;
+
+    if (modelCcp)
+        out_activities = modelCcp->evolveSingleStep(activities);
+    else if (modelDc)
+        out_activities = modelDc->evolveSingleStep(activities);
 
     PyObject* tuple = PyTuple_New(out_activities.size());
 
@@ -76,7 +119,10 @@ PyObject* miind_evolveSingleStep(PyObject* self, PyObject* args)
 
 PyObject* miind_endSimulation(PyObject* self, PyObject* args)
 {
-    model->endSimulation();
+    if (modelCcp)
+        modelCcp->endSimulation();
+    else if (modelDc)
+        modelDc->endSimulation();
 
     Py_RETURN_NONE;
 }
@@ -95,42 +141,22 @@ static PyMethodDef miindsimv_functions[] = {
 };
 
 /*
- * Initialize WinMiindPython. May be called multiple times, so avoid
- * using static state. "oops." - Hugh
+ * Documentation for miindsim.
  */
-int exec_miindsimv(PyObject* module) {
-    PyModule_AddFunctions(module, miindsimv_functions);
-
-    PyModule_AddStringConstant(module, "__author__", "Hugh");
-    PyModule_AddStringConstant(module, "__version__", "1.0.0");
-    PyModule_AddIntConstant(module, "year", 2020);
-
-    return 0; /* success */
-}
-
-/*
- * Documentation for WinMiindPython.
- */
-PyDoc_STRVAR(miindsimv_doc, "The WinMiindPython module");
-
-
-static PyModuleDef_Slot miindsimv_slots[] = {
-    { Py_mod_exec, exec_miindsimv },
-    { 0, NULL }
-};
+PyDoc_STRVAR(miindsimv_doc, "The miindsim vectorised module");
 
 static PyModuleDef miindsimv_def = {
     PyModuleDef_HEAD_INIT,
     "miindsimv",
     miindsimv_doc,
-    0,              /* m_size */
-    NULL,           /* m_methods */
-    miindsimv_slots,
-    NULL,           /* m_traverse */
-    NULL,           /* m_clear */
-    NULL,           /* m_free */
+    -1,
+    miindsimv_functions,
+    NULL,
+    NULL,
+    NULL,
+    NULL
 };
 
 PyMODINIT_FUNC PyInit_miindsimv() {
-    return PyModuleDef_Init(&miindsimv_def);
+    return PyModule_Create(&miindsimv_def);
 }

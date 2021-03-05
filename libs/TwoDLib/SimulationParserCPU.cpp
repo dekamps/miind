@@ -65,21 +65,6 @@ double SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string value
 	return std::stod(_variables[value]);
 }
 
-template<class WeightType >
-int SimulationParserCPU<WeightType>::interpretValueAsInt(std::string value) {
-
-	if (value == "")
-		return 0;
-
-	if (_variables.find(value) == _variables.end()) // If the string isn't in the map, assume it's just a value
-		return std::stoi(value);
-
-	if (_variables[value] == "")
-		std::cout << "Warning: The value of variable " << value << " in xml file is empty and cannot be converted to a number.\n";
-
-	return std::stoi(_variables[value]);
-}
-
 template<class WeightType>
 void SimulationParserCPU<WeightType>::endSimulation() {
 	MPILib::MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::endSimulation();
