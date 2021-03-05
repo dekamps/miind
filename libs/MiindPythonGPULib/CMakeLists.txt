@@ -4,6 +4,13 @@ include_directories( ${GSL_INCLUDE_DIRS} )
 
 set( LIB_TYPE SHARED )
 
+if (WIN32) # When cmake generates the VS files, it needs to know this is a cuda project
+enable_language(CUDA)
+endif (WIN32)
+
+find_package(CUDA  REQUIRED)
+include_directories( ${CUDA_INCLUDE_DIRS} )
+
 find_package (Python3 COMPONENTS Development)
 include_directories(${Python3_INCLUDE_DIRS})
 

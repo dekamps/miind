@@ -126,11 +126,6 @@ add_definitions( -DUSING_APPLE_GLUT=1 ) # this tells TwoDLib/display.cpp to avoi
 endif(GLUT_FOUND AND APPLE)
 ENDIF (WIN32 OR APPLE)
 
-IF(ENABLE_CUDA)
-set(CMAKE_CUDA_ARCHITECTURES "sm_60") #adapt this to the GPU on your system
-ENDIF(ENABLE_CUDA)
-
-
 IF(ENABLE_OPENMP)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")

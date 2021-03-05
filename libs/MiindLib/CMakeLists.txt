@@ -1,6 +1,13 @@
 
 project( ${MIIND_LIBRARY_PREFIX}shared )
 
+if (WIN32) # When cmake generates the VS files, it needs to know this is a cuda project
+enable_language(CUDA)
+endif (WIN32)
+
+find_package(CUDA  REQUIRED)
+include_directories( ${CUDA_INCLUDE_DIRS} )
+
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
@@ -10,7 +17,7 @@ else (WIN32)
 set( LIB_TYPE SHARED )
 endif (WIN32)
 
-include_directories( ${ROOT_INCLUDE_DIRS} )
+include_directories( ${ROOT_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
 
 

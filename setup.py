@@ -88,7 +88,11 @@ def main():
         [
             '-DCMAKE_BUILD_TYPE=Release',
             '-DENABLE_OPENMP:BOOL=ON',
-            '-DENABLE_MPI:BOOL=ON'#, VCPkg installs libraries which are too new for manylinux2014 so we have to do it the old fashioned way. sucks.
+            '-DENABLE_MPI:BOOL=ON',
+            '-DENABLE_TESTING:BOOL=ON',
+            '-DENABLE_CUDA:BOOL=OFF',
+            '-DENABLE_ROOT:BOOL=OFF',
+            '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_52,code=[compute_52,sm_52]'#, VCPkg installs libraries which are too new for manylinux2014 so we have to do it the old fashioned way. sucks.
             #'-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
             #'-DVCPKG_MANIFEST_MODE:BOOL=ON',
             #'-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
@@ -102,10 +106,14 @@ def main():
             [
                 '-DCMAKE_BUILD_TYPE=Release',
                 '-DENABLE_OPENMP:BOOL=ON',
-                '-DENABLE_MPI:BOOL=ON',
+                '-DENABLE_MPI:BOOL=OFF',
+                '-DENABLE_TESTING:BOOL=ON',
+                '-DENABLE_CUDA:BOOL=ON',
+                '-DENABLE_ROOT:BOOL=OFF',
                 '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 '-DVCPKG_MANIFEST_MODE:BOOL=ON',
                 '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
+                '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_52,code=[compute_52,sm_52]',
                 '-DVCPKG_TARGET_TRIPLET=x64-windows',
                 '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/vcpkg/scripts/buildsystems/vcpkg.cmake'
             ]
@@ -115,8 +123,12 @@ def main():
         cmake_args = (
             [
                 '-DCMAKE_BUILD_TYPE=Release',
-                '-DENABLE_OPENMP:BOOL=OFF',
-                '-DENABLE_MPI:BOOL=ON'#,
+                '-DENABLE_OPENMP:BOOL=ON',
+                '-DENABLE_MPI:BOOL=ON',
+                '-DENABLE_TESTING:BOOL=ON',
+                '-DENABLE_CUDA:BOOL=OFF',
+                '-DENABLE_ROOT:BOOL=OFF',
+                '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_52,code=[compute_52,sm_52]'#,
                 #'-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 #'-DVCPKG_MANIFEST_MODE:BOOL=ON',
                 #'-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
