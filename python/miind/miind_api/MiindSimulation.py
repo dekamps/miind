@@ -56,6 +56,10 @@ class MiindSimulation:
                         for m in self.sim.findall('Algorithms/Algorithm')
                         if 'modelfile' in m.attrib]
 
+        self.requires_cuda = len([m.attrib['type']
+                        for m in self.sim.findall('Algorithms/Algorithm')
+                        if 'Group' in m.attrib['type']]) > 0
+
         # Get the names of each Node instance. We know that MIIND indexes each node in order
         # of definition in the xml file and uses that number to index the firing rate results so
         # we can enumerate this list to get the index of each node.

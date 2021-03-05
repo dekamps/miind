@@ -2,9 +2,9 @@
   "name": "miind",
   "version-string": "0.0.11",
   "dependencies": [
+	"cuda",
 	"boost",
     "fftw3",
-	"cuda",
 	"gsl",
 	"pugixml",
 	"glew",
