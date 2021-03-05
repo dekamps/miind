@@ -20,5 +20,9 @@
 
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE UnitMPILib
+#ifndef USING_APPLE_BOOST_TEST
 #include <boost/test/unit_test.hpp>
+#else
+#include <boost/test/included/unit_test.hpp>
+#endif
 
