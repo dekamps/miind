@@ -46,10 +46,6 @@ set ( LIBLIST
     gslcblas
 )
 
-if (APPLE)
-	ADD_DEFINITIONS("-lboost_unit_test_framework" )
-endif (APPLE)
-
 
 #############################################################################
 # executables

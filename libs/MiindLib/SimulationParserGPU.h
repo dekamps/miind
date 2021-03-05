@@ -16,12 +16,15 @@ template <class WeightType>
 class SimulationParserGPU : public SimulationParserCPU<WeightType> {
 public:
 	SimulationParserGPU(int num_nodes, const std::string xml_filename);
-
 	SimulationParserGPU(const std::string xml_filename);
 
 	void endSimulation();
 
-	void addGridConnectionCCP(pugi::xml_node& xml_conn);
+	void addGridConnection(pugi::xml_node& xml_conn);
+
+	void addMeshConnection(pugi::xml_node& xml_conn);
+
+	/*void addGridConnectionCCP(pugi::xml_node& xml_conn);
 
 	void addMeshConnectionCCP(pugi::xml_node& xml_conn);
 
@@ -45,13 +48,14 @@ public:
 
 	std::vector<double> evolveSingleStep(std::vector<double> activity);
 
-	bool simulationComplete();
+	bool simulationComplete();*/
 
 private:
 
 	MiindLib::VectorizedNetwork vec_network;
+	std::map<std::string, std::string> _node_algorithm_types;
 
-	std::vector<TwoDLib::Mesh> _meshes;
+	/*std::vector<TwoDLib::Mesh> _meshes;
 	std::vector<std::vector<TwoDLib::Redistribution>> _reversal_mappings;
 	std::vector<std::vector<TwoDLib::Redistribution>> _reset_mappings;
 	std::vector<TwoDLib::TransitionMatrix> _transition_mats;
@@ -62,7 +66,7 @@ private:
 	std::string _xml_filename;
 
 	std::map<std::string, MPILib::NodeId> _node_ids;
-	std::map<std::string, std::string> _node_algorithm_types;
+	
 	unsigned int _external_node_count;
 
 	unsigned long _count;
@@ -72,7 +76,7 @@ private:
 	std::vector<MPILib::NodeId> _density_nodes;
 	std::vector<MPILib::Time> _density_node_start_times;
 	std::vector<MPILib::Time> _density_node_end_times;
-	std::vector<MPILib::Time> _density_node_intervals;
+	std::vector<MPILib::Time> _density_node_intervals;*/
 
 
 };

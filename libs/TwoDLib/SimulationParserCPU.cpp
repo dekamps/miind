@@ -6,7 +6,7 @@
 template<>
 SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(int num_nodes, const std::string xml_filename) :
 	// For now we don't allow num_nodes : override to 1 node only.
-	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
+	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>(num_nodes, 1.0), _count(0), _xml_filename(xml_filename) {
 }
 
 template<>
@@ -17,7 +17,7 @@ SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(con
 template<>
 SimulationParserCPU<MPILib::DelayedConnection>::SimulationParserCPU(int num_nodes, const std::string xml_filename) :
 	// For now we don't allow num_nodes : override to 1 node only.
-	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
+	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>(num_nodes, 1.0), _count(0), _xml_filename(xml_filename) {
 }
 
 template<>
@@ -28,7 +28,7 @@ SimulationParserCPU<MPILib::DelayedConnection>::SimulationParserCPU(const std::s
 template<>
 SimulationParserCPU<double>::SimulationParserCPU(int num_nodes, const std::string xml_filename) :
 	// For now we don't allow num_nodes : override to 1 node only.
-	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
+	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>(num_nodes, 1.0), _count(0), _xml_filename(xml_filename) {
 }
 
 template<>

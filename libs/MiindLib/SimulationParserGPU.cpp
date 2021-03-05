@@ -1,17 +1,69 @@
 #include "SimulationParserGPU.h"
 #include <TwoDLib\XML.hpp>
 
+template<>
 SimulationParserGPU<MPILib::CustomConnectionParameters>::SimulationParserGPU(int num_nodes, const std::string xml_filename) :
 	// For now we don't allow num_nodes : override to 1 node only.
-	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>(1, 1.0), vec_network(0.001), _count(0), _xml_filename(xml_filename) {
+	SimulationParserCPU(num_nodes, xml_filename), vec_network(0.001) {
 }
 
+template<>
 SimulationParserGPU<MPILib::CustomConnectionParameters>::SimulationParserGPU(const std::string xml_filename) :
-	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>(1, 1.0), vec_network(0.001), _count(0), _xml_filename(xml_filename) {
+	SimulationParserCPU(1, xml_filename), vec_network(0.001) {
 }
 
-void SimulationParserGPU<MPILib::CustomConnectionParameters>::endSimulation() {
-	MPILib::MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::endSimulation();
+template<>
+SimulationParserGPU<MPILib::DelayedConnection>::SimulationParserGPU(int num_nodes, const std::string xml_filename) :
+	// For now we don't allow num_nodes : override to 1 node only.
+	SimulationParserCPU(num_nodes, xml_filename), vec_network(0.001) {
+}
+
+template<>
+SimulationParserGPU<MPILib::DelayedConnection>::SimulationParserGPU(const std::string xml_filename) :
+	SimulationParserCPU(1, xml_filename), vec_network(0.001) {
+}
+
+template<class WeightType>
+void SimulationParserGPU<WeightType>::endSimulation() {
+	SimulationParserCPU::endSimulation();
+}
+
+template<>
+void SimulationParserGPU<MPILib::CustomConnectionParameters>::addConnection(pugi::xml_node& xml_conn) {
+	
+	std::map<std::string, std::string> connection_parameters;
+
+	std::string in = interpretValueAsString(std::string(xml_conn.attribute("In").value()));
+	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
+
+	for (pugi::xml_attribute_iterator ait = xml_conn.attributes_begin(); ait != xml_conn.attributes_end(); ++ait) {
+
+		if ((std::string("In") == std::string(ait->name())) || (std::string("Out") == std::string(ait->name())))
+			continue;
+
+		connection_parameters[std::string(ait->name())] = interpretValueAsString(std::string(ait->value()));
+		// todo : Check the value for a variable definition - need a special function for checking all inputs really
+	}
+
+	vec_network.addGridConnection(_node_ids[in], _node_ids[out], connection_parameters);
+}
+
+template<>
+void SimulationParserGPU<MPILib::DelayedConnection>::addConnection(pugi::xml_node& xml_conn) {
+
+
+	std::string in = interpretValueAsString(std::string(xml_conn.attribute("In").value()));
+	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
+
+	std::string values = std::string(xml_conn.text().as_string());
+	char num_connections[255];
+	char efficacy[255];
+	char delay[255];
+	std::sscanf(values.c_str(), "%s %s %s", num_connections, efficacy, delay);
+
+	MPILib::DelayedConnection connection(interpretValueAsDouble(std::string(num_connections)), interpretValueAsDouble(std::string(efficacy)), interpretValueAsDouble(std::string(delay)));
+
+	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], connection);
 }
 
 void SimulationParserGPU<MPILib::CustomConnectionParameters>::addGridConnectionCCP(pugi::xml_node& xml_conn) {
