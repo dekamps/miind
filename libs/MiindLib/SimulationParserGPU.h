@@ -8,11 +8,12 @@
 #include <MPILib/include/CustomConnectionParameters.hpp>
 #include <CudaTwoDLib/CudaTwoDLib.hpp>
 #include <MiindLib/VectorizedNetwork.hpp>
+#include <TwoDLib/SimulationParserCPU.h>
 
 typedef CudaTwoDLib::fptype fptype;
 
 template <class WeightType>
-class SimulationParserGPU : public MPILib::MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution> {
+class SimulationParserGPU : public SimulationParserCPU<WeightType> {
 public:
 	SimulationParserGPU(int num_nodes, const std::string xml_filename);
 
@@ -39,6 +40,8 @@ public:
 	void startSimulation();
 
 	void init();
+
+	double getCurrentSimTime();
 
 	std::vector<double> evolveSingleStep(std::vector<double> activity);
 

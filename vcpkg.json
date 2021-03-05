@@ -3,9 +3,7 @@
   "version-string": "0.0.11",
   "dependencies": [
 	"boost",
-	"boost-mpi",
     "fftw3",
-	"mpi",
 	"cuda",
 	"gsl",
 	"pugixml",
