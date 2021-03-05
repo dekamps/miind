@@ -30,7 +30,7 @@ jobs:
         if: contains( matrix.os, 'ubuntu')
         
       - name: MacOS - install dependencies
-        run: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja open-mpi boost-mpi
+        run: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja open-mpi
         if: contains( matrix.os, 'macos')
       
       - name: dir
