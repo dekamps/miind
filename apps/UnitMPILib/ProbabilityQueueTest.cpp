@@ -18,12 +18,10 @@
 //      If you use this software in work leading to a scientific publication, you should include a reference there to
 //      the 'currently valid reference', which can be found at http://miind.sourceforge.net
 
-#define BOOST_TEST_DYN_LINK
 #ifndef USING_APPLE_BOOST_TEST
-#include <boost/test/unit_test.hpp>
-#else
-#include <boost/test/included/unit_test.hpp>
+#define BOOST_TEST_DYN_LINK
 #endif
+#include <boost/test/unit_test.hpp>
 #include <boost/test/execution_monitor.hpp>
 #include <MPILib/include/ProbabilityQueue.hpp>
 #include <MPILib/include/utilities/Exception.hpp>
