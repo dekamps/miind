@@ -144,10 +144,9 @@ ENDIF(ENABLE_MPI)
 IF(ENABLE_MPI)
 	# On mac, if boost-mpi is installed, without manually being told where boost is,
 	# cmake can't find it. 
-	if (APPLE AND SKBUILD)
+	if (APPLE)
 	set(Boost_NO_BOOST_CMAKE ON)
-	message ("Set Boost_NO_BOOST_CMAKE on MAC SKBUILD.")
-	endif (APPLE AND SKBUILD)
+	endif (APPLE)
 	find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer system REQUIRED)
 ELSE(ENABLE_MPI)
 	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer system REQUIRED)
