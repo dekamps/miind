@@ -295,7 +295,7 @@ bool SimulationParserGPU<WeightType>::addRateFunctorNode(pugi::xml_document& doc
 template<class WeightType>
 void SimulationParserGPU<WeightType>::parseXmlFile() {
 	pugi::xml_document doc;
-	if (!doc.load_file(_xml_filename.c_str()))
+	if (!doc.load_file(SimulationParserCPU<WeightType>::_xml_filename.c_str()))
 		std::cout << "Failed to load XML simulation file.\n";
 
 	//check Weight Type matches this class
@@ -324,7 +324,7 @@ void SimulationParserGPU<WeightType>::parseXmlFile() {
 		std::string algorithm_name = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(node.attribute("algorithm").value()));
 
 		pugi::xml_document check_doc;
-		check_doc.load_file(_xml_filename.c_str());
+		check_doc.load_file(SimulationParserCPU<WeightType>::_xml_filename.c_str());
 
 		_node_algorithm_mapping[node_name] = algorithm_name;
 
@@ -373,10 +373,10 @@ void SimulationParserGPU<WeightType>::parseXmlFile() {
 		double t_end = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(conn.attribute("t_end").value()));
 		double t_interval = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
 
-		_density_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
-		_density_node_start_times.push_back(t_start);
-		_density_node_end_times.push_back(t_end);
-		_density_node_intervals.push_back(t_interval);
+		SimulationParserCPU<WeightType>::_density_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
+		SimulationParserCPU<WeightType>::_density_node_start_times.push_back(t_start);
+		SimulationParserCPU<WeightType>::_density_node_end_times.push_back(t_end);
+		SimulationParserCPU<WeightType>::_density_node_intervals.push_back(t_interval);
 	}
 
 	//Reporting Rates
@@ -384,15 +384,15 @@ void SimulationParserGPU<WeightType>::parseXmlFile() {
 		std::string node = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(conn.attribute("node").value()));
 		double t_interval = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
 
-		_rate_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
-		_rate_node_intervals.push_back(t_interval);
+		SimulationParserCPU<WeightType>::_rate_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
+		SimulationParserCPU<WeightType>::_rate_node_intervals.push_back(t_interval);
 	}
 
 	//Reporting Display
 	for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Display"); conn; conn = conn.next_sibling("Display")) {
 		std::string node = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(conn.attribute("node").value()));
 
-		_display_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
+		SimulationParserCPU<WeightType>::_display_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
 	}
 
 
@@ -417,7 +417,7 @@ void SimulationParserGPU<WeightType>::parseXmlFile() {
 template<class WeightType>
 void SimulationParserGPU<WeightType>::startSimulation() {
 	vec_network.setupLoop(true);
-	pb = new MPILib::utilities::ProgressBar((int)(SimulationParserCPU<WeightType>::_simulation_length / SimulationParserCPU<WeightType>::_time_step));
+	SimulationParserCPU<WeightType>::pb = new MPILib::utilities::ProgressBar((int)(SimulationParserCPU<WeightType>::_simulation_length / SimulationParserCPU<WeightType>::_time_step));
 }
 
 template<class WeightType>
