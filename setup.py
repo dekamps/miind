@@ -62,7 +62,7 @@ def main():
     # Path regexes with forward slashes relative to CMake install dir.
     
     rearrange_cmake_output_data = {
-        "miind": (["lib/miindsim.pyd","lib/miindsimv.pyd"] if platform == "win32" else []) + (["bin\/.+\.dll"] if platform == "win32" else []) + (["lib/miindsim.so"] if platform not in ["win32"] else []) + ["share\/miind\/python\/miind\/.+"],
+        "miind": (["lib/miindsim.pyd","lib/miindsimv.pyd"] if platform == "win32" else []) + (["bin\/.+\.dll"] if platform == "win32" else []) + (["lib/miindsim.so","lib/miindsimv.so"] if platform not in ["win32"] else []) + ["share\/miind\/python\/miind\/.+"],
         "miind.miind_api": ["share\/miind\/python\/miind\/miind_api\/.+"],
         "miind.build": [],
         "miind.build.apps.MatrixGenerator": (["bin\/gsl.dll", "bin\/gslcblas.dll", "bin\/vcruntime140.dll", "bin\/vcruntime140_1.dll", "bin\/msvcp140.dll"] if platform == "win32" else []) + (["bin\/MatrixGenerator.+", "bin\/Bind.+"] if platform == "win32" else []) + (["share\/miind\/apps\/MatrixGenerator\/.+"] if platform != "win32" else []),
@@ -90,7 +90,7 @@ def main():
             '-DENABLE_OPENMP:BOOL=ON',
             '-DENABLE_MPI:BOOL=OFF',
             '-DENABLE_TESTING:BOOL=ON',
-            '-DENABLE_CUDA:BOOL=OFF',
+            '-DENABLE_CUDA:BOOL=ON',
             '-DENABLE_ROOT:BOOL=OFF',
             '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_52,code=[compute_52,sm_52]'#, VCPkg installs libraries which are too new for manylinux2014 so we have to do it the old fashioned way. sucks.
             #'-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
