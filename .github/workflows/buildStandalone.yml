@@ -26,9 +26,24 @@ jobs:
       
       - name: Ubuntu - install dependencies
         run: |
-          sudo apt-get install ninja-build libboost-all-dev libpugixml-dev fftw3-dev freeglut3-dev libgsl0-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev cuda
+          sudo apt-get install ninja-build libboost-all-dev libpugixml-dev fftw3-dev freeglut3-dev libgsl0-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev
+          add-apt-repository ppa:graphics-drivers
+          apt-key adv --fetch-keys  http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
+          bash -c 'echo "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64 /" > /etc/apt/sources.list.d/cuda.list'
+          bash -c 'echo "deb http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64 /" > /etc/apt/sources.list.d/cuda_learn.list'
+          apt update
+          apt install cuda-10-1
+          apt install libcudnn7
         if: contains( matrix.os, 'ubuntu')
-        
+
+      - name: Add cuda to path
+        run: echo '/usr/local/cuda-10.1/bin' >> $GITHUB_PATH
+        if: contains( matrix.os, 'ubuntu')
+
+      - name: Add cuda to ld
+        run: echo "LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64" >> $GITHUB_ENV
+        if: contains( matrix.os, 'ubuntu')
+
       - name: MacOS - install dependencies
         run: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja
         if: contains( matrix.os, 'macos')
