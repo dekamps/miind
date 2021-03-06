@@ -1,5 +1,5 @@
 #include "SimulationParserGPU.h"
-#include <TwoDLib\XML.hpp>
+#include <TwoDLib/XML.hpp>
 
 template<>
 SimulationParserGPU<MPILib::CustomConnectionParameters>::SimulationParserGPU(int num_nodes, const std::string xml_filename) :
