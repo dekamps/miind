@@ -112,7 +112,7 @@ def main():
                 '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 '-DVCPKG_MANIFEST_MODE:BOOL=ON',
                 '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
-                '-DCMAKE_CUDA_FLAGS=--ccbin="C:\\\"Program Files (x86)\"\\\"Microsoft Visual Studio\"\\2019\\Enterprise\\VC\\Tools\\MSVC\\14.28.29333\\bin\\Hostx64\\x64" --generate-code=arch=compute_52,code=[compute_52,sm_52]',
+                '-DCMAKE_CUDA_FLAGS=-ccbin="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Tools\\MSVC\\14.28.29333\\bin\\Hostx64\\x64" --generate-code=arch=compute_52,code=[compute_52,sm_52]',
                 '-DVCPKG_TARGET_TRIPLET=x64-windows',
                 '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/vcpkg/scripts/buildsystems/vcpkg.cmake'
             ]
