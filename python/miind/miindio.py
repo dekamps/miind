@@ -673,19 +673,8 @@ class MiindIO:
         self.lost(command)
 
         return current_sim
-        
-    def main(self):
-        self.available_settings['mpi_enabled'] = False
-        self.available_settings['openmp_enabled'] = False
-        self.available_settings['root_enabled'] = False
-        self.available_settings['cuda_enabled'] = False
 
-        self.settings['root_enabled'] = False
-        self.settings['cuda_enabled'] = False
-
-        self.cwd_settings['sim'] = 'NOT_SET'
-        self.cwd_settings['sim_project'] = 'NOT_SET'
-
+    def loadMiindSettings(self):
         if op.exists(self.available_settingsfilename):
           # Read available settings from MIIND installation.
           with open(self.available_settingsfilename, 'r') as settingsfile:
@@ -743,6 +732,20 @@ class MiindIO:
                   for line in settingsfile:
                       tokens = line.split('=')
                       settings[tokens[0].strip()] = (tokens[1].strip() == 'ON')
+        
+    def main(self):
+        self.available_settings['mpi_enabled'] = False
+        self.available_settings['openmp_enabled'] = False
+        self.available_settings['root_enabled'] = False
+        self.available_settings['cuda_enabled'] = False
+
+        self.settings['root_enabled'] = False
+        self.settings['cuda_enabled'] = False
+
+        self.cwd_settings['sim'] = 'NOT_SET'
+        self.cwd_settings['sim_project'] = 'NOT_SET'
+
+        self.loadMiindSettings()
 
         if not op.exists(self.cwdfilename):
           with open(self.cwdfilename, 'w') as cwdsettingsfile:

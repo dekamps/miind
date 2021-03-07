@@ -7,8 +7,12 @@ import matplotlib.pyplot as plt
 import subprocess
 import os
 import shutil
+from miind.miindio impost MiindIO
 
-test_gpu = False
+m = MiindIO()
+m.loadMiindSettings()
+
+test_gpu = m.available_settings['cuda_enabled']
 hide_all_output = False
 lif_steady_lower_bound = 0.34
 lif_steady_upper_bound = 0.36
