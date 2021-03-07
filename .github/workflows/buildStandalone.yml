@@ -45,7 +45,7 @@ jobs:
         if: contains( matrix.os, 'ubuntu')
 
       - name: MacOS - install dependencies
-        run: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja & brew tap homebrew/cask-drivers & brew install --cask nvidia-cuda 
+        run: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja
         if: contains( matrix.os, 'macos')
       
       - name: dir
@@ -64,7 +64,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=OFF -DENABLE_MPI:BOOL=OFF -DENABLE_CUDA:BOOL=ON'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=OFF -DENABLE_MPI:BOOL=OFF -DENABLE_CUDA:BOOL=OFF'
           buildWithCMake: true
         if: contains( matrix.os, 'macos')
         
@@ -122,6 +122,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install numpy matplotlib==3.2 scipy shapely descartes
+        shell: bash
+
+      - name: Check MatrixGenerator works
+        run: ${{ env.installDir }}/share/miind/apps/MatrixGenerator/MatrixGenerator
         shell: bash
         
       - name: Run Integration Tests
