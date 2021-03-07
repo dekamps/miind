@@ -9,12 +9,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04] #macos-10.15
+        os: [ubuntu-18.04, macos-10.15] #
         include:
           - os: ubuntu-18.04
             installDir: /usr/local
-          #- os: macos-10.15
-          #  installDir: /usr/local
+          - os: macos-10.15
+            installDir: /usr/local
             
     env:
       buildDir: '${{ github.workspace }}/build'
@@ -127,15 +127,16 @@ jobs:
       - name: Check MatrixGenerator works
         run: ${{ env.installDir }}/share/miind/apps/MatrixGenerator/MatrixGenerator
         shell: bash
-        
-      - name: Run Integration Tests
-        env:
-          CC: gcc-6
-          CXX: g++-6
-        working-directory: ${{ github.workspace }}/examples/IntegrationTests 
-        run: python system_tests.py
-        shell: bash
-        if: contains( matrix.os, 'macos')
+       
+      # TESTS DON'T WORK ON MAC! AT LEAST WE CAN CHECK IT BUILDS THOUGH
+      #- name: Run Integration Tests
+      #  env:
+      #    CC: gcc-6
+      #    CXX: g++-6
+      #  working-directory: ${{ github.workspace }}/examples/IntegrationTests 
+      #  run: python system_tests.py
+      #  shell: bash
+      #  if: contains( matrix.os, 'macos')
         
       - name: Run Integration Tests
         working-directory: ${{ github.workspace }}/examples/IntegrationTests 
