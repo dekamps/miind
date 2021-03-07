@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, windows-2019] #macos-10.15 
+        os: [ubuntu-18.04, windows-2019, macos-10.15]  
         include:
           - os: windows-2019
             triplet: x64-windows
@@ -16,9 +16,9 @@ jobs:
           - os: ubuntu-18.04
             triplet: x64-linux-mixed
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
-          #- os: macos-10.15
-          #  triplet: x64-osx-mixed
-          #  vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
+          - os: macos-10.15
+            triplet: x64-osx-mixed
+            vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
             
     env:
       buildDir: '${{ github.workspace }}/build'
@@ -26,14 +26,17 @@ jobs:
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib scipy shapely descartes
       CIBW_BEFORE_BUILD_LINUX: bash setupCiBuildPython.sh ; yum install -y python36-devel ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel ; yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm ; yum-config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo ; yum clean expire-cache ; yum install nvidia-driver-latest-dkms cuda cuda-drivers
-      CIBW_BEFORE_BUILD_WINDOWS: choco install cuda ninja -y & dir "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.28.29333/bin/Hostx64/x64" dir "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/" & C:/"Program Files (x86)"/"Microsoft Visual Studio"/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+      CIBW_BEFORE_BUILD_WINDOWS: choco install cuda ninja -y & C:/"Program Files (x86)"/"Microsoft Visual Studio"/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
       CIBW_BEFORE_BUILD_MACOS: brew install gcc6 pugixml freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja boost
       CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" #delocate-listdeps -d -a {wheel} && delocate-wheel -w {dest_dir} -v {wheel}
       CIBW_ENVIRONMENT_MACOS: "PATH=$PATH:/Developer/NVIDIA/CUDA-11.2/bin DYLD_LIBRARY_PATH=/Developer/NVIDIA/CUDA-11.2/lib CC=gcc-6 CXX=g++-6"
       CIBW_ENVIRONMENT_WINDOWS: "PATH=$PATH:\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin\":\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/libnvvp\":\"C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.28.29333/bin/Hostx64/x64\":\"C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.25.28610/bin/Hostx64/x64\":\"C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.16.27023/bin/Hostx64/x64\" CUDA_PATH=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2\" CUDACXX=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin/nvcc.exe\""
       CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/usr/lib64/openmpi/bin/ LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:/usr/lib64/nvidia:$LD_LIBRARY_PATH"
       CIBW_BUILD_VERBOSITY: 0
-      CIBW_TEST_COMMAND: python -m miind.system_tests
+      CIBW_TEST_COMMAND_LINUX: python -m miind.system_tests
+      CIBW_TEST_COMMAND_WINDOWS: python -m miind.system_tests
+      #TESTS DON'T WORK ON MAC CI MACHINE! LET'S STILL BUILD AND DISTRIBUTE IT FOR NOW
+      #CIBW_TEST_COMMAND_MACOS: python -m miind.system_tests
     steps:
     
       - uses: actions/checkout@v2
@@ -59,8 +62,6 @@ jobs:
         run: |
           python -m pip install numpy matplotlib==3.2 scipy descartes shapely twine cibuildwheel==1.8.0
         
-      #- name: Build sdist wheel
-      #  run: python setup.py sdist
 
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
