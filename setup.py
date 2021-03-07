@@ -126,7 +126,7 @@ def main():
                 '-DENABLE_OPENMP:BOOL=ON',
                 '-DENABLE_MPI:BOOL=OFF',
                 '-DENABLE_TESTING:BOOL=ON',
-                '-DENABLE_CUDA:BOOL=OFF',
+                '-DENABLE_CUDA:BOOL=ON',
                 '-DENABLE_ROOT:BOOL=OFF',
                 '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_52,code=[compute_52,sm_52]'#,
                 #'-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
