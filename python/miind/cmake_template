@@ -218,7 +218,7 @@ ENDIF(ENABLE_OPENMP)
 
 
 if (UNIX)
-   ADD_DEFINITIONS("-fno-strict-aliasing" )
+   ADD_DEFINITIONS("-fno-strict-aliasing -Wno-pedantic )" )
 endif (UNIX)
 set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}geom
