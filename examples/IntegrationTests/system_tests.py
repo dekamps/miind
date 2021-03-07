@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import subprocess
 import os
 import shutil
-from miind.miindio impost MiindIO
+from miind.miindio import MiindIO
 
 m = MiindIO()
 m.loadMiindSettings()
