@@ -29,7 +29,7 @@ jobs:
       CIBW_BEFORE_BUILD_LINUX: bash setupCiBuildPython.sh ; yum install -y ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel ; yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm ; yum-config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo ; yum clean expire-cache ; yum install nvidia-driver-latest-dkms cuda cuda-drivers
       CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" #delocate-listdeps -d -a {wheel} && delocate-wheel -w {dest_dir} -v {wheel}
       CIBW_ENVIRONMENT_WINDOWS: "PATH=$PATH:\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin\":\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/libnvvp\" CUDA_PATH=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2\" CUDACXX=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin/nvcc.exe\""
-      CIBW_ENVIRONMENT_MACOS: "PATH=$PATH:/Developer/NVIDIA/CUDA-11.2/bin DYLD_LIBRARY_PATH=/Developer/NVIDIA/CUDA-11.2/lib"
+      CIBW_ENVIRONMENT_MACOS: "PATH=$PATH:/Developer/NVIDIA/CUDA-11.2/bin DYLD_LIBRARY_PATH=/Developer/NVIDIA/CUDA-11.2/lib CC=gcc-6 CXX=g++-6"
       CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/usr/lib64/openmpi/bin/ LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:/usr/lib64/nvidia:$LD_LIBRARY_PATH"
       CIBW_BUILD_VERBOSITY: 0
       CIBW_TEST_COMMAND_LINUX: python -m miind.system_tests
@@ -56,7 +56,7 @@ jobs:
         if: contains( matrix.os, 'windows')
         
       - name: Add msbuild to PATH
-        uses: ilammy/msvc-dev-cmd@v1.3.0
+        uses: microsoft/setup-msbuild@v1.0.2
         if: contains( matrix.os, 'windows')
                   
       - name: Install Dependencies on Windows
