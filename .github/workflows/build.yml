@@ -37,7 +37,7 @@ jobs:
       CIBW_TEST_COMMAND_LINUX: python -m miind.system_tests
       CIBW_TEST_COMMAND_WINDOWS: python -m miind.system_tests
       #TESTS DON'T WORK ON MAC CI MACHINE! LET'S STILL BUILD AND DISTRIBUTE IT FOR NOW
-      CIBW_TEST_COMMAND_MACOS: python -m miind.system_tests
+      #CIBW_TEST_COMMAND_MACOS: python -m miind.system_tests
     steps:
     
       - uses: actions/checkout@v2
@@ -58,7 +58,7 @@ jobs:
         if: contains( matrix.os, 'windows')
         
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: ilammy/msvc-dev-cmd
         if: contains( matrix.os, 'windows')
                   
       - name: Install Dependencies on Windows
