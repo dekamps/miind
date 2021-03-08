@@ -9,6 +9,9 @@ then
 fi
 
 parsedVersion=$(echo "${version//./}")
+
+echo "Found Python Version: $parsedVersion"
+
 if [[ "$parsedVersion" -gt "380" && "$parsedVersion" -lt "390" ]]
 then 
     yum install gcc openssl-devel bzip2-devel libffi-devel -y
