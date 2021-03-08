@@ -58,7 +58,7 @@ jobs:
         if: contains( matrix.os, 'windows')
         
       - name: Add msbuild to PATH
-        uses: ilammy/msvc-dev-cmd
+        uses: ilammy/msvc-dev-cmd@v1
         if: contains( matrix.os, 'windows')
                   
       - name: Install Dependencies on Windows
