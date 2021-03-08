@@ -77,9 +77,6 @@ jobs:
           python -m pip install numpy matplotlib==3.2 scipy descartes shapely twine cibuildwheel==1.8.0
         
       - name: Build wheels on Windows
-        env:
-          CC: cl
-          CXX: cl
         run: python -m cibuildwheel --output-dir wheelhouse
         if: contains( matrix.os, 'windows')
         
