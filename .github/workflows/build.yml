@@ -66,7 +66,7 @@ jobs:
         if: contains( matrix.os, 'windows')
         
       - name: Install Dependencies on MacOS
-        run: brew install gcc6 xquartz fftw libomp pkg-config ninja
+        run: brew install gcc6 pugixml boost gsl boost-python3 xquartz fftw libomp pkg-config ninja
         if: contains( matrix.os, 'macos')
         
       - name: Set up Python
