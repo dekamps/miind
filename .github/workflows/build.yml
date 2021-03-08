@@ -56,7 +56,8 @@ jobs:
         if: contains( matrix.os, 'windows')
         
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.0.1
+        uses: ilammy/msvc-dev-cmd@v1.3.0
+        if: contains( matrix.os, 'windows')
                   
       - name: Install Dependencies on Windows
         run: choco install cuda ninja -y
