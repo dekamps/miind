@@ -27,9 +27,8 @@ jobs:
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib scipy shapely descartes
       # Linux builds are on docker images so we need to add the dependency installation setup here so they go to the docker not the host.
       CIBW_BEFORE_BUILD_LINUX: bash setupCiBuildPython.sh ; yum install -y ninja-build boost-devel pugixml-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel ; yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm ; yum-config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo ; yum clean expire-cache ; yum install nvidia-driver-latest-dkms cuda cuda-drivers
-      CIBW_BEFORE_BUILD_WINDOWS: C:/"Program Files (x86)"/"Microsoft Visual Studio"/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat
       CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" #delocate-listdeps -d -a {wheel} && delocate-wheel -w {dest_dir} -v {wheel}
-      CIBW_ENVIRONMENT_WINDOWS: "CC=cl CXX=cl PATH=$PATH:\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin\":\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/libnvvp\" CUDA_PATH=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2\" CUDACXX=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin/nvcc.exe\""
+      CIBW_ENVIRONMENT_WINDOWS: "PATH=$PATH:\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin\":\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/libnvvp\" CUDA_PATH=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2\" CUDACXX=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin/nvcc.exe\""
       CIBW_ENVIRONMENT_MACOS: "PATH=$PATH:/Developer/NVIDIA/CUDA-11.2/bin DYLD_LIBRARY_PATH=/Developer/NVIDIA/CUDA-11.2/lib CC=gcc-6 CXX=g++-6"
       CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/usr/lib64/openmpi/bin/ LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:/usr/lib64/nvidia:$LD_LIBRARY_PATH"
       CIBW_BUILD_VERBOSITY: 0
@@ -51,6 +50,10 @@ jobs:
             cp custom-triplets/*.cmake vcpkg/triplets
         shell: bash
         if: contains( matrix.os, 'windows') || contains( matrix.os, 'macos')
+        
+      - name: Setup Visual Studio ENV VARS
+        run: C:/"Program Files (x86)"/"Microsoft Visual Studio"/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat
+        if: contains( matrix.os, 'windows')
           
       - name: Install Dependencies on Windows
         run: choco install cuda ninja -y
@@ -70,7 +73,15 @@ jobs:
           python -m pip install numpy matplotlib==3.2 scipy descartes shapely twine cibuildwheel==1.8.0
         
       - name: Build wheels
+        env:
+          CC: "cl.exe"
+          CXX: "cl.exe"
         run: python -m cibuildwheel --output-dir wheelhouse
+        if: contains( matrix.os, 'windows')
+        
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+        if: contains( matrix.os, 'ubuntu') || contains( matrix.os, 'macos')
             
       - uses: actions/upload-artifact@v2
         with:
