@@ -55,8 +55,8 @@ jobs:
       - name: Configure Windows
         shell: cmake -P {0}
         run: |
-          set(ENV{CC} ${{ cl }})
-          set(ENV{CXX} ${{ cl }})
+          set(ENV{CC} cl)
+          set(ENV{CXX} cl)
 
           if (NOT result EQUAL 0)
             message(FATAL_ERROR "Bad exit status")
