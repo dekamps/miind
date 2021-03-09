@@ -83,6 +83,8 @@ def main():
     shutil.copy2(src_osx, dst)
     #shutil.copy2(src_windows, dst)
     
+    # vcpkg builds libraries which are too new for manylinux2014 so
+    # is disabled for Linux
     cmake_args = (
         [
             '-DCMAKE_BUILD_TYPE=Release',
@@ -112,12 +114,13 @@ def main():
                 '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 '-DVCPKG_MANIFEST_MODE:BOOL=ON',
                 '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
-                '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_52,code=[compute_52,sm_52]',
+                '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_30,code=[compute_30,sm_30]',
                 '-DVCPKG_TARGET_TRIPLET=x64-windows',
                 '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/vcpkg/scripts/buildsystems/vcpkg.cmake'
             ]
         )
-        
+    
+    # Building python-3 in vcpkg on macos seems broken. It is exluded for now.
     if platform == "darwin":
         cmake_args = (
             [
@@ -153,7 +156,6 @@ def main():
         name=package_name,
         version=package_version,
         url="https://github.com/dekamps/miind",
-        license="MIT",
         description="MIIND",
         long_description=long_description,
         long_description_content_type="text/markdown",
@@ -175,7 +177,6 @@ def main():
             "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
-            "License :: OSI Approved :: MIT License",
             "Operating System :: MacOS",
             "Operating System :: Unix",
             "Operating System :: Microsoft :: Windows",

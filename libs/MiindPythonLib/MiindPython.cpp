@@ -15,7 +15,24 @@ SimulationParserCPU<MPILib::CustomConnectionParameters>* modelCcp;
 SimulationParserCPU<MPILib::DelayedConnection>* modelDc;
 SimulationParserCPU<double>* modelDouble;
 
-void InitialiseModel(int num_nodes, std::string filename) {
+std::map<std::string, std::string> getVariablesFromFile(std::string filename) {
+    std::map<std::string, std::string> dict;
+
+    pugi::xml_document doc;
+    if (!doc.load_file(filename.c_str())) {
+        std::cout << "Failed to load XML simulation file.\n";
+        return dict;
+    }
+    
+
+    for (pugi::xml_node var = doc.child("Simulation").child("Variable"); var; var = var.next_sibling("Variable")) {
+        dict[std::string(var.attribute("Name").value())] = std::string(var.text().as_string());
+    }
+
+    return dict;
+}
+
+void InitialiseModel(int num_nodes, std::string filename, std::map<std::string,std::string> variables) {
     pugi::xml_document doc;
     if (!doc.load_file(filename.c_str())) {
         std::cout << "Failed to load XML simulation file.\n";
@@ -24,26 +41,93 @@ void InitialiseModel(int num_nodes, std::string filename) {
 
     if (std::string("CustomConnectionParameters") == std::string(doc.child("Simulation").child_value("WeightType"))) {
         std::cout << "Loading simulation with WeightType: CustomConnectionParameters.\n";
-        modelCcp = new SimulationParserCPU<MPILib::CustomConnectionParameters>(num_nodes, filename);
+        modelCcp = new SimulationParserCPU<MPILib::CustomConnectionParameters>(num_nodes, filename, variables);
         modelCcp->init();
     }
     else if (std::string("DelayedConnection") == std::string(doc.child("Simulation").child_value("WeightType"))) {
         std::cout << "Loading simulation with WeightType: DelayedConnection.\n";
-        modelDc = new SimulationParserCPU<MPILib::DelayedConnection>(num_nodes, filename);
+        modelDc = new SimulationParserCPU<MPILib::DelayedConnection>(num_nodes, filename, variables);
         modelDc->init();
     }
     else if (std::string("double") == std::string(doc.child("Simulation").child_value("WeightType"))) {
         std::cout << "Loading simulation with WeightType: double.\n";
-        modelDouble = new SimulationParserCPU<double>(num_nodes, filename);
+        modelDouble = new SimulationParserCPU<double>(num_nodes, filename, variables);
         modelDouble->init();
     }
 }
 
-void InitialiseModel(std::string filename) {
-    InitialiseModel(1, filename);
+void InitialiseModel(std::string filename, std::map<std::string, std::string> variables) {
+    InitialiseModel(1, filename, variables);
 }
 
-PyObject* miind_init(PyObject* self, PyObject* args)
+std::map<std::string, std::string> ParseArguments(int& num_nodes, PyObject* args, PyObject* kwargs) {
+    /* Get arbitrary number of strings from Py_Tuple */
+    std::map<std::string, std::string> str_list;
+    Py_ssize_t i = 0;
+    PyObject *temp_p, *temp_p2;
+
+    // First parameter is either an int to give the number of nodes...
+    temp_p = PyTuple_GetItem(args, i);
+    if (temp_p == NULL) { return str_list; }
+    if (PyNumber_Check(temp_p) == 1) {
+        /* Convert number to python long then C int*/
+        temp_p2 = PyNumber_Long(temp_p);
+        num_nodes = (int)PyLong_AsUnsignedLong(temp_p2);
+        Py_DECREF(temp_p2);
+        i++;
+    }
+
+    // ... or it's the xml filename
+    temp_p = PyTuple_GetItem(args, i);
+    if (temp_p == NULL) { return str_list; }
+    if (PyUnicode_Check(temp_p) == 1) {
+        PyObject* repr = PyObject_Repr(temp_p);
+        PyObject* str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
+        const char* bytes = PyBytes_AS_STRING(str);
+        std::string passed = std::string(bytes);
+        // Bit of a weird key so nobody ends up creating a variable with the same name
+        str_list[std::string("_1927482_MIIND_SIMULATION_FILENAME")] = passed.substr(1, passed.size() - 2);
+        
+        Py_XDECREF(repr);
+        Py_XDECREF(str);
+    }
+
+    if (!kwargs)
+        return str_list;
+
+    // Now look at keyword args...
+    PyObject* key, * value;
+    Py_ssize_t pos = 0;
+
+    while (PyDict_Next(kwargs, &pos, &key, &value)) {
+        std::string str_ky;
+        //PyObject* repr = PyObject_Repr(key);
+        PyObject* str = PyUnicode_AsEncodedString(key, "utf-8", "~E~");
+        const char* bytes = PyBytes_AS_STRING(str);
+
+        str_ky = std::string(bytes);
+
+        //Py_XDECREF(repr);
+        Py_XDECREF(str);
+
+        std::string str_val;
+        PyObject* repr = PyObject_Repr(value);
+        str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
+        bytes = PyBytes_AS_STRING(str);
+
+        str_val = std::string(bytes);
+
+        Py_XDECREF(repr);
+        Py_XDECREF(str);
+
+        str_list[str_ky] = str_val.substr(1, str_val.size() - 2);
+    }
+
+    return str_list;
+}
+
+
+PyObject* miind_init(PyObject *self, PyObject *args, PyObject *keywds)
 {
     if (modelCcp) {
         delete modelCcp;
@@ -60,14 +144,32 @@ PyObject* miind_init(PyObject* self, PyObject* args)
         modelDouble = NULL;
     }
 
-    int nodes;
-    char* filename;
-    if (PyArg_ParseTuple(args, "s", &filename)) {
-        InitialiseModel(std::string(filename));
-    } else if (PyArg_ParseTuple(args, "is", &nodes, &filename)) {
-        InitialiseModel(nodes, std::string(filename));
-    } else
-        return NULL;
+    int nodes = -1;
+
+    std::map<std::string, std::string> argvars = ParseArguments(nodes, args, keywds);
+    std::string filename = argvars[std::string("_1927482_MIIND_SIMULATION_FILENAME")];
+    std::map<std::string, std::string> sim_variables = getVariablesFromFile(filename);
+    
+    // Replace sim_variable values with matching keys in argvars
+    std::map<std::string, std::string>::iterator it;
+
+    for (it = argvars.begin(); it != argvars.end(); it++)
+    {
+        if (it->first == std::string("_1927482_MIIND_SIMULATION_FILENAME"))
+            continue;
+
+        if (!sim_variables.count(it->first)) {
+            std::cout << "Warning: Named argument [" << it->first << "] passed to init does not match any variables in " << filename << "\n";
+            continue;
+        }
+
+        sim_variables[it->first] = it->second;
+    }
+
+    if(nodes > 0)
+        InitialiseModel(nodes, filename, sim_variables);
+    else
+        InitialiseModel(filename, sim_variables);
 
     Py_RETURN_NONE;
 }
@@ -159,7 +261,7 @@ PyObject* miind_endSimulation(PyObject* self, PyObject* args)
  * List of functions to add to miindsim in exec_miindsim().
  */
 static PyMethodDef miindsim_functions[] = {
-    {"init",  miind_init, METH_VARARGS, "Init Miind Model."},
+    {"init", (PyCFunction)miind_init, METH_VARARGS | METH_KEYWORDS, "Init Miind Model."},
     {"getTimeStep",  miind_getTimeStep, METH_VARARGS, "Get time step."},
     {"getSimulationLength",  miind_getSimulationLength, METH_VARARGS, "Get sim time."},
     {"startSimulation",  miind_startSimulation, METH_VARARGS, "Start simulation."},

@@ -2,6 +2,17 @@
 #include <TwoDLib/XML.hpp>
 
 template<>
+SimulationParserGPU<MPILib::CustomConnectionParameters>::SimulationParserGPU(int num_nodes, const std::string xml_filename, std::map<std::string,std::string> vars) :
+	// For now we don't allow num_nodes : override to 1 node only.
+	SimulationParserCPU(num_nodes, xml_filename, vars), vec_network(0.001) {
+}
+
+template<>
+SimulationParserGPU<MPILib::CustomConnectionParameters>::SimulationParserGPU(const std::string xml_filename, std::map<std::string, std::string> vars) :
+	SimulationParserCPU(xml_filename, vars), vec_network(0.001) {
+}
+
+template<>
 SimulationParserGPU<MPILib::CustomConnectionParameters>::SimulationParserGPU(int num_nodes, const std::string xml_filename) :
 	// For now we don't allow num_nodes : override to 1 node only.
 	SimulationParserCPU(num_nodes, xml_filename), vec_network(0.001) {
@@ -9,8 +20,20 @@ SimulationParserGPU<MPILib::CustomConnectionParameters>::SimulationParserGPU(int
 
 template<>
 SimulationParserGPU<MPILib::CustomConnectionParameters>::SimulationParserGPU(const std::string xml_filename) :
-	SimulationParserCPU(1, xml_filename), vec_network(0.001) {
+	SimulationParserCPU(xml_filename), vec_network(0.001) {
 }
+
+template<>
+SimulationParserGPU<MPILib::DelayedConnection>::SimulationParserGPU(int num_nodes, const std::string xml_filename, std::map<std::string, std::string> vars) :
+	// For now we don't allow num_nodes : override to 1 node only.
+	SimulationParserCPU(num_nodes, xml_filename, vars), vec_network(0.001) {
+}
+
+template<>
+SimulationParserGPU<MPILib::DelayedConnection>::SimulationParserGPU(const std::string xml_filename, std::map<std::string, std::string> vars) :
+	SimulationParserCPU(xml_filename, vars), vec_network(0.001) {
+}
+
 
 template<>
 SimulationParserGPU<MPILib::DelayedConnection>::SimulationParserGPU(int num_nodes, const std::string xml_filename) :
@@ -20,7 +43,7 @@ SimulationParserGPU<MPILib::DelayedConnection>::SimulationParserGPU(int num_node
 
 template<>
 SimulationParserGPU<MPILib::DelayedConnection>::SimulationParserGPU(const std::string xml_filename) :
-	SimulationParserCPU(1, xml_filename), vec_network(0.001) {
+	SimulationParserCPU(xml_filename), vec_network(0.001) {
 }
 
 template<class WeightType >
@@ -304,7 +327,8 @@ void SimulationParserGPU<WeightType>::parseXmlFile() {
 
 	// Load Variables into map
 	for (pugi::xml_node var = doc.child("Simulation").child("Variable"); var; var = var.next_sibling("Variable")) {
-		SimulationParserCPU<WeightType>::_variables[std::string(var.attribute("Name").value())] = std::string(var.text().as_string());
+		if (!SimulationParserCPU<WeightType>::_variables.count(std::string(var.attribute("Name").value())))
+			SimulationParserCPU<WeightType>::_variables[std::string(var.attribute("Name").value())] = std::string(var.text().as_string());
 	}
 
 	//Algorithms - In the CUDA version we don't store the algorithm, just search for the correct algorithm to add each node

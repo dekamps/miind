@@ -12,6 +12,8 @@
 template <class WeightType>
 class SimulationParserCPU : public MPILib::MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution> {
 public:
+	SimulationParserCPU(int num_nodes, const std::string xml_filename, std::map<std::string,std::string> vars);
+	SimulationParserCPU(const std::string xml_filename, std::map<std::string, std::string> vars);
 	SimulationParserCPU(int num_nodes, const std::string xml_filename);
 	SimulationParserCPU(const std::string xml_filename);
 	void endSimulation();

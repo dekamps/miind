@@ -26,6 +26,7 @@ TwoDLib::UserTranslationMode InterpretArguments(int argc, char** argv){
 	// if argv[4] is the jump file, then argc must be 5 or 7
 
 	std::string mode(argv[1]);
+	std::cout << "MatrixGenerator called with mode: " << mode << "\n";
 	if (mode == string("jump"))
 		return TwoDLib::JumpFile;
 	if (mode == string("area"))

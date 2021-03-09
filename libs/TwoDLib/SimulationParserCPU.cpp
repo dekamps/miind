@@ -4,36 +4,64 @@
 #include <TwoDLib/GridReport.hpp>
 
 template<>
+SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(int num_nodes, const std::string xml_filename, std::map<std::string, std::string> vars) :
+	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>(num_nodes, 1.0), _count(0), _xml_filename(xml_filename), _variables(vars) {
+}
+
+template<>
+SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(const std::string xml_filename, std::map<std::string, std::string> vars) :
+	SimulationParserCPU(1, xml_filename, vars) {
+}
+
+template<>
 SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(int num_nodes, const std::string xml_filename) :
-	// For now we don't allow num_nodes : override to 1 node only.
-	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>(num_nodes, 1.0), _count(0), _xml_filename(xml_filename) {
+	SimulationParserCPU(num_nodes, xml_filename,std::map<std::string,std::string>()) {
 }
 
 template<>
 SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(const std::string xml_filename) :
-	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
+	SimulationParserCPU(1,xml_filename) {
+}
+
+template<>
+SimulationParserCPU<MPILib::DelayedConnection>::SimulationParserCPU(int num_nodes, const std::string xml_filename, std::map<std::string, std::string> vars) :
+	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>(num_nodes, 1.0), _count(0), _xml_filename(xml_filename), _variables(vars) {
+}
+
+template<>
+SimulationParserCPU<MPILib::DelayedConnection>::SimulationParserCPU(const std::string xml_filename, std::map<std::string, std::string> vars) :
+	SimulationParserCPU(1,xml_filename, vars) {
 }
 
 template<>
 SimulationParserCPU<MPILib::DelayedConnection>::SimulationParserCPU(int num_nodes, const std::string xml_filename) :
-	// For now we don't allow num_nodes : override to 1 node only.
-	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>(num_nodes, 1.0), _count(0), _xml_filename(xml_filename) {
+	SimulationParserCPU(num_nodes, xml_filename, std::map<std::string,std::string>()) {
 }
 
 template<>
 SimulationParserCPU<MPILib::DelayedConnection>::SimulationParserCPU(const std::string xml_filename) :
-	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
+	SimulationParserCPU(1, xml_filename) {
+}
+
+template<>
+SimulationParserCPU<double>::SimulationParserCPU(int num_nodes, const std::string xml_filename, std::map<std::string, std::string> vars) :
+	// For now we don't allow num_nodes : override to 1 node only.
+	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>(num_nodes, 1.0), _count(0), _xml_filename(xml_filename), _variables(vars) {
+}
+
+template<>
+SimulationParserCPU<double>::SimulationParserCPU(const std::string xml_filename, std::map<std::string, std::string> vars) :
+	SimulationParserCPU(1, xml_filename, vars){
 }
 
 template<>
 SimulationParserCPU<double>::SimulationParserCPU(int num_nodes, const std::string xml_filename) :
-	// For now we don't allow num_nodes : override to 1 node only.
-	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>(num_nodes, 1.0), _count(0), _xml_filename(xml_filename) {
+	SimulationParserCPU(num_nodes, xml_filename, std::map<std::string,std::string>()) {
 }
 
 template<>
 SimulationParserCPU<double>::SimulationParserCPU(const std::string xml_filename) :
-	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>(1, 1.0), _count(0), _xml_filename(xml_filename) {
+	SimulationParserCPU(1,xml_filename) {
 }
 
 
@@ -321,9 +349,11 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 	if (!checkWeightType(doc))
 		return;
 
-	// Load Variables into map
+	// Load Variables into map - map might already have been populated with external variables
+	// So only add variables which haven't been set externally
 	for (pugi::xml_node var = doc.child("Simulation").child("Variable"); var; var = var.next_sibling("Variable")) {
-		_variables[std::string(var.attribute("Name").value())] = std::string(var.text().as_string());
+		if (!_variables.count(std::string(var.attribute("Name").value())))
+			_variables[std::string(var.attribute("Name").value())] = std::string(var.text().as_string());
 	}
 
 	//Algorithms

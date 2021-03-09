@@ -9,7 +9,7 @@ import os
 import shutil
 import miind.directories3
 
-test_gpu = False
+test_gpu = (len(sys.argv) > 1 and sys.argv[1] in ['gpu','GPU','g','G','-g','-G','-gpu','-GPU'])
 hide_all_output = False
 lif_steady_lower_bound = 0.34
 lif_steady_upper_bound = 0.36

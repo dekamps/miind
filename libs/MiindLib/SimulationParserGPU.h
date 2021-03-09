@@ -15,6 +15,8 @@ typedef CudaTwoDLib::fptype fptype;
 template <class WeightType>
 class SimulationParserGPU : public SimulationParserCPU<WeightType> {
 public:
+	SimulationParserGPU(int num_nodes, const std::string xml_filename, std::map<std::string,std::string> variables);
+	SimulationParserGPU(const std::string xml_filename, std::map<std::string, std::string> variables);
 	SimulationParserGPU(int num_nodes, const std::string xml_filename);
 	SimulationParserGPU(const std::string xml_filename);
 

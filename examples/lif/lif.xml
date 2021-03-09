@@ -1,5 +1,6 @@
 <Simulation>
 <WeightType>DelayedConnection</WeightType>
+<Variable Name="TIME_END">1.0</Variable>
 <Algorithms>
 <Algorithm type="MeshAlgorithmGroup" name="E" modelfile="lif.model" >
 <TimeStep>0.001</TimeStep>
@@ -23,7 +24,7 @@
 </Reporting>
 <SimulationRunParameter>
 <SimulationName>lif</SimulationName>
-<t_end>3.0</t_end>
+<t_end>TIME_END</t_end>
 <t_step>0.001</t_step>
 <name_log>lif.log</name_log>
 </SimulationRunParameter>
