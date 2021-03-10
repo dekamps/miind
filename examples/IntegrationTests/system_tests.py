@@ -642,7 +642,6 @@ def TestGenerateFidAndMatrix():
 	os.remove('lif.fid')
 	os.remove('lif.res')
 	os.remove('lif_0.01_0_0_0_.mat')
-	os.remove('lif_0.01_0_0_0_.lost')
 	os.chdir('..')
 
 # 23. Generate Matrix Monte Carlo
@@ -713,7 +712,6 @@ def TestGenerateMeshModel():
 	os.remove('lif.mesh')
 	os.remove('lif.fid')
 	os.remove('lif_1_0_0_0_.mat')
-	os.remove('lif_1_0_0_0_.lost')
 	os.chdir('..')
 
 TestMiindio()

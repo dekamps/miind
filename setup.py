@@ -39,7 +39,7 @@ def main():
         "\\", "/"
     )
 
-    package_version = "0.0.11"
+    package_version = "0.0.12"
 
     package_name = "miind"
 
@@ -114,7 +114,7 @@ def main():
                 '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 '-DVCPKG_MANIFEST_MODE:BOOL=ON',
                 '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
-                '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_30,code=[compute_30,sm_30]',
+                '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_50,code=[compute_50,sm_50]',
                 '-DVCPKG_TARGET_TRIPLET=x64-windows',
                 '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/vcpkg/scripts/buildsystems/vcpkg.cmake'
             ]
