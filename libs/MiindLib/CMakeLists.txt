@@ -11,11 +11,8 @@ include_directories( ${CUDA_INCLUDE_DIRS} )
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
-if (WIN32)
+
 set( LIB_TYPE STATIC )
-else (WIN32)
-set( LIB_TYPE SHARED )
-endif (WIN32)
 
 include_directories( ${ROOT_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
