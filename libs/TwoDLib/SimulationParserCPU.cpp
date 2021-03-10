@@ -102,8 +102,8 @@ template<>
 void SimulationParserCPU<MPILib::CustomConnectionParameters>::addConnection(pugi::xml_node& xml_conn) {
 	MPILib::CustomConnectionParameters connection;
 
-	std::string in = interpretValueAsString(std::string(xml_conn.attribute("In").value()));
-	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
+	std::string in = interpretValueAsString(std::string(xml_conn.attribute("In").value())) + std::string("_") + std::to_string(_current_node);
+	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value())) + std::string("_") + std::to_string(_current_node);
 
 	for (pugi::xml_attribute_iterator ait = xml_conn.attributes_begin(); ait != xml_conn.attributes_end(); ++ait) {
 
@@ -120,8 +120,8 @@ template<>
 void SimulationParserCPU<MPILib::DelayedConnection>::addConnection(pugi::xml_node& xml_conn) {
 	
 
-	std::string in = interpretValueAsString(std::string(xml_conn.attribute("In").value()));
-	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
+	std::string in = interpretValueAsString(std::string(xml_conn.attribute("In").value())) + std::string("_") + std::to_string(_current_node);
+	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value())) + std::string("_") + std::to_string(_current_node);
 
 	std::string values = std::string(xml_conn.text().as_string());
 	char num_connections[255];
@@ -137,8 +137,8 @@ void SimulationParserCPU<MPILib::DelayedConnection>::addConnection(pugi::xml_nod
 template<>
 void SimulationParserCPU<double>::addConnection(pugi::xml_node& xml_conn) {
 
-	std::string in = interpretValueAsString(std::string(xml_conn.attribute("In").value()));
-	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
+	std::string in = interpretValueAsString(std::string(xml_conn.attribute("In").value())) + std::string("_") + std::to_string(_current_node);
+	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value())) + std::string("_") + std::to_string(_current_node);
 
 	double value = interpretValueAsDouble(xml_conn.text().as_string());
 	
@@ -149,7 +149,7 @@ template<>
 void SimulationParserCPU<MPILib::CustomConnectionParameters>::addIncomingConnection(pugi::xml_node& xml_conn) {
 	MPILib::CustomConnectionParameters connection;
 
-	std::string node = interpretValueAsString(std::string(xml_conn.attribute("Node").value()));
+	std::string node = interpretValueAsString(std::string(xml_conn.attribute("Node").value())) + std::string("_") + std::to_string(_current_node);
 
 	for (pugi::xml_attribute_iterator ait = xml_conn.attributes_begin(); ait != xml_conn.attributes_end(); ++ait) {
 
@@ -165,7 +165,7 @@ void SimulationParserCPU<MPILib::CustomConnectionParameters>::addIncomingConnect
 
 template<>
 void SimulationParserCPU<MPILib::DelayedConnection>::addIncomingConnection(pugi::xml_node& xml_conn) {
-	std::string node = interpretValueAsString(std::string(xml_conn.attribute("Node").value()));
+	std::string node = interpretValueAsString(std::string(xml_conn.attribute("Node").value())) + std::string("_") + std::to_string(_current_node);
 
 
 	std::string values = std::string(xml_conn.text().as_string());
@@ -181,7 +181,7 @@ void SimulationParserCPU<MPILib::DelayedConnection>::addIncomingConnection(pugi:
 
 template<>
 void SimulationParserCPU<double>::addIncomingConnection(pugi::xml_node& xml_conn) {
-	std::string node = interpretValueAsString(std::string(xml_conn.attribute("Node").value()));
+	std::string node = interpretValueAsString(std::string(xml_conn.attribute("Node").value())) + std::string("_") + std::to_string(_current_node);
 
 	double value = interpretValueAsDouble(xml_conn.text().as_string());
 
@@ -364,79 +364,84 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 
 	parseXMLAlgorithms(doc, _algorithms, _node_ids);
 
-	//Nodes
-	for (pugi::xml_node node = doc.child("Simulation").child("Nodes").child("Node"); node; node = node.next_sibling("Node")) {
-		std::string node_name = interpretValueAsString(std::string(node.attribute("name").value()));
-		std::cout << "Found Node " << node_name << ".\n";
+	// For now, let's allow multiple nodes but only with the same variables and algorithms.
 
-		// Check what type the node is
-		MPILib::NodeType node_type = MPILib::NEUTRAL;
-		if (std::string("EXCITATORY_DIRECT") == interpretValueAsString(std::string(node.attribute("type").value())))
-			node_type = MPILib::EXCITATORY_DIRECT;
-		if (std::string("INHIBITORY_DIRECT") == interpretValueAsString(std::string(node.attribute("type").value())))
-			node_type = MPILib::INHIBITORY_DIRECT;
-		if (std::string("INHIBITORY") == interpretValueAsString(std::string(node.attribute("type").value())))
-			node_type = MPILib::INHIBITORY_DIRECT;
-		if (std::string("EXCITATORY") == interpretValueAsString(std::string(node.attribute("type").value())))
-			node_type = MPILib::EXCITATORY_DIRECT;
-		// todo : Add gaussian node types when required.
+	for (unsigned int node_num = 0; node_num < MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_num_nodes; node_num++) {
+		_current_node = node_num; 
+		//Nodes
+		for (pugi::xml_node node = doc.child("Simulation").child("Nodes").child("Node"); node; node = node.next_sibling("Node")) {
+			std::string node_name = interpretValueAsString(std::string(node.attribute("name").value())) + std::string("_") + std::to_string(node_num);
+			std::cout << "Found Node " << node_name << ".\n";
 
-		std::string algorithm_name = interpretValueAsString(std::string(node.attribute("algorithm").value()));
+			// Check what type the node is
+			MPILib::NodeType node_type = MPILib::NEUTRAL;
+			if (std::string("EXCITATORY_DIRECT") == interpretValueAsString(std::string(node.attribute("type").value())))
+				node_type = MPILib::EXCITATORY_DIRECT;
+			if (std::string("INHIBITORY_DIRECT") == interpretValueAsString(std::string(node.attribute("type").value())))
+				node_type = MPILib::INHIBITORY_DIRECT;
+			if (std::string("INHIBITORY") == interpretValueAsString(std::string(node.attribute("type").value())))
+				node_type = MPILib::INHIBITORY_DIRECT;
+			if (std::string("EXCITATORY") == interpretValueAsString(std::string(node.attribute("type").value())))
+				node_type = MPILib::EXCITATORY_DIRECT;
+			// todo : Add gaussian node types when required.
 
-		MPILib::NodeId id = MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.addNode(*_algorithms[algorithm_name], node_type);
-		_node_ids[node_name] = id;
-	}
+			std::string algorithm_name = interpretValueAsString(std::string(node.attribute("algorithm").value()));
 
-	//Connections
-	for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("Connection"); conn; conn = conn.next_sibling("Connection")) {
-		// A better way to do this is to move the connection building to a separate concrete non-templated class
-		// too lazy right now...
-		addConnection(conn);
-		// todo : Deal with other connection types - DelayedConnection, double
-	}
+			MPILib::NodeId id = MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.addNode(*_algorithms[algorithm_name], node_type);
+			_node_ids[node_name] = id;
+		}
 
-	//Incoming Connections
-	for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("IncomingConnection"); conn; conn = conn.next_sibling("IncomingConnection")) {
-		// A better way to do this is to move the connection building to a separate concrete non-templated class
-		// too lazy right now...
-		addIncomingConnection(conn);
-		// todo : Deal with other connection types - DelayedConnection, double
-	}
+		//Connections
+		for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("Connection"); conn; conn = conn.next_sibling("Connection")) {
+			// A better way to do this is to move the connection building to a separate concrete non-templated class
+			// too lazy right now...
+			addConnection(conn);
+			// todo : Deal with other connection types - DelayedConnection, double
+		}
 
-	//Outgoing Connections
-	for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("OutgoingConnection"); conn; conn = conn.next_sibling("OutgoingConnection")) {
-		std::string node = interpretValueAsString(std::string(conn.attribute("Node").value()));
-		MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.setNodeExternalSuccessor(_node_ids[node]);
-		_ordered_output_nodes.push_back(node);
-	}
+		//Incoming Connections
+		for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("IncomingConnection"); conn; conn = conn.next_sibling("IncomingConnection")) {
+			// A better way to do this is to move the connection building to a separate concrete non-templated class
+			// too lazy right now...
+			addIncomingConnection(conn);
+			// todo : Deal with other connection types - DelayedConnection, double
+		}
 
-	//Reporting Densities
-	for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Density"); conn; conn = conn.next_sibling("Density")) {
-		std::string node = interpretValueAsString(std::string(conn.attribute("node").value()));
-		double t_start = interpretValueAsDouble(std::string(conn.attribute("t_start").value()));
-		double t_end = interpretValueAsDouble(std::string(conn.attribute("t_end").value()));
-		double t_interval = interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
+		//Outgoing Connections
+		for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("OutgoingConnection"); conn; conn = conn.next_sibling("OutgoingConnection")) {
+			std::string node = interpretValueAsString(std::string(conn.attribute("Node").value())) + std::string("_") + std::to_string(node_num);
+			MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.setNodeExternalSuccessor(_node_ids[node]);
+			_ordered_output_nodes.push_back(node);
+		}
 
-		_density_nodes.push_back(_node_ids[node]);
-		_density_node_start_times.push_back(t_start);
-		_density_node_end_times.push_back(t_end);
-		_density_node_intervals.push_back(t_interval);
-	}
+		//Reporting Densities
+		for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Density"); conn; conn = conn.next_sibling("Density")) {
+			std::string node = interpretValueAsString(std::string(conn.attribute("node").value())) + std::string("_") + std::to_string(node_num);
+			double t_start = interpretValueAsDouble(std::string(conn.attribute("t_start").value()));
+			double t_end = interpretValueAsDouble(std::string(conn.attribute("t_end").value()));
+			double t_interval = interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
 
-	//Reporting Rates
-	for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Rate"); conn; conn = conn.next_sibling("Rate")) {
-		std::string node = interpretValueAsString(std::string(conn.attribute("node").value()));
-		double t_interval = interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
+			_density_nodes.push_back(_node_ids[node]);
+			_density_node_start_times.push_back(t_start);
+			_density_node_end_times.push_back(t_end);
+			_density_node_intervals.push_back(t_interval);
+		}
 
-		_rate_nodes.push_back(_node_ids[node]);
-		_rate_node_intervals.push_back(t_interval);
-	}
+		//Reporting Rates
+		for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Rate"); conn; conn = conn.next_sibling("Rate")) {
+			std::string node = interpretValueAsString(std::string(conn.attribute("node").value())) + std::string("_") + std::to_string(node_num);
+			double t_interval = interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
 
-	//Reporting Display
-	for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Display"); conn; conn = conn.next_sibling("Display")) {
-		std::string node = interpretValueAsString(std::string(conn.attribute("node").value()));
+			_rate_nodes.push_back(_node_ids[node]);
+			_rate_node_intervals.push_back(t_interval);
+		}
 
-		_display_nodes.push_back(_node_ids[node]);
+		//Reporting Display
+		for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Display"); conn; conn = conn.next_sibling("Display")) {
+			std::string node = interpretValueAsString(std::string(conn.attribute("node").value())) + std::string("_") + std::to_string(node_num);
+
+			_display_nodes.push_back(_node_ids[node]);
+		}
 	}
 
 

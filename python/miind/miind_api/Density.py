@@ -20,9 +20,9 @@ import miind.mesh3 as meshmod
 class Density(Result):
     def __init__(self, io, nodename):
         super(Density, self).__init__(io, nodename)
-        self.path = op.join(self.io.output_directory,
+        self.path = op.join(self.io.getOutputDirectory(),
                             self.nodename + '_density')
-        self.display_images_path = op.join(self.io.output_directory,
+        self.display_images_path = op.join(self.io.getOutputDirectory(),
                             'node_' + str(self.nodeindex) )
 
     @property

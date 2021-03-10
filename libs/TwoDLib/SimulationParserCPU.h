@@ -56,6 +56,8 @@ protected:
 	std::vector<MPILib::Time> _density_node_end_times;
 	std::vector<MPILib::Time> _density_node_intervals;
 
+	unsigned int _current_node;
+
 	std::vector<std::string> _ordered_output_nodes;
 };
 

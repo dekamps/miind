@@ -4,7 +4,7 @@ configure_file(miind_settings_template ${CMAKE_CURRENT_SOURCE_DIR}/miind_setting
 set( PYTHON_SCRIPTS
 __init__.py
 algorithms.py
-connections.py
+connections.py 
 lost.py
 parametersweep.py
 peakdetect.py
@@ -37,6 +37,7 @@ miindTVBlibs.py
 visualize.py
 codegen_lib.py
 run.py
+TvbMiindModel.py
 checkMatrixGenerator.py
 nodes.py
 writemesh.py

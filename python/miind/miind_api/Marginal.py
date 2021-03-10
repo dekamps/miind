@@ -19,9 +19,9 @@ import miind.mesh3 as meshmod
 class Marginal(Result):
     def __init__(self, io, nodename, vn=100, wn=100):
         super(Marginal, self).__init__(io, nodename)
-        self.path = op.join(self.io.output_directory,
+        self.path = op.join(self.io.getOutputDirectory(),
                             self.nodename + '_marginal_density')
-        self.data_path = op.join(self.io.output_directory, 'marginal_density.npz')
+        self.data_path = op.join(self.io.getOutputDirectory(), 'marginal_density.npz')
         self.projfname = self.modelpath.replace('.model', '.projection')
         self.vn, self.wn = vn, wn
 

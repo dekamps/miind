@@ -24,7 +24,7 @@ class Result(object):
     @property
     def fnames(self):
         self._fnames, self._times = find_density_fnames(
-            self.modelfname, self.nodeindex, self.io.output_directory)
+            self.modelfname, self.nodeindex, self.io.getOutputDirectory())
         return self._fnames
 
     @property
