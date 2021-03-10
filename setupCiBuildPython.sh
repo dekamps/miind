@@ -12,7 +12,7 @@ parsedVersion=$(echo "${version//./}")
 
 echo "Found Python Version: $parsedVersion"
 
-if [[ "$parsedVersion" -eq "370" ]]
+if [[ "$parsedVersion" -gt "3700" && "$parsedVersion" -lt "3800" ]]
 then 
     yum install gcc openssl-devel bzip2-devel libffi-devel -y
 	curl -O https://www.python.org/ftp/python/3.7.1/Python-3.7.1.tgz
@@ -22,7 +22,7 @@ then
 	make install
 fi
 
-if [[ "$parsedVersion" -eq "380" ]]
+if [[ "$parsedVersion" -gt "3800" && "$parsedVersion" -lt "3900" ]]
 then 
     yum install gcc openssl-devel bzip2-devel libffi-devel -y
 	curl -O https://www.python.org/ftp/python/3.8.1/Python-3.8.1.tgz
@@ -32,7 +32,7 @@ then
 	make install
 fi
 
-if [[ "$parsedVersion" -eq "390" ]]
+if [[ "$parsedVersion" -eq "3900" ]]
 then 
     yum install gcc openssl-devel bzip2-devel libffi-devel -y
 	curl -O https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tgz
