@@ -1,0 +1,71 @@
+<Simulation>
+<WeightType>double</WeightType>
+<Variable Name="E_tau">10.0</Variable>
+<Variable Name="E_max_rate">1.0</Variable>
+<Variable Name="E_noise">1.2</Variable>
+<Variable Name="E_bias">2.8</Variable>
+<Variable Name="E_smoothing">1.0</Variable>
+<Variable Name="I_tau">10.0</Variable>
+<Variable Name="I_max_rate">1.0</Variable>
+<Variable Name="I_noise">1.0</Variable>
+<Variable Name="I_bias">4.0</Variable>
+<Variable Name="I_smoothing">1.0</Variable>
+<Variable Name="E_E_Weight">12.0</Variable>
+<Variable Name="I_E_Weight">-4.0</Variable>
+<Variable Name="E_I_Weight">13.0</Variable>
+<Variable Name="I_I_Weight">-11.0</Variable>
+<Variable Name="P_E_Weight">10.0</Variable>
+<Variable Name="Q_I_Weight">10.0</Variable>
+<Algorithms>
+<Algorithm type="WilsonCowanAlgorithm" name="WC_E">
+<NeuronParameter>
+<t_membrane>E_tau</t_membrane>
+<f_noise>E_noise</f_noise>
+<f_max>E_max_rate</f_max>
+<f_bias>E_bias</f_bias>
+<I_ext>0.0</I_ext>
+<smoothing>E_smoothing</smoothing>
+</NeuronParameter>
+</Algorithm>
+<Algorithm type="WilsonCowanAlgorithm" name="WC_I">
+<NeuronParameter>
+<t_membrane>I_tau</t_membrane>
+<f_noise>I_noise</f_noise>
+<f_max>I_max_rate</f_max>
+<f_bias>I_bias</f_bias>
+<I_ext>0.0</I_ext>
+<smoothing>I_smoothing</smoothing>
+</NeuronParameter>
+</Algorithm>
+<Algorithm name="Input_P" type="RateFunctor">
+<expression>0.2</expression>
+</Algorithm>
+<Algorithm name="Input_Q" type="RateFunctor">
+<expression>0.2</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node name="E" type="EXCITATORY_DIRECT" algorithm="WC_E"></Node>
+<Node name="I" type="INHIBITORY_DIRECT" algorithm="WC_I"></Node>
+<Node name="P" type="EXCITATORY_DIRECT" algorithm="Input_P"></Node>
+<Node name="Q" type="EXCITATORY_DIRECT" algorithm="Input_Q"></Node>
+</Nodes>
+<Connections>
+<Connection In="E" Out="E">E_E_Weight</Connection>
+<Connection In="I" Out="E">I_E_Weight</Connection>
+<Connection In="E" Out="I">E_I_Weight</Connection>
+<Connection In="I" Out="I">I_I_Weight</Connection>
+<Connection In="P" Out="E">P_E_Weight</Connection>
+<Connection In="Q" Out="I">Q_I_Weight</Connection>
+</Connections>
+<Reporting>
+<Rate node="E" t_interval="0.01"/>
+<Rate node="I" t_interval="0.01"/>
+</Reporting>
+<SimulationRunParameter>
+<SimulationName>WilsonCowanEI</SimulationName>
+<t_end>1000</t_end>
+<t_step>0.01</t_step>
+<name_log>WilsonCowanEI.log</name_log>
+</SimulationRunParameter>
+</Simulation>

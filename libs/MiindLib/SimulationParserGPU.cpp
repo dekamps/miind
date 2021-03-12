@@ -71,8 +71,8 @@ void SimulationParserGPU<MPILib::CustomConnectionParameters>::addGridConnection(
 	
 	std::map<std::string, std::string> connection_parameters;
 
-	std::string in = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("In").value()));
-	std::string out = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
+	std::string in = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("In").value())) + std::string("_") + std::to_string(SimulationParserCPU<MPILib::CustomConnectionParameters>::_current_node);
+	std::string out = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("Out").value())) + std::string("_") + std::to_string(SimulationParserCPU<MPILib::CustomConnectionParameters>::_current_node);
 
 	for (pugi::xml_attribute_iterator ait = xml_conn.attributes_begin(); ait != xml_conn.attributes_end(); ++ait) {
 
@@ -89,8 +89,8 @@ void SimulationParserGPU<MPILib::CustomConnectionParameters>::addGridConnection(
 template<>
 void SimulationParserGPU<MPILib::DelayedConnection>::addGridConnection(pugi::xml_node& xml_conn) {
 
-	std::string in = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(xml_conn.attribute("In").value()));
-	std::string out = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
+	std::string in = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(xml_conn.attribute("In").value())) + std::string("_") + std::to_string(SimulationParserCPU<MPILib::DelayedConnection>::_current_node);
+	std::string out = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(xml_conn.attribute("Out").value())) + std::string("_") + std::to_string(SimulationParserCPU<MPILib::DelayedConnection>::_current_node);
 
 	std::string values = std::string(xml_conn.text().as_string());
 	char num_connections[255];
@@ -111,8 +111,8 @@ void SimulationParserGPU<MPILib::CustomConnectionParameters>::addMeshConnection(
 
 	std::map<std::string, std::string> connection_parameters;
 
-	std::string in = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("In").value()));
-	std::string out = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
+	std::string in = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("In").value())) + std::string("_") + std::to_string(SimulationParserCPU<MPILib::CustomConnectionParameters>::_current_node);
+	std::string out = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("Out").value())) + std::string("_") + std::to_string(SimulationParserCPU<MPILib::CustomConnectionParameters>::_current_node);
 	std::string efficacy = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("efficacy").value()));
 
 	for (pugi::xml_attribute_iterator ait = xml_conn.attributes_begin(); ait != xml_conn.attributes_end(); ++ait) {
@@ -131,8 +131,8 @@ void SimulationParserGPU<MPILib::CustomConnectionParameters>::addMeshConnection(
 template<>
 void SimulationParserGPU<MPILib::DelayedConnection>::addMeshConnection(pugi::xml_node& xml_conn) {
 
-	std::string in = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(xml_conn.attribute("In").value()));
-	std::string out = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(xml_conn.attribute("Out").value()));
+	std::string in = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(xml_conn.attribute("In").value())) + std::string("_") + std::to_string(SimulationParserCPU<MPILib::DelayedConnection>::_current_node);
+	std::string out = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(xml_conn.attribute("Out").value())) + std::string("_") + std::to_string(SimulationParserCPU<MPILib::DelayedConnection>::_current_node);
 
 	std::string values = std::string(xml_conn.text().as_string());
 	char num_connections[255];
@@ -152,7 +152,7 @@ template<>
 void SimulationParserGPU<MPILib::CustomConnectionParameters>::addIncomingGridConnection(pugi::xml_node& xml_conn) {
 	std::map<std::string, std::string> connection_parameters;
 
-	std::string node = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("Node").value()));
+	std::string node = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("Node").value())) + std::string("_") + std::to_string(SimulationParserCPU<MPILib::CustomConnectionParameters>::_current_node);
 
 	for (pugi::xml_attribute_iterator ait = xml_conn.attributes_begin(); ait != xml_conn.attributes_end(); ++ait) {
 
@@ -167,7 +167,7 @@ void SimulationParserGPU<MPILib::CustomConnectionParameters>::addIncomingGridCon
 
 template<>
 void SimulationParserGPU<MPILib::DelayedConnection>::addIncomingGridConnection(pugi::xml_node& xml_conn) {
-	std::string node = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(xml_conn.attribute("Node").value()));
+	std::string node = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(xml_conn.attribute("Node").value())) + std::string("_") + std::to_string(SimulationParserCPU<MPILib::DelayedConnection>::_current_node);
 
 	std::string values = std::string(xml_conn.text().as_string());
 	char num_connections[255];
@@ -188,7 +188,7 @@ template<>
 void SimulationParserGPU<MPILib::CustomConnectionParameters>::addIncomingMeshConnection(pugi::xml_node& xml_conn) {
 	std::map<std::string, std::string> connection_parameters;
 
-	std::string node = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("Node").value()));
+	std::string node = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("Node").value())) + std::string("_") + std::to_string(SimulationParserCPU<MPILib::CustomConnectionParameters>::_current_node);
 	std::string efficacy = SimulationParserCPU<MPILib::CustomConnectionParameters>::interpretValueAsString(std::string(xml_conn.attribute("efficacy").value()));
 
 	for (pugi::xml_attribute_iterator ait = xml_conn.attributes_begin(); ait != xml_conn.attributes_end(); ++ait) {
@@ -205,7 +205,7 @@ void SimulationParserGPU<MPILib::CustomConnectionParameters>::addIncomingMeshCon
 
 template<>
 void SimulationParserGPU<MPILib::DelayedConnection>::addIncomingMeshConnection(pugi::xml_node& xml_conn) {
-	std::string node = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(xml_conn.attribute("Node").value()));
+	std::string node = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(xml_conn.attribute("Node").value())) + std::string("_") + std::to_string(SimulationParserCPU<MPILib::DelayedConnection>::_current_node);
 	
 	std::string values = std::string(xml_conn.text().as_string());
 	char num_connections[255];
@@ -336,87 +336,92 @@ void SimulationParserGPU<WeightType>::parseXmlFile() {
 
 	SimulationParserCPU<WeightType>::_node_ids = std::map<std::string, MPILib::NodeId>();
 	_external_node_count = 0;
-	//Nodes
-	for (pugi::xml_node node = doc.child("Simulation").child("Nodes").child("Node"); node; node = node.next_sibling("Node")) {
-		std::string node_name = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(node.attribute("name").value()));
-		std::cout << "Found Node " << node_name << ".\n";
-			
-		// Check what type the node is
-		/* In the CUDA version, there's currently no check for correct NodeType
-		*/
 
-		std::string algorithm_name = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(node.attribute("algorithm").value()));
+	for (unsigned int node_num = 0; node_num < MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_num_nodes; node_num++) {
+		SimulationParserCPU<WeightType>::_current_node = node_num;
 
-		pugi::xml_document check_doc;
-		check_doc.load_file(SimulationParserCPU<WeightType>::_xml_filename.c_str());
+		//Nodes
+		for (pugi::xml_node node = doc.child("Simulation").child("Nodes").child("Node"); node; node = node.next_sibling("Node")) {
+			std::string node_name = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(node.attribute("name").value())) + std::string("_") + std::to_string(node_num);
+			std::cout << "Found Node " << node_name << ".\n";
 
-		_node_algorithm_mapping[node_name] = algorithm_name;
+			// Check what type the node is
+			/* In the CUDA version, there's currently no check for correct NodeType
+			*/
 
-		// We just call all of the add functions here - the algorithm name will only match one algorithm in the correct function.
-		if (addGridAlgorithmGroupNode(check_doc, algorithm_name))
-			_node_algorithm_types[node_name] = std::string("grid");
-		if (addMeshAlgorithmGroupNode(check_doc, algorithm_name))
-			_node_algorithm_types[node_name] = std::string("mesh");
-		if (addRateFunctorNode(check_doc,algorithm_name))
-			_node_algorithm_types[node_name] = std::string("rate");
+			std::string algorithm_name = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(node.attribute("algorithm").value()));
 
-		MPILib::NodeId test = SimulationParserCPU<WeightType>::_node_ids.size();
-		SimulationParserCPU<WeightType>::_node_ids[node_name] = test;
-	}
+			pugi::xml_document check_doc;
+			check_doc.load_file(SimulationParserCPU<WeightType>::_xml_filename.c_str());
 
-	//Connections
-	for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("Connection"); conn; conn = conn.next_sibling("Connection")) {
-		std::string conn_out = std::string(conn.attribute("Out").value());
-		if (_node_algorithm_types[conn_out] == std::string("grid"))
-			addGridConnection(conn);
-		if (_node_algorithm_types[conn_out] == std::string("mesh"))
-			addMeshConnection(conn);
-	}
+			_node_algorithm_mapping[node_name] = algorithm_name;
 
-	//Incoming Connections
-	for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("IncomingConnection"); conn; conn = conn.next_sibling("IncomingConnection")) {
-		std::string conn_node = std::string(conn.attribute("Node").value());
-		if (_node_algorithm_types[conn_node] == std::string("grid"))
-			addIncomingGridConnection(conn);
-		if (_node_algorithm_types[conn_node] == std::string("mesh"))
-			addIncomingMeshConnection(conn);
+			// We just call all of the add functions here - the algorithm name will only match one algorithm in the correct function.
+			if (addGridAlgorithmGroupNode(check_doc, algorithm_name))
+				_node_algorithm_types[node_name] = std::string("grid");
+			if (addMeshAlgorithmGroupNode(check_doc, algorithm_name))
+				_node_algorithm_types[node_name] = std::string("mesh");
+			if (addRateFunctorNode(check_doc, algorithm_name))
+				_node_algorithm_types[node_name] = std::string("rate");
 
-		_external_node_count++;
-	}
+			MPILib::NodeId test = SimulationParserCPU<WeightType>::_node_ids.size();
+			SimulationParserCPU<WeightType>::_node_ids[node_name] = test;
+		}
 
-	//Outgoing Connections
-	for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("OutgoingConnection"); conn; conn = conn.next_sibling("OutgoingConnection")) {
-		std::string node = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(conn.attribute("Node").value()));
-		vec_network.addExternalMonitor(SimulationParserCPU<WeightType>::_node_ids[node]);
-	}
+		//Connections
+		for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("Connection"); conn; conn = conn.next_sibling("Connection")) {
+			std::string conn_out = std::string(conn.attribute("Out").value());
+			if (_node_algorithm_types[conn_out] == std::string("grid"))
+				addGridConnection(conn);
+			if (_node_algorithm_types[conn_out] == std::string("mesh"))
+				addMeshConnection(conn);
+		}
 
-	//Reporting Densities
-	for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Density"); conn; conn = conn.next_sibling("Density")) {
-		std::string node = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(conn.attribute("node").value()));
-		double t_start = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(conn.attribute("t_start").value()));
-		double t_end = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(conn.attribute("t_end").value()));
-		double t_interval = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
+		//Incoming Connections
+		for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("IncomingConnection"); conn; conn = conn.next_sibling("IncomingConnection")) {
+			std::string conn_node = std::string(conn.attribute("Node").value());
+			if (_node_algorithm_types[conn_node] == std::string("grid"))
+				addIncomingGridConnection(conn);
+			if (_node_algorithm_types[conn_node] == std::string("mesh"))
+				addIncomingMeshConnection(conn);
 
-		SimulationParserCPU<WeightType>::_density_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
-		SimulationParserCPU<WeightType>::_density_node_start_times.push_back(t_start);
-		SimulationParserCPU<WeightType>::_density_node_end_times.push_back(t_end);
-		SimulationParserCPU<WeightType>::_density_node_intervals.push_back(t_interval);
-	}
+			_external_node_count++;
+		}
 
-	//Reporting Rates
-	for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Rate"); conn; conn = conn.next_sibling("Rate")) {
-		std::string node = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(conn.attribute("node").value()));
-		double t_interval = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
+		//Outgoing Connections
+		for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("OutgoingConnection"); conn; conn = conn.next_sibling("OutgoingConnection")) {
+			std::string node = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(conn.attribute("Node").value())) + std::string("_") + std::to_string(node_num);
+			vec_network.addExternalMonitor(SimulationParserCPU<WeightType>::_node_ids[node]);
+		}
 
-		SimulationParserCPU<WeightType>::_rate_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
-		SimulationParserCPU<WeightType>::_rate_node_intervals.push_back(t_interval);
-	}
+		//Reporting Densities
+		for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Density"); conn; conn = conn.next_sibling("Density")) {
+			std::string node = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(conn.attribute("node").value())) + std::string("_") + std::to_string(node_num);
+			double t_start = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(conn.attribute("t_start").value()));
+			double t_end = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(conn.attribute("t_end").value()));
+			double t_interval = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
 
-	//Reporting Display
-	for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Display"); conn; conn = conn.next_sibling("Display")) {
-		std::string node = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(conn.attribute("node").value()));
+			SimulationParserCPU<WeightType>::_density_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
+			SimulationParserCPU<WeightType>::_density_node_start_times.push_back(t_start);
+			SimulationParserCPU<WeightType>::_density_node_end_times.push_back(t_end);
+			SimulationParserCPU<WeightType>::_density_node_intervals.push_back(t_interval);
+		}
 
-		SimulationParserCPU<WeightType>::_display_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
+		//Reporting Rates
+		for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Rate"); conn; conn = conn.next_sibling("Rate")) {
+			std::string node = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(conn.attribute("node").value())) + std::string("_") + std::to_string(node_num);
+			double t_interval = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
+
+			SimulationParserCPU<WeightType>::_rate_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
+			SimulationParserCPU<WeightType>::_rate_node_intervals.push_back(t_interval);
+		}
+
+		//Reporting Display
+		for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Display"); conn; conn = conn.next_sibling("Display")) {
+			std::string node = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(conn.attribute("node").value())) + std::string("_") + std::to_string(node_num);
+
+			SimulationParserCPU<WeightType>::_display_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
+		}
 	}
 
 

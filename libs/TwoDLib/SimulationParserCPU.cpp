@@ -2,6 +2,9 @@
 #include <map>
 #include <memory>
 #include <TwoDLib/GridReport.hpp>
+#include <MPILib/include/WilsonCowanAlgorithm.hpp>
+#include <TwoDLib/GridSomaDendriteAlgorithmCode.hpp>
+#include <TwoDLib/GridJumpAlgorithmCode.hpp>
 
 template<>
 SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(int num_nodes, const std::string xml_filename, std::map<std::string, std::string> vars) :
@@ -113,7 +116,8 @@ void SimulationParserCPU<MPILib::CustomConnectionParameters>::addConnection(pugi
 		connection.setParam(std::string(ait->name()), interpretValueAsString(std::string(ait->value())));
 		// todo : Check the value for a variable definition - need a special function for checking all inputs really
 	}
-	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], connection);
+	_connections.push_back(connection);
+	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], _connections.back());
 }
 
 template<>
@@ -130,8 +134,8 @@ void SimulationParserCPU<MPILib::DelayedConnection>::addConnection(pugi::xml_nod
 	std::sscanf(values.c_str(), "%s %s %s", num_connections, efficacy, delay);
 	
 	MPILib::DelayedConnection connection(interpretValueAsDouble(std::string(num_connections)), interpretValueAsDouble(std::string(efficacy)), interpretValueAsDouble(std::string(delay)));
-
-	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], connection);
+	_connections.push_back(connection);
+	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], _connections.back());
 }
 
 template<>
@@ -141,8 +145,8 @@ void SimulationParserCPU<double>::addConnection(pugi::xml_node& xml_conn) {
 	std::string out = interpretValueAsString(std::string(xml_conn.attribute("Out").value())) + std::string("_") + std::to_string(_current_node);
 
 	double value = interpretValueAsDouble(xml_conn.text().as_string());
-	
-	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], value);
+	_connections.push_back(value);
+	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>::network.makeFirstInputOfSecond(_node_ids[in], _node_ids[out], _connections.back());
 }
 
 template<>
@@ -159,8 +163,8 @@ void SimulationParserCPU<MPILib::CustomConnectionParameters>::addIncomingConnect
 		connection.setParam(std::string(ait->name()), interpretValueAsString(std::string(ait->value())));
 		// todo : Check the value for a variable definition - need a special function for checking all inputs really
 	}
-
-	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], connection);
+	_connections.push_back(connection);
+	MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], _connections.back());
 }
 
 template<>
@@ -175,8 +179,8 @@ void SimulationParserCPU<MPILib::DelayedConnection>::addIncomingConnection(pugi:
 	std::sscanf(values.c_str(), "%s%s%s", num_connections, efficacy, delay);
 	
 	MPILib::DelayedConnection connection(interpretValueAsDouble(std::string(num_connections)), interpretValueAsDouble(std::string(efficacy)), interpretValueAsDouble(std::string(delay)));
-
-	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], connection);
+	_connections.push_back(connection);
+	MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], _connections.back());
 }
 
 template<>
@@ -184,8 +188,8 @@ void SimulationParserCPU<double>::addIncomingConnection(pugi::xml_node& xml_conn
 	std::string node = interpretValueAsString(std::string(xml_conn.attribute("Node").value())) + std::string("_") + std::to_string(_current_node);
 
 	double value = interpretValueAsDouble(xml_conn.text().as_string());
-
-	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], value);
+	_connections.push_back(value);
+	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], _connections.back());
 }
 
 template<class WeightType>
@@ -210,8 +214,39 @@ void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithm
 			double start_v = interpretValueAsDouble(algorithm.attribute("start_v").as_string());
 			double start_w = interpretValueAsDouble(algorithm.attribute("start_w").as_string());
 			double time_step = interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
+			std::string activity_mode = interpretValueAsString(std::string(algorithm.attribute("ratemethod").value()));
 
-			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::GridAlgorithm(model_filename, transform_filename, time_step, start_v, start_w, tau_refractive));
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::GridAlgorithm(model_filename, transform_filename, time_step, start_v, start_w, tau_refractive, activity_mode));
+		}
+
+		if (std::string("GridSomaDendriteAlgorithm") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
+			std::cout << "Found GridSomaDendriteAlgorithm " << algorithm_name << ".\n";
+
+			std::string model_filename = interpretValueAsString(std::string(algorithm.attribute("modelfile").value()));
+			double tau_refractive = interpretValueAsDouble(algorithm.attribute("tau_refractive").as_string());
+			std::string transform_filename = interpretValueAsString(std::string(algorithm.attribute("transformfile").value()));
+			double start_v = interpretValueAsDouble(algorithm.attribute("start_v").as_string());
+			double start_w = interpretValueAsDouble(algorithm.attribute("start_w").as_string());
+			double time_step = interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
+			std::string activity_mode = interpretValueAsString(std::string(algorithm.attribute("ratemethod").value()));
+
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::GridSomaDendriteAlgorithm(model_filename, transform_filename, time_step, start_v, start_w, tau_refractive, activity_mode));
+		}
+
+		if (std::string("GridJumpAlgorithm") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
+			std::cout << "Found GridJumpAlgorithm " << algorithm_name << ".\n";
+
+			std::string model_filename = interpretValueAsString(std::string(algorithm.attribute("modelfile").value()));
+			double tau_refractive = interpretValueAsDouble(algorithm.attribute("tau_refractive").as_string());
+			std::string transform_filename = interpretValueAsString(std::string(algorithm.attribute("transformfile").value()));
+			double start_v = interpretValueAsDouble(algorithm.attribute("start_v").as_string());
+			double start_w = interpretValueAsDouble(algorithm.attribute("start_w").as_string());
+			double time_step = interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
+			std::string activity_mode = interpretValueAsString(std::string(algorithm.attribute("ratemethod").value()));
+
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::GridJumpAlgorithm(model_filename, transform_filename, time_step, start_v, start_w, tau_refractive, activity_mode));
 		}
 
 		if (std::string("MeshAlgorithmCustom") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
@@ -221,13 +256,14 @@ void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithm
 			std::string model_filename = interpretValueAsString(std::string(algorithm.attribute("modelfile").value()));
 			double tau_refractive = interpretValueAsDouble(algorithm.attribute("tau_refractive").as_string());
 			double time_step = interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
+			std::string activity_mode = interpretValueAsString(std::string(algorithm.attribute("ratemethod").value()));
 
 			std::vector<std::string> matrix_files;
 			for (pugi::xml_node matrix_file = algorithm.child("MatrixFile"); matrix_file; matrix_file = matrix_file.next_sibling("MatrixFile")) {
 				matrix_files.push_back(interpretValueAsString(std::string(matrix_file.child_value())));
 			}
 
-			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::MeshAlgorithmCustom<TwoDLib::MasterOdeint>(model_filename, matrix_files, time_step, tau_refractive));
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::MeshAlgorithmCustom<TwoDLib::MasterOdeint>(model_filename, matrix_files, time_step, tau_refractive, activity_mode));
 		}
 
 		if (std::string("RateFunctor") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
@@ -241,8 +277,6 @@ void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithm
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new MPILib::RateAlgorithm<MPILib::CustomConnectionParameters>(rate));
 		}
 
-		//... todo : other algorithms
-		//... todo : AvgV or no?
 	}
 
 }
@@ -261,13 +295,30 @@ void SimulationParserCPU< MPILib::DelayedConnection>::parseXMLAlgorithms(pugi::x
 			std::string model_filename = interpretValueAsString(std::string(algorithm.attribute("modelfile").value()));
 			double tau_refractive = interpretValueAsDouble(algorithm.attribute("tau_refractive").as_string());
 			double time_step = interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
+			std::string activity_mode = interpretValueAsString(std::string(algorithm.attribute("ratemethod").value()));
 
 			std::vector<std::string> matrix_files;
 			for (pugi::xml_node matrix_file = algorithm.child("MatrixFile"); matrix_file; matrix_file = matrix_file.next_sibling("MatrixFile")) {
 				matrix_files.push_back(interpretValueAsString(std::string(matrix_file.child_value())));
 			}
 
-			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::DelayedConnection>>(new TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOdeint>(model_filename, matrix_files, time_step, tau_refractive));
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::DelayedConnection>>(new TwoDLib::MeshAlgorithm<MPILib::DelayedConnection,TwoDLib::MasterOdeint>(model_filename, matrix_files, time_step, tau_refractive, activity_mode));
+		}
+
+		if (std::string("OUAlgorithm") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
+
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
+			std::cout << "Found OUAlgorithm " << algorithm_name << ".\n";
+
+			double t_membrane = interpretValueAsDouble(std::string(algorithm.child("NeuronParameter").child_value("t_membrane")));
+			double t_refractive = interpretValueAsDouble(std::string(algorithm.child("NeuronParameter").child_value("t_refractive")));
+			double V_threshold = interpretValueAsDouble(std::string(algorithm.child("NeuronParameter").child_value("V_threshold")));
+			double V_reset = interpretValueAsDouble(std::string(algorithm.child("NeuronParameter").child_value("V_reset")));
+			double V_reversal = interpretValueAsDouble(std::string(algorithm.child("NeuronParameter").child_value("V_reversal")));
+
+			GeomLib::NeuronParameter params(V_threshold, V_reset, V_reversal, t_refractive, t_membrane);
+
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::DelayedConnection>>(new GeomLib::OUAlgorithm(params));
 		}
 
 		if (std::string("RateFunctor") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
@@ -280,8 +331,6 @@ void SimulationParserCPU< MPILib::DelayedConnection>::parseXMLAlgorithms(pugi::x
 
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::DelayedConnection>>(new MPILib::RateAlgorithm<MPILib::DelayedConnection>(rate));
 		}
-
-		//... todo : AvgV or no?
 	}
 
 }
@@ -294,6 +343,23 @@ void SimulationParserCPU<double>::parseXMLAlgorithms(pugi::xml_document& doc,
 	for (pugi::xml_node algorithm = doc.child("Simulation").child("Algorithms").child("Algorithm"); algorithm; algorithm = algorithm.next_sibling("Algorithm")) {
 		//Check all possible Algorithm types
 
+		if (std::string("WilsonCowanAlgorithm") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
+
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
+			std::cout << "Found WilsonCowanAlgorithm " << algorithm_name << ".\n";
+
+			double t_membrane = interpretValueAsDouble(std::string(algorithm.child("NeuronParameter").child_value("t_membrane")));
+			double f_noise = interpretValueAsDouble(std::string(algorithm.child("NeuronParameter").child_value("f_noise")));
+			double f_max = interpretValueAsDouble(std::string(algorithm.child("NeuronParameter").child_value("f_max")));
+			double f_bias = interpretValueAsDouble(std::string(algorithm.child("NeuronParameter").child_value("f_bias")));
+			double I_ext = interpretValueAsDouble(std::string(algorithm.child("NeuronParameter").child_value("I_ext")));
+			double smoothing = interpretValueAsDouble(std::string(algorithm.child("NeuronParameter").child_value("smoothing")));
+
+			MPILib::WilsonCowanParameter params(t_membrane, f_max, f_noise, f_bias, I_ext, smoothing);
+			wcparams.push_back(params);
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<double>>(new MPILib::WilsonCowanAlgorithm(wcparams.back()));
+		}
+
 		if (std::string("RateFunctor") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
 			// As we can't use the "expression" part properly here because we're not doing an intemediate cpp translation step
 			// Let's just use RateAlgorithm for RateFunctor for now.
@@ -305,7 +371,6 @@ void SimulationParserCPU<double>::parseXMLAlgorithms(pugi::xml_document& doc,
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<double>>(new MPILib::RateAlgorithm<double>(rate));
 		}
 
-		//... todo : AvgV or no?
 	}
 
 }

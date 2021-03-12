@@ -56,6 +56,10 @@ protected:
 	std::vector<MPILib::Time> _density_node_end_times;
 	std::vector<MPILib::Time> _density_node_intervals;
 
+	// For some algorithms, we need to hold on to parameters and connections because of pass by reference. 
+	std::vector<WeightType> _connections;
+	std::vector<MPILib::WilsonCowanParameter> wcparams;
+
 	unsigned int _current_node;
 
 	std::vector<std::string> _ordered_output_nodes;

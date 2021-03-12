@@ -130,8 +130,6 @@ void WilsonCowanAlgorithm::evolveNodeState(const std::vector<Rate>& nodeVector,
 
 	double f_inner_product = innerProduct(nodeVector, weightVector);
 
-	//printf("%f, %f, %f, %f, %f\n", nodeVector[0] * weightVector[0], nodeVector[1] * weightVector[1], nodeVector[2] * weightVector[2], nodeVector[3] * weightVector[3], nodeVector[4] * weightVector[4]);
-
 	_integrator.Parameter()._f_input = f_inner_product;
 
 	try {

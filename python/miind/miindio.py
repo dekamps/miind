@@ -72,6 +72,7 @@ class MiindIO:
             print('lost                     : Open the fiducial tool for capturing lost points.')
             print('generate-lif-mesh        : Helper command to build a LIF neuron mesh.')
             print('generate-qif-mesh        : Helper command to build a QIF neuron mesh.')
+            print('generate-eif-mesh        : Helper command to build a EIF neuron mesh.')
             print('draw-mesh                : Draw the mesh described in an existing .mesh file.')
             print('')
 
@@ -481,6 +482,30 @@ class MiindIO:
             print (name + ' [Basename] : Generate a new Basename.mesh, Basename.stat and Basename.rev file for a Quadratic Integrate and Fire Neuron (with constant input current I=-1.0).')
             print ('Defaults : Time Scale = 10e-3, Min Potential = -10.0, Max Potential = 10.0, Time step = 0.0001')
             print (name + ' [Basename] [Time Scale] [Min Potential] [Max Potential] [Time step] [I (Non-zero Current)] : Generate a new Basename.mesh, Basename.stat and Basename.rev file for a Quadratic Integrate and Fire Neuron.')
+            
+    def generateEifMesh(self,command):
+        command_name = command[0]
+        name = 'generate-eif-mesh'
+
+        if command_name in [name]:
+            if len(command) == 2:
+                gen = api.EifMeshGenerator(command[1])
+                gen.generateEifMesh()
+                gen.generateEifStationary()
+                gen.generateEifReversal()
+            elif len(command) == 10:
+                gen = api.EifMeshGenerator(command[1], float(command[2]), float(command[3]), float(command[4]), float(command[5]), float(command[6]), int(command[7]))
+                gen.generateEifMesh()
+                gen.generateEifStationary()
+                gen.generateEifReversal()
+            else:
+                print (name + ' expects one or nine parameters.')
+                self.generateEifMesh(name+'?')
+
+        if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
+            print (name + ' [Basename] : Generate a new Basename.mesh, Basename.stat and Basename.rev file for an Exponential Integrate and Fire Neuron.')
+            print ('Defaults : Leak Conductance (g_l) = 0.3, Resting Potential (v_l) = -70.0, Threshold Potential (v_th) = -56, Delta t (delta_t) = 1.48, Min Potential (V_min) = -90.0, Max Potential (V_max) = -51.5, Time step = 0.1, Epsilon = 0.01')
+            print (name + ' [Basename] [Leak Conductance] [Resting Potential] [Threshold Potential] [Delta t] [Min Potential] [Max Potential] [Time step] [Epsilon] : Generate a new Basename.mesh, Basename.stat and Basename.rev file for a Leaky Integrate and Fire Neuron.')
 
 
     def generateModel(self,command):
@@ -655,6 +680,8 @@ class MiindIO:
         self.generateLifMesh(command)
 
         self.generateQifMesh(command)
+        
+        self.generateEifMesh(command)
 
         self.generateModel(command)
 

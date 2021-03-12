@@ -125,6 +125,7 @@ if (UNIX)
    ADD_DEFINITIONS("-fno-strict-aliasing" )
 endif (UNIX)
 set ( LIBLIST
+	${MIIND_LIBRARY_PREFIX}geom
     ${MIIND_LIBRARY_PREFIX}mpi
     ${Boost_LIBRARIES}
     ${MPI_LIBRARIES}

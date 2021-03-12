@@ -46,6 +46,13 @@ qif/qif.xml
 qif/show_qif_gain.py
 )
 
+set( TVB
+miind_tvb/tvb_miind_sim.py
+miind_tvb/lif_0.01_0_0_0_.mat
+miind_tvb/lif.xml
+miind_tvb/lif.model
+)
+
 set( RATE
 rate_based/analyse_rate.py
 rate_based/analytic.dat
@@ -138,6 +145,10 @@ model_archive/QIF/qif.model
 model_archive/QIF/qif_0.01_0_0_0_.mat
 )
 
+set( MA_WC
+model_archive/WilsonCowan/wc.xml
+)
+
 set( TUTORIAL
 tutorial/Tutorial\ MIIND.pdf
 )
@@ -192,6 +203,8 @@ install( FILES ${LIF_PYTHON}
     DESTINATION ${EXAMPLES_BASE_DIR}/lif_python )
 install( FILES ${QIF}
     DESTINATION ${EXAMPLES_BASE_DIR}/qif )
+install( FILES ${TVB}
+    DESTINATION ${EXAMPLES_BASE_DIR}/miind_tvb )
 install( FILES ${RATE}
     DESTINATION ${EXAMPLES_BASE_DIR}/rate_based )
 install( FILES ${RESP}
@@ -222,6 +235,8 @@ install( FILES ${MA_PNAP}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/PersistentSodium2D )
 install( FILES ${MA_QIF}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/QIF )
+install( FILES ${MA_WC}
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/WilsonCowan )
 install( FILES ${TUTORIAL}
     DESTINATION ${EXAMPLES_BASE_DIR}/tutorial )
 install( FILES ${TUTORIAL_GRID}
