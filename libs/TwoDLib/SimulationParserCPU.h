@@ -61,8 +61,6 @@ protected:
 	std::vector<MPILib::WilsonCowanParameter> wcparams;
 
 	unsigned int _current_node;
-
-	std::vector<std::string> _ordered_output_nodes;
 };
 
 #endif

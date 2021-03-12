@@ -165,6 +165,7 @@ void VectorizedNetwork::addExternalMonitor(MPILib::NodeId nid) {
 }
 
 void VectorizedNetwork::setupLoop(bool write_displays) {
+
     for (unsigned int i = 0; i < _display_nodes.size(); i++) {
         TwoDLib::Display::getInstance()->addOdeSystem(_display_nodes[i], _group, _node_id_to_group_mesh[_display_nodes[i]]);
     }

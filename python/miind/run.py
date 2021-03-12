@@ -21,7 +21,22 @@ else:
 if len(sys.argv) < 2:
     print("run expects a simulation file name as parameter.")
 else:
-    miind.init(sys.argv[1])
+    num_nodes = 1
+    miind_vars = {}
+    if len(sys.argv) > 2:
+        if sys.argv[2].isdigit():
+            try:
+                num_nodes = int(sys.argv[2])
+                if num_nodes < 1:
+                    print('If parameter 2 is the number of nodes, it must be greater than 0.')
+            except ValueError:
+                print('If parameter 2 is the number of nodes, it must be a integer.')
+        else:
+            for a in sys.argv[2:]:
+                [key, val] = a.strip().split('=')
+                miind_vars[key] = val
+
+    miind.init(num_nodes, sys.argv[1], **miind_vars)
 
     timestep = miind.getTimeStep()
     simulation_length = miind.getSimulationLength()

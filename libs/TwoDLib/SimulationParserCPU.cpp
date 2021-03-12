@@ -173,10 +173,10 @@ void SimulationParserCPU<MPILib::DelayedConnection>::addIncomingConnection(pugi:
 
 
 	std::string values = std::string(xml_conn.text().as_string());
-	char* num_connections;
-	char* efficacy;
-	char* delay;
-	std::sscanf(values.c_str(), "%s%s%s", num_connections, efficacy, delay);
+	char num_connections[255];
+	char efficacy[255];
+	char delay[255];
+	std::sscanf(values.c_str(), "%s %s %s", num_connections, efficacy, delay);
 	
 	MPILib::DelayedConnection connection(interpretValueAsDouble(std::string(num_connections)), interpretValueAsDouble(std::string(efficacy)), interpretValueAsDouble(std::string(delay)));
 	_connections.push_back(connection);
@@ -458,25 +458,18 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 
 		//Connections
 		for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("Connection"); conn; conn = conn.next_sibling("Connection")) {
-			// A better way to do this is to move the connection building to a separate concrete non-templated class
-			// too lazy right now...
 			addConnection(conn);
-			// todo : Deal with other connection types - DelayedConnection, double
 		}
 
 		//Incoming Connections
 		for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("IncomingConnection"); conn; conn = conn.next_sibling("IncomingConnection")) {
-			// A better way to do this is to move the connection building to a separate concrete non-templated class
-			// too lazy right now...
 			addIncomingConnection(conn);
-			// todo : Deal with other connection types - DelayedConnection, double
 		}
 
 		//Outgoing Connections
 		for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("OutgoingConnection"); conn; conn = conn.next_sibling("OutgoingConnection")) {
 			std::string node = interpretValueAsString(std::string(conn.attribute("Node").value())) + std::string("_") + std::to_string(node_num);
 			MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.setNodeExternalSuccessor(_node_ids[node]);
-			_ordered_output_nodes.push_back(node);
 		}
 
 		//Reporting Densities
@@ -541,6 +534,7 @@ void SimulationParserCPU<WeightType>::init() {
 
 template<class WeightType>
 std::vector<double> SimulationParserCPU<WeightType>::evolveSingleStep(std::vector<double> activity) {
+
 	MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.reportNodeActivities(_rate_nodes, _rate_node_intervals,
 		(_count * MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_time_step));
 

@@ -2,7 +2,7 @@
 <WeightType>DelayedConnection</WeightType>
 <Variable Name="TIME_END">1.0</Variable>
 <Algorithms>
-<Algorithm type="MeshAlgorithmGroup" name="E" modelfile="lif.model" >
+<Algorithm type="MeshAlgorithm" name="E" modelfile="lif.model" >
 <TimeStep>0.001</TimeStep>
 <MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
 </Algorithm>

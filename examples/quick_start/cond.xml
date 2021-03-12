@@ -1,0 +1,37 @@
+<Simulation>
+     <WeightType>CustomConnectionParameters</WeightType>
+     <Algorithms>
+          <Algorithm type="GridAlgorithm" name="COND" modelfile="cond.model" tau_refractive="0.0" transformfile="cond_0_0_0_0_.tmat" start_v="-0.065" start_w="0.0" >
+               <TimeStep>1e-05</TimeStep>
+          </Algorithm>
+		  <Algorithm type="RateFunctor" name="ExcitatoryInput">
+			   <expression>800.</expression>
+		  </Algorithm>
+     </Algorithms>
+     <Nodes>
+		  <Node algorithm="ExcitatoryInput" name="INPUT_E" type="EXCITATORY_DIRECT" />
+		  <Node algorithm="ExcitatoryInput" name="INPUT_I" type="EXCITATORY_DIRECT" />
+          <Node algorithm="COND" name="E" type="EXCITATORY_DIRECT" />
+          <Node algorithm="COND" name="I" type="INHIBITORY_DIRECT" />
+     </Nodes>
+     <Connections>
+		  <Connection In="INPUT_E" Out="E" num_connections="1" efficacy="0.1" delay="0.0"/>
+		  <Connection In="INPUT_I" Out="I" num_connections="1" efficacy="0.1" delay="0.0"/>
+          <Connection In="E" Out="I" num_connections="1" efficacy="0.1" delay="0.001"/>
+          <Connection In="E" Out="E" num_connections="1" efficacy="0.1" delay="0.001"/>
+          <Connection In="I" Out="E" num_connections="1" efficacy="-0.1" delay="0.001"/>
+          <Connection In="I" Out="I" num_connections="1" efficacy="-0.1" delay="0.001"/>
+     </Connections>
+     <Reporting>
+          <Display node="E" />
+          <Display node="I" />
+          <Rate node="E" t_interval="0.001" />
+          <Rate node="I" t_interval="0.001" />
+     </Reporting>
+     <SimulationRunParameter>
+          <SimulationName>EINetwork</SimulationName>
+          <t_end>0.2</t_end>
+          <t_step>1e-05</t_step>
+          <name_log>einetwork.log</name_log>
+     </SimulationRunParameter>
+</Simulation>

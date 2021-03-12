@@ -202,6 +202,13 @@ template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::setExternalPrecursorActivities(
 std::vector<ActivityType> activities) {
 
+	// Check that sizes match up
+	if (_externalReceivers.size() != activities.size()) {
+		std::string error_string = std::string("Number of external inputs (") + std::to_string(activities.size()) 
+			+ std::string(") does not match the number of nodes expected to receive them (") + std::to_string(_externalReceivers.size()) + std::string(").");
+		throw std::runtime_error(error_string);
+	}
+
 	if (_nodeDistribution.isMaster()) {
 		int i=0;
 		for (auto& id : _externalReceivers) {

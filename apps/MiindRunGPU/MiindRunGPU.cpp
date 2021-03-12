@@ -1,4 +1,4 @@
-#include <TwoDLib/SimulationParserCPU.h>
+#include <MiindLib/SimulationParserGPU.h>
 
 // The entirety of MIIND is based on templated code which is not resolved when MIIND is built.
 // It is resolved when the cpp code is generated in python and compiled by the user.
@@ -9,9 +9,8 @@
 // At least we know that there are only three possible Weight Types (In the future, we should only support
 // CustomConnectionParameters as it is the most flexible). However, which model we need is not known
 // until we look at WeightType in the XML file.
-SimulationParserCPU<MPILib::CustomConnectionParameters>* modelCcp;
-SimulationParserCPU<MPILib::DelayedConnection>* modelDc;
-SimulationParserCPU<double>* modelDouble;
+SimulationParserGPU<MPILib::CustomConnectionParameters>* modelCcp;
+SimulationParserGPU<MPILib::DelayedConnection>* modelDc;
 
 std::map<std::string, std::string> getVariablesFromFile(std::string filename) {
     std::map<std::string, std::string> dict;
@@ -39,23 +38,14 @@ void InitialiseModel(int num_nodes, std::string filename, std::map<std::string, 
 
     if (std::string("CustomConnectionParameters") == std::string(doc.child("Simulation").child_value("WeightType"))) {
         std::cout << "Loading simulation with WeightType: CustomConnectionParameters.\n";
-        modelCcp = new SimulationParserCPU<MPILib::CustomConnectionParameters>(num_nodes, filename, variables);
+        modelCcp = new SimulationParserGPU<MPILib::CustomConnectionParameters>(num_nodes, filename, variables);
         modelCcp->init();
     }
     else if (std::string("DelayedConnection") == std::string(doc.child("Simulation").child_value("WeightType"))) {
         std::cout << "Loading simulation with WeightType: DelayedConnection.\n";
-        modelDc = new SimulationParserCPU<MPILib::DelayedConnection>(num_nodes, filename, variables);
+        modelDc = new SimulationParserGPU<MPILib::DelayedConnection>(num_nodes, filename, variables);
         modelDc->init();
     }
-    else if (std::string("double") == std::string(doc.child("Simulation").child_value("WeightType"))) {
-        std::cout << "Loading simulation with WeightType: double.\n";
-        modelDouble = new SimulationParserCPU<double>(num_nodes, filename, variables);
-        modelDouble->init();
-    }
-}
-
-void InitialiseModel(std::string filename, std::map<std::string, std::string> variables) {
-    InitialiseModel(1, filename, variables);
 }
 
 bool is_number(const std::string& s)
@@ -112,16 +102,6 @@ int main(int argc, char* argv[]) {
             modelDc->evolveSingleStep(std::vector<double>());
         }
         modelDc->endSimulation();
-    }
-    else if (modelDouble) {
-        std::cout << "Time Step: " << modelDouble->getTimeStep() << "\n";
-        std::cout << "Sim Time: " << modelDouble->getSimulationLength() << "\n";
-        modelDouble->startSimulation();
-        while (time < modelDouble->getSimulationLength()) {
-            time += modelDouble->getTimeStep();
-            modelDouble->evolveSingleStep(std::vector<double>());
-        }
-        modelDouble->endSimulation();
     }
 
 }

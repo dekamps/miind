@@ -3,7 +3,6 @@
 
 template<>
 SimulationParserGPU<MPILib::CustomConnectionParameters>::SimulationParserGPU(int num_nodes, const std::string xml_filename, std::map<std::string,std::string> vars) :
-	// For now we don't allow num_nodes : override to 1 node only.
 	SimulationParserCPU(num_nodes, xml_filename, vars), vec_network(0.001) {
 }
 
@@ -14,7 +13,6 @@ SimulationParserGPU<MPILib::CustomConnectionParameters>::SimulationParserGPU(con
 
 template<>
 SimulationParserGPU<MPILib::CustomConnectionParameters>::SimulationParserGPU(int num_nodes, const std::string xml_filename) :
-	// For now we don't allow num_nodes : override to 1 node only.
 	SimulationParserCPU(num_nodes, xml_filename), vec_network(0.001) {
 }
 
@@ -25,7 +23,6 @@ SimulationParserGPU<MPILib::CustomConnectionParameters>::SimulationParserGPU(con
 
 template<>
 SimulationParserGPU<MPILib::DelayedConnection>::SimulationParserGPU(int num_nodes, const std::string xml_filename, std::map<std::string, std::string> vars) :
-	// For now we don't allow num_nodes : override to 1 node only.
 	SimulationParserCPU(num_nodes, xml_filename, vars), vec_network(0.001) {
 }
 
@@ -37,7 +34,6 @@ SimulationParserGPU<MPILib::DelayedConnection>::SimulationParserGPU(const std::s
 
 template<>
 SimulationParserGPU<MPILib::DelayedConnection>::SimulationParserGPU(int num_nodes, const std::string xml_filename) :
-	// For now we don't allow num_nodes : override to 1 node only.
 	SimulationParserCPU(num_nodes, xml_filename), vec_network(0.001) {
 }
 
@@ -140,12 +136,12 @@ void SimulationParserGPU<MPILib::DelayedConnection>::addMeshConnection(pugi::xml
 	char delay[255];
 	std::sscanf(values.c_str(), "%s %s %s", num_connections, efficacy, delay);
 
-	std::map<std::string, std::string> connection_parameters;
-	connection_parameters["num_connections"] = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(num_connections));
-	connection_parameters["efficacy"] = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(efficacy));
-	connection_parameters["delay"] = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(delay));
-
-	vec_network.addMeshCustomConnection(SimulationParserCPU<MPILib::DelayedConnection>::_node_ids[in], SimulationParserCPU<MPILib::DelayedConnection>::_node_ids[out], connection_parameters, &_mesh_transition_matrics[_node_algorithm_mapping[out]][SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsDouble(std::string(efficacy))]);
+	vec_network.addMeshConnection(SimulationParserCPU<MPILib::DelayedConnection>::_node_ids[in],
+		SimulationParserCPU<MPILib::DelayedConnection>::_node_ids[out],
+		interpretValueAsDouble(std::string(efficacy)),
+		interpretValueAsDouble(std::string(num_connections)),
+		interpretValueAsDouble(std::string(delay)),
+		&_mesh_transition_matrics[_node_algorithm_mapping[out]][SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsDouble(std::string(efficacy))]);
 }
 
 template<>
@@ -213,12 +209,12 @@ void SimulationParserGPU<MPILib::DelayedConnection>::addIncomingMeshConnection(p
 	char delay[255];
 	std::sscanf(values.c_str(), "%s %s %s", num_connections, efficacy, delay);
 
-	std::map<std::string, std::string> connection_parameters;
-	connection_parameters["num_connections"] = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(num_connections));
-	connection_parameters["efficacy"] = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(efficacy));
-	connection_parameters["delay"] = SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsString(std::string(delay));
-
-	vec_network.addMeshCustomConnection(SimulationParserCPU<MPILib::DelayedConnection>::_node_ids[node], connection_parameters, &_mesh_transition_matrics[_node_algorithm_mapping[node]][SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsDouble(std::string(efficacy))], _external_node_count);
+	vec_network.addMeshConnection(SimulationParserCPU<MPILib::DelayedConnection>::_node_ids[node], 
+		interpretValueAsDouble(std::string(efficacy)), 
+		interpretValueAsDouble(std::string(num_connections)), 
+		interpretValueAsDouble(std::string(delay)), 
+		&_mesh_transition_matrics[_node_algorithm_mapping[node]][SimulationParserCPU<MPILib::DelayedConnection>::interpretValueAsDouble(std::string(efficacy))], 
+		_external_node_count);
 }
 
 template<class WeightType>
@@ -265,16 +261,19 @@ bool SimulationParserGPU<WeightType>::addMeshAlgorithmGroupNode(pugi::xml_docume
 			double tau_refractive = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.attribute("tau_refractive").value()));
 			double time_step = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
 
-			std::map<double, TwoDLib::TransitionMatrix> matrices;
-			for (pugi::xml_node matrix_file = algorithm.child("MatrixFile"); matrix_file; matrix_file = matrix_file.next_sibling("MatrixFile")) {
-				// In this version, lets say that the efficacy must match the file name of the associated matrix file - makes so much more sense
-				// than to quote the efficacy value and hope we choose the correct mat file
-				auto s = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(matrix_file.child_value()));
-				auto tm = TwoDLib::TransitionMatrix(s);
-				matrices[tm.Efficacy()] = tm;
-			}
+			// Only load the matrices once for each algorithm.
+			if (!_mesh_transition_matrics.count(algorithm_name)) {
+				std::map<double, TwoDLib::TransitionMatrix> matrices;
+				for (pugi::xml_node matrix_file = algorithm.child("MatrixFile"); matrix_file; matrix_file = matrix_file.next_sibling("MatrixFile")) {
+					// In this version, lets say that the efficacy must match the file name of the associated matrix file - makes so much more sense
+					// than to quote the efficacy value and hope we choose the correct mat file
+					auto s = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(matrix_file.child_value()));
+					auto tm = TwoDLib::TransitionMatrix(s);
+					matrices[tm.Efficacy()] = tm;
+				}
 
-			_mesh_transition_matrics[algorithm_name] = matrices;
+				_mesh_transition_matrics[algorithm_name] = matrices;
+			}
 
 			// todo: Check time_step matches network time step
 
@@ -370,7 +369,7 @@ void SimulationParserGPU<WeightType>::parseXmlFile() {
 
 		//Connections
 		for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("Connection"); conn; conn = conn.next_sibling("Connection")) {
-			std::string conn_out = std::string(conn.attribute("Out").value());
+			std::string conn_out = std::string(conn.attribute("Out").value()) + std::string("_") + std::to_string(node_num);
 			if (_node_algorithm_types[conn_out] == std::string("grid"))
 				addGridConnection(conn);
 			if (_node_algorithm_types[conn_out] == std::string("mesh"))
@@ -379,7 +378,7 @@ void SimulationParserGPU<WeightType>::parseXmlFile() {
 
 		//Incoming Connections
 		for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("IncomingConnection"); conn; conn = conn.next_sibling("IncomingConnection")) {
-			std::string conn_node = std::string(conn.attribute("Node").value());
+			std::string conn_node = std::string(conn.attribute("Node").value()) + std::string("_") + std::to_string(node_num);
 			if (_node_algorithm_types[conn_node] == std::string("grid"))
 				addIncomingGridConnection(conn);
 			if (_node_algorithm_types[conn_node] == std::string("mesh"))
