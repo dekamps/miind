@@ -470,6 +470,7 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 		for (pugi::xml_node conn = doc.child("Simulation").child("Connections").child("OutgoingConnection"); conn; conn = conn.next_sibling("OutgoingConnection")) {
 			std::string node = interpretValueAsString(std::string(conn.attribute("Node").value())) + std::string("_") + std::to_string(node_num);
 			MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::network.setNodeExternalSuccessor(_node_ids[node]);
+			_ordered_output_nodes.push_back(node);
 		}
 
 		//Reporting Densities
