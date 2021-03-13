@@ -94,29 +94,29 @@ jobs:
           python -m pip install numpy matplotlib==3.2 scipy descartes shapely twine cibuildwheel==1.8.0
         
       - name: Build wheels on Windows
-        run: python -m cibuildwheel --output-dir wheelhouse
+        run: python -m cibuildwheel --output-dir dist
         if: contains( matrix.os, 'windows')
         
       - name: Build wheels on Linux
-        run: python -m cibuildwheel --output-dir wheelhouse
+        run: python -m cibuildwheel --output-dir dist
         if: contains( matrix.os, 'ubuntu')
         
       - name: Build wheels on MacOS
         env:
           CC: gcc-6
           CXX: g++-6
-        run: python -m cibuildwheel --output-dir wheelhouse
+        run: python -m cibuildwheel --output-dir dist
         if: contains( matrix.os, 'macos')
             
       - uses: actions/upload-artifact@v2
         with:
-          path: ./wheelhouse/*.whl 
+          path: ./dist/*.whl 
 
       - name: Publish package to test pypi
-        run: python -m twine upload -u __token__ -p ${{ secrets.PYPI_TEST_MIIND_API_TOKEN }} --skip-existing --repository testpypi ./wheelhouse/*
+        run: python -m twine upload -u __token__ -p ${{ secrets.PYPI_TEST_MIIND_API_TOKEN }} --skip-existing --repository testpypi dist/*
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         
       - name: Publish package to pypi
-        run: python -m twine upload --skip-existing -u __token__ -p ${{ secrets.PYPI_MIIND_API_TOKEN }} ./wheelhouse/*
+        run: python -m twine upload -u __token__ -p ${{ secrets.PYPI_MIIND_API_TOKEN }} dist/*
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         

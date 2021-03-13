@@ -445,7 +445,7 @@ void MPINetwork<WeightValue, NodeDistribution>::clearSimulation() {
 	for (auto& it : _localNodes) {
 		it.second.clearSimulation();
 	}
-
+	_localNodes.clear();
 }
 
 template<class WeightValue, class NodeDistribution>

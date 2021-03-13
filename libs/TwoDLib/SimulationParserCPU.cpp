@@ -98,6 +98,19 @@ double SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string value
 
 template<class WeightType>
 void SimulationParserCPU<WeightType>::endSimulation() {
+	_connections.clear();
+	_ordered_output_nodes.clear();
+	_display_nodes.clear();
+	_rate_nodes.clear();
+	_rate_node_intervals.clear();
+	_density_nodes.clear();
+	_density_node_start_times.clear();
+	_density_node_end_times.clear();
+	_density_node_intervals.clear();
+	_node_ids.clear();
+	_algorithms.clear();
+	_variables.clear();
+
 	MPILib::MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::endSimulation();
 }
 

@@ -89,11 +89,24 @@ int main(int argc, char* argv[]) {
         std::string var_val = arg.substr(0, arg.find(delimiter));
         vars[var_name] = var_val;
     }
-
     InitialiseModel(node_count, xmlfile, vars);
+    
     double time = 0.0;
 
     if (modelCcp) {
+        std::cout << "Time Step: " << modelCcp->getTimeStep() << "\n";
+        std::cout << "Sim Time: " << modelCcp->getSimulationLength() << "\n";
+        modelCcp->startSimulation();
+        while (time < modelCcp->getSimulationLength()) {
+            time += modelCcp->getTimeStep();
+            modelCcp->evolveSingleStep(std::vector<double>());
+        }
+        modelCcp->endSimulation();
+
+
+        InitialiseModel(node_count, xmlfile, vars);
+        time = 0.0;
+
         std::cout << "Time Step: " << modelCcp->getTimeStep() << "\n";
         std::cout << "Sim Time: " << modelCcp->getSimulationLength() << "\n";
         modelCcp->startSimulation();

@@ -430,6 +430,9 @@ void SimulationParserGPU<WeightType>::parseXmlFile() {
 	std::string log_filename = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(doc.child("Simulation").child("SimulationRunParameter").child_value("name_log")));
 	unsigned int master_steps = interpretValueAsInt(std::string(doc.child("Simulation").child("SimulationRunParameter").child_value("master_steps")));
 
+	if (master_steps == 0) // Let's assume that if we didn't include a master_steps or we set it to 0, we just want the default of 10.
+		master_steps = 10;
+
 	SimulationParserCPU<WeightType>::_simulation_length = simulation_length;
 	SimulationParserCPU<WeightType>::_time_step = time_step;
 	vec_network.setTimeStep(time_step);
