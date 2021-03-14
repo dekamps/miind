@@ -36,17 +36,20 @@ else:
                 [key, val] = a.strip().split('=')
                 miind_vars[key] = val
 
-    miind.init(num_nodes, sys.argv[1], **miind_vars)
+    try:
+        miind.init(num_nodes, sys.argv[1], **miind_vars)
 
-    timestep = miind.getTimeStep()
-    simulation_length = miind.getSimulationLength()
-    print('Timestep from XML : {}'.format(timestep))
-    print('Sim time from XML : {}'.format(simulation_length))
+        timestep = miind.getTimeStep()
+        simulation_length = miind.getSimulationLength()
+        print('Timestep from XML : {}'.format(timestep))
+        print('Sim time from XML : {}'.format(simulation_length))
 
-    miind.startSimulation()
+        miind.startSimulation()
 
-    for i in range(int(simulation_length/timestep)):
-        miind.evolveSingleStep([])
+        for i in range(int(simulation_length/timestep)):
+            miind.evolveSingleStep([])
 
-    miind.endSimulation()
+        miind.endSimulation()
+    except Exception as inst:
+        print(inst)
 

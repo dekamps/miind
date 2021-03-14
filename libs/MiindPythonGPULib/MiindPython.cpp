@@ -113,70 +113,113 @@ std::map<std::string, std::string> ParseArguments(int& num_nodes, PyObject* args
 
 PyObject* miind_init(PyObject* self, PyObject* args, PyObject* keywds)
 {
-    if (modelCcp) {
-        delete modelCcp;
-        modelCcp = NULL;
-    }
-
-    if (modelDc) {
-        delete modelDc;
-        modelDc = NULL;
-    }
-
-    int nodes = -1;
-
-    std::map<std::string, std::string> argvars = ParseArguments(nodes, args, keywds);
-    std::string filename = argvars[std::string("_1927482_MIIND_SIMULATION_FILENAME")];
-    std::map<std::string, std::string> sim_variables = getVariablesFromFile(filename);
-
-    // Replace sim_variable values with matching keys in argvars
-    std::map<std::string, std::string>::iterator it;
-
-    for (it = argvars.begin(); it != argvars.end(); it++)
-    {
-        if (it->first == std::string("_1927482_MIIND_SIMULATION_FILENAME"))
-            continue;
-
-        if (!sim_variables.count(it->first)) {
-            std::cout << "Warning: Named argument [" << it->first << "] passed to init does not match any variables in " << filename << "\n";
-            continue;
+    try {
+        if (modelCcp) {
+            delete modelCcp;
+            modelCcp = NULL;
         }
 
-        sim_variables[it->first] = it->second;
+        if (modelDc) {
+            delete modelDc;
+            modelDc = NULL;
+        }
+
+        int nodes = -1;
+
+        std::map<std::string, std::string> argvars = ParseArguments(nodes, args, keywds);
+        std::string filename = argvars[std::string("_1927482_MIIND_SIMULATION_FILENAME")];
+        std::map<std::string, std::string> sim_variables = getVariablesFromFile(filename);
+
+        // Replace sim_variable values with matching keys in argvars
+        std::map<std::string, std::string>::iterator it;
+
+        for (it = argvars.begin(); it != argvars.end(); it++)
+        {
+            if (it->first == std::string("_1927482_MIIND_SIMULATION_FILENAME"))
+                continue;
+
+            if (!sim_variables.count(it->first)) {
+                std::cout << "Warning: Named argument [" << it->first << "] passed to init does not match any variables in " << filename << "\n";
+                continue;
+            }
+
+            sim_variables[it->first] = it->second;
+        }
+
+        if (nodes > 0)
+            InitialiseModel(nodes, filename, sim_variables);
+        else
+            InitialiseModel(filename, sim_variables);
+
+        Py_RETURN_NONE;
     }
-
-    if (nodes > 0)
-        InitialiseModel(nodes, filename, sim_variables);
-    else
-        InitialiseModel(filename, sim_variables);
-
-    Py_RETURN_NONE;
+    catch (const std::exception& e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what());
+        return NULL;
+    }
+    catch (...) {
+        PyErr_SetString(PyExc_RuntimeError, "Unhandled Exception during init()");
+        return NULL;
+    }
 }
 
 PyObject* miind_getTimeStep(PyObject* self, PyObject* args)
 {
-    if (modelCcp)
-        return Py_BuildValue("d", modelCcp->getTimeStep());
-    if (modelDc)
-        return Py_BuildValue("d", modelDc->getTimeStep());
+    try {
+        if (modelCcp)
+            return Py_BuildValue("d", modelCcp->getTimeStep());
+        if (modelDc)
+            return Py_BuildValue("d", modelDc->getTimeStep());
+    }
+    catch (const std::exception& e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what());
+        return NULL;
+    }
+    catch (...) {
+        PyErr_SetString(PyExc_RuntimeError, "Unhandled Exception during getTimeStep()");
+        return NULL;
+    }
+
 }
 
 PyObject* miind_getSimulationLength(PyObject* self, PyObject* args)
 {
-    if (modelCcp)
-        return Py_BuildValue("d", modelCcp->getSimulationLength());
-    if (modelDc)
-        return Py_BuildValue("d", modelDc->getSimulationLength());
+    try {
+        if (modelCcp)
+            return Py_BuildValue("d", modelCcp->getSimulationLength());
+        if (modelDc)
+            return Py_BuildValue("d", modelDc->getSimulationLength());
+    }
+    catch (const std::exception& e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what());
+        return NULL;
+    }
+    catch (...) {
+        PyErr_SetString(PyExc_RuntimeError, "Unhandled Exception during getSimulationLength()");
+        return NULL;
+    }
+    
 }
 
 PyObject* miind_startSimulation(PyObject* self, PyObject* args)
 {
-    if (modelCcp)
-        modelCcp->startSimulation();
-    else if (modelDc)
-        modelDc->startSimulation();
+    try {
+        if (modelCcp)
+            modelCcp->startSimulation();
+        else if (modelDc)
+            modelDc->startSimulation();
 
-    Py_RETURN_NONE;
+        Py_RETURN_NONE;
+    }
+    catch (const std::exception& e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what());
+        return NULL;
+    }
+    catch (...) {
+        PyErr_SetString(PyExc_RuntimeError, "Unhandled Exception during startSimulation()");
+        return NULL;
+    }
+    
 }
 
 PyObject* miind_evolveSingleStep(PyObject* self, PyObject* args)
@@ -200,30 +243,51 @@ PyObject* miind_evolveSingleStep(PyObject* self, PyObject* args)
         activities[index] = PyFloat_AsDouble(item);
     }
 
-    std::vector<double> out_activities;
+    try {
+        std::vector<double> out_activities;
 
-    if (modelCcp)
-        out_activities = modelCcp->evolveSingleStep(activities);
-    else if (modelDc)
-        out_activities = modelDc->evolveSingleStep(activities);
+        if (modelCcp)
+            out_activities = modelCcp->evolveSingleStep(activities);
+        else if (modelDc)
+            out_activities = modelDc->evolveSingleStep(activities);
 
-    PyObject* tuple = PyTuple_New(out_activities.size());
+        PyObject* tuple = PyTuple_New(out_activities.size());
 
-    for (int index = 0; index < out_activities.size(); index++) {
-        PyTuple_SetItem(tuple, index, Py_BuildValue("d", out_activities[index]));
+        for (int index = 0; index < out_activities.size(); index++) {
+            PyTuple_SetItem(tuple, index, Py_BuildValue("d", out_activities[index]));
+        }
+
+        return tuple;
     }
-
-    return tuple;
+    catch (const std::exception& e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what());
+        return NULL;
+    }
+    catch (...) {
+        PyErr_SetString(PyExc_RuntimeError, "Unhandled Exception during evolveSingleStep()");
+        return NULL;
+    }
 }
 
 PyObject* miind_endSimulation(PyObject* self, PyObject* args)
 {
-    if (modelCcp)
-        modelCcp->endSimulation();
-    else if (modelDc)
-        modelDc->endSimulation();
+    try {
+        if (modelCcp)
+            modelCcp->endSimulation();
+        else if (modelDc)
+            modelDc->endSimulation();
 
-    Py_RETURN_NONE;
+        Py_RETURN_NONE;
+    }
+    catch (const std::exception& e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what());
+        return NULL;
+    }
+    catch (...) {
+        PyErr_SetString(PyExc_RuntimeError, "Unhandled Exception during endSimulation()");
+        return NULL;
+    }
+    
 }
 
 /*
