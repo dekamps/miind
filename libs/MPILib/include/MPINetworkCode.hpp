@@ -39,7 +39,7 @@
 namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
-MPINetwork<WeightValue, NodeDistribution>::MPINetwork(){
+MPINetwork<WeightValue, NodeDistribution>::MPINetwork() : _externalReceivers(0), _externalSenders(0){
 }
 
 template<class WeightValue, class NodeDistribution>
