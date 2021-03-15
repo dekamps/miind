@@ -74,15 +74,6 @@ def main():
     # Raw paths relative to sourcetree root.
     files_outside_package_dir = {"miind": []}
     
-    # Copy triplet files to vcpkg from custom-triplets to vcpkg
-    src_linux = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'custom-triplets/x64-linux-mixed.cmake')
-    src_osx = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'custom-triplets/x64-osx-mixed.cmake')
-    #src_windows = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'custom-triplets/x64-windows-mixed.cmake')
-    dst = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'vcpkg/triplets/')
-    shutil.copy2(src_linux, dst)
-    shutil.copy2(src_osx, dst)
-    #shutil.copy2(src_windows, dst)
-    
     # vcpkg builds libraries which are too new for manylinux2014 so
     # is disabled for Linux
     cmake_args = (
@@ -93,12 +84,7 @@ def main():
             '-DENABLE_TESTING:BOOL=ON',
             '-DENABLE_CUDA:BOOL=ON',
             '-DENABLE_ROOT:BOOL=OFF',
-            '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_30,code=[compute_30,sm_30]'#, VCPkg installs libraries which are too new for manylinux2014 so we have to do it the old fashioned way. sucks.
-            #'-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
-            #'-DVCPKG_MANIFEST_MODE:BOOL=ON',
-            #'-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
-            #'-DVCPKG_TARGET_TRIPLET=x64-linux-mixed',
-            #'-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/vcpkg/scripts/buildsystems/vcpkg.cmake'
+            '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_30,code=[compute_30,sm_30]'
         ]
     )
         
@@ -129,13 +115,8 @@ def main():
                 '-DENABLE_MPI:BOOL=OFF',
                 '-DENABLE_TESTING:BOOL=ON',
                 '-DENABLE_CUDA:BOOL=OFF',
-                '-DENABLE_ROOT:BOOL=OFF',
-                '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_30,code=[compute_30,sm_30]'#,
-                #'-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
-                #'-DVCPKG_MANIFEST_MODE:BOOL=ON',
-                #'-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
-                #'-DVCPKG_TARGET_TRIPLET=x64-osx-mixed',
-                #'-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + #'/vcpkg/scripts/buildsystems/vcpkg.cmake'
+                '-DENABLE_ROOT:BOOL=OFF'#,
+                #'-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_30,code=[compute_30,sm_30]'
             ]
         )
     

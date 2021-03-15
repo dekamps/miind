@@ -11,13 +11,10 @@ jobs:
         os: [ubuntu-18.04, windows-2019, macos-10.15]  
         include:
           - os: windows-2019
-            triplet: x64-windows
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
           - os: ubuntu-18.04
-            triplet: x64-linux-mixed
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
           - os: macos-10.15
-            triplet: x64-osx-mixed
             vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
             
     env:
@@ -45,13 +42,6 @@ jobs:
           submodules: true
           
       - uses: lukka/get-cmake@latest
-      
-        # Linux does not use vcpkg because it builds libraries
-        # which are too new for manylinux to support.
-      - run: |
-            cp custom-triplets/*.cmake vcpkg/triplets
-        shell: bash
-        if: contains( matrix.os, 'windows') || contains( matrix.os, 'macos')
           
       - name: Setup Visual Studio ENV VARS
         run: C:/"Program Files (x86)"/"Microsoft Visual Studio"/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat
@@ -79,7 +69,7 @@ jobs:
           # Since the cache must be invalidated when content of the vcpkg.json file changes, let's
           # compute its hash and append this to the computed cache's key.
           appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
-          vcpkgTriplet: ${{ matrix.triplet }}
+          vcpkgTriplet: x64-windows
           # Ensure the vcpkg artifacts are cached, they are generated in the 'CMAKE_BINARY_DIR/vcpkg_installed' directory.
           additionalCachedPaths: ${{ github.workspace }}/vcpkg_installed
         if: contains( matrix.os, 'windows')
@@ -112,9 +102,9 @@ jobs:
         with:
           path: dist/*.whl 
 
-      - name: Publish package to test pypi
-        run: python -m twine upload -u __token__ -p ${{ secrets.PYPI_TEST_MIIND_API_TOKEN }} --skip-existing --repository testpypi dist/*
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+      #- name: Publish package to test pypi
+      #  run: python -m twine upload -u __token__ -p ${{ secrets.PYPI_TEST_MIIND_API_TOKEN }} --skip-existing --repository testpypi dist/*
+      #  if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         
       - name: Publish package to pypi
         run: python -m twine upload dist/* -u __token__ -p ${{ secrets.PYPI_MIIND_API_TOKEN }}
