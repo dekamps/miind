@@ -91,7 +91,7 @@ jobs:
         run: echo "LD_LIBRARY_PATH=${{ env.installDir }}/lib" >> $GITHUB_ENV
         if: contains( matrix.os, 'ubuntu')
       - name: Add DYLD_LIBRARY_PATH to ENV
-        run: echo "LD_LIBRARY_PATH=/Developer/NVIDIA/CUDA-11.2/lib:${{ env.installDir }}/lib" >> $GITHUB_ENV
+        run: echo "DYLD_LIBRARY_PATH=/Developer/NVIDIA/CUDA-11.2/lib:${{ env.installDir }}/lib" >> $GITHUB_ENV
         if: contains( matrix.os, 'macos')
       - name: Add miind python to PYTHONPATH
         run: echo "PYTHONPATH=${{ env.installDir }}/share/miind/python" >> $GITHUB_ENV
@@ -128,15 +128,14 @@ jobs:
         run: ${{ env.installDir }}/share/miind/apps/MatrixGenerator/MatrixGenerator
         shell: bash
        
-      # TESTS DON'T WORK ON MAC! AT LEAST WE CAN CHECK IT BUILDS THOUGH
-      #- name: Run Integration Tests
-      #  env:
-      #    CC: gcc-6
-      #    CXX: g++-6
-      #  working-directory: ${{ github.workspace }}/examples/IntegrationTests 
-      #  run: python system_tests.py
-      #  shell: bash
-      #  if: contains( matrix.os, 'macos')
+      - name: Run Integration Tests
+        env:
+          CC: gcc-6
+          CXX: g++-6
+        working-directory: ${{ github.workspace }}/examples/IntegrationTests 
+        run: python system_tests.py
+        shell: bash
+        if: contains( matrix.os, 'macos')
         
       - name: Run Integration Tests
         working-directory: ${{ github.workspace }}/examples/IntegrationTests 

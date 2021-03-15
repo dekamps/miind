@@ -26,7 +26,7 @@ jobs:
       CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib scipy shapely descartes
       # Linux builds are on docker images so we need to add the dependency installation setup here so they go to the docker not the host. Installing cuda is *SLOW* and we have to do it on *EVERY* image argh!
       CIBW_BEFORE_BUILD_LINUX: bash setupCiBuildPython.sh ; yum install -y centos-release-scl ; yum install -y devtoolset-7 ; yum install -y ninja-build boost-devel pugixml-devel python36-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel wget ; wget  https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-repo-rhel7-10.0.130-1.x86_64.rpm ; rpm -i cuda-repo-*.rpm ; yum install -y cuda-10-0 
-      CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" #delocate-listdeps -d -a {wheel} && delocate-wheel -w {dest_dir} -v {wheel}
+      #CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" #delocate-listdeps -d -a {wheel} && delocate-wheel -w {dest_dir} -v {wheel}
       CIBW_ENVIRONMENT_WINDOWS: "PATH=$PATH:\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin\":\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/libnvvp\" CUDA_PATH=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2\" CUDACXX=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin/nvcc.exe\""
       CIBW_ENVIRONMENT_MACOS: "PATH=$PATH:/Developer/NVIDIA/CUDA-11.2/bin DYLD_LIBRARY_PATH=/Developer/NVIDIA/CUDA-11.2/lib CC=gcc-6 CXX=g++-6"
       CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/usr/lib64/openmpi/bin/ LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:/usr/lib64/nvidia:$LD_LIBRARY_PATH CC=/opt/rh/devtoolset-7/root/usr/bin/gcc CXX=/opt/rh/devtoolset-7/root/usr/bin/g++"
@@ -34,7 +34,7 @@ jobs:
       CIBW_TEST_COMMAND_LINUX: python -m miind.system_tests
       CIBW_TEST_COMMAND_WINDOWS: python -m miind.system_tests
       #TESTS DON'T WORK ON MAC CI MACHINE! LET'S STILL BUILD AND DISTRIBUTE IT FOR NOW
-      #CIBW_TEST_COMMAND_MACOS: python -m miind.system_tests
+      CIBW_TEST_COMMAND_MACOS: python -m miind.system_tests
     steps:
     
       - uses: actions/checkout@v2
@@ -43,10 +43,6 @@ jobs:
           
       - uses: lukka/get-cmake@latest
           
-      - name: Setup Visual Studio ENV VARS
-        run: C:/"Program Files (x86)"/"Microsoft Visual Studio"/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat
-        if: contains( matrix.os, 'windows')
-        
       - name: Add msbuild to PATH
         uses: ilammy/msvc-dev-cmd@v1
         if: contains( matrix.os, 'windows')
@@ -85,18 +81,6 @@ jobs:
         
       - name: Build wheels on Windows
         run: python -m cibuildwheel --output-dir dist
-        if: contains( matrix.os, 'windows')
-        
-      - name: Build wheels on Linux
-        run: python -m cibuildwheel --output-dir dist
-        if: contains( matrix.os, 'ubuntu')
-        
-      - name: Build wheels on MacOS
-        env:
-          CC: gcc-6
-          CXX: g++-6
-        run: python -m cibuildwheel --output-dir dist
-        if: contains( matrix.os, 'macos')
             
       - uses: actions/upload-artifact@v2
         with:
