@@ -111,7 +111,7 @@ def main():
         cmake_args = (
             [
                 '-DCMAKE_BUILD_TYPE=Release',
-                '-DENABLE_OPENMP:BOOL=ON',
+                '-DENABLE_OPENMP:BOOL=OFF',
                 '-DENABLE_MPI:BOOL=OFF',
                 '-DENABLE_TESTING:BOOL=ON',
                 '-DENABLE_CUDA:BOOL=OFF',
