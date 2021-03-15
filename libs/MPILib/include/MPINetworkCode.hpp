@@ -202,7 +202,7 @@ template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::setExternalPrecursorActivities(
 std::vector<ActivityType> activities) {
 
-	if (_externalReceivers.empty() && activities.empty())
+	if (_externalReceivers.empty() || activities.empty())
 		return;
 
 	// Check that sizes match up
