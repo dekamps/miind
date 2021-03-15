@@ -86,6 +86,10 @@ jobs:
         with:
           path: dist/*.whl 
           
+      - name: Install delocate on MacOS
+        run: python -m pip install delocate
+        if: contains( matrix.os, 'macos')
+          
       - name: Try MacOS delocate-wheel manually
         run: delocate-wheel -w dist -v dist/miind-0.0.18-cp36-cp36m-macosx_10_9_x86_64.whl
         if: contains( matrix.os, 'macos')
