@@ -64,7 +64,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=OFF -DENABLE_MPI:BOOL=OFF -DENABLE_CUDA:BOOL=OFF'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=ON -DENABLE_MPI:BOOL=OFF -DENABLE_CUDA:BOOL=OFF'
           buildWithCMake: true
         if: contains( matrix.os, 'macos')
         
@@ -91,7 +91,7 @@ jobs:
         run: echo "LD_LIBRARY_PATH=${{ env.installDir }}/lib" >> $GITHUB_ENV
         if: contains( matrix.os, 'ubuntu')
       - name: Add DYLD_LIBRARY_PATH to ENV
-        run: echo "DYLD_LIBRARY_PATH=/Developer/NVIDIA/CUDA-11.2/lib:${{ env.installDir }}/lib" >> $GITHUB_ENV
+        run: echo "DYLD_LIBRARY_PATH=${{ env.installDir }}/lib" >> $GITHUB_ENV
         if: contains( matrix.os, 'macos')
       - name: Add miind python to PYTHONPATH
         run: echo "PYTHONPATH=${{ env.installDir }}/share/miind/python" >> $GITHUB_ENV
@@ -101,9 +101,6 @@ jobs:
         run: echo "CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind:${{ env.installDir }}/include/miind/GeomLib" >> $GITHUB_ENV
       - name: Add MIIND_INCLUDE_DIR to ENV
         run: echo "MIIND_INCLUDE_DIR=${{ env.installDir }}/include/miind" >> $GITHUB_ENV
-      - name: Add cuda to path
-        run: echo '/Developer/NVIDIA/CUDA-11.2/bin' >> $GITHUB_PATH
-        if: contains( matrix.os, 'macos')
       - name: Update locate database on Linux
         run: sudo updatedb
         shell: bash

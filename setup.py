@@ -114,9 +114,8 @@ def main():
                 '-DENABLE_OPENMP:BOOL=ON',
                 '-DENABLE_MPI:BOOL=OFF',
                 '-DENABLE_TESTING:BOOL=ON',
-                '-DENABLE_CUDA:BOOL=ON',
-                '-DENABLE_ROOT:BOOL=OFF',
-                '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_30,code=[compute_30,sm_30]'
+                '-DENABLE_CUDA:BOOL=OFF',
+                '-DENABLE_ROOT:BOOL=OFF'
             ]
         )
     
