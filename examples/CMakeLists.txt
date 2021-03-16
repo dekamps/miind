@@ -48,9 +48,10 @@ qif/show_qif_gain.py
 
 set( TVB
 miind_tvb/tvb_miind_sim.py
-miind_tvb/lif_0.01_0_0_0_.mat
-miind_tvb/lif.xml
-miind_tvb/lif.model
+miind_tvb/grid_izhikevich.py
+miind_tvb/izh.model
+miind_tvb/izh.xml
+miind_tvb/izh_0_0_0_0_.tmat
 )
 
 set( RATE
@@ -189,6 +190,11 @@ tutorial/vectorised/adex_-1_0_0_0_.mat
 tutorial/vectorised/vector.xml
 )
 
+set( QUICK_START
+quick_start/cond.xml
+quick_start/generateCondFiles.py
+)
+
 ADD_SUBDIRECTORY(IntegrationTests)
 
 set(EXAMPLES_BASE_DIR share/miind/examples)
@@ -205,6 +211,8 @@ install( FILES ${QIF}
     DESTINATION ${EXAMPLES_BASE_DIR}/qif )
 install( FILES ${TVB}
     DESTINATION ${EXAMPLES_BASE_DIR}/miind_tvb )
+install( FILES ${QUICK_START}
+    DESTINATION ${EXAMPLES_BASE_DIR}/quick_start )
 install( FILES ${RATE}
     DESTINATION ${EXAMPLES_BASE_DIR}/rate_based )
 install( FILES ${RESP}

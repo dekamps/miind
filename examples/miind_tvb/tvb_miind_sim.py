@@ -6,7 +6,7 @@ from tvb.simulator.lab import *
 
 import miind.TvbMiindModel as tvbmiind
 
-model = tvbmiind.Miind("lif.xml", 76)
+model = tvbmiind.Miind("izh.xml", 76, duplicate_connections=True)
 
 white_matter = connectivity.Connectivity.from_file()
 white_matter.speed = numpy.array([4.0])
@@ -45,7 +45,7 @@ TAVG = numpy.array(tavg_data)
 
 plt.figure(1)
 plt.plot(raw_time, RAW[:, 0, :, 0])
-plt.title("LIF Excitatory Population Mean Firing Rate \nUsing MIIND's LIF population model in TVB")
+plt.title("Default TVB whole-brain connectivity using populations \n of Izhikevich simple neurons simulated in MIIND.")
 plt.ylabel("Firing Rate (Hz)")
 plt.xlabel("Time (ms)")
 plt.show()

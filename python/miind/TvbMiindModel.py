@@ -95,8 +95,25 @@ class Miind(Model):
     gid = Final( label="gid", default=uuid.uuid1(), doc="""This is a hack""")
     log = get_logger(__name__)
 
-    def __init__(self, sim_file, num_nodes):
+    def __init__(self, sim_file, num_nodes, duplicate_connections=False):
+        # In TVB, connection weights can cause input activities to MIIND
+        # to go negative (inhibition). MIIND expects to always recieve positive
+        # activities with the post synaptic efficacy either excitatory or inhibitory
+        # As a work around, we can set duplicate_connections to True
+        # All TVB connections will be duplicated with the expectation that 
+        # every IncomingConnection in the MIIND simulation is duplicated in the XML:
+        # one with a positive efficacy, one with a matching negative efficacy.
+        #
+        # eg. if in dfun, parameter x multiplied by the coupling yields
+        # c_ = [0.24, -3.2, 1.324, -0.52]
+        # with duplicate_connections == True
+        # cd_ = [0.24, 0.0, 0.0, 3.2, 1.324, 0.0, 0.0, 0.52] will be passed to MIIND
+        #
+        # See the miind_tvb example.
+        self.duplicate_connections = duplicate_connections
+        
         sim = MiindSimulation(sim_file)
+        
         if sim.requires_cuda:
             print("Group algorithm detected. Importing Cuda MIIND (miindsimv).")
             import miind.miindsimv as miind_sim
@@ -131,6 +148,16 @@ class Miind(Model):
         coupling_S = c_0 + lc_0
 
         c_ = coupling_S[:,0]
-        x_ = numpy.array(self.miind.evolveSingleStep(c_.tolist()))
+        # In TVB, the coupling can make the incoming activity go negative.
+        # MIIND does not allow negative activities (only negative efficacies)
+        # To work with TVB, all MIIND simulations must provide a positive and
+        # negative efficacy incoming connection.
+        # Here we duplicate and negate each incoming activity
+        if self.duplicate_connections:
+            cn_ = [i*val if i*val > 0 else 0.0 for val in c_.tolist() for i in (1, -1)]
+        else:
+            cn_ = c_.tolist()
+        
+        x_ = numpy.array(self.miind.evolveSingleStep(cn_))
 
         return numpy.reshape(x_, x.shape)
