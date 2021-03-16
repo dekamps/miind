@@ -39,7 +39,7 @@ def main():
         "\\", "/"
     )
 
-    package_version = "0.0.18"
+    package_version = "0.0.19"
 
     package_name = "miind"
 

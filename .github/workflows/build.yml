@@ -90,12 +90,7 @@ jobs:
         run: python -m pip install delocate
         if: contains( matrix.os, 'macos')
         
-      - name: Get the version
-        id: get_version
-        #run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v/}
-        run: echo ::set-output name=VERSION::0.0.18 
-        if: contains( matrix.os, 'macos')
-        
+        # Cibuildwheel's delocate-wheel call seems broken for some reason. Let's do it ourselves now
       - name: Try MacOS delocate-wheel manually
         run: delocate-wheel -v dist/*-cp36-cp36m-macosx_10_9_x86_64.whl & delocate-wheel -v dist/*-cp37-cp37m-macosx_10_9_x86_64.whl & delocate-wheel -v dist/*-cp38-cp38-macosx_10_9_x86_64.whl & delocate-wheel -v dist/*-cp39-cp39-macosx_10_9_x86_64.whl
         if: contains( matrix.os, 'macos')
