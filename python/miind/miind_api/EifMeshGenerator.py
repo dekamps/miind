@@ -48,7 +48,7 @@ class EifMeshGenerator:
 
             meshfile.write('ignore\n')
             bin=[]
-            meshfile.write(str(self.dt) +'\n')
+            meshfile.write(str(self.dt*0.001) +'\n')
 
             # strip below reversal potential (v_l)
             v0 = self.V_min
@@ -72,8 +72,6 @@ class EifMeshGenerator:
             meshfile.write('\n')
             meshfile.write('closed\n')
             
-            print("Here1")
-            
             # strip between threshold and reversale potentials (v_th -> v_l)
             v0 = self.calculated_threshold - self.epsilon
             
@@ -95,9 +93,6 @@ class EifMeshGenerator:
                 meshfile.write(str(0.0) + '\t')
             meshfile.write('\n')
             meshfile.write('closed\n')
-            
-            
-            print("HEre2")
             
             # strip between vmax and threshold potentials (V_max -> v_l)
             v0 = self.V_max
