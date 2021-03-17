@@ -9,6 +9,8 @@ To install with pip::
 
     $ python -m pip install miind
 	
+MIIND is available on Windows, MacOS, and Linux for python versions >=3.6.
+	
 Standalone package
 ------------------
 

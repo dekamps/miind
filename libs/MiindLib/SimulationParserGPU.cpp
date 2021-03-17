@@ -310,6 +310,20 @@ bool SimulationParserGPU<WeightType>::addRateFunctorNode(pugi::xml_document& doc
 			vec_network.addRateNode(_rate_functors.back());
 			return true;
 		}
+
+		if (std::string("RateAlgorithm") == SimulationParserCPU<WeightType>::interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
+			std::string algorithm_name = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(algorithm.attribute("name").value()));
+			if (alg_name != algorithm_name)
+				continue;
+
+			double rate = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.child_value("rate")));
+
+			rate_functor rf(rate);
+			_rate_functors.push_back(rf);
+
+			vec_network.addRateNode(_rate_functors.back());
+			return true;
+		}
 	}
 	return false;
 }

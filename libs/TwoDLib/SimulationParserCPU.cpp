@@ -290,6 +290,17 @@ void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithm
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new MPILib::RateAlgorithm<MPILib::CustomConnectionParameters>(rate));
 		}
 
+		if (std::string("RateAlgorithm") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
+			// As we can't use the "expression" part properly here because we're not doing an intemediate cpp translation step
+			// Let's just use RateAlgorithm for RateFunctor for now.
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
+			std::cout << "Found RateAlgorithm " << algorithm_name << ".\n";
+
+			double rate = interpretValueAsDouble(std::string(algorithm.child_value("rate")));
+
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new MPILib::RateAlgorithm<MPILib::CustomConnectionParameters>(rate));
+		}
+
 	}
 
 }
@@ -344,6 +355,17 @@ void SimulationParserCPU< MPILib::DelayedConnection>::parseXMLAlgorithms(pugi::x
 
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::DelayedConnection>>(new MPILib::RateAlgorithm<MPILib::DelayedConnection>(rate));
 		}
+
+		if (std::string("RateAlgorithm") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
+			// As we can't use the "expression" part properly here because we're not doing an intemediate cpp translation step
+			// Let's just use RateAlgorithm for RateFunctor for now.
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
+			std::cout << "Found RateAlgorithm " << algorithm_name << ".\n";
+
+			double rate = interpretValueAsDouble(std::string(algorithm.child_value("rate")));
+
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::DelayedConnection>>(new MPILib::RateAlgorithm<MPILib::DelayedConnection>(rate));
+		}
 	}
 
 }
@@ -380,6 +402,17 @@ void SimulationParserCPU<double>::parseXMLAlgorithms(pugi::xml_document& doc,
 			std::cout << "Found RateFunctor (Using a RateAlgorithm) " << algorithm_name << ".\n";
 
 			double rate = interpretValueAsDouble(std::string(algorithm.child_value("expression")));
+
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<double>>(new MPILib::RateAlgorithm<double>(rate));
+		}
+
+		if (std::string("RateAlgorithm") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
+			// As we can't use the "expression" part properly here because we're not doing an intemediate cpp translation step
+			// Let's just use RateAlgorithm for RateFunctor for now.
+			std::string algorithm_name = interpretValueAsString(std::string(algorithm.attribute("name").value()));
+			std::cout << "Found RateAlgorithm " << algorithm_name << ".\n";
+
+			double rate = interpretValueAsDouble(std::string(algorithm.child_value("rate")));
 
 			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<double>>(new MPILib::RateAlgorithm<double>(rate));
 		}
