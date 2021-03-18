@@ -204,7 +204,9 @@ class Marginal(Result):
             self.plotW(self['times'][ii], axs[1])
             required_padding = len(str(len(self.times)))
             padding_format_code = '{0:0' + str(required_padding) + 'd}'
-            figname = op.join(self.path, (padding_format_code).format(ii) )
+            # We used to need the padding but don't any more (I hope)...
+            #figname = op.join(self.path, (padding_format_code).format(ii) )
+            figname = op.join(self.path, str(ii) )
             fig.savefig(figname, res=image_size, bbox_inches='tight')
             plt.close(fig)
 
@@ -218,18 +220,15 @@ class Marginal(Result):
             files = glob.glob(op.join(self.path, '*.png'))
             files.sort()
 
-
             # note ffmpeg must be installed
-            # example : ffmpeg -r 1000 -f image2 -pattern_type glob -i "*.png" test.mp4
             process = ['ffmpeg',
-                '-r', str(int((1.0 / time_scale) * (len(files) / float(self.times[-1])))),
-                '-f', 'image2',
-                '-pattern_type', 'glob',
-                '-i', op.join(self.path, '*.png')]
+                '-r', str(1.0/time_scale),
+                '-i', op.join(self.path, "%d.png")]
 
             process.append(filename + '.mp4')
 
             subprocess.call(process)
+
         except OSError as e:
             if e.errno == 2:
                 print ("MIIND API Error : generateMarginalAnimation() requires ffmpeg to be installed.")

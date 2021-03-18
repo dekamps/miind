@@ -54,6 +54,15 @@ miind_tvb/izh.xml
 miind_tvb/izh_0_0_0_0_.tmat
 )
 
+set( CLI_PLOTS
+cli_plots/example.xml
+cli_plots/grid_izhikevich.py
+cli_plots/izh.model
+cli_plots/izh.projection
+cli_plots/izh_0_0_0_0_.tmat
+cli_plots/marginal_density.npz
+)
+
 set( RATE
 rate_based/analyse_rate.py
 rate_based/analytic.dat
@@ -221,6 +230,8 @@ install( FILES ${SINGLE}
     DESTINATION ${EXAMPLES_BASE_DIR}/single_lif )
 install( FILES ${SELF}
     DESTINATION ${EXAMPLES_BASE_DIR}/single_selfinhib )
+install( FILES ${CLI_PLOTS}
+    DESTINATION ${EXAMPLES_BASE_DIR}/cli_plots )
 install( FILES ${TWO}
     DESTINATION ${EXAMPLES_BASE_DIR}/twopop )
 install( FILES ${MA_ADEX}

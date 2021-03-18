@@ -63,7 +63,7 @@ def replace(value, string, *args):
 def find_density_fnames(modelfname, nodeindex, directory):
     fnames = glob.glob(op.join(directory, modelfname + '_mesh', 'density_mesh_' + str(nodeindex) + '*'))
     if len(fnames) == 0:
-        fnames = glob.glob(op.join(directory, 'densities', 'density_node_' + str(nodeindex) + '*'))
+        fnames = glob.glob(op.join(directory, 'densities', 'node_' + str(nodeindex) + '*'))
         if len(fnames) == 0:
             raise ValueError('No density output found for node index : {}'.format(nodeindex))
 
@@ -80,7 +80,7 @@ def read_density(filename):
 
 def get_density_time(path):
     fname = op.split(path)[-1]
-    return fname.split('_')[3]
+    return fname.split('_')[-1]
 
 def calc_mass(mesh, density, coords):
     masses = [mesh.cells[i][j].area * dens

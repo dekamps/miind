@@ -108,14 +108,13 @@ class Density(Result):
 
             try:
                 # grab all the filenames
-                files = glob.glob(op.join(image_path, extension))
+                files = glob.glob(op.join(image_path, "*.png"))
                 files.sort()
 
                 # note ffmpeg must be installed
                 process = ['ffmpeg',
                     '-r', str(1.0/time_step),
-                    '-pattern_type', 'glob',
-                    '-i', op.join(image_path, extension)]
+                    '-i', op.join(image_path, "%d.png")]
 
                 process.append(filename + '.mp4')
 
@@ -162,8 +161,9 @@ class Density(Result):
             #calculate max padding required
             required_padding = len(str(len(self.times)))
             padding_format_code = '{0:0' + str(required_padding) + 'd}'
-            figname = op.join(
-                self.path, (padding_format_code).format(f))
+            # For some reason padding was required but isn't any more...
+            #figname = op.join(self.path, (padding_format_code).format(f))
+            figname = op.join(self.path, str(f))
             plt.gcf().savefig(figname + ext, res=image_size, bbox_inches='tight')
 
             return p,
@@ -177,7 +177,7 @@ class Density(Result):
         for fname in self.fnames:
             path, filename = op.split(fname)
             tokens = filename.split('_')
-            if float(tokens[3]) == float(time):
+            if float(tokens[-1]) == float(time):
                 return fname
         return None
 
