@@ -9,7 +9,7 @@ We calculate this distribution in terms of a density function, and from this den
 By modeling large-scale networks as homogeneous populations that exchange firing rate statistics, rather than spikes, remarkable efficiency can be achieved, whilst retaining
 a connection to spiking neurons that is not present in neural mass models.
 
-## Version 1.0.7 (03/2021)
+## Version 1.0.8 (03/2021)
 
 MIIND is now available through python pip!
 
