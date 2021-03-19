@@ -39,13 +39,15 @@ def TestMeshAlgorithmLIF():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
-
+    
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -59,6 +61,7 @@ def TestMeshAlgorithmLIFCustomConnectionParameters():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
@@ -67,6 +70,7 @@ def TestMeshAlgorithmLIFCustomConnectionParameters():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -82,12 +86,14 @@ def TestMeshAlgorithmLIFCustomConnectionParametersGPU():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
-
+    
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -103,13 +109,14 @@ def TestMeshAlgorithmLIFGPU():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -121,7 +128,7 @@ def TestVariables():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
@@ -130,6 +137,7 @@ def TestVariables():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -141,7 +149,7 @@ def TestDelayMeshAlgorithmDelayedConnection():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
@@ -149,7 +157,7 @@ def TestDelayMeshAlgorithmDelayedConnection():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -161,7 +169,7 @@ def TestDelayMeshAlgorithmCustomConnectionParameters():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
@@ -170,6 +178,7 @@ def TestDelayMeshAlgorithmCustomConnectionParameters():
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -185,13 +194,13 @@ def TestDelayMeshAlgorithmCustomConnectionParametersGPU():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -207,13 +216,13 @@ def TestDelayMeshAlgorithmDelayedConnectionGPU():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -225,7 +234,7 @@ def TestMeshAlgorithmRefractive():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 1998
@@ -233,7 +242,7 @@ def TestMeshAlgorithmRefractive():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound_refract and steady_rate < lif_steady_upper_bound_refract # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -249,13 +258,13 @@ def TestMeshAlgorithmRefractiveGPU():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound_refract and steady_rate < lif_steady_upper_bound_refract # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -267,7 +276,7 @@ def TestMeshAlgorithmTimeStepMultiple():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 999
@@ -275,7 +284,7 @@ def TestMeshAlgorithmTimeStepMultiple():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > 0.39 and steady_rate < 0.41 # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -291,13 +300,13 @@ def TestMeshAlgorithmTimeStepMultipleGPU():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > 0.39 and steady_rate < 0.41 # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -309,7 +318,7 @@ def TestMeshAlgorithmMultipleConnections():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
@@ -317,7 +326,7 @@ def TestMeshAlgorithmMultipleConnections():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > 2.11 and steady_rate < 2.13 # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -333,13 +342,13 @@ def TestMeshAlgorithmMultipleConnectionsGPU():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > 2.11 and steady_rate < 2.13 # This is a very generous margin!
 	print('Success. Clean up.\n')
-
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -351,12 +360,14 @@ def TestMeshAlgorithmDensityRecording():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
+	os.chdir("lif_")
 	os.chdir('lif.model_mesh')
 	assert len([name for name in os.listdir('.') if os.path.isfile(name)]) == 499
 	assert all([float(name.split('_')[4]) > 0.99998 and float(name.split('_')[4]) < 1.0001 for name in os.listdir('.') if os.path.isfile(name)])
 	print('Success. Clean up.\n')
 	os.chdir('..')
 	shutil.rmtree('lif.model_mesh')
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -371,10 +382,12 @@ def TestMeshAlgorithmGroupDensityRecordingGPU():
 	os.chdir(testdir)
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
+	os.chdir("lif_")
 	os.chdir('densities')
 	print('Success. Clean up.\n')
 	os.chdir('..')
 	shutil.rmtree('densities')
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -386,7 +399,7 @@ def TestMeshAlgorithmTwoNodes():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
@@ -400,7 +413,7 @@ def TestMeshAlgorithmTwoNodes():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -416,7 +429,7 @@ def TestMeshAlgorithmGroupTwoNodesGPU():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		steady_rate = float(lines[-1].split('\t')[1])
@@ -426,7 +439,7 @@ def TestMeshAlgorithmGroupTwoNodesGPU():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -438,7 +451,7 @@ def TestMeshAlgorithmTwoNodesSelfConnections():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
@@ -452,7 +465,7 @@ def TestMeshAlgorithmTwoNodesSelfConnections():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > 0.375 and steady_rate < 0.385 # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -468,7 +481,7 @@ def TestMeshAlgorithmGroupTwoNodesSelfConnectionsGPU():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		steady_rate = float(lines[-1].split('\t')[1])
@@ -478,7 +491,7 @@ def TestMeshAlgorithmGroupTwoNodesSelfConnectionsGPU():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > 0.365 and steady_rate < 0.375 # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -500,7 +513,7 @@ def TestGenerateFidAndMatrix():
 	print('run.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
@@ -508,7 +521,7 @@ def TestGenerateFidAndMatrix():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
-
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -526,7 +539,7 @@ def TestGenerateMatrixMC():
 	print('run.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
@@ -534,7 +547,7 @@ def TestGenerateMatrixMC():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > 0.245 and steady_rate < 0.255 # Obviously this range is wrong but that's because we used MC=10
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 
@@ -554,7 +567,7 @@ def TestGenerateMeshModel():
 	print('run lif.xml.')
 	results = subprocess.run("python -m miind.run lif.xml", shell=True, check=True)
 	print('Checking rate output...')
-	
+	os.chdir("lif_")
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
@@ -562,7 +575,7 @@ def TestGenerateMeshModel():
 		steady_rate = float(lines[-1].split('\t')[1])
 		assert steady_rate > 6.9 and steady_rate < 6.91 # This is a very generous margin!
 	print('Success. Clean up.\n')
-	
+	os.chdir('..')
 	os.chdir('..')
 	os.chdir('..')
 

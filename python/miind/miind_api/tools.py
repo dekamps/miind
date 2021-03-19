@@ -80,7 +80,7 @@ def read_density(filename):
 
 def get_density_time(path):
     fname = op.split(path)[-1]
-    return fname.split('_')[-1]
+    return fname.split('_')[-2]
 
 def calc_mass(mesh, density, coords):
     masses = [mesh.cells[i][j].area * dens

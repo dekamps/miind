@@ -146,9 +146,13 @@ class Density(Result):
 
         if colorbar is not None:
             plt.colorbar(p)
-
+            
+        
         def animate(f):
-            density, coords = read_density(self.fnames[f])
+            ordered_times = [float(t) for t in self.times]
+            ordered_times.sort()
+            file = self.findDensityFileFromTime(str(ordered_times[f]))
+            density, coords = read_density(file)
             sort_idx = sorted(range(len(coords)), key=coords.__getitem__)
             coords = [coords[i] for i in sort_idx]
             density = [density[i] for i in sort_idx]
@@ -168,7 +172,7 @@ class Density(Result):
 
             return p,
 
-        ani = animation.FuncAnimation(fig, animate, frames=len(self.fnames), interval=1, blit=True, repeat=False)
+        ani = animation.FuncAnimation(fig, animate, frames=len(self.times), interval=1, blit=True, repeat=False)
 
         plt.show()
 
@@ -177,7 +181,7 @@ class Density(Result):
         for fname in self.fnames:
             path, filename = op.split(fname)
             tokens = filename.split('_')
-            if float(tokens[-1]) == float(time):
+            if float(tokens[-2]) == float(time):
                 return fname
         return None
 

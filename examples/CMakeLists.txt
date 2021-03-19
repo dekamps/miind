@@ -39,6 +39,23 @@ lif_python/lif.stat
 lif_python/runlif.py
 )
 
+set( LIF_PYTHON_SWEEP
+lif_python_sweep/lif.model
+lif_python_sweep/lif.xml
+lif_python_sweep/lif_0.01_0_0_0_.mat
+lif_python_sweep/lif_0.1_0_0_0_.mat
+lif_python_sweep/lif_0.02_0_0_0_.mat
+lif_python_sweep/lif_0.03_0_0_0_.mat
+lif_python_sweep/lif_0.04_0_0_0_.mat
+lif_python_sweep/lif_0.05_0_0_0_.mat
+lif_python_sweep/lif_0.06_0_0_0_.mat
+lif_python_sweep/lif_0.07_0_0_0_.mat
+lif_python_sweep/lif_0.08_0_0_0_.mat
+lif_python_sweep/lif_0.09_0_0_0_.mat
+lif_python_sweep/sweep_one_shot.py
+lif_python_sweep/sweep_re_runnable.py
+)
+
 set( QIF
 qif/qifanalysis.py
 qif/qif.model
@@ -216,6 +233,8 @@ install( FILES ${LIF}
     DESTINATION ${EXAMPLES_BASE_DIR}/lif )
 install( FILES ${LIF_PYTHON}
     DESTINATION ${EXAMPLES_BASE_DIR}/lif_python )
+install( FILES ${LIF_PYTHON_SWEEP}
+    DESTINATION ${EXAMPLES_BASE_DIR}/lif_python_sweep )
 install( FILES ${QIF}
     DESTINATION ${EXAMPLES_BASE_DIR}/qif )
 install( FILES ${TVB}
