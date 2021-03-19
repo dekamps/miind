@@ -88,12 +88,12 @@ class MiindIO:
                 if not current_sim:
                     print('No simulation currently defined.')
                     print('')
-                    sim([name+'?'])
+                    self.sim([name+'?'], None)
+                    return
                 print('Original XML File : {}'.format(current_sim.original_xml_path))
                 print('Project Name : {}'.format(current_sim.submit_name))
                 print('Parameters : {}'.format(current_sim.parameters))
-                print('Generated XML File : {}'.format(current_sim.xml_fname))
-                print('Output Directory : {}'.format(current_sim.output_directory))
+                print('Output Directory : {}'.format(current_sim.getOutputDirectory()))
                 print('Variables :')
                 for name in current_sim.variablenames:
                     print('   ' + name)
@@ -108,39 +108,32 @@ class MiindIO:
                 current_sim = api.MiindSimulation(command[1])
 
                 self.cwd_settings['sim'] = current_sim.xml_fname
-                self.cwd_settings['sim_project'] = current_sim.submit_name
+                self.cwd_settings['sim_params'] = {}
 
                 with open(self.cwdfilename, 'w') as settingsfile:
-                    for k,v in self.cwd_settings.items():
-                        settingsfile.write(k + '=' + str(v) + '\n')
-            if len(command) == 3:
-                current_sim = api.MiindSimulation(command[1], command[2])
-
-                self.cwd_settings['sim'] = current_sim.xml_fname
-                self.cwd_settings['sim_project'] = current_sim.submit_name
-
-                with open(self.cwdfilename, 'w') as settingsfile:
-                    for k,v in self.cwd_settings.items():
-                        settingsfile.write(k + '=' + str(v) + '\n')
-            if len(command) > 3:
+                    settingsfile.write('sim=' + str(self.cwd_settings['sim']) + '\n')
+                    settingsfile.write('sim_params=\n')
+            if len(command) >= 3:
                 comm_dict = {}
-                for comm in command[3:]:
+                for comm in command[2:]:
                     kv = comm.split('=')
                     comm_dict[kv[0]] = kv[1]
-                current_sim = api.MiindSimulation(command[1], command[2], **comm_dict)
+                current_sim = api.MiindSimulation(command[1], **comm_dict)
 
                 self.cwd_settings['sim'] = current_sim.xml_fname
-                self.cwd_settings['sim_project'] = current_sim.submit_name
+                self.cwd_settings['sim_params'] = current_sim.parameters
 
                 with open(self.cwdfilename, 'w') as settingsfile:
-                    for k,v in self.cwd_settings.items():
-                        settingsfile.write(k + '=' + str(v) + '\n')
+                    settingsfile.write('sim=' + str(self.cwd_settings['sim']) + '\n')
+                    param_string = ""
+                    for k,v in self.cwd_settings['sim_params'].items():
+                      param_string = param_string + k + ',' + v + ','
+                    settingsfile.write('sim_params=' + param_string + '\n')
 
         if command_name in [name+'?', name+' ?', name+' -h', name+' -?', name+' help', 'man '+name]:
             print (name + ' : Provide information on the current simulation.')
             print (name + ' [XML filename] : Use this XML file for the current simulation. The default project name is the same as the XML filename.')
-            print (name + ' [XML filename] [Project name] : Use this XML file for the current simulation and set a different project name.')
-            print (name + ' [XML filename] [Project name] [Parameter 1] [Parameter 2] ... : Use this XML file as a template with this project name to generate a new xml file (if not already generated) in which the Variable objects are set using the given Parameters.')
+            print (name + ' [XML filename] [Parameter 1] [Parameter 2] ... : Use this XML file with the Variable objects set using the given Parameters.')
 
         return current_sim
 
@@ -770,14 +763,14 @@ class MiindIO:
         self.settings['cuda_enabled'] = False
 
         self.cwd_settings['sim'] = 'NOT_SET'
-        self.cwd_settings['sim_project'] = 'NOT_SET'
+        self.cwd_settings['sim_params'] = {}
 
         self.loadMiindSettings()
 
         if not op.exists(self.cwdfilename):
           with open(self.cwdfilename, 'w') as cwdsettingsfile:
-              for k,v in self.cwd_settings.items():
-                  cwdsettingsfile.write(k + '=' + str(v) + '\n')
+              cwdsettingsfile.write('sim=NOT_SET\n')
+              cwdsettingsfile.write('sim_params=\n')
         else:
           with open(self.cwdfilename, 'r') as cwdsettingsfile:
               for line in cwdsettingsfile:
@@ -788,16 +781,25 @@ class MiindIO:
                            self.cwd_settings['sim'] = None
                        else:
                            self.cwd_settings['sim'] = tokens[1].strip()
-                  elif tokens[0].strip() == 'sim_project':
-                       if tokens[1].strip() == 'NOT_SET':
-                           self.cwd_settings['sim_project'] = None
+                  elif tokens[0].strip() == 'sim_params':
+                       if tokens[1].strip() == '':
+                           self.cwd_settings['sim_params'] = {}
                        else:
-                           self.cwd_settings['sim_project'] = tokens[1].strip()
+                           param_string = tokens[1].strip()
+                           params = tokens[1].strip().split(',')
+                           param_keys = params[::2]
+                           param_vals = params[1::2]
+                           param_dict = {}
+                           if len(param_keys) > 0:
+                               for p in range(len(param_keys)-1):
+                                  param_dict[param_keys[p]] = param_vals[p]
+                           self.cwd_settings['sim_params'] = param_dict
 
         current_sim = None
         if self.cwd_settings['sim'] != None:
           if self.cwd_settings['sim'] != 'NOT_SET':
-              current_sim = api.MiindSimulation(self.cwd_settings['sim'], self.cwd_settings['sim_project'])
+              
+              current_sim = api.MiindSimulation(self.cwd_settings['sim'], **self.cwd_settings['sim_params'])
               print('**** Current Simulation Details ****\n')
               self.sim(['sim'], current_sim)
           else:

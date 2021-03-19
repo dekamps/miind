@@ -1,5 +1,5 @@
 <Simulation>
- <Variable Name='TIME_END'>20</Variable>
+ <Variable Name='TIME_END'>20.0</Variable>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
 <Algorithm type="GridSomaDendriteAlgorithm" name="SOMA" modelfile="mn_soma.model" tau_refractive="0.0" transformfile="mn_soma_0_0_0_0_.tmat" start_v="-0.5" start_w="0.0000001" >
@@ -9,7 +9,7 @@
 <TimeStep>0.0001</TimeStep>
 </Algorithm>
 <Algorithm type="RateFunctor" name="MLR_1">
-<expression>t > 0.1 ? (t > 0.4 ? 5000 : 40000 ) : 5000</expression>
+<expression>5000</expression>
 </Algorithm>
 <Algorithm type="RateFunctor" name="MLR_2">
 <expression>0</expression>
@@ -30,8 +30,8 @@
 <Reporting>
 	<!--<Density node="RG_E" t_start="0.0" t_end="6.0" t_interval="0.001" />
 	<Density node="RG_F" t_start="0.0" t_end="6.0" t_interval="0.001" />-->
-	<!--<Display node="S" />
-	<Display node="D" />-->
+	<Display node="S" />
+	<Display node="D" />
 	<Rate node="S" t_interval="0.0001" />
 	<Rate node="D" t_interval="0.0001" />
 </Reporting>

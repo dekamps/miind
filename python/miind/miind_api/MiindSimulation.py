@@ -21,21 +21,29 @@ import miind.miindrun as miind
 import miind.miind_lib as miind_lib
 
 class MiindSimulation:
-    def __init__(self, xml_path, submit_name=None, **kwargs):
+    def __init__(self, xml_path, **kwargs):
         self.parameters = kwargs
         # original xml path used by the ui to reference this MiindSimulation
         self.original_xml_path = xml_path
+        
+        ### THIS HAS BEEN NIXED - FROM NOW ON, OUTPUT DIRECTORY IS IN THE FORM:
+        ### simname_key1_val1_key2_val2...
+        ### 
         # If there are kwargs, we either want to create a new xml with these
         # parameters, or we want to load a previously generated xml
         # else just load what in xml_path and normal
-        if self.parameters :
-            xml_path_with_sha = xml_path.replace('.xml', self.sha + '.xml')
-            if op.exists(xml_path_with_sha) :
-                self.xml_path = op.abspath(xml_path_with_sha)
-            else :
-                self.xml_path = op.abspath(MiindSimulation.generateNewXmlWithDictionaryParameters(xml_path, kwargs))
-        else :
-            self.xml_path = op.abspath(xml_path)
+        #if self.parameters :
+        #    xml_path_with_sha = xml_path.replace('.xml', self.sha + '.xml')
+        #    if op.exists(xml_path_with_sha) :
+        #        self.xml_path = op.abspath(xml_path_with_sha)
+        #    else :
+        #        self.xml_path = #op.abspath(MiindSimulation.generateNewXmlWithDictionaryParameters(xml_path, kwargs))
+        #else :
+        #    self.xml_path = op.abspath(xml_path)
+        ###
+        ###
+        
+        self.xml_path = op.abspath(xml_path)
 
         # check our (maybe new) xml exists
         assert op.exists(self.xml_path)
@@ -44,7 +52,7 @@ class MiindSimulation:
         self.xml_location, self.xml_fname = op.split(self.xml_path)
 
         xml_base_fname, _ = op.splitext(self.xml_fname)
-        self.submit_name = submit_name or xml_base_fname
+        self.submit_name = xml_base_fname
         self.miind_executable = xml_base_fname
         self.output_directory = op.join(self.xml_location, self.submit_name, xml_base_fname)
         # grab the names of the model files used and whether we should expect
@@ -193,8 +201,11 @@ class MiindSimulation:
     def getOutputDirectory(self):
         if op.exists(self.output_directory):
             return self.output_directory
-        else: # If there was no output directory in the form of lif/lif.. then hopefully we're using the pip package and it's just the current dir (XML dir).
-            return self.xml_location
+        else: # If there was no output directory in the form of lif/lif.. then hopefully there's just a simple output directory or a directory made up of variable kv pairs
+            outdir = os.path.join(self.xml_location, os.path.basename(os.path.splitext(self.original_xml_path)[0]) + '_')
+            for k,v in self.parameters.items():
+                outdir = outdir + k + '_' + v + '_'
+            return outdir 
 
     def getModelFilenameAndIndexFromNode(self, nodename):
         if nodename.isdigit():
