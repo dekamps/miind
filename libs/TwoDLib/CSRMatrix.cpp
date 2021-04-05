@@ -138,6 +138,28 @@ void CSRMatrix::MV(vector<double>& out, const vector<double>& in){
 	}
 }
 
+MPILib::Index CSRMatrix::MVObject(MPILib::Index start_index, int spikes) const{
+	MPILib::Index current_index = start_index;
+
+	for (int s = 0; s < spikes; s++) {
+
+		MPILib::Index i_r = _sys.Map(current_index + _i_offset);
+		int range = _ia[current_index + 1] - _ia[current_index];
+
+		double r1 = ((double)rand() / (double)RAND_MAX);
+		double check = 0.0;
+		for (MPILib::Index j = _ia[current_index]; j < _ia[current_index + 1]; j++) {
+			check += _val[j];
+			if (r1 < check) {
+				current_index = _ja[j];
+				break;
+			}
+		}
+	}
+	
+	return current_index;
+}
+
 
 void CSRMatrix::MVMapped
 (

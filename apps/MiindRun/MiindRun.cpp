@@ -97,9 +97,10 @@ int main(int argc, char* argv[]) {
         std::cout << "Time Step: " << modelCcp->getTimeStep() << "\n";
         std::cout << "Sim Time: " << modelCcp->getSimulationLength() << "\n";
         modelCcp->startSimulation();
+        std::vector<double> ins = { 5000.0 };
         while (time < modelCcp->getSimulationLength()) {
             time += modelCcp->getTimeStep();
-            modelCcp->evolveSingleStep(std::vector<double>());
+            std::vector<double> outs = modelCcp->evolveSingleStep(ins);
         }
         modelCcp->endSimulation();
 

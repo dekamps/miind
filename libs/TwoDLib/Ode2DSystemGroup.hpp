@@ -24,6 +24,7 @@
 #include <iostream>
 #include <numeric>
 #include <vector>
+#include <map>
 #include "MPILib/include/TypeDefinitions.hpp"
 #include "Mesh.hpp"
 #include "modulo.hpp"
@@ -55,14 +56,16 @@ namespace TwoDLib {
 			const std::vector<Mesh>&, 					       //!< A series of Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
 			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin
 			const std::vector< std::vector<Redistribution> >&,  //!< A series of mappings from threshold to reset bin
-			const std::vector<MPILib::Time>&
+			const std::vector<MPILib::Time>&,
+			unsigned int num_objects = 0
 		);
 
 		Ode2DSystemGroup
 		(
 			const std::vector<Mesh>&, 					       //!< A series of Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
 			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin
-			const std::vector< std::vector<Redistribution> >&  //!< A series of mappings from threshold to reset bin
+			const std::vector< std::vector<Redistribution> >&,  //!< A series of mappings from threshold to reset bin
+			unsigned int num_objects = 0
 		);
 
 
@@ -95,10 +98,16 @@ namespace TwoDLib {
 		//! Remap probability that has run from the end of a strip. Run this after evolution
 		void RemapReversal();
 
+		//! Remap individual objects that has run from the end of a strip. Run this after evolution
+		void RemapObjectReversal();
+
 		//! Redistribute probability that has moved through threshold. Run this after the Master equation
 		void RedistributeProbability();
 
 		void RedistributeProbability(MPILib::Number);
+
+		//! Redistribute objects that has moved through threshold. Run this after the Master equation
+		void RedistributeObjects(MPILib::Time timestep);
 
 		//! Return the instantaneous firing rate
 		const vector<MPILib::Rate>& F() const {return _fs;}
@@ -168,6 +177,26 @@ namespace TwoDLib {
 			MPILib::Index     		_m;
 		};
 
+		class ObjectReversal {
+		public:
+
+			ObjectReversal(Ode2DSystemGroup& sys, vector<vector<MPILib::Index>>& vec_cell_to_obj, MPILib::Index m) 
+				:_sys(sys), _vec_cells_to_objects(vec_cell_to_obj), _m(m) {}
+
+			void operator()(const Redistribution& map) {
+				_vec_cells_to_objects[_sys.Map(_m, map._to[0], map._to[1])].insert(
+					_vec_cells_to_objects[_sys.Map(_m, map._to[0], map._to[1])].end(),
+					_vec_cells_to_objects[_sys.Map(_m, map._from[0], map._from[1])].begin(),
+					_vec_cells_to_objects[_sys.Map(_m, map._from[0], map._from[1])].end());
+				_vec_cells_to_objects[_sys.Map(_m, map._from[0], map._from[1])].clear();
+			}
+
+		private:
+			Ode2DSystemGroup& _sys;
+			vector<vector<MPILib::Index>>& _vec_cells_to_objects;
+			MPILib::Index     		_m;
+		};
+
 		//! Implement the remapping of probability mass that hits threshold
 		class Reset {
 		public:
@@ -183,6 +212,34 @@ namespace TwoDLib {
 
 			Ode2DSystemGroup&		_sys;
 			vector<MPILib::Mass>&  	_vec_mass;
+			MPILib::Index       	_m;
+		};
+
+		//! Implement the remapping of objects that hit threshold
+		class ObjectReset {
+		public:
+			ObjectReset(Ode2DSystemGroup& sys, 
+				vector<vector<MPILib::Index>>& vec_cell_to_obj,
+				vector<double>& vec_refract_times, 
+				MPILib::Time tau_refractive, MPILib::Index m)
+				:_sys(sys), 
+				_vec_cells_to_objects(vec_cell_to_obj),
+				_vec_objects_refract_times(vec_refract_times),
+				_tau_refractive(tau_refractive), _m(m) {}
+
+			void operator()(const Redistribution& map) {
+				for (auto is : _vec_cells_to_objects[_sys.Map(_m, map._from[0], map._from[1])]) {
+					_vec_objects_refract_times[is] = _tau_refractive;
+					_sys._fs[_m]++;
+				}
+			}
+
+		private:
+
+			Ode2DSystemGroup& _sys;
+			MPILib::Time _tau_refractive;
+			vector<vector<MPILib::Index>>& _vec_cells_to_objects;
+			vector<double>& _vec_objects_refract_times;
 			MPILib::Index       	_m;
 		};
 
@@ -273,6 +330,8 @@ namespace TwoDLib {
 		bool				  CheckConsistency() const;
 		std::vector<Reset>    InitializeReset();
 		std::vector<Reversal> InitializeReversal();
+		std::vector<ObjectReversal> InitializeObjectReversal();
+		std::vector<ObjectReset> InitializeObjectReset();
 		std::vector<ResetRefractive> InitializeResetRefractiveInternal(MPILib::Time network_time_step);
 		std::vector<Clean>    InitializeClean();
 
@@ -295,6 +354,28 @@ namespace TwoDLib {
 		std::vector<MPILib::Time>    _vec_tau_refractive;
 public:
 		vector<MPILib::Mass>	     	_vec_mass;
+		unsigned int					_num_objects;
+		vector<MPILib::Index>			_vec_objects_to_index;
+		vector<vector<MPILib::Index>>	_vec_cells_to_objects;
+		vector<double>					_vec_objects_refract_times; // not refracting -> val < 0, ready to reset -> val == 0
+		std::vector<std::map<MPILib::Index, std::map<MPILib::Index, double>>> _vec_reset_sorted;
+
+		void updateVecObjectsToIndex() {
+			for (int i = 0; i < _vec_cells_to_objects.size(); i++) {
+				for (int j = 0; j < _vec_cells_to_objects[i].size(); j++) {
+					_vec_objects_to_index[_vec_cells_to_objects[i][j]] = i;
+				}
+			}
+		}
+
+		void updateVecCellsToObjects() {
+			for (auto v : _vec_cells_to_objects)
+				v.clear();
+
+			for (int i = 0; i < _vec_objects_to_index.size(); i++) {
+				_vec_cells_to_objects[_vec_objects_to_index[i]].push_back(i);
+			}
+		}
 private:
 		vector<MPILib::Potential>		_vec_area;
 
@@ -309,8 +390,10 @@ private:
 		std::vector<std::vector<Redistribution> > _vec_reset;
 
 		std::vector<Reversal> _reversal;
+		std::vector<ObjectReversal> _object_reversal;
 		std::vector<ResetRefractive> _reset_refractive;
 		std::vector<Reset>    _reset;
+		std::vector<ObjectReset> _object_reset;
 		std::vector<Clean>    _clean;
 	};
 }

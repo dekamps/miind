@@ -5,6 +5,7 @@
 #include <MPILib/include/WilsonCowanAlgorithm.hpp>
 #include <TwoDLib/GridSomaDendriteAlgorithmCode.hpp>
 #include <TwoDLib/GridJumpAlgorithmCode.hpp>
+#include <TwoDLib/MeshFiniteSizeAlgorithm.h>
 
 template<>
 SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(int num_nodes, const std::string xml_filename, std::map<std::string, std::string> vars) :
@@ -205,11 +206,6 @@ void SimulationParserCPU<double>::addIncomingConnection(pugi::xml_node& xml_conn
 	MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>::network.setNodeExternalPrecursor(_node_ids[node], _connections.back());
 }
 
-template<class WeightType>
-double SimulationParserCPU<WeightType>::getCurrentSimTime() {
-	return _count * MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_time_step;
-}
-
 template<>
 void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithms(pugi::xml_document& doc,
 	std::map<std::string, std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>>& _algorithms,
@@ -276,7 +272,7 @@ void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithm
 				matrix_files.push_back(interpretValueAsString(std::string(matrix_file.child_value())));
 			}
 
-			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::MeshAlgorithmCustom<TwoDLib::MasterOdeint>(model_filename, matrix_files, time_step, tau_refractive, activity_mode));
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::MeshFiniteSizeAlgorithm<TwoDLib::MasterFiniteObject>(model_filename, matrix_files, time_step, tau_refractive, activity_mode));
 		}
 
 		if (std::string("RateFunctor") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {
@@ -577,6 +573,21 @@ void SimulationParserCPU<WeightType>::startSimulation() {
 template<class WeightType>
 void SimulationParserCPU<WeightType>::init() {
 	parseXmlFile();
+}
+
+template<>
+double SimulationParserCPU<MPILib::CustomConnectionParameters>::getCurrentSimTime() {
+	return _count * MiindTvbModelAbstract<MPILib::CustomConnectionParameters, MPILib::utilities::CircularDistribution>::_time_step;
+}
+
+template<>
+double SimulationParserCPU<MPILib::DelayedConnection>::getCurrentSimTime() {
+	return _count * MiindTvbModelAbstract<MPILib::DelayedConnection, MPILib::utilities::CircularDistribution>::_time_step;
+}
+
+template<>
+double SimulationParserCPU<double>::getCurrentSimTime() {
+	return _count * MiindTvbModelAbstract<double, MPILib::utilities::CircularDistribution>::_time_step;
 }
 
 template<class WeightType>

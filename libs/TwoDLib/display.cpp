@@ -162,8 +162,12 @@ void Display::display(void) {
 			Quadrilateral q = m.Quad(i,j);
 			double cell_area = std::abs(q.SignedArea());
 			double mass = 0.0;
-			if (_dws[window_index]._system->Mass()[idx]/cell_area != 0)
-				mass = std::min(1.0,std::max(0.0,(log10(_dws[window_index]._system->Mass()[idx]/cell_area) - min) / (max-min)));
+			if (_dws[window_index]._system->Mass()[idx] / cell_area != 0 && _dws[window_index]._system->_num_objects == 0)
+				mass = std::min(1.0, std::max(0.0, (log10(_dws[window_index]._system->Mass()[idx] / cell_area) - min) / (max - min)));
+			else
+				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() > 0)
+					mass = 1.0;
+
 			vector<Point> ps = q.Points();
 
 			glColor3f(std::min(1.0,mass*2.0), std::max(0.0,((mass*2.0) - 1.0)), 0);

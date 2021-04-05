@@ -205,6 +205,27 @@ PyObject* miind_getTimeStep(PyObject* self, PyObject* args)
     
 }
 
+PyObject* miind_getCurrentSimTime(PyObject* self, PyObject* args)
+{
+    try {
+        if (modelCcp)
+            return Py_BuildValue("d", modelCcp->getCurrentSimTime());
+        if (modelDc)
+            return Py_BuildValue("d", modelDc->getCurrentSimTime());
+        if (modelDouble)
+            return Py_BuildValue("d", modelDouble->getCurrentSimTime());
+    }
+    catch (const std::exception& e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what());
+        return NULL;
+    }
+    catch (...) {
+        PyErr_SetString(PyExc_RuntimeError, "Unhandled Exception during getCurrentSimTime()");
+        return NULL;
+    }
+
+}
+
 PyObject* miind_getSimulationLength(PyObject* self, PyObject* args)
 {
     try {
@@ -322,6 +343,7 @@ PyObject* miind_endSimulation(PyObject* self, PyObject* args)
 static PyMethodDef miindsim_functions[] = {
     {"init", (PyCFunction)miind_init, METH_VARARGS | METH_KEYWORDS, "Init Miind Model."},
     {"getTimeStep",  miind_getTimeStep, METH_VARARGS, "Get time step."},
+    {"getCurrentSimulationTime",  miind_getCurrentSimTime, METH_VARARGS, "Get current sim time."},
     {"getSimulationLength",  miind_getSimulationLength, METH_VARARGS, "Get sim time."},
     {"startSimulation",  miind_startSimulation, METH_VARARGS, "Start simulation."},
     {"evolveSingleStep",  miind_evolveSingleStep, METH_VARARGS, "Evolve one time step."},

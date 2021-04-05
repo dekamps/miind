@@ -59,6 +59,8 @@ namespace TwoDLib {
 				double				   rate         //!< Firing rate that should be applied to the derivative
 			) const;
 
+		MPILib::Index MVObject(MPILib::Index start_index, int spikes) const;
+
 		//! Each matrix corresponds to a well defined jump
 		double Efficacy() const {return _efficacy; }
 

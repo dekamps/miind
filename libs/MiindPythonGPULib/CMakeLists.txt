@@ -92,7 +92,7 @@ install( TARGETS ${MIIND_LIBRARY_PREFIX}simv DESTINATION lib)
 # freeglut then install them too.
 # I imagine there are a myriad ways that this could break but seriously, dependency stuff sucks so hard, and it
 # took me all weekend just to get this to work.
-if (WIN32)
+if (WIN32 AND SKBUILD)
 ## First lets get GLUT, it should be easy thanks to FindGLUT.
 get_filename_component(glut_lib_basename "${GLUT_glut_LIBRARY}" NAME_WE)
 install( FILES ${GLUT_RUNTIME_LIBRARY}/${glut_lib_basename}.dll DESTINATION bin)
