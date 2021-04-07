@@ -34,7 +34,8 @@ namespace TwoDLib {
 			double,
 			double,
 			MPILib::Time tau_refractive = 0,     //!< absolute refractive period
-			const string& ratemethod = ""       //!< firing rate computation; by default the mass flux across threshold
+			const string& ratemethod = "",       //!< firing rate computation; by default the mass flux across threshold
+			const unsigned int num_objects = 0	 //!< number of finite objects 
 		);
 
 		GridAlgorithm(const GridAlgorithm&);
@@ -82,6 +83,8 @@ namespace TwoDLib {
 
 		const std::string _model_name;
 		const std::string _rate_method;
+
+		const unsigned int _num_objects;
 
 		MPILib::Rate _rate;
 		MPILib::Time _t_cur;

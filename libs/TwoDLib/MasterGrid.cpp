@@ -20,6 +20,7 @@
 #endif
 #include <algorithm>
 #include <numeric>
+#include <random>
 
 #include "MasterGrid.hpp"
 
@@ -53,6 +54,32 @@ _cell_width(cell_width)
  		 dydt[i] += rate*goes*vec_mass[(((int)i+offset_2)%(int)dydt.size()+(int)dydt.size()) % (int)dydt.size()];
      dydt[i] -= rate*vec_mass[i];
  	}
+ }
+
+ MPILib::Index MasterGrid::MVGridObject
+ (
+     MPILib::Index start_index, 
+     int spikes,
+     double stays,
+     double goes,
+     int offset_1,
+     int offset_2
+ ) const
+ {
+     MPILib::Index current_index = start_index;
+     int max = (int)_sys._vec_cells_to_objects.size();
+
+     for (int s = 0; s < spikes; s++) {
+         double r1 = ((double)rand() / (double)RAND_MAX);
+         if (r1 < stays) {
+             current_index = (((int)current_index + offset_1) % max + max) % max;
+         }
+         else {
+             current_index = (((int)current_index + offset_2) % max + max) % max;
+         }
+     }
+
+     return current_index;
  }
 
  void MasterGrid::CalculateStaticEfficiacies(vector<double>& efficacy_map) {
@@ -128,6 +155,41 @@ _cell_width(cell_width)
 
 	 boost::numeric::odeint::integrate_adaptive(boost::numeric::odeint::make_controlled< error_stepper_type >( 1.0e-6 , 1.0e-6 ),
 			 *this , _sys._vec_mass , 0.0 , t_step , 1e-4 );
+ }
+
+ void MasterGrid::ApplyFinitePoisson
+ (
+     double t_step, 
+     const vector<double>& rates, 
+     vector<double>& efficacy_map
+ )
+ {
+     static std::random_device rd;
+     static std::mt19937 gen(rd());
+
+#pragma omp parallel for
+     for (int id = 0; id < _sys._vec_objects_to_index.size(); id++) {
+         if (_sys._vec_objects_refract_times[id] >= 0.0)
+             continue;
+
+         for (unsigned int irate = 0; irate < rates.size(); irate++) {
+            if (rates[irate] == 0)
+                continue;
+
+            unsigned int offset = (unsigned int)abs(efficacy_map[irate] / _cell_width);
+            double goes = (double)fabs(efficacy_map[irate] / _cell_width) - offset;
+            double stays = 1.0 - goes;
+
+            int offset_1 = efficacy_map[irate] > 0 ? offset : -offset;
+            int offset_2 = efficacy_map[irate] > 0 ? (offset + 1) : -(offset + 1);
+
+            std::poisson_distribution<int> pd(rates[irate] * t_step);
+            int spikes = pd(gen);
+            _sys._vec_objects_to_index[id] = MVGridObject(_sys._vec_objects_to_index[id], spikes, stays, goes, offset_1, offset_2);
+         }
+     }
+
+     _sys.updateVecCellsToObjects();
  }
 
  void MasterGrid::operator()(const vector<double>& vec_mass, vector<double>& dydt, const double)

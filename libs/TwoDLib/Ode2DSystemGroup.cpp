@@ -303,7 +303,7 @@ void Ode2DSystemGroup::Initialize(MPILib::Index m, MPILib::Index i, MPILib::Inde
 		_vec_cells_to_objects[i] = vector<MPILib::Index>();
 	}
 
-	unsigned int start_index = 0;
+	unsigned int start_index = this->Map(m, i, j);
 	_vec_objects_to_index = vector<MPILib::Index>(_num_objects);
 	_vec_objects_refract_times = vector<double>(_num_objects);
 	_vec_objects_refract_index = vector<MPILib::Index>(_num_objects);

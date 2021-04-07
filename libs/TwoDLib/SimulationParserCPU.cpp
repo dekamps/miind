@@ -235,13 +235,14 @@ void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithm
 
 			std::string model_filename = interpretValueAsString(std::string(algorithm.attribute("modelfile").value()));
 			double tau_refractive = interpretValueAsDouble(algorithm.attribute("tau_refractive").as_string());
+			int num_objects = interpretValueAsInt(algorithm.attribute("finite_size").as_string());
 			std::string transform_filename = interpretValueAsString(std::string(algorithm.attribute("transformfile").value()));
 			double start_v = interpretValueAsDouble(algorithm.attribute("start_v").as_string());
 			double start_w = interpretValueAsDouble(algorithm.attribute("start_w").as_string());
 			double time_step = interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
 			std::string activity_mode = interpretValueAsString(std::string(algorithm.attribute("ratemethod").value()));
 
-			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::GridAlgorithm(model_filename, transform_filename, time_step, start_v, start_w, tau_refractive, activity_mode));
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::GridAlgorithm(model_filename, transform_filename, time_step, start_v, start_w, tau_refractive, activity_mode, num_objects));
 		}
 
 		if (std::string("GridSomaDendriteAlgorithm") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {

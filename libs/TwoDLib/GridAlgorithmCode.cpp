@@ -19,7 +19,8 @@ namespace TwoDLib {
 		double start_v,
 		double start_w,
 		MPILib::Time tau_refractive,
-		const std::string&  rate_method
+		const std::string&  rate_method,
+		const unsigned int num_objects
 	):
 	_model_name(model_name),
 	_rate_method(rate_method),
@@ -31,7 +32,8 @@ namespace TwoDLib {
 	_vec_vec_res(std::vector<std::vector<Redistribution> >{this->Mapping("Reset")}),
 	_vec_tau_refractive(std::vector<MPILib::Time>({tau_refractive})),
 	_dt(_vec_mesh[0].TimeStep()),
-	_sys(_vec_mesh,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive),
+	_num_objects(num_objects),
+	_sys(_vec_mesh,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive,num_objects),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystemGroup::AvgV : &TwoDLib::Ode2DSystemGroup::F),
@@ -58,7 +60,8 @@ namespace TwoDLib {
 	_vec_vec_res(rhs._vec_vec_res),
 	_dt(_vec_mesh[0].TimeStep()),
 	_vec_tau_refractive(rhs._vec_tau_refractive),
-	_sys(_vec_mesh,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive),
+	_num_objects(rhs._num_objects),
+	_sys(_vec_mesh,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive, rhs._num_objects),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction),
@@ -207,14 +210,26 @@ namespace TwoDLib {
 	    // mass rotation
 	    for (MPILib::Index i = 0; i < _n_steps; i++){
 
-				_sys.EvolveWithoutMeshUpdate();
-#pragma omp parallel for
-				 for(int id = 0; id < _mass_swap.size(); id++)
-					  _mass_swap[id] = 0.;
+			_sys.EvolveWithoutMeshUpdate();
 
-			 	_csr_transform->MV(_mass_swap,_sys._vec_mass);
+			if (_num_objects > 0) {
+#pragma omp parallel for
+				for (int id = 0; id < _sys._vec_objects_to_index.size(); id++) {
+					if (_sys._vec_objects_refract_times[id] >= 0.0)
+						continue;
+					_sys._vec_objects_to_index[id] = _csr_transform->MVObject(_sys._vec_objects_to_index[id], 1);
+				}
+				_sys.updateVecCellsToObjects();
+			}
+			else {
+#pragma omp parallel for
+				for (int id = 0; id < _mass_swap.size(); id++)
+					_mass_swap[id] = 0.;
+
+				_csr_transform->MV(_mass_swap, _sys._vec_mass);
 
 				_sys._vec_mass = _mass_swap;
+			}
 	    }
 
 			// WARNING: originally reset goes afvirtual void applyMasterSolver();ter master but this way,
@@ -241,7 +256,10 @@ namespace TwoDLib {
 	}
 
 	void GridAlgorithm::applyMasterSolver(std::vector<MPILib::Rate> rates) {
-			_p_master->Apply(_n_steps*_dt,rates,_efficacy_map);
+		if (_num_objects > 0)
+			_p_master->ApplyFinitePoisson(_n_steps * _dt, rates, _efficacy_map);
+		else
+			_p_master->Apply(_n_steps * _dt, rates, _efficacy_map);
 	}
 
 	void GridAlgorithm::FillMap(const std::vector<MPILib::CustomConnectionParameters>& vec_weights)
