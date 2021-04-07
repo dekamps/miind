@@ -482,6 +482,7 @@ void Ode2DSystemGroup::RedistributeObjects(MPILib::Time timestep) {
 					for (auto const& t : trans) {
 						check += t.second;
 						if (r1 <= check) {
+							_fs[m]++;
 							_vec_objects_to_index[i] = Map(t.first);
 							break;
 						}

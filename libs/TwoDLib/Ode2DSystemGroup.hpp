@@ -235,7 +235,6 @@ namespace TwoDLib {
 				for (auto is : _vec_cells_to_objects[_sys.Map(_m, map._from[0], map._from[1])]) {
 					_vec_objects_refract_times[is] = _tau_refractive;
 					_vec_objects_refract_index[is] = _sys.UnMap(_sys.Map(_m, map._from[0], map._from[1]));
-					_sys._fs[_m]++;
 				}
 			}
 
