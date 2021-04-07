@@ -39,8 +39,11 @@ void CSRMatrix::Initialize(const TransitionMatrix& mat, MPILib::Index mesh_index
 		for(MPILib::Index j = 0; j < m.NrCellsInStrip(i); j++)
 			counter++;
 
-	vector< vector<MPILib::Index> > vec_mat(counter);
-	vector< vector<double> > mat_vals(counter);
+	vector< vector<MPILib::Index> > vec_mat = vector< vector<MPILib::Index> >(counter);
+	vector< vector<double> > mat_vals = vector< vector<double> >(counter);
+
+	_vec_mat_original = vector< vector<MPILib::Index> >(counter);
+	_mat_vals_original = vector< vector<double> >(counter);
 
 	Validate(mat);
 
@@ -51,6 +54,8 @@ void CSRMatrix::Initialize(const TransitionMatrix& mat, MPILib::Index mesh_index
 			// Map produces the index relative to the full matrix, it needs to be reduced to the row index within the current submatrix
 			vec_mat[_sys.Map(mesh_index,r._to[0],r._to[1]) - _i_offset].push_back(_sys.Map(mesh_index, line._from[0],line._from[1]) - _i_offset);
 			mat_vals[_sys.Map(mesh_index,r._to[0],r._to[1]) - _i_offset].push_back(r._fraction);
+			_vec_mat_original[_sys.Map(mesh_index, line._from[0], line._from[1]) - _i_offset].push_back(_sys.Map(mesh_index, r._to[0], r._to[1]) - _i_offset);
+			_mat_vals_original[_sys.Map(mesh_index, line._from[0], line._from[1]) - _i_offset].push_back(r._fraction);
 		}
 	}
     // csr for mat
@@ -139,25 +144,23 @@ void CSRMatrix::MV(vector<double>& out, const vector<double>& in){
 }
 
 MPILib::Index CSRMatrix::MVObject(MPILib::Index start_index, int spikes) const{
-	MPILib::Index current_index = start_index;
+	MPILib::Index mapped_start_index = _sys.UnMap(start_index);
+	MPILib::Index current_index = mapped_start_index;
 
 	for (int s = 0; s < spikes; s++) {
-
-		MPILib::Index i_r = _sys.Map(current_index + _i_offset);
-		int range = _ia[current_index + 1] - _ia[current_index];
-
+		
 		double r1 = ((double)rand() / (double)RAND_MAX);
 		double check = 0.0;
-		for (MPILib::Index j = _ia[current_index]; j < _ia[current_index + 1]; j++) {
-			check += _val[j];
+		for (MPILib::Index j = 0; j < _vec_mat_original[current_index].size(); j++) {
+			check += _mat_vals_original[current_index][j];
 			if (r1 < check) {
-				current_index = _ja[j];
+				current_index = _vec_mat_original[current_index][j];
 				break;
 			}
 		}
 	}
 	
-	return current_index;
+	return _sys.Map(current_index);
 }
 
 

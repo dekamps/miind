@@ -50,6 +50,14 @@ namespace TwoDLib {
 				const vector<MPILib::Index>&	         weight_order    //!< reference to the mapping from NodeId to weight order
 			);
 
+		//! Communicate the firing rates to the sparse matrix implementation for individual neurons
+		void ApplyFinitePoisson
+		(
+			double                                   time_step,      //!< mesh time step
+			const std::vector<std::vector<double> >& rate_matrix,	 //!< rate matrix
+			const vector<MPILib::Index>& weight_order    //!< reference to the mapping from NodeId to weight order
+		);
+
 		//! Number of meshes
 		MPILib::Number  NrMeshes() const { return _vec_vec_csr.size(); }
 

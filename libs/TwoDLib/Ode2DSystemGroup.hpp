@@ -83,6 +83,8 @@ namespace TwoDLib {
 		//! Takes an index for the mass array and converts to the mapped version. This is used in the Master equation solvers
 		MPILib::Index Map(MPILib::Index i) const{ return _linear_map[i]; }
 
+		MPILib::Index UnMap(MPILib::Index i) const { return _linear_unmap[i]; }
+
 		//! Shift the density
 		void Evolve();
 		void Evolve(std::vector<MPILib::Index>& meshes);
@@ -220,16 +222,19 @@ namespace TwoDLib {
 		public:
 			ObjectReset(Ode2DSystemGroup& sys, 
 				vector<vector<MPILib::Index>>& vec_cell_to_obj,
-				vector<double>& vec_refract_times, 
+				vector<double>& vec_refract_times,
+				vector<MPILib::Index>& vec_refract_index,
 				MPILib::Time tau_refractive, MPILib::Index m)
 				:_sys(sys), 
 				_vec_cells_to_objects(vec_cell_to_obj),
 				_vec_objects_refract_times(vec_refract_times),
+				_vec_objects_refract_index(vec_refract_index),
 				_tau_refractive(tau_refractive), _m(m) {}
 
 			void operator()(const Redistribution& map) {
 				for (auto is : _vec_cells_to_objects[_sys.Map(_m, map._from[0], map._from[1])]) {
 					_vec_objects_refract_times[is] = _tau_refractive;
+					_vec_objects_refract_index[is] = _sys.UnMap(_sys.Map(_m, map._from[0], map._from[1]));
 					_sys._fs[_m]++;
 				}
 			}
@@ -238,8 +243,9 @@ namespace TwoDLib {
 
 			Ode2DSystemGroup& _sys;
 			MPILib::Time _tau_refractive;
-			vector<vector<MPILib::Index>>& _vec_cells_to_objects;
+			vector<vector<MPILib::Index>>& _vec_cells_to_objects; 
 			vector<double>& _vec_objects_refract_times;
+			vector<MPILib::Index>& _vec_objects_refract_index;
 			MPILib::Index       	_m;
 		};
 
@@ -358,22 +364,25 @@ public:
 		vector<MPILib::Index>			_vec_objects_to_index;
 		vector<vector<MPILib::Index>>	_vec_cells_to_objects;
 		vector<double>					_vec_objects_refract_times; // not refracting -> val < 0, ready to reset -> val == 0
+		vector<MPILib::Index>			_vec_objects_refract_index; // holds the threshold index of each refracting object
 		std::vector<std::map<MPILib::Index, std::map<MPILib::Index, double>>> _vec_reset_sorted;
 
 		void updateVecObjectsToIndex() {
 			for (int i = 0; i < _vec_cells_to_objects.size(); i++) {
 				for (int j = 0; j < _vec_cells_to_objects[i].size(); j++) {
-					_vec_objects_to_index[_vec_cells_to_objects[i][j]] = i;
+					if (_vec_objects_refract_times[_vec_cells_to_objects[i][j]] < 0)
+						_vec_objects_to_index[_vec_cells_to_objects[i][j]] = i;
 				}
 			}
 		}
 
 		void updateVecCellsToObjects() {
-			for (auto v : _vec_cells_to_objects)
-				v.clear();
+			for (int i=0; i< _vec_cells_to_objects.size(); i++)
+				_vec_cells_to_objects[i].clear();
 
 			for (int i = 0; i < _vec_objects_to_index.size(); i++) {
-				_vec_cells_to_objects[_vec_objects_to_index[i]].push_back(i);
+				if (_vec_objects_refract_times[i] < 0)
+					_vec_cells_to_objects[_vec_objects_to_index[i]].push_back(i);
 			}
 		}
 private:
@@ -385,6 +394,7 @@ private:
 
 		std::vector< std::vector<std::vector<MPILib::Index> > > _map;
 		std::vector< MPILib::Index> _linear_map;
+		std::vector< MPILib::Index> _linear_unmap;
 
 		std::vector<std::vector<Redistribution> > _vec_reversal;
 		std::vector<std::vector<Redistribution> > _vec_reset;

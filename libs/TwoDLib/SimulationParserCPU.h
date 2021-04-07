@@ -31,6 +31,7 @@ public:
 
 	std::string interpretValueAsString(std::string value);
 	double interpretValueAsDouble(std::string value);
+	int interpretValueAsInt(std::string value);
 
 protected:
 

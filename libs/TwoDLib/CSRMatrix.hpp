@@ -94,6 +94,10 @@ namespace TwoDLib {
 		std::vector<unsigned int> _ia;
 		std::vector<unsigned int> _ja;
 
+		// Store the original matrix too so we can apply to finite sized
+		vector< vector<MPILib::Index> > _vec_mat_original;
+		vector< vector<double> >		_mat_vals_original;
+
 		MPILib::Index _mesh_index;  // index of the Mesh on the Ode2DSystemGroup that this CSRMatrix is responsible for
 		MPILib::Index _i_offset;    // offset of the part of the mass array that this CSRMatrix is responsible for
 

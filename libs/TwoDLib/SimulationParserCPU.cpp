@@ -5,7 +5,6 @@
 #include <MPILib/include/WilsonCowanAlgorithm.hpp>
 #include <TwoDLib/GridSomaDendriteAlgorithmCode.hpp>
 #include <TwoDLib/GridJumpAlgorithmCode.hpp>
-#include <TwoDLib/MeshFiniteSizeAlgorithm.h>
 
 template<>
 SimulationParserCPU<MPILib::CustomConnectionParameters>::SimulationParserCPU(int num_nodes, const std::string xml_filename, std::map<std::string, std::string> vars) :
@@ -95,6 +94,23 @@ double SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string value
 		std::cout << "Warning: The value of variable " << value << " in xml file is empty and cannot be converted to a number.\n";
 
 	return std::stod(_variables[value]);
+}
+
+template<class WeightType >
+int SimulationParserCPU<WeightType>::interpretValueAsInt(std::string value) {
+
+	if (value == "")
+		return 0;
+
+	// todo: Do some checking to see if this is an actual double
+
+	if (_variables.find(value) == _variables.end()) // If the string isn't in the map, assume it's just a value
+		return std::stoi(value);
+
+	if (_variables[value] == "")
+		std::cout << "Warning: The value of variable " << value << " in xml file is empty and cannot be converted to a number.\n";
+
+	return std::stoi(_variables[value]);
 }
 
 template<class WeightType>
@@ -264,6 +280,7 @@ void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithm
 
 			std::string model_filename = interpretValueAsString(std::string(algorithm.attribute("modelfile").value()));
 			double tau_refractive = interpretValueAsDouble(algorithm.attribute("tau_refractive").as_string());
+			int num_objects = interpretValueAsInt(algorithm.attribute("finite_size").as_string());
 			double time_step = interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
 			std::string activity_mode = interpretValueAsString(std::string(algorithm.attribute("ratemethod").value()));
 
@@ -272,7 +289,7 @@ void SimulationParserCPU< MPILib::CustomConnectionParameters>::parseXMLAlgorithm
 				matrix_files.push_back(interpretValueAsString(std::string(matrix_file.child_value())));
 			}
 
-			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::MeshFiniteSizeAlgorithm<TwoDLib::MasterFiniteObject>(model_filename, matrix_files, time_step, tau_refractive, activity_mode));
+			_algorithms[algorithm_name] = std::unique_ptr<MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>>(new TwoDLib::MeshAlgorithmCustom<TwoDLib::MasterOdeint>(model_filename, matrix_files, time_step, tau_refractive, activity_mode, num_objects));
 		}
 
 		if (std::string("RateFunctor") == interpretValueAsString(std::string(algorithm.attribute("type").value()))) {

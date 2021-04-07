@@ -68,7 +68,8 @@ namespace TwoDLib {
 		const std::vector<std::string>& mat_names,
 		MPILib::Time h,
 		MPILib::Time tau_refractive,
-		const std::string&  rate_method
+		const std::string&  rate_method,
+		const unsigned int num_objects
 	):
 	_tolerance(1e-7),
 	_model_name(model_name),
@@ -84,7 +85,8 @@ namespace TwoDLib {
 	_vec_tau_refractive(std::vector<MPILib::Time>({tau_refractive})),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive),
+	_num_objects(num_objects),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive, num_objects),
 	_n_evolve(0),
 	_n_steps(0),
 	// AvgV method is for Fitzhugh-Nagumo, and other methods that don't have a threshold crossing
@@ -118,7 +120,8 @@ namespace TwoDLib {
 	_vec_tau_refractive(rhs._vec_tau_refractive),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive),
+	_num_objects(rhs._num_objects),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive, rhs._num_objects),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction)
@@ -289,9 +292,14 @@ namespace TwoDLib {
 			}
 
 	    // master equation
-	    _p_master->Apply(_n_steps*_dt,vec_rates,_vec_map);
-
-			_sys.RedistributeProbability(_n_steps);
+		if (_num_objects > 0) {
+			_p_master->ApplyFinitePoisson(_n_steps * _dt, vec_rates, _vec_map);
+		}
+		else {
+			_p_master->Apply(_n_steps * _dt, vec_rates, _vec_map);
+		}
+	    
+		_sys.RedistributeProbability(_n_steps);
 
  	    _t_cur += _n_steps*_dt;
  	    _rate = (_sys.*_sysfunction)()[0];

@@ -49,7 +49,8 @@ namespace TwoDLib {
 			const std::vector<std::string>&,        //!< vector of transition matrix files
 			MPILib::Time,                           //!< default time step for Master equation
 			MPILib::Time tau_refractive = 0,        //!< absolute refractive period
-			const string& ratemethod = ""           //!< firing rate computation; by default the mass flux across threshold
+			const string& ratemethod = "",           //!< firing rate computation; by default the mass flux across threshold
+			const unsigned int num_objects = 0		//!< number of objects for finite sized population
 		);
 
 		MeshAlgorithmCustom(const MeshAlgorithmCustom&);
@@ -165,6 +166,7 @@ namespace TwoDLib {
 		MPILib::Time _h;
 		MPILib::Rate _rate;
 		MPILib::Time _t_cur;
+		const unsigned int _num_objects;
 
 		std::vector<MPILib::Time>    _vec_tau_refractive;
 
