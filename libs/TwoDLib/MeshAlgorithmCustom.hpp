@@ -152,6 +152,7 @@ namespace TwoDLib {
 		// initialization routines
 		pugi::xml_node                          CreateRootNode(const std::string&);
 		std::vector<TwoDLib::Mesh>              CreateMeshObject();
+		std::vector<MPILib::Index>				CreateNumObjects(MPILib::Index num_objects);
 		std::vector<TwoDLib::Redistribution>    Mapping(const std::string&);
 		std::vector<TwoDLib::TransitionMatrix>  InitializeMatrices(const std::vector<std::string>&);
 		void                                    FillMap(const std::vector<MPILib::CustomConnectionParameters>& weightVector);
@@ -166,7 +167,7 @@ namespace TwoDLib {
 		MPILib::Time _h;
 		MPILib::Rate _rate;
 		MPILib::Time _t_cur;
-		const unsigned int _num_objects;
+		std::vector<MPILib::Index> _vec_num_objects;
 
 		std::vector<MPILib::Time>    _vec_tau_refractive;
 

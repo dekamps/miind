@@ -32,8 +32,8 @@ namespace TwoDLib {
 	_vec_vec_res(std::vector<std::vector<Redistribution> >{this->Mapping("Reset")}),
 	_vec_tau_refractive(std::vector<MPILib::Time>({tau_refractive})),
 	_dt(_vec_mesh[0].TimeStep()),
-	_num_objects(num_objects),
-	_sys(_vec_mesh,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive,num_objects),
+	_vec_num_objects(CreateNumObjects(num_objects)),
+	_sys(_vec_mesh, _vec_vec_rev, _vec_vec_res, _vec_tau_refractive, _vec_num_objects),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rate_method == "AvgV" ? &TwoDLib::Ode2DSystemGroup::AvgV : &TwoDLib::Ode2DSystemGroup::F),
@@ -60,8 +60,8 @@ namespace TwoDLib {
 	_vec_vec_res(rhs._vec_vec_res),
 	_dt(_vec_mesh[0].TimeStep()),
 	_vec_tau_refractive(rhs._vec_tau_refractive),
-	_num_objects(rhs._num_objects),
-	_sys(_vec_mesh,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive, rhs._num_objects),
+	_vec_num_objects(rhs._vec_num_objects),
+	_sys(_vec_mesh,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive, rhs._vec_num_objects),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction),
@@ -75,6 +75,11 @@ namespace TwoDLib {
 
 		_sys.Initialize(0,coords[0][0],coords[0][1]);
 
+	}
+
+	std::vector<MPILib::Index> GridAlgorithm::CreateNumObjects(MPILib::Index num) {
+		std::vector<MPILib::Index> r = { num };
+		return r;
 	}
 
 	GridAlgorithm* GridAlgorithm::clone() const
@@ -212,7 +217,7 @@ namespace TwoDLib {
 
 			_sys.EvolveWithoutMeshUpdate();
 
-			if (_num_objects > 0) {
+			if (_vec_num_objects[0] > 0) {
 #pragma omp parallel for
 				for (int id = 0; id < _sys._vec_objects_to_index.size(); id++) {
 					if (_sys._vec_objects_refract_times[id] >= 0.0)
@@ -256,7 +261,7 @@ namespace TwoDLib {
 	}
 
 	void GridAlgorithm::applyMasterSolver(std::vector<MPILib::Rate> rates) {
-		if (_num_objects > 0)
+		if (_vec_num_objects[0] > 0)
 			_p_master->ApplyFinitePoisson(_n_steps * _dt, rates, _efficacy_map);
 		else
 			_p_master->Apply(_n_steps * _dt, rates, _efficacy_map);

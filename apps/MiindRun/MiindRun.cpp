@@ -103,19 +103,6 @@ int main(int argc, char* argv[]) {
             std::vector<double> outs = modelCcp->evolveSingleStep(ins);
         }
         modelCcp->endSimulation();
-
-
-        InitialiseModel(node_count, xmlfile, vars);
-        time = 0.0;
-
-        std::cout << "Time Step: " << modelCcp->getTimeStep() << "\n";
-        std::cout << "Sim Time: " << modelCcp->getSimulationLength() << "\n";
-        modelCcp->startSimulation();
-        while (time < modelCcp->getSimulationLength()) {
-            time += modelCcp->getTimeStep();
-            modelCcp->evolveSingleStep(std::vector<double>());
-        }
-        modelCcp->endSimulation();
     }
     else if (modelDc) {
         std::cout << "Time Step: " << modelDc->getTimeStep() << "\n";

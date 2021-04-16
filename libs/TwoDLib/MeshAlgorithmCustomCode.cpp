@@ -85,8 +85,8 @@ namespace TwoDLib {
 	_vec_tau_refractive(std::vector<MPILib::Time>({tau_refractive})),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_num_objects(num_objects),
-	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive, num_objects),
+	_vec_num_objects(CreateNumObjects(num_objects)),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive, _vec_num_objects),
 	_n_evolve(0),
 	_n_steps(0),
 	// AvgV method is for Fitzhugh-Nagumo, and other methods that don't have a threshold crossing
@@ -120,8 +120,8 @@ namespace TwoDLib {
 	_vec_tau_refractive(rhs._vec_tau_refractive),
 	_vec_map(0),
 	_dt(_mesh_vec[0].TimeStep()),
-	_num_objects(rhs._num_objects),
-	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive, rhs._num_objects),
+	_vec_num_objects(rhs._vec_num_objects),
+	_sys(_mesh_vec,_vec_vec_rev,_vec_vec_res,_vec_tau_refractive, rhs._vec_num_objects),
 	_n_evolve(0),
 	_n_steps(0),
 	_sysfunction(rhs._sysfunction)
@@ -130,6 +130,12 @@ namespace TwoDLib {
 		// default initialization is (0,0); if there is no strip 0, it's down to the user
 		if (_mesh_vec[0].NrCellsInStrip(0) > 0 )
 			_sys.Initialize(0,0,0);
+	}
+
+	template <class Solver>
+	std::vector<MPILib::Index> MeshAlgorithmCustom<Solver>::CreateNumObjects(MPILib::Index num) {
+		std::vector<MPILib::Index> r = { num };
+		return r;
 	}
 
 	template <class Solver>
@@ -292,7 +298,7 @@ namespace TwoDLib {
 			}
 
 	    // master equation
-		if (_num_objects > 0) {
+		if (_vec_num_objects[0] > 0) {
 			_p_master->ApplyFinitePoisson(_n_steps * _dt, vec_rates, _vec_map);
 		}
 		else {

@@ -42,15 +42,20 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 CudaOde2DSystemAdapter::CudaOde2DSystemAdapter
 (
     TwoDLib::Ode2DSystemGroup& group,
-		MPILib::Time network_time_step
+		MPILib::Time network_time_step,
+	unsigned int mesh_objects_start_index
 ):
 _group(group),
+_mesh_objects_start_index(mesh_objects_start_index),
 _time_step(group.MeshObjects()[0].TimeStep()),
 _network_time_step(network_time_step),
 _mesh_size(group.MeshObjects().size()),
 _n(group.Mass().size()),
 _hostmass(_n,0.),
 _hostmap(_n,0.),
+_hostunmap(_n, 0.),
+_host_map_cumulative_value(_n, 0),
+_host_map_strip_length_value(_n, 0),
 _offsets(group.Offsets()),
 _nr_refractory_steps(group.MeshObjects().size(),0),
 _refractory_prop(group.MeshObjects().size(),0),
@@ -59,6 +64,7 @@ _refractory_mass_local(group.MeshObjects().size()),
 _nr_minimal_resets(_group.MeshObjects().size(),0),
 _res_to_minimal(_group.MeshObjects().size(),0),
 _res_from_ordered(_group.MeshObjects().size(),0),
+_res_to_ordered(_group.MeshObjects().size(), 0),
 _res_alpha_ordered(_group.MeshObjects().size(),0),
 _res_from_counts(_group.MeshObjects().size(),0),
 _res_from_offsets(_group.MeshObjects().size(),0),
@@ -66,31 +72,77 @@ _vec_alpha_ord(_group.MeshObjects().size()),
 _res_sum(group.MeshObjects().size(),0),
 _res_to_mass(group.MeshObjects().size(),0),
 _host_fs(group.MeshObjects().size(),0),
+_spikeCounts(group.MeshObjects().size(), 0),
+_thresholds(group.MeshObjects().size(), 0),
+_resets(group.MeshObjects().size(), 0),
+_reset_ws(group.MeshObjects().size(), 0),
+_refractories(group.MeshObjects().size(), 0),
 _blockSize(256),
+_vec_num_objects(group.FiniteSizeNumObjects()),
+_vec_num_object_offsets(group.FiniteSizeOffsets()),
+_host_vec_objects_to_index(group._vec_objects_to_index.size(),0),
+_host_vec_objects_refract_times(group._vec_objects_refract_times.size(), 0),
+_host_vec_objects_refract_index(group._vec_objects_refract_index.size(), 0),
 _numBlocks( (_n + _blockSize - 1) / _blockSize)
 {
     this->FillMass();
     this->FillMapData();
     this->FillReversalMap(group.MeshObjects(),group.MapReversal());
-		this->FillRefractoryTimes(group.Tau_ref());
+	this->FillRefractoryTimes(group.Tau_ref());
     this->FillResetMap(group.MeshObjects(),group.MapReset());
 
+	if (_group.NumObjects() > 0) {
+		this->FillFiniteVectors();
+		this->FillSpikesAndSpikeCounts();
+		this->EstimateGridThresholdsResetsRefractories(group.MeshObjects(), group.MapReset(), group.Tau_ref());
+	}
+}
+
+void CudaOde2DSystemAdapter::EstimateGridThresholdsResetsRefractories(const std::vector<TwoDLib::Mesh>& vec_mesh,
+	const std::vector<std::vector<TwoDLib::Redistribution> >& vec_vec_reset, const std::vector<MPILib::Time>& times) {
+	for (inttype m = 0; m < _mesh_size; m++) {
+		_refractories[m] = times[m];
+		unsigned int middle_cell = int(vec_vec_reset[m].size() / 2.0);
+		double min_threshold = (vec_mesh[m].getGridResV() * vec_mesh[m].getVWidth()) + vec_mesh[m].getGridMinV();
+		for (unsigned int check = 0; check < vec_vec_reset[m].size(); check++) {
+			if (min_threshold > vec_mesh[m].Quad(vec_vec_reset[m][check]._from[0], vec_vec_reset[m][check]._from[1]).Centroid()[0])
+				min_threshold = vec_mesh[m].Quad(vec_vec_reset[m][check]._from[0], vec_vec_reset[m][check]._from[1]).Centroid()[0];
+		}
+		_thresholds[m] = min_threshold;
+		_resets[m] = vec_mesh[m].Quad(vec_vec_reset[m][middle_cell]._to[0], vec_vec_reset[m][middle_cell]._to[1]).Centroid()[0];
+		
+		// To calculate the reset_w, get the w difference between from and to then add a little based on the alpha value.
+		_reset_ws[m] = vec_mesh[m].Quad(vec_vec_reset[m][middle_cell]._to[0], vec_vec_reset[m][middle_cell]._to[1]).Centroid()[1] - vec_mesh[m].Quad(vec_vec_reset[m][middle_cell]._from[0], vec_vec_reset[m][middle_cell]._from[1]).Centroid()[1];
+		_reset_ws[m] -= vec_mesh[m].getHHeight() * (1.0 - vec_vec_reset[m][middle_cell]._alpha);
+	}
 }
 
 CudaOde2DSystemAdapter::CudaOde2DSystemAdapter
 (
-    TwoDLib::Ode2DSystemGroup& group
-): CudaOde2DSystemAdapter(group, group.MeshObjects()[0].TimeStep())
+    TwoDLib::Ode2DSystemGroup& group,
+	unsigned int mesh_objects_start_index
+): CudaOde2DSystemAdapter(group, group.MeshObjects()[0].TimeStep(), mesh_objects_start_index)
 {
+}
+
+void CudaOde2DSystemAdapter::FillSpikesAndSpikeCounts() {
+	checkCudaErrors(cudaMalloc((inttype**)&_spikes, _group.NumObjects() * sizeof(inttype)));
+	for (inttype m = 0; m < _mesh_size; m++) {
+		inttype numBlocks = (_vec_num_objects[m] + _blockSize - 1) / _blockSize;
+		checkCudaErrors(cudaMalloc((inttype**)&_spikeCounts[m], numBlocks * sizeof(inttype)));
+	}
 }
 
 void CudaOde2DSystemAdapter::TransferMapData()
 {
 
-    for( inttype i = 0; i < _n; i++)
-        _hostmap[i] = _group.Map(i);
+	for (inttype i = 0; i < _n; i++) {
+		_hostmap[i] = _group.Map(i);
+		_hostunmap[_group.Map(i)] = i;	
+	}
 
     checkCudaErrors(cudaMemcpy(_map,&_hostmap[0],_n*sizeof(inttype),cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(_unmap, &_hostunmap[0], _n * sizeof(inttype), cudaMemcpyHostToDevice));
 }
 
 void CudaOde2DSystemAdapter::FillRefractoryTimes(const std::vector<MPILib::Time>& times) {
@@ -102,8 +154,23 @@ void CudaOde2DSystemAdapter::FillRefractoryTimes(const std::vector<MPILib::Time>
 
 void CudaOde2DSystemAdapter::FillMapData(){
     checkCudaErrors(cudaMalloc((inttype**)&_map,_n*sizeof(inttype)));
+	checkCudaErrors(cudaMalloc((inttype**)&_unmap, _n * sizeof(inttype)));
+	checkCudaErrors(cudaMalloc((inttype**)&_map_cumulative_value, _n * sizeof(inttype)));
+	checkCudaErrors(cudaMalloc((inttype**)&_map_strip_length_value, _n * sizeof(inttype)));
 
-    this->TransferMapData();
+	for (inttype i = 0; i < _n; i++) {
+		_hostmap[i] = _group.Map(i);
+		_hostunmap[_group.Map(i)] = i;
+	}
+
+	checkCudaErrors(cudaMemcpy(_map, &_hostmap[0], _n * sizeof(inttype), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(_unmap, &_hostunmap[0], _n * sizeof(inttype), cudaMemcpyHostToDevice));
+
+	_host_map_cumulative_value = _group.BuildMapCumulatives();
+	_host_map_strip_length_value = _group.BuildMapLengths();
+
+	checkCudaErrors(cudaMemcpy(_map_cumulative_value, &_host_map_cumulative_value[0], _n * sizeof(inttype), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(_map_strip_length_value, &_host_map_strip_length_value[0], _n * sizeof(inttype), cudaMemcpyHostToDevice));
 }
 
 void CudaOde2DSystemAdapter::DeleteMass()
@@ -114,10 +181,12 @@ void CudaOde2DSystemAdapter::DeleteMass()
 void CudaOde2DSystemAdapter::DeleteMapData()
 {
     cudaFree(_map);
+	cudaFree(_unmap);
 }
 
 CudaOde2DSystemAdapter::~CudaOde2DSystemAdapter()
 {
+	this->DeleteFiniteVectors();
     this->DeleteMass();
     this->DeleteMapData();
     this->DeleteReversalMap();
@@ -134,6 +203,45 @@ void CudaOde2DSystemAdapter::FillMass()
      checkCudaErrors(cudaMemcpy(_mass,&_hostmass[0],_n*sizeof(fptype),cudaMemcpyHostToDevice));
 }
 
+void CudaOde2DSystemAdapter::FillFiniteVectors() {
+	// Malloc the object cell index vector
+	checkCudaErrors(cudaMalloc((inttype**)&_vec_objects_to_index, _group.NumObjects() * sizeof(inttype)));
+	
+	// Malloc the refract times
+	checkCudaErrors(cudaMalloc((fptype**)&_vec_objects_refract_times, _group.NumObjects() * sizeof(fptype)));
+
+	// Malloc the refract times
+	checkCudaErrors(cudaMalloc((inttype**)&_vec_objects_refract_index, _group.NumObjects() * sizeof(inttype)));
+
+	for (inttype i = 0; i < _group.NumObjects(); i++) {
+		_host_vec_objects_to_index[i] = _group._vec_objects_to_index[i];
+		_host_vec_objects_refract_times[i] = _group._vec_objects_refract_times[i];
+		_host_vec_objects_refract_index[i] = _group._vec_objects_refract_index[i];
+	}
+
+	// Copy values
+	checkCudaErrors(cudaMemcpy(_vec_objects_to_index, &_host_vec_objects_to_index[0], _group.NumObjects() * sizeof(inttype), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(_vec_objects_refract_times, &_host_vec_objects_refract_times[0], _group.NumObjects() * sizeof(fptype), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(_vec_objects_refract_index, &_host_vec_objects_refract_index[0], _group.NumObjects() * sizeof(inttype), cudaMemcpyHostToDevice));
+}
+
+void CudaOde2DSystemAdapter::TransferFiniteObjects() {
+	for (inttype i = 0; i < _group.NumObjects(); i++) {
+		_host_vec_objects_to_index[i] = _group._vec_objects_to_index[i];
+		_host_vec_objects_refract_times[i] = _group._vec_objects_refract_times[i];
+	}
+
+	checkCudaErrors(cudaMemcpy(_vec_objects_to_index, &_host_vec_objects_to_index[0], _group.NumObjects() * sizeof(inttype), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(_vec_objects_refract_times, &_host_vec_objects_refract_times[0], _group.NumObjects() * sizeof(fptype), cudaMemcpyHostToDevice));
+}
+
+void CudaOde2DSystemAdapter::DeleteFiniteVectors()
+{
+	cudaFree(_vec_objects_to_index);
+	cudaFree(_vec_objects_refract_times);
+	cudaFree(_vec_objects_refract_index);
+}
+
 void CudaOde2DSystemAdapter::Validate() const
 {
     // check wether the mass array of the Ode2DSystemGroup has been initialized properly. This means the mass must
@@ -148,6 +256,32 @@ void CudaOde2DSystemAdapter::Validate() const
 	fprintf(stderr,"Total mass unequal to number of mesh objects:%f, %f\n",sum,nmesh);
         exit(0);
     }
+}
+
+void CudaOde2DSystemAdapter::EvolveOnDevice() {
+	_group.EvolveWithoutMeshUpdate();
+	inttype numBlocks = (_n + _blockSize - 1) / _blockSize;
+	evolveMap << <numBlocks, _blockSize >> > (_n, 0, _map, _unmap, _map_cumulative_value, _map_strip_length_value, _group._T());
+}
+
+void CudaOde2DSystemAdapter::EvolveOnDevice(std::vector<inttype>& meshes) {
+	_group.EvolveWithoutMeshUpdate();
+
+	for (unsigned int m  : meshes) {
+		unsigned int count = _offsets[m+1] - _offsets[m];
+
+		inttype numBlocks = (count + _blockSize - 1) / _blockSize;
+		evolveMap << <numBlocks, _blockSize >> > (count, _offsets[m], _map, _unmap, _map_cumulative_value, _map_strip_length_value, _group._T());
+	}
+}
+
+void CudaOde2DSystemAdapter::UpdateMapData() {
+	checkCudaErrors(cudaMemcpy(&_hostmap[0], _map, _n * sizeof(inttype), cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(&_hostunmap[0], _unmap, _n * sizeof(inttype), cudaMemcpyDeviceToHost));
+	for (inttype i = 0; i < _n; i++) {
+		_group.setLinearMap(i, _hostmap[i]);
+		_group.setLinearUnMap(i, _hostunmap[i]);
+	}
 }
 
 void CudaOde2DSystemAdapter::Evolve()
@@ -168,6 +302,16 @@ void CudaOde2DSystemAdapter::EvolveWithoutMeshUpdate()
 		this->TransferMapData();
 }
 
+void CudaOde2DSystemAdapter::EvolveWithoutTransfer()
+{
+	_group.UpdateMap();
+}
+
+void CudaOde2DSystemAdapter::EvolveWithoutTransfer(std::vector<inttype>& meshes)
+{
+	_group.UpdateMap(meshes);
+}
+
 void CudaOde2DSystemAdapter::Dump(const std::vector<std::ostream*>& vec_stream, int mode)
 {
      checkCudaErrors(cudaMemcpy(&_hostmass[0],_mass,_n*sizeof(fptype),cudaMemcpyDeviceToHost));
@@ -178,10 +322,27 @@ void CudaOde2DSystemAdapter::Dump(const std::vector<std::ostream*>& vec_stream, 
 
 void CudaOde2DSystemAdapter::updateGroupMass()
 {
+	if (_group.NumObjects() > 0)
+		return;
+
      checkCudaErrors(cudaMemcpy(&_hostmass[0],_mass,_n*sizeof(fptype),cudaMemcpyDeviceToHost));
      for(inttype i = 0; i < _n; i++){
 			 _group.Mass()[i] = _hostmass[i];
 		 }
+}
+
+void CudaOde2DSystemAdapter::updateFiniteObjects()
+{
+	if (_group.NumObjects() == 0)
+		return;
+
+	checkCudaErrors(cudaMemcpy(&_host_vec_objects_to_index[0], _vec_objects_to_index, _group.NumObjects() * sizeof(inttype), cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(&_host_vec_objects_refract_times[0], _vec_objects_refract_times, _group.NumObjects() * sizeof(inttype), cudaMemcpyDeviceToHost));
+	for (inttype i = 0; i < _group.NumObjects(); i++) {
+		_group._vec_objects_to_index[i] = _host_vec_objects_to_index[i];
+		_group._vec_objects_refract_times[i] = _host_vec_objects_refract_times[i];
+	}
+	_group.updateVecCellsToObjects();
 }
 
 void CudaOde2DSystemAdapter::updateRefractory()
@@ -214,18 +375,37 @@ MPILib::Potential CudaOde2DSystemAdapter::getAvgV(unsigned int m){
 	return pots[m];
 }
 
+
+
 const std::vector<fptype>& CudaOde2DSystemAdapter::F(unsigned int n_steps) const
 {
 	_host_fs.clear();
 	for(inttype m = 0; m < _mesh_size; m++)
 	{
-		inttype numBlocks = (_nr_minimal_resets[m] + _blockSize - 1)/_blockSize;
-		vector<fptype> host_sum(numBlocks,0.);
-		checkCudaErrors(cudaMemcpy(&host_sum[0],_res_sum[m],numBlocks*sizeof(fptype),cudaMemcpyDeviceToHost));
-		fptype sum = 0.0;
-		for (auto& rate: host_sum)
-			sum += rate;
-		_host_fs.push_back(sum/(_time_step*n_steps));
+		if (_vec_num_objects[m] == 0) {
+			inttype numBlocks = (_nr_minimal_resets[m] + _blockSize - 1) / _blockSize;
+			vector<fptype> host_sum(numBlocks, 0.);
+			checkCudaErrors(cudaMemcpy(&host_sum[0], _res_sum[m], numBlocks * sizeof(fptype), cudaMemcpyDeviceToHost));
+			fptype sum = 0.0;
+			for (auto& rate : host_sum)
+				sum += rate;
+			_host_fs.push_back(sum / (_time_step * n_steps));
+		}
+		else {
+			inttype numBlocks = (_vec_num_objects[m] + _blockSize - 1) / _blockSize;
+			inttype numSumBlocks = (numBlocks + _blockSize - 1) / _blockSize;
+			CudaClearSpikeCounts << <numSumBlocks, _blockSize >> > (numBlocks, _spikeCounts[m]);
+			countSpikesAndClear << <numBlocks, _blockSize, _blockSize * sizeof(inttype) >> > (_vec_num_objects[m], _vec_num_object_offsets[m], _spikes, _spikeCounts[m]);
+
+			vector<inttype> host_sum(numBlocks, 0);
+			checkCudaErrors(cudaMemcpy(&host_sum[0], _spikeCounts[m], numBlocks * sizeof(inttype), cudaMemcpyDeviceToHost));
+			inttype sum = 0;
+			for (auto& count : host_sum)
+				sum += count;
+				
+			_host_fs.push_back(((double)sum / (double)_vec_num_objects[m]) / (_time_step * n_steps));
+		}
+		
 	}
 
   return _host_fs;
@@ -256,8 +436,8 @@ void CudaOde2DSystemAdapter::FillResetMap
 
 			 checkCudaErrors(cudaMalloc((fptype**)&_refractory_mass[m], _nr_refractory_steps[m]*vec_vec_reset[m].size()*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((inttype**)&_res_to_minimal[m], _nr_minimal_resets[m]*sizeof(inttype)));
-       checkCudaErrors(cudaMalloc((inttype**)&_res_from_ordered[m], vec_vec_reset[m].size()*sizeof(inttype)));
-       
+			 checkCudaErrors(cudaMalloc((inttype**)&_res_from_ordered[m], vec_vec_reset[m].size()*sizeof(inttype))); 
+		     checkCudaErrors(cudaMalloc((inttype**)&_res_to_ordered[m], vec_vec_reset[m].size() * sizeof(inttype)));
 			 checkCudaErrors(cudaMalloc((fptype**)&_res_from_counts[m], _nr_minimal_resets[m]*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((fptype**)&_res_from_offsets[m], _nr_minimal_resets[m]*sizeof(fptype)));
 			 checkCudaErrors(cudaMalloc((fptype**)&_res_to_mass[m],_nr_minimal_resets[m]*sizeof(fptype)));
@@ -265,6 +445,7 @@ void CudaOde2DSystemAdapter::FillResetMap
 			 checkCudaErrors(cudaMalloc((fptype**)&_res_sum[m], numBlocks*sizeof(fptype)));
 			 std::vector<inttype> vec_to_min;
 			 std::vector<inttype> vec_from_ord;
+			 std::vector<inttype> vec_to_ord;
 			 std::vector<inttype> counts;
 			 std::vector<inttype> offsets;
 
@@ -277,6 +458,7 @@ void CudaOde2DSystemAdapter::FillResetMap
 				 offset_count += it->second.size();
 				 for(int i=0; i<it->second.size(); i++){
 					 vec_from_ord.push_back(it->second[i].first);
+					 vec_to_ord.push_back(it->first);
 					 _vec_alpha_ord[m].push_back(it->second[i].second);
 				 }
 			 }
@@ -285,6 +467,7 @@ void CudaOde2DSystemAdapter::FillResetMap
 
 			 checkCudaErrors(cudaMemcpy(_res_to_minimal[m],&vec_to_min[0],vec_to_min.size()*sizeof(inttype),cudaMemcpyHostToDevice));
        		 checkCudaErrors(cudaMemcpy(_res_from_ordered[m],&vec_from_ord[0],vec_from_ord.size()*sizeof(inttype),cudaMemcpyHostToDevice));
+			 checkCudaErrors(cudaMemcpy(_res_to_ordered[m], &vec_to_ord[0], vec_to_ord.size() * sizeof(inttype), cudaMemcpyHostToDevice));
        		 checkCudaErrors(cudaMemcpy(_res_alpha_ordered[m],&_vec_alpha_ord[m][0],_vec_alpha_ord[m].size()*sizeof(fptype),cudaMemcpyHostToDevice));
 			 checkCudaErrors(cudaMemcpy(_res_from_counts[m],&counts[0],counts.size()*sizeof(inttype),cudaMemcpyHostToDevice));
 			 checkCudaErrors(cudaMemcpy(_res_from_offsets[m],&offsets[0],offsets.size()*sizeof(inttype),cudaMemcpyHostToDevice));
@@ -293,6 +476,9 @@ void CudaOde2DSystemAdapter::FillResetMap
 
 void CudaOde2DSystemAdapter::RedistributeProbability(std::vector<inttype>& meshes)
 {
+	if (_group.NumObjects() > 0)
+		return;
+
 	for(inttype i = 0; i < meshes.size(); i++)
   {
 			inttype m = meshes[i];
@@ -301,8 +487,8 @@ void CudaOde2DSystemAdapter::RedistributeProbability(std::vector<inttype>& meshe
 			inttype numSumBlocks = (numBlocks + _blockSize - 1)/_blockSize;
 			inttype numResetBlocks = (_nr_resets[m] + _blockSize - 1)/_blockSize;
 
-			CudaClearDerivative<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m],_res_to_mass[m],_mass);
-			CudaClearDerivative<<<numSumBlocks,_blockSize>>>(numBlocks,_res_sum[m],_mass);
+			CudaClearDerivative<<<numBlocks,_blockSize>>>(_nr_minimal_resets[m],_res_to_mass[m]);
+			CudaClearDerivative<<<numSumBlocks,_blockSize>>>(numBlocks,_res_sum[m]);
 
 			for(int t = _nr_refractory_steps[m]-2; t >= 0; t--){
 				MapResetShiftRefractory<<<numResetBlocks,_blockSize>>>(_nr_resets[m],_refractory_mass[m], t*_nr_resets[m]);
@@ -330,6 +516,9 @@ void CudaOde2DSystemAdapter::RedistributeProbability(std::vector<inttype>& meshe
 
 void CudaOde2DSystemAdapter::RedistributeProbability()
 {
+	if (_group.NumObjects() > 0)
+		return;
+
 	std::vector<inttype> meshes(_mesh_size);
 	for(int i=0;i<_mesh_size;i++)
 		meshes[i] = i;
@@ -339,12 +528,14 @@ void CudaOde2DSystemAdapter::RedistributeProbability()
 
 void CudaOde2DSystemAdapter::MapFinish(std::vector<inttype>& meshes)
 {
+	if (_group.NumObjects() > 0)
+		return;
 	for(inttype i = 0; i < meshes.size(); i++)
   {
 			inttype m = meshes[i];
       // be careful to use this block size
       inttype numBlocks = (_nr_resets[m] + _blockSize - 1)/_blockSize;
-			ResetFinishThreaded<<<numBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m],_mass,_map);
+		ResetFinishThreaded<<<numBlocks,_blockSize>>>(_nr_resets[m],_res_from_ordered[m],_mass,_map);
   }
 
 	cudaDeviceSynchronize();
@@ -387,11 +578,86 @@ void CudaOde2DSystemAdapter::FillReversalMap
 
 void CudaOde2DSystemAdapter::RemapReversal()
 {
+	if (_group.NumObjects() > 0)
+		return;
+
     MapReversal<<<1,1>>>(_n_rev, _rev_from, _rev_to, _rev_alpha, _mass, _map);
-		cudaDeviceSynchronize();
+	cudaDeviceSynchronize();
 }
 
+void CudaOde2DSystemAdapter::RemapReversalFiniteObjects() {
+	if (_group.NumObjects() == 0)
+		return;
 
+	unsigned int num_mesh_objects = _group.NumObjects() - _vec_num_object_offsets[_mesh_objects_start_index];
+
+	inttype numBlocks = (num_mesh_objects + _blockSize - 1) / _blockSize;
+	CudaReversalFiniteObjects << <numBlocks, _blockSize >> > (num_mesh_objects, _vec_num_object_offsets[_mesh_objects_start_index], _vec_objects_to_index, _n_rev, _rev_from, _rev_to, _map);
+}
+
+void CudaOde2DSystemAdapter::RedistributeFiniteObjects(double timestep, curandState* rand_state)
+{
+	if (_group.NumObjects() == 0)
+		return;
+
+	std::vector<inttype> meshes(_mesh_size);
+	for (int i = 0; i < _mesh_size; i++)
+		meshes[i] = i + _mesh_objects_start_index;
+
+	RedistributeFiniteObjects(meshes, timestep, rand_state);
+}
+
+void CudaOde2DSystemAdapter::RedistributeFiniteObjects(std::vector<inttype>& meshes, double timestep, curandState* rand_state )
+{
+	if (_group.NumObjects() == 0)
+		return;
+
+	for (inttype m : meshes) {
+		inttype numBlocks = (_vec_num_objects[m] + _blockSize - 1) / _blockSize;
+		CudaResetFiniteObjects << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m],
+			_vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index, 
+			_refractories[m], _vec_alpha_ord[m].size(), _res_from_ordered[m], _unmap, _spikes);
+
+		CudaCheckRefractingFiniteObjects << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m],
+			_vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index, timestep,
+			_vec_alpha_ord[m].size(), _res_from_ordered[m], _res_to_ordered[m], _res_alpha_ordered[m], rand_state, _map, _unmap);
+	}
+	
+}
+
+void CudaOde2DSystemAdapter::RedistributeGridFiniteObjects(curandState* rand_state)
+{
+	if (_group.NumObjects() == 0)
+		return;
+
+	std::vector<inttype> meshes(_mesh_objects_start_index);
+	for (int i = 0; i < _mesh_objects_start_index; i++)
+		meshes[i] = i;
+
+	RedistributeGridFiniteObjects(meshes, rand_state);
+}
+
+void CudaOde2DSystemAdapter::RedistributeGridFiniteObjects(std::vector<inttype>& meshes, curandState* rand_state)
+{
+	if (_group.NumObjects() == 0)
+		return;
+
+	for (inttype m : meshes) {
+		inttype numBlocks = (_vec_num_objects[m] + _blockSize - 1) / _blockSize;
+
+		int threshold_col = int((_thresholds[m]-_group.MeshObjects()[m].getGridMinV()) / _group.MeshObjects()[m].getVWidth());
+		int reset_col = int((_resets[m] - _group.MeshObjects()[m].getGridMinV()) / _group.MeshObjects()[m].getVWidth());
+		int reset_w_rows = int (_reset_ws[m] / _group.MeshObjects()[m].getHHeight());
+		int res_v = _group.MeshObjects()[m].getGridResV();
+		double reset_stays_probability = (_reset_ws[m] / _group.MeshObjects()[m].getHHeight()) - reset_w_rows;
+		double refractory_time = _refractories[m];
+		double timestep = _group.MeshObjects()[m].TimeStep();
+
+		CudaGridResetFiniteObjects << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m], _vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index,
+			threshold_col, reset_col, reset_w_rows, res_v, reset_stays_probability, refractory_time, timestep, _spikes, rand_state);
+	}
+
+}
 
 void CudaOde2DSystemAdapter::DeleteResetMap()
 {
@@ -401,6 +667,7 @@ void CudaOde2DSystemAdapter::DeleteResetMap()
     {
 				cudaFree(_res_to_minimal[m]);
         cudaFree(_res_from_ordered[m]);
+		cudaFree(_res_to_ordered[m]);
 				cudaFree(_res_from_counts[m]);
 				cudaFree(_res_alpha_ordered[m]);
         cudaFree(_res_from_offsets[m]);

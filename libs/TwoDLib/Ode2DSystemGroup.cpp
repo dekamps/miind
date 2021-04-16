@@ -87,7 +87,7 @@ std::vector<Ode2DSystemGroup::ObjectReversal> Ode2DSystemGroup::InitializeObject
 {
 	std::vector<Ode2DSystemGroup::ObjectReversal> vec_ret;
 	for (MPILib::Index m = 0; m < _mesh_list.size(); m++) {
-		ObjectReversal reversal(*this, _vec_cells_to_objects, m);
+		ObjectReversal reversal(*this, _vec_cells_to_objects, _vec_objects_to_index, m);
 		vec_ret.push_back(reversal);
 	}
 	return vec_ret;
@@ -99,7 +99,7 @@ Ode2DSystemGroup::Ode2DSystemGroup
 	const std::vector<std::vector<Redistribution> >& vec_reversal,
 	const std::vector<std::vector<Redistribution> >& vec_reset,
 	const std::vector<MPILib::Time>& vec_tau_refractive,
-	unsigned int num_objects
+	const std::vector<MPILib::Index> num_objects
 ):
 _mesh_list(mesh_list),
 _vec_mesh_offset(MeshOffset(mesh_list)),
@@ -114,6 +114,7 @@ _avs(std::vector<MPILib::Potential>(mesh_list.size(),0.0)),
 _map(InitializeMap()),
 _linear_map(InitializeLinearMap()),
 _linear_unmap(InitializeLinearMap()),
+_map_counter(InitializeMap()),
 _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
 _vec_tau_refractive(vec_tau_refractive),
@@ -123,8 +124,11 @@ _reset(InitializeReset()),
 _reset_refractive(InitializeResetRefractiveInternal(mesh_list[0].TimeStep())),
 _object_reset(InitializeObjectReset()),
 _clean(InitializeClean()),
-_num_objects(num_objects)
+_vec_num_objects(num_objects),
+_vec_num_object_offsets(FiniteSizeOffset(num_objects))
 {
+	InitializeFiniteObjects();
+
 	for(const auto& m: _mesh_list)
 		assert(m.TimeStep() != 0.0);
 
@@ -149,7 +153,7 @@ Ode2DSystemGroup::Ode2DSystemGroup
 	const std::vector<Mesh>& mesh_list,
 	const std::vector<std::vector<Redistribution> >& vec_reversal,
 	const std::vector<std::vector<Redistribution> >& vec_reset,
-	unsigned int num_objects
+	const std::vector<MPILib::Index> num_objects
 ):
 _mesh_list(mesh_list),
 _vec_mesh_offset(MeshOffset(mesh_list)),
@@ -164,6 +168,7 @@ _avs(std::vector<MPILib::Potential>(mesh_list.size(),0.0)),
 _map(InitializeMap()),
 _linear_map(InitializeLinearMap()),
 _linear_unmap(InitializeLinearMap()),
+_map_counter(InitializeMap()),
 _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
 _vec_tau_refractive(std::vector<MPILib::Time>(mesh_list.size(),0.0)),
@@ -173,8 +178,11 @@ _reset(InitializeReset()),
 _reset_refractive(InitializeResetRefractiveInternal(mesh_list[0].TimeStep())),
 _object_reset(InitializeObjectReset()),
 _clean(InitializeClean()),
-_num_objects(num_objects)
+_vec_num_objects(num_objects),
+_vec_num_object_offsets(FiniteSizeOffset(num_objects))
 {
+	InitializeFiniteObjects();
+
 	for(const auto& m: _mesh_list)
 		assert(m.TimeStep() != 0.0);
 
@@ -206,6 +214,16 @@ std::vector<MPILib::Number> Ode2DSystemGroup::MeshOffset(const std::vector<Mesh>
 	}
 
 	return vec_ret;
+}
+
+std::vector<MPILib::Index> Ode2DSystemGroup::FiniteSizeOffset(const std::vector<MPILib::Index>& l) const {
+	std::vector<MPILib::Index> offsets{ 0 }; 
+
+	for (const MPILib::Index& i : l) {
+		offsets.push_back(i + offsets.back());
+	}
+
+	return offsets;
 }
 
 std::vector<double> Ode2DSystemGroup::MeshVs(const std::vector<Mesh>& l) const
@@ -254,6 +272,27 @@ vector<MPILib::Potential> Ode2DSystemGroup::InitializeMass() const
 	return vector<MPILib::Potential>(n_cells,0.0);
 }
 
+void Ode2DSystemGroup::InitializeFiniteObjects() {
+	_vec_cells_to_objects = vector<vector<MPILib::Index>>(_vec_mass.size());
+	for (int i = 0; i < _vec_cells_to_objects.size(); i++) {
+		_vec_cells_to_objects[i] = vector<MPILib::Index>();
+	}
+
+	unsigned int total_objects = 0;
+	for (auto n : _vec_num_objects)
+		total_objects += n;
+
+	_vec_objects_to_index = vector<MPILib::Index>(total_objects);
+	_vec_objects_refract_times = vector<double>(total_objects);
+	_vec_objects_refract_index = vector<MPILib::Index>(total_objects);
+	for (int i = 0; i < total_objects; i++) {
+		_vec_objects_to_index[i] = 0;
+		_vec_objects_refract_times[i] = -1.0;
+		_vec_objects_refract_index[i] = 0;
+	}
+}
+
+
 std::vector<MPILib::Index> Ode2DSystemGroup::InitializeWorkingIndex()
 {
 	std::vector<MPILib::Index> vec_ret;
@@ -296,25 +335,16 @@ vector<MPILib::Potential> Ode2DSystemGroup::InitializeArea(const std::vector<Mes
 }
 
 void Ode2DSystemGroup::Initialize(MPILib::Index m, MPILib::Index i, MPILib::Index j){
-	_vec_mass[this->Map(m,i,j)] = 1.0;
-
-	_vec_cells_to_objects = vector<vector<MPILib::Index>>(_vec_mass.size());
-	for (int i = 0; i < _vec_cells_to_objects.size(); i++) {
-		_vec_cells_to_objects[i] = vector<MPILib::Index>();
-	}
-
 	unsigned int start_index = this->Map(m, i, j);
-	_vec_objects_to_index = vector<MPILib::Index>(_num_objects);
-	_vec_objects_refract_times = vector<double>(_num_objects);
-	_vec_objects_refract_index = vector<MPILib::Index>(_num_objects);
-	for (int i = 0; i < _num_objects; i++) {
+
+	_vec_mass[start_index] = 1.0;
+
+	for (int i = 0; i < _vec_num_objects[m]; i++) {
 		_vec_objects_to_index[i] = start_index;
 		_vec_objects_refract_times[i] = -1.0;
 		_vec_objects_refract_index[i] = 0;
 		_vec_cells_to_objects[start_index].push_back(i);
 	}
-	
-
 }
 
 std::vector< std::vector< std::vector<MPILib::Index> > > Ode2DSystemGroup::InitializeMap() const
@@ -340,10 +370,12 @@ std::vector<MPILib::Index> Ode2DSystemGroup::InitializeLinearMap()
 {
 	std::vector<MPILib::Index> vec_ret;
 	MPILib::Index counter = 0;
-	for( const Mesh& mesh: _mesh_list){
-		for (MPILib::Index i = 0; i < mesh.NrStrips(); i++)
-			for (MPILib::Index j = 0; j < mesh.NrCellsInStrip(i); j++)
+	for(MPILib::Index m = 0; m < _mesh_list.size(); m++){
+		for (MPILib::Index i = 0; i < _mesh_list[m].NrStrips(); i++) {
+			for (MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++) {
 				vec_ret.push_back(counter++);
+			}
+		}
 	}
 	return vec_ret;
 }
@@ -403,23 +435,53 @@ void Ode2DSystemGroup::EvolveWithoutMeshUpdate(){
 		f = 0.;
 }
 
+std::vector<MPILib::Index> Ode2DSystemGroup::BuildMapCumulatives() {
+	std::vector<MPILib::Index> cumulatives;
+
+	for (unsigned int m = 0; m < _mesh_list.size(); m++) {
+		for (MPILib::Index i = 0; i < _mesh_list[m].NrStrips(); i++) {
+			for (MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++) {
+				cumulatives.push_back(_vec_cumulative[m][i]);
+			}
+		}
+	}
+
+	return cumulatives;
+}
+
+std::vector<MPILib::Index> Ode2DSystemGroup::BuildMapLengths() {
+	std::vector<MPILib::Index> lengths;
+
+	for (unsigned int m = 0; m < _mesh_list.size(); m++) {
+		for (MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(0); j++) {
+			lengths.push_back(0);
+		}
+		for (MPILib::Index i = 1; i < _mesh_list[m].NrStrips(); i++) {
+			for (MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++) {
+				lengths.push_back(_vec_length[m][i]);
+			}
+		}
+	}
+
+	return lengths;
+}
+
 
 void Ode2DSystemGroup::UpdateMap()
 {
-	MPILib::Index counter = 0;
 	for (MPILib::Index m = 0; m < _mesh_list.size(); m++){ // we need the index for mapping, so no range-based loop
 		for (MPILib::Index i_stat = 0; i_stat < _mesh_list[m].NrCellsInStrip(0); i_stat++) {
-			_linear_map[counter++] = i_stat + _vec_mesh_offset[m]; // the stationary strip needs to be handled separately
-			_linear_unmap[i_stat + _vec_mesh_offset[m]] = counter-1;
+			_linear_map[_map_counter[m][0][i_stat]] = i_stat + _vec_mesh_offset[m]; // the stationary strip needs to be handled separately
+			_linear_unmap[i_stat + _vec_mesh_offset[m]] = _map_counter[m][0][i_stat];
 		}
-
-		for (MPILib::Index i = 1; i < _mesh_list[m].NrStrips(); i++){
+#pragma omp parallel for
+		for (int i = 1; i < _mesh_list[m].NrStrips(); i++){
 			// yes! i = 1. strip 0 is not supposed to have dynamics
-			for (MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++ ){
+			for (int j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++ ){
 				MPILib::Index ind = _vec_cumulative[m][i] + modulo(j-_t,_vec_length[m][i]) + _vec_mesh_offset[m];
 				_map[m][i][j] = ind;
-				_linear_map[counter++] = ind;
-				_linear_unmap[ind] = counter-1;
+				_linear_map[_map_counter[m][i][j]] = ind;
+				_linear_unmap[ind] = _map_counter[m][i][j];
 			}
 		}
 	}
@@ -428,21 +490,19 @@ void Ode2DSystemGroup::UpdateMap()
 void Ode2DSystemGroup::UpdateMap(std::vector<MPILib::Index>& meshes)
 {
 	for (MPILib::Index n = 0; n < meshes.size(); n++){ // we need the index for mapping, so no range-based loop
-		MPILib::Index counter = 0;
 		MPILib::Index m = meshes[n];
 		for(MPILib::Index i_stat = 0; i_stat < _mesh_list[m].NrCellsInStrip(0); i_stat++){
-			_linear_map[_vec_mesh_offset[m] + counter] = i_stat + _vec_mesh_offset[m]; // the stationary strip needs to be handled separately
-			_linear_unmap[i_stat + _vec_mesh_offset[m]] = _vec_mesh_offset[m] + counter;
-			counter++;
+			_linear_map[_vec_mesh_offset[m] + _map_counter[m][0][i_stat]] = i_stat + _vec_mesh_offset[m]; // the stationary strip needs to be handled separately
+			_linear_unmap[i_stat + _vec_mesh_offset[m]] = _vec_mesh_offset[m] + _map_counter[m][0][i_stat];
 		}
-		for (MPILib::Index i = 1; i < _mesh_list[m].NrStrips(); i++){
+#pragma omp parallel for
+		for (int i = 1; i < _mesh_list[m].NrStrips(); i++){
 			// yes! i = 1. strip 0 is not supposed to have dynamics
-			for (MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++ ){
+			for (int j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++ ){
 				MPILib::Index ind = _vec_cumulative[m][i] + modulo(j-_t,_vec_length[m][i]) + _vec_mesh_offset[m];
 				_map[m][i][j] = ind;
-				_linear_map[_vec_mesh_offset[m] + counter] = ind;
-				_linear_unmap[ind] = _vec_mesh_offset[m] + counter;
-				counter++;
+				_linear_map[_vec_mesh_offset[m] + _map_counter[m][i][j]] = ind;
+				_linear_unmap[ind] = _vec_mesh_offset[m] + _map_counter[m][i][j];
 			}
 		}
 	}
@@ -450,7 +510,7 @@ void Ode2DSystemGroup::UpdateMap(std::vector<MPILib::Index>& meshes)
 
 void Ode2DSystemGroup::RemapReversal(){
 
-	if (_num_objects > 0) {
+	if (_vec_num_objects[0] > 0) {
 		RemapObjectReversal();
 		return;
 	}
@@ -460,14 +520,18 @@ void Ode2DSystemGroup::RemapReversal(){
 }
 
 void Ode2DSystemGroup::RemapObjectReversal() {
-
+	// requires valid _vec_cells_to_objects and _vec_objects_to_index
+	// _vec_cells_to_objects is valid at the end of this
+	// _vec_objects_to_index is valid at the end of this
 	for (MPILib::Index m = 0; m < _mesh_list.size(); m++)
 		std::for_each(_vec_reversal[m].begin(), _vec_reversal[m].end(), _object_reversal[m]);
 
-	updateVecObjectsToIndex();
 }
 
 void Ode2DSystemGroup::RedistributeObjects(MPILib::Time timestep) {
+	// requires valid _vec_cells_to_objects and _vec_objects_to_index
+	// _vec_cells_to_objects is valid at the end of this
+	// _vec_objects_to_index is valid at the end of this
 	for (MPILib::Index m = 0; m < _mesh_list.size(); m++) {
 		std::for_each(_vec_reset[m].begin(), _vec_reset[m].end(), _object_reset[m]);
 
@@ -483,7 +547,9 @@ void Ode2DSystemGroup::RedistributeObjects(MPILib::Time timestep) {
 						check += t.second;
 						if (r1 <= check) {
 							_fs[m]++;
-							_vec_objects_to_index[i] = Map(t.first);
+							auto ind = Map(t.first);
+							_vec_objects_to_index[i] = ind;
+							_vec_cells_to_objects[ind].push_back(i);
 							break;
 						}
 					}
@@ -492,37 +558,33 @@ void Ode2DSystemGroup::RedistributeObjects(MPILib::Time timestep) {
 
 		}
 	}
-
-	updateVecCellsToObjects();
 }
 
 void Ode2DSystemGroup::RedistributeProbability(MPILib::Number steps)
 {
-	MPILib::Time t_step = _mesh_list[0].TimeStep();
-
-	if (_num_objects > 0) {
-		RedistributeObjects(t_step);
-		for (MPILib::Rate& f : _fs) {
-			f /= _num_objects*t_step;
-		}
-		return;
-	}
-
 	for(MPILib::Index m=0; m < _mesh_list.size(); m++){
-		if (_vec_tau_refractive[m] == 0.){
-			std::for_each(_vec_reset[m].begin(),_vec_reset[m].end(),_reset[m]);
-		}
-		else{
-			for(auto& r: _vec_reset[m])
-				_reset_refractive[m](r);
-		}
 
-		std::for_each(_vec_reset[m].begin(),_vec_reset[m].end(),_clean[m]);
+		MPILib::Time t_step = _mesh_list[m].TimeStep();
 
-	}
-	// they all should have the same time step
-	for (MPILib::Rate& f: _fs){
-		f /= t_step*steps;
+		if (_vec_num_objects[m] > 0) {
+			RedistributeObjects(t_step);
+			_fs[m] /= _vec_num_objects[m] * t_step * steps;
+		}
+		else {
+			if (_vec_tau_refractive[m] == 0.) {
+				std::for_each(_vec_reset[m].begin(), _vec_reset[m].end(), _reset[m]);
+			}
+			else {
+				for (auto& r : _vec_reset[m])
+					_reset_refractive[m](r);
+			}
+
+			std::for_each(_vec_reset[m].begin(), _vec_reset[m].end(), _clean[m]);
+
+			_fs[m] /= t_step * steps;
+		}
+		
+
 	}
 }
 

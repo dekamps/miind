@@ -84,7 +84,7 @@ namespace TwoDLib {
 		const std::string _model_name;
 		const std::string _rate_method;
 
-		const unsigned int _num_objects;
+		std::vector<MPILib::Index> _vec_num_objects;
 
 		MPILib::Rate _rate;
 		MPILib::Time _t_cur;
@@ -128,6 +128,7 @@ namespace TwoDLib {
 
 		virtual void FillMap(const std::vector<MPILib::CustomConnectionParameters>& weightVector);
 		std::vector<Mesh> CreateMeshObject();
+		std::vector<MPILib::Index> CreateNumObjects(MPILib::Index num_objects);
 		pugi::xml_node CreateRootNode(const std::string&);
 		std::vector<TwoDLib::Redistribution> Mapping(const std::string&);
 

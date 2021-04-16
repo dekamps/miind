@@ -227,6 +227,7 @@ bool SimulationParserGPU<WeightType>::addGridAlgorithmGroupNode(pugi::xml_docume
 
 			std::string model_filename = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(algorithm.attribute("modelfile").value()));
 			double tau_refractive = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.attribute("tau_refractive").value()));
+			double finite_size = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.attribute("finite_size").value()));
 			std::string transform_filename = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(algorithm.attribute("transformfile").value()));
 			double start_v = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.attribute("start_v").value()));
 			double start_w = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.attribute("start_w").value()));
@@ -242,7 +243,7 @@ bool SimulationParserGPU<WeightType>::addGridAlgorithmGroupNode(pugi::xml_docume
 			_reset_mappings.push_back(TwoDLib::RetrieveMappingFromXML("Reset", model));
 			_transition_mats.push_back(TwoDLib::TransitionMatrix(transform_filename));
 
-			vec_network.addGridNode(_meshes.back(), _transition_mats.back(), start_v, start_w, _reversal_mappings.back(), _reset_mappings.back(), tau_refractive);
+			vec_network.addGridNode(_meshes.back(), _transition_mats.back(), start_v, start_w, _reversal_mappings.back(), _reset_mappings.back(), tau_refractive, finite_size);
 			return true;
 		}
 	}
@@ -259,6 +260,7 @@ bool SimulationParserGPU<WeightType>::addMeshAlgorithmGroupNode(pugi::xml_docume
 
 			std::string model_filename = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(algorithm.attribute("modelfile").value()));
 			double tau_refractive = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.attribute("tau_refractive").value()));
+			double finite_size = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.attribute("finite_size").value()));
 			double time_step = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
 
 			// Only load the matrices once for each algorithm.
@@ -284,7 +286,7 @@ bool SimulationParserGPU<WeightType>::addMeshAlgorithmGroupNode(pugi::xml_docume
 			_reversal_mappings.push_back(TwoDLib::RetrieveMappingFromXML("Reversal", model));
 			_reset_mappings.push_back(TwoDLib::RetrieveMappingFromXML("Reset", model));
 
-			vec_network.addMeshNode(_meshes.back(), _reversal_mappings.back(), _reset_mappings.back(), tau_refractive);
+			vec_network.addMeshNode(_meshes.back(), _reversal_mappings.back(), _reset_mappings.back(), tau_refractive, finite_size);
 
 			return true;
 		}

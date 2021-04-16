@@ -96,9 +96,9 @@ namespace MiindLib {
         }
 
         void addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w,
-            std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive);
+            std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive, unsigned int finite_size = 0);
 
-        void addMeshNode(TwoDLib::Mesh mesh, std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive);
+        void addMeshNode(TwoDLib::Mesh mesh, std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive, unsigned int finite_size = 0);
 
         void addRateNode(function_pointer functor);
 
@@ -160,6 +160,10 @@ namespace MiindLib {
 
         std::vector<inttype> _grid_meshes;
         std::vector<inttype> _mesh_meshes;
+
+        std::vector<inttype> _num_grid_objects;
+        std::vector<inttype> _num_mesh_objects;
+        std::vector<inttype> _num_objects;
 
         TwoDLib::Ode2DSystemGroup* _group;
 

@@ -2,7 +2,7 @@
  <Variable Name='TIME_END'>0.5</Variable>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="GridAlgorithm" name="OSC" modelfile="fn.model" tau_refractive="0.0" transformfile="fn_0_0_0_0_.tmat" start_v="-1.0" start_w="-0.3" >
+<Algorithm type="GridAlgorithm" name="OSC" modelfile="fn.model" tau_refractive="0.0" transformfile="fn_0_0_0_0_.tmat" finite_size="1000" start_v="-1.0" start_w="-0.3" >
 <TimeStep>0.0001</TimeStep>
 </Algorithm>
 <Algorithm type="RateFunctor" name="MLR_1">
@@ -18,7 +18,7 @@
 </Connections>
 <Reporting>
 	<!--<Density node="RG_E" t_start="0.0" t_end="6.0" t_interval="0.001" />-->
-	<!--<Display node="RG_E" />-->
+	<Display node="RG_E" />
 	<Rate node="RG_E" t_interval="0.001" />
 </Reporting>
 <SimulationIO>

@@ -45,7 +45,7 @@ _vec_timefactor(0){
 	if (NrStrips() > 3) {// this is a 2D mesh and if it's a grid, we want to know the cell dimensions
 
 		// If this mesh is a grid, calculate the cell width.
-		// If it's not a mesh, _grid_cell_width is meaningless.
+		// If it's not a mesh, _grid_cell_width etc is meaningless.
 		Quadrilateral q1 = Quad(1,0);
 		Quadrilateral q2 = Quad(1,1);
 
@@ -57,6 +57,17 @@ _vec_timefactor(0){
 
 		_grid_cell_width = std::max(cell_h_dist, cell_v_dist);
 
+		if (cell_h_dist > cell_v_dist) { // This is the v distance
+			_grid_v_width = cell_h_dist; 
+			_grid_min_v = Quad(0, 0).Centroid()[0] - (_grid_v_width / 2.0);
+			_grid_res_v = NrCellsInStrip(0);
+		}
+		else {
+			_grid_h_height = cell_v_dist;
+			_grid_min_h = Quad(0, 0).Centroid()[1] - (_grid_h_height / 2.0);
+			_grid_res_h = NrCellsInStrip(0);
+		}
+
 		Quadrilateral q3 = Quad(1,1);
 		Quadrilateral q4 = Quad(2,1);
 
@@ -67,6 +78,18 @@ _vec_timefactor(0){
 		// we do this because we don't know if this is a v- or h- efficacy
 
 		_grid_cell_height = std::max(cell_h_dist, cell_v_dist);
+
+		if (cell_h_dist > cell_v_dist) { // This is the h distance
+			_grid_v_width = cell_h_dist; 
+			_grid_min_v = Quad(0, 0).Centroid()[0] - (_grid_v_width / 2.0);
+			_grid_res_v = NrStrips();
+		}
+		else {
+			_grid_h_height = cell_v_dist;
+			_grid_min_h = Quad(0, 0).Centroid()[1] - (_grid_h_height / 2.0);
+			_grid_res_h = NrStrips();
+		}
+
 	} else {
 		_grid_cell_width = 0.0;
 		_grid_cell_height = 0.0;
@@ -82,7 +105,13 @@ _t_step(m._t_step),
 _map(m._map),
 _vec_vec_cell(m._vec_vec_cell),
 _grid_cell_width(m._grid_cell_width),
-_grid_cell_height(m._grid_cell_height)
+_grid_cell_height(m._grid_cell_height),
+_grid_v_width(m._grid_v_width),
+_grid_h_height(m._grid_h_height),
+_grid_min_v(m._grid_min_v),
+_grid_min_h(m._grid_min_h),
+_grid_res_v(m._grid_res_v),
+_grid_res_h(m._grid_res_h)
 {
 }
 
@@ -92,6 +121,30 @@ double Mesh::getCellWidth() const {
 
 double Mesh::getCellHeight() const {
 	return _grid_cell_height;
+}
+
+double Mesh::getVWidth() const {
+	return _grid_v_width;
+}
+
+double Mesh::getHHeight() const {
+	return _grid_h_height;
+}
+
+double Mesh::getGridMinV() const {
+	return _grid_min_v;
+}
+
+double Mesh::getGridMinH() const {
+	return _grid_min_h;
+}
+
+unsigned int Mesh::getGridResV() const {
+	return _grid_res_v;
+}
+
+unsigned int Mesh::getGridResH() const {
+	return _grid_res_h;
 }
 
 Mesh::GridCellTransition Mesh::calculateCellTransition(double efficacy) const{

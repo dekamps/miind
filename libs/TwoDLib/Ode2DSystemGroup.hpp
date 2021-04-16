@@ -57,7 +57,7 @@ namespace TwoDLib {
 			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin
 			const std::vector< std::vector<Redistribution> >&,  //!< A series of mappings from threshold to reset bin
 			const std::vector<MPILib::Time>&,
-			unsigned int num_objects = 0
+			const std::vector<MPILib::Index> num_objects = std::vector<MPILib::Index>()
 		);
 
 		Ode2DSystemGroup
@@ -65,7 +65,7 @@ namespace TwoDLib {
 			const std::vector<Mesh>&, 					       //!< A series of Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
 			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin
 			const std::vector< std::vector<Redistribution> >&,  //!< A series of mappings from threshold to reset bin
-			unsigned int num_objects = 0
+			const std::vector<MPILib::Index> num_objects = std::vector<MPILib::Index>()
 		);
 
 
@@ -84,6 +84,13 @@ namespace TwoDLib {
 		MPILib::Index Map(MPILib::Index i) const{ return _linear_map[i]; }
 
 		MPILib::Index UnMap(MPILib::Index i) const { return _linear_unmap[i]; }
+
+		void setLinearMap(unsigned int i, MPILib::Index ind) { _linear_map[i] = ind; }
+		void setLinearUnMap(unsigned int i, MPILib::Index ind) { _linear_unmap[i] = ind; }
+
+		std::vector<MPILib::Index> BuildMapCumulatives();
+		std::vector<MPILib::Index> BuildMapLengths();
+		unsigned int _T() { return _t; }
 
 		//! Shift the density
 		void Evolve();
@@ -134,6 +141,14 @@ namespace TwoDLib {
 		//! See what part of the mass array each Mesh is responsible for: the offsets are given as a function of mesh index
 		const std::vector<MPILib::Index>& Offsets() const {return _vec_mesh_offset; }
 
+		//! See which finite objects are associated with which mesh: the offsets are given as a function of mesh index
+		const std::vector<MPILib::Index>& FiniteSizeOffsets() const {return _vec_num_object_offsets; }
+
+		//! allow inspection of the Mesh objects
+		const std::vector<MPILib::Index>& FiniteSizeNumObjects() const { return _vec_num_objects; }
+
+		const unsigned int NumObjects() const { return _vec_objects_to_index.size(); }
+
 		//! Provide access to the mass array
 	    vector<MPILib::Mass>& Mass() { return _vec_mass; }
 
@@ -146,6 +161,9 @@ namespace TwoDLib {
 		const std::vector<std::vector<Redistribution> >& MapReset()    const { return  _vec_reset;}
 
 		const std::vector<MPILib::Time> Tau_ref() const { return _vec_tau_refractive; }
+
+		void UpdateMap(std::vector<MPILib::Index>& meshes);
+		void UpdateMap();
 
 		// Initialize the refractory reset queue with the network's time step
 		void    InitializeResetRefractive(MPILib::Time network_time_step);
@@ -182,10 +200,13 @@ namespace TwoDLib {
 		class ObjectReversal {
 		public:
 
-			ObjectReversal(Ode2DSystemGroup& sys, vector<vector<MPILib::Index>>& vec_cell_to_obj, MPILib::Index m) 
-				:_sys(sys), _vec_cells_to_objects(vec_cell_to_obj), _m(m) {}
+			ObjectReversal(Ode2DSystemGroup& sys, vector<vector<MPILib::Index>>& vec_cell_to_obj, vector<MPILib::Index>& vec_objects_to_index, MPILib::Index m)
+				:_sys(sys), _vec_cells_to_objects(vec_cell_to_obj), _vec_objects_to_index(vec_objects_to_index), _m(m) {}
 
 			void operator()(const Redistribution& map) {
+				for (auto i : _vec_cells_to_objects[_sys.Map(_m, map._from[0], map._from[1])]) {
+					_vec_objects_to_index[i] = _sys.Map(_m, map._to[0], map._to[1]);
+				}
 				_vec_cells_to_objects[_sys.Map(_m, map._to[0], map._to[1])].insert(
 					_vec_cells_to_objects[_sys.Map(_m, map._to[0], map._to[1])].end(),
 					_vec_cells_to_objects[_sys.Map(_m, map._from[0], map._from[1])].begin(),
@@ -196,6 +217,7 @@ namespace TwoDLib {
 		private:
 			Ode2DSystemGroup& _sys;
 			vector<vector<MPILib::Index>>& _vec_cells_to_objects;
+			vector<MPILib::Index>& _vec_objects_to_index;
 			MPILib::Index     		_m;
 		};
 
@@ -236,6 +258,7 @@ namespace TwoDLib {
 					_vec_objects_refract_times[is] = _tau_refractive;
 					_vec_objects_refract_index[is] = _sys.UnMap(_sys.Map(_m, map._from[0], map._from[1]));
 				}
+				_vec_cells_to_objects[_sys.Map(_m, map._from[0], map._from[1])].clear();
 			}
 
 		private:
@@ -330,7 +353,10 @@ namespace TwoDLib {
 		std::vector<MPILib::Index> InitializeCumulative(const Mesh&) const;
 		std::vector<std::vector<MPILib::Index> > InitializeCumulatives(const std::vector<Mesh>&);
 		std::vector<MPILib::Number> MeshOffset(const std::vector<Mesh>&) const;
+		std::vector<MPILib::Index> FiniteSizeOffset(const std::vector<MPILib::Index>&) const;
 		std::vector<double> MeshVs(const std::vector<Mesh>&) const;
+
+		void InitializeFiniteObjects();
 
 		bool				  CheckConsistency() const;
 		std::vector<Reset>    InitializeReset();
@@ -346,8 +372,7 @@ namespace TwoDLib {
 		std::vector< std::vector< std::vector<MPILib::Index> > > InitializeMap() const;
 		std::vector< MPILib::Index> InitializeLinearMap();
 		std::vector< MPILib::Index> InitializeWorkingIndex();
-		void 									UpdateMap(std::vector<MPILib::Index>& meshes);
-		void                  UpdateMap();
+		
 
 		const std::vector<Mesh>&    _mesh_list;
 
@@ -356,10 +381,12 @@ namespace TwoDLib {
 		std::vector<std::vector<MPILib::Index> > _vec_cumulative;
 		std::vector<double>					_vec_vs;
 
+		std::vector<MPILib::Index>  _vec_num_objects;
+		std::vector<MPILib::Index>  _vec_num_object_offsets;
+
 		std::vector<MPILib::Time>    _vec_tau_refractive;
 public:
 		vector<MPILib::Mass>	     	_vec_mass;
-		unsigned int					_num_objects;
 		vector<MPILib::Index>			_vec_objects_to_index;
 		vector<vector<MPILib::Index>>	_vec_cells_to_objects;
 		vector<double>					_vec_objects_refract_times; // not refracting -> val < 0, ready to reset -> val == 0
@@ -394,6 +421,7 @@ private:
 		std::vector< std::vector<std::vector<MPILib::Index> > > _map;
 		std::vector< MPILib::Index> _linear_map;
 		std::vector< MPILib::Index> _linear_unmap;
+		std::vector< std::vector< std::vector<MPILib::Index>>> _map_counter;
 
 		std::vector<std::vector<Redistribution> > _vec_reversal;
 		std::vector<std::vector<Redistribution> > _vec_reset;

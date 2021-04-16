@@ -23,6 +23,323 @@ __global__ void CudaCalculateDerivative(inttype N, fptype rate, fptype* derivati
     }
 }
 
+__global__ void evolveMap(inttype N, inttype offset, inttype* map, inttype* unmap, inttype* cumulatives, 
+    inttype* lengths, inttype _t) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        int offset_ind = i + offset;
+        if (lengths[offset_ind] == 0)
+            continue;
+        int mapped = cumulatives[offset_ind] + modulo((offset_ind - cumulatives[offset_ind]) - _t, lengths[offset_ind]);
+        map[offset_ind] = mapped;
+        unmap[mapped] = offset_ind;
+    }
+}
+
+__global__ void initCurand(curandState* state, unsigned long seed) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    curand_init(seed, index, 0, &state[index]);
+}
+
+__global__ void generatePoissonSpikes(inttype N, inttype offset, fptype rate, fptype timestep, inttype* spike_counts, curandState* state) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        unsigned int r = curand_poisson(&state[index], rate* timestep);
+        spike_counts[i+offset] = r;
+    }
+}
+
+__global__ void CudaUpdateFiniteObjects(inttype N, inttype finite_offset, inttype* spike_counts, inttype* objects, fptype* refract_times,
+    inttype* refract_inds, fptype* val, inttype* ia, inttype* ja, inttype* map, inttype* unmap, inttype offset, curandState* state)
+{
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        if (refract_times[i+finite_offset] > 0)
+            continue;
+
+        int current_index = unmap[objects[i+finite_offset] + offset];
+        for (unsigned int s = 0; s < spike_counts[i+finite_offset]; s++) {
+            fptype r = curand_uniform(&state[index]);
+            fptype check = 0.0;
+            for (unsigned int j = ia[current_index]; j < ia[current_index + 1]; j++) {
+                check += val[j];
+                if (r < check) {
+                    current_index = ja[j];
+                    break;
+                }
+            }
+        }
+        
+        objects[i+finite_offset] = map[current_index];
+    }
+}
+
+__global__ void CudaReversalFiniteObjects(inttype N, inttype offset, inttype* objects, inttype reversal_N, 
+    unsigned int* rev_from, unsigned int* rev_to, inttype* map) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        // ew! We loop through all reversal cells for each object.
+        for (unsigned int s = 0; s < reversal_N; s++) {
+            if (map[rev_from[s]] != objects[i+offset])
+                continue;
+
+            objects[i+offset] = rev_to[s];
+            break;
+        }
+    }
+}
+
+__global__ void countSpikesAndClear(inttype N, inttype finite_offset, inttype* spiked, inttype* total_spikes) {
+    extern __shared__ inttype idata[];
+    // each thread loads one element from global to shared mem
+    unsigned int tid = threadIdx.x;
+    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (i >= N) {
+        idata[tid] = 0.;
+        return;
+    }
+
+
+    idata[tid] = spiked[i + finite_offset];
+    __syncthreads();
+    // do reduction in shared mem
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+        if (tid < s) {
+            idata[tid] += idata[tid + s];
+        }
+        __syncthreads();
+    }
+    // write result for this block to global mem
+    if (tid == 0) {
+        total_spikes[blockIdx.x] = idata[0];
+    }
+}
+
+__global__ void countSpikesAndClearSlow(inttype N, inttype finite_offset, inttype* spiked, inttype* total_spikes) {
+    inttype total = 0;
+    for (int i = 0; i < N; i++) {
+        if (spiked[i + finite_offset] == 1)
+            total++;
+        spiked[i + finite_offset] = 0;
+    }
+    total_spikes[0] = total;
+}
+
+__global__ void CudaGridEvolveFiniteObjects(inttype N, inttype finite_offset, inttype* objects, fptype* refract_times, fptype* val,
+    inttype* ia, inttype* ja, inttype offset, curandState* state) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        if (refract_times[i+finite_offset] > 0)
+            continue;
+
+        int current_index = objects[i+finite_offset];
+        fptype r = curand_uniform(&state[index]);
+        fptype check = 0.0;
+        for (unsigned int j = ia[current_index]; j < ia[current_index + 1]; j++) {
+            check += val[j];
+            if (r < check) {
+                objects[i+finite_offset] = ja[j];
+                break;
+            }
+        }
+    }
+}
+
+__global__ void CudaGridUpdateFiniteObjects(inttype N, inttype* spike_counts, inttype* objects,
+    fptype* refract_times, inttype* refract_inds, fptype* stays, fptype* goes,
+    int* offset1, int* offset2, inttype offset, curandState* state) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        if (refract_times[i] > 0)
+            continue;
+
+        int current_index = objects[i] + offset;
+        for (unsigned int s = 0; s < spike_counts[i]; s++) {
+            fptype r = curand_uniform(&state[index]);
+            if (r < stays[current_index]) {
+                current_index = modulo(current_index + offset1[current_index], N);
+            }
+            else {
+                current_index = modulo(current_index + offset2[current_index], N);
+            }
+        }
+
+        objects[i] = current_index;
+    }
+}
+
+__global__ void CudaGridUpdateFiniteObjectsCalc(inttype N, inttype finite_offset, inttype* spike_counts, inttype* objects,
+    fptype* refract_times, inttype* refract_inds, fptype efficacy, fptype grid_cell_width, curandState* state) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        int offset_index = i + finite_offset;
+        if (refract_times[offset_index] > 0 || spike_counts[offset_index] == 0)
+            continue;
+
+        fptype spike_eff = spike_counts[offset_index] * efficacy;
+        inttype ofs = (inttype)abs(spike_eff / grid_cell_width);
+        fptype g = (fptype)fabs(spike_eff / grid_cell_width) - ofs;
+
+        fptype r = curand_uniform(&state[index]);
+        if (r > g) {
+            int o1 = spike_eff > 0 ? ofs : -ofs;
+            objects[offset_index] = objects[offset_index] + o1;
+        } else {
+            int o2 = spike_eff > 0 ? (ofs + 1) : (ofs - 1);
+            objects[offset_index] = objects[offset_index] + o2;
+        }
+
+    }
+}
+
+__global__ void CudaSolveIzhikevichNeurons(inttype N, inttype* spike_counts, inttype* spiked, fptype* vs, fptype* ws,
+    fptype* refract_times, fptype refractory_time, fptype timestep, curandState* state) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        spiked[i] = 0;
+
+        if (refract_times[i] >= 0) {
+            refract_times[i] -= timestep;
+            if (refract_times[i] < 0) {
+                refract_times[i] = -1.0;
+                vs[i] = -50.0;
+                ws[i] += 2.0;
+            }
+        }
+        else {
+
+            vs[i] += spike_counts[i] * 0.5;
+
+            fptype v = vs[i];
+            fptype w = ws[i];
+
+            if (v > -30.0) {
+                refract_times[i] = refractory_time;
+                spiked[i] = 1;
+            } else {
+                fptype v_prime = (0.04 * (v * v)) + (5 * v) + 140 - w;
+                fptype w_prime = 0.02 * ((0.2 * v) - w);
+
+                vs[i] = vs[i] + (timestep * 1000 * v_prime);
+                ws[i] = ws[i] + (timestep * 1000 * w_prime);
+            }
+        }
+    }
+}
+
+__global__ void CudaGridResetFiniteObjects(inttype N, inttype finite_offset, inttype* objects, fptype* refract_times,
+    inttype* refract_inds, inttype threshold_col_index, inttype reset_col_index, inttype reset_w_rows, 
+    inttype res_v, fptype res_v_stays, fptype refractory_time, fptype timestep, inttype* spiked, curandState* state) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        int offset_ind = i + finite_offset;
+        spiked[offset_ind] = 0;
+
+        if (refract_times[offset_ind] >= 0) {
+            refract_times[offset_ind] -= timestep;
+
+            if (refract_times[offset_ind] <= 0) {
+                refract_times[offset_ind] = -1.0;
+
+                objects[offset_ind] = refract_inds[offset_ind];
+            }
+        }
+        else {
+            // Is the column of this cell above the threshold column?
+            inttype i_col = (objects[offset_ind] % res_v);
+            if (i_col >= threshold_col_index) {
+
+                //roll for whether we're in the quoted reset cell or the cell above
+                fptype r = curand_uniform(&state[index]);
+                if (r > res_v_stays)
+                    reset_w_rows = reset_w_rows + 1;
+
+                // Calculate the reset cell
+                inttype reset_cell = (objects[offset_ind] - (i_col - reset_col_index)) + (reset_w_rows * res_v);
+
+                refract_times[offset_ind] = refractory_time;
+                refract_inds[offset_ind] = reset_cell; // instead of storing the current threshold cell - store the target reset cell
+                spiked[offset_ind] = 1;
+            }
+        }
+    }
+}
+
+__global__ void CudaResetFiniteObjects(inttype N, inttype offset, inttype* objects, fptype* refract_times, 
+    inttype* refract_inds, fptype refractory_time, inttype reset_N,
+    unsigned int* rev_from, inttype* unmap, inttype* spiked) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        int offset_ind = i + offset;
+        spiked[offset_ind] = 0;
+        // ew! We loop through all reset cells for each object.
+        for (unsigned int s = 0; s < reset_N; s++) {
+            if (rev_from[s] != unmap[objects[offset_ind]])
+                continue;
+
+            refract_times[offset_ind] = refractory_time;
+            refract_inds[offset_ind] = rev_from[s];
+            spiked[offset_ind] = 1;
+            break;
+        }
+    }
+}
+
+__global__ void CudaCheckRefractingFiniteObjects(inttype N, inttype finite_offset, inttype* objects, fptype* refract_times,
+    inttype* refract_inds, fptype timestep, inttype reset_N,
+    unsigned int* rev_from, unsigned int* rev_to, fptype* rev_alpha, curandState* state, inttype* map, inttype* unmap) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        int offset_ind = i + finite_offset;
+        if (refract_times[offset_ind] >= 0) {
+            refract_times[offset_ind] -= timestep;
+
+            if (refract_times[offset_ind] <= 0) {
+                refract_times[offset_ind] = -1.0;
+
+                fptype r = curand_uniform(&state[index]);
+                fptype check = 0.0;
+                // ew! We loop through all reset cells for each object.
+                for (unsigned int s = 0; s < reset_N; s++) {
+                    if (rev_from[s] != refract_inds[offset_ind])
+                        continue;
+
+                    check += rev_alpha[s];
+                    if (r < check) {
+                        objects[offset_ind] = map[rev_to[s]];
+                        break;
+                    }
+                }
+            }
+
+        }
+        
+    }
+}
+
 __global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* mass, fptype* val, inttype* ia, inttype* ja, inttype* map, inttype offset)
 {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -261,9 +578,16 @@ __global__ void Remap(int N, unsigned int* i_1, unsigned int t, unsigned int* ma
             map[i] = modulo((i - t - first[i]), length[i]) + first[i];
 }
 
-__global__ void CudaClearDerivative(inttype N, fptype* dydt, fptype* mass) {
+__global__ void CudaClearDerivative(inttype N, fptype* dydt) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
     for (int i = index; i < N; i += stride)
         dydt[i] = 0.;
+}
+
+__global__ void CudaClearSpikeCounts(inttype N, inttype* dydt) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+    for (int i = index; i < N; i += stride)
+        dydt[i] = 0;
 }

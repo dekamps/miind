@@ -1,6 +1,7 @@
 #include "VectorizedNetwork.hpp"
 #include <boost/timer/timer.hpp>
 #include <boost/filesystem.hpp>
+#include <chrono>
 
 using namespace MiindLib;
 
@@ -12,7 +13,7 @@ VectorizedNetwork::VectorizedNetwork(MPILib::Time time_step) :
 }
 
 void VectorizedNetwork::addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w,
-    std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive) {
+    std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive, unsigned int finite_size) {
 
     _num_nodes++;
     _grid_node_ids.push_back(_num_nodes - 1);
@@ -25,10 +26,11 @@ void VectorizedNetwork::addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatri
     _start_vs.push_back(start_v);
     _start_ws.push_back(start_w);
 
+    _num_grid_objects.push_back(finite_size);
 }
 
 void VectorizedNetwork::addMeshNode(TwoDLib::Mesh mesh,
-    std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive) {
+    std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive, unsigned int finite_size) {
 
     _num_nodes++;
     _mesh_node_ids.push_back(_num_nodes - 1);
@@ -36,7 +38,7 @@ void VectorizedNetwork::addMeshNode(TwoDLib::Mesh mesh,
     _mesh_vec_vec_rev.push_back(vec_rev);
     _mesh_vec_vec_res.push_back(vec_res);
     _mesh_vec_tau_refractive.push_back(tau_refractive);
-
+    _num_mesh_objects.push_back(finite_size);
 }
 
 void VectorizedNetwork::addRateNode(function_pointer functor) {
@@ -61,6 +63,7 @@ void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps) {
         _vec_vec_rev.push_back(_grid_vec_vec_rev[g]);
         _vec_vec_res.push_back(_grid_vec_vec_res[g]);
         _vec_tau_refractive.push_back(_grid_vec_tau_refractive[g]);
+        _num_objects.push_back(_num_grid_objects[g]);
     }
 
     for (int m = 0; m < _mesh_node_ids.size(); m++) {
@@ -72,9 +75,18 @@ void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps) {
         _vec_vec_rev.push_back(_mesh_vec_vec_rev[m]);
         _vec_vec_res.push_back(_mesh_vec_vec_res[m]);
         _vec_tau_refractive.push_back(_mesh_vec_tau_refractive[m]);
+        _num_objects.push_back(_num_mesh_objects[m]);
     }
 
-    _group = new TwoDLib::Ode2DSystemGroup(_vec_mesh, _vec_vec_rev, _vec_vec_res, _vec_tau_refractive);
+#ifdef IZHIKEVICH_TEST
+    _network_time_step = 0.0001;
+    _display_nodes.clear();
+    _num_objects.clear();
+    _num_objects.push_back(50000);
+    _group = new TwoDLib::Ode2DSystemGroup(_vec_mesh, _vec_vec_rev, _vec_vec_res, _vec_tau_refractive, _num_objects);
+#else
+    _group = new TwoDLib::Ode2DSystemGroup(_vec_mesh, _vec_vec_rev, _vec_vec_res, _vec_tau_refractive, _num_objects);
+#endif
 
     for (MPILib::Index i = 0; i < _grid_meshes.size(); i++) {
         vector<TwoDLib::Coordinates> coords = _vec_mesh[_grid_meshes[i]].findPointInMeshSlow(TwoDLib::Point(_start_vs[i], _start_ws[i]));
@@ -269,11 +281,15 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
         _effs.size(), h, _mesh_transform_indexes, _grid_transform_indexes);
 
     _csr_adapter->InitializeStaticGridEfficacies(_connection_out_group_mesh, _effs);
+
+    const auto p1 = std::chrono::system_clock::now();
+    _csr_adapter->setRandomSeeds(std::chrono::duration_cast<std::chrono::seconds>(
+        p1.time_since_epoch()).count());
 }
 
 std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities, unsigned int i_loop) {
     MPILib::Time time = _network_time_step * i_loop;
-
+#ifndef IZHIKEVICH_TEST
     for (const auto& element : _rate_functions) {
         for (unsigned int i = 0; i < _node_to_connection_queue[element.first].size(); i++) {
             _connection_queue[_node_to_connection_queue[element.first][i]].updateQueue(element.second(time));
@@ -307,27 +323,40 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
         connection_count++;
     }
 
-
     for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++) {
-        _group_adapter->Evolve(_mesh_meshes);
+        _group_adapter->EvolveOnDevice(_mesh_meshes);
         _group_adapter->RemapReversal();
+        _group_adapter->RemapReversalFiniteObjects();
 
         _csr_adapter->ClearDerivative();
         _csr_adapter->SingleTransformStep();
         _csr_adapter->AddDerivativeFull();
+        
+        _csr_adapter->SingleTransformStepFiniteSize();
     }
 
     _group_adapter->RedistributeProbability(_grid_meshes);
     _group_adapter->MapFinish(_grid_meshes);
 
-    for (MPILib::Index i_part = 0; i_part < _n_steps * _master_steps; i_part++) {
+    for (unsigned int i = 0; i < rates.size(); i++)
+        rates[i] *= _n_steps;
+
+    for (MPILib::Index i_part = 0; i_part < _master_steps; i_part++) {
         _csr_adapter->ClearDerivative();
         _csr_adapter->CalculateMeshGridDerivativeWithEfficacy(_connection_out_group_mesh, rates);
         _csr_adapter->AddDerivative();
     }
 
+    _csr_adapter->CalculateMeshGridDerivativeWithEfficacyFinite(_connection_out_group_mesh, rates, _effs, _vec_mesh[0].TimeStep());
+
+    _group_adapter->RedistributeFiniteObjects(_mesh_meshes, _vec_mesh[0].TimeStep(), _csr_adapter->getCurandState());
+    _group_adapter->RedistributeGridFiniteObjects(_grid_meshes, _csr_adapter->getCurandState());
+
     _group_adapter->RedistributeProbability(_mesh_meshes);
     _group_adapter->MapFinish(_mesh_meshes);
+#else
+    _csr_adapter->IzhTest(_group_adapter->getSpikes());
+#endif
 
     const std::vector<fptype>& group_rates = _group_adapter->F(_n_steps);
 
@@ -337,14 +366,18 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
             _connection_queue[_node_to_connection_queue[_group_mesh_to_node_id[i]][j]].updateQueue(group_rates[i]);
         }
     }
-
+    
     std::vector<double> monitored_rates(_monitored_nodes.size());
     for (unsigned int i = 0; i < _monitored_nodes.size(); i++) {
         monitored_rates[i] = group_rates[_node_id_to_group_mesh[_monitored_nodes[i]]];
     }
-
+  
     if (_display_nodes.size() > 0) {
         _group_adapter->updateGroupMass();
+        _group_adapter->updateFiniteObjects();
+        for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++) {
+            _group_adapter->EvolveWithoutTransfer(_mesh_meshes);
+        }
         TwoDLib::Display::getInstance()->updateDisplay(i_loop);
     }
 

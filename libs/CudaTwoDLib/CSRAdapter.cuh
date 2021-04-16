@@ -23,7 +23,11 @@
 
 #include <cassert>
 #include <cuda_runtime.h>
+#include <curand.h>
+#include <curand_kernel.h>
 #include "CudaOde2DSystemAdapter.cuh"
+
+//#define IZHIKEVICH_TEST
 
 
 namespace CudaTwoDLib {
@@ -65,11 +69,21 @@ namespace CudaTwoDLib {
 
 		void CalculateMeshGridDerivativeWithEfficacy(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates);
 
+		void CalculateMeshGridDerivativeWithEfficacyFinite(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates, const std::vector<fptype>& efficacy, double timestep);
+
 		void SingleTransformStep();
+
+		void SingleTransformStepFiniteSize();
 
 		void AddDerivative();
 
+		void IzhTest(inttype* spikes);
+
 		void AddDerivativeFull();
+
+		curandState* getCurandState() { return _randomState; }
+
+		void setRandomSeeds(double seed);
 
 		inttype NrIterations() const { return _nr_iterations; }
 
@@ -79,7 +93,12 @@ namespace CudaTwoDLib {
 
 		void FillMatrixMaps(const std::vector<TwoDLib::CSRMatrix>&);
 		void DeleteMatrixMaps();
+		void FillForwardMatrixMaps(const std::vector<TwoDLib::CSRMatrix>&);
+		void DeleteForwardMatrixMaps();
 		void FillDerivative();
+		void FillRandom();
+		void FillIzhVectors();
+		void DeleteRandom();
 		void DeleteDerivative();
 		void CreateStreams();
 		void DeleteStreams();
@@ -105,6 +124,13 @@ namespace CudaTwoDLib {
 		std::vector<inttype>   _nja;
 		std::vector<inttype*>  _ja;
 
+		curandState				   *_randomState;
+		inttype*					_random_poisson;
+
+		std::vector<inttype*>  _forward_ia;
+		std::vector<inttype*>  _forward_ja;
+		std::vector<fptype*>  _forward_val;
+
 		std::vector<inttype> _offsets;
 		std::vector<inttype> _nr_rows;
 
@@ -113,6 +139,10 @@ namespace CudaTwoDLib {
 		std::vector<fptype*> _stays;
 		std::vector<int*> _offset1s;
 		std::vector<int*> _offset2s;
+
+		fptype* _izh_vs;
+		fptype* _izh_ws;
+		fptype* _refract_times;
 
 		fptype* _dydt;
 		fptype* _cell_vs;

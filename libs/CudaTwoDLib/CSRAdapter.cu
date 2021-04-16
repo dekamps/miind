@@ -67,6 +67,31 @@ void CSRAdapter::FillMatrixMaps(const std::vector<TwoDLib::CSRMatrix>& vecmat)
     }
 }
 
+void CSRAdapter::FillForwardMatrixMaps(const std::vector<TwoDLib::CSRMatrix>& vecmat)
+{
+    for (inttype m = 0; m < vecmat.size(); m++)
+    {
+        checkCudaErrors(cudaMalloc((fptype**)&_forward_val[m], vecmat[m].ForwardVal().size() * sizeof(fptype)));
+        // dont't depend on Val() being of fptype
+        std::vector<fptype> vecval;
+        for (fptype val : vecmat[m].ForwardVal())
+            vecval.push_back(val);
+        checkCudaErrors(cudaMemcpy(_forward_val[m], &vecval[0], sizeof(fptype) * vecmat[m].ForwardVal().size(), cudaMemcpyHostToDevice));
+
+        checkCudaErrors(cudaMalloc((inttype**)&_forward_ia[m], vecmat[m].ForwardIa().size() * sizeof(inttype)));
+        std::vector<inttype> vecia;
+        for (inttype ia : vecmat[m].ForwardIa())
+            vecia.push_back(ia);
+        checkCudaErrors(cudaMemcpy(_forward_ia[m], &vecia[0], sizeof(inttype) * vecmat[m].ForwardIa().size(), cudaMemcpyHostToDevice));
+
+        checkCudaErrors(cudaMalloc((inttype**)&_forward_ja[m], vecmat[m].ForwardJa().size() * sizeof(inttype)));
+        std::vector<inttype> vecja;
+        for (inttype ja : vecmat[m].ForwardJa())
+            vecja.push_back(ja);
+        checkCudaErrors(cudaMemcpy(_forward_ja[m], &vecja[0], sizeof(inttype) * vecmat[m].ForwardJa().size(), cudaMemcpyHostToDevice));
+    }
+}
+
 void CSRAdapter::InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex, const std::vector<fptype>& efficacy) {
     _nr_grid_connections = efficacy.size();
     for (inttype m = 0; m < efficacy.size(); m++)
@@ -122,6 +147,16 @@ void CSRAdapter::DeleteMatrixMaps()
     }
 }
 
+void CSRAdapter::DeleteForwardMatrixMaps()
+{
+    for (inttype m = 0; m < _nr_m; m++)
+    {
+        cudaFree(_forward_val[m]);
+        cudaFree(_forward_ia[m]);
+        cudaFree(_forward_ja[m]);
+    }
+}
+
 inttype CSRAdapter::NumberIterations(const CudaOde2DSystemAdapter& group, fptype euler_timestep) const
 {
     fptype tstep = group._group.MeshObjects()[0].TimeStep();
@@ -153,10 +188,13 @@ CSRAdapter::CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib:
     _grid_transforms(grid_transforms),
     _nval(std::vector<inttype>(vecmat.size())),
     _val(std::vector<fptype*>(vecmat.size())),
+    _forward_val(std::vector<fptype*>(vecmat.size())),
     _nia(std::vector<inttype>(vecmat.size())),
     _ia(std::vector<inttype*>(vecmat.size())),
+    _forward_ia(std::vector<inttype*>(vecmat.size())),
     _nja(std::vector<inttype>(vecmat.size())),
     _ja(std::vector<inttype*>(vecmat.size())),
+    _forward_ja(std::vector<inttype*>(vecmat.size())),
     _offsets(this->Offsets(vecmat)),
     _nr_rows(this->NrRows(vecmat)),
     _cell_widths(this->CellWidths(vecmat)),
@@ -168,8 +206,38 @@ CSRAdapter::CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib:
     _numBlocks((_group._n + _blockSize - 1) / _blockSize)
 {
     this->FillMatrixMaps(vecmat);
+    this->FillForwardMatrixMaps(vecmat);
     this->FillDerivative();
     this->CreateStreams();
+    this->FillRandom();
+    // Speed Testing for comparison - Izhikevich neurons on the GPU
+#ifdef IZHIKEVICH_TEST
+    this->FillIzhVectors();
+#endif
+}
+
+// Speed Testing for comparison - Izhikevich neurons on the GPU
+void CSRAdapter::FillIzhVectors() {
+    checkCudaErrors(cudaMalloc((fptype**)&_izh_vs, _group.NumObjects() * sizeof(fptype)));
+    checkCudaErrors(cudaMalloc((fptype**)&_izh_ws, _group.NumObjects() * sizeof(fptype)));
+    checkCudaErrors(cudaMalloc((fptype**)&_refract_times, _group.NumObjects() * sizeof(fptype)));
+
+    std::vector<fptype> vs(_group.NumObjects(), -70.0);
+    std::vector<fptype> ws(_group.NumObjects(), 0.0);
+    std::vector<fptype> refract_times(_group.NumObjects(), -1.0);
+
+    checkCudaErrors(cudaMemcpy(_izh_vs, &vs[0], _group.NumObjects() * sizeof(fptype), cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(_izh_ws, &ws[0], _group.NumObjects() * sizeof(fptype), cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(_refract_times, &refract_times[0], _group.NumObjects() * sizeof(fptype), cudaMemcpyHostToDevice));
+}
+
+// Speed Testing for comparison - Izhikevich neurons on the GPU
+void CSRAdapter::IzhTest(inttype* spikes) {
+    inttype numBlocks = (_group.NumObjects() + _blockSize - 1) / _blockSize;
+    generatePoissonSpikes << <numBlocks, _blockSize >> > (_group.NumObjects(), 0, 5000 * 2, 0.0001, _random_poisson, _randomState);
+
+    CudaSolveIzhikevichNeurons << <numBlocks, _blockSize >> > (_group.NumObjects(), _random_poisson, spikes, _izh_vs, _izh_ws, _refract_times, 0.0, 0.0001, _randomState);
+
 }
 
 CSRAdapter::CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib::CSRMatrix>& vecmat, fptype euler_timestep) :
@@ -184,6 +252,7 @@ CSRAdapter::~CSRAdapter()
     this->DeleteMatrixMaps();
     this->DeleteDerivative();
     this->DeleteStreams();
+    this->DeleteRandom();
 }
 
 void CSRAdapter::CreateStreams()
@@ -203,6 +272,19 @@ void CSRAdapter::FillDerivative()
     checkCudaErrors(cudaMalloc((fptype**)&_dydt, _group._n * sizeof(fptype)));
 }
 
+void CSRAdapter::FillRandom()
+{
+    inttype numBlocks = (_group.NumObjects() + _blockSize - 1) / _blockSize;
+    checkCudaErrors(cudaMalloc((inttype**)&_random_poisson, _group.NumObjects() * sizeof(inttype)));
+    checkCudaErrors(cudaMalloc((void**)&_randomState, _blockSize * numBlocks * sizeof(curandState)));
+}
+
+void CSRAdapter::DeleteRandom()
+{
+    free(_random_poisson);
+    free(_randomState);
+}
+
 void CSRAdapter::DeleteDerivative()
 {
     cudaFree(_dydt);
@@ -210,8 +292,11 @@ void CSRAdapter::DeleteDerivative()
 
 void CSRAdapter::ClearDerivative()
 {
+    if (_group.NumObjects() > 0)
+        return;
+
     inttype n = _group._n;
-    CudaClearDerivative << <_numBlocks, _blockSize >> > (n, _dydt, _group._mass);
+    CudaClearDerivative << <_numBlocks, _blockSize >> > (n, _dydt);
 }
 
 std::vector<inttype> CSRAdapter::NrRows(const std::vector<TwoDLib::CSRMatrix>& vecmat) const
@@ -290,6 +375,9 @@ void CSRAdapter::CalculateMeshGridDerivative(const std::vector<inttype>& vecinde
 void CSRAdapter::CalculateMeshGridDerivativeWithEfficacy(const std::vector<inttype>& vecindex,
     const std::vector<fptype>& vecrates)
 {
+    if (_group.NumObjects() > 0)
+        return;
+
     for (inttype m = 0; m < _nr_grid_connections; m++)
     {
         // be careful to use this block size
@@ -313,6 +401,9 @@ void CSRAdapter::CalculateMeshGridDerivativeWithEfficacy(const std::vector<intty
 
 void CSRAdapter::SingleTransformStep()
 {
+    if (_group.NumObjects() > 0)
+        return;
+
     for (inttype m : _grid_transforms)
     {
         // be careful to use this block size
@@ -321,12 +412,79 @@ void CSRAdapter::SingleTransformStep()
     }
 }
 
+void CSRAdapter::SingleTransformStepFiniteSize()
+{
+    if (_group.NumObjects() == 0)
+        return;
+
+    for (inttype m : _grid_transforms)
+    {
+        // be careful to use this block size
+        inttype numBlocks = (_group._vec_num_objects[m] + _blockSize - 1) / _blockSize;
+        CudaGridEvolveFiniteObjects << <numBlocks, _blockSize, 0, _streams[m] >> > 
+            (_group._vec_num_objects[m], _group._vec_num_object_offsets[m], _group._vec_objects_to_index, _group._vec_objects_refract_times,
+                _forward_val[m], _forward_ia[m], _forward_ja[m],
+                _offsets[m], _randomState);
+    }
+}
+
 void CSRAdapter::AddDerivative()
 {
+    if (_group.NumObjects() > 0)
+        return;
+
     EulerStep << <_numBlocks, _blockSize >> > (_group._n, _dydt, _group._mass, _euler_timestep);
 }
 
 void CSRAdapter::AddDerivativeFull()
 {
+    if (_group.NumObjects() > 0)
+        return;
+
     EulerStep << <_numBlocks, _blockSize >> > (_group._n, _dydt, _group._mass, 1.0);
+}
+
+void CSRAdapter::setRandomSeeds(double seed) {
+    if (_group.NumObjects() == 0)
+        return;
+
+    inttype numBlocks = (_group.NumObjects() + _blockSize - 1) / _blockSize;
+    initCurand << <numBlocks, _blockSize >> > (_randomState, seed);
+}
+
+void CSRAdapter::CalculateMeshGridDerivativeWithEfficacyFinite(const std::vector<inttype>& vecindex,
+    const std::vector<fptype>& vecrates, const std::vector<fptype>& efficacy, double timestep)
+{
+    if (_group.NumObjects() == 0)
+        return;
+
+    for (inttype m = 0; m < _nr_grid_connections; m++)
+    {
+        unsigned int mesh_m = vecindex[m];
+        // be careful to use this block size
+        inttype numBlocks = (_group._vec_num_objects[mesh_m] + _blockSize - 1) / _blockSize;
+        generatePoissonSpikes << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_m], _group._vec_num_object_offsets[mesh_m], vecrates[m], timestep, _random_poisson, _randomState);
+
+        CudaGridUpdateFiniteObjectsCalc << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_m], _group._vec_num_object_offsets[mesh_m], _random_poisson, _group._vec_objects_to_index,
+            _group._vec_objects_refract_times, _group._vec_objects_refract_index,
+            efficacy[mesh_m],_cell_widths[mesh_m], _randomState);
+
+    }
+
+    for (int n = _nr_grid_connections; n < vecrates.size(); n++)
+    {
+        inttype mat_index = _grid_transforms.size() + (n - _nr_grid_connections);
+        unsigned int mesh_n = vecrates[mat_index];
+        inttype numBlocks = (_group._vec_num_objects[mesh_n] + _blockSize - 1) / _blockSize;
+        // be careful to use this block size
+        generatePoissonSpikes << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_n], _group._vec_num_object_offsets[mesh_n], vecrates[mat_index], timestep, _random_poisson, _randomState);
+        CudaUpdateFiniteObjects << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_n], _group._vec_num_object_offsets[mesh_n], _random_poisson, _group._vec_objects_to_index,
+            _group._vec_objects_refract_times, _group._vec_objects_refract_index, _forward_val[mat_index], _forward_ia[mat_index], _forward_ja[mat_index],
+            _group._map, _group._unmap, _offsets[mat_index], _randomState);
+
+        
+    }
+
+    cudaDeviceSynchronize();
+
 }

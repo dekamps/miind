@@ -71,6 +71,13 @@ namespace TwoDLib {
 		//! Expose underlying arrays Ja
 		const std::vector<unsigned int>& Ja() const {return _ja;}
 
+		//! Expose underlying arrays Val
+		const std::vector<double>& ForwardVal() const { return _forward_val; }
+		//! Expose underlying arrays Ia
+		const std::vector<unsigned int>& ForwardIa() const { return _forward_ia; }
+		//! Expose underlying arrays Ja
+		const std::vector<unsigned int>& ForwardJa() const { return _forward_ja; }
+
 		//! Which mesh is this matrix relating to?
 		MPILib::Index MeshIndex() const {return _mesh_index; }
 
@@ -86,6 +93,7 @@ namespace TwoDLib {
 		void Validate(const TransitionMatrix&);
 
 		void CSR(const vector<vector<MPILib::Index> >&, const vector<vector<double> >&);
+		void ForwardCSR(const vector<vector<MPILib::Index> >&, const vector<vector<double> >&);
 
 		const Ode2DSystemGroup& _sys;
 		const double       _efficacy; // efficacy used in the generation of the TransitionMatrix
@@ -94,9 +102,9 @@ namespace TwoDLib {
 		std::vector<unsigned int> _ia;
 		std::vector<unsigned int> _ja;
 
-		// Store the original matrix too so we can apply to finite sized
-		vector< vector<MPILib::Index> > _vec_mat_original;
-		vector< vector<double> >		_mat_vals_original;
+		std::vector<double>				_forward_val;
+		std::vector<unsigned int>		_forward_ia;
+		std::vector<unsigned int>		_forward_ja;
 
 		MPILib::Index _mesh_index;  // index of the Mesh on the Ode2DSystemGroup that this CSRMatrix is responsible for
 		MPILib::Index _i_offset;    // offset of the part of the mass array that this CSRMatrix is responsible for
