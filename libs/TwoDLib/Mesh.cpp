@@ -58,11 +58,13 @@ _vec_timefactor(0){
 		_grid_cell_width = std::max(cell_h_dist, cell_v_dist);
 
 		if (cell_h_dist > cell_v_dist) { // This is the v distance
+			_strips_are_v_oriented = true;
 			_grid_v_width = cell_h_dist; 
 			_grid_min_v = Quad(0, 0).Centroid()[0] - (_grid_v_width / 2.0);
 			_grid_res_v = NrCellsInStrip(0);
 		}
 		else {
+			_strips_are_v_oriented = false;
 			_grid_h_height = cell_v_dist;
 			_grid_min_h = Quad(0, 0).Centroid()[1] - (_grid_h_height / 2.0);
 			_grid_res_h = NrCellsInStrip(0);
@@ -111,12 +113,17 @@ _grid_h_height(m._grid_h_height),
 _grid_min_v(m._grid_min_v),
 _grid_min_h(m._grid_min_h),
 _grid_res_v(m._grid_res_v),
-_grid_res_h(m._grid_res_h)
+_grid_res_h(m._grid_res_h),
+_strips_are_v_oriented(m._strips_are_v_oriented)
 {
 }
 
 double Mesh::getCellWidth() const {
 	return _grid_cell_width;
+}
+
+bool Mesh::stripsAreVOriented() const {
+	return _strips_are_v_oriented;
 }
 
 double Mesh::getCellHeight() const {

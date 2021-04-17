@@ -32,9 +32,9 @@ __global__ void evolveMap(inttype N, inttype offset, inttype* map, inttype* unma
         int offset_ind = i + offset;
         if (lengths[offset_ind] == 0)
             continue;
-        int mapped = cumulatives[offset_ind] + modulo((offset_ind - cumulatives[offset_ind]) - _t, lengths[offset_ind]);
-        map[offset_ind] = mapped;
-        unmap[mapped] = offset_ind;
+        int mapped = cumulatives[offset_ind] + modulo((i - cumulatives[offset_ind]) - _t, lengths[offset_ind]);
+        map[offset_ind] = mapped + offset;
+        unmap[mapped + offset] = offset_ind;
     }
 }
 
@@ -63,7 +63,7 @@ __global__ void CudaUpdateFiniteObjects(inttype N, inttype finite_offset, inttyp
         if (refract_times[i+finite_offset] > 0)
             continue;
 
-        int current_index = unmap[objects[i+finite_offset] + offset];
+        int current_index = unmap[objects[i+finite_offset]] - offset;
         for (unsigned int s = 0; s < spike_counts[i+finite_offset]; s++) {
             fptype r = curand_uniform(&state[index]);
             fptype check = 0.0;
@@ -76,7 +76,7 @@ __global__ void CudaUpdateFiniteObjects(inttype N, inttype finite_offset, inttyp
             }
         }
         
-        objects[i+finite_offset] = map[current_index];
+        objects[i+finite_offset] = map[current_index + offset];
     }
 }
 
@@ -143,13 +143,13 @@ __global__ void CudaGridEvolveFiniteObjects(inttype N, inttype finite_offset, in
         if (refract_times[i+finite_offset] > 0)
             continue;
 
-        int current_index = objects[i+finite_offset];
+        int current_index = objects[i+finite_offset] - offset;
         fptype r = curand_uniform(&state[index]);
         fptype check = 0.0;
         for (unsigned int j = ia[current_index]; j < ia[current_index + 1]; j++) {
             check += val[j];
             if (r < check) {
-                objects[i+finite_offset] = ja[j];
+                objects[i+finite_offset] = ja[j] + offset;
                 break;
             }
         }
@@ -246,7 +246,7 @@ __global__ void CudaSolveIzhikevichNeurons(inttype N, inttype* spike_counts, int
 
 __global__ void CudaGridResetFiniteObjects(inttype N, inttype finite_offset, inttype* objects, fptype* refract_times,
     inttype* refract_inds, inttype threshold_col_index, inttype reset_col_index, inttype reset_w_rows, 
-    inttype res_v, fptype res_v_stays, fptype refractory_time, fptype timestep, inttype* spiked, curandState* state) {
+    inttype res_v, fptype res_v_stays, fptype refractory_time, fptype timestep, inttype* spiked, inttype offset, curandState* state) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
 
@@ -260,21 +260,69 @@ __global__ void CudaGridResetFiniteObjects(inttype N, inttype finite_offset, int
             if (refract_times[offset_ind] <= 0) {
                 refract_times[offset_ind] = -1.0;
 
-                objects[offset_ind] = refract_inds[offset_ind];
+                objects[offset_ind] = refract_inds[offset_ind] + offset;
             }
         }
         else {
             // Is the column of this cell above the threshold column?
-            inttype i_col = (objects[offset_ind] % res_v);
+            inttype i_col = ((objects[offset_ind]-offset) % res_v);
             if (i_col >= threshold_col_index) {
 
                 //roll for whether we're in the quoted reset cell or the cell above
                 fptype r = curand_uniform(&state[index]);
                 if (r > res_v_stays)
-                    reset_w_rows = reset_w_rows + 1;
+                    if (reset_w_rows > 0)
+                        reset_w_rows = reset_w_rows + 1;
+                    else
+                        reset_w_rows = reset_w_rows - 1;
 
                 // Calculate the reset cell
-                inttype reset_cell = (objects[offset_ind] - (i_col - reset_col_index)) + (reset_w_rows * res_v);
+                inttype reset_cell = ((objects[offset_ind]-offset) - (i_col - reset_col_index)) + (reset_w_rows * res_v);
+
+                refract_times[offset_ind] = refractory_time;
+                refract_inds[offset_ind] = reset_cell; // instead of storing the current threshold cell - store the target reset cell
+                spiked[offset_ind] = 1;
+            }
+        }
+    }
+}
+
+// For meshes which have the strips going up instead of across
+__global__ void CudaGridResetFiniteObjectsRot(inttype N, inttype finite_offset, inttype* objects, fptype* refract_times,
+    inttype* refract_inds, inttype threshold_col_index, inttype reset_col_index, inttype reset_w_rows,
+    inttype res_w, fptype res_v_stays, fptype refractory_time, fptype timestep, inttype* spiked, inttype offset, curandState* state) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        int offset_ind = i + finite_offset;
+        spiked[offset_ind] = 0;
+
+        if (refract_times[offset_ind] >= 0) {
+            refract_times[offset_ind] -= timestep;
+
+            if (refract_times[offset_ind] <= 0) {
+                refract_times[offset_ind] = -1.0;
+
+                objects[offset_ind] = refract_inds[offset_ind] + offset;
+            }
+        }
+        else {
+            // Is the column of this cell above the threshold column?
+            inttype i_col = int((objects[offset_ind] - offset) / res_w);
+
+            if (i_col >= threshold_col_index) {
+
+                //roll for whether we're in the quoted reset cell or the cell above
+                fptype r = curand_uniform(&state[index]);
+                if (r > res_v_stays)
+                    if (reset_w_rows > 0)
+                        reset_w_rows = reset_w_rows + 1;
+                    else
+                        reset_w_rows = reset_w_rows - 1;
+
+                // Calculate the reset cell
+                inttype reset_cell = ((objects[offset_ind] - offset) + reset_w_rows ) - ((i_col - reset_col_index) * res_w);
 
                 refract_times[offset_ind] = refractory_time;
                 refract_inds[offset_ind] = reset_cell; // instead of storing the current threshold cell - store the target reset cell

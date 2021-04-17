@@ -474,7 +474,7 @@ void CSRAdapter::CalculateMeshGridDerivativeWithEfficacyFinite(const std::vector
     for (int n = _nr_grid_connections; n < vecrates.size(); n++)
     {
         inttype mat_index = _grid_transforms.size() + (n - _nr_grid_connections);
-        unsigned int mesh_n = vecrates[mat_index];
+        unsigned int mesh_n = vecindex[mat_index];
         inttype numBlocks = (_group._vec_num_objects[mesh_n] + _blockSize - 1) / _blockSize;
         // be careful to use this block size
         generatePoissonSpikes << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_n], _group._vec_num_object_offsets[mesh_n], vecrates[mat_index], timestep, _random_poisson, _randomState);

@@ -85,7 +85,10 @@ _host_vec_objects_refract_times(group._vec_objects_refract_times.size(), 0),
 _host_vec_objects_refract_index(group._vec_objects_refract_index.size(), 0),
 _numBlocks( (_n + _blockSize - 1) / _blockSize)
 {
-    this->FillMass();
+	if (_group.NumObjects() == 0) {
+		this->FillMass();
+	}
+
     this->FillMapData();
     this->FillReversalMap(group.MeshObjects(),group.MapReversal());
 	this->FillRefractoryTimes(group.Tau_ref());
@@ -653,8 +656,13 @@ void CudaOde2DSystemAdapter::RedistributeGridFiniteObjects(std::vector<inttype>&
 		double refractory_time = _refractories[m];
 		double timestep = _group.MeshObjects()[m].TimeStep();
 
-		CudaGridResetFiniteObjects << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m], _vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index,
-			threshold_col, reset_col, reset_w_rows, res_v, reset_stays_probability, refractory_time, timestep, _spikes, rand_state);
+		if (_group.MeshObjects()[m].stripsAreVOriented())
+			CudaGridResetFiniteObjects << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m], _vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index,
+				threshold_col, reset_col, reset_w_rows, res_v, reset_stays_probability, refractory_time, timestep, _spikes, _offsets[m], rand_state);
+		else
+			CudaGridResetFiniteObjectsRot << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m], _vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index,
+				threshold_col, reset_col, reset_w_rows, res_v, reset_stays_probability, refractory_time, timestep, _spikes, _offsets[m], rand_state);
+
 	}
 
 }

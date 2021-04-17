@@ -340,18 +340,18 @@ void Ode2DSystemGroup::Initialize(MPILib::Index m, MPILib::Index i, MPILib::Inde
 	_vec_mass[start_index] = 1.0;
 
 	for (int i = 0; i < _vec_num_objects[m]; i++) {
-		_vec_objects_to_index[i] = start_index;
-		_vec_objects_refract_times[i] = -1.0;
-		_vec_objects_refract_index[i] = 0;
-		_vec_cells_to_objects[start_index].push_back(i);
+		_vec_objects_to_index[i+_vec_num_object_offsets[m]] = start_index;
+		_vec_objects_refract_times[i + _vec_num_object_offsets[m]] = -1.0;
+		_vec_objects_refract_index[i + _vec_num_object_offsets[m]] = 0;
+		_vec_cells_to_objects[start_index].push_back(i + _vec_num_object_offsets[m]);
 	}
 }
 
 std::vector< std::vector< std::vector<MPILib::Index> > > Ode2DSystemGroup::InitializeMap() const
 {
 	std::vector< std::vector<std::vector<MPILib::Index> > > vec_map;
+	
 	MPILib::Index count = 0;
-
 	for(const Mesh& mesh: _mesh_list){
 		std::vector<std::vector<MPILib::Index> > vec_mesh;
 		for (MPILib::Index i = 0; i < mesh.NrStrips();i++){
@@ -492,8 +492,8 @@ void Ode2DSystemGroup::UpdateMap(std::vector<MPILib::Index>& meshes)
 	for (MPILib::Index n = 0; n < meshes.size(); n++){ // we need the index for mapping, so no range-based loop
 		MPILib::Index m = meshes[n];
 		for(MPILib::Index i_stat = 0; i_stat < _mesh_list[m].NrCellsInStrip(0); i_stat++){
-			_linear_map[_vec_mesh_offset[m] + _map_counter[m][0][i_stat]] = i_stat + _vec_mesh_offset[m]; // the stationary strip needs to be handled separately
-			_linear_unmap[i_stat + _vec_mesh_offset[m]] = _vec_mesh_offset[m] + _map_counter[m][0][i_stat];
+			_linear_map[_map_counter[m][0][i_stat]] = i_stat + _vec_mesh_offset[m]; // the stationary strip needs to be handled separately
+			_linear_unmap[i_stat + _vec_mesh_offset[m]] = _map_counter[m][0][i_stat];
 		}
 #pragma omp parallel for
 		for (int i = 1; i < _mesh_list[m].NrStrips(); i++){
@@ -501,8 +501,8 @@ void Ode2DSystemGroup::UpdateMap(std::vector<MPILib::Index>& meshes)
 			for (int j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++ ){
 				MPILib::Index ind = _vec_cumulative[m][i] + modulo(j-_t,_vec_length[m][i]) + _vec_mesh_offset[m];
 				_map[m][i][j] = ind;
-				_linear_map[_vec_mesh_offset[m] + _map_counter[m][i][j]] = ind;
-				_linear_unmap[ind] = _vec_mesh_offset[m] + _map_counter[m][i][j];
+				_linear_map[_map_counter[m][i][j]] = ind;
+				_linear_unmap[ind] = _map_counter[m][i][j];
 			}
 		}
 	}

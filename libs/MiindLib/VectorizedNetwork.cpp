@@ -98,7 +98,7 @@ void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps) {
     }
 
     for (MPILib::Index i = 0; i < _mesh_meshes.size(); i++) {
-        _group->Initialize(_mesh_meshes[i], 0, 0);
+        _group->Initialize(_mesh_meshes[i], 50, 0);
     }
 
     _master_steps = min_solve_steps;
@@ -347,7 +347,7 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
         _csr_adapter->AddDerivative();
     }
 
-    _csr_adapter->CalculateMeshGridDerivativeWithEfficacyFinite(_connection_out_group_mesh, rates, _effs, _vec_mesh[0].TimeStep());
+    //_csr_adapter->CalculateMeshGridDerivativeWithEfficacyFinite(_connection_out_group_mesh, rates, _effs, _vec_mesh[0].TimeStep());
 
     _group_adapter->RedistributeFiniteObjects(_mesh_meshes, _vec_mesh[0].TimeStep(), _csr_adapter->getCurandState());
     _group_adapter->RedistributeGridFiniteObjects(_grid_meshes, _csr_adapter->getCurandState());
