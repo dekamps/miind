@@ -98,7 +98,7 @@ void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps) {
     }
 
     for (MPILib::Index i = 0; i < _mesh_meshes.size(); i++) {
-        _group->Initialize(_mesh_meshes[i], 50, 0);
+        _group->Initialize(_mesh_meshes[i], 0, 0);
     }
 
     _master_steps = min_solve_steps;
