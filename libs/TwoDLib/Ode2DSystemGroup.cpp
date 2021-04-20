@@ -152,6 +152,21 @@ Ode2DSystemGroup::Ode2DSystemGroup
 (
 	const std::vector<Mesh>& mesh_list,
 	const std::vector<std::vector<Redistribution> >& vec_reversal,
+	const std::vector<std::vector<Redistribution> >& vec_reset
+) : Ode2DSystemGroup(mesh_list, vec_reversal, vec_reset, std::vector<MPILib::Index>(mesh_list.size())) {}
+
+Ode2DSystemGroup::Ode2DSystemGroup
+(
+	const std::vector<Mesh>& mesh_list,
+	const std::vector<std::vector<Redistribution> >& vec_reversal,
+	const std::vector<std::vector<Redistribution> >& vec_reset,
+	const std::vector<MPILib::Time>& vec_tau_refractive
+) : Ode2DSystemGroup(mesh_list, vec_reversal, vec_reset, vec_tau_refractive, std::vector<MPILib::Index>(mesh_list.size())) {}
+
+Ode2DSystemGroup::Ode2DSystemGroup
+(
+	const std::vector<Mesh>& mesh_list,
+	const std::vector<std::vector<Redistribution> >& vec_reversal,
 	const std::vector<std::vector<Redistribution> >& vec_reset,
 	const std::vector<MPILib::Index> num_objects
 ):

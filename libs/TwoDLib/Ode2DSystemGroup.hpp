@@ -55,9 +55,7 @@ namespace TwoDLib {
 		(
 			const std::vector<Mesh>&, 					       //!< A series of Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
 			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin
-			const std::vector< std::vector<Redistribution> >&,  //!< A series of mappings from threshold to reset bin
-			const std::vector<MPILib::Time>&,
-			const std::vector<MPILib::Index> num_objects = std::vector<MPILib::Index>()
+			const std::vector< std::vector<Redistribution> >&  //!< A series of mappings from threshold to reset bin
 		);
 
 		Ode2DSystemGroup
@@ -65,7 +63,24 @@ namespace TwoDLib {
 			const std::vector<Mesh>&, 					       //!< A series of Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
 			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin
 			const std::vector< std::vector<Redistribution> >&,  //!< A series of mappings from threshold to reset bin
-			const std::vector<MPILib::Index> num_objects = std::vector<MPILib::Index>()
+			const std::vector<MPILib::Time>&
+		);
+
+		Ode2DSystemGroup
+		(
+			const std::vector<Mesh>&, 					       //!< A series of Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
+			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin
+			const std::vector< std::vector<Redistribution> >&,  //!< A series of mappings from threshold to reset bin
+			const std::vector<MPILib::Time>&,
+			const std::vector<MPILib::Index> num_objects
+		);
+
+		Ode2DSystemGroup
+		(
+			const std::vector<Mesh>&, 					       //!< A series of Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
+			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin
+			const std::vector< std::vector<Redistribution> >&,  //!< A series of mappings from threshold to reset bin
+			const std::vector<MPILib::Index> num_objects
 		);
 
 
