@@ -42,7 +42,7 @@ _vec_vec_gen(0),
 _vec_timefactor(0){
 	this->FromXML(s);
 
-	if (NrStrips() > 3) {// this is a 2D mesh and if it's a grid, we want to know the cell dimensions
+	if (NrStrips() > 3 && NrCellsInStrip(0) > 0) {// this is a 2D mesh and if it's a grid, we want to know the cell dimensions
 
 		// If this mesh is a grid, calculate the cell width.
 		// If it's not a mesh, _grid_cell_width etc is meaningless.
