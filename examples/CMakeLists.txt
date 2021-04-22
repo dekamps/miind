@@ -126,6 +126,13 @@ model_archive/EIF/eif.model
 model_archive/EIF/eif_0.1_0_0_0_.mat
 )
 
+set( MA_POTJANS
+model_archive/POTJANS/potjans.xml
+model_archive/POTJANS/potjanslif.model
+model_archive/POTJANS/potjanslif_-0.0007_0_0_0_.mat
+model_archive/POTJANS/potjanslif_0.000175_0_0_0_.mat
+)
+
 set( MA_EPILEPTOR
 model_archive/Epileptor/epi.xml
 model_archive/Epileptor/epileptor_ict.model
@@ -259,6 +266,8 @@ install( FILES ${MA_COND}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Conductance2D )
 install( FILES ${MA_EIF}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/EIF )
+install( FILES ${MA_POTJANS}
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/POTJANS )
 install( FILES ${MA_EPILEPTOR}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Epileptor )
 install( FILES ${MA_FN}
