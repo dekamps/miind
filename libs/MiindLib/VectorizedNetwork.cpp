@@ -347,7 +347,7 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
         _csr_adapter->AddDerivative();
     }
 
-    //_csr_adapter->CalculateMeshGridDerivativeWithEfficacyFinite(_connection_out_group_mesh, rates, _effs, _vec_mesh[0].TimeStep());
+    _csr_adapter->CalculateMeshGridDerivativeWithEfficacyFinite(_connection_out_group_mesh, rates, _effs, _vec_mesh[0].TimeStep());
 
     _group_adapter->RedistributeFiniteObjects(_mesh_meshes, _vec_mesh[0].TimeStep(), _csr_adapter->getCurandState());
     _group_adapter->RedistributeGridFiniteObjects(_grid_meshes, _csr_adapter->getCurandState());
