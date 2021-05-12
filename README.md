@@ -9,9 +9,15 @@ We calculate this distribution in terms of a density function, and from this den
 By modeling large-scale networks as homogeneous populations that exchange firing rate statistics, rather than spikes, remarkable efficiency can be achieved, whilst retaining
 a connection to spiking neurons that is not present in neural mass models.
 
-## Version 1.0.8 (03/2021)
+## Documentation and Installation Instructions
 
-MIIND is now available through python pip!
+MIIND is available through pypi and can be installed on most Linux and Windows systems (Mac version in development) with the command:
+
+<strong>$ python -m pip install miind</strong>
+
+For building from source and further documentation:
+
+https://miind.readthedocs.io/en/latest/
 
 ## Three dimensional population density methods! (26/11/2019)
 They said it could not be done, but we have created an efficient version of the Hindmarsh rose model,

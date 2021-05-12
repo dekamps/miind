@@ -54,7 +54,7 @@ def generate_transition_matrices(J, dir, modelname = 'life23f9d42-38a0-450c-bd59
     where this script is run. It is the user's responsibility to check whether the file is adequate. The fiducial file is generated for trainsitions up 0.01,
     both excitatory and inhibitory'''
     for j in J:
-        print 'Generating transition: ', j
+        print('Generating transition: ', j)
         sp.check_output(['MatrixGenerator', modelname, fidname, str(nr_mc),str(j),'0','0'])
     name=sp.check_output(['ls','-t']).split('\n')
     matnames = glob.glob('*.mat')
@@ -189,14 +189,14 @@ if __name__ == "__main__":
 
 
     if args.d == False:
-	print 'Generating simulation files'
+	print('Generating simulation files')
         generate_omurtag(rerun=True,batch=args.b)
         generate_response(rerun=True,batch=args.b)
         generate_spectrum(rerun=True,batch=args.b)
     
     if args.d == True:
         if args.b == True:
-            print 'Batch option ignored in DST production.'
+            print('Batch option ignored in DST production.')
 
         J1, nu1, ms1 = generate_response_curve_values_low_noise(sigma=1e-3)
         J2, nu2, ms2 = generate_response_curve_values_low_noise(sigma=2e-3)

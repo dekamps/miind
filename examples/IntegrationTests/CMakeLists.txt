@@ -1,4 +1,4 @@
-install( FILES system_tests.py
+install( FILES system_tests.py README.txt
     DESTINATION share/miind/examples )
 
 set(TESTFILES_BASE_DIR share/miind/examples/testfiles)

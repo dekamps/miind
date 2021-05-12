@@ -14,12 +14,11 @@
 <OutgoingConnection Node="LIF"/>
 </Connections>
 <Reporting>
-<Display node="LIF" />
 <Rate node="LIF" t_interval="0.01" />
 </Reporting>
 <SimulationRunParameter>
 <SimulationName>lif</SimulationName>
-<t_end>3.0</t_end>
+<t_end>1.0</t_end>
 <t_step>0.001</t_step>
 <name_log>lif.log</name_log>
 </SimulationRunParameter>

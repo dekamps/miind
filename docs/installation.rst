@@ -57,12 +57,58 @@ Python MIIND optionally depends on:
 - MPI
 - ROOT
 
+setup.py defines the cmake options for building MIIND in the variable cmake_args. When using setup.py to build MIIND, these options should be changed if a different configuration is required to the default (ENABLE_OPENMP, ENABLE_CUDA, ENABLE_TESTING). Note that platform specific versions of cmake_args are defined later in the script.
+
+.. code-block:: python
+   :caption: Default value of cmake_args in setup.py.
+   :name: setup-py
+	cmake_args = (
+			[
+				'-DCMAKE_BUILD_TYPE=Release',
+				'-DENABLE_OPENMP:BOOL=ON',
+				'-DENABLE_MPI:BOOL=OFF',
+				'-DENABLE_TESTING:BOOL=ON',
+				'-DENABLE_CUDA:BOOL=ON',
+				'-DENABLE_ROOT:BOOL=OFF',
+				'-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_30,code=[compute_30,sm_30]'
+			]
+		)
+		
+For example, to build MIIND with CUDA disabled and ROOT enabled::
+
+.. code-block:: python
+   :caption: cmake_args in setup.py with CUDA disabled and ROOT enabled. As CUDA is disabled, CMAKE_CUDA_FLAGS is not required.
+   :name: setup-py
+	cmake_args = (
+			[
+				'-DCMAKE_BUILD_TYPE=Release',
+				'-DENABLE_OPENMP:BOOL=ON',
+				'-DENABLE_MPI:BOOL=OFF',
+				'-DENABLE_TESTING:BOOL=ON',
+				'-DENABLE_CUDA:BOOL=OFF',
+				'-DENABLE_ROOT:BOOL=ON'
+			]
+		)
+
 On Windows, vcpkg is used for building Python MIIND therefore only CUDA drivers and Ninja are required in addition to cmake and a compiler.
 
 Building Standalone MIIND From Source
 -------------------------------------
 
 Standalone MIIND can also be built in the tranditional way (create a build directory and run cmake then install).
+
+Create a build directory in the MIIND root directory::
+
+    $ mkdir build
+	$ cd build
+	
+Run ccmake to set the required cmake options and generate a cmake file::
+
+    $ cmake ..
+	
+Once generated, call make install (with admin permissions if required)::
+
+    $ make install
 
 Additional python libraries which need to be installed using pip or conda:
 

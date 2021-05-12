@@ -8,6 +8,7 @@ aexp/aexpnoa642fee6a-9257-4624-9178-9a404b8bad50_-1_0_0_0_.mat
 aexp/aexpnoa642fee6a-9257-4624-9178-9a404b8bad50_1_0_0_0_.mat
 aexp/aexpnoa642fee6a-9257-4624-9178-9a404b8bad50.model
 aexp/aexp.xml
+aexp/README.txt
 )
 
 set( COND
@@ -17,6 +18,7 @@ cond/cond.xml
 cond/cond_0_0.05_0.mat
 cond/cond.model
 cond/mc_gain_curves.py
+cond/README.txt
 )
 
 set( LIF
@@ -25,6 +27,7 @@ lif/lif.model
 lif/lifanalysis.py
 lif/lif.xml
 lif/steady_state.dat
+lif/README.txt
 )
 
 set( LIF_PYTHON
@@ -37,6 +40,7 @@ lif_python/lif.mesh
 lif_python/lif.res
 lif_python/lif.stat
 lif_python/runlif.py
+lif_python/README.txt
 )
 
 set( LIF_PYTHON_SWEEP
@@ -54,6 +58,7 @@ lif_python_sweep/lif_0.08_0_0_0_.mat
 lif_python_sweep/lif_0.09_0_0_0_.mat
 lif_python_sweep/sweep_one_shot.py
 lif_python_sweep/sweep_re_runnable.py
+lif_python_sweep/README.txt
 )
 
 set( QIF
@@ -61,6 +66,7 @@ qif/qifanalysis.py
 qif/qif.model
 qif/qif.xml
 qif/show_qif_gain.py
+qif/README.txt
 )
 
 set( TVB
@@ -69,6 +75,7 @@ miind_tvb/grid_izhikevich.py
 miind_tvb/izh.model
 miind_tvb/izh.xml
 miind_tvb/izh_0_0_0_0_.tmat
+miind_tvb/README.txt
 )
 
 set( CLI_PLOTS
@@ -78,6 +85,7 @@ cli_plots/izh.model
 cli_plots/izh.projection
 cli_plots/izh_0_0_0_0_.tmat
 cli_plots/marginal_density.npz
+cli_plots/README.txt
 )
 
 set( RATE
@@ -85,6 +93,7 @@ rate_based/analyse_rate.py
 rate_based/analytic.dat
 rate_based/rate.xml
 rate_based/response_curve.py
+rate_based/README.txt
 )
 
 set( RESP
@@ -92,20 +101,24 @@ response_curve_lif/analyse_response.py
 response_curve_lif/response_analyse.py
 response_curve_lif/response_curve.py
 response_curve_lif/response.xml
+response_curve_lif/README.txt
 )
 
 set( SINGLE
 single_lif/analyse_single_lif.py
 single_lif/response.xml
 single_lif/single_lif.py
+single_lif/README.txt
 )
 
 set( SELF
 single_selfinhib/self.xml
+single_selfinhib/README.txt
 )
 
 set( TWO
 twopop/twopop.xml
+twopop/README.txt
 )
 
 set( MA_ADEX
@@ -118,6 +131,17 @@ set( MA_COND
 model_archive/Conductance2D/cond.xml
 model_archive/Conductance2D/cond.model
 model_archive/Conductance2D/cond_0_0_0_0_.tmat
+)
+
+set( MA_DIPDE 
+model_archive/DIPDE/ei.xml
+model_archive/DIPDE/lifdipde.model
+model_archive/DIPDE/lifdipde_0.005.mat
+model_archive/DIPDE/lifdipde_-0.005.mat
+model_archive/DIPDE/README.txt
+model_archive/DIPDE/recurrent.xml
+model_archive/DIPDE/single.xml
+model_archive/DIPDE/variable.xml
 )
 
 set( MA_EIF
@@ -185,6 +209,7 @@ model_archive/WilsonCowan/wc.xml
 
 set( TUTORIAL
 tutorial/Tutorial\ MIIND.pdf
+tutorial/README.txt
 )
 
 set( TUTORIAL_GRID
@@ -226,6 +251,7 @@ tutorial/vectorised/vector.xml
 set( QUICK_START
 quick_start/cond.xml
 quick_start/generateCondFiles.py
+quick_start/README.txt
 )
 
 ADD_SUBDIRECTORY(IntegrationTests)
@@ -260,8 +286,12 @@ install( FILES ${CLI_PLOTS}
     DESTINATION ${EXAMPLES_BASE_DIR}/cli_plots )
 install( FILES ${TWO}
     DESTINATION ${EXAMPLES_BASE_DIR}/twopop )
+install( FILES model_archive/README.txt 
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive )
 install( FILES ${MA_ADEX}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Adex )
+install( FILES ${MA_DIPDE}
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/DIPDE )
 install( FILES ${MA_COND}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Conductance2D )
 install( FILES ${MA_EIF}

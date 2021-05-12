@@ -130,7 +130,7 @@ void VectorizedNetwork::reportNodeDensities(MPILib::Time sim_time) {
             continue;
 
         std::ostringstream ost;
-        ost << _density_nodes[i] << "_" << sim_time;
+        ost << _density_nodes[i] << "_" << sim_time << "1";
         string fn("node_" + ost.str());
 
         std::string model_path("densities");
