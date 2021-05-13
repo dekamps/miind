@@ -127,10 +127,16 @@ model_archive/Adex/adex.model
 model_archive/Adex/adex_0_0_0_0_.tmat
 )
 
-set( MA_COND
-model_archive/Conductance2D/cond.xml
-model_archive/Conductance2D/cond.model
-model_archive/Conductance2D/cond_0_0_0_0_.tmat
+set( MA_COND_GRID
+model_archive/Conductance2D/Grid/cond.xml
+model_archive/Conductance2D/Grid/cond.model
+model_archive/Conductance2D/Grid/cond_0_0_0_0_.tmat
+)
+
+set( MA_COND_MESH
+model_archive/Conductance2D/Mesh/cond.xml
+model_archive/Conductance2D/Mesh/cond.model
+model_archive/Conductance2D/Mesh/cond_0_0.05_0_0_.mat
 )
 
 set( MA_DIPDE 
@@ -165,10 +171,17 @@ model_archive/Epileptor/epileptor_intict.model
 model_archive/Epileptor/epileptor_intict_0_0_0_0_.tmat
 )
 
-set( MA_FN
-model_archive/FitzhughNagumo/fn.xml
-model_archive/FitzhughNagumo/fn.model
-model_archive/FitzhughNagumo/fn_0_0_0_0_.tmat
+set( MA_FN_GRID
+model_archive/FitzhughNagumo/Grid/fn.xml
+model_archive/FitzhughNagumo/Grid/fn.model
+model_archive/FitzhughNagumo/Grid/fn_0_0_0_0_.tmat
+)
+
+set( MA_FN_MESH
+model_archive/FitzhughNagumo/Mesh/fn.xml
+model_archive/FitzhughNagumo/Mesh/fn.model
+model_archive/FitzhughNagumo/Mesh/fn_0.02_0_0_0_.mat
+model_archive/FitzhughNagumo/Mesh/fn_-0.02_0_0_0_.mat
 )
 
 set( MA_IZH
@@ -292,16 +305,20 @@ install( FILES ${MA_ADEX}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Adex )
 install( FILES ${MA_DIPDE}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/DIPDE )
-install( FILES ${MA_COND}
-    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Conductance2D )
+install( FILES ${MA_COND_GRID}
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Conductance2D/Grid )
+install( FILES ${MA_COND_MESH}
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Conductance2D/Mesh )
 install( FILES ${MA_EIF}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/EIF )
 install( FILES ${MA_POTJANS}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/POTJANS )
 install( FILES ${MA_EPILEPTOR}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Epileptor )
-install( FILES ${MA_FN}
-    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/FitzhughNagumo )
+install( FILES ${MA_FN_GRID}
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/FitzhughNagumo/Grid )
+install( FILES ${MA_FN_MESH}
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/FitzhughNagumo/Mesh )
 install( FILES ${MA_IZH}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Izhikevich )
 install( FILES ${MA_LIF}

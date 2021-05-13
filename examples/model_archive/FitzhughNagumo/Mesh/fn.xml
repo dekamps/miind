@@ -1,0 +1,31 @@
+<Simulation>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithmCustom" name="E" modelfile="fn.model" >
+<TimeStep>0.01</TimeStep>
+<MatrixFile>fn_0.02_0_0_0_.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="Exc_Input">
+<expression>5.0</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="E" name="fn" type="NEUTRAL" />
+<Node algorithm="Exc_Input" name="Inp" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="Inp" Out="fn" num_connections="1" efficacy="0.02" delay="0"/>
+</Connections>
+<Reporting>
+<!--<Density node="fn" t_start="0.0" t_end="30.0" t_interval="0.01" />-->
+<Display node="fn" />
+<Rate node="fn" t_interval="0.01" />
+</Reporting>
+<SimulationRunParameter>
+<max_iter>1000000</max_iter>
+<t_begin>0</t_begin>
+<t_end>30.0</t_end>
+<t_step>0.01</t_step>
+<name_log>fn.log</name_log>
+</SimulationRunParameter>
+</Simulation>
