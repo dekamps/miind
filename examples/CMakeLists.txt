@@ -272,75 +272,78 @@ ADD_SUBDIRECTORY(IntegrationTests)
 
 set(EXAMPLES_BASE_DIR share/miind/examples)
 
-install( FILES ${AEXP}
-    DESTINATION ${EXAMPLES_BASE_DIR}/aexp )
-install( FILES ${COND}
-    DESTINATION ${EXAMPLES_BASE_DIR}/cond )
 install( FILES ${LIF}
     DESTINATION ${EXAMPLES_BASE_DIR}/lif )
 install( FILES ${LIF_PYTHON}
     DESTINATION ${EXAMPLES_BASE_DIR}/lif_python )
 install( FILES ${LIF_PYTHON_SWEEP}
     DESTINATION ${EXAMPLES_BASE_DIR}/lif_python_sweep )
-install( FILES ${QIF}
-    DESTINATION ${EXAMPLES_BASE_DIR}/qif )
 install( FILES ${TVB}
     DESTINATION ${EXAMPLES_BASE_DIR}/miind_tvb )
 install( FILES ${QUICK_START}
     DESTINATION ${EXAMPLES_BASE_DIR}/quick_start )
-install( FILES ${RATE}
-    DESTINATION ${EXAMPLES_BASE_DIR}/rate_based )
-install( FILES ${RESP}
-    DESTINATION ${EXAMPLES_BASE_DIR}/response_curve_lif )
-install( FILES ${SINGLE}
-    DESTINATION ${EXAMPLES_BASE_DIR}/single_lif )
-install( FILES ${SELF}
-    DESTINATION ${EXAMPLES_BASE_DIR}/single_selfinhib )
-install( FILES ${CLI_PLOTS}
-    DESTINATION ${EXAMPLES_BASE_DIR}/cli_plots )
-install( FILES ${TWO}
-    DESTINATION ${EXAMPLES_BASE_DIR}/twopop )
 install( FILES model_archive/README.txt 
 	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive )
 install( FILES ${MA_ADEX}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Adex )
-install( FILES ${MA_DIPDE}
-    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/DIPDE )
 install( FILES ${MA_COND_GRID}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Conductance2D/Grid )
-install( FILES ${MA_COND_MESH}
-    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Conductance2D/Mesh )
-install( FILES ${MA_EIF}
-    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/EIF )
 install( FILES ${MA_POTJANS}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/POTJANS )
-install( FILES ${MA_EPILEPTOR}
-    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Epileptor )
 install( FILES ${MA_FN_GRID}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/FitzhughNagumo/Grid )
-install( FILES ${MA_FN_MESH}
-    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/FitzhughNagumo/Mesh )
 install( FILES ${MA_IZH}
     DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Izhikevich )
-install( FILES ${MA_LIF}
-    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/LIF )
 install( FILES ${MA_MN}
-    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/MinimalMotorneuron )
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/MinimalMotorneuron )
 install( FILES ${MA_PNAP}
-    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/PersistentSodium2D )
-install( FILES ${MA_QIF}
-    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/QIF )
-install( FILES ${MA_WC}
-    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/WilsonCowan )
-install( FILES ${TUTORIAL}
-    DESTINATION ${EXAMPLES_BASE_DIR}/tutorial )
-install( FILES ${TUTORIAL_GRID}
-    DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/grid )
-install( FILES ${TUTORIAL_T1}
-    DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t1 )
-install( FILES ${TUTORIAL_T2}
-    DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t2 )
-install( FILES ${TUTORIAL_T3}
-    DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t3 )
-install( FILES ${TUTORIAL_VECTOR}
-    DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/vectorised )
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/PersistentSodium2D )
+install( FILES ${MA_EPILEPTOR}
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Epileptor )
+
+if (NOT SKBUILD) # If we're not installing for pip, install all examples
+	install( FILES ${AEXP}
+		DESTINATION ${EXAMPLES_BASE_DIR}/aexp )
+	install( FILES ${COND}
+		DESTINATION ${EXAMPLES_BASE_DIR}/cond )
+	install( FILES ${QIF}
+		DESTINATION ${EXAMPLES_BASE_DIR}/qif )
+	install( FILES ${RATE}
+		DESTINATION ${EXAMPLES_BASE_DIR}/rate_based )
+	install( FILES ${RESP}
+		DESTINATION ${EXAMPLES_BASE_DIR}/response_curve_lif )
+	install( FILES ${SINGLE}
+		DESTINATION ${EXAMPLES_BASE_DIR}/single_lif )
+	install( FILES ${SELF}
+		DESTINATION ${EXAMPLES_BASE_DIR}/single_selfinhib )
+	install( FILES ${CLI_PLOTS}
+		DESTINATION ${EXAMPLES_BASE_DIR}/cli_plots )
+	install( FILES ${TWO}
+		DESTINATION ${EXAMPLES_BASE_DIR}/twopop )
+	install( FILES ${MA_DIPDE}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/DIPDE )
+	install( FILES ${MA_COND_MESH}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Conductance2D/Mesh )
+	install( FILES ${MA_EIF}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/EIF )
+	install( FILES ${MA_FN_MESH}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/FitzhughNagumo/Mesh )
+	install( FILES ${MA_LIF}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/LIF )
+	install( FILES ${MA_QIF}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/QIF )
+	install( FILES ${MA_WC}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/WilsonCowan )
+	install( FILES ${TUTORIAL}
+		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial )
+	install( FILES ${TUTORIAL_GRID}
+		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/grid )
+	install( FILES ${TUTORIAL_T1}
+		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t1 )
+	install( FILES ${TUTORIAL_T2}
+		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t2 )
+	install( FILES ${TUTORIAL_T3}
+		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t3 )
+	install( FILES ${TUTORIAL_VECTOR}
+		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/vectorised )
+endif(NOT SKBUILD)
