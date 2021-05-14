@@ -179,9 +179,10 @@ model_archive/FitzhughNagumo/Grid/fn_0_0_0_0_.tmat
 
 set( MA_FN_MESH
 model_archive/FitzhughNagumo/Mesh/fn.xml
-model_archive/FitzhughNagumo/Mesh/fn.model
+model_archive/FitzhughNagumo/Mesh/fn.model.zip
 model_archive/FitzhughNagumo/Mesh/fn_0.02_0_0_0_.mat
 model_archive/FitzhughNagumo/Mesh/fn_-0.02_0_0_0_.mat
+model_archive/FitzhughNagumo/Mesh/README.txt
 )
 
 set( MA_IZH
