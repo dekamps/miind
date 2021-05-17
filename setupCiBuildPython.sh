@@ -15,13 +15,13 @@ echo "Found Python Version: $parsedVersionRed"
 
 if [[ "$parsedVersionRed" -gt "360" && "$parsedVersionRed" -lt "370" ]]
 then 
-    yum install gcc openssl-devel bzip2-devel libffi-devel -y
+    yum install locate gcc openssl-devel bzip2-devel libffi-devel -y
 	curl -O https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
 	tar -xzf Python-3.6.1.tgz
 	cd Python-3.6.1/
 	./configure --enable-optimizations
 	make install
-	updatedb
+	sudo updatedb
 fi
 
 if [[ "$parsedVersionRed" -gt "370" && "$parsedVersionRed" -lt "380" ]]
