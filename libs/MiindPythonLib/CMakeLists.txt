@@ -28,9 +28,6 @@ include_directories(${Python3_INCLUDE_DIRS})
 endif (SKBUILD)
 endif(APPLE)
 
-find_package (Python3 COMPONENTS Interpreter Development)
-include_directories(${Python3_INCLUDE_DIRS})
-
 include_directories( ${ROOT_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
 
@@ -56,10 +53,10 @@ set ( LIBLIST
     ${gsl_LINK_FLAGS}
     gsl
     ${GLUT_LIBRARY}
-	${Python3_LIBRARIES}
+	${PYTHON_LIBRARIES}
 )
 
-message ( "Using python libraries: ${Python3_LIBRARIES}")
+message ( "Using python libraries: ${PYTHON_LIBRARIES} and ${Python3_LIBRARIES}")
 
 #if (APPLE)
 #set( LIBLIST ${LIBLIST} ${Python3_LIBRARIES} )
