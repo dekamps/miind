@@ -17,19 +17,16 @@ find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 endif(SKBUILD)
 else (APPLE)
-if (WIN32 AND SKBUILD) # We're building using SKBUILD which means the correct python lib is passed as a flag! Hooray!
+if (SKBUILD) # We're building using SKBUILD which means the correct python lib is passed as a flag! Hooray!
 set(Python3_INCLUDE_DIRS ${PYTHON_INCLUDE_DIR} )
 set(PYTHON_LIBRARIES ${PYTHON_LIBRARY})
 set(Python3_LIBRARIES ${PYTHON_LIBRARY})
 include_directories(${Python3_INCLUDE_DIRS})
-else (WIN32 AND SKBUILD)
+else (SKBUILD)
 find_package (Python3 COMPONENTS Interpreter Development)
 include_directories(${Python3_INCLUDE_DIRS})
-endif (WIN32 AND SKBUILD)
+endif (SKBUILD)
 endif(APPLE)
-
-find_package (Python3 COMPONENTS Development)
-include_directories(${Python3_INCLUDE_DIRS})
 
 include_directories( ${ROOT_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
@@ -56,10 +53,10 @@ set ( LIBLIST
     ${gsl_LINK_FLAGS}
     gsl
     ${GLUT_LIBRARY}
-	${PYTHON_LIBRARIES}
+	${Python3_LIBRARIES}
 )
 
-message ( "Using python libraries: ${PYTHON_LIBRARIES} and ${Python3_LIBRARIES}")
+message ( "Using python libraries: ${Python3_LIBRARIES}")
 
 #if (APPLE)
 #set( LIBLIST ${LIBLIST} ${Python3_LIBRARIES} )
