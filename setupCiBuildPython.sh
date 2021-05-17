@@ -21,6 +21,7 @@ then
 	cd Python-3.6.1/
 	./configure --enable-optimizations
 	make install
+	updatedb
 fi
 
 if [[ "$parsedVersionRed" -gt "370" && "$parsedVersionRed" -lt "380" ]]
@@ -31,6 +32,7 @@ then
 	cd Python-3.7.1/
 	./configure --enable-optimizations
 	make install
+	updatedb
 fi
 
 if [[ "$parsedVersionRed" -gt "380" && "$parsedVersionRed" -lt "390" ]]
@@ -41,6 +43,7 @@ then
 	cd Python-3.8.1/
 	./configure --enable-optimizations
 	make install
+	updatedb
 fi
 
 if [[ "$parsedVersionRed" -gt "390" && "$parsedVersionRed" -lt "400" ]]
@@ -51,5 +54,6 @@ then
 	cd Python-3.9.1/
 	./configure --enable-optimizations
 	make install
+	updatedb
 fi
 
