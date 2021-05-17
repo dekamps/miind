@@ -46,7 +46,7 @@ BOOST_FIXTURE_TEST_CASE(CSRMatrixTest, FixtureOde2DSystemGroup)
 	TransitionMatrix mat1("mat1.mat");
 	TransitionMatrix mat2("mat2.mat");
 	
-	std::vector<std::vector<Redistribution> > vec_dummy;
+	std::vector<std::vector<Redistribution> > vec_dummy { std::vector<Redistribution>(), std::vector<Redistribution>() };
 	std::vector<Mesh> vec_mesh {_mesh1, _mesh2 };
        	Ode2DSystemGroup group(vec_mesh,vec_dummy,vec_dummy);
 	std::cout << "yipta" << std::endl;

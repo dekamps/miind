@@ -59,6 +59,13 @@ namespace TwoDLib {
 				const vector<MPILib::Index>&	               weight_order    //!< reference to the mapping from NodeId to weight order
 			);
 
+		void ApplyFinitePoisson
+		(
+			double                                         time_step,      //!< mesh time step
+			const std::vector<std::vector<MPILib::Rate> >& rate_matrix,	//!< rate matrix
+			const vector<MPILib::Index>& weight_order    //!< reference to the mapping from NodeId to weight order
+		);
+
 	private:
 
 		MasterOMP(const MasterOMP&);

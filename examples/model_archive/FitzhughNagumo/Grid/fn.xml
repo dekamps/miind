@@ -1,0 +1,51 @@
+<Simulation>
+ <Variable Name='TIME_END'>0.5</Variable>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="GridAlgorithm" name="OSC" modelfile="fn.model" tau_refractive="0.0" transformfile="fn_0_0_0_0_.tmat" start_v="-1.0" start_w="-0.3" ratemethod="AvgV">
+<TimeStep>0.0001</TimeStep>
+</Algorithm>
+<Algorithm type="RateFunctor" name="MLR_1">
+<expression>10000</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="OSC" name="RG_E" type="NEUTRAL" />
+<Node algorithm="MLR_1" name="MLR_E" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="MLR_E" Out="RG_E" num_connections="1" efficacy="0.05" delay="0.0"/>
+</Connections>
+<Reporting>
+	<!--<Density node="RG_E" t_start="0.0" t_end="6.0" t_interval="0.001" />-->
+	<Display node="RG_E" />
+	<Rate node="RG_E" t_interval="0.001" />
+</Reporting>
+<SimulationIO>
+<SimulationName>cond</SimulationName>
+<OnScreen>FALSE</OnScreen>
+<WithState>TRUE</WithState>
+<WriteNet>FALSE</WriteNet>
+<CanvasParameter>
+<T_min>0</T_min>
+<T_max>5.0</T_max>
+<F_min>0</F_min>
+<F_max>20</F_max>
+<State_min>0</State_min>
+<State_max>1.0</State_max>
+<Dense_min>0</Dense_min>
+<Dense_max>2.5</Dense_max>
+</CanvasParameter>
+<CanvasNode Name="RG_E" />
+</SimulationIO>
+<SimulationRunParameter>
+<max_iter>1000000</max_iter>
+<t_begin>0</t_begin>
+<t_end>TIME_END</t_end>
+<t_report>0.0002</t_report>
+<master_steps>10</master_steps>
+<t_state_report>0.0002</t_state_report>
+<t_step>0.0002</t_step>
+<name_log>cond.log</name_log>
+</SimulationRunParameter>
+</Simulation>

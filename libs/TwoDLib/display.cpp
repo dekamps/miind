@@ -31,7 +31,9 @@ Display::~Display(){
 		Display::getInstance()->updateDisplay(1);
 		glutDestroyWindow(glutGetWindow());
 	}
+#ifndef USING_APPLE_GLUT // Hack to avoid issues with OSX glut version
 	glutExit();
+#endif
 }
 
 unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys) {
@@ -160,8 +162,15 @@ void Display::display(void) {
 			Quadrilateral q = m.Quad(i,j);
 			double cell_area = std::abs(q.SignedArea());
 			double mass = 0.0;
-			if (_dws[window_index]._system->Mass()[idx]/cell_area != 0)
-				mass = std::min(1.0,std::max(0.0,(log10(_dws[window_index]._system->Mass()[idx]/cell_area) - min) / (max-min)));
+			if (_dws[window_index]._system->Mass()[idx] / cell_area != 0 && _dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] == 0) {
+				mass = std::min(1.0, std::max(0.0, (log10(_dws[window_index]._system->Mass()[idx] / cell_area) - min) / (max - min)));
+			}
+			else {
+				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() > 0)
+					//mass = (double)_dws[window_index]._system->_vec_cells_to_objects[idx].size() / (double)_dws[window_index]._system->_num_objects;
+					mass = 1.0;
+			}
+
 			vector<Point> ps = q.Points();
 
 			glColor3f(std::min(1.0,mass*2.0), std::max(0.0,((mass*2.0) - 1.0)), 0);
@@ -347,13 +356,18 @@ void Display::updateDisplay(long current_sim_it) {
 		glutSetWindow(_dws[_nodes_to_display[id]]._window_index);
 		glutPostRedisplay();
 	}
-
+#ifndef USING_APPLE_GLUT
 	glutMainLoopEvent();
+#else
+	glutCheckLoop();
+#endif
 
 }
 
 void Display::shutdown() const {
+#ifndef USING_APPLE_GLUT // Hack to avoid issues with OSX glut version
 	glutExit();
+#endif
 
 	// Nice new line if we quit early.
 	std::cout << "\n";
@@ -380,9 +394,12 @@ void Display::animate(bool _write_frames, std::vector<MPILib::NodeId> nodes_to_d
 	}
 
 	atexit(Display::stat_shutdown);
-
+// glutSetOption is not available in OSX glut - on other OSs (using freeglut), this allows us to keep running the simulation 
+// even though the window is closed
+// I don't know what will happen on OSX because I don't live and work in Shoreditch. 
+#ifndef USING_APPLE_GLUT
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
-
+#endif
 	init();
 }
 

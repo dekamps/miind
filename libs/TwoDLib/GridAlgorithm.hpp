@@ -12,6 +12,7 @@
 #include "pugixml.hpp"
 #include "display.hpp"
 #include "MasterGrid.hpp"
+#include "DensityAlgorithmInterface.hpp"
 
 namespace TwoDLib {
 
@@ -21,7 +22,8 @@ namespace TwoDLib {
  * This class simulates the evolution of a neural population density function on a 2D grid.
  */
 
-	class GridAlgorithm : public DensityAlgorithmInterface<CustomConnectionParameters>{
+	class GridAlgorithm : public DensityAlgorithmInterface<MPILib::CustomConnectionParameters>{
+		friend DensityAlgorithmInterface<MPILib::CustomConnectionParameters>;
 
 	public:
     GridAlgorithm
@@ -32,7 +34,8 @@ namespace TwoDLib {
 			double,
 			double,
 			MPILib::Time tau_refractive = 0,     //!< absolute refractive period
-			const string& ratemethod = ""       //!< firing rate computation; by default the mass flux across threshold
+			const string& ratemethod = "",       //!< firing rate computation; by default the mass flux across threshold
+			const unsigned int num_objects = 0	 //!< number of finite objects 
 		);
 
 		GridAlgorithm(const GridAlgorithm&);
@@ -59,12 +62,12 @@ namespace TwoDLib {
 		virtual void setupMasterSolver(double cell_width);
 
 		virtual void prepareEvolve(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<CustomConnectionParameters>& weightVector,
+				const std::vector<MPILib::CustomConnectionParameters>& weightVector,
 				const std::vector<MPILib::NodeType>& typeVector);
 
-		using MPILib::AlgorithmInterface<CustomConnectionParameters>::evolveNodeState;
+		using MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>::evolveNodeState;
 		virtual void evolveNodeState(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<CustomConnectionParameters>& weightVector, MPILib::Time time);
+				const std::vector<MPILib::CustomConnectionParameters>& weightVector, MPILib::Time time);
 
 		virtual void applyMasterSolver(std::vector<MPILib::Rate> rates);
 
@@ -80,6 +83,8 @@ namespace TwoDLib {
 
 		const std::string _model_name;
 		const std::string _rate_method;
+
+		std::vector<MPILib::Index> _vec_num_objects;
 
 		MPILib::Rate _rate;
 		MPILib::Time _t_cur;
@@ -121,8 +126,9 @@ namespace TwoDLib {
 
 	protected:
 
-		virtual void FillMap(const std::vector<CustomConnectionParameters>& weightVector);
+		virtual void FillMap(const std::vector<MPILib::CustomConnectionParameters>& weightVector);
 		std::vector<Mesh> CreateMeshObject();
+		std::vector<MPILib::Index> CreateNumObjects(MPILib::Index num_objects);
 		pugi::xml_node CreateRootNode(const std::string&);
 		std::vector<TwoDLib::Redistribution> Mapping(const std::string&);
 

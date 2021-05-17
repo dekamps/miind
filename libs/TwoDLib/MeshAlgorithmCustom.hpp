@@ -39,7 +39,7 @@ namespace TwoDLib {
  */
 
 	template <class Solver=TwoDLib::MasterOdeint>
-	class MeshAlgorithmCustom : public DensityAlgorithmInterface<CustomConnectionParameters>  {
+	class MeshAlgorithmCustom : public DensityAlgorithmInterface<MPILib::CustomConnectionParameters>  {
 
 	public:
 
@@ -49,7 +49,8 @@ namespace TwoDLib {
 			const std::vector<std::string>&,        //!< vector of transition matrix files
 			MPILib::Time,                           //!< default time step for Master equation
 			MPILib::Time tau_refractive = 0,        //!< absolute refractive period
-			const string& ratemethod = ""           //!< firing rate computation; by default the mass flux across threshold
+			const string& ratemethod = "",           //!< firing rate computation; by default the mass flux across threshold
+			const unsigned int num_objects = 0		//!< number of objects for finite sized population
 		);
 
 		MeshAlgorithmCustom(const MeshAlgorithmCustom&);
@@ -98,9 +99,9 @@ namespace TwoDLib {
 		 * @param time Time point of the algorithm
 		 * @param typeVector Vector of the NodeTypes of the precursors
 		 */
-		using MPILib::AlgorithmInterface<CustomConnectionParameters>::evolveNodeState;
+		using MPILib::AlgorithmInterface<MPILib::CustomConnectionParameters>::evolveNodeState;
 		virtual void evolveNodeState(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<CustomConnectionParameters>& weightVector, MPILib::Time time);
+				const std::vector<MPILib::CustomConnectionParameters>& weightVector, MPILib::Time time);
 
 		/**
 		 * prepare the Evolve method
@@ -109,7 +110,7 @@ namespace TwoDLib {
 		 * @param typeVector Vector of the NodeTypes of the precursors
 		 */
 		virtual void prepareEvolve(const std::vector<MPILib::Rate>& nodeVector,
-				const std::vector<CustomConnectionParameters>& weightVector,
+				const std::vector<MPILib::CustomConnectionParameters>& weightVector,
 				const std::vector<MPILib::NodeType>& typeVector);
 
 
@@ -151,9 +152,10 @@ namespace TwoDLib {
 		// initialization routines
 		pugi::xml_node                          CreateRootNode(const std::string&);
 		std::vector<TwoDLib::Mesh>              CreateMeshObject();
+		std::vector<MPILib::Index>				CreateNumObjects(MPILib::Index num_objects);
 		std::vector<TwoDLib::Redistribution>    Mapping(const std::string&);
 		std::vector<TwoDLib::TransitionMatrix>  InitializeMatrices(const std::vector<std::string>&);
-		void                                    FillMap(const std::vector<CustomConnectionParameters>& weightVector);
+		void                                    FillMap(const std::vector<MPILib::CustomConnectionParameters>& weightVector);
 
 		double _tolerance;
 
@@ -165,6 +167,7 @@ namespace TwoDLib {
 		MPILib::Time _h;
 		MPILib::Rate _rate;
 		MPILib::Time _t_cur;
+		std::vector<MPILib::Index> _vec_num_objects;
 
 		std::vector<MPILib::Time>    _vec_tau_refractive;
 

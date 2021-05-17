@@ -47,6 +47,14 @@ namespace TwoDLib {
 		  int offset_1,
 			int offset_2) const;
 
+		MPILib::Index MVGridObject(
+			MPILib::Index start_index, 
+			int spikes,
+			double stays,
+			double goes,
+			int offset_1,
+			int offset_2) const;
+
 		void MVGridWithEfficacy(
 			vector<double>&       dydt,
 			const vector<double>& vec_mass,
@@ -57,6 +65,7 @@ namespace TwoDLib {
 		void CalculateStaticEfficiaciesForConductance(vector<double>& efficacy_map, vector<double>& rest_v);
 
 		void Apply(double t_step, const vector<double>& rates, vector<double>& efficacy_map);
+		void ApplyFinitePoisson(double t_step, const vector<double>& rates, vector<double>& efficacy_map);
 
 		void operator()(const vector<double>&, vector<double>&, const double t = 0);
 

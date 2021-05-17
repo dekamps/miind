@@ -18,6 +18,7 @@
 #include <cassert>
 #include <MPILib/include/TypeDefinitions.hpp>
 #include "Cell.hpp"
+#include <algorithm>
 #include "modulo.hpp"
 #include <iostream>
 

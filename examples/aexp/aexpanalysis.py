@@ -37,7 +37,7 @@ def check_setup_routine():
         for matrix in MATRICES[MODELS[model]]:
             if not os.path.exists(matrix):
                 raise NameError('Matrix file missing: ' + matrix)
-    print 'All files present'
+    print('All files present')
 
 def generate_spectrum_xml_files(model_file, J, omega, matnames, dir_spectrum):
 
@@ -86,21 +86,20 @@ if __name__ == "__main__":
 
 
     if args.d == False:
-        print 'Generating simulation files'
+        print('Generating simulation files')
         generate_spectrum(rerun=True,batch=args.b)
 
-    if args.d == True:
-	if args.b == True:
-            print 'Batch option ignored in DST production.'
+    if args.b == True:
+        print('Batch option ignored in DST production.')
 
         J1, nu1, ms1 = generate_response_curve_values_low_noise(sigma=0.158)
         J2, nu2, ms2 = generate_response_curve_values_low_noise(sigma=0.316)
         J5, nu5, ms5 = generate_response_curve_values_low_noise(sigma=0.791)
         J  = np.concatenate((J1,  J2,  J5))
-	nu = np.concatenate((nu1, nu2, nu5))
+        nu = np.concatenate((nu1, nu2, nu5))
         ms = ms1 + ms2 + ms5
         fns = [ 'response_' + str(el[0]) + '_' + str(el[1]) for el in zip(J,nu) ]
         d = { el[0]: el[1] for el in zip(fns,ms)}
 
-	ut.produce_data_summary('response',[0],model,d)
+        ut.produce_data_summary('response',[0],model,d)
         ut.produce_data_summary('spectrum',[0],model)

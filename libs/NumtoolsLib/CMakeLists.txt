@@ -1,18 +1,9 @@
 
 project( ${MIIND_LIBRARY_PREFIX}numtools )
 
-if( WIN32 )
-  find_package( WINGSL REQUIRED )
-  if( NOT GSL_FOUND )
-    message( FATAL_ERROR "WinGsl not found (module NumtoolsLib)." )
-  endif( NOT GSL_FOUND )
-  link_directories( ${GSL_LIBRARY_RELEASE_DIRS} )
-  set(LIB_TYPE STATIC)
-else( WIN32 )
-  link_directories( ${GSL_LIBRARY_DIRS} )
-  include( RequireGSL )
-  set( LIB_TYPE STATIC )
-endif( WIN32 )
+link_directories( ${GSL_LIBRARY_DIRS} )
+include( RequireGSL )
+set( LIB_TYPE STATIC )
 
 set( numtools_SRC
     Distribution.cpp

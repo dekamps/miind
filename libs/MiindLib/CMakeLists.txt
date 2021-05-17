@@ -1,11 +1,20 @@
 
 project( ${MIIND_LIBRARY_PREFIX}shared )
 
+if (WIN32) # When cmake generates the VS files, it needs to know this is a cuda project
+enable_language(CUDA)
+endif (WIN32)
+
+find_package(CUDA  REQUIRED)
+include_directories( ${CUDA_INCLUDE_DIRS} )
+
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
 include_directories( ${GSL_INCLUDE_DIRS} )
-set( LIB_TYPE SHARED )
-include_directories( ${ROOT_INCLUDE_DIRS} )
+
+set( LIB_TYPE STATIC )
+
+include_directories( ${ROOT_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
 
 
@@ -15,21 +24,15 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_BINARY_DIR}/../
 )
 
-set( TWOD_SRC
-VectorizedNetwork.cpp
-)
-
-set( TWOD_HEADERS
-VectorizedNetwork.hpp
-)
-
 if (ENABLE_CUDA)
    if (NOT APPLE)
    list(APPEND TWOD_SRC
 	VectorizedNetwork.cpp
+    SimulationParserGPU.cpp
    )
    list(APPEND TWOD_HEADERS
 	VectorizedNetwork.hpp
+    SimulationParserGPU.h
    )
    endif (NOT APPLE)
 endif(ENABLE_CUDA)

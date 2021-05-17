@@ -36,7 +36,7 @@ def check_setup_routine():
         for matrix in MATRICES[MODELS[model]]:
             if not os.path.exists(matrix):
                 raise NameError('Matrix file missing: ' + matrix)
-    print 'All files present'
+    print('All files present')
 
 
 def generate_gain_xml_files(xml_file, rates, J, model, matrices, dir):
@@ -115,12 +115,12 @@ if __name__ == "__main__":
 
     demofy()
     if args.d == False:
-        print 'Generating simulation files'
+        print('Generating simulation files')
         generate_gain(rerun=True,batch=args.b)
 
     if args.d == True:
 	if args.b == True:
-            print 'Batch option ignored in DST production.'
+            print('Batch option ignored in DST production.')
     	else:
 	    dst_name = 'DST_' + DIR_GAIN
 	    sp.call(['mkdir',dst_name])

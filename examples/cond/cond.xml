@@ -1,7 +1,7 @@
 <Simulation>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="MeshAlgorithmCustom" name="ConductanceNeuron" modelfile="cond.model" >
+<Algorithm type="MeshAlgorithmCustom" name="ConductanceNeuron" finite_size="0" modelfile="cond.model" >
 <TimeStep>0.00001</TimeStep>
 <MatrixFile>cond_0_0.05_0.mat</MatrixFile>
 </Algorithm>
@@ -18,7 +18,6 @@
 </Connections>
 <Reporting>
 <Density node="CondNode" t_start="0.0" t_end="0.1" t_interval="0.001" />
-<Display node="CondNode" />
 <Rate node="CondNode" t_interval="0.001"/>
 </Reporting>
 <SimulationRunParameter>

@@ -1,0 +1,34 @@
+<Simulation>
+<Variable Name="efficacy">0.01</Variable>
+<Variable Name="connections">1</Variable>
+<Variable Name="delay">0</Variable>
+<Variable Name="rate">1500</Variable>
+<Variable Name="t_end">1.0</Variable>
+<Variable Name="t_step">0.001</Variable>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithm" name="E" modelfile="lif.model" >
+<TimeStep>t_step</TimeStep>
+<MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="ExcInput">
+<expression>rate</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="E" name="LIF" type="EXCITATORY_DIRECT" />
+<Node algorithm="ExcInput" name="Inp" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="Inp" Out="LIF">connections efficacy delay</Connection>
+</Connections>
+<Reporting>
+<Rate node="LIF" t_interval="0.001"/>
+</Reporting>
+<SimulationRunParameter>
+<SimulationName>lif</SimulationName>
+<t_end>t_end</t_end>
+<t_step>t_step</t_step>
+<name_log>lif.log</name_log>
+</SimulationRunParameter>
+</Simulation>

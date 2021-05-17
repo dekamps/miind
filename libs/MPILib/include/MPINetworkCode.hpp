@@ -39,7 +39,7 @@
 namespace MPILib {
 
 template<class WeightValue, class NodeDistribution>
-MPINetwork<WeightValue, NodeDistribution>::MPINetwork(){
+MPINetwork<WeightValue, NodeDistribution>::MPINetwork() : _externalReceivers(0), _externalSenders(0){
 }
 
 template<class WeightValue, class NodeDistribution>
@@ -201,6 +201,16 @@ void MPINetwork<WeightValue, NodeDistribution>::getExternalActivities(){
 template<class WeightValue, class NodeDistribution>
 void MPINetwork<WeightValue, NodeDistribution>::setExternalPrecursorActivities(
 std::vector<ActivityType> activities) {
+
+	if (_externalReceivers.empty() || activities.empty())
+		return;
+
+	// Check that sizes match up
+	if (_externalReceivers.size() != activities.size()) {
+		std::string error_string = std::string("Number of external inputs (") + std::to_string(activities.size()) 
+			+ std::string(") does not match the number of nodes expected to receive them (") + std::to_string(_externalReceivers.size()) + std::string(").");
+		throw std::runtime_error(error_string);
+	}
 
 	if (_nodeDistribution.isMaster()) {
 		int i=0;
@@ -438,7 +448,7 @@ void MPINetwork<WeightValue, NodeDistribution>::clearSimulation() {
 	for (auto& it : _localNodes) {
 		it.second.clearSimulation();
 	}
-
+	_localNodes.clear();
 }
 
 template<class WeightValue, class NodeDistribution>

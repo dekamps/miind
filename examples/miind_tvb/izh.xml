@@ -1,0 +1,25 @@
+<Simulation>
+ <Variable Name='TIME_END'>1</Variable>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="GridAlgorithmGroup" name="OSC" modelfile="izh.model" tau_refractive="0.0" transformfile="izh_0_0_0_0_.tmat" start_v="-70.000001" start_w="0.0000001" >
+<TimeStep>0.0001</TimeStep>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="OSC" name="RG_E" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<IncomingConnection Node="RG_E" num_connections="1000" efficacy="0.1" delay="0.0"/>
+<IncomingConnection Node="RG_E" num_connections="1000" efficacy="-0.1" delay="0.0"/>
+<OutgoingConnection Node="RG_E"/>
+</Connections>
+<Reporting>
+</Reporting>
+<SimulationRunParameter>
+<t_end>TIME_END</t_end>
+<master_steps>10</master_steps>
+<t_step>0.0001</t_step>
+<name_log>izh.log</name_log>
+</SimulationRunParameter>
+</Simulation>

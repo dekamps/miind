@@ -20,6 +20,7 @@
 #endif
 #include <algorithm>
 #include <numeric>
+#include <random>
 
 #include "MasterOdeint.hpp"
 
@@ -76,6 +77,42 @@ _p_vec_rates(rhs._p_vec_rates) // nor the rates object. integrate and variations
 
  }
 
+ void MasterOdeint::ApplyFinitePoisson
+ (
+	 double t_step,
+	 const std::vector< std::vector<double > >& vec_vec_rates,
+	 const vector<MPILib::Index>& vec_vec_map
+ )
+ {
+	 // requires valid _vec_objects_to_index
+	 // _vec_cells_to_objects is valid at the end of this
+	 // _vec_objects_to_index is valid at the end of this
+
+	 static std::random_device rd;
+	 static std::mt19937 gen(rd());
+	 MPILib::Number n_mesh = vec_vec_rates.size();
+
+#pragma omp parallel for
+	 for (int id = 0; id < _sys._vec_objects_to_index.size(); id++) {
+		 if (_sys._vec_objects_refract_times[id] >= 0.0)
+			 continue;
+
+		 for (MPILib::Index mesh_index = 0; mesh_index < n_mesh; mesh_index++) {
+			 for (unsigned int irate = 0; irate < vec_vec_rates[mesh_index].size(); irate++) {
+				 if (vec_vec_rates[mesh_index][irate] == 0)
+					 continue;
+
+				 std::poisson_distribution<int> pd(vec_vec_rates[mesh_index][irate] * t_step);
+				 int spikes = pd(gen);
+				 _sys._vec_objects_to_index[id] =
+					 _vec_vec_csr[mesh_index][vec_vec_map[irate]].MVObject(_sys._vec_objects_to_index[id], spikes);
+			 }
+		 }
+	 }
+
+	 _sys.updateVecCellsToObjects();
+ }
+
 std::vector<std::vector<CSRMatrix> > MasterOdeint::InitializeCSR(const std::vector< std::vector<TransitionMatrix> >& vec_vec_mat, const Ode2DSystemGroup& sys)
  {
 	 std::vector<std::vector<CSRMatrix> > vec_ret;
@@ -97,7 +134,7 @@ std::vector<std::vector<CSRMatrix> > MasterOdeint::InitializeCSR(const std::vect
 
 
 #pragma omp parallel for
-	for(unsigned int id = 0; id < dydt.size(); id++)
+	for(int id = 0; id < dydt.size(); id++)
 		dydt[id] = 0.;
 
 	MPILib::Number nr_meshes = _p_vec_rates->size();

@@ -8,6 +8,7 @@ aexp/aexpnoa642fee6a-9257-4624-9178-9a404b8bad50_-1_0_0_0_.mat
 aexp/aexpnoa642fee6a-9257-4624-9178-9a404b8bad50_1_0_0_0_.mat
 aexp/aexpnoa642fee6a-9257-4624-9178-9a404b8bad50.model
 aexp/aexp.xml
+aexp/README.txt
 )
 
 set( COND
@@ -17,6 +18,7 @@ cond/cond.xml
 cond/cond_0_0.05_0.mat
 cond/cond.model
 cond/mc_gain_curves.py
+cond/README.txt
 )
 
 set( LIF
@@ -25,6 +27,7 @@ lif/lif.model
 lif/lifanalysis.py
 lif/lif.xml
 lif/steady_state.dat
+lif/README.txt
 )
 
 set( LIF_PYTHON
@@ -37,6 +40,25 @@ lif_python/lif.mesh
 lif_python/lif.res
 lif_python/lif.stat
 lif_python/runlif.py
+lif_python/README.txt
+)
+
+set( LIF_PYTHON_SWEEP
+lif_python_sweep/lif.model
+lif_python_sweep/lif.xml
+lif_python_sweep/lif_0.01_0_0_0_.mat
+lif_python_sweep/lif_0.1_0_0_0_.mat
+lif_python_sweep/lif_0.02_0_0_0_.mat
+lif_python_sweep/lif_0.03_0_0_0_.mat
+lif_python_sweep/lif_0.04_0_0_0_.mat
+lif_python_sweep/lif_0.05_0_0_0_.mat
+lif_python_sweep/lif_0.06_0_0_0_.mat
+lif_python_sweep/lif_0.07_0_0_0_.mat
+lif_python_sweep/lif_0.08_0_0_0_.mat
+lif_python_sweep/lif_0.09_0_0_0_.mat
+lif_python_sweep/sweep_one_shot.py
+lif_python_sweep/sweep_re_runnable.py
+lif_python_sweep/README.txt
 )
 
 set( QIF
@@ -44,6 +66,26 @@ qif/qifanalysis.py
 qif/qif.model
 qif/qif.xml
 qif/show_qif_gain.py
+qif/README.txt
+)
+
+set( TVB
+miind_tvb/tvb_miind_sim.py
+miind_tvb/grid_izhikevich.py
+miind_tvb/izh.model
+miind_tvb/izh.xml
+miind_tvb/izh_0_0_0_0_.tmat
+miind_tvb/README.txt
+)
+
+set( CLI_PLOTS
+cli_plots/example.xml
+cli_plots/grid_izhikevich.py
+cli_plots/izh.model
+cli_plots/izh.projection
+cli_plots/izh_0_0_0_0_.tmat
+cli_plots/marginal_density.npz
+cli_plots/README.txt
 )
 
 set( RATE
@@ -51,6 +93,7 @@ rate_based/analyse_rate.py
 rate_based/analytic.dat
 rate_based/rate.xml
 rate_based/response_curve.py
+rate_based/README.txt
 )
 
 set( RESP
@@ -58,20 +101,24 @@ response_curve_lif/analyse_response.py
 response_curve_lif/response_analyse.py
 response_curve_lif/response_curve.py
 response_curve_lif/response.xml
+response_curve_lif/README.txt
 )
 
 set( SINGLE
 single_lif/analyse_single_lif.py
 single_lif/response.xml
 single_lif/single_lif.py
+single_lif/README.txt
 )
 
 set( SELF
 single_selfinhib/self.xml
+single_selfinhib/README.txt
 )
 
 set( TWO
 twopop/twopop.xml
+twopop/README.txt
 )
 
 set( MA_ADEX
@@ -80,16 +127,40 @@ model_archive/Adex/adex.model
 model_archive/Adex/adex_0_0_0_0_.tmat
 )
 
-set( MA_COND
-model_archive/Conductance2D/cond.xml
-model_archive/Conductance2D/cond.model
-model_archive/Conductance2D/cond_0_0_0_0_.tmat
+set( MA_COND_GRID
+model_archive/Conductance2D/Grid/cond.xml
+model_archive/Conductance2D/Grid/cond.model
+model_archive/Conductance2D/Grid/cond_0_0_0_0_.tmat
+)
+
+set( MA_COND_MESH
+model_archive/Conductance2D/Mesh/cond.xml
+model_archive/Conductance2D/Mesh/cond.model
+model_archive/Conductance2D/Mesh/cond_0_0.05_0_0_.mat
+)
+
+set( MA_DIPDE 
+model_archive/DIPDE/ei.xml
+model_archive/DIPDE/lifdipde.model
+model_archive/DIPDE/lifdipde_0.005.mat
+model_archive/DIPDE/lifdipde_-0.005.mat
+model_archive/DIPDE/README.txt
+model_archive/DIPDE/recurrent.xml
+model_archive/DIPDE/single.xml
+model_archive/DIPDE/variable.xml
 )
 
 set( MA_EIF
 model_archive/EIF/eif.xml
 model_archive/EIF/eif.model
 model_archive/EIF/eif_0.1_0_0_0_.mat
+)
+
+set( MA_POTJANS
+model_archive/POTJANS/potjans.xml
+model_archive/POTJANS/potjanslif.model
+model_archive/POTJANS/potjanslif_-0.0007_0_0_0_.mat
+model_archive/POTJANS/potjanslif_0.000175_0_0_0_.mat
 )
 
 set( MA_EPILEPTOR
@@ -100,10 +171,18 @@ model_archive/Epileptor/epileptor_intict.model
 model_archive/Epileptor/epileptor_intict_0_0_0_0_.tmat
 )
 
-set( MA_FN
-model_archive/FitzhughNagumo/fn.xml
-model_archive/FitzhughNagumo/fn.model
-model_archive/FitzhughNagumo/fn_0_0_0_0_.tmat
+set( MA_FN_GRID
+model_archive/FitzhughNagumo/Grid/fn.xml
+model_archive/FitzhughNagumo/Grid/fn.model
+model_archive/FitzhughNagumo/Grid/fn_0_0_0_0_.tmat
+)
+
+set( MA_FN_MESH
+model_archive/FitzhughNagumo/Mesh/fn.xml
+model_archive/FitzhughNagumo/Mesh/fn.model.zip
+model_archive/FitzhughNagumo/Mesh/fn_0.02_0_0_0_.mat
+model_archive/FitzhughNagumo/Mesh/fn_-0.02_0_0_0_.mat
+model_archive/FitzhughNagumo/Mesh/README.txt
 )
 
 set( MA_IZH
@@ -138,8 +217,13 @@ model_archive/QIF/qif.model
 model_archive/QIF/qif_0.01_0_0_0_.mat
 )
 
+set( MA_WC
+model_archive/WilsonCowan/wc.xml
+)
+
 set( TUTORIAL
 tutorial/Tutorial\ MIIND.pdf
+tutorial/README.txt
 )
 
 set( TUTORIAL_GRID
@@ -178,55 +262,88 @@ tutorial/vectorised/adex_-1_0_0_0_.mat
 tutorial/vectorised/vector.xml
 )
 
-install( FILES ${AEXP}
-    DESTINATION share/miind/examples/aexp )
-install( FILES ${COND}
-    DESTINATION share/miind/examples/cond )
+set( QUICK_START
+quick_start/cond.xml
+quick_start/generateCondFiles.py
+quick_start/README.txt
+)
+
+ADD_SUBDIRECTORY(IntegrationTests)
+
+set(EXAMPLES_BASE_DIR share/miind/examples)
+
 install( FILES ${LIF}
-    DESTINATION share/miind/examples/lif )
+    DESTINATION ${EXAMPLES_BASE_DIR}/lif )
 install( FILES ${LIF_PYTHON}
-    DESTINATION share/miind/examples/lif_python )
-install( FILES ${QIF}
-    DESTINATION share/miind/examples/qif )
-install( FILES ${RATE}
-    DESTINATION share/miind/examples/rate_based )
-install( FILES ${RESP}
-    DESTINATION share/miind/examples/response_curve_lif )
-install( FILES ${SINGLE}
-    DESTINATION share/miind/examples/single_lif )
-install( FILES ${SELF}
-    DESTINATION share/miind/examples/single_selfinhib )
-install( FILES ${TWO}
-    DESTINATION share/miind/examples/twopop )
+    DESTINATION ${EXAMPLES_BASE_DIR}/lif_python )
+install( FILES ${LIF_PYTHON_SWEEP}
+    DESTINATION ${EXAMPLES_BASE_DIR}/lif_python_sweep )
+install( FILES ${TVB}
+    DESTINATION ${EXAMPLES_BASE_DIR}/miind_tvb )
+install( FILES ${QUICK_START}
+    DESTINATION ${EXAMPLES_BASE_DIR}/quick_start )
+install( FILES model_archive/README.txt 
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive )
 install( FILES ${MA_ADEX}
-    DESTINATION share/miind/examples/model_archive/Adex )
-install( FILES ${MA_COND}
-    DESTINATION share/miind/examples/model_archive/Conductance2D )
-install( FILES ${MA_EIF}
-    DESTINATION share/miind/examples/model_archive/EIF )
-install( FILES ${MA_EPILEPTOR}
-    DESTINATION share/miind/examples/model_archive/Epileptor )
-install( FILES ${MA_FN}
-    DESTINATION share/miind/examples/model_archive/FitzhughNagumo )
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Adex )
+install( FILES ${MA_COND_GRID}
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Conductance2D/Grid )
+install( FILES ${MA_POTJANS}
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/POTJANS )
+install( FILES ${MA_FN_GRID}
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/FitzhughNagumo/Grid )
 install( FILES ${MA_IZH}
-    DESTINATION share/miind/examples/model_archive/Izhikevich )
-install( FILES ${MA_LIF}
-    DESTINATION share/miind/examples/model_archive/LIF )
+    DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Izhikevich )
 install( FILES ${MA_MN}
-    DESTINATION share/miind/examples/model_archive/MinimalMotorneuron )
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/MinimalMotorneuron )
 install( FILES ${MA_PNAP}
-    DESTINATION share/miind/examples/model_archive/PersistentSodium2D )
-install( FILES ${MA_QIF}
-    DESTINATION share/miind/examples/model_archive/QIF )
-install( FILES ${TUTORIAL}
-    DESTINATION share/miind/examples/tutorial )
-install( FILES ${TUTORIAL_GRID}
-    DESTINATION share/miind/examples/tutorial/grid )
-install( FILES ${TUTORIAL_T1}
-    DESTINATION share/miind/examples/tutorial/t1 )
-install( FILES ${TUTORIAL_T2}
-    DESTINATION share/miind/examples/tutorial/t2 )
-install( FILES ${TUTORIAL_T3}
-    DESTINATION share/miind/examples/tutorial/t3 )
-install( FILES ${TUTORIAL_VECTOR}
-    DESTINATION share/miind/examples/tutorial/vectorised )
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/PersistentSodium2D )
+install( FILES ${MA_EPILEPTOR}
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Epileptor )
+
+if (NOT SKBUILD) # If we're not installing for pip, install all examples
+	install( FILES ${AEXP}
+		DESTINATION ${EXAMPLES_BASE_DIR}/aexp )
+	install( FILES ${COND}
+		DESTINATION ${EXAMPLES_BASE_DIR}/cond )
+	install( FILES ${QIF}
+		DESTINATION ${EXAMPLES_BASE_DIR}/qif )
+	install( FILES ${RATE}
+		DESTINATION ${EXAMPLES_BASE_DIR}/rate_based )
+	install( FILES ${RESP}
+		DESTINATION ${EXAMPLES_BASE_DIR}/response_curve_lif )
+	install( FILES ${SINGLE}
+		DESTINATION ${EXAMPLES_BASE_DIR}/single_lif )
+	install( FILES ${SELF}
+		DESTINATION ${EXAMPLES_BASE_DIR}/single_selfinhib )
+	install( FILES ${CLI_PLOTS}
+		DESTINATION ${EXAMPLES_BASE_DIR}/cli_plots )
+	install( FILES ${TWO}
+		DESTINATION ${EXAMPLES_BASE_DIR}/twopop )
+	install( FILES ${MA_DIPDE}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/DIPDE )
+	install( FILES ${MA_COND_MESH}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Conductance2D/Mesh )
+	install( FILES ${MA_EIF}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/EIF )
+	install( FILES ${MA_FN_MESH}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/FitzhughNagumo/Mesh )
+	install( FILES ${MA_LIF}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/LIF )
+	install( FILES ${MA_QIF}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/QIF )
+	install( FILES ${MA_WC}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/WilsonCowan )
+	install( FILES ${TUTORIAL}
+		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial )
+	install( FILES ${TUTORIAL_GRID}
+		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/grid )
+	install( FILES ${TUTORIAL_T1}
+		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t1 )
+	install( FILES ${TUTORIAL_T2}
+		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t2 )
+	install( FILES ${TUTORIAL_T3}
+		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t3 )
+	install( FILES ${TUTORIAL_VECTOR}
+		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/vectorised )
+endif(NOT SKBUILD)

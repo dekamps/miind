@@ -114,6 +114,17 @@ namespace TwoDLib {
 		double getCellWidth() const;
 		double getCellHeight() const;
 
+		bool stripsAreVOriented() const;
+
+		double getVWidth() const;
+		double getHHeight() const;
+
+		double getGridMinV() const;
+		double getGridMinH() const;
+
+		unsigned int getGridResV() const;
+		unsigned int getGridResH() const;
+
 		class GridCellTransition{
 		public:
 			double _stays;
@@ -167,8 +178,16 @@ namespace TwoDLib {
 		vector<vector<PolyGenerator> >	    _vec_vec_gen;
 		vector<unsigned int>              	_vec_timefactor;
 		double								_t_step;
+		bool										_strips_are_v_oriented; // strips in the grid go horizontally, not vertically
 		double										_grid_cell_width;
 		double										_grid_cell_height;
+
+		double										_grid_v_width; // this is different to _grid_cell_width because it is independent of the direction of the efficacy
+		double										_grid_h_height;
+		double										_grid_min_v;
+		double										_grid_min_h;
+		unsigned int								_grid_res_v;
+		unsigned int								_grid_res_h;
 
 		// It is sometimes necessary to find out to which cells a given mesh point belongs.
 		// A mesh point will be mapped to an index position in a list of a list of coordinates.
