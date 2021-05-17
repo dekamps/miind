@@ -28,6 +28,9 @@ include_directories(${Python3_INCLUDE_DIRS})
 endif (WIN32 AND SKBUILD)
 endif(APPLE)
 
+find_package (Python3 COMPONENTS Development)
+include_directories(${Python3_INCLUDE_DIRS})
+
 include_directories( ${ROOT_INCLUDE_DIRS} )
 link_directories( ${ROOT_LIBRARY_DIRS} )
 
