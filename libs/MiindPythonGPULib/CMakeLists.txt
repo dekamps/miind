@@ -4,6 +4,8 @@ include_directories( ${GSL_INCLUDE_DIRS} )
 
 set( LIB_TYPE SHARED )
 
+set( Python3_USE_STATIC_LIBS FALSE )
+
 if (APPLE)
 if (SKBUILD) # We're building using SKBUILD which means the correct python lib is passed as a flag! Hooray!
 set(Python3_INCLUDE_DIRS ${PYTHON_INCLUDE_DIR} )
@@ -15,15 +17,15 @@ find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 endif(SKBUILD)
 else (APPLE)
-if (WIN32 AND SKBUILD) # We're building using SKBUILD which means the correct python lib is passed as a flag! Hooray!
+if (SKBUILD) # We're building using SKBUILD which means the correct python lib is passed as a flag! Hooray!
 set(Python3_INCLUDE_DIRS ${PYTHON_INCLUDE_DIR} )
 set(PYTHON_LIBRARIES ${PYTHON_LIBRARY})
 set(Python3_LIBRARIES ${PYTHON_LIBRARY})
 include_directories(${Python3_INCLUDE_DIRS})
-else (WIN32 AND SKBUILD)
+else (SKBUILD)
 find_package (Python3 COMPONENTS Interpreter Development)
 include_directories(${Python3_INCLUDE_DIRS})
-endif (WIN32)
+endif (SKBUILD)
 endif(APPLE)
 
 if (WIN32) # When cmake generates the VS files, it needs to know this is a cuda project
@@ -33,7 +35,7 @@ endif (WIN32)
 find_package(CUDA  REQUIRED)
 include_directories( ${CUDA_INCLUDE_DIRS} )
 
-find_package (Python3 COMPONENTS Development)
+find_package (Python3 COMPONENTS Interpreter Development)
 include_directories(${Python3_INCLUDE_DIRS})
 
 include_directories( ${ROOT_INCLUDE_DIRS} )

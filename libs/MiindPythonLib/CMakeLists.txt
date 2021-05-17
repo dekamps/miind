@@ -28,7 +28,7 @@ include_directories(${Python3_INCLUDE_DIRS})
 endif (SKBUILD)
 endif(APPLE)
 
-find_package (Python3 COMPONENTS Development)
+find_package (Python3 COMPONENTS Interpreter Development)
 include_directories(${Python3_INCLUDE_DIRS})
 
 include_directories( ${ROOT_INCLUDE_DIRS} )
