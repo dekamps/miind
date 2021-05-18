@@ -711,7 +711,7 @@ def TestGenerateMeshModel():
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
 		print("Steady state rate is " + str(steady_rate), " between " + str(6.9) + " and " + str(6.91) + "?")
-		assert steady_rate > 6.9 and steady_rate < 6.91 # This is a very generous margin!
+		assert steady_rate > 8.75 and steady_rate < 8.78 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
 	shutil.rmtree('lif')

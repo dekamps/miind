@@ -573,7 +573,7 @@ def TestGenerateMeshModel():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
-		assert steady_rate > 6.9 and steady_rate < 6.91 # This is a very generous margin!
+		assert steady_rate > 8.75 and steady_rate < 8.78 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('..')
 	os.chdir('..')
@@ -603,6 +603,7 @@ TestMeshAlgorithmTwoNodesSelfConnections()
 TestMeshAlgorithmGroupTwoNodesSelfConnectionsGPU()
 TestGenerateFidAndMatrix()
 TestGenerateMatrixMC()
+TestGenerateMeshModel()
 print('All tests successful.')
 
 print('Deleting local testfiles.')
