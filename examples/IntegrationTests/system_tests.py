@@ -498,12 +498,14 @@ def TestMeshAlgorithmTwoNodes():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
+        print("Steady state rate is " + str(steady_rate), " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	with open('rate_1', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
+        print("Steady state rate is " + str(steady_rate), " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -532,12 +534,14 @@ def TestMeshAlgorithmGroupTwoNodesGPU():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
+        print("Steady state rate is " + str(steady_rate), " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	with open('rate_1', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
+        print("Steady state rate is " + str(steady_rate), " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -562,12 +566,14 @@ def TestMeshAlgorithmTwoNodesSelfConnections():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
+        print("Steady state rate is " + str(steady_rate), " between " + str(0.375) + " and " + str(0.385) + "?")
 		assert steady_rate > 0.375 and steady_rate < 0.385 # This is a very generous margin!
 	with open('rate_1', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
+        print("Steady state rate is " + str(steady_rate), " between " + str(0.375) + " and " + str(0.385) + "?")
 		assert steady_rate > 0.375 and steady_rate < 0.385 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -596,12 +602,14 @@ def TestMeshAlgorithmGroupTwoNodesSelfConnectionsGPU():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
+        print("Steady state rate is " + str(steady_rate), " between " + str(0.365) + " and " + str(0.375) + "?")
 		assert steady_rate > 0.365 and steady_rate < 0.375 # This is a very generous margin!
 	with open('rate_1', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
+        print("Steady state rate is " + str(steady_rate), " between " + str(0.365) + " and " + str(0.375) + "?")
 		assert steady_rate > 0.365 and steady_rate < 0.375 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -634,6 +642,7 @@ def TestGenerateFidAndMatrix():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
+        print("Steady state rate is " + str(steady_rate), " between " + str(lif_steady_lower_bound) + " and " + str(lif_steady_upper_bound) + "?")
 		assert steady_rate > lif_steady_lower_bound and steady_rate < lif_steady_upper_bound # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -665,6 +674,7 @@ def TestGenerateMatrixMC():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
+        print("Steady state rate is " + str(steady_rate), " between " + str(0.245) + " and " + str(0.255) + "?")
 		assert steady_rate > 0.245 and steady_rate < 0.255 # Obviously this range is wrong but that's because we used MC=10
 	print('Success. Clean up.\n')
 	os.chdir('../..')
@@ -700,6 +710,7 @@ def TestGenerateMeshModel():
 		assert len(lines) == 998
 		assert lines[-1].split('\t')[0] == "0.998"
 		steady_rate = float(lines[-1].split('\t')[1])
+        print("Steady state rate is " + str(steady_rate), " between " + str(6.9) + " and " + str(6.91) + "?")
 		assert steady_rate > 6.9 and steady_rate < 6.91 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
