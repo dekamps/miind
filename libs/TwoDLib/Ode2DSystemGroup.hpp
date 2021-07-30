@@ -49,20 +49,21 @@ namespace TwoDLib {
 	class Ode2DSystemGroup {
 	public:
 
-		//! Standard Constructor
+		//! Standard Constructor for system groups with a refractive period.
 		Ode2DSystemGroup
 		(
-			const std::vector<Mesh>&, 					       //!< A series of Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
-			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin
-			const std::vector< std::vector<Redistribution> >&,  //!< A series of mappings from threshold to reset bin
+			const std::vector<Mesh>&, //!< A series of Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
+			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin;  the individual mappings may be empty, but this vector must be of the same length as the mesh vector
+			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from threshold to reset bin; the individual mappings may be empty, but this vector must be of the same length as the mesh vector
 			const std::vector<MPILib::Time>&
 		);
 
+	  //! Constructor for a system group without refractive period. No queues for firing rates are created in the system group.
 		Ode2DSystemGroup
 		(
 			const std::vector<Mesh>&, 					       //!< A series of Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
-			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin
-			const std::vector< std::vector<Redistribution> >&  //!< A series of mappings from threshold to reset bin
+			const std::vector< std::vector<Redistribution> >&, //!< A series of mappings from strip end to reversal bin; the individual mappings may be empty, but this vector must be of the same length as the mesh vector
+			const std::vector< std::vector<Redistribution> >&  //!< A series of mappings from threshold to reset bin; the individual mappings may be empty, but this vector must be of the same length as the mesh vector
 		);
 
 
@@ -194,12 +195,12 @@ namespace TwoDLib {
 				Ode2DSystemGroup&                  sys,
 				vector<double>&               vec_mass,
 				MPILib::Time                  network_time_step,
-				MPILib::Time                  tau_refractive,
+		      		MPILib::Time                  tau_refractive,
 				const vector<Redistribution>& vec_reset,
 				MPILib::Index m
 			):
-			_t_step(network_time_step),
-			_tau_refractive(tau_refractive),
+			  //_t_step(network_time_step),
+      			//_tau_refractive(tau_refractive),
 			_vec_reset(vec_reset),
 			_vec_queue(vec_reset.size(),MPILib::RefractoryQueue(network_time_step,tau_refractive)),
 			_sys(sys),
@@ -231,8 +232,8 @@ namespace TwoDLib {
 
 			MPILib::Index       	_m;
 
-			MPILib::Time                               _t_step;
-			MPILib::Time                               _tau_refractive;
+		  //MPILib::Time                               _t_step;
+		  //MPILib::Time                               _tau_refractive;
 
 			const vector<Redistribution>&              _vec_reset;
 			vector<MPILib::RefractoryQueue>  					_vec_queue;
