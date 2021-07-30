@@ -28,8 +28,8 @@ using namespace TwoDLib;
 
 BOOST_FIXTURE_TEST_CASE(SystemGroupConstructionTest,FixtureOde2DSystemGroup){
 
-	std::vector<Redistribution> vec_dummy;
-	std::vector<std::vector<Redistribution> > vec_vec_dummy;
+  
+  std::vector<std::vector<Redistribution> > vec_vec_dummy(2);
 	std::vector<Mesh> vec_mesh  {_mesh1,_mesh2};
 	Ode2DSystemGroup sys(vec_mesh,vec_vec_dummy,vec_vec_dummy);
 	BOOST_CHECK( sys.Map(0)  == 0 );
@@ -66,9 +66,7 @@ BOOST_FIXTURE_TEST_CASE(SystemGroupConstructionTest,FixtureOde2DSystemGroup){
 
 BOOST_FIXTURE_TEST_CASE(GroupMapTest, FixtureOde2DSystemGroup){
 
-
-	std::vector<Redistribution> vec_dummy;
-	std::vector<std::vector<Redistribution> > vec_vec_dummy;
+  std::vector<std::vector<Redistribution> > vec_vec_dummy(3);
 	std::vector<Mesh> vec_mesh  {_mesh1, _mesh2, _mesh3};
 	Ode2DSystemGroup sys(vec_mesh,vec_vec_dummy,vec_vec_dummy);
 
@@ -126,8 +124,7 @@ BOOST_AUTO_TEST_CASE(ConductanceMapTest){
 	std::vector<Quadrilateral> vecq = stat.Extract();
 	mesh.InsertStationary(vecq[0]);
 
-	std::vector<Redistribution> vec_dummy;
-	std::vector<std::vector<Redistribution> > vec_vec_dummy;
+	std::vector<std::vector<Redistribution> > vec_vec_dummy(1);
 	std::vector<Mesh> vec_mesh{mesh};
 	Ode2DSystemGroup sys(vec_mesh,vec_vec_dummy,vec_vec_dummy);
 
