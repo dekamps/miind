@@ -55,6 +55,8 @@ void Ode2DSystemGroup::InitializeResetRefractive(MPILib::Time network_time_step)
 
 std::vector<Ode2DSystemGroup::ResetRefractive> Ode2DSystemGroup::InitializeResetRefractiveInternal(MPILib::Time network_time_step)
 {
+  if (_vec_reset.size() != _mesh_list.size() || _vec_reversal.size() != _mesh_list.size() )
+    throw TwoDLib::TwoDLibException("Reversal and reset vector sizes must match the number of meshes.");
 	std::vector<Ode2DSystemGroup::ResetRefractive> vec_ret;
 	for (MPILib::Index m = 0; m < _mesh_list.size(); m++){
 		ResetRefractive reset(*this,_vec_mass,network_time_step,_vec_tau_refractive[m],_vec_reset[m],m);
@@ -82,9 +84,10 @@ Ode2DSystemGroup::Ode2DSystemGroup
 ):
 _mesh_list(mesh_list),
 _vec_mesh_offset(MeshOffset(mesh_list)),
-_vec_vs(MeshVs(mesh_list)),
 _vec_length(InitializeLengths(mesh_list)),
 _vec_cumulative(InitializeCumulatives(mesh_list)),
+_vec_vs(MeshVs(mesh_list)),
+_vec_tau_refractive(vec_tau_refractive),
 _vec_mass(InitializeMass()),
 _vec_area(InitializeArea(mesh_list)),
 _t(0),
@@ -94,10 +97,9 @@ _map(InitializeMap()),
 _linear_map(InitializeLinearMap()),
 _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
-_vec_tau_refractive(vec_tau_refractive),
 _reversal(InitializeReversal()),
-_reset(InitializeReset()),
 _reset_refractive(InitializeResetRefractiveInternal(mesh_list[0].TimeStep())),
+_reset(InitializeReset()),
 _clean(InitializeClean())
 {
 	for(const auto& m: _mesh_list)
@@ -114,9 +116,10 @@ Ode2DSystemGroup::Ode2DSystemGroup
 ):
 _mesh_list(mesh_list),
 _vec_mesh_offset(MeshOffset(mesh_list)),
-_vec_vs(MeshVs(mesh_list)),
 _vec_length(InitializeLengths(mesh_list)),
 _vec_cumulative(InitializeCumulatives(mesh_list)),
+_vec_vs(MeshVs(mesh_list)),
+_vec_tau_refractive(std::vector<MPILib::Time>(mesh_list.size(),0.0)),
 _vec_mass(InitializeMass()),
 _vec_area(InitializeArea(mesh_list)),
 _t(0),
@@ -126,10 +129,9 @@ _map(InitializeMap()),
 _linear_map(InitializeLinearMap()),
 _vec_reversal(vec_reversal),
 _vec_reset(vec_reset),
-_vec_tau_refractive(std::vector<MPILib::Time>(mesh_list.size(),0.0)),
 _reversal(InitializeReversal()),
-_reset(InitializeReset()),
 _reset_refractive(InitializeResetRefractiveInternal(mesh_list[0].TimeStep())),
+_reset(InitializeReset()),
 _clean(InitializeClean())
 {
 	for(const auto& m: _mesh_list)
