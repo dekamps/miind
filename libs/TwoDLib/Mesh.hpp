@@ -67,7 +67,7 @@ namespace TwoDLib {
 
 
 		//!< destructor
-		~Mesh(){}
+		virtual ~Mesh(){}
 
 		//!< number of strips in the grid
 		virtual unsigned int NrStrips() const { return _vec_vec_quad.size(); }
