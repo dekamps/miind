@@ -1,6 +1,6 @@
 import numpy as np
 import mesh3
-import ROOT
+#import ROOT
 
 class ScoopList:
     '''Create a list of scoops. A scoop specifies from which bin at any given time probability must be taken and
