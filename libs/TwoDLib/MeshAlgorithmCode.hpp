@@ -195,6 +195,7 @@ namespace TwoDLib {
 		Display::getInstance()->addOdeSystem(_node_id, &_sys);
 		GridReport<WeightValue>::getInstance()->registerObject(_node_id, this);
 
+		//TODO: review this. Why is 10 in there?
 		// the integration time step, stored in the MasterParameter, is gauged with respect to the
 		// network time step.
 		MPILib::Number n_ode = static_cast<MPILib::Number>(std::floor(t_step/_h));
