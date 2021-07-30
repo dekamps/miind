@@ -39,8 +39,11 @@ void CSRMatrix::Initialize(const TransitionMatrix& mat, MPILib::Index mesh_index
 		for(MPILib::Index j = 0; j < m.NrCellsInStrip(i); j++)
 			counter++;
 
-	vector< vector<MPILib::Index> > vec_mat(counter);
-	vector< vector<double> > mat_vals(counter);
+	vector< vector<MPILib::Index> > vec_mat = vector< vector<MPILib::Index> >(counter);
+	vector< vector<double> > mat_vals = vector< vector<double> >(counter);
+
+	vector< vector<MPILib::Index> > vec_mat_original = vector< vector<MPILib::Index> >(counter);
+	vector< vector<double> > mat_vals_original = vector< vector<double> >(counter);
 
 	Validate(mat);
 
@@ -51,11 +54,14 @@ void CSRMatrix::Initialize(const TransitionMatrix& mat, MPILib::Index mesh_index
 			// Map produces the index relative to the full matrix, it needs to be reduced to the row index within the current submatrix
 			vec_mat[_sys.Map(mesh_index,r._to[0],r._to[1]) - _i_offset].push_back(_sys.Map(mesh_index, line._from[0],line._from[1]) - _i_offset);
 			mat_vals[_sys.Map(mesh_index,r._to[0],r._to[1]) - _i_offset].push_back(r._fraction);
+			vec_mat_original[_sys.Map(mesh_index, line._from[0], line._from[1]) - _i_offset].push_back(_sys.Map(mesh_index, r._to[0], r._to[1]) - _i_offset);
+			mat_vals_original[_sys.Map(mesh_index, line._from[0], line._from[1]) - _i_offset].push_back(r._fraction);
 		}
 	}
     // csr for mat
 
     CSR(vec_mat,mat_vals);
+	ForwardCSR(vec_mat_original, mat_vals_original);
 }
 
 CSRMatrix::CSRMatrix
@@ -124,6 +130,18 @@ void CSRMatrix::CSR(const vector<vector<MPILib::Index> >& vec_mat, const vector<
 	}
 }
 
+void CSRMatrix::ForwardCSR(const vector<vector<MPILib::Index> >& vec_mat, const vector<vector<double> >& mat_vals) {
+	_forward_ia.push_back(0);
+
+	for (MPILib::Index i = 0; i < vec_mat.size(); i++) {
+		_forward_ia.push_back(_forward_ia.back() + vec_mat[i].size());
+		for (MPILib::Index j = 0; j < vec_mat[i].size(); j++) {
+			_forward_val.push_back(mat_vals[i][j]);
+			_forward_ja.push_back(vec_mat[i][j]);
+		}
+	}
+}
+
 void CSRMatrix::MV(vector<double>& out, const vector<double>& in){
 
 	assert( out.size() + 1 == _ia.size());
@@ -131,11 +149,30 @@ void CSRMatrix::MV(vector<double>& out, const vector<double>& in){
 	MPILib::Index nr_rows = _ia.size();
 
 #pragma omp parallel for
-	for (MPILib::Index i = 0; i < nr_rows ; i++){
+	for (int i = 0; i < nr_rows-1 ; i++){
 	  for(MPILib::Index j = _ia[i]; j < _ia[i+1]; j++){
 			out[i] += _val[j]*in[_ja[j]];
 		}
 	}
+}
+
+MPILib::Index CSRMatrix::MVObject(MPILib::Index start_index, int spikes) const{
+	MPILib::Index current_index = _sys.UnMap(start_index);
+
+	for (int s = 0; s < spikes; s++) {
+		
+		double r1 = ((double)rand() / (double)RAND_MAX);
+		double check = 0.0;
+		for (MPILib::Index j = _forward_ia[current_index]; j < _forward_ia[current_index + 1]; j++) {
+			check += _forward_val[j];
+			if (r1 < check) {
+				current_index = _forward_ja[j];
+				break;
+			}
+		}
+	}
+	
+	return _sys.Map(current_index);
 }
 
 
@@ -149,7 +186,7 @@ void CSRMatrix::MVMapped
 	unsigned int nr_rows = _ia.size() - 1;
 
 #pragma omp parallel for
-	for (MPILib::Index i = 0; i < nr_rows; i++){
+	for (int i = 0; i < nr_rows; i++){
 		MPILib::Index i_r =_sys.Map(i+_i_offset);
 		for( MPILib::Index j = _ia[i]; j < _ia[i+1]; j++){
 			 int j_m = _sys.Map(_ja[j]+_i_offset);

@@ -1,0 +1,105 @@
+name: Build
+on: [push]
+
+jobs: 
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, windows-2019, macos-10.15]  
+        include:
+          - os: windows-2019
+            vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
+          - os: ubuntu-18.04
+            vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
+          - os: macos-10.15
+            vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
+            
+    env:
+      buildDir: '${{ github.workspace }}/build'
+      # skip python 2.7 and 3.5, PyPy, and 32 bit builds
+      CIBW_SKIP: "cp27* cp35* pp* *-win32 *-manylinux_i686"
+      #CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64 cp36-macosx_x86_64 cp37-macosx_x86_64 cp38-macosx_x86_64 cp39-macosx_x86_64
+      CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
+      CIBW_BEFORE_BUILD: pip install scikit-build build auditwheel numpy matplotlib scipy shapely descartes
+      # Linux builds are on docker images so we need to add the dependency installation setup here so they go to the docker not the host. Installing cuda is *SLOW* and we have to do it on *EVERY* image argh!
+      CIBW_BEFORE_BUILD_LINUX: yum install -y centos-release-scl ; yum install -y devtoolset-7 ; yum install -y ninja-build boost-devel pugixml-devel python36-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel wget ; wget  https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-repo-rhel7-10.0.130-1.x86_64.rpm ; rpm -i cuda-repo-*.rpm ; yum install -y cuda-10-0 
+      CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" # Something wrong with the cibuildwheel delocate call. We manually run it after all wheels have been built.
+      CIBW_ENVIRONMENT_WINDOWS: "PATH=$PATH:\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin\":\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/libnvvp\" CUDA_PATH=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2\" CUDACXX=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin/nvcc.exe\""
+      CIBW_ENVIRONMENT_MACOS: "CC=gcc-6 CXX=g++-6"
+      CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/usr/lib64/openmpi/bin/ LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:/usr/lib64/nvidia:$LD_LIBRARY_PATH CC=/opt/rh/devtoolset-7/root/usr/bin/gcc CXX=/opt/rh/devtoolset-7/root/usr/bin/g++"
+      CIBW_BUILD_VERBOSITY: 0
+      CIBW_TEST_COMMAND_LINUX: python -m miind.system_tests
+      CIBW_TEST_COMMAND_WINDOWS: python -m miind.system_tests
+      #TESTS DON'T WORK ON MAC CI MACHINE! LET'S STILL BUILD AND DISTRIBUTE IT FOR NOW
+      #CIBW_TEST_COMMAND_MACOS: python -m miind.system_tests
+    steps:
+    
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+          
+      - uses: lukka/get-cmake@latest
+          
+      - name: Add msbuild to PATH
+        uses: ilammy/msvc-dev-cmd@v1
+        if: contains( matrix.os, 'windows')
+                  
+      - name: Install Dependencies on Windows
+        run: choco install cuda ninja -y
+        if: contains( matrix.os, 'windows')
+        
+      - name: Install Dependencies on MacOS
+        run: brew install gcc6 pugixml boost gsl boost-python3 xquartz fftw libomp pkg-config ninja
+        if: contains( matrix.os, 'macos')
+
+      - name: Restore artifacts, or setup vcpkg 
+        uses: lukka/run-vcpkg@v6
+        with:
+          # Just install vcpkg for now, do not install any ports in this step yet.
+          setupOnly: true
+          # Location of the vcpkg submodule in the Git repository.
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          # Since the cache must be invalidated when content of the vcpkg.json file changes, let's
+          # compute its hash and append this to the computed cache's key.
+          appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
+          vcpkgTriplet: x64-windows
+          # Ensure the vcpkg artifacts are cached, they are generated in the 'CMAKE_BINARY_DIR/vcpkg_installed' directory.
+          additionalCachedPaths: ${{ github.workspace }}/vcpkg_installed
+        if: contains( matrix.os, 'windows')
+        
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+          
+      - name: Install cibuildwheel
+        run: |
+          python -m pip install numpy matplotlib==3.2 scipy descartes shapely twine cibuildwheel==1.11.0
+        
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir dist
+            
+      - uses: actions/upload-artifact@v2
+        with:
+          path: dist/*.whl 
+          
+      - name: Install delocate on MacOS
+        run: python -m pip install delocate
+        if: contains( matrix.os, 'macos')
+        
+        # Cibuildwheel's delocate-wheel call seems broken for some reason. Let's do it ourselves now
+      - name: Try MacOS delocate-wheel manually
+        run: delocate-wheel -v dist/*-cp36-cp36m-macosx_10_9_x86_64.whl & delocate-wheel -v dist/*-cp37-cp37m-macosx_10_9_x86_64.whl & delocate-wheel -v dist/*-cp38-cp38-macosx_10_9_x86_64.whl & delocate-wheel -v dist/*-cp39-cp39-macosx_10_9_x86_64.whl
+        if: contains( matrix.os, 'macos')
+
+      #- name: Publish package to test pypi
+      #  run: python -m twine upload -u __token__ -p ${{ secrets.PYPI_TEST_MIIND_API_TOKEN }} --skip-existing --repository testpypi dist/*
+      #  if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        
+      - name: Publish package to pypi
+        run: python -m twine upload dist/* -u __token__ -p ${{ secrets.PYPI_MIIND_API_TOKEN }}
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        

@@ -7,7 +7,8 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_SOURCE_DIR}/../
    ${CMAKE_CURRENT_BINARY_DIR}/../
 )
-set( LIB_TYPE SHARED )
+
+set( LIB_TYPE STATIC )
 
 include_directories(include)
 

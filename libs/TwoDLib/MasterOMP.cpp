@@ -21,6 +21,7 @@
 #endif
 #include <algorithm>
 #include <numeric>
+#include <random>
 #include <fstream>
 
 #include "MasterOMP.hpp"
@@ -57,7 +58,7 @@ _init(_rate)
 	 for (unsigned int j = 0; j < _par._N_steps; j++){
 
 #pragma omp parallel for
-		 for(unsigned int id = 0; id < _dydt.size(); id++)
+		 for(int id = 0; id < _dydt.size(); id++)
 			 _dydt[id] = 0.;
 		 for(MPILib::Index mesh_index = 0; mesh_index < n_mesh; mesh_index++){
 			 for (unsigned int irate = 0; irate < vec_vec_rates[mesh_index].size(); irate++){
@@ -74,9 +75,41 @@ _init(_rate)
 		 }
 
 #pragma omp parallel for
-		 for (MPILib::Index imass = 0; imass < _sys._vec_mass.size(); imass++)
+		 for (int imass = 0; imass < _sys._vec_mass.size(); imass++)
 			 _sys._vec_mass[imass] += _add._h*t_step*_dydt[imass]; // the mult
 	 }
+ }
+
+ void MasterOMP::ApplyFinitePoisson
+ (
+	 double t_step,
+	 const std::vector< std::vector<double > >& vec_vec_rates,
+	 const vector<MPILib::Index>& vec_vec_map
+ )
+ {
+	 static std::random_device rd;
+	 static std::mt19937 gen(rd());
+	 MPILib::Number n_mesh = vec_vec_rates.size();
+
+#pragma omp parallel for
+	 for (int id = 0; id < _sys._vec_objects_to_index.size(); id++) {
+		 if (_sys._vec_objects_refract_times[id] >= 0.0)
+			 continue;
+
+		 for (MPILib::Index mesh_index = 0; mesh_index < n_mesh; mesh_index++) {
+			 for (unsigned int irate = 0; irate < vec_vec_rates[mesh_index].size(); irate++) {
+				 if (vec_vec_rates[mesh_index][irate] == 0)
+					 continue;
+
+				 std::poisson_distribution<int> pd(vec_vec_rates[mesh_index][irate] * t_step);
+				 int spikes = pd(gen);
+				 _sys._vec_objects_to_index[id] =
+					 _vec_vec_csr[mesh_index][vec_vec_map[irate]].MVObject(_sys._vec_objects_to_index[id], spikes);
+			 }
+		 }
+	 }
+
+	 _sys.updateVecCellsToObjects();
  }
 
 std::vector<std::vector<CSRMatrix> > MasterOMP::InitializeCSR(const std::vector< std::vector<TransitionMatrix> >& vec_vec_mat, const Ode2DSystemGroup& sys)

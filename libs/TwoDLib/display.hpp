@@ -3,8 +3,12 @@
 
 #define LINUX // This #define is used in glew.c so it does not require installation
 #include "include/GL/glew.h"
+#ifndef USING_APPLE_GLUT
 // The application does require glut to be installed
 #include <GL/freeglut.h>
+#else
+#include <GLUT/glut.h>
+#endif
 
 #include <string>
 #include <chrono>

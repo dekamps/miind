@@ -1,16 +1,15 @@
 project( ${MIIND_LIBRARY_PREFIX}cudatwod )
 
+if (WIN32) # When cmake generates the VS files, it needs to know this is a cuda project
+enable_language(CUDA)
+endif (WIN32)
+
 find_package(CUDA  REQUIRED)
+include_directories(${CUDA_INCLUDE_DIRS})
 link_directories( ${GSL_LIBRARY_DIRS} )
 include( RequireGSL )
-include_directories(${CUDA_INCLUDE_DIRS})
 include_directories( ${GSL_INCLUDE_DIRS} )
 set( LIB_TYPE STATIC )
-
-set(CUDA_NVCC_FLAGS
-${CUDA_NVCC_FLAGS};
--arch=sm_60 #adapt this to the GPU on your system
-)
 
 #one below that MPILib is included in the paths they are needed for the camke config files
 INCLUDE_DIRECTORIES(

@@ -124,6 +124,8 @@ void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 
 	_maximum_iterations = simParam.getMaximumNumberIterations();
 
+	
+
 	_pAlgorithm->assignNodeId(_nodeId);
 	_pAlgorithm->configure(simParam);
 
@@ -237,7 +239,7 @@ void MPINode<Weight, NodeDistribution>::reportAll(
 
 template<class Weight, class NodeDistribution>
 void MPINode<Weight, NodeDistribution>::clearSimulation() {
-
+	//_pAlgorithm.reset();
 	_pHandler->detachHandler(_nodeId);
 }
 

@@ -38,9 +38,15 @@ public:
   */
  DelayedConnectionQueue(Time timestep = 0.001,Time delay = 0):
    	_t_delay(delay),
+      _timestep(timestep),
     _queue(1 + static_cast<int>(std::floor(delay/timestep)),0.0),
     _t_delay_proprtion(std::abs(std::fmod(delay,timestep) - timestep) < 0.0000000001 ? 0.0 : std::fmod(delay,timestep)/timestep){
     }
+
+ void reset() {
+    _queue.clear();
+    _queue = std::deque<ActivityType>(1 + static_cast<int>(std::floor(_t_delay/_timestep)),0.0);
+ }
 
  void updateQueue(ActivityType inRate);
 
@@ -52,6 +58,7 @@ private:
 
  Time _t_delay;
  Time _t_delay_proprtion;
+ Time _timestep;
  ActivityType _rate_current;
 
  std::deque<ActivityType> _queue;

@@ -1,0 +1,29 @@
+<Simulation>
+ <Variable Name='TIME_END'>0.2</Variable>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithmCustom" name="COND" modelfile="cond.model">
+<TimeStep>0.0001</TimeStep>
+<MatrixFile>cond_0_0.05_0_0_.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="Inp">
+<expression>500</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="COND" name="E" type="NEUTRAL" />
+<Node algorithm="Inp" name="Input" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="Input" Out="E" num_connections="1" efficacy="0.05" delay="0.0"/>
+</Connections>
+<Reporting>
+	<Display node="E" />
+	<Rate node="E" t_interval="0.0001" />
+</Reporting>
+<SimulationRunParameter>
+<t_end>TIME_END</t_end>
+<t_step>0.0001</t_step>
+<name_log>cond.log</name_log>
+</SimulationRunParameter>
+</Simulation>

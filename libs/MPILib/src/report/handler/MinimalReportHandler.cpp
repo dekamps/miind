@@ -29,7 +29,7 @@ MinimalReportHandler::MinimalReportHandler
 	const std::string& result_name,
 	bool report_state,
 	bool place_holder,
-	const CanvasParameter&
+	const MPILib::CanvasParameter&
 ):
 AbstractReportHandler(result_name,report_state)
 {
@@ -57,10 +57,10 @@ void MinimalReportHandler::writeReport(const Report& report) {
 	_ofst << report._id << " " << report._time << " " << report._rate << std::endl;
 }
 
-void MinimalReportHandler::detachHandler(const NodeId& nodeId) {
+void MinimalReportHandler::detachHandler(const MPILib::NodeId& nodeId) {
 }
 
-void MinimalReportHandler::initializeHandler(const NodeId& nodeId) {
+void MinimalReportHandler::initializeHandler(const MPILib::NodeId& nodeId) {
 
 }
 

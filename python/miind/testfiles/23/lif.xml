@@ -1,0 +1,28 @@
+<Simulation>
+<WeightType>DelayedConnection</WeightType>
+<Algorithms>
+<Algorithm type="MeshAlgorithm" name="E" modelfile="lif.model" >
+<TimeStep>0.001</TimeStep>
+<MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
+</Algorithm>
+<Algorithm type="RateFunctor" name="ExcInput">
+<expression>1500.</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="E" name="LIF" type="EXCITATORY_DIRECT" />
+<Node algorithm="ExcInput" name="Inp" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="Inp" Out="LIF">1 0.01 0</Connection>
+</Connections>
+<Reporting>
+<Rate node="LIF" t_interval="0.001"/>
+</Reporting>
+<SimulationRunParameter>
+<SimulationName>lif</SimulationName>
+<t_end>1.0</t_end>
+<t_step>0.001</t_step>
+<name_log>lif.log</name_log>
+</SimulationRunParameter>
+</Simulation>

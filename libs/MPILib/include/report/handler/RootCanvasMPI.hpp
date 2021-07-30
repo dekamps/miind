@@ -27,6 +27,7 @@
 #include <MPILib/include/TypeDefinitions.hpp>
 #include "CanvasParameter.hpp"
 #include "../ReportType.hpp"
+#include "../../utilities/Log.hpp"
 
 class TGraph;
 
@@ -57,7 +58,9 @@ public:
 	void Render(report::ReportType, NodeId, TGraph*){}
 
 	//! To be called by RootReportHandler
-	void addNode(NodeId){}
+	void addNode(NodeId){
+		LOG(MPILib::utilities::logWARNING) << "ROOT Canvas is disabled when MPI is enabled. No ROOT display will appear.";
+	}
 
 private:
 	CanvasParameter _par_canvas;

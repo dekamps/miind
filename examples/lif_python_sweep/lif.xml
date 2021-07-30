@@ -1,8 +1,9 @@
 <Simulation>
 <Variable Name="efficacy">0.01</Variable>
+<Variable Name="rate">0.0</Variable>
 <WeightType>DelayedConnection</WeightType>
 <Algorithms>
-<Algorithm type="MeshAlgorithmGroup" name="E" modelfile="lif.model" >
+<Algorithm type="MeshAlgorithm" name="E" modelfile="lif.model" >
 <TimeStep>0.001</TimeStep>
 <MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
 <MatrixFile>lif_0.02_0_0_0_.mat</MatrixFile>
@@ -15,17 +16,20 @@
 <MatrixFile>lif_0.09_0_0_0_.mat</MatrixFile>
 <MatrixFile>lif_0.1_0_0_0_.mat</MatrixFile>
 </Algorithm>
+<Algorithm type="RateAlgorithm" name="R">
+<rate>rate</rate>
+</Algorithm>
 </Algorithms>
 <Nodes>
+<Node algorithm="R" name="RIN" type="EXCITATORY_DIRECT" />
 <Node algorithm="E" name="LIF" type="EXCITATORY_DIRECT" />
 </Nodes>
 <Connections>
+<Connection In="RIN" Out="LIF">1 efficacy 0</Connection>
 <IncomingConnection Node="LIF">1 efficacy 0</IncomingConnection>
 <OutgoingConnection Node="LIF"/>
 </Connections>
 <Reporting>
-<Density node="LIF" t_start="0.0" t_end="3.0" t_interval="0.001" />
-<!--<Display node="LIF" />-->
 <Rate node="LIF" t_interval="0.001" />
 </Reporting>
 <SimulationRunParameter>

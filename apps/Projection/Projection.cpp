@@ -113,7 +113,7 @@ void CalculateProjectionsGeometric(std::ofstream& ofst,
       	  ofst << "<coordinates>";
       	  	  ofst << i << "," << j;
       	  ofst << "</coordinates>";
-      	  ofst << "<vbins>";
+      	  ofst << "<wbins>";
           std::map<unsigned int, double> props;
       	  for (auto h : l._destination_list){
             if (h._prop > 0.) {
@@ -125,8 +125,8 @@ void CalculateProjectionsGeometric(std::ofstream& ofst,
       	  }
           for( std::map<unsigned int, double>::const_iterator it = props.begin(); it != props.end(); ++it )
             ofst << it->first << "," << it->second << ";";
-      	  ofst << "</vbins>";
-      	  ofst << "<wbins>";
+      	  ofst << "</wbins>";
+      	  ofst << "<vbins>";
       	  props.clear();
       	  for (auto h : l._destination_list){
             if (h._prop > 0.) {
@@ -138,7 +138,7 @@ void CalculateProjectionsGeometric(std::ofstream& ofst,
       	  }
           for( std::map<unsigned int, double>::const_iterator it = props.begin(); it != props.end(); ++it )
             ofst << it->first << "," << it->second << ";";
-      	  ofst << "</wbins>";
+      	  ofst << "</vbins>";
       ofst << "</cell>\n";
     }
   }

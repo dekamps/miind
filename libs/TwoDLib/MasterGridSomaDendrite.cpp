@@ -45,12 +45,12 @@ _cell_width(cell_width)
 
  void MasterGridSomaDendrite::CalculateDynamicEfficiacies(vector<std::string>& conn_types, vector<double>& efficacy_map, vector<double>& rest_v, vector<double>& conductances) {
 #pragma omp parallel for
-   	for (MPILib::Index i = 0; i < efficacy_map.size(); i++){
+   	for (int i = 0; i < efficacy_map.size(); i++){
       std::map<int,vector<double>>::iterator iter = _stays[i].begin();
 #pragma omp parallel for
       for (int n = 0; n<_stays[i].size(); n++){
         #pragma omp parallel for
-        for (MPILib::Index j=0; j < _dydt.size(); j++){
+        for (int j=0; j < _dydt.size(); j++){
           iter->second[j] = 0.0;
         }
        iter++;
@@ -59,7 +59,7 @@ _cell_width(cell_width)
 #pragma omp parallel for
       for (int n = 0; n<_goes[i].size(); n++){
         #pragma omp parallel for
-        for (MPILib::Index j=0; j < _dydt.size(); j++){
+        for (int j=0; j < _dydt.size(); j++){
           iter->second[j] = 0.0;
         }
        iter++;
@@ -100,18 +100,18 @@ _cell_width(cell_width)
  {
   for (std::map<int,vector<double>>::const_iterator iter = _stays[efficiacy_index].begin(); iter != _stays[efficiacy_index].end(); ++iter){
 #pragma omp parallel for
-    for (MPILib::Index i = 0; i < iter->second.size(); i++){
+    for (int i = 0; i < iter->second.size(); i++){
       dydt[i] += rate*iter->second[i]*vec_mass[(((int)i+iter->first)%(int)dydt.size()+(int)dydt.size()) % (int)dydt.size()];
    	}
   }
   for (std::map<int,vector<double>>::const_iterator iter = _goes[efficiacy_index].begin(); iter != _goes[efficiacy_index].end(); ++iter){
 #pragma omp parallel for
-    for (MPILib::Index i = 0; i < iter->second.size(); i++){
+    for (int i = 0; i < iter->second.size(); i++){
       dydt[i] += rate*iter->second[i]*vec_mass[(((int)i+iter->first)%(int)dydt.size()+(int)dydt.size()) % (int)dydt.size()];
     }
   }
 #pragma omp parallel for
- 	for (MPILib::Index i = 0; i < dydt.size(); i++){
+ 	for (int i = 0; i < dydt.size(); i++){
     dydt[i] -= rate*vec_mass[i];
  	}
  }
@@ -133,7 +133,7 @@ void MasterGridSomaDendrite::operator()(const vector<double>& vec_mass, vector<d
 
 
 #pragma omp parallel for
-  for(unsigned int id = 0; id < dydt.size(); id++)
+  for(int id = 0; id < dydt.size(); id++)
     dydt[id] = 0.;
 
   for (unsigned int irate = 0; irate < rates.size(); irate++){

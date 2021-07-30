@@ -1,7 +1,7 @@
 #include <vector>
 #include <boost/timer/timer.hpp>
-#include <GeomLib.hpp>
-#include <TwoDLib.hpp>
+#include <GeomLib/GeomLib.hpp>
+#include <TwoDLib/TwoDLib.hpp>
 #include <MPILib/include/MPINetworkCode.hpp>
 #include <MPILib/include/RateAlgorithmCode.hpp>
 #include <MPILib/include/SimulationRunParameter.hpp>

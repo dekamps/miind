@@ -44,7 +44,7 @@ _lost(0),
 _accounted(0),
 _vec_fiducial(InitializeFiducialVector(tree.MeshRef(),element_list))
 {
-	if(_tree.MeshRef().NrStrips() > 2) {
+	if(_tree.MeshRef().NrStrips() > 2 && _tree.MeshRef().NrCellsInStrip(0) > 0 && _tree.MeshRef().NrCellsInStrip(1) > 2 && _tree.MeshRef().NrCellsInStrip(2) > 2) {
 		_grid_normal_orientation =
 		(std::abs((_tree.MeshRef().Quad(1,1).Centroid() - _tree.MeshRef().Quad(1,2).Centroid())[0]) >
 		std::abs((_tree.MeshRef().Quad(1,1).Centroid() - _tree.MeshRef().Quad(2,1).Centroid())[0]));

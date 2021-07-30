@@ -146,7 +146,7 @@ void WriteProportion
 void GenerateResetTransitionsOnly(
 	const string& base_name,
 	const TwoDLib::Mesh& mesh,
-	const TwoDLib::Fid& fid,
+	const TwoDLib::Fid* fid,
 	double V_th,
 	double V_reset,
 	std::unique_ptr<TwoDLib::TranslationObject>& p_to,
@@ -168,7 +168,10 @@ void GenerateResetTransitionsOnly(
 	TwoDLib::MeshTree tree(mesh);
 	TwoDLib::Uniform uni(123456);
 
-	std::vector<TwoDLib::FiducialElement> list = fid.Generate(mesh);
+	std::vector<TwoDLib::FiducialElement> list;
+	if (fid)
+		list = fid->Generate(mesh);
+
 	TwoDLib::TransitionMatrixGenerator gen(tree,uni,nr_points,list);
 
 	// the reset mapping is the same for all ranges
@@ -183,7 +186,7 @@ void GenerateResetTransitionsOnly(
 	(
 			const string& base_name,
 			const TwoDLib::Mesh& mesh,
-			const TwoDLib::Fid& fid,
+			const TwoDLib::Fid* fid,
 			double V_th,
 			double V_reset,
 			std::unique_ptr<TwoDLib::TranslationObject>& p_to,
@@ -217,7 +220,10 @@ void GenerateResetTransitionsOnly(
 		TwoDLib::MeshTree tree(mesh);
 		TwoDLib::Uniform uni(123456);
 
-		std::vector<TwoDLib::FiducialElement> list = fid.Generate(mesh);
+		std::vector<TwoDLib::FiducialElement> list;
+		if (fid)
+			list = fid->Generate(mesh);
+
 		TwoDLib::TransitionMatrixGenerator gen(tree,uni,nr_points,list);
 
 		TwoDLib::TransitionList l;
@@ -282,7 +288,9 @@ void GenerateResetTransitionsOnly(
 		FixModelFile(base_name);
 
 		// Give an account of lost points
-		WriteOutLost(base_name + ostfn.str() + string(".lost"), gen);
+		if (mode != TwoDLib::AreaCalculation && mode != TwoDLib::ResetOnly && mode != TwoDLib::Transform && mode != TwoDLib::TransformResetOnly) {
+			WriteOutLost(base_name + ostfn.str() + string(".lost"), gen);
+		}
 	}
 
 	void GenerateResetTransitionsOnlyUsingTransform(
@@ -492,15 +500,19 @@ void GenerateResetTransitionsOnly(
 			return;
 		}
 
-		TwoDLib::Fid fid((base_name + std::string(".fid")).c_str());
-
 		p_to->GenerateTranslationList(mesh);
 
-		if (mode == TwoDLib::ResetOnly)
-			GenerateResetTransitionsOnly(base_name, mesh,fid,theta,V_reset, p_to, tr_reset, nr_points, l_min,l_max, mode);
-		else
-			GenerateElements(base_name, mesh,fid,theta,V_reset, p_to, tr_reset, nr_points, l_min,l_max, mode);
+		TwoDLib::Fid* fid_ptr = NULL;
+		// If we're using area calculation or just reset recalculation then ignore the .fid file
+		if (mode == TwoDLib::TranslationArguments) {
+			fid_ptr = new TwoDLib::Fid((base_name + std::string(".fid")).c_str());
+		}
 
+		if (mode == TwoDLib::ResetOnly)
+			GenerateResetTransitionsOnly(base_name, mesh, fid_ptr, theta, V_reset, p_to, tr_reset, nr_points, l_min, l_max, mode);
+		else
+			GenerateElements(base_name, mesh, fid_ptr, theta, V_reset, p_to, tr_reset, nr_points, l_min, l_max, mode);
+		
 	}
 
 	void PrepareMatrixGeneration(int argc, char** argv, TwoDLib::UserTranslationMode mode){

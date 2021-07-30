@@ -24,7 +24,7 @@ void TwoDLib::ClearDerivative(std::vector<MPILib::Mass>& dydt)
 {
   MPILib::Number n_dydt = dydt.size();
 #pragma omp parallel for
-  for (MPILib::Index ideriv = 0; ideriv < n_dydt; ideriv++)
+  for (int ideriv = 0; ideriv < n_dydt; ideriv++)
     dydt[ideriv] = 0.;
 }
 
@@ -38,7 +38,7 @@ void TwoDLib::AddDerivative
 {
   MPILib::Number n_mass = mass.size();
 #pragma omp parallel for
-  for(MPILib::Index i = 0; i < n_mass; i++){
+  for(int i = 0; i < n_mass; i++){
     mass[i] += h*dydt[i];
   }
 }

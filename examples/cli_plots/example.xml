@@ -1,0 +1,30 @@
+<Simulation>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="GridAlgorithm" name="OSC" modelfile="izh.model" tau_refractive="0.0" transformfile="izh_0_0_0_0_.tmat" start_v="-70.000001" start_w="0.0000001" >
+<TimeStep>0.0001</TimeStep>
+</Algorithm>
+<Algorithm type="RateAlgorithm" name="InRate">
+<rate>5000</rate>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="OSC" name="POP1" type="NEUTRAL" />
+<Node algorithm="InRate" name="Input" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="Input" Out="POP1" num_connections="20" efficacy="0.05" delay="0.0"/>
+</Connections>
+<Reporting>
+	<Density node="POP1" t_start="0.0" t_end="6.0" t_interval="0.01" />
+	<Display node="POP1" />
+	<Rate node="POP1" t_interval="0.001" />
+</Reporting>
+<SimulationRunParameter>
+<SimulationName>example</SimulationName>
+<t_end>1</t_end>
+<master_steps>30</master_steps>
+<t_step>0.001</t_step>
+<name_log>example.log</name_log>
+</SimulationRunParameter>
+</Simulation>

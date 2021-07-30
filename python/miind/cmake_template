@@ -1,0 +1,259 @@
+##############################################################################
+# include the header files
+##############################################################################
+
+#############################################################################
+
+cmake_minimum_required(VERSION 2.6)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+FIND_PACKAGE(GSL REQUIRED)
+FIND_PACKAGE(CUDA QUIET)
+
+if (APPLE)
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
+else (APPLE)
+find_package (Python3 COMPONENTS Interpreter Development)
+include_directories(${Python3_INCLUDE_DIRS})
+endif(APPLE)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(MIIND_LIBRARY_PREFIX miind)
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-parameter -O0 -pedantic")
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
+if (APPLE) 
+	find_package(OpenGL)
+	# -D_GLIBCXX_USE_CXX11_ABI=0 sets the ABI to match older boost unit test framework on mac
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0 -fPIC")
+	set(GLUT_LIBRARY "-lGL -lGLU -lGLUT")
+else (APPLE)
+	if(CMAKE_COMPILER_IS_GNUCXX)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals -fPIC")
+		set(GLUT_LIBRARY "-lGL -lGLU -lglut")
+	endif(CMAKE_COMPILER_IS_GNUCXX)
+endif(APPLE)
+set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
+
+# FIND MIIND INCLUDE DIRECTORY, START BY CHECKING ENVIRONMENT VARIABLE MIIND_INCLUDE_DIR
+
+IF (DEFINED ENV{MIIND_INCLUDE_DIR})
+MESSAGE( " Miind include directory (MIIND_INCLUDE_DIR) : $ENV{MIIND_INCLUDE_DIR}" )
+include_directories( $ENV{MIIND_INCLUDE_DIR} )
+include_directories( $ENV{MIIND_INCLUDE_DIR}/GeomLib )
+include_directories( $ENV{MIIND_INCLUDE_DIR}/TwoDLib )
+include_directories( $ENV{MIIND_INCLUDE_DIR}/CudaTwoDLib )
+include_directories( $ENV{MIIND_INCLUDE_DIR}/MiindLib )
+ELSE ()
+
+# Check default include directory if MIIND was installed somewhere normal
+find_path(MIIND_INCLUDE_DIR_DEFAULT NAMES "miind/GeomLib/GeomLib.hpp")
+IF (MIIND_INCLUDE_DIR_DEFAULT)
+set (MIIND_INCLUDE_DIR_DEFAULT "${MIIND_INCLUDE_DIR_DEFAULT}/miind")
+MESSAGE( " Miind include directory (default) : ${MIIND_INCLUDE_DIR_DEFAULT}" )
+include_directories( ${MIIND_INCLUDE_DIR_DEFAULT} )
+include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/GeomLib )
+include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/TwoDLib )
+include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/CudaTwoDLib )
+include_directories( ${MIIND_INCLUDE_DIR_DEFAULT}/MiindLib )
+
+ELSE (MIIND_INCLUDE_DIR_DEFAULT) # Miind isn't installed, so see if we can find at the dev location
+
+find_path(MIIND_INCLUDE_DIR NAMES "GeomLib/GeomLib.hpp" PATHS "${CMAKE_SOURCE_DIR}/libs/")
+MESSAGE( " Miind include directory : ${MIIND_INCLUDE_DIR} " )
+IF (MIIND_INCLUDE_DIR)
+include_directories( ${MIIND_INCLUDE_DIR} )
+include_directories( ${MIIND_INCLUDE_DIR}/GeomLib )
+include_directories( ${MIIND_INCLUDE_DIR}/TwoDLib )
+include_directories( ${MIIND_INCLUDE_DIR}/CudaTwoDLib )
+include_directories( ${MIIND_INCLUDE_DIR}/MiindLib )
+ENDIF (MIIND_INCLUDE_DIR)
+
+ENDIF (MIIND_INCLUDE_DIR_DEFAULT)
+
+ENDIF()
+
+IF (DEFINED ENV{MIIND_LIBRARY_DIR})
+MESSAGE( " Miind library directory (MIIND_LIBRARY_DIR) : $ENV{MIIND_LIBRARY_DIR}" )
+link_directories( $ENV{MIIND_LIBRARY_DIR} )
+ELSE()
+MESSAGE( " No Miind library directory defined." )
+ENDIF()
+
+
+include_directories( ${GSL_INCLUDE_DIRS} )
+link_directories( ${GSL_LIBRARY_DIRS} )
+include_directories( ${ROOT_INCLUDE_DIRS} )
+link_directories( ${ROOT_LIBRARY_DIRS} )
+
+OPTION(ENABLE_MPI "MPI Desired" ${TOKEN_ENABLE_MPI})
+OPTION(ENABLE_OPENMP "OpenMP Desired" ${TOKEN_ENABLE_OPENMP})
+
+##############################################################################
+# find ROOT
+##############################################################################
+
+OPTION(ENABLE_ROOT "Root Desired" ${TOKEN_ENABLE_ROOT})
+
+IF (ENABLE_ROOT)
+   # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
+   #   - ROOT built with classic configure/make use the provided $ROOTSYS/etc/cmake/FindROOT.cmake
+   #   - ROOT built with CMake. Add in CMAKE_PREFIX_PATH the installation prefix for ROOT
+   list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+
+   #---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
+   find_package(ROOT REQUIRED COMPONENTS RIO Net)
+
+   #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
+   include(${ROOT_USE_FILE})
+
+   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+   ROOT_GENERATE_DICTIONARY(G__Event Event.h LINKDEF EventLinkDef.h)
+
+   message(STATUS "Building Root dependent parts")
+   message(STATUS "Root include directories:" ${ROOT_INCLUDE_DIRS})
+   message(STATUS "Root library directories:" ${ROOT_LIBRARY_DIR})
+   include_directories( ${ROOT_INCLUDE_DIRS} )
+   link_directories( ${ROOT_LIBRARY_DIR} )
+
+   #---Create a shared library with geneated dictionary (don't want to do that now; maybe not ever)
+   # add_library(Event SHARED Event.cxx G__Event.cxx)
+   # target_link_libraries(Event ${ROOT_LIBRARIES})
+   add_definitions("-DWANTROOT")
+ENDIF(ENABLE_ROOT)
+
+IF(ENABLE_MPI)
+  find_package(MPI REQUIRED)
+  add_definitions( -DENABLE_MPI=1 )
+	set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
+	set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
+	include_directories(${MPI_INCLUDE_PATH})
+ENDIF(ENABLE_MPI)
+
+##############################################################################
+# find boost with mpi
+##############################################################################
+IF(ENABLE_MPI)
+        find_package( Boost COMPONENTS unit_test_framework filesystem program_options mpi thread serialization timer system)
+ELSE(ENABLE_MPI)
+	find_package( Boost COMPONENTS unit_test_framework filesystem program_options thread serialization timer system)
+ENDIF(ENABLE_MPI)
+if( Boost_FOUND )
+   message(STATUS "Boost found setting up directories")
+   message(STATUS "BOOST_ROOT: " ${BOOST_ROOT} )
+   message(STATUS "Boost include directories:" ${Boost_INCLUDE_DIR} )
+   message(STATUS "Boost library directories:" ${Boost_LIBRARY_DIRS} )
+   include_directories( ${Boost_INCLUDE_DIR} )
+   link_directories( ${Boost_LIBRARY_DIR} )
+else ( Boost_FOUND )
+   message(FATAL_ERROR "Boost is mandatory to build the libraries")
+endif( Boost_FOUND )
+
+##############################################################################
+# allow OpenMP to be enabled
+##############################################################################
+
+IF(ENABLE_OPENMP)
+	if (APPLE)
+		if(ENABLE_OPENMP)
+			if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+			  message ( "Setting OpenMP_C_FLAGS for Clang.")
+			  set(OpenMP_C "${CMAKE_C_COMPILER}")
+			  set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -Wno-unused-command-line-argument")
+			  set(OpenMP_C_LIB_NAMES "libomp" "libgomp" "libiomp5")
+			  set(OpenMP_libomp_LIBRARY ${OpenMP_C_LIB_NAMES})
+		      set(OpenMP_libgomp_LIBRARY ${OpenMP_C_LIB_NAMES})
+			  set(OpenMP_libiomp5_LIBRARY ${OpenMP_C_LIB_NAMES})
+			endif()
+			if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+			  message ( "Setting OpenMP_CXX_FLAGS for Clang.")
+			  set(OpenMP_CXX "${CMAKE_CXX_COMPILER}")
+			  set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -Wno-unused-command-line-argument")
+			  set(OpenMP_CXX_LIB_NAMES "libomp" "libgomp" "libiomp5")
+			  set(OpenMP_libomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+			  set(OpenMP_libgomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+			  set(OpenMP_libiomp5_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+			endif()
+		endif()
+	endif()
+	
+	find_package(OpenMP REQUIRED)
+	
+	if (OpenMP_FOUND AND APPLE)
+		message ( "Found OpenMP. Try to find omp.h..." )
+		find_path(OpenMP_INCLUDE_DIR
+			omp.h
+		)
+		
+		message ( "Adding include directories: ${OpenMP_INCLUDE_DIR} ")
+		include_directories("${OpenMP_INCLUDE_DIR}")
+		set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    # set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+	endif(OpenMP_FOUND AND APPLE)
+	
+	add_definitions( -DENABLE_OPENMP=1 )
+ENDIF(ENABLE_OPENMP)
+
+IF (WIN32 OR APPLE) # For windows packaging, we want to include the glut dll so we need FindGLUT to find it during install
+find_package(GLUT REQUIRED)
+if (GLUT_FOUND AND APPLE)
+add_definitions( -DUSING_APPLE_GLUT=1 ) # this tells TwoDLib/display.cpp to avoid non mac-glut functions.
+endif(GLUT_FOUND AND APPLE)
+ENDIF (WIN32 OR APPLE)
+
+IF(ENABLE_OPENMP)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+ENDIF(ENABLE_OPENMP)
+
+#############################################################################
+# Libraries
+#############################################################################
+
+
+if (UNIX)
+   ADD_DEFINITIONS("-fno-strict-aliasing -Wno-pedantic" )
+endif (UNIX)
+set ( LIBLIST
+    ${MIIND_LIBRARY_PREFIX}geom
+    ${MIIND_LIBRARY_PREFIX}twod
+    ${MIIND_LIBRARY_PREFIX}numtools
+    ${MIIND_LIBRARY_PREFIX}mpi
+    ${MPI_LIBRARIES}
+    ${ROOT_LIBRARIES}
+    ${Boost_LIBRARIES}
+    ${gsl_LINK_FLAGS}
+    gsl
+    gslcblas
+    ${GLUT_LIBRARY}
+	${PYTHON_LIBRARIES}
+)
+
+if (APPLE)
+set( LIBLIST ${LIBLIST} ${OPENGL_LIBRARIES} ${Python3_LIBRARIES} )
+endif (APPLE)
+
+
+if (ENABLE_CUDA)
+   if (NOT APPLE)
+   list(APPEND LIBLIST ${MIIND_LIBRARY_PREFIX}cudatwod)
+   list(APPEND LIBLIST ${MIIND_LIBRARY_PREFIX}shared)
+   endif (NOT APPLE)
+endif(ENABLE_CUDA)
+
+
+#############################################################################
+# executables
+#############################################################################
+ #   add the flags for C++11
+#if(CMAKE_COMPILER_IS_GNUCXX)
+#add_definitions("-fext-numeric-literals ${GLUT_LIBRARY}")
+#else(CMAKE_COMPILER_IS_GNUCXX)
+#add_definitions("${GLUT_LIBRARY}")
+#endif(CMAKE_COMPILER_IS_GNUCXX)
