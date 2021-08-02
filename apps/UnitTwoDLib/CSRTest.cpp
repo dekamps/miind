@@ -46,13 +46,7 @@ BOOST_FIXTURE_TEST_CASE(CSRMatrixTest, FixtureOde2DSystemGroup)
 	TransitionMatrix mat1("mat1.mat");
 	TransitionMatrix mat2("mat2.mat");
 	
-<<<<<<< HEAD
-	// size of the Redistribution vectors vectors must be equal to that of the mesh vector
-	// even when there vectors themselves are empty
-	std::vector<std::vector<Redistribution> > vec_dummy(2);
-=======
 	std::vector<std::vector<Redistribution> > vec_dummy { std::vector<Redistribution>(), std::vector<Redistribution>() };
->>>>>>> f014c5b0bb90511bb1f830ce88ffb23838d23b6a
 	std::vector<Mesh> vec_mesh {_mesh1, _mesh2 };
        	Ode2DSystemGroup group(vec_mesh,vec_dummy,vec_dummy);
 	group.Initialize(0,0,0);

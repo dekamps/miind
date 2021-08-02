@@ -51,7 +51,7 @@ namespace TwoDLib {
 		//! Standard Constructor
 		Ode2DSystem
 		(
-			const Mesh&, 					        //!< Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
+			const Mesh&, 	  //!< Mesh in the Python convention. Most models require a reversal bin that is not part of the grid. In that case it must be inserted into the Mesh by calling Mesh::InsertStationary. It is legal not to define an extra reversal bin, and use one of the existing Mesh cells at such, but in that case Cell (0,0) will not exist.
 			const std::vector<Redistribution>&,     //!< A mapping from strip end to reversal bin
 			const std::vector<Redistribution>&,     //!< A mapping from threshold to reset bin
 			const MPILib::Time& tau_refactive = 0   //!< absolute refractive period

@@ -1,3 +1,7 @@
+#ifdef ENABLE_OMP
+#include <omp.h>
+#endif
+
 #include "Point.hpp"
 #include "Simplex.hpp"
 #include "Cell.hpp"
@@ -5,7 +9,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <omp.h>
 #include <iomanip>
 
 class Grid {
