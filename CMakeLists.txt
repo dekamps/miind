@@ -1,6 +1,6 @@
 project( miind )
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.9)
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake-modules )
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
