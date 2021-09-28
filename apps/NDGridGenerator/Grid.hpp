@@ -588,7 +588,24 @@ public:
         file << "<Mesh>\n";
         file << "<TimeStep>" << timestep*timestep_multiplier << "</TimeStep>\n";
 
-        
+        file << "<GridNumDimensions>" << num_dimensions << "</GridNumDimensions>\n";
+        file << "<GridDimensions>";
+        for (unsigned int n = 0; n < num_dimensions; n++) {
+            file << dimensions[n] << " ";
+        }
+        file << "</GridDimensions>\n";
+
+        file << "<GridResolution>";
+        for (unsigned int n = 0; n < num_dimensions; n++) {
+            file << resolution[n] << " ";
+        }
+        file << "</GridResolution>\n";
+
+        file << "<GridBase>";
+        for (unsigned int n = 0; n < num_dimensions; n++) {
+            file << base[n] << " ";
+        }
+        file << "</GridBase>\n";
 
         file << "</Mesh>\n";
         file << "<Stationary>\n";

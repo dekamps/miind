@@ -96,7 +96,7 @@ namespace TwoDLib {
 		_transformMatrix = TransitionMatrix(_transform_matrix);
 		_csr_transform = new CSRMatrix(_transformMatrix, _sys, 0);
 
-		Display::getInstance()->addOdeSystem(_node_id, &_sys);
+		Display::getInstance()->addOdeSystem(_node_id, &_sys, false);
 		GridReport<MPILib::CustomConnectionParameters>::getInstance()->registerObject(_node_id, this);
 
 		_t_cur = par_run.getTBegin();

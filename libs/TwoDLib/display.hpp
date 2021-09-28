@@ -28,6 +28,7 @@ public:
   Ode2DSystemGroup* _system;
   unsigned int _mesh_index;
   int _window_index;
+  bool _3D;
 
   double mesh_min_v;
   double mesh_max_v;
@@ -55,6 +56,11 @@ public:
   void animate(bool,std::vector<MPILib::NodeId>, double time_step) const;
   void processDraw(void);
 
+  void display_3d(void);
+  void scene_3d(int width, int height);
+  void init_3d() const;
+  void update_3d();
+
   static void stat_display(void) {
     disp->display();
   }
@@ -68,8 +74,18 @@ public:
     disp->shutdown();
   }
 
-  unsigned int addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys, unsigned int mesh_index);
-  unsigned int addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys);
+  static void stat_display_3d(void) {
+      disp->display_3d();
+  }
+  static void stat_scene_3d(int width, int height) {
+      disp->scene_3d(width, height);
+  }
+  static void stat_update_3d(void) {
+      disp->update_3d();
+  }
+
+  unsigned int addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys, bool _3d, unsigned int mesh_index);
+  unsigned int addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys, bool _3d);
 
   void updateDisplay(long current_sim_it);
 

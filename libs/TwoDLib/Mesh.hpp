@@ -189,6 +189,13 @@ namespace TwoDLib {
 		unsigned int								_grid_res_v;
 		unsigned int								_grid_res_h;
 
+		unsigned int								_grid_num_dimensions;
+		std::vector<unsigned int>					_resolution;
+		std::vector<double>							_dimensions;
+		std::vector<double>							_base;
+		unsigned int								_num_strips;
+		unsigned int								_strip_length;
+
 		// It is sometimes necessary to find out to which cells a given mesh point belongs.
 		// A mesh point will be mapped to an index position in a list of a list of coordinates.
 		// The list of coordinates at that position is the list of cells that this point belongs to.

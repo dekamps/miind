@@ -42,7 +42,7 @@ _vec_vec_gen(0),
 _vec_timefactor(0){
 	this->FromXML(s);
 
-	if (NrStrips() > 3 && NrCellsInStrip(0) > 0) {// this is a 2D mesh and if it's a grid, we want to know the cell dimensions
+	if (NrStrips() > 3 && NrCellsInStrip(0) > 0) { // this is a 2D mesh and if it's a grid, we want to know the cell dimensions
 
 		// If this mesh is a grid, calculate the cell width.
 		// If it's not a mesh, _grid_cell_width etc is meaningless.
@@ -547,6 +547,39 @@ void Mesh::FromXML(istream& s)
     std::istringstream ival(node_ts.first_child().value());
 	ival >> _t_step;
 
+	//Extract number of dimensions if it's there.
+	node_ts = node_mesh.child("GridNumDimensions");
+	if (node_ts) {
+		std::istringstream ival(node_ts.first_child().value());
+		ival >> _grid_num_dimensions;
+		_resolution = vector<unsigned int>(_grid_num_dimensions);
+		_dimensions = vector<double>(_grid_num_dimensions);
+		_base = vector<double>(_grid_num_dimensions);
+	}
+
+	node_ts = node_mesh.child("GridDimensions");
+	if (node_ts) {
+		std::istringstream ival(node_ts.first_child().value());
+		for (unsigned int i = 0; i < _grid_num_dimensions; i++) {
+			ival >> _dimensions[i];
+		}
+	}
+
+	node_ts = node_mesh.child("GridResolution");
+	if (node_ts) {
+		std::istringstream ival(node_ts.first_child().value());
+		for (unsigned int i = 0; i < _grid_num_dimensions; i++) {
+			ival >> _resolution[i];
+		}
+	}
+	
+	node_ts = node_mesh.child("GridBase");
+	if (node_ts) {
+		std::istringstream ival(node_ts.first_child().value());
+		for (unsigned int i = 0; i < _grid_num_dimensions; i++) {
+			ival >> _base[i];
+		}
+	}
 
     for (pugi::xml_node strip = node_mesh.child("Strip"); strip; strip = strip.next_sibling("Strip")){
 
@@ -555,6 +588,42 @@ void Mesh::FromXML(istream& s)
         vector<Cell> vec_quad = this->CellsFromXMLStrip(strip,time_factor);
 		_vec_vec_quad.push_back(vec_quad);
     }
+
+	_strip_length = _resolution[_grid_num_dimensions - 1];
+	_num_strips = 1;
+	for (unsigned int d = 0; d < _resolution.size() - 1; d++) { _num_strips *= _resolution[d]; }
+	_grid_cell_width = _dimensions[_grid_num_dimensions - 1] / _strip_length;
+	_grid_cell_height = _dimensions[_grid_num_dimensions - 2] / _resolution[_grid_num_dimensions - 2];
+
+	_grid_v_width = _dimensions[_grid_num_dimensions - 1] / _strip_length;
+	_grid_h_height = _dimensions[_grid_num_dimensions - 2] / _resolution[_grid_num_dimensions - 2];
+	_grid_min_v = _base[_grid_num_dimensions - 1];
+	_grid_min_h = _base[_grid_num_dimensions - 2];
+	_grid_res_v = _resolution[_grid_num_dimensions - 1];
+	_grid_res_h = _resolution[_grid_num_dimensions - 2];
+
+	for (unsigned int i = 0; i < _num_strips; i++) {
+		std::vector<Cell> strip;
+		for (unsigned int j = 0; j < _strip_length; j++) {
+			// For now, just generate four 2D points for the last two
+			// demensions
+			double v_width = _dimensions[_grid_num_dimensions - 1] / _resolution[_grid_num_dimensions - 1];
+			double w_width = _dimensions[0] / (_resolution[0]);
+			double pv = v_width * j;
+			double pw = w_width * i;
+			double bv = _base[_grid_num_dimensions - 1];
+			double bw = _base[0];
+
+			std::vector<Point> ps;
+			ps.push_back(Point(bv + pv, bw + pw));
+			ps.push_back(Point(bv + pv + v_width, bw + pw));
+			ps.push_back(Point(bv + pv + v_width, bw + pw + w_width));
+			ps.push_back(Point(bv + pv, bw + pw + w_width));
+
+			strip.push_back(Cell(ps));
+		}
+		_vec_vec_quad.push_back(strip);
+	}
 
 	// build the mapping and the list of lists that allows to tell which cells a mesh point belongs to
 	this->CreateNeighbours();

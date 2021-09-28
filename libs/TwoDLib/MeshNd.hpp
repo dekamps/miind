@@ -29,6 +29,15 @@ namespace TwoDLib {
                 _num_strips = 1;
                 for (unsigned int d = 0; d< _resolution.size()-1; d++) { _num_strips *= _resolution[d]; }
                 _grid_cell_width =  dimensions[_num_dimensions-1] / _strip_length;
+                _grid_cell_height = dimensions[_num_dimensions-2] / _resolution[_num_dimensions-2];
+
+                _grid_v_width = dimensions[_num_dimensions - 1] / _strip_length;
+                _grid_h_height = dimensions[_num_dimensions - 2] / _resolution[_num_dimensions - 2];
+                _grid_min_v = base[_num_dimensions - 1];
+                _grid_min_h = base[_num_dimensions - 2];
+                _grid_res_v = _resolution[_num_dimensions - 1];
+                _grid_res_h = _resolution[_num_dimensions - 2];
+
                 _t_step = t_step;
 
                 for (unsigned int i =0; i<_num_strips; i++){

@@ -5,6 +5,7 @@
 #include <MPILib/include/DelayedConnectionQueue.hpp>
 #include <TwoDLib/display.hpp>
 #include <TwoDLib/MasterParameter.hpp>
+#include <TwoDLib/MeshNd.hpp>
 
 typedef CudaTwoDLib::fptype fptype;
 typedef CudaTwoDLib::inttype inttype;

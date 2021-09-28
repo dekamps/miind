@@ -162,7 +162,7 @@ namespace TwoDLib {
 		_t_cur = par_run.getTBegin();
 		MPILib::Time t_step     = par_run.getTStep();
 
-		Display::getInstance()->addOdeSystem(_node_id, &_sys);
+		Display::getInstance()->addOdeSystem(_node_id, &_sys, false);
 		GridReport<MPILib::CustomConnectionParameters>::getInstance()->registerObject(_node_id, this);
 
 		// the integration time step, stored in the MasterParameter, is gauged with respect to the
