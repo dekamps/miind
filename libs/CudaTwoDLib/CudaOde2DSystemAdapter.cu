@@ -106,7 +106,9 @@ void CudaOde2DSystemAdapter::EstimateGridThresholdsResetsRefractories(const std:
 	for (inttype m = 0; m < _mesh_size; m++) {
 		_refractories[m] = times[m];
 		unsigned int middle_cell = int(vec_vec_reset[m].size() / 2.0);
-		double min_threshold = (vec_mesh[m].getGridResV() * vec_mesh[m].getVWidth()) + vec_mesh[m].getGridMinV();
+		unsigned int threshold_reset_dimension = vec_mesh[m].getGridThresholdResetDirection();
+		double min_threshold = (vec_mesh[m].getGridResolutionByDimension(threshold_reset_dimension) * vec_mesh[m].getGridCellWidthByDimension(threshold_reset_dimension)) 
+			+ vec_mesh[m].getGridBaseByDimension(threshold_reset_dimension);
 		for (unsigned int check = 0; check < vec_vec_reset[m].size(); check++) {
 			if (min_threshold > vec_mesh[m].Quad(vec_vec_reset[m][check]._from[0], vec_vec_reset[m][check]._from[1]).Centroid()[0])
 				min_threshold = vec_mesh[m].Quad(vec_vec_reset[m][check]._from[0], vec_vec_reset[m][check]._from[1]).Centroid()[0];
@@ -116,7 +118,7 @@ void CudaOde2DSystemAdapter::EstimateGridThresholdsResetsRefractories(const std:
 		
 		// To calculate the reset_w, get the w difference between from and to then add a little based on the alpha value.
 		_reset_ws[m] = vec_mesh[m].Quad(vec_vec_reset[m][middle_cell]._to[0], vec_vec_reset[m][middle_cell]._to[1]).Centroid()[1] - vec_mesh[m].Quad(vec_vec_reset[m][middle_cell]._from[0], vec_vec_reset[m][middle_cell]._from[1]).Centroid()[1];
-		_reset_ws[m] -= vec_mesh[m].getHHeight() * (1.0 - vec_vec_reset[m][middle_cell]._alpha);
+		_reset_ws[m] -= vec_mesh[m].getGridCellWidthByDimension(vec_mesh[m].getGridThresholdResetJumpDirection()) * (1.0 - vec_vec_reset[m][middle_cell]._alpha);
 	}
 }
 
@@ -647,21 +649,19 @@ void CudaOde2DSystemAdapter::RedistributeGridFiniteObjects(std::vector<inttype>&
 
 	for (inttype m : meshes) {
 		inttype numBlocks = (_vec_num_objects[m] + _blockSize - 1) / _blockSize;
+		inttype reset_dim = _group.MeshObjects()[m].getGridThresholdResetDirection();
+		inttype jump_dim = _group.MeshObjects()[m].getGridThresholdResetJumpDirection();
 
-		int threshold_col = int((_thresholds[m]-_group.MeshObjects()[m].getGridMinV()) / _group.MeshObjects()[m].getVWidth());
-		int reset_col = int((_resets[m] - _group.MeshObjects()[m].getGridMinV()) / _group.MeshObjects()[m].getVWidth());
-		int reset_w_rows = int (_reset_ws[m] / _group.MeshObjects()[m].getHHeight());
-		int res_v = _group.MeshObjects()[m].getGridResV();
-		double reset_stays_probability = (_reset_ws[m] / _group.MeshObjects()[m].getHHeight()) - reset_w_rows;
+		int threshold_col = int((_thresholds[m]-_group.MeshObjects()[m].getGridBaseByDimension(reset_dim) / _group.MeshObjects()[m].getGridCellWidthByDimension(reset_dim)));
+		int reset_col = int((_resets[m] - _group.MeshObjects()[m].getGridBaseByDimension(reset_dim)) / _group.MeshObjects()[m].getGridCellWidthByDimension(reset_dim));
+		int reset_w_rows = int (_reset_ws[m] / _group.MeshObjects()[m].getGridCellWidthByDimension(jump_dim));
+		int res_v = _group.MeshObjects()[m].getGridResolutionByDimension(reset_dim);
+		double reset_stays_probability = (_reset_ws[m] / _group.MeshObjects()[m].getGridCellWidthByDimension(jump_dim)) - reset_w_rows;
 		double refractory_time = _refractories[m];
 		double timestep = _group.MeshObjects()[m].TimeStep();
 
-		if (_group.MeshObjects()[m].stripsAreVOriented())
-			CudaGridResetFiniteObjects << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m], _vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index,
-				threshold_col, reset_col, reset_w_rows, res_v, reset_stays_probability, refractory_time, timestep, _spikes, _offsets[m], rand_state);
-		else
-			CudaGridResetFiniteObjectsRot << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m], _vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index,
-				threshold_col, reset_col, reset_w_rows, res_v, reset_stays_probability, refractory_time, timestep, _spikes, _offsets[m], rand_state);
+		CudaGridResetFiniteObjects << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m], _vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index,
+			threshold_col, reset_col, reset_w_rows, res_v, reset_stays_probability, refractory_time, timestep, _spikes, _offsets[m], rand_state);
 
 	}
 

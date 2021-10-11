@@ -85,7 +85,7 @@ void CalculateProjectionsGeometric(std::ofstream& ofst,
   std::vector<double> base = {w_min, v_min};
   std::vector<unsigned int> resolution = {nw, nv};
   
-  TwoDLib::MeshNd bins(0.1, 2, resolution, dimensions, base);
+  TwoDLib::Mesh bins(0.1, resolution, dimensions, base);
   TwoDLib::MeshTree tree(mesh);
   TwoDLib::MeshTree tree_bins(bins);
   TwoDLib::Uniform uni(123456);

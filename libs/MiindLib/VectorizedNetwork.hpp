@@ -5,7 +5,6 @@
 #include <MPILib/include/DelayedConnectionQueue.hpp>
 #include <TwoDLib/display.hpp>
 #include <TwoDLib/MasterParameter.hpp>
-#include <TwoDLib/MeshNd.hpp>
 
 typedef CudaTwoDLib::fptype fptype;
 typedef CudaTwoDLib::inttype inttype;
@@ -96,7 +95,7 @@ namespace MiindLib {
             _density_intervals = intervals;
         }
 
-        void addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w,
+        void addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w, double start_u,
             std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive, unsigned int finite_size = 0);
 
         void addMeshNode(TwoDLib::Mesh mesh, std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive, unsigned int finite_size = 0);
@@ -136,6 +135,7 @@ namespace MiindLib {
         std::vector<TwoDLib::TransitionMatrix> _vec_transforms;
         std::vector<double> _start_vs;
         std::vector<double> _start_ws;
+        std::vector<double> _start_us;
 
         std::vector<TwoDLib::Mesh> _vec_mesh;
         std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_rev;
@@ -192,6 +192,8 @@ namespace MiindLib {
         std::map<MPILib::NodeId, std::vector<MPILib::NodeId>> _node_to_connection_queue;
         std::map<MPILib::NodeId, std::vector<MPILib::NodeId>> _external_to_connection_queue;
         std::vector<fptype> _effs;
+        std::vector<fptype> _grid_cell_widths;
+        std::vector<inttype> _grid_cell_offsets;
 
         std::map<MPILib::NodeId, fptype> _current_node_rates;
 

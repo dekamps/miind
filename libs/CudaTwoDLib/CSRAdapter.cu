@@ -92,7 +92,7 @@ void CSRAdapter::FillForwardMatrixMaps(const std::vector<TwoDLib::CSRMatrix>& ve
     }
 }
 
-void CSRAdapter::InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex, const std::vector<fptype>& efficacy) {
+void CSRAdapter::InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex, const std::vector<fptype>& efficacy, const std::vector<fptype>& cell_width, const std::vector<inttype>& grid_efficacy_offset) {
     _nr_grid_connections = efficacy.size();
     for (inttype m = 0; m < efficacy.size(); m++)
     {
@@ -104,13 +104,13 @@ void CSRAdapter::InitializeStaticGridEfficacies(const std::vector<inttype>& veci
         inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1) / _blockSize;
 
         CudaCalculateGridEfficacies << <numBlocks, _blockSize >> > (_nr_rows[vecindex[m]],
-            efficacy[m], _cell_widths[vecindex[m]],
+            efficacy[m], cell_width[m], grid_efficacy_offset[m],
             _stays[m], _goes[m], _offset1s[m], _offset2s[m]);
     }
 }
 
 void CSRAdapter::InitializeStaticGridConductanceEfficacies(const std::vector<inttype>& vecindex,
-    const std::vector<fptype>& efficacy, const std::vector<fptype>& rest_vs) {
+    const std::vector<fptype>& efficacy, const std::vector<fptype>& cell_widths, const std::vector<inttype>& cell_offsets, const std::vector<fptype>& rest_vs) {
     _nr_grid_connections = efficacy.size();
 
     checkCudaErrors(cudaMalloc((fptype**)&_cell_vs, _group.getGroup().Vs().size() * sizeof(fptype)));
@@ -131,7 +131,7 @@ void CSRAdapter::InitializeStaticGridConductanceEfficacies(const std::vector<int
         inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1) / _blockSize;
 
         CudaCalculateGridEfficaciesWithConductance << <numBlocks, _blockSize >> > (_nr_rows[vecindex[m]],
-            efficacy[m], _cell_widths[vecindex[m]], _cell_vs, rest_vs[m],
+            efficacy[m], cell_widths[m], cell_offsets[m], _cell_vs, rest_vs[m],
             _stays[m], _goes[m], _offset1s[m], _offset2s[m], _offsets[vecindex[m]]);
     }
 }
@@ -197,7 +197,6 @@ CSRAdapter::CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib:
     _forward_ja(std::vector<inttype*>(vecmat.size())),
     _offsets(this->Offsets(vecmat)),
     _nr_rows(this->NrRows(vecmat)),
-    _cell_widths(this->CellWidths(vecmat)),
     _goes(nr_grid_connections),
     _stays(nr_grid_connections),
     _offset1s(nr_grid_connections),
@@ -304,15 +303,6 @@ std::vector<inttype> CSRAdapter::NrRows(const std::vector<TwoDLib::CSRMatrix>& v
     std::vector<inttype> vecret;
     for (inttype m = 0; m < vecmat.size(); m++)
         vecret.push_back(vecmat[m].NrRows());
-    return vecret;
-}
-
-std::vector<fptype> CSRAdapter::CellWidths(const std::vector<TwoDLib::CSRMatrix>& vecmat) const
-{
-    std::vector<fptype> vecret;
-    for (inttype m = 0; m < _grid_transforms.size(); m++) {
-        vecret.push_back(_group.getGroup().MeshObjects()[_grid_transforms[m]].getCellWidth());
-    }
     return vecret;
 }
 
@@ -453,7 +443,7 @@ void CSRAdapter::setRandomSeeds(double seed) {
 }
 
 void CSRAdapter::CalculateMeshGridDerivativeWithEfficacyFinite(const std::vector<inttype>& vecindex,
-    const std::vector<fptype>& vecrates, const std::vector<fptype>& efficacy, double timestep)
+    const std::vector<fptype>& vecrates, const std::vector<fptype>& efficacy, const std::vector<fptype>& cell_widths, const std::vector<inttype>& cell_offsets, double timestep)
 {
     if (_group.NumObjects() == 0)
         return;
@@ -467,7 +457,7 @@ void CSRAdapter::CalculateMeshGridDerivativeWithEfficacyFinite(const std::vector
 
         CudaGridUpdateFiniteObjectsCalc << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_m], _group._vec_num_object_offsets[mesh_m], _random_poisson, _group._vec_objects_to_index,
             _group._vec_objects_refract_times, _group._vec_objects_refract_index,
-            efficacy[mesh_m],_cell_widths[mesh_m], _randomState);
+            efficacy[mesh_m],cell_widths[mesh_m], cell_offsets[mesh_m], _randomState);
 
     }
 

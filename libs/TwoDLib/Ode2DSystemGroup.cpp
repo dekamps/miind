@@ -665,7 +665,7 @@ bool Ode2DSystemGroup::CheckConsistency() const {
 				ost_err << "reset. NrStrips: " << _mesh_list[m].NrStrips() << ", from: " << r._from[0] << std::endl;
 				throw TwoDLib::TwoDLibException(ost_err.str());
 			}
-			if ( r._from[1] >= _mesh_list[m].NrCellsInStrip(r._from[0] ) ){
+			if ( r._from[1] >= _mesh_list[m].NrCellsInStrip(r._from[0] )){
 				ost_err << "reset. Nr cells in strip r._from[0]: " <<  _mesh_list[m].NrCellsInStrip(r._from[0] ) << ", from: " << r._from[1];
 				throw TwoDLib::TwoDLibException(ost_err.str());
 			}

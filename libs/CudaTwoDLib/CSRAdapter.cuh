@@ -63,13 +63,13 @@ namespace CudaTwoDLib {
 
 		void CalculateGridDerivative(const std::vector<inttype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<fptype>&, const std::vector<int>&, const std::vector<int>&);
 
-		void InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex, const std::vector<fptype>& efficacy);
+		void InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex, const std::vector<fptype>& efficacy, const std::vector<fptype>& cell_width, const std::vector<inttype>& grid_efficacy_offset);
 
-		void InitializeStaticGridConductanceEfficacies(const std::vector<inttype>& vecindex, const std::vector<fptype>& efficacy, const std::vector<fptype>& rest_vs);
+		void InitializeStaticGridConductanceEfficacies(const std::vector<inttype>& vecindex, const std::vector<fptype>& efficacy, const std::vector<fptype>& cell_widths, const std::vector<inttype>& cell_offsets, const std::vector<fptype>& rest_vs);
 
 		void CalculateMeshGridDerivativeWithEfficacy(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates);
 
-		void CalculateMeshGridDerivativeWithEfficacyFinite(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates, const std::vector<fptype>& efficacy, double timestep);
+		void CalculateMeshGridDerivativeWithEfficacyFinite(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates, const std::vector<fptype>& efficacy, const std::vector<fptype>& cell_widths, const std::vector<inttype>& cell_offsets, double timestep);
 
 		void SingleTransformStep();
 
@@ -134,7 +134,6 @@ namespace CudaTwoDLib {
 		std::vector<inttype> _offsets;
 		std::vector<inttype> _nr_rows;
 
-		std::vector<fptype>	 _cell_widths;
 		std::vector<fptype*> _goes;
 		std::vector<fptype*> _stays;
 		std::vector<int*> _offset1s;

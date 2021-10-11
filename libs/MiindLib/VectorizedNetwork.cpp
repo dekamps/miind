@@ -12,7 +12,7 @@ VectorizedNetwork::VectorizedNetwork(MPILib::Time time_step) :
 {
 }
 
-void VectorizedNetwork::addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w,
+void VectorizedNetwork::addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w, double start_u,
     std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive, unsigned int finite_size) {
 
     _num_nodes++;
@@ -25,6 +25,7 @@ void VectorizedNetwork::addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatri
     _vec_transforms.push_back(tmat);
     _start_vs.push_back(start_v);
     _start_ws.push_back(start_w);
+    _start_us.push_back(start_u);
 
     _num_grid_objects.push_back(finite_size);
 }
@@ -89,7 +90,7 @@ void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps) {
 #endif
 
     for (MPILib::Index i = 0; i < _grid_meshes.size(); i++) {
-        vector<TwoDLib::Coordinates> coords = _vec_mesh[_grid_meshes[i]].findPointInMeshSlow(TwoDLib::Point(_start_vs[i], _start_ws[i]));
+        vector<TwoDLib::Coordinates> coords = _vec_mesh[_grid_meshes[i]].findPointInMeshSlow(TwoDLib::Point(_start_vs[i], _start_ws[i]), _start_us[i]);
         _group->Initialize(_grid_meshes[i], coords[0][0], coords[0][1]);
 
         //create CSR Matrix for each transforms
@@ -179,7 +180,7 @@ void VectorizedNetwork::addExternalMonitor(MPILib::NodeId nid) {
 void VectorizedNetwork::setupLoop(bool write_displays) {
 
     for (unsigned int i = 0; i < _display_nodes.size(); i++) {
-        TwoDLib::Display::getInstance()->addOdeSystem(_display_nodes[i], _group, true, _node_id_to_group_mesh[_display_nodes[i]]);
+        TwoDLib::Display::getInstance()->addOdeSystem(_display_nodes[i], _group, _vec_mesh[_node_id_to_group_mesh[_display_nodes[i]]].getGridNumDimensions() >= 3, _node_id_to_group_mesh[_display_nodes[i]]);
     }
 
     const MPILib::Time h = 1. / _master_steps * _vec_mesh[0].TimeStep();
@@ -193,6 +194,19 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
         // for each connection, which of group's meshes is being affected
         _connection_out_group_mesh.push_back(_node_id_to_group_mesh[_grid_connections[i]._out]);
         _effs.push_back(std::stod(_grid_connections[i]._params["efficacy"]));
+        
+        unsigned int connection_dimension = 0;
+        if (_grid_connections[i]._params.find("dimension") != _grid_connections[i]._params.end())
+            connection_dimension = std::stoi(_grid_connections[i]._params["dimension"]);
+
+        // Calculate the offset based on dimension of the connection
+        unsigned int num_dimensions = _vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions();
+        unsigned int offset = 1;
+        for (unsigned int i = 0; i < connection_dimension; i++)
+            offset *= _vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridResolutionByDimension(num_dimensions - 1 - i);
+
+        _grid_cell_widths.push_back(_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(num_dimensions - 1 - connection_dimension));
+        _grid_cell_offsets.push_back(offset);
 
         _connection_queue.push_back(MPILib::DelayedConnectionQueue(_network_time_step, std::stod(_grid_connections[i]._params["delay"])));
         if (_grid_connections[i]._external)
@@ -277,10 +291,10 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
             }
     }
 
-    _csr_adapter = new CudaTwoDLib::CSRAdapter(*_group_adapter, _csrs,
+    _csr_adapter = new CudaTwoDLib::CSRAdapter(*_group_adapter, _csrs, 
         _effs.size(), h, _mesh_transform_indexes, _grid_transform_indexes);
 
-    _csr_adapter->InitializeStaticGridEfficacies(_connection_out_group_mesh, _effs);
+    _csr_adapter->InitializeStaticGridEfficacies(_connection_out_group_mesh, _effs, _grid_cell_widths, _grid_cell_offsets);
 
     const auto p1 = std::chrono::system_clock::now();
     _csr_adapter->setRandomSeeds(std::chrono::duration_cast<std::chrono::seconds>(
@@ -347,7 +361,7 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
         _csr_adapter->AddDerivative();
     }
 
-    _csr_adapter->CalculateMeshGridDerivativeWithEfficacyFinite(_connection_out_group_mesh, rates, _effs, _vec_mesh[0].TimeStep());
+    _csr_adapter->CalculateMeshGridDerivativeWithEfficacyFinite(_connection_out_group_mesh, rates, _effs, _grid_cell_widths, _grid_cell_offsets, _vec_mesh[0].TimeStep());
 
     _group_adapter->RedistributeFiniteObjects(_mesh_meshes, _vec_mesh[0].TimeStep(), _csr_adapter->getCurandState());
     _group_adapter->RedistributeGridFiniteObjects(_grid_meshes, _csr_adapter->getCurandState());

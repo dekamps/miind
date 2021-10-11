@@ -115,7 +115,7 @@ public:
     void applyConductance3D(Point& p) {
         double tau_m = 20e-3;
         double E_r = -65e-3;
-        double E_e = 0.0;
+        double E_e = 0;
         double tau_s = 5e-3;
         double tau_t = 5e-3;
         double g_max = 0.8;
@@ -248,7 +248,7 @@ public:
                 ps[i].coords[d] += base_point_coords[d];
             }
             if(btranslated)
-                applyMauritzioExEuler(ps[i]);
+                applyConductance3D(ps[i]);
         }
 
         return Cell(cell_coord, num_dimensions, ps, triangulator);

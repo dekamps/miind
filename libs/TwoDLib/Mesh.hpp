@@ -48,7 +48,15 @@ namespace TwoDLib {
 		//!< Files produced by mesh.py
 		//!< or MatrixGenerator conform to this requirement.
 
-		Mesh(double width) : _grid_cell_width(width) {}
+		Mesh() : _grid_num_dimensions(2), 
+			_num_strips(0), 
+			_strip_length(0), 
+			_t_step(0.1), 
+			_threshold_reset_dimension(1),
+			_threshold_reset_jump_dimension(0) {}
+
+		// Make a 2D grid
+		Mesh(double timestep, std::vector<unsigned int> resolution, std::vector<double> dimension, std::vector<double> base);
 
 		//!< construction from a disk representation via stream. Beware: The disk representation must be in XML format
 		Mesh
@@ -70,12 +78,40 @@ namespace TwoDLib {
 		virtual ~Mesh(){}
 
 		//!< number of strips in the grid
-		virtual unsigned int NrStrips() const { return _vec_vec_quad.size(); }
+		virtual unsigned int NrStrips() const {
+			if (_vec_vec_quad.size() == 0) { return _num_strips; }
+			else { return _vec_vec_quad.size(); }
+		}
 
 		//!< number of cells in strip i
-		virtual unsigned int NrCellsInStrip(unsigned int i) const { assert( i < _vec_vec_quad.size()); return _vec_vec_quad[i].size();}
+		virtual unsigned int NrCellsInStrip(unsigned int i) const {
+			if (_vec_vec_quad.size() == 0 && _grid_num_dimensions > 0)
+				return getGridResolutionByDimension(_grid_num_dimensions - 1);
+			else
+				return _vec_vec_quad[i].size();
+		}
 
-		virtual const Cell& Quad(unsigned int i, unsigned int j) const { return _vec_vec_quad[i][j]; }
+		virtual Cell Quad(unsigned int i, unsigned int j) const {
+			if (_vec_vec_quad.size() == 0 && _grid_num_dimensions > 0) {
+				double v_width = _dimensions[_grid_num_dimensions - 1] / _resolution[_grid_num_dimensions - 1];
+				double w_width = _dimensions[0] / (_resolution[0]);
+				double pv = v_width * j;
+				double pw = w_width * i;
+				double bv = _base[_grid_num_dimensions - 1];
+				double bw = _base[0];
+
+				std::vector<Point> ps;
+				ps.push_back(Point(bv + pv, bw + pw));
+				ps.push_back(Point(bv + pv + v_width, bw + pw));
+				ps.push_back(Point(bv + pv + v_width, bw + pw + w_width));
+				ps.push_back(Point(bv + pv, bw + pw + w_width));
+
+				return Cell(ps);
+			}
+			else {
+				return _vec_vec_quad[i][j];
+			}
+		}
 
 		//!< Provide a mesh point, the function returns a list of Coordinates that this point belongs to
 		//!< Caution! Stationary points will not show up in the returned list and must be tested separately
@@ -95,7 +131,7 @@ namespace TwoDLib {
 
 		vector<Coordinates> findV(double V, Threshold) const;
 
-		vector<Coordinates> findPointInMeshSlow(const Point&) const;
+		vector<Coordinates> findPointInMeshSlow(const Point&, const double u = 0.0) const;
 
 		//! These cells are labeled with Coordinates(0,j). They have no neighbours, and tests as to whether
 		//! points fall inside them should be made directly; they can not be expected to show up in
@@ -110,20 +146,20 @@ namespace TwoDLib {
 		//! and therefore can be processed by getline
 		void ToXML(std::ostream&) const;
 
-		// Get the grid cell width (only useful if the mesh is a grid)
-		double getCellWidth() const;
-		double getCellHeight() const;
+		double getGridCellWidthByDimension(unsigned int dim) const;
+		unsigned int getGridResolutionByDimension(unsigned int dim) const;
+		double getGridBaseByDimension(unsigned int dim) const;
+		double getGridSizeByDimension(unsigned int dim) const;
 
-		bool stripsAreVOriented() const;
+		// ideally, we wouldn't have a single direction for reset in the grid (and we don't
+		// if we're not using finite size - but to speed up finite size, we calculate the minimum threshold
+		// instead of applying the reset check for every reset cell so we need to say here which
+		// dimension the threshold/reset applies so we can work out in what direction to check for the 
+		// minimum threshold collumn (or row or whatever).
+		unsigned int getGridThresholdResetDirection() const;
+		unsigned int getGridThresholdResetJumpDirection() const;
 
-		double getVWidth() const;
-		double getHHeight() const;
-
-		double getGridMinV() const;
-		double getGridMinH() const;
-
-		unsigned int getGridResV() const;
-		unsigned int getGridResH() const;
+		unsigned int getGridNumDimensions() const;
 
 		class GridCellTransition{
 		public:
@@ -136,7 +172,7 @@ namespace TwoDLib {
 			_stays(s), _goes(g), _offset_1(o1), _offset_2(o2) {}
 		};
 
-		GridCellTransition calculateCellTransition(double efficacy) const;
+		GridCellTransition calculateCellTransition(double efficacy, unsigned int dim) const;
 
 	protected:
 
@@ -178,21 +214,13 @@ namespace TwoDLib {
 		vector<vector<PolyGenerator> >	    _vec_vec_gen;
 		vector<unsigned int>              	_vec_timefactor;
 		double								_t_step;
-		bool										_strips_are_v_oriented; // strips in the grid go horizontally, not vertically
-		double										_grid_cell_width;
-		double										_grid_cell_height;
-
-		double										_grid_v_width; // this is different to _grid_cell_width because it is independent of the direction of the efficacy
-		double										_grid_h_height;
-		double										_grid_min_v;
-		double										_grid_min_h;
-		unsigned int								_grid_res_v;
-		unsigned int								_grid_res_h;
 
 		unsigned int								_grid_num_dimensions;
 		std::vector<unsigned int>					_resolution;
 		std::vector<double>							_dimensions;
 		std::vector<double>							_base;
+		unsigned int								_threshold_reset_dimension;
+		unsigned int								_threshold_reset_jump_dimension;
 		unsigned int								_num_strips;
 		unsigned int								_strip_length;
 

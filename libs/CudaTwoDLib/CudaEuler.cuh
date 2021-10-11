@@ -36,7 +36,7 @@ __global__ void CudaCheckRefractingFiniteObjects(inttype N, inttype finite_offse
 __global__ void CudaGridEvolveFiniteObjects(inttype N, inttype finite_offset, inttype* objects, fptype* refract_times, fptype* val, inttype* ia, inttype* ja, inttype offset, curandState* state);
 __global__ void CudaGridUpdateFiniteObjects(inttype N, inttype* spike_counts, inttype* objects, fptype* refract_times, inttype* refract_inds, fptype* stays, fptype* goes, int* offset1, int* offset2, inttype offset, curandState* state);
 __global__ void CudaGridUpdateFiniteObjectsCalc(inttype N, inttype finite_offset, inttype* spike_counts, inttype* objects,
-    fptype* refract_times, inttype* refract_inds, fptype efficacy, fptype grid_cell_width, curandState* state);
+    fptype* refract_times, inttype* refract_inds, fptype efficacy, fptype grid_cell_width, inttype grid_cell_offset, curandState* state);
 __global__ void CudaGridResetFiniteObjects(inttype N, inttype finite_offset, inttype* objects, fptype* refract_times,
     inttype* refract_inds, inttype threshold_col_index, inttype reset_col_index, inttype reset_w_rows,
     inttype res_v, fptype res_v_stays, fptype refractory_time, fptype timestep, inttype* spiked, inttype offset, curandState* state);
@@ -51,6 +51,6 @@ __global__ void CudaSolveIzhikevichNeurons(inttype N, inttype* spike_counts, int
 
 // Grid Algorithm Specialisations
 __global__ void CudaCalculateGridDerivativeWithEfficacy(inttype N, fptype rate, fptype* stays, fptype* goes, int* offset_1, int* offset_2, fptype* derivative, fptype* mass, inttype offset);
-__global__ void CudaCalculateGridEfficaciesWithConductance(inttype N, fptype efficacy, fptype grid_cell_width, fptype* cell_vs, fptype cond_stable, fptype* stays, fptype* goes, int* offset1s, int* offset2s, inttype vs_offset);
-__global__ void CudaCalculateGridEfficacies(inttype N, fptype efficacy, fptype grid_cell_width, fptype* stays, fptype* goes, int* offset1s, int* offset2s);
+__global__ void CudaCalculateGridEfficaciesWithConductance(inttype N, fptype efficacy, fptype grid_cell_width, inttype grid_cell_offset, fptype* cell_vs, fptype cond_stable, fptype* stays, fptype* goes, int* offset1s, int* offset2s, inttype vs_offset);
+__global__ void CudaCalculateGridEfficacies(inttype N, fptype efficacy, fptype grid_cell_width, inttype grid_offset_width, fptype* stays, fptype* goes, int* offset1s, int* offset2s);
 #endif

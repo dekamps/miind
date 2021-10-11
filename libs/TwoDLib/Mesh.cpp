@@ -35,67 +35,51 @@ using namespace std;
 
 const int Mesh::_dimension = 2;
 
+Mesh::Mesh(double timestep,
+	std::vector<unsigned int> resolution,
+	std::vector<double> dimension,
+	std::vector<double> base) :
+	_t_step(timestep),
+	_resolution(resolution),
+	_dimensions(dimension),
+	_base(base){
+
+	_grid_num_dimensions = _dimensions.size();
+	_num_strips = 1;
+	for (unsigned int d = 0; d < _resolution.size()-1; d++) { _num_strips *= _resolution[d]; }
+
+	_strip_length = _resolution[_grid_num_dimensions - 1];
+
+	for (unsigned int i = 0; i < _num_strips; i++) {
+		std::vector<Cell> strip;
+		for (unsigned int j = 0; j < _strip_length; j++) {
+			// For now, just generate four 2D points for the last two
+			// demensions
+			double v_width = _dimensions[_grid_num_dimensions - 1] / _resolution[_grid_num_dimensions - 1];
+			double w_width = _dimensions[0] / (_resolution[0]);
+			double pv = v_width * j;
+			double pw = w_width * i;
+			double bv = _base[_grid_num_dimensions - 1];
+			double bw = _base[0];
+
+			std::vector<Point> ps;
+			ps.push_back(Point(bv + pv, bw + pw));
+			ps.push_back(Point(bv + pv + v_width, bw + pw));
+			ps.push_back(Point(bv + pv + v_width, bw + pw + w_width));
+			ps.push_back(Point(bv + pv, bw + pw + w_width));
+
+			strip.push_back(Cell(ps));
+		}
+		_vec_vec_quad.push_back(strip);
+	}
+}
+
 Mesh::Mesh(istream& s):
 _vec_block(0),
 _vec_vec_quad(0),
 _vec_vec_gen(0),
 _vec_timefactor(0){
 	this->FromXML(s);
-
-	if (NrStrips() > 3 && NrCellsInStrip(0) > 0) { // this is a 2D mesh and if it's a grid, we want to know the cell dimensions
-
-		// If this mesh is a grid, calculate the cell width.
-		// If it's not a mesh, _grid_cell_width etc is meaningless.
-		Quadrilateral q1 = Quad(1,0);
-		Quadrilateral q2 = Quad(1,1);
-
-		double cell_h_dist = std::fabs(q2.Centroid()[0] - q1.Centroid()[0]);
-		double cell_v_dist = std::fabs(q2.Centroid()[1] - q1.Centroid()[1]);
-
-		// one of these distances should be close to zero, so pick the other one
-		// we do this because we don't know if this is a v- or h- efficacy
-
-		_grid_cell_width = std::max(cell_h_dist, cell_v_dist);
-
-		if (cell_h_dist > cell_v_dist) { // This is the v distance
-			_strips_are_v_oriented = true;
-			_grid_v_width = cell_h_dist; 
-			_grid_min_v = Quad(0, 0).Centroid()[0] - (_grid_v_width / 2.0);
-			_grid_res_v = NrCellsInStrip(0);
-		}
-		else {
-			_strips_are_v_oriented = false;
-			_grid_h_height = cell_v_dist;
-			_grid_min_h = Quad(0, 0).Centroid()[1] - (_grid_h_height / 2.0);
-			_grid_res_h = NrCellsInStrip(0);
-		}
-
-		Quadrilateral q3 = Quad(1,1);
-		Quadrilateral q4 = Quad(2,1);
-
-		cell_h_dist = std::fabs(q4.Centroid()[0] - q3.Centroid()[0]);
-		cell_v_dist = std::fabs(q4.Centroid()[1] - q3.Centroid()[1]);
-
-		// one of these distances should be close to zero, so pick the other one
-		// we do this because we don't know if this is a v- or h- efficacy
-
-		_grid_cell_height = std::max(cell_h_dist, cell_v_dist);
-
-		if (cell_h_dist > cell_v_dist) { // This is the h distance
-			_grid_v_width = cell_h_dist; 
-			_grid_min_v = Quad(0, 0).Centroid()[0] - (_grid_v_width / 2.0);
-			_grid_res_v = NrStrips();
-		}
-		else {
-			_grid_h_height = cell_v_dist;
-			_grid_min_h = Quad(0, 0).Centroid()[1] - (_grid_h_height / 2.0);
-			_grid_res_h = NrStrips();
-		}
-
-	} else {
-		_grid_cell_width = 0.0;
-		_grid_cell_height = 0.0;
-	}
 }
 
 Mesh::Mesh(const Mesh& m):
@@ -106,57 +90,48 @@ _vec_timefactor(m._vec_timefactor),
 _t_step(m._t_step),
 _map(m._map),
 _vec_vec_cell(m._vec_vec_cell),
-_grid_cell_width(m._grid_cell_width),
-_grid_cell_height(m._grid_cell_height),
-_grid_v_width(m._grid_v_width),
-_grid_h_height(m._grid_h_height),
-_grid_min_v(m._grid_min_v),
-_grid_min_h(m._grid_min_h),
-_grid_res_v(m._grid_res_v),
-_grid_res_h(m._grid_res_h),
-_strips_are_v_oriented(m._strips_are_v_oriented)
+_grid_num_dimensions(m._grid_num_dimensions),
+_resolution(m._resolution),
+_dimensions(m._dimensions),
+_threshold_reset_dimension(m._threshold_reset_dimension),
+_threshold_reset_jump_dimension(m._threshold_reset_jump_dimension),
+_base(m._base),
+_num_strips(m._num_strips),
+_strip_length(m._strip_length)
 {
 }
 
-double Mesh::getCellWidth() const {
-	return _grid_cell_width;
+double Mesh::getGridCellWidthByDimension(unsigned int dim) const {
+	return _dimensions[dim] / _resolution[dim];
 }
 
-bool Mesh::stripsAreVOriented() const {
-	return _strips_are_v_oriented;
+unsigned int Mesh::getGridResolutionByDimension(unsigned int dim) const {
+	return _resolution[dim];
 }
 
-double Mesh::getCellHeight() const {
-	return _grid_cell_height;
+double Mesh::getGridBaseByDimension(unsigned int dim) const {
+	return _base[dim];
 }
 
-double Mesh::getVWidth() const {
-	return _grid_v_width;
+double Mesh::getGridSizeByDimension(unsigned int dim) const {
+	return _dimensions[dim];
 }
 
-double Mesh::getHHeight() const {
-	return _grid_h_height;
+unsigned int Mesh::getGridThresholdResetDirection() const {
+	return _threshold_reset_dimension;
 }
 
-double Mesh::getGridMinV() const {
-	return _grid_min_v;
+unsigned int Mesh::getGridThresholdResetJumpDirection() const {
+	return _threshold_reset_jump_dimension;
 }
 
-double Mesh::getGridMinH() const {
-	return _grid_min_h;
+unsigned int Mesh::getGridNumDimensions() const {
+	return _grid_num_dimensions;
 }
 
-unsigned int Mesh::getGridResV() const {
-	return _grid_res_v;
-}
-
-unsigned int Mesh::getGridResH() const {
-	return _grid_res_h;
-}
-
-Mesh::GridCellTransition Mesh::calculateCellTransition(double efficacy) const{
-	unsigned int offset = (unsigned int)abs(efficacy/_grid_cell_width);
-	double goes = (double)fabs(efficacy / _grid_cell_width) - offset;
+Mesh::GridCellTransition Mesh::calculateCellTransition(double efficacy, unsigned int dim) const{
+	unsigned int offset = (unsigned int)abs(efficacy/this->getGridCellWidthByDimension(dim));
+	double goes = (double)fabs(efficacy / this->getGridCellWidthByDimension(dim)) - offset;
 	double stays = 1.0 - goes;
 
 	int offset_1 = efficacy > 0 ? -offset : offset;
@@ -284,7 +259,7 @@ vector<Coordinates> Mesh::allCoords() const{
 	return vec_ret;
 }
 
-vector<Coordinates> Mesh::findPointInMeshSlow(const Point& p) const{
+vector<Coordinates> Mesh::findPointInMeshSlow(const Point& p, const double u) const{
 	vector<Coordinates> vec_ret;
 	for (unsigned int i = 0; i < _vec_vec_quad.size(); i++){
 		for (unsigned int j = 0; j < _vec_vec_quad[i].size(); j++){
@@ -293,8 +268,44 @@ vector<Coordinates> Mesh::findPointInMeshSlow(const Point& p) const{
 		}
 	}
 
-	if(vec_ret.size() == 0)
-		throw TwoDLibException("Position does not exist in Mesh");
+	if (vec_ret.size() == 0) { // uh oh, maybe this is a grid, not a mesh
+		if (_grid_num_dimensions >= 3) {
+			if (p[0] < getGridBaseByDimension(_grid_num_dimensions - 1) + getGridSizeByDimension(_grid_num_dimensions - 1) &&
+				p[0] > getGridBaseByDimension(_grid_num_dimensions - 1) &&
+				p[1] < getGridBaseByDimension(_grid_num_dimensions - 2) + getGridSizeByDimension(_grid_num_dimensions - 2) &&
+				p[1] > getGridBaseByDimension(_grid_num_dimensions - 2) &&
+				u < getGridBaseByDimension(_grid_num_dimensions - 3) + getGridSizeByDimension(_grid_num_dimensions - 3) &&
+				u > getGridBaseByDimension(_grid_num_dimensions - 3)) {
+
+				unsigned int i = int(((p[0] - getGridBaseByDimension(_grid_num_dimensions - 1)) / getGridSizeByDimension(_grid_num_dimensions - 1)) * getGridResolutionByDimension(_grid_num_dimensions - 1));
+				unsigned int j = int(((p[1] - getGridBaseByDimension(_grid_num_dimensions - 2)) / getGridSizeByDimension(_grid_num_dimensions - 2)) * getGridResolutionByDimension(_grid_num_dimensions - 2));
+				unsigned int k = int(((u - getGridBaseByDimension(_grid_num_dimensions - 3)) / getGridSizeByDimension(_grid_num_dimensions - 3)) * getGridResolutionByDimension(_grid_num_dimensions - 3));
+
+				unsigned int strips = j + (k * getGridResolutionByDimension(_grid_num_dimensions - 3));
+
+				vec_ret.push_back(Coordinates(strips, i));
+			}
+			else {
+				throw TwoDLibException("Position does not exist in 3D Grid");
+			}
+		}
+		else {
+			if (p[0] < getGridBaseByDimension(_grid_num_dimensions - 1) + getGridSizeByDimension(_grid_num_dimensions - 1) &&
+				p[0] > getGridBaseByDimension(_grid_num_dimensions - 1) &&
+				p[1] < getGridBaseByDimension(_grid_num_dimensions - 2) + getGridSizeByDimension(_grid_num_dimensions - 2) &&
+				p[1] > getGridBaseByDimension(_grid_num_dimensions - 2)) {
+
+				unsigned int i = int(((p[0] - getGridBaseByDimension(_grid_num_dimensions - 1)) / getGridSizeByDimension(_grid_num_dimensions - 1)) * getGridResolutionByDimension(_grid_num_dimensions - 1));
+				unsigned int j = int(((p[1] - getGridBaseByDimension(_grid_num_dimensions - 2)) / getGridSizeByDimension(_grid_num_dimensions - 2)) * getGridResolutionByDimension(_grid_num_dimensions - 2));
+
+				vec_ret.push_back(Coordinates(j, i));
+			}
+			else {
+				throw TwoDLibException("Position does not exist in Grid");
+			}
+		}
+		
+	}
 
 	return vec_ret;
 }
@@ -404,21 +415,6 @@ _vec_vec_gen(0)
 			this->ProcessNonXML(ifst);
 		}
 	}
-	// if (! this->CheckAreas() )
-	// 	throw TwoDLib::TwoDLibException("Zero area in mesh.");
-
-	// If this mesh is a grid, calculate the cell width.
-	// If it's not a mesh, _grid_cell_width is meaningless.
-	Quadrilateral q1 = Quad(1,0);
-	Quadrilateral q2 = Quad(1,1);
-
-	double cell_h_dist = std::fabs(q2.Centroid()[0] - q1.Centroid()[0]);
-	double cell_v_dist = std::fabs(q2.Centroid()[1] - q1.Centroid()[1]);
-
-	// one of these distances should be close to zero, so pick the other one
-	// we do this because we don't know if this is a v- or h- efficacy
-
-	_grid_cell_width = std::max(cell_h_dist, cell_v_dist);
 }
 
 bool Mesh::CheckAreas() const {
@@ -547,15 +543,17 @@ void Mesh::FromXML(istream& s)
     std::istringstream ival(node_ts.first_child().value());
 	ival >> _t_step;
 
+	_grid_num_dimensions = 2;
 	//Extract number of dimensions if it's there.
 	node_ts = node_mesh.child("GridNumDimensions");
 	if (node_ts) {
 		std::istringstream ival(node_ts.first_child().value());
 		ival >> _grid_num_dimensions;
-		_resolution = vector<unsigned int>(_grid_num_dimensions);
-		_dimensions = vector<double>(_grid_num_dimensions);
-		_base = vector<double>(_grid_num_dimensions);
 	}
+
+	_resolution = vector<unsigned int>(_grid_num_dimensions);
+	_dimensions = vector<double>(_grid_num_dimensions);
+	_base = vector<double>(_grid_num_dimensions);
 
 	node_ts = node_mesh.child("GridDimensions");
 	if (node_ts) {
@@ -581,52 +579,43 @@ void Mesh::FromXML(istream& s)
 		}
 	}
 
-    for (pugi::xml_node strip = node_mesh.child("Strip"); strip; strip = strip.next_sibling("Strip")){
+	// For now, just say that the direction of the strip is the threshold reset direction
+	// TODO: Allow this to be overridden in the model XML
+	_threshold_reset_dimension = _grid_num_dimensions - 1;
+	_threshold_reset_jump_dimension = _grid_num_dimensions - 2;
 
-    	unsigned int time_factor = this->TimeFactorFromStrip(strip);
-    	_vec_timefactor.push_back(time_factor);
-        vector<Cell> vec_quad = this->CellsFromXMLStrip(strip,time_factor);
-		_vec_vec_quad.push_back(vec_quad);
-    }
+	
 
-	_strip_length = _resolution[_grid_num_dimensions - 1];
-	_num_strips = 1;
-	for (unsigned int d = 0; d < _resolution.size() - 1; d++) { _num_strips *= _resolution[d]; }
-	_grid_cell_width = _dimensions[_grid_num_dimensions - 1] / _strip_length;
-	_grid_cell_height = _dimensions[_grid_num_dimensions - 2] / _resolution[_grid_num_dimensions - 2];
+	if (_dimensions.size() == 0 || _grid_num_dimensions == 2) { // this is a mesh or a 2D grid
+		_num_strips = 0;
+		for (pugi::xml_node strip = node_mesh.child("Strip"); strip; strip = strip.next_sibling("Strip")) {
 
-	_grid_v_width = _dimensions[_grid_num_dimensions - 1] / _strip_length;
-	_grid_h_height = _dimensions[_grid_num_dimensions - 2] / _resolution[_grid_num_dimensions - 2];
-	_grid_min_v = _base[_grid_num_dimensions - 1];
-	_grid_min_h = _base[_grid_num_dimensions - 2];
-	_grid_res_v = _resolution[_grid_num_dimensions - 1];
-	_grid_res_h = _resolution[_grid_num_dimensions - 2];
-
-	for (unsigned int i = 0; i < _num_strips; i++) {
-		std::vector<Cell> strip;
-		for (unsigned int j = 0; j < _strip_length; j++) {
-			// For now, just generate four 2D points for the last two
-			// demensions
-			double v_width = _dimensions[_grid_num_dimensions - 1] / _resolution[_grid_num_dimensions - 1];
-			double w_width = _dimensions[0] / (_resolution[0]);
-			double pv = v_width * j;
-			double pw = w_width * i;
-			double bv = _base[_grid_num_dimensions - 1];
-			double bw = _base[0];
-
-			std::vector<Point> ps;
-			ps.push_back(Point(bv + pv, bw + pw));
-			ps.push_back(Point(bv + pv + v_width, bw + pw));
-			ps.push_back(Point(bv + pv + v_width, bw + pw + w_width));
-			ps.push_back(Point(bv + pv, bw + pw + w_width));
-
-			strip.push_back(Cell(ps));
+			unsigned int time_factor = this->TimeFactorFromStrip(strip);
+			_vec_timefactor.push_back(time_factor);
+			vector<Cell> vec_quad = this->CellsFromXMLStrip(strip, time_factor);
+			_vec_vec_quad.push_back(vec_quad);
+			_num_strips++;
 		}
-		_vec_vec_quad.push_back(strip);
-	}
 
-	// build the mapping and the list of lists that allows to tell which cells a mesh point belongs to
-	this->CreateNeighbours();
+		double min_v = _vec_vec_quad[0][0].getVecV()[0];
+		double max_v = _vec_vec_quad[0][_vec_vec_quad.size()-1].getVecV()[3];
+
+		_resolution[1] = _vec_vec_quad[0].size();
+		_resolution[0] = _num_strips;
+
+		_base[1] = _vec_vec_quad[0][0].Centroid()[0];
+		_base[0] = _vec_vec_quad[0][0].Centroid()[1];
+
+		_dimensions[1] = _vec_vec_quad[0][_vec_vec_quad[0].size()-1].Centroid()[0];
+		_dimensions[0] = _vec_vec_quad[0][_vec_vec_quad[0].size() - 1].Centroid()[1];
+
+		this->CreateNeighbours();
+	}
+	else {
+		_strip_length = _resolution[_grid_num_dimensions - 1];
+		_num_strips = 1;
+		for (unsigned int d = 0; d < _resolution.size() - 1; d++) { _num_strips *= _resolution[d]; }
+	}
 }
 
 void Mesh::ToXML(ostream& s) const{

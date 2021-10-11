@@ -182,7 +182,7 @@ __global__ void CudaGridUpdateFiniteObjects(inttype N, inttype* spike_counts, in
 }
 
 __global__ void CudaGridUpdateFiniteObjectsCalc(inttype N, inttype finite_offset, inttype* spike_counts, inttype* objects,
-    fptype* refract_times, inttype* refract_inds, fptype efficacy, fptype grid_cell_width, curandState* state) {
+    fptype* refract_times, inttype* refract_inds, fptype efficacy, fptype grid_cell_width, inttype grid_cell_offset, curandState* state) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
 
@@ -197,10 +197,10 @@ __global__ void CudaGridUpdateFiniteObjectsCalc(inttype N, inttype finite_offset
 
         fptype r = curand_uniform(&state[index]);
         if (r > g) {
-            int o1 = spike_eff > 0 ? ofs : -ofs;
+            int o1 = (spike_eff > 0 ? ofs : -ofs) * grid_cell_offset;
             objects[offset_index] = objects[offset_index] + o1;
         } else {
-            int o2 = spike_eff > 0 ? (ofs + 1) : (ofs - 1);
+            int o2 = (spike_eff > 0 ? (ofs + 1) : (ofs - 1))* grid_cell_offset;
             objects[offset_index] = objects[offset_index] + o2;
         }
 
@@ -410,7 +410,7 @@ __global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* m
 // This function shouldn't be used in that way but it a good example in case you want to
 // include some kind of variable efficacy.
 __global__ void CudaCalculateGridEfficacies(inttype N,
-    fptype efficacy, fptype grid_cell_width,
+    fptype efficacy, fptype grid_cell_width, inttype grid_offset_width,
     fptype* stays, fptype* goes, int* offset1s, int* offset2s)
 {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -421,8 +421,8 @@ __global__ void CudaCalculateGridEfficacies(inttype N,
         fptype g = (fptype)fabs(efficacy / grid_cell_width) - ofs;
         fptype s = 1.0 - g;
 
-        int o1 = efficacy > 0 ? ofs : -ofs;
-        int o2 = efficacy > 0 ? (ofs + 1) : (ofs - 1);
+        int o1 = (efficacy > 0 ? ofs : -ofs) * grid_offset_width;
+        int o2 = (efficacy > 0 ? (ofs + 1) : (ofs - 1)) * grid_offset_width;
 
         stays[modulo(i + o1, N)] = s;
         goes[modulo(i + o2, N)] = g;
@@ -434,7 +434,7 @@ __global__ void CudaCalculateGridEfficacies(inttype N,
 // As above, this function should not be used per iteration as the efficacy doesn't
 // change during simulation.
 __global__ void CudaCalculateGridEfficaciesWithConductance(inttype N,
-    fptype efficacy, fptype grid_cell_width, fptype* cell_vs, fptype cond_stable,
+    fptype efficacy, fptype grid_cell_width, inttype grid_cell_offset, fptype* cell_vs, fptype cond_stable,
     fptype* stays, fptype* goes, int* offset1s, int* offset2s, inttype vs_offset)
 {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -451,8 +451,8 @@ __global__ void CudaCalculateGridEfficaciesWithConductance(inttype N,
         fptype g = (fptype)fabs(eff / grid_cell_width) - ofs;
         fptype s = 1.0 - g;
 
-        int o1 = efficacy > 0 ? ofs : -ofs;
-        int o2 = efficacy > 0 ? (ofs + 1) : (ofs - 1);
+        int o1 = (efficacy > 0 ? ofs : -ofs) * grid_cell_offset;
+        int o2 = (efficacy > 0 ? (ofs + 1) : (ofs - 1)) * grid_cell_offset;
 
         stays[modulo(i + o1, N)] = s;
         goes[modulo(i + o2, N)] = g;
