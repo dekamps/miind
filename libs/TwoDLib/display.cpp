@@ -482,7 +482,7 @@ void Display::display_3d(void) {
 			for (unsigned int j = 0; j < m.NrCellsInStrip(i); j++) {
 				unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index, (i * size_y) + k, j);
 
-				if (i != 0 && k != 0 && j != 0 && i != size_z - 1 && k != size_y - 1 && j != size_x - 1)
+				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() == 0 && i != 0 && k != 0 && j != 0 && i != size_z - 1 && k != size_y - 1 && j != size_x - 1)
 					if (_dws[window_index]._system->Mass()[idx] == 0) continue; // skip if mass is basically nothing
 
 				double cell_area = std::abs(m.Quad(0, 0).SignedArea());
@@ -873,15 +873,10 @@ void Display::scene_3d(int width, int height)
 }
 
 void Display::init() const {
-	gluPerspective(45, 1, 2, 10);
-	glEnable(GL_DEPTH_TEST);
-	//glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
+	
 }
 
 void Display::init_3d() const {
-	gluPerspective(45, 1, 2, 10);
-	glEnable(GL_DEPTH_TEST);
-	//glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
 }
 
 void Display::update() {

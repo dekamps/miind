@@ -97,7 +97,8 @@ _threshold_reset_dimension(m._threshold_reset_dimension),
 _threshold_reset_jump_dimension(m._threshold_reset_jump_dimension),
 _base(m._base),
 _num_strips(m._num_strips),
-_strip_length(m._strip_length)
+_strip_length(m._strip_length),
+_strips_are_v_oriented(m._strips_are_v_oriented)
 {
 }
 
@@ -246,6 +247,10 @@ vector<Coordinates> Mesh::findV(double V, Threshold th) const
 		}
 	}
 	return vec_ret;
+}
+
+bool Mesh::stripsAreVOriented() const {
+	return _strips_are_v_oriented;
 }
 
 vector<Coordinates> Mesh::allCoords() const{
@@ -583,8 +588,7 @@ void Mesh::FromXML(istream& s)
 	// TODO: Allow this to be overridden in the model XML
 	_threshold_reset_dimension = _grid_num_dimensions - 1;
 	_threshold_reset_jump_dimension = _grid_num_dimensions - 2;
-
-	
+	_strips_are_v_oriented = true;
 
 	if (_dimensions.size() == 0 || _grid_num_dimensions == 2) { // this is a mesh or a 2D grid
 		_num_strips = 0;
@@ -597,17 +601,48 @@ void Mesh::FromXML(istream& s)
 			_num_strips++;
 		}
 
+		// We're unfortunately still potentially using the old way of doing 2D
+		// i.e strips in a different direction instead of always horizontal.
+		// We need to do work to identify which direction is which.
+
+		// Start by setting values assuming v is horizontal
 		double min_v = _vec_vec_quad[0][0].getVecV()[0];
-		double max_v = _vec_vec_quad[0][_vec_vec_quad.size()-1].getVecV()[3];
+		double max_v = _vec_vec_quad[0][_vec_vec_quad[0].size() - 1].getVecV()[2];
+
+		double min_w = _vec_vec_quad[0][0].getVecW()[0];
+		double max_w = _vec_vec_quad[_vec_vec_quad.size() - 1][0].getVecW()[3];
+
+
+		Quadrilateral q1 = Quad(1, 0);
+		Quadrilateral q2 = Quad(1, 1);
+
+		double horiz_dist = std::fabs(q2.Centroid()[0] - q1.Centroid()[0]);
+		double vert_dist = std::fabs(q2.Centroid()[1] - q1.Centroid()[1]);
+
+		// one of these distances should be close to zero, so pick the other one
+		// we do this because we don't know if this is a v- or h- efficacy
+
+		if (vert_dist > horiz_dist) { // This is the v distance
+			min_v = _vec_vec_quad[0][0].getVecW()[0];
+			max_v = _vec_vec_quad[0][_vec_vec_quad[0].size() - 1].getVecW()[2];
+
+			min_w = _vec_vec_quad[0][0].getVecV()[0];
+			max_w = _vec_vec_quad[_vec_vec_quad.size() - 1][0].getVecV()[3];
+
+			_threshold_reset_dimension = _grid_num_dimensions - 2;
+			_threshold_reset_jump_dimension = _grid_num_dimensions - 1;
+
+			_strips_are_v_oriented = false;
+		}
 
 		_resolution[1] = _vec_vec_quad[0].size();
 		_resolution[0] = _num_strips;
 
-		_base[1] = _vec_vec_quad[0][0].Centroid()[0];
-		_base[0] = _vec_vec_quad[0][0].Centroid()[1];
+		_base[1] = min_v;
+		_base[0] = min_w;
 
-		_dimensions[1] = _vec_vec_quad[0][_vec_vec_quad[0].size()-1].Centroid()[0];
-		_dimensions[0] = _vec_vec_quad[0][_vec_vec_quad[0].size() - 1].Centroid()[1];
+		_dimensions[1] = max_v - _base[1];
+		_dimensions[0] = max_w - _base[0];
 
 		this->CreateNeighbours();
 	}

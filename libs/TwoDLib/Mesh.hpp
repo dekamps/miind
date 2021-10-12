@@ -161,6 +161,8 @@ namespace TwoDLib {
 
 		unsigned int getGridNumDimensions() const;
 
+		bool stripsAreVOriented() const;
+
 		class GridCellTransition{
 		public:
 			double _stays;
@@ -223,6 +225,7 @@ namespace TwoDLib {
 		unsigned int								_threshold_reset_jump_dimension;
 		unsigned int								_num_strips;
 		unsigned int								_strip_length;
+		bool										_strips_are_v_oriented;
 
 		// It is sometimes necessary to find out to which cells a given mesh point belongs.
 		// A mesh point will be mapped to an index position in a list of a list of coordinates.

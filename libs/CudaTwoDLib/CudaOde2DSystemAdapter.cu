@@ -652,17 +652,24 @@ void CudaOde2DSystemAdapter::RedistributeGridFiniteObjects(std::vector<inttype>&
 		inttype reset_dim = _group.MeshObjects()[m].getGridThresholdResetDirection();
 		inttype jump_dim = _group.MeshObjects()[m].getGridThresholdResetJumpDirection();
 
-		int threshold_col = int((_thresholds[m]-_group.MeshObjects()[m].getGridBaseByDimension(reset_dim) / _group.MeshObjects()[m].getGridCellWidthByDimension(reset_dim)));
+		int threshold_col = int((_thresholds[m]-_group.MeshObjects()[m].getGridBaseByDimension(reset_dim)) / _group.MeshObjects()[m].getGridCellWidthByDimension(reset_dim));
 		int reset_col = int((_resets[m] - _group.MeshObjects()[m].getGridBaseByDimension(reset_dim)) / _group.MeshObjects()[m].getGridCellWidthByDimension(reset_dim));
 		int reset_w_rows = int (_reset_ws[m] / _group.MeshObjects()[m].getGridCellWidthByDimension(jump_dim));
 		int res_v = _group.MeshObjects()[m].getGridResolutionByDimension(reset_dim);
 		double reset_stays_probability = (_reset_ws[m] / _group.MeshObjects()[m].getGridCellWidthByDimension(jump_dim)) - reset_w_rows;
 		double refractory_time = _refractories[m];
 		double timestep = _group.MeshObjects()[m].TimeStep();
+		
+		inttype num_cells = 1;
+		for (int i = 0; i < _group.MeshObjects()[m].getGridNumDimensions(); i++)
+			num_cells *= _group.MeshObjects()[m].getGridResolutionByDimension(i);
 
-		CudaGridResetFiniteObjects << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m], _vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index,
-			threshold_col, reset_col, reset_w_rows, res_v, reset_stays_probability, refractory_time, timestep, _spikes, _offsets[m], rand_state);
-
+		if (_group.MeshObjects()[m].stripsAreVOriented())
+			CudaGridResetFiniteObjects << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m], _vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index,
+				threshold_col, reset_col, reset_w_rows, res_v, reset_stays_probability, refractory_time, timestep, _spikes, _offsets[m], rand_state, num_cells);
+		else
+			CudaGridResetFiniteObjectsRot << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m], _vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index,
+				threshold_col, reset_col, reset_w_rows, res_v, reset_stays_probability, refractory_time, timestep, _spikes, _offsets[m], rand_state, num_cells);
 	}
 
 }
@@ -673,7 +680,7 @@ void CudaOde2DSystemAdapter::DeleteResetMap()
 
     for(inttype m = 0; m < _mesh_size; m++)
     {
-				cudaFree(_res_to_minimal[m]);
+		cudaFree(_res_to_minimal[m]);
         cudaFree(_res_from_ordered[m]);
 		cudaFree(_res_to_ordered[m]);
 				cudaFree(_res_from_counts[m]);

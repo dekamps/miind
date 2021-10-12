@@ -246,7 +246,7 @@ __global__ void CudaSolveIzhikevichNeurons(inttype N, inttype* spike_counts, int
 
 __global__ void CudaGridResetFiniteObjects(inttype N, inttype finite_offset, inttype* objects, fptype* refract_times,
     inttype* refract_inds, inttype threshold_col_index, inttype reset_col_index, inttype reset_w_rows, 
-    inttype res_v, fptype res_v_stays, fptype refractory_time, fptype timestep, inttype* spiked, inttype offset, curandState* state) {
+    inttype res_v, fptype res_v_stays, fptype refractory_time, fptype timestep, inttype* spiked, inttype offset, curandState* state, inttype num_cells) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
 
@@ -277,7 +277,7 @@ __global__ void CudaGridResetFiniteObjects(inttype N, inttype finite_offset, int
                         reset_w_rows = reset_w_rows - 1;
 
                 // Calculate the reset cell
-                inttype reset_cell = ((objects[offset_ind]-offset) - (i_col - reset_col_index)) + (reset_w_rows * res_v);
+                inttype reset_cell = modulo(((objects[offset_ind]-offset) - (i_col - reset_col_index)) + (reset_w_rows * res_v), num_cells);
 
                 refract_times[offset_ind] = refractory_time;
                 refract_inds[offset_ind] = reset_cell; // instead of storing the current threshold cell - store the target reset cell
@@ -290,7 +290,7 @@ __global__ void CudaGridResetFiniteObjects(inttype N, inttype finite_offset, int
 // For meshes which have the strips going up instead of across
 __global__ void CudaGridResetFiniteObjectsRot(inttype N, inttype finite_offset, inttype* objects, fptype* refract_times,
     inttype* refract_inds, inttype threshold_col_index, inttype reset_col_index, inttype reset_w_rows,
-    inttype res_w, fptype res_v_stays, fptype refractory_time, fptype timestep, inttype* spiked, inttype offset, curandState* state) {
+    inttype res_w, fptype res_v_stays, fptype refractory_time, fptype timestep, inttype* spiked, inttype offset, curandState* state, inttype num_cells) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
 
@@ -322,7 +322,7 @@ __global__ void CudaGridResetFiniteObjectsRot(inttype N, inttype finite_offset, 
                         reset_w_rows = reset_w_rows - 1;
 
                 // Calculate the reset cell
-                inttype reset_cell = ((objects[offset_ind] - offset) + reset_w_rows ) - ((i_col - reset_col_index) * res_w);
+                inttype reset_cell = modulo(((objects[offset_ind] - offset) + reset_w_rows ) - ((i_col - reset_col_index) * res_w), num_cells);
 
                 refract_times[offset_ind] = refractory_time;
                 refract_inds[offset_ind] = reset_cell; // instead of storing the current threshold cell - store the target reset cell
