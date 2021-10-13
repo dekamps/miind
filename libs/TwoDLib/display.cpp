@@ -413,7 +413,7 @@ void Display::display_3d(void) {
 					mass = 1.0; // 1000.0 * ((double)_dws[window_index]._system->_vec_cells_to_objects[idx].size() / (double)_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index]);
 
 				if (mass < 0.00000001 && (j == 0 || k ==0 || i == size_z -1 || i == 0 || k == size_y - 1 || j == size_x - 1)) {
-					glColor4f(1.0, 1.0, 1.0, 0.02);
+					continue; // glColor4f(1.0, 1.0, 1.0, 0.02);
 				}
 				else if (mass > 0.00000001) {
 					glColor4f(std::min(1.0, mass * 2.0), std::max(0.0, ((mass * 2.0) - 1.0)), 0, mass);
@@ -426,9 +426,9 @@ void Display::display_3d(void) {
 				double cell_y = -0.5 + i * (1.0 / size_z);
 				double cell_z = -0.5 + k * (1.0 / size_y);
 
-				double half_cell_x_width = 0.95 * (0.5 / size_x);
-				double half_cell_y_width = 0.95 * (0.5 / size_z);
-				double half_cell_z_width = 0.95 * (0.5 / size_y);
+				double half_cell_x_width = 0.55 * (0.5 / size_x);
+				double half_cell_y_width = 0.55 * (0.5 / size_z);
+				double half_cell_z_width = 0.55 * (0.5 / size_y);
 
 				std::vector<double> p1 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
 				std::vector<double> p2 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
@@ -481,6 +481,63 @@ void Display::display_3d(void) {
 
 	_dws[window_index].max_mass = max_m;
 	_dws[window_index].min_mass = min_m;
+
+	// Draw a Cube
+
+	glColor4f(0.0, 0.0, 0.0, 1);
+
+	double cell_x = 0.0;
+	double cell_y = 0.0;
+	double cell_z = 0.0;
+
+	double half_cell_x_width = 0.5;
+	double half_cell_y_width = 0.5;
+	double half_cell_z_width = 0.5;
+
+	std::vector<double> p1 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+	std::vector<double> p2 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+	std::vector<double> p3 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+	std::vector<double> p4 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+	std::vector<double> p5 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+	std::vector<double> p6 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+	std::vector<double> p7 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+	std::vector<double> p8 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+
+	// front face
+	glVertex3f(p1[0], p1[1], p1[2]);
+	glVertex3f(p2[0], p2[1], p2[2]);
+	glVertex3f(p3[0], p3[1], p3[2]);
+	glVertex3f(p4[0], p4[1], p4[2]);
+
+	// back face
+	glVertex3f(p6[0], p6[1], p6[2]);
+	glVertex3f(p5[0], p5[1], p5[2]);
+	glVertex3f(p8[0], p8[1], p8[2]);
+	glVertex3f(p7[0], p7[1], p7[2]);
+
+	// right face
+	glVertex3f(p4[0], p4[1], p4[2]);
+	glVertex3f(p3[0], p3[1], p3[2]);
+	glVertex3f(p7[0], p7[1], p7[2]);
+	glVertex3f(p8[0], p8[1], p8[2]);
+
+	// left face
+	glVertex3f(p6[0], p6[1], p6[2]);
+	glVertex3f(p2[0], p2[1], p2[2]);
+	glVertex3f(p1[0], p1[1], p1[2]);
+	glVertex3f(p5[0], p5[1], p5[2]);
+
+	//// top face
+	glVertex3f(p2[0], p2[1], p2[2]);
+	glVertex3f(p6[0], p6[1], p6[2]);
+	glVertex3f(p7[0], p7[1], p7[2]);
+	glVertex3f(p3[0], p3[1], p3[2]);
+
+	//// bottom face
+	glVertex3f(p5[0], p5[1], p5[2]);
+	glVertex3f(p1[0], p1[1], p1[2]);
+	glVertex3f(p4[0], p4[1], p4[2]);
+	glVertex3f(p8[0], p8[1], p8[2]);
 
 	glEnd();
 
