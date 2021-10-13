@@ -30,10 +30,16 @@ public:
   int _window_index;
   bool _3D;
 
+  double rot_x;
+  double rot_y;
+
   double mesh_min_v;
   double mesh_max_v;
   double mesh_min_h;
   double mesh_max_h;
+
+  double max_mass;
+  double min_mass;
 };
 
 class Display{
@@ -60,6 +66,8 @@ public:
   void scene_3d(int width, int height);
   void init_3d() const;
   void update_3d();
+  void keyboard_3d_down(int key, int _x, int _y);
+  void keyboard_3d_up(int key, int _x, int _y);
 
   static void stat_display(void) {
     disp->display();
@@ -82,6 +90,14 @@ public:
   }
   static void stat_update_3d(void) {
       disp->update_3d();
+  }
+
+  static void stat_keyboard_3d_down(int key, int _x, int _y) {
+      disp->keyboard_3d_down(key, _x, _y);
+  }
+
+  static void stat_keyboard_3d_up(int key, int _x, int _y) {
+      disp->keyboard_3d_up(key, _x, _y);
   }
 
   unsigned int addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys, bool _3d, unsigned int mesh_index);
@@ -109,6 +125,11 @@ private:
   std::chrono::milliseconds start_time;
 
   std::map<MPILib::NodeId, DisplayWindow> _dws;
+
+  bool upPressed;
+  bool downPressed;
+  bool leftPressed;
+  bool rightPressed;
 };
 
 }

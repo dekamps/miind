@@ -24,6 +24,10 @@ Display::Display(){
 	write_frames = false;
 	start_time = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
 	_dws = std::map<MPILib::NodeId, DisplayWindow>();
+	upPressed = false;
+	downPressed = false;
+	leftPressed = false;
+	rightPressed = false;
 }
 
 Display::~Display(){
@@ -47,6 +51,10 @@ unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys, bo
 	window._system = sys;
 	window._mesh_index = mesh_index;
 	window._3D = _3d;
+	window.rot_x = 0.0;
+	window.rot_y = 0.0;
+	window.max_mass = -9999999;
+	window.min_mass = 9999999;
 
 	// Find extent of mesh to normalise to screen size
 
@@ -287,8 +295,6 @@ void Display::display_3d(void) {
 	// if(num_frames++ % 2 != 0)
 	// 	return;
 
-	static float rot = 0.0;
-
 	milliseconds real_time = duration_cast<milliseconds>(
 		system_clock::now().time_since_epoch());
 	milliseconds time_elapsed = real_time - start_time;
@@ -299,8 +305,40 @@ void Display::display_3d(void) {
 			window_index = iter->first;
 	}
 
-	if (time_elapsed.count() % 10 != 0)
-	 	return;
+	if (upPressed) {
+		_dws[window_index].rot_x += 1.5f;
+	}
+
+	if (downPressed) {
+		_dws[window_index].rot_x -= 1.5f;
+	}
+
+	if (leftPressed) {
+		_dws[window_index].rot_y += 1.5f;
+	}
+
+	if (rightPressed) {
+		_dws[window_index].rot_y -= 1.5f;
+	}
+
+	glViewport(0, 0, 500, 500);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	gluPerspective(45.0f, (GLfloat)500 / (GLfloat)500, 0.1f, 50.0f);
+
+	gluLookAt(0, 0, -2,
+		0, 0, 0,
+		0, 1, 0); //Orient the camera
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	//if (time_elapsed.count() % 10 != 0)
+	// 	return;
 
 	glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
 
@@ -308,175 +346,38 @@ void Display::display_3d(void) {
 
 	// **** used for 3D ****
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushMatrix();
-	glTranslatef(0, 0, -1);
+
+
+	glRotatef(-22 + _dws[window_index].rot_x, 1.0f, 0.0f, 0.0f);
+	glRotatef(200 + _dws[window_index].rot_y, 0.0f, -1.0f, 0.0f);
+	
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
 	glBegin(GL_QUADS);
 
 	Mesh m = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index];
 
-	double max = -99999999.0;
-	for (unsigned int i = 0; i < m.NrStrips(); i++) {
-		for (unsigned int j = 0; j < m.NrCellsInStrip(i); j++) {
-			double cell_area = std::abs(m.Quad(i, j).SignedArea());
-			if (_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index, i, j)] / cell_area == 0) {
-				continue;
-			}
-			if (!log_scale) {
-				if (max < 1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index, i, j)] / cell_area)
-					max = 1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index, i, j)] / cell_area;
-			}
-			else {
-				if (max < log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index, i, j)] / cell_area))
-					max = log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index, i, j)] / cell_area);
-			}
-
-		}
-	}
-
-	double min = 99999999999.0;
-	for (unsigned int i = 0; i < m.NrStrips(); i++) {
-		for (unsigned int j = 0; j < m.NrCellsInStrip(i); j++) {
-			double cell_area = std::abs(m.Quad(i, j).SignedArea());
-			if (_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index, i, j)] / cell_area == 0) {
-				continue;
-			}
-
-			if (!log_scale)
-			{
-				if (1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index, i, j)] / cell_area < min)
-					min = 1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index, i, j)] / cell_area;
-			}
-			else {
-				if (log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index, i, j)] / cell_area) < min)
-					min = log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index, i, j)] / cell_area);
-			}
-
-		}
-	}
+	double max = 0.5;
+	double min = 0.0;
 
 	double mesh_min_v = _dws[window_index].mesh_min_v;
 	double mesh_max_v = _dws[window_index].mesh_max_v;
 	double mesh_min_h = _dws[window_index].mesh_min_h;
 	double mesh_max_h = _dws[window_index].mesh_max_h;
 
-	// display for individual
-
-	// for(unsigned int idx : _dws[window_index]._system->_individuals){
-	// 	Coordinates c = _dws[window_index]._system->toCoords(idx);
-	// 	Quadrilateral q = m.Quad(c[0],c[1]);
-	// 	vector<Point> ps = q.Points();
-
-	// 	glColor3f(1.0, 0, 0);
-	// 	glVertex2f(2*(ps[0][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[0][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 	glVertex2f(2*(ps[1][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[1][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 	glVertex2f(2*(ps[2][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[2][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 	glVertex2f(2*(ps[3][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[3][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// }
-
-	// Display 2D mass
-
-	// for(unsigned int i = 0; i<m.NrStrips(); i++){
-	// 	for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
-	// 		unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j);
-	// 		Cell q = m.Quad(i,j);
-	// 		double cell_area = std::abs(q.SignedArea());
-	// 		double mass = 0.0;
-	// 		if (_dws[window_index]._system->Mass()[idx]/cell_area != 0)
-	// 			mass = std::min(1.0,std::max(0.0,(log10(_dws[window_index]._system->Mass()[idx]/cell_area) - min) / (max-min)));
-	// 		vector<Point> ps = q.Points();
-
-	// 		glColor3f(std::min(1.0,mass*2.0), std::max(0.0,((mass*2.0) - 1.0)), 0);
-	// 		glVertex2f(2*(ps[0][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[0][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 		glVertex2f(2*(ps[1][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[1][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 		glVertex2f(2*(ps[2][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[2][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 		glVertex2f(2*(ps[3][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[3][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 	}
-	// }
-
-	// Display 2D layered mass
-
-	// for(unsigned int i = 0; i<100; i++){
-	// 	for(unsigned int k = 0; k<100; k++){
-	// 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
-	// 			unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index,(k*100)+i,j);
-	// 			Cell q = m.Quad(i,j);
-	// 			double cell_area = std::abs(q.SignedArea());
-	// 			double mass = 0.0;
-	// 			if (_dws[window_index]._system->Mass()[idx]/cell_area != 0)
-	// 				mass = std::min(1.0,std::max(0.0,(log10(_dws[window_index]._system->Mass()[idx]/cell_area) - min) / (max-min)));
-	// 			vector<Point> ps = q.Points();
-
-	// 			// glColor4f(std::min(1.0,mass*2.0), std::max(0.0,((mass*2.0) - 1.0)), 0, std::min(1.0,mass*2.0));
-	// 			glColor4f(1.0, 0.0, 0, std::min(1.0,mass*2.0));
-	// 			// glColor4f(1.0, 0.0, 0, 0.01);
-	// 			glVertex2f(2*(ps[0][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[0][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 			glVertex2f(2*(ps[1][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[1][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 			glVertex2f(2*(ps[2][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[2][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 			glVertex2f(2*(ps[3][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[3][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 		}
-	// 	}
-	// }
-
-	// Display 2D layered flattened
-
-	// for(unsigned int i = 0; i<100; i++){
-	// 	for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
-
-	// 		unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j);
-	// 		Cell q = m.Quad(i,j);
-	// 		vector<Point> ps = q.Points();
-
-	// 		double mass = 0.0;
-	// 		double cell_area = std::abs(q.SignedArea());
-	// 		for(unsigned int k = 0; k<100; k++){
-	// 			unsigned int idxx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index,(k*100)+i,j);
-	// 			if (mass < std::min(1.0,std::max(0.0,(log10(_dws[window_index]._system->Mass()[idxx]/cell_area) - min) / (max-min)))){
-	// 				if (_dws[window_index]._system->Mass()[idx]/cell_area != 0)
-	// 					mass += std::min(1.0,std::max(0.0,(log10(_dws[window_index]._system->Mass()[idxx]/cell_area) - min) / (max-min)));
-	// 			}			
-	// 		}
-
-	// 		// glColor4f(std::min(1.0,mass*2.0), std::max(0.0,((mass*2.0) - 1.0)), 0, std::min(1.0,mass*2.0));
-	// 		glColor4f(1.0, 0.0, 0, std::min(1.0,mass*2.0));
-	// 		// glColor4f(1.0, 0.0, 0, 0.01);
-	// 		glVertex2f(2*(ps[0][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[0][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 		glVertex2f(2*(ps[1][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[1][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 		glVertex2f(2*(ps[2][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[2][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 		glVertex2f(2*(ps[3][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[3][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
-	// 	}
-	// }
-
 	// Display 3D mass
-
-	double rot_y_angle = -M_PI_4 + 3.6 + (rot);
-	double rot_x_angle = (-M_PI_4 / 2.0);
-
-	// rot += 0.01;
-
-	double x_scale = 1.0;
-	double y_scale = 1.0;
-	double z_scale = 1.0;
-
-	double x_pos = 0.0;
-	double y_pos = 0.2;
-	double z_pos = -1.0;
 
 	unsigned int size_x = m.getGridResolutionByDimension(2);
 	unsigned int size_y = m.getGridResolutionByDimension(1);
 	unsigned int size_z = m.getGridResolutionByDimension(0);
 
-	std::vector<std::vector<double>> world_scale = { {x_scale,0.0,0.0,0.0},{0.0,y_scale,0.0,0.0},{0.0,0.0,z_scale,0.0},{0.0,0.0,0.0,1.0} };
-	std::vector<std::vector<double>> world_x_rotation = { {1.0,0.0,0.0,0.0},{0.0,cos(rot_x_angle),sin(rot_x_angle),0.0},{0.0,-sin(rot_x_angle),cos(rot_x_angle),0.0},{0.0,0.0,0.0,1.0} };
-	std::vector<std::vector<double>> world_y_rotation = { {cos(rot_y_angle),0.0,sin(rot_y_angle),0.0},{0.0,1.0,0.0,0.0},{-sin(rot_y_angle),0.0,cos(rot_y_angle),0.0},{0.0,0.0,0.0,1.0} };
-	std::vector<std::vector<double>> world_translate = { {1.0,0.0,0.0,x_pos},{0.0,1.0,0.0,y_pos},{0.0,0.0,1.0,z_pos},{0.0,0.0,0.0,1.0} };
-
 	unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index, 0, 12);
-
-	double max_mass = 0.0;
+	
+	double max_m = -9999999;
+	double min_m = 9999999;
 	for (unsigned int i = 0; i < size_z; i++) {
 		for (unsigned int k = 0; k < size_y; k++) {
 			for (unsigned int j = 0; j < m.NrCellsInStrip(i); j++) {
@@ -486,21 +387,33 @@ void Display::display_3d(void) {
 					if (_dws[window_index]._system->Mass()[idx] == 0) continue; // skip if mass is basically nothing
 
 				double cell_area = std::abs(m.Quad(0, 0).SignedArea());
-				double mass = 0.0;
+
 				if (!log_scale) {
-					if (cell_area != 0 && _dws[window_index]._system->Mass()[idx] > 0.0)
-						mass = (_dws[window_index]._system->Mass()[idx] / cell_area - min) / (max - min);
+					if (max_m < 1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area)
+						max_m = 1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area;
+					if (min_m >= 1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area)
+						min_m = 1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area;
 				}
 				else {
-					if (cell_area != 0 && _dws[window_index]._system->Mass()[idx] > 0.0)
-						mass = (log10(_dws[window_index]._system->Mass()[idx] / cell_area) - min) / (max - min);
+					if (max_m < log10(1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area))
+						max_m = log10(1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area);
+					if (min_m >= log10(1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area))
+						min_m = log10(1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area);
+				}
+
+				double mass = 0.0;
+				if (!log_scale) {
+					mass = (_dws[window_index]._system->Mass()[idx] / cell_area - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass);
+				}
+				else {
+					mass = (log10(_dws[window_index]._system->Mass()[idx] / cell_area) - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass);
 				}
 
 				if (_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] > 0 && _dws[window_index]._system->_vec_cells_to_objects[idx].size() > 0)
-					mass = 1.0;
+					mass = 1.0; // 1000.0 * ((double)_dws[window_index]._system->_vec_cells_to_objects[idx].size() / (double)_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index]);
 
-				if (mass < 0.00000001 && (i == 0 || k == size_y - 1 || j == size_x - 1)) {
-					glColor4f(1.0, 1.0, 1.0, 0.1);
+				if (mass < 0.00000001 && (j == 0 || k ==0 || i == size_z -1 || i == 0 || k == size_y - 1 || j == size_x - 1)) {
+					glColor4f(1.0, 1.0, 1.0, 0.02);
 				}
 				else if (mass > 0.00000001) {
 					glColor4f(std::min(1.0, mass * 2.0), std::max(0.0, ((mass * 2.0) - 1.0)), 0, mass);
@@ -513,9 +426,9 @@ void Display::display_3d(void) {
 				double cell_y = -0.5 + i * (1.0 / size_z);
 				double cell_z = -0.5 + k * (1.0 / size_y);
 
-				double half_cell_x_width = 0.55 * (0.5 / size_x);
-				double half_cell_y_width = 0.55 * (0.5 / size_z);
-				double half_cell_z_width = 0.55 * (0.5 / size_y);
+				double half_cell_x_width = 0.95 * (0.5 / size_x);
+				double half_cell_y_width = 0.95 * (0.5 / size_z);
+				double half_cell_z_width = 0.95 * (0.5 / size_y);
 
 				std::vector<double> p1 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
 				std::vector<double> p2 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
@@ -526,47 +439,11 @@ void Display::display_3d(void) {
 				std::vector<double> p7 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
 				std::vector<double> p8 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
 
-				p1 = mat_mult(world_scale, p1);
-				p2 = mat_mult(world_scale, p2);
-				p3 = mat_mult(world_scale, p3);
-				p4 = mat_mult(world_scale, p4);
-				p5 = mat_mult(world_scale, p5);
-				p6 = mat_mult(world_scale, p6);
-				p7 = mat_mult(world_scale, p7);
-				p8 = mat_mult(world_scale, p8);
-
-				p1 = mat_mult(world_y_rotation, p1);
-				p2 = mat_mult(world_y_rotation, p2);
-				p3 = mat_mult(world_y_rotation, p3);
-				p4 = mat_mult(world_y_rotation, p4);
-				p5 = mat_mult(world_y_rotation, p5);
-				p6 = mat_mult(world_y_rotation, p6);
-				p7 = mat_mult(world_y_rotation, p7);
-				p8 = mat_mult(world_y_rotation, p8);
-
-				p1 = mat_mult(world_x_rotation, p1);
-				p2 = mat_mult(world_x_rotation, p2);
-				p3 = mat_mult(world_x_rotation, p3);
-				p4 = mat_mult(world_x_rotation, p4);
-				p5 = mat_mult(world_x_rotation, p5);
-				p6 = mat_mult(world_x_rotation, p6);
-				p7 = mat_mult(world_x_rotation, p7);
-				p8 = mat_mult(world_x_rotation, p8);
-
-				p1 = mat_mult(world_translate, p1);
-				p2 = mat_mult(world_translate, p2);
-				p3 = mat_mult(world_translate, p3);
-				p4 = mat_mult(world_translate, p4);
-				p5 = mat_mult(world_translate, p5);
-				p6 = mat_mult(world_translate, p6);
-				p7 = mat_mult(world_translate, p7);
-				p8 = mat_mult(world_translate, p8);
-
 				// front face
-				/*glVertex3f(p1[0], p1[1], p1[2]);
 				glVertex3f(p2[0], p2[1], p2[2]);
+				glVertex3f(p1[0], p1[1], p1[2]);
+				glVertex3f(p4[0], p4[1], p4[2]);
 				glVertex3f(p3[0], p3[1], p3[2]);
-				glVertex3f(p4[0], p4[1], p4[2]);*/
 
 				// back face
 				glVertex3f(p5[0], p5[1], p5[2]);
@@ -575,142 +452,47 @@ void Display::display_3d(void) {
 				glVertex3f(p8[0], p8[1], p8[2]);
 
 				// right face
-				/*glVertex3f(p4[0], p4[1], p4[2]);
 				glVertex3f(p3[0], p3[1], p3[2]);
+				glVertex3f(p4[0], p4[1], p4[2]);
+				glVertex3f(p8[0], p8[1], p8[2]);
 				glVertex3f(p7[0], p7[1], p7[2]);
-				glVertex3f(p8[0], p8[1], p8[2]);*/
 
 				// left face
-				glVertex3f(p6[0], p6[1], p6[2]);
 				glVertex3f(p2[0], p2[1], p2[2]);
-				glVertex3f(p1[0], p1[1], p1[2]);
+				glVertex3f(p6[0], p6[1], p6[2]);
 				glVertex3f(p5[0], p5[1], p5[2]);
+				glVertex3f(p1[0], p1[1], p1[2]);
 
 				//// top face
-				glVertex3f(p2[0], p2[1], p2[2]);
 				glVertex3f(p6[0], p6[1], p6[2]);
-				glVertex3f(p7[0], p7[1], p7[2]);
+				glVertex3f(p2[0], p2[1], p2[2]);
 				glVertex3f(p3[0], p3[1], p3[2]);
+				glVertex3f(p7[0], p7[1], p7[2]);
 
 				//// bottom face
-				/*glVertex3f(p1[0], p1[1], p1[2]);
+				glVertex3f(p1[0], p1[1], p1[2]);
 				glVertex3f(p5[0], p5[1], p5[2]);
 				glVertex3f(p8[0], p8[1], p8[2]);
-				glVertex3f(p4[0], p4[1], p4[2]);*/
+				glVertex3f(p4[0], p4[1], p4[2]);
 
 			}
 		}
 	}
 
-	//3D individuals
-
-	// for(unsigned int idx : _dws[window_index]._system->_individuals){
-
-	// 	double cell_area = std::abs(m.Quad(0,0).SignedArea());
-	// 	double mass = 0.0;
-	// 	if (cell_area != 0 && _dws[window_index]._system->Mass()[idx] > 0.0)
-	// 		mass = (log10(_dws[window_index]._system->Mass()[idx]/cell_area) - min) / (max-min);
-
-	// 	glColor4f(std::min(1.0,mass*2.0), std::max(0.0,((mass*2.0) - 1.0)), 0, mass);
-
-	// 	unsigned int j = (idx % 200);
-	// 	unsigned int i = (idx - (idx % 200)) / (200);
-	// 	unsigned int k = (idx - (idx % 200)) / (200*200);
-
-	// 	double cell_x = -0.5 + j*(1.0/size_x);
-	// 	double cell_y = -0.5 + i*(1.0/size_z);
-	// 	double cell_z = -0.5 + k*(1.0/size_y);
-
-	// 	double half_cell_x_width = 0.95*(0.5/size_x);
-	// 	double half_cell_y_width = 0.95*(0.5/size_z);
-	// 	double half_cell_z_width = 0.95*(0.5/size_y);
-
-	// 	std::vector<double> p1 = {cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0};
-	// 	std::vector<double> p2 = {cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0};
-	// 	std::vector<double> p3 = {cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0};
-	// 	std::vector<double> p4 = {cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0};
-	// 	std::vector<double> p5 = {cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0};
-	// 	std::vector<double> p6 = {cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0};
-	// 	std::vector<double> p7 = {cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0};
-	// 	std::vector<double> p8 = {cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0};
-
-	// 	p1 = mat_mult(world_scale, p1);
-	// 	p2 = mat_mult(world_scale, p2);
-	// 	p3 = mat_mult(world_scale, p3);
-	// 	p4 = mat_mult(world_scale, p4);
-	// 	p5 = mat_mult(world_scale, p5);
-	// 	p6 = mat_mult(world_scale, p6);
-	// 	p7 = mat_mult(world_scale, p7);
-	// 	p8 = mat_mult(world_scale, p8);
-
-	// 	p1 = mat_mult(world_y_rotation, p1);
-	// 	p2 = mat_mult(world_y_rotation, p2);
-	// 	p3 = mat_mult(world_y_rotation, p3);
-	// 	p4 = mat_mult(world_y_rotation, p4);
-	// 	p5 = mat_mult(world_y_rotation, p5);
-	// 	p6 = mat_mult(world_y_rotation, p6);
-	// 	p7 = mat_mult(world_y_rotation, p7);
-	// 	p8 = mat_mult(world_y_rotation, p8);
-
-	// 	p1 = mat_mult(world_x_rotation, p1);
-	// 	p2 = mat_mult(world_x_rotation, p2);
-	// 	p3 = mat_mult(world_x_rotation, p3);
-	// 	p4 = mat_mult(world_x_rotation, p4);
-	// 	p5 = mat_mult(world_x_rotation, p5);
-	// 	p6 = mat_mult(world_x_rotation, p6);
-	// 	p7 = mat_mult(world_x_rotation, p7);
-	// 	p8 = mat_mult(world_x_rotation, p8);
-
-	// 	p1 = mat_mult(world_translate, p1);
-	// 	p2 = mat_mult(world_translate, p2);
-	// 	p3 = mat_mult(world_translate, p3);
-	// 	p4 = mat_mult(world_translate, p4);
-	// 	p5 = mat_mult(world_translate, p5);
-	// 	p6 = mat_mult(world_translate, p6);
-	// 	p7 = mat_mult(world_translate, p7);
-	// 	p8 = mat_mult(world_translate, p8);
-
-	// 	// front face bad
-	// 	glVertex3f(p1[0], p1[1], p1[2]);
-	// 	glVertex3f(p2[0], p2[1], p2[2]);
-	// 	glVertex3f(p3[0], p3[1], p3[2]);
-	// 	glVertex3f(p4[0], p4[1], p4[2]);
-
-	// 	// back face bad
-	// 	glVertex3f(p5[0], p5[1], p5[2]);
-	// 	glVertex3f(p6[0], p6[1], p6[2]);
-	// 	glVertex3f(p7[0], p7[1], p7[2]);
-	// 	glVertex3f(p8[0], p8[1], p8[2]);
-
-	// 	// right face
-	// 	glVertex3f(p4[0], p4[1], p4[2]);
-	// 	glVertex3f(p3[0], p3[1], p3[2]);
-	// 	glVertex3f(p7[0], p7[1], p7[2]);
-	// 	glVertex3f(p8[0], p8[1], p8[2]);
-
-	// 	// left face
-	// 	glVertex3f(p1[0], p1[1], p1[2]);
-	// 	glVertex3f(p2[0], p2[1], p2[2]);
-	// 	glVertex3f(p6[0], p6[1], p6[2]);
-	// 	glVertex3f(p5[0], p5[1], p5[2]);
-
-	// 	// top face good
-	// 	glVertex3f(p2[0], p2[1], p2[2]);
-	// 	glVertex3f(p6[0], p6[1], p6[2]);
-	// 	glVertex3f(p7[0], p7[1], p7[2]);
-	// 	glVertex3f(p3[0], p3[1], p3[2]);
-
-	// 	// bottom face
-	// 	glVertex3f(p1[0], p1[1], p1[2]);
-	// 	glVertex3f(p5[0], p5[1], p5[2]);
-	// 	glVertex3f(p8[0], p8[1], p8[2]);
-	// 	glVertex3f(p4[0], p4[1], p4[2]);
-
-	// }
+	_dws[window_index].max_mass = max_m;
+	_dws[window_index].min_mass = min_m;
 
 	glEnd();
 
+
 	// Print real time and sim time
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(0, 1.0, 1.0, 0);
+	glViewport(0, 0, 1.0, 1.0);
+	glLoadIdentity();
 
 	double sim_time = 0.0;
 
@@ -726,70 +508,9 @@ void Display::display_3d(void) {
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
 	}
 
-	double h_width = (mesh_max_h - mesh_min_h);
-	char buff[32];
-	sprintf(buff, "%.*g", 1, h_width);
-	double h_step = (double)std::atof(buff) / 10.0;
-
-	std::string s_h_step = std::to_string(h_step);
-	s_h_step.pop_back();
-	h_step = std::stod(s_h_step);
-	double nice_min_h = (double)floor(mesh_min_h / h_step) * h_step;
-	double nice_max_h = (double)ceil(mesh_max_h / h_step) * h_step;
-
-	double v_width = (mesh_max_v - mesh_min_v);
-	sprintf(buff, "%.*g", 1, v_width);
-	double v_step = (double)std::atof(buff) / 10.0;
-
-	std::string s_v_step = std::to_string(v_step);
-	s_v_step.pop_back();
-	v_step = std::stod(s_v_step);
-	double nice_min_v = (double)floor(mesh_min_v / v_step) * v_step;
-	double nice_max_v = (double)ceil(mesh_max_v / v_step) * v_step;
-
-	double pos = nice_min_h;
-	double scaled_pos = nice_min_h;
-	while (pos < nice_max_h) {
-		if (std::abs(pos) < 0.0000000001) {
-			pos = 0.0;
-			scaled_pos = 0.0;
-		}
-
-		glColor3f(1.0, 1.0, 1.0);
-		glRasterPos2f(-1.0, 2 * ((pos - (mesh_min_h + ((mesh_max_h - mesh_min_h) / 2.0))) / (mesh_max_h - mesh_min_h)));
-
-		std::stringstream stream;
-		stream << std::setprecision(3) << scaled_pos;
-		t = stream.str();
-		c_string = t.c_str();
-		len = (int)strlen(c_string);
-		for (i = 0; i < len; i++) {
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
-		}
-		pos += h_step;
-		scaled_pos += h_step * 100.0;
-	}
-
-	pos = nice_min_v;
-	while (pos < nice_max_v) {
-		if (std::abs(pos) < 0.0000000001)
-			pos = 0.0;
-		glRasterPos2f(2 * ((pos - (mesh_min_v + ((mesh_max_v - mesh_min_v) / 2.0))) / (mesh_max_v - mesh_min_v)), -1.0);
-		std::stringstream stream2;
-		stream2 << std::setprecision(3) << pos;
-		t = stream2.str();
-		c_string = t.c_str();
-		len = (int)strlen(c_string);
-		for (i = 0; i < len; i++) {
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
-		}
-		pos += (nice_max_v - nice_min_v) / 10;
-	}
-
-	// **** used for 3D ****
 	glPopMatrix();
+
 	glutSwapBuffers();
-	glFlush();
 
 	if (write_frames)
 		writeFrame(window_index, _current_sim_it);
@@ -856,20 +577,6 @@ void Display::scene_3d(int width, int height)
 	{
 		height = 1;
 	}
-
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
- 
-	gluPerspective(45.0f, (GLfloat)width / (GLfloat)height, 0.1f, 10.0f);
-
-	glEnable(GL_DEPTH_TEST);
- 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glViewport(0, 0, width, height);
-	glLoadIdentity();
 }
 
 void Display::init() const {
@@ -885,12 +592,43 @@ void Display::update() {
 void Display::update_3d() {
 }
 
+void Display::keyboard_3d_down(int key, int _x, int _y) {
+
+	if (key == GLUT_KEY_UP)
+		upPressed = true;
+
+	if (key == GLUT_KEY_DOWN)
+		downPressed = true;
+
+	if (key == GLUT_KEY_LEFT)
+		leftPressed = true;
+
+	if (key == GLUT_KEY_RIGHT)
+		rightPressed = true;
+}
+
+void Display::keyboard_3d_up(int key, int _x, int _y) {
+
+	if (key == GLUT_KEY_UP)
+		upPressed = false;
+
+	if (key == GLUT_KEY_DOWN)
+		downPressed = false;
+
+	if (key == GLUT_KEY_LEFT)
+		leftPressed = false;
+
+	if (key == GLUT_KEY_RIGHT)
+		rightPressed = false;
+}
+
+
 void Display::updateDisplay(long current_sim_it) {
 	int time;
 	time = glutGet(GLUT_ELAPSED_TIME);
 	Display::getInstance()->_current_sim_it = current_sim_it;
 	lastTime = time;
-	//Sleep(50);
+	Sleep(1);
 	for (MPILib::NodeId id = 0; id < _nodes_to_display.size(); id++) {
 		if(!glutGetWindow())
 			continue;
@@ -926,6 +664,7 @@ void Display::animate(bool _write_frames, std::vector<MPILib::NodeId> nodes_to_d
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(500, 500);
 	glutInitWindowPosition(0, 0);
+	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 
 	for (MPILib::NodeId id = 0; id < Display::getInstance()->_nodes_to_display.size(); id++) {
 		if (!Display::getInstance()->_dws[Display::getInstance()->_nodes_to_display[id]]._3D) {
@@ -939,6 +678,8 @@ void Display::animate(bool _write_frames, std::vector<MPILib::NodeId> nodes_to_d
 			glutDisplayFunc(Display::stat_display_3d);
 			glutReshapeFunc(Display::stat_scene_3d);
 			glutIdleFunc(Display::stat_update_3d);
+			glutSpecialFunc(Display::stat_keyboard_3d_down);
+			glutSpecialUpFunc(Display::stat_keyboard_3d_up);
 		}
 		
 	}
