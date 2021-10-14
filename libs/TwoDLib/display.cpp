@@ -321,15 +321,15 @@ void Display::display_3d(void) {
 		_dws[window_index].rot_y -= 1.5f;
 	}
 
-	glViewport(0, 0, 500, 500);
+	glViewport(0, 0, _dws[window_index].width, _dws[window_index].height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluPerspective(45.0f, (GLfloat)500 / (GLfloat)500, 0.1f, 50.0f);
+	gluPerspective(45.0f, (GLfloat)_dws[window_index].width / (GLfloat)_dws[window_index].height, 0.1f, 50.0f);
 
-	gluLookAt(0, 0, -2,
-		0, 0, 0,
-		0, 1, 0); //Orient the camera
+	gluLookAt(  0, 0,-2,
+				0, 0, 0,
+				0, 1, 0); //Orient the camera
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -347,14 +347,94 @@ void Display::display_3d(void) {
 	// **** used for 3D ****
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
 	glRotatef(-22 + _dws[window_index].rot_x, 1.0f, 0.0f, 0.0f);
 	glRotatef(200 + _dws[window_index].rot_y, 0.0f, -1.0f, 0.0f);
-	
+
+	glColor3f(1.0, 1.0, 1.0);
+	glRasterPos3f(-0.5f, 0.52f, -0.5f);
+	int len, i;
+	std::string t = std::string("u");
+	const char* c_string = t.c_str();
+	len = (int)strlen(c_string);
+	for (i = 0; i < len; i++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+	}
+
+	glColor3f(1.0, 1.0, 1.0);
+	glRasterPos3f(-0.5f, -0.52f, 0.52f);
+	t = std::string("w");
+	c_string = t.c_str();
+	len = (int)strlen(c_string);
+	for (i = 0; i < len; i++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+	}
+
+	glColor3f(1.0, 1.0, 1.0);
+	glRasterPos3f(0.52f, -0.52f, -0.5f);
+	t = std::string("v");
+	c_string = t.c_str();
+	len = (int)strlen(c_string);
+	for (i = 0; i < len; i++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+	}
+
+	// Draw lines
+
+	glLineWidth(2.0f);
+	glBegin(GL_LINES);
+
+	// y axis
+	glVertex3f(-0.5f, -0.5f, -0.5f);
+	glVertex3f(-0.5f, 0.5f, -0.5f);
+
+	glVertex3f(-0.5f, 0.5f, -0.5f);
+	glVertex3f(-0.5f, 0.48f, -0.48f);
+
+	glVertex3f(-0.5f, 0.5f, -0.5f);
+	glVertex3f(-0.48f, 0.48f, -0.5f);
+
+	glVertex3f(-0.5f, 0.5f, -0.5f);
+	glVertex3f(-0.5f, 0.48f, -0.52f);
+
+	glVertex3f(-0.5f, 0.5f, -0.5f);
+	glVertex3f(-0.52f, 0.48f, -0.5f);
+
+	// x axis
+	glVertex3f(-0.5f, -0.5f, -0.5f);
+	glVertex3f(0.5f, -0.5f, -0.5f);
+
+	glVertex3f(0.5f, -0.5f, -0.5f);
+	glVertex3f(0.48f, -0.48f, -0.5f);
+
+	glVertex3f(0.5f, -0.5f, -0.5f);
+	glVertex3f(0.48f, -0.5f, -0.48f);
+
+	glVertex3f(0.5f, -0.5f, -0.5f);
+	glVertex3f(0.48f, -0.5f, -0.52f);
+
+	glVertex3f(0.5f, -0.5f, -0.5f);
+	glVertex3f(0.48f, -0.52f, -0.5f);
+
+	// z axis
+	glVertex3f(-0.5f, -0.5f, -0.5f);
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+	glVertex3f(-0.48f, -0.5f, 0.48f);
+
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+	glVertex3f(-0.5f, -0.48f, 0.48f);
+
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+	glVertex3f(-0.5f, -0.52f, 0.48f);
+
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+	glVertex3f(-0.52f, -0.5f, 0.48f);
+
+	glEnd();
 
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+	glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
 
 	glBegin(GL_QUADS);
 
@@ -374,7 +454,63 @@ void Display::display_3d(void) {
 	unsigned int size_y = m.getGridResolutionByDimension(1);
 	unsigned int size_z = m.getGridResolutionByDimension(0);
 
-	unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index, 0, 12);
+	// Draw a Cube
+
+	double cell_x = 0.0;
+	double cell_y = 0.0;
+	double cell_z = 0.0;
+
+	double half_cell_x_width = 0.5;
+	double half_cell_y_width = 0.5;
+	double half_cell_z_width = 0.5;
+
+	std::vector<double> p1 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+	std::vector<double> p2 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+	std::vector<double> p3 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+	std::vector<double> p4 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+	std::vector<double> p5 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+	std::vector<double> p6 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+	std::vector<double> p7 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+	std::vector<double> p8 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+	//glColor4f(0.0, 0.0, 0.0, 1);
+	glColor4f(0.3, 0.3, 0.3, 1);
+	// front face
+	glVertex3f(p1[0], p1[1], p1[2]);
+	glVertex3f(p2[0], p2[1], p2[2]);
+	glVertex3f(p3[0], p3[1], p3[2]);
+	glVertex3f(p4[0], p4[1], p4[2]);
+
+	// back face
+	glVertex3f(p6[0], p6[1], p6[2]);
+	glVertex3f(p5[0], p5[1], p5[2]);
+	glVertex3f(p8[0], p8[1], p8[2]);
+	glVertex3f(p7[0], p7[1], p7[2]);
+
+	glColor4f(0.35, 0.35, 0.35, 1);
+	// right face
+	glVertex3f(p4[0], p4[1], p4[2]);
+	glVertex3f(p3[0], p3[1], p3[2]);
+	glVertex3f(p7[0], p7[1], p7[2]);
+	glVertex3f(p8[0], p8[1], p8[2]);
+
+	// left face
+	glVertex3f(p6[0], p6[1], p6[2]);
+	glVertex3f(p2[0], p2[1], p2[2]);
+	glVertex3f(p1[0], p1[1], p1[2]);
+	glVertex3f(p5[0], p5[1], p5[2]);
+
+	glColor4f(0.4, 0.4, 0.4, 1);
+	//// top face
+	glVertex3f(p2[0], p2[1], p2[2]);
+	glVertex3f(p6[0], p6[1], p6[2]);
+	glVertex3f(p7[0], p7[1], p7[2]);
+	glVertex3f(p3[0], p3[1], p3[2]);
+
+	//// bottom face
+	glVertex3f(p5[0], p5[1], p5[2]);
+	glVertex3f(p1[0], p1[1], p1[2]);
+	glVertex3f(p4[0], p4[1], p4[2]);
+	glVertex3f(p8[0], p8[1], p8[2]);
 	
 	double max_m = -9999999;
 	double min_m = 9999999;
@@ -416,7 +552,7 @@ void Display::display_3d(void) {
 					continue; // glColor4f(1.0, 1.0, 1.0, 0.02);
 				}
 				else if (mass > 0.00000001) {
-					glColor4f(std::min(1.0, mass * 2.0), std::max(0.0, ((mass * 2.0) - 1.0)), 0, mass);
+					glColor4f(std::min(1.0, mass * 2.0), std::max(0.0, ((mass * 2.0) - 1.0)), 0, 1);
 				}
 				else {
 					continue;
@@ -426,9 +562,9 @@ void Display::display_3d(void) {
 				double cell_y = -0.5 + i * (1.0 / size_z);
 				double cell_z = -0.5 + k * (1.0 / size_y);
 
-				double half_cell_x_width = 0.55 * (0.5 / size_x);
-				double half_cell_y_width = 0.55 * (0.5 / size_z);
-				double half_cell_z_width = 0.55 * (0.5 / size_y);
+				double half_cell_x_width = (0.5 / size_x);
+				double half_cell_y_width = (0.5 / size_z);
+				double half_cell_z_width = (0.5 / size_y);
 
 				std::vector<double> p1 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
 				std::vector<double> p2 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
@@ -482,63 +618,6 @@ void Display::display_3d(void) {
 	_dws[window_index].max_mass = max_m;
 	_dws[window_index].min_mass = min_m;
 
-	// Draw a Cube
-
-	glColor4f(0.0, 0.0, 0.0, 1);
-
-	double cell_x = 0.0;
-	double cell_y = 0.0;
-	double cell_z = 0.0;
-
-	double half_cell_x_width = 0.5;
-	double half_cell_y_width = 0.5;
-	double half_cell_z_width = 0.5;
-
-	std::vector<double> p1 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
-	std::vector<double> p2 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
-	std::vector<double> p3 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
-	std::vector<double> p4 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
-	std::vector<double> p5 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
-	std::vector<double> p6 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
-	std::vector<double> p7 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
-	std::vector<double> p8 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
-
-	// front face
-	glVertex3f(p1[0], p1[1], p1[2]);
-	glVertex3f(p2[0], p2[1], p2[2]);
-	glVertex3f(p3[0], p3[1], p3[2]);
-	glVertex3f(p4[0], p4[1], p4[2]);
-
-	// back face
-	glVertex3f(p6[0], p6[1], p6[2]);
-	glVertex3f(p5[0], p5[1], p5[2]);
-	glVertex3f(p8[0], p8[1], p8[2]);
-	glVertex3f(p7[0], p7[1], p7[2]);
-
-	// right face
-	glVertex3f(p4[0], p4[1], p4[2]);
-	glVertex3f(p3[0], p3[1], p3[2]);
-	glVertex3f(p7[0], p7[1], p7[2]);
-	glVertex3f(p8[0], p8[1], p8[2]);
-
-	// left face
-	glVertex3f(p6[0], p6[1], p6[2]);
-	glVertex3f(p2[0], p2[1], p2[2]);
-	glVertex3f(p1[0], p1[1], p1[2]);
-	glVertex3f(p5[0], p5[1], p5[2]);
-
-	//// top face
-	glVertex3f(p2[0], p2[1], p2[2]);
-	glVertex3f(p6[0], p6[1], p6[2]);
-	glVertex3f(p7[0], p7[1], p7[2]);
-	glVertex3f(p3[0], p3[1], p3[2]);
-
-	//// bottom face
-	glVertex3f(p5[0], p5[1], p5[2]);
-	glVertex3f(p1[0], p1[1], p1[2]);
-	glVertex3f(p4[0], p4[1], p4[2]);
-	glVertex3f(p8[0], p8[1], p8[2]);
-
 	glEnd();
 
 
@@ -557,12 +636,12 @@ void Display::display_3d(void) {
 
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos2f(0.3, 0.9);
-	int len, i;
-	std::string t = std::string("Sim Time (s) : ") + std::to_string(sim_time);
-	const char* c_string = t.c_str();
-	len = (int)strlen(c_string);
-	for (i = 0; i < len; i++) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+	int text_len, text_i;
+	std::string text_v = std::string("Sim Time (s) : ") + std::to_string(sim_time);
+	const char* c_string_v = text_v.c_str();
+	text_len = (int)strlen(c_string_v);
+	for (text_i = 0; text_i < text_len; text_i++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string_v[text_i]);
 	}
 
 	glPopMatrix();
@@ -634,6 +713,15 @@ void Display::scene_3d(int width, int height)
 	{
 		height = 1;
 	}
+
+	int window_index = 0;
+	for (std::map<MPILib::NodeId, DisplayWindow>::iterator iter = Display::getInstance()->_dws.begin(); iter != Display::getInstance()->_dws.end(); ++iter) {
+		if (iter->second._window_index == glutGetWindow())
+			window_index = iter->first;
+	}
+
+	_dws[window_index].width = width;
+	_dws[window_index].height = height;
 }
 
 void Display::init() const {

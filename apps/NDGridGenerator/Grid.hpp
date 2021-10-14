@@ -11,6 +11,8 @@
 #include <fstream>
 #include <iomanip>
 
+#include <Python.h>
+
 class Grid {
 public:
     double timestep;
@@ -22,14 +24,16 @@ public:
     std::vector<unsigned int> resolution;
     std::vector<double> base;
     std::vector<std::vector<unsigned int>> coord_list;
+    std::string function_file_name;
 
-    Grid(std::vector<double> _base, std::vector<double> _dims, std::vector<unsigned int> _res, double _threshold_v, double _reset_v, double _timestep):
+    Grid(std::vector<double> _base, std::vector<double> _dims, std::vector<unsigned int> _res, double _threshold_v, double _reset_v, double _timestep, std::string function):
     base(_base),
     dimensions(_dims),
     resolution(_res),
     threshold_v(_threshold_v),
     reset_v(_reset_v),
-    timestep(_timestep) {
+    timestep(_timestep),
+    function_file_name(function) {
         num_dimensions = _dims.size();
 
         generate_cell_coords(std::vector<unsigned int>(), resolution);

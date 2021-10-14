@@ -40,6 +40,9 @@ public:
 
   double max_mass;
   double min_mass;
+
+  double width;
+  double height;
 };
 
 class Display{
