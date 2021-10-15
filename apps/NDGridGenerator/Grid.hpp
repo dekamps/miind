@@ -11,7 +11,7 @@
 #include <fstream>
 #include <iomanip>
 
-#include <Python.h>
+#include "pyhelper.h"
 
 class Grid {
 public:
@@ -25,221 +25,96 @@ public:
     std::vector<double> base;
     std::vector<std::vector<unsigned int>> coord_list;
     std::string function_file_name;
+    std::string function_name;
 
-    Grid(std::vector<double> _base, std::vector<double> _dims, std::vector<unsigned int> _res, double _threshold_v, double _reset_v, double _timestep, std::string function):
+    CPyObject python_func;
+
+    void (*fcnPtr)(Point&,double);
+
+    Grid(std::vector<double> _base, std::vector<double> _dims, std::vector<unsigned int> _res, double _threshold_v, double _reset_v, double _timestep, std::string function, std::string functionname, void(*Func)(Point&,double)):
     base(_base),
     dimensions(_dims),
     resolution(_res),
     threshold_v(_threshold_v),
     reset_v(_reset_v),
     timestep(_timestep),
-    function_file_name(function) {
+    function_file_name(function),
+    function_name(functionname){
+
+        fcnPtr = Func;
+
         num_dimensions = _dims.size();
+
+        Py_Initialize();
+
+        CPyObject pName = PyUnicode_FromString(function_file_name.c_str());
+        CPyObject pModule = PyImport_Import(pName);
+
+        if (pModule)
+        {
+            python_func = PyObject_GetAttrString(pModule, function_name.c_str());
+        }
+        else
+        {
+            std::cout << "ERROR: Python module not imported\n";
+        }
 
         generate_cell_coords(std::vector<unsigned int>(), resolution);
     }
 
-    // obviously this constrains the number of dimensions to a hard coded 3.
-    // need to pass the function as a parameter to the class. Can't be bothered right now.
-    void applyRybakInterneuronEuler(Point& p) {
-        double g_nap = 0.25;
-        double g_na = 30.0;
-        double g_k = 6.0;
-        double E_na = 55.0;
-        double E_k = -80.0;
-        double C = 1.0;
-        double g_l = 0.1;
-        double E_l = -64.0;
-        double I = 3.4;
-        double I_h = 0.0;
-
-        double v = p.coords[2];
-        double h_na = p.coords[1];
-        double m_k = p.coords[0];
-
-        for(unsigned int i=0; i<11; i++) {
-
-            double I_l = -g_l*(v - E_l);
-            double I_na = -g_na * h_na * (v - E_na) * (pow((pow((1 + exp(-(v+35)/7.8)),-1)),3));
-            double I_k = -g_k * (pow(m_k,4)) * (v - E_k);
-
-            double v_prime = I_na + I_k + I_l + I;
-
-            double part_1 = (pow((1 + (exp((v + 55)/7))),-1)) - h_na;
-            double part_2 = 30 / (exp((v+50)/15) + exp(-(v+50)/16));
-            double h_na_prime = part_1 / part_2;
-
-            part_1 = (pow((1 + (exp(-(v + 28)/15))),-1)) - m_k;
-            part_2 = 7 / (exp((v+40)/40) + exp((-v + 40)/50));
-            double m_k_prime = part_1 / part_2;
-
-            v = v + (timestep/11.0)*v_prime;
-            h_na = h_na + (timestep/11.0)*h_na_prime;
-            m_k = m_k + (timestep/11.0)*m_k_prime;
-        }
-
-        p.coords[2] = v;
-        p.coords[1] = h_na;
-        p.coords[0] = m_k;
-
+    ~Grid() {
+        Py_Finalize();
     }
 
-    void applyHindmarshRoseEuler(Point& p) {
-        double a = 1.0;
-        double b = 3.0;
-        double c = 1.0;
-        double d = 5.0;
-        double r = 0.002;
-        double s = 4.0;
-        double x_R = -1.6;
-        double I = 3.14;
-        double I_h = 0.0;
+    Cell generate_cell_with_coords_python(std::vector<unsigned int> cell_coord, bool btranslated) {
 
-        double x = p.coords[2];
-        double y = p.coords[1];
-        double z = p.coords[0];
-
-        for(unsigned int i=0; i<11; i++) {
-
-            double x_prime = y + (-a*pow(x,3) + b*pow(x,2)) - z + I;
-            double y_prime = c - (d*pow(x,2)) - y;
-            double z_prime = r*(s*(x - x_R) - z);
-            
-            x = x + (timestep/11.0)*x_prime;
-            y = y + (timestep/11.0)*y_prime;
-            z = z + (timestep/11.0)*z_prime;
+        std::vector<double> base_point_coords(num_dimensions);
+        for (unsigned int j = 0; j < num_dimensions; j++) {
+            base_point_coords[j] = base[j] + (cell_coord[j] * (dimensions[j] / resolution[j]));
         }
 
-        p.coords[2] = x;
-        p.coords[1] = y;
-        p.coords[0] = z;
+        std::vector<Point> ps = triangulator.generateUnitCubePoints(num_dimensions);
+        for (unsigned int i = 0; i < ps.size(); i++) {
 
-    }
+            PyObject* point_coord_list = PyList_New((Py_ssize_t)num_dimensions);
 
-    void applyConductance3D(Point& p) {
-        double tau_m = 20e-3;
-        double E_r = -65e-3;
-        double E_e = 0;
-        double tau_s = 5e-3;
-        double tau_t = 5e-3;
-        double g_max = 0.8;
-        double V_min = -66e-3;
-        double V_max = -55e-3;
-        double V_th = -55e-3;
-        double N_V = 2000;
-        double w_min = 0.0;
-        double w_max = 10.0;
-        double N_w = 20.0;
-        double u_min = 0.0;
-        double u_max = 10.0;
-        double N_u = 20.0;
+            std::vector<PyObject*> list_objects(num_dimensions);
 
-        double v = p.coords[2];
-        double w = p.coords[1];
-        double u = p.coords[0];
+            for (unsigned int d = 0; d < num_dimensions; d++) {
+                ps[i].coords[d] *= (dimensions[d] / resolution[d]);
+                ps[i].coords[d] += base_point_coords[d];
 
-        for(unsigned int i=0; i<11; i++) {
-            double v_prime = (-(v-E_r) - w*(v-E_e) - u*(v-E_e))/tau_m;
-            double w_prime = -w/tau_s;
-            double u_prime = -u/tau_t;
-            
-            v = v + (timestep/11.0)*v_prime;
-            w = w + (timestep/11.0)*w_prime;
-            u = u + (timestep/11.0)*u_prime;
+                list_objects[d] = PyFloat_FromDouble(ps[i].coords[d]);
+                PyList_SetItem(point_coord_list, d, list_objects[d]);
+            }
+
+            //PyObject* time = PyFloat_FromDouble(0.0);
+            //PyList_SetItem(point_coord_list, num_dimensions, time);
+
+            PyObject* tuple = PyList_AsTuple(point_coord_list);
+            if (btranslated) {
+                if (python_func && PyCallable_Check(python_func))
+                {
+                    PyObject* pass = Py_BuildValue("(O)", tuple);
+                    PyErr_Print();
+                    PyObject* pValue = PyObject_CallObject(python_func, pass);
+                    PyErr_Print();
+                    for (unsigned int d = 0; d < num_dimensions; d++) {
+                        ps[i].coords[d] = ps[i].coords[d] + timestep * PyFloat_AsDouble(PyList_GetItem(pValue, d));
+                    }
+                }
+                else
+                {
+                    std::cout << "ERROR: function.\n";
+                }
+            }
         }
 
-        p.coords[2] = v;
-        p.coords[1] = w;
-        p.coords[0] = u;
-    }
-
-    void applyMauritzioExEuler(Point& p) {
-
-        double C_m = 281.0;
-        double g_L = 30.0;
-        double t_ref = 2.0;
-        double E_L = -70.6;
-        double V_reset = -70.6;
-        double E_ex = 0.0;
-        double E_in = -75.0;
-        double tau_syn_ex = 34.78;
-        double tau_syn_in = 8.28;
-        double a = 0.0;
-        double b = 0.0;
-        double Delta_T = 2.0;
-        double tau_w = 0.0;
-        double V_th = -50.4;
-        double V_peak = -40.4;
-        double I_e = 60.0;
-
-        double V_m = p.coords[2];
-        double g_e = p.coords[1];
-        double g_i = p.coords[0];
-
-        for(unsigned int i=0; i<100; i++) {
-            if(V_m > -30.0)
-                V_m = -30.0;
-
-            double w = 0.0; // both tau_w and a are 0, so there is no adaptation.
-            double V_m_prime = (-(g_L*(V_m-E_L))+g_L*Delta_T*exp((V_m-V_th)/Delta_T)-(g_e*(V_m-E_ex)) -(g_i*(V_m-E_in))-w +I_e) / C_m;
-            double g_e_prime = (-g_e/tau_syn_ex);// + (2870.249*0.001*0.1);
-            double g_i_prime = (-g_i/tau_syn_in);// + (245.329*0.001*1.2671875);
-            
-            V_m = V_m + (timestep/100.0)*V_m_prime;
-            g_e = g_e + (timestep/100.0)*g_e_prime;
-            g_i = g_i + (timestep/100.0)*g_i_prime;
-        }
-
-        p.coords[2] = V_m;
-        p.coords[1] = g_e;
-        p.coords[0] = g_i;
-
-    }
-
-    void applyMauritzioInEuler(Point& p) {
-
-        double C_m = 281.0;
-        double g_L = 30.0;
-        double t_ref = 1.0;
-        double E_L = -70.6;
-        double V_reset = -70.6;
-        double E_ex = 0.0;
-        double E_in = -75.0;
-        double tau_syn_ex = 26.55;
-        double tau_syn_in = 8.28;
-        double a = 0.0;
-        double b = 0.0;
-        double Delta_T = 2.0;
-        double tau_w = 0.0;
-        double V_th = -50.4;
-        double V_peak = -40.4;
-        double I_e = 0.0;
-
-        double V_m = p.coords[2];
-        double g_e = p.coords[1];
-        double g_i = p.coords[0];
-
-        for(unsigned int i=0; i<100; i++) {
-            if(V_m > -30.0)
-                V_m = -30.0;
-
-            double w = 0.0; // both tau_w and a are 0, so there is no adaptation.
-            double V_m_prime = (-(g_L*(V_m-E_L))+g_L*Delta_T*exp((V_m-V_th)/Delta_T)-(g_e*(V_m-E_ex)) -(g_i*(V_m-E_in))-w +I_e) / C_m;
-            double g_e_prime = (-g_e/tau_syn_ex);// + (733.4874*0.001*0.4875);
-            double g_i_prime = (-g_i/tau_syn_in);// + (86.1246*0.001*1.2671875);
-            
-            V_m = V_m + (timestep/100.0)*V_m_prime;
-            g_e = g_e + (timestep/100.0)*g_e_prime;
-            g_i = g_i + (timestep/100.0)*g_i_prime;
-        }
-
-        p.coords[2] = V_m;
-        p.coords[1] = g_e;
-        p.coords[0] = g_i;
-
+        return Cell(cell_coord, num_dimensions, ps, triangulator);
     }
 
     Cell generate_cell_with_coords(std::vector<unsigned int> cell_coord, bool btranslated) {
+
         std::vector<double> base_point_coords(num_dimensions);
         for (unsigned int j=0; j<num_dimensions; j++) {
             base_point_coords[j] = base[j] + (cell_coord[j]*(dimensions[j]/resolution[j]));
@@ -247,12 +122,14 @@ public:
 
         std::vector<Point> ps = triangulator.generateUnitCubePoints(num_dimensions);
         for(unsigned int i=0; i<ps.size(); i++){
+
             for(unsigned int d=0; d<num_dimensions; d++){
                 ps[i].coords[d] *= (dimensions[d]/resolution[d]);
                 ps[i].coords[d] += base_point_coords[d];
             }
-            if(btranslated)
-                applyConductance3D(ps[i]);
+
+            if (btranslated)
+                fcnPtr(ps[i], timestep);
         }
 
         return Cell(cell_coord, num_dimensions, ps, triangulator);
@@ -435,7 +312,7 @@ public:
 
     std::map<std::vector<unsigned int> ,std::map<std::vector<unsigned int>, double>> calculateTransitionMatrix() {  
         std::map<std::vector<unsigned int> ,std::map<std::vector<unsigned int>, double>> transitions;    
-#pragma omp parallel for
+//#pragma omp parallel for
         for (int c=0; c < coord_list.size(); c++) {
             Cell cell = generate_cell_with_coords(coord_list[c],true);
             std::vector<Cell> check_cells = getCellRange(cell);
@@ -471,7 +348,7 @@ public:
 
         std::map<std::vector<unsigned int> ,std::map<std::vector<unsigned int>, double>> transitions;  
         for (unsigned int batch=0; batch < coord_list.size() / batch_size; batch++) {
-#pragma omp parallel for
+//#pragma omp parallel for
             for (int c=(batch*batch_size); c < (batch*batch_size)+batch_size; c++) {
                 Cell cell = generate_cell_with_coords(coord_list[c],true);
                 std::vector<Cell> check_cells = getCellRange(cell);

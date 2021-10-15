@@ -395,6 +395,7 @@ class Grid:
                 print(str(percent_complete) + '% complete.')
 
             tcell_transitions = self.calculateTransitionForCell(tcell, self.cells, [], self.calculateCellRange(tcell))
+            
             # if there were no transitions, the cell was entirely outside everything
             if len(tcell_transitions) == 0:
                 tcell_transitions = [[tcell.grid_coords, 1.0]]
@@ -582,6 +583,31 @@ class Triangulator:
 
         return [Simplex(self.num_dimensions, [p.coords for p in [points[total_inds[i]] for i in s]], self) for s in tris]
 
+class MiindGrid3DFileGenerator:
+    def __init__(self, _grid, _basename, _timescale, _reset_v, _threshold_v, _relative_reset_w, _reset_func=None, _reset_w_func=None):
+        self.grid = _grid
+        self.basename = _basename
+        self.timescale = _timescale
+        self.reset_v = _reset_v
+        self.threshold_v = _threshold_v
+        self.relative_reset_w = _relative_reset_w
+        self.reset_func = _reset_func
+        self.reset_w_func = _reset_w_func
+
+    def generateTMatFile(self):
+        transitions = self.grid.calculateTransitionMatrix()
+        print(transitions)
+
+        with open(self.basename + '.tmat', 'w') as tmat_file:
+            tmat_file.write('0	0\n')
+            for c in transitions:
+                line = '1000000000;' + str(c[0][0]) + ',' + str(c[0][1]) + ';'
+                for t in c[1]:
+                    line += str(t[0][0]) + ',' + str(t[0][1]) + ':' + '{:.9f}'.format(t[1]) + ';'
+                line += '\n'
+                tmat_file.write(line)
+
+
 class MiindGrid2DFileGenerator:
     def __init__(self, _grid, _basename, _timescale, _reset_v, _threshold_v, _relative_reset_w, _reset_func=None, _reset_w_func=None):
         self.grid = _grid
@@ -707,9 +733,6 @@ class MiindGrid2DFileGenerator:
                 tmat_file.write(line)
 
 
-
-
-
 #5D?!?
 # g = Grid([-40.0,0.0,0.0,0.0,0.0], [1.0,1.0,1.0,1.0,1.0], [3,3,3,3,3])
 # print([a.coords for a in g.cells[0][0][0][0][0].simplices[0].points])
@@ -778,10 +801,9 @@ def cond3d(y, t):
 
     return [u_prime, w_prime, v_prime]
 
-g = Grid([-2.0,-2.0,-75], [60.0-2,60.0-2,40-75], [50,50,50], cond3d, -40.3, 0.00001)
-two_d_gen = MiindGrid2DFileGenerator(g, 'cond3D', 1, -70.6, -40.3, 0.0, _reset_func=None)
-two_d_gen.generateModelFile()
-two_d_gen.generateTMatFile()
+g = Grid([-2.0,-2.0,-66e-3], [2.2,2.2,12e-3], [50,100,100], cond3d, -55e-3, 0.00001)
+three_d_gen = MiindGrid3DFileGenerator(g, 'cond3D', 1, -65e-3, -55e-3, 0.0)
+three_d_gen.generateTMatFile()
 
 # 2D
 
