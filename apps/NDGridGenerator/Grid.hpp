@@ -26,29 +26,45 @@ public:
     std::vector<std::vector<unsigned int>> coord_list;
     std::string function_file_name;
     std::string function_name;
+    bool usePythonFunction;
 
     CPyObject python_func;
 
     void (*fcnPtr)(Point&,double);
 
-    Grid(std::vector<double> _base, std::vector<double> _dims, std::vector<unsigned int> _res, double _threshold_v, double _reset_v, double _timestep, std::string function, std::string functionname, void(*Func)(Point&,double)):
+    Grid(std::vector<double> _base, std::vector<double> _dims, std::vector<unsigned int> _res, 
+        double _threshold_v, double _reset_v, double _timestep):
     base(_base),
     dimensions(_dims),
     resolution(_res),
     threshold_v(_threshold_v),
     reset_v(_reset_v),
-    timestep(_timestep),
-    function_file_name(function),
-    function_name(functionname){
-
-        fcnPtr = Func;
+    timestep(_timestep) {
+        usePythonFunction = false;
 
         num_dimensions = _dims.size();
 
+        generate_cell_coords(std::vector<unsigned int>(), resolution);
+    }
+
+    ~Grid() {
+        if (usePythonFunction)
+            Py_Finalize();
+    }
+
+    void Grid::setPythonFunction(std::string function, std::string functionname) {
+
+        function_file_name = function;
+        function_name = functionname;
+
         Py_Initialize();
 
+        usePythonFunction = true;
+
         CPyObject pName = PyUnicode_FromString(function_file_name.c_str());
+        PyErr_Print();
         CPyObject pModule = PyImport_Import(pName);
+        PyErr_Print();
 
         if (pModule)
         {
@@ -58,12 +74,10 @@ public:
         {
             std::cout << "ERROR: Python module not imported\n";
         }
-
-        generate_cell_coords(std::vector<unsigned int>(), resolution);
     }
 
-    ~Grid() {
-        Py_Finalize();
+    void Grid::setCppFunction(void(*Func)(Point&, double)) {
+        fcnPtr = Func;
     }
 
     Cell generate_cell_with_coords_python(std::vector<unsigned int> cell_coord, bool btranslated) {
@@ -311,31 +325,60 @@ public:
     }
 
     std::map<std::vector<unsigned int> ,std::map<std::vector<unsigned int>, double>> calculateTransitionMatrix() {  
-        std::map<std::vector<unsigned int> ,std::map<std::vector<unsigned int>, double>> transitions;    
-//#pragma omp parallel for
-        for (int c=0; c < coord_list.size(); c++) {
-            Cell cell = generate_cell_with_coords(coord_list[c],true);
-            std::vector<Cell> check_cells = getCellRange(cell);
-            std::map<std::vector<unsigned int>, double> ts = calculateTransitionForCell(cell, check_cells);
+        std::map<std::vector<unsigned int> ,std::map<std::vector<unsigned int>, double>> transitions; 
+        if (!usePythonFunction) {
+#pragma omp parallel for
+            for (int c = 0; c < coord_list.size(); c++) {
+                Cell cell = generate_cell_with_coords(coord_list[c], true);
+                std::vector<Cell> check_cells = getCellRange(cell);
+                std::map<std::vector<unsigned int>, double> ts = calculateTransitionForCell(cell, check_cells);
 
-            if (ts.size() == 0) { // cell was completely outside the grid, so don't move it.
-                ts[cell.grid_coords] = 1.0;
-            }
+                if (ts.size() == 0) { // cell was completely outside the grid, so don't move it.
+                    ts[cell.grid_coords] = 1.0;
+                }
 
-            double total_prop = 0.0;
-            for(auto const& kv : ts){
-                total_prop += kv.second;
-            }
-            double missed_prop = 1.0/total_prop;
+                double total_prop = 0.0;
+                for (auto const& kv : ts) {
+                    total_prop += kv.second;
+                }
+                double missed_prop = 1.0 / total_prop;
 
-            for(auto kv : ts){
-                double d = ts[kv.first];
-                ts[kv.first] *= missed_prop;
+                for (auto kv : ts) {
+                    double d = ts[kv.first];
+                    ts[kv.first] *= missed_prop;
+                }
+                transitions[cell.grid_coords] = ts;
+                if (transitions.size() % 100 == 0)
+                    std::cout << transitions.size() << " complete(ish).\n";
             }
-            transitions[cell.grid_coords] = ts;
-            if(transitions.size() % 100 == 0)
-                std::cout << transitions.size() << " complete(ish).\n";
         }
+        else {
+//#pragma omp parallel for
+            for (int c = 0; c < coord_list.size(); c++) {
+                Cell cell = generate_cell_with_coords_python(coord_list[c], true);
+                std::vector<Cell> check_cells = getCellRange(cell);
+                std::map<std::vector<unsigned int>, double> ts = calculateTransitionForCell(cell, check_cells);
+
+                if (ts.size() == 0) { // cell was completely outside the grid, so don't move it.
+                    ts[cell.grid_coords] = 1.0;
+                }
+
+                double total_prop = 0.0;
+                for (auto const& kv : ts) {
+                    total_prop += kv.second;
+                }
+                double missed_prop = 1.0 / total_prop;
+
+                for (auto kv : ts) {
+                    double d = ts[kv.first];
+                    ts[kv.first] *= missed_prop;
+                }
+                transitions[cell.grid_coords] = ts;
+                if (transitions.size() % 100 == 0)
+                    std::cout << transitions.size() << " complete(ish).\n";
+            }
+        }
+
         return transitions;
     }
 
@@ -348,28 +391,55 @@ public:
 
         std::map<std::vector<unsigned int> ,std::map<std::vector<unsigned int>, double>> transitions;  
         for (unsigned int batch=0; batch < coord_list.size() / batch_size; batch++) {
-//#pragma omp parallel for
-            for (int c=(batch*batch_size); c < (batch*batch_size)+batch_size; c++) {
-                Cell cell = generate_cell_with_coords(coord_list[c],true);
-                std::vector<Cell> check_cells = getCellRange(cell);
-                std::map<std::vector<unsigned int>, double> ts = calculateTransitionForCell(cell, check_cells);
+            if (!usePythonFunction) {
+#pragma omp parallel for
+                for (int c = (batch * batch_size); c < (batch * batch_size) + batch_size; c++) {
+                    Cell cell = generate_cell_with_coords(coord_list[c], true);
+                    std::vector<Cell> check_cells = getCellRange(cell);
+                    std::map<std::vector<unsigned int>, double> ts = calculateTransitionForCell(cell, check_cells);
 
-                if (ts.size() == 0) { // cell was completely outside the grid, so don't move it.
-                    ts[cell.grid_coords] = 1.0;
-                }
+                    if (ts.size() == 0) { // cell was completely outside the grid, so don't move it.
+                        ts[cell.grid_coords] = 1.0;
+                    }
 
-                double total_prop = 0.0;
-                for(auto const& kv : ts){
-                    total_prop += kv.second;
-                }
-                double missed_prop = 1.0/total_prop;
+                    double total_prop = 0.0;
+                    for (auto const& kv : ts) {
+                        total_prop += kv.second;
+                    }
+                    double missed_prop = 1.0 / total_prop;
 
-                for(auto const& kv : ts){
-                    double d = ts[kv.first];
-                    ts[kv.first] *= missed_prop;
-                }
+                    for (auto const& kv : ts) {
+                        double d = ts[kv.first];
+                        ts[kv.first] *= missed_prop;
+                    }
 #pragma omp critical
-                transitions[cell.grid_coords] = ts;
+                    transitions[cell.grid_coords] = ts;
+                }
+            }
+            else {
+//#pragma omp parallel for
+                for (int c = (batch * batch_size); c < (batch * batch_size) + batch_size; c++) {
+                    Cell cell = generate_cell_with_coords_python(coord_list[c], true);
+                    std::vector<Cell> check_cells = getCellRange(cell);
+                    std::map<std::vector<unsigned int>, double> ts = calculateTransitionForCell(cell, check_cells);
+
+                    if (ts.size() == 0) { // cell was completely outside the grid, so don't move it.
+                        ts[cell.grid_coords] = 1.0;
+                    }
+
+                    double total_prop = 0.0;
+                    for (auto const& kv : ts) {
+                        total_prop += kv.second;
+                    }
+                    double missed_prop = 1.0 / total_prop;
+
+                    for (auto const& kv : ts) {
+                        double d = ts[kv.first];
+                        ts[kv.first] *= missed_prop;
+                    }
+//#pragma omp critical
+                    transitions[cell.grid_coords] = ts;
+                }
             }
 
             for(auto const& kv : transitions) {
