@@ -39,7 +39,7 @@ def main():
         "\\", "/"
     )
 
-    package_version = "1.0.13"
+    package_version = "1.0.14"
 
     package_name = "miind"
 
@@ -61,7 +61,7 @@ def main():
     # Files from CMake output to copy to package.
     # Path regexes with forward slashes relative to CMake install dir.
     rearrange_cmake_output_data = {
-        "miind": (["lib/miindsim.pyd","lib/miindsimv.pyd"] if platform == "win32" else []) + (["bin\/.+\.dll"] if platform == "win32" else []) + (["lib/miindsim.so"] if platform not in ["win32"] else []) + (["lib/miindsimv.so"] if platform not in ["win32","darwin"] else []) + ["share\/miind\/python\/miind\/.+"],
+        "miind": (["lib/miindsim.pyd","lib/miindsimv.pyd","lib/miindgen.pyd"] if platform == "win32" else []) + (["bin\/.+\.dll"] if platform == "win32" else []) + (["lib/miindsim.so","lib/miindgen.so"] if platform not in ["win32"] else []) + (["lib/miindsimv.so","lib/miindgen.so"] if platform not in ["win32","darwin"] else []) + ["share\/miind\/python\/miind\/.+"],
         "miind.miind_api": ["share\/miind\/python\/miind\/miind_api\/.+"],
         "miind.build": [],
         "miind.build.apps.MatrixGenerator": (["bin\/gsl.dll", "bin\/gslcblas.dll", "bin\/vcruntime140.dll", "bin\/vcruntime140_1.dll", "bin\/msvcp140.dll"] if platform == "win32" else []) + (["bin\/MatrixGenerator.+", "bin\/Bind.+"] if platform == "win32" else []) + (["share\/miind\/apps\/MatrixGenerator\/.+"] if platform != "win32" else []),

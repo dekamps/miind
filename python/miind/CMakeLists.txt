@@ -28,6 +28,7 @@ grid_fn.py
 miind_lib.py
 utilities.py
 grid_generate.py
+grid_generate_nd.py
 variables.py
 codegen_lib3.py
 loadExamples.py

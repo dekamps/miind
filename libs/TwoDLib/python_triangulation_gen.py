@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+### 
+# This script generates the C++ files Triangulator.hpp and Triangulator.cpp.
+# The triangulation pattern for simplices of different dimensions
+# is hard coded in C++. Currently, only 2D and 3D are supported but a new
+# pair of files can be generated if higher dimensions are required.
+### 
+
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -343,29 +350,55 @@ class Triangulator:
             tri = Delaunay([a.coords for a in all_points])
 
             # DRAW UNIT CUBE TRIANGULATIONS
-            # fig = plt.figure()
-            # ax = fig.add_subplot(111, projection='3d')
-            #
-            # for s in tri.simplices:
-            #     for p1 in s:
-            #         for p2 in s:
-            #             p1_red = [element for i, element in enumerate(all_points[p1].coords) if i in [0,1,2]]
-            #             p2_red = [element for i, element in enumerate(all_points[p2].coords) if i in [0,1,2]]
-            #             line = np.array(p1_red)
-            #             line = np.vstack((line, np.array(p2_red)))
-            #             line = line.transpose()
-            #             ax.plot(line[0], line[1], line[2], color='g')
-            #
-            # for p in hyps:
-            #     p_red = [element for i, element in enumerate(p.coords) if i in [0,1,2]]
-            #     ax.scatter(p_red[0],p_red[1],p_red[2], color='b')
-            #
-            #
-            # for p in unit_simplex.points:
-            #     p_red = [element for i, element in enumerate(p.coords) if i in [0,1,2]]
-            #     ax.scatter(p_red[0],p_red[1],p_red[2], color='k')
-            #
-            # plt.show()
+            #fig = plt.figure()
+            #ax = fig.add_subplot(111, projection='3d')
+            
+            #for s in tri.simplices:
+            #    for p1 in s:
+            #        for p2 in s:
+            #            p1_red = [element for i, element in enumerate(all_points[p1].coords) if i in [0,1,2]]
+            #            p2_red = [element for i, element in enumerate(all_points[p2].coords) if i in [0,1,2]]
+            #            line = np.array(p1_red)
+            #            line = np.vstack((line, np.array(p2_red)))
+            #            line = line.transpose()
+            #            ax.plot(line[0], line[1], line[2], color='g')
+            
+            #for p in hyps:
+            #    p_red = [element for i, element in enumerate(p.coords) if i in [0,1,2]]
+            #    ax.scatter(p_red[0],p_red[1],p_red[2], color='b')
+            
+            
+            #for p in unit_simplex.points:
+            #    p_red = [element for i, element in enumerate(p.coords) if i in [0,1,2]]
+            #    ax.scatter(p_red[0],p_red[1],p_red[2], color='k')
+            
+            #plt.show()
+            # DEBUGGING
+
+            # DRAW UNIT SQUARE TRIANGULATIONS
+            #fig = plt.figure()
+            #ax = fig.add_subplot(111)
+            
+            #for s in tri.simplices:
+            #    for p1 in s:
+            #        for p2 in s:
+            #            p1_red = [element for i, element in enumerate(all_points[p1].coords) if i in [0,1,2]]
+            #            p2_red = [element for i, element in enumerate(all_points[p2].coords) if i in [0,1,2]]
+            #            line = np.array(p1_red)
+            #            line = np.vstack((line, np.array(p2_red)))
+            #            line = line.transpose()
+            #            ax.plot(line[0], line[1], color='g')
+            
+            #for p in hyps:
+            #    p_red = [element for i, element in enumerate(p.coords) if i in [0,1,2]]
+            #    ax.scatter(p_red[0],p_red[1], color='b')
+            
+            
+            #for p in unit_simplex.points:
+            #    p_red = [element for i, element in enumerate(p.coords) if i in [0,1,2]]
+            #    ax.scatter(p_red[0],p_red[1], color='k')
+            
+            #plt.show()
             # DEBUGGING
 
             simps[a][b][len(hyps)] = tri.simplices
@@ -402,7 +435,7 @@ class Triangulator:
         return result
 
     def generate_cell_simplices(self):
-        cpp  = 'std::vector<Simplex> Triangulator::generateCellSimplices(unsigned int num_dimensions, std::vector<Point>& points) {\n'
+        cpp  = 'std::vector<Simplex> Triangulator::generateCellSimplices(unsigned int num_dimensions, std::vector<NdPoint>& points) {\n'
         cpp += '\tswitch(num_dimensions) {\n'
         for i in range(self.num_dimensions-1):
             i = i + 2
@@ -410,7 +443,7 @@ class Triangulator:
             indices = self.gen_simplices_for_cell(i)
             cpp += '\t\tstd::vector<Simplex> simplices;\n'
             for j in range(len(indices)):
-                cpp += '\t\tstd::vector<Point> ps_{}({});\n'.format(j,len(indices[j]))
+                cpp += '\t\tstd::vector<NdPoint> ps_{}({});\n'.format(j,len(indices[j]))
                 for k in range(len(indices[j])):
                     cpp += '\t\tps_{}[{}] = points[{}];\n'.format(j,k, indices[j][k])
                 cpp += '\t\tsimplices.push_back(Simplex(num_dimensions,ps_{},*this));\n'.format(j)
@@ -426,7 +459,7 @@ class Triangulator:
         return cpp
 
     def generate_cell_cube_unit_points(self):     
-        cpp  = 'std::vector<Point> Triangulator::generateUnitCubePoints(unsigned int num_dimensions) {\n'
+        cpp  = 'std::vector<NdPoint> Triangulator::generateUnitCubePoints(unsigned int num_dimensions) {\n'
         cpp += '\tswitch(num_dimensions) {\n'
         for i in range(self.num_dimensions-1):
             i = i + 2
@@ -434,17 +467,17 @@ class Triangulator:
             tri = Triangulator(i)
             unit_cell = tri.generate_cells([],[1 for a in range(tri.num_dimensions)])
             unit_cell = tri.flatten([], unit_cell)[0]
-            cpp += '\t\tstd::vector<Point> points({});\n'.format(2**i)
+            cpp += '\t\tstd::vector<NdPoint> points({});\n'.format(2**i)
             for j in range(len(unit_cell.points)):
                 cpp += '\t\tstd::vector<double> coords_{}({});\n'.format(j,i)
                 for k in range(i):
                     cpp += '\t\tcoords_{}[{}] = {};\n'.format(j,k,unit_cell.points[j].coords[k])
-                cpp += '\t\tpoints[{}] = Point(coords_{});\n'.format(j,j)
+                cpp += '\t\tpoints[{}] = NdPoint(coords_{});\n'.format(j,j)
             cpp += '\t\treturn points;\n'
             cpp += '\t}\n'
         
         cpp += '\tdefault: {\n'
-        cpp +='\t\treturn std::vector<Point>();\n'
+        cpp +='\t\treturn std::vector<NdPoint>();\n'
         cpp += '\t}\n'
         cpp += '\t}\n'
         cpp += '}\n'
@@ -452,15 +485,15 @@ class Triangulator:
         return cpp
 
     def generate_triangulations_cpp(self):
-        cpp  = '#include "Point.hpp"\n'
-        cpp += '#include "Cell.hpp"\n'
+        cpp  = '#include "NdPoint.hpp"\n'
+        cpp += '#include "NdCell.hpp"\n'
         cpp += '#include "Simplex.hpp"\n'
         cpp += '#include "Triangulator.hpp"\n'
         cpp += '\n\n'
-        cpp += 'std::vector<Simplex> Triangulator::chooseTriangulation(unsigned int num_dimensions, std::vector<Point>& points, std::vector<unsigned int>& lower_inds, std::vector<unsigned int>& upper_inds, std::vector<unsigned int>& hyper_inds, std::vector<unsigned int>& all_inds) {\n'
+        cpp += 'std::vector<Simplex> Triangulator::chooseTriangulation(unsigned int num_dimensions, std::vector<NdPoint>& points, std::vector<unsigned int>& lower_inds, std::vector<unsigned int>& upper_inds, std::vector<unsigned int>& hyper_inds) {\n'
         cpp += '\tif (lower_inds.size() == 0){\n'
         cpp += '\t\tstd::vector<Simplex> out;\n'
-        cpp += '\t\tstd::vector<Point> ps(upper_inds.size());\n'
+        cpp += '\t\tstd::vector<NdPoint> ps(upper_inds.size());\n'
         cpp += '\t\tfor (unsigned int i=0; i<upper_inds.size(); i++)\n'
         cpp += '\t\t\tps[i] = points[upper_inds[i]];\n'
         cpp += '\t\tout.push_back(Simplex(num_dimensions, ps, *this));\n'
@@ -468,7 +501,7 @@ class Triangulator:
         cpp += '\t}\n'
         cpp += '\tif (upper_inds.size() == 0){\n'
         cpp += '\t\tstd::vector<Simplex> out;\n'
-        cpp += '\t\tstd::vector<Point> ps(lower_inds.size());\n'
+        cpp += '\t\tstd::vector<NdPoint> ps(lower_inds.size());\n'
         cpp += '\t\tfor (unsigned int i=0; i<lower_inds.size(); i++)\n'
         cpp += '\t\t\tps[i] = points[lower_inds[i]];\n'
         cpp += '\t\tout.push_back(Simplex(num_dimensions, ps, *this));\n'
@@ -477,7 +510,7 @@ class Triangulator:
         cpp += '\tstd::vector<std::vector<unsigned int>> tris = transitions[lower_inds.size()][upper_inds.size()][hyper_inds.size()];\n'
         cpp += '\tstd::vector<Simplex> out;\n'
         cpp += '\tfor (unsigned int t=0; t <tris.size(); t++) {\n'
-        cpp += '\t\tstd::vector<Point> ps(tris[t].size());\n'
+        cpp += '\t\tstd::vector<NdPoint> ps(tris[t].size());\n'
         cpp += '\t\tfor (unsigned int i=0; i<tris[t].size(); i++)\n'
         cpp += '\t\t\tps[i] = points[tris[t][i]];\n'
         cpp += '\t\tout.push_back(Simplex(num_dimensions, ps, *this));\n'
@@ -494,32 +527,37 @@ class Triangulator:
         cpp += '#include <map>\n'
         cpp += '#include <vector>\n'
         cpp += '\n\n'
-        cpp += 'class Point;\n'
+        cpp += 'class NdPoint;\n'
         cpp += 'class Simplex;\n'
         cpp += '\n'
         cpp += 'class Triangulator {\n'
         cpp += 'public:\n'
-        cpp += '\tstd::map<unsigned int, std::map<unsigned int, std::map<unsigned int, std::vector<std::vector<unsigned int>>>>> transitions;\n'
+        cpp += '\tstd::vector<std::map<unsigned int, std::map<unsigned int, std::map<unsigned int, std::vector<std::vector<unsigned int>>>>>> transitions;\n'
         cpp += '\tTriangulator() {\n'
         
-        transitions = self.triangulations
-        cpp += '\t\ttransitions = std::map<unsigned int, std::map<unsigned int, std::map<unsigned int, std::vector<std::vector<unsigned int>>>>>();\n'
-        for ih,it in transitions.items():
-            cpp += '\t\ttransitions[{}] = std::map<unsigned int, std::map<unsigned int, std::vector<std::vector<unsigned int>>>>();\n'.format(ih) 
-            for jh,jt in it.items():
-                cpp += '\t\ttransitions[{}][{}] = std::map<unsigned int, std::vector<std::vector<unsigned int>>>();\n'.format(ih, jh) 
-                for kh,kt in jt.items():
-                    cpp += '\t\ttransitions[{}][{}][{}] = std::vector<std::vector<unsigned int>>({});\n'.format(ih, jh, kh, len(kt)) 
-                    for l in range(len(kt)):
-                        cpp += '\t\ttransitions[{}][{}][{}][{}] = std::vector<unsigned int>({});\n'.format(ih, jh, kh, l, len(kt[l]))
-                        for m in range(len(kt[l])):
-                            cpp += '\t\ttransitions[{}][{}][{}][{}][{}] = {};\n'.format(ih, jh, kh, l, m, kt[l][m])
+        transitions_dims = [Triangulator(n).triangulations for n in range(self.num_dimensions+1) if n >= 2]
         
+        cpp += '\t\ttransitions = std::vector<std::map<unsigned int, std::map<unsigned int, std::map<unsigned int, std::vector<std::vector<unsigned int>>>>>>();\n'
+        cpp += '\t\tstd::map<unsigned int, std::map<unsigned int, std::map<unsigned int, std::vector<std::vector<unsigned int>>>>> t;\n'
+        for transitions in transitions_dims:
+            cpp += '\t\tt = std::map<unsigned int, std::map<unsigned int, std::map<unsigned int, std::vector<std::vector<unsigned int>>>>>();\n'
+            for ih,it in transitions.items():
+                cpp += '\t\tt[{}] = std::map<unsigned int, std::map<unsigned int, std::vector<std::vector<unsigned int>>>>();\n'.format(ih) 
+                for jh,jt in it.items():
+                    cpp += '\t\tt[{}][{}] = std::map<unsigned int, std::vector<std::vector<unsigned int>>>();\n'.format(ih, jh) 
+                    for kh,kt in jt.items():
+                        cpp += '\t\tt[{}][{}][{}] = std::vector<std::vector<unsigned int>>({});\n'.format(ih, jh, kh, len(kt)) 
+                        for l in range(len(kt)):
+                            cpp += '\t\tt[{}][{}][{}][{}] = std::vector<unsigned int>({});\n'.format(ih, jh, kh, l, len(kt[l]))
+                            for m in range(len(kt[l])):
+                                cpp += '\t\tt[{}][{}][{}][{}][{}] = {};\n'.format(ih, jh, kh, l, m, kt[l][m])
+            cpp += '\t\ttransitions.push_back(t);\n'
+            
         cpp += '\t}\n'
         cpp += '\n\n'
-        cpp += '\tstd::vector<Simplex> chooseTriangulation(unsigned int num_dimensions, std::vector<Point>& points, std::vector<unsigned int>& lower_inds, std::vector<unsigned int>& upper_inds, std::vector<unsigned int>& hyper_inds, std::vector<unsigned int>& all_inds);\n'
-        cpp += '\tstd::vector<Simplex> generateCellSimplices(unsigned int num_dimensions, std::vector<Point>& points);\n'
-        cpp += '\tstd::vector<Point> generateUnitCubePoints(unsigned int num_dimensions);\n'
+        cpp += '\tstd::vector<Simplex> chooseTriangulation(unsigned int num_dimensions, std::vector<NdPoint>& points, std::vector<unsigned int>& lower_inds, std::vector<unsigned int>& upper_inds, std::vector<unsigned int>& hyper_inds);\n'
+        cpp += '\tstd::vector<Simplex> generateCellSimplices(unsigned int num_dimensions, std::vector<NdPoint>& points);\n'
+        cpp += '\tstd::vector<NdPoint> generateUnitCubePoints(unsigned int num_dimensions);\n'
         cpp += '};\n'
         cpp += '\n#endif\n'
 

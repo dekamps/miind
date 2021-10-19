@@ -1,0 +1,438 @@
+#include "NdPoint.hpp"
+#include "NdCell.hpp"
+#include "Simplex.hpp"
+#include "Triangulator.hpp"
+
+
+std::vector<Simplex> Triangulator::chooseTriangulation(unsigned int num_dimensions, std::vector<NdPoint>& points, std::vector<unsigned int>& lower_inds, std::vector<unsigned int>& upper_inds, std::vector<unsigned int>& hyper_inds) {
+	if (lower_inds.size() == 0){
+		std::vector<Simplex> out;
+		std::vector<NdPoint> ps(upper_inds.size());
+		for (unsigned int i=0; i<upper_inds.size(); i++)
+			ps[i] = points[upper_inds[i]];
+		out.push_back(Simplex(num_dimensions, ps, *this));
+		return out;
+	}
+	if (upper_inds.size() == 0){
+		std::vector<Simplex> out;
+		std::vector<NdPoint> ps(lower_inds.size());
+		for (unsigned int i=0; i<lower_inds.size(); i++)
+			ps[i] = points[lower_inds[i]];
+		out.push_back(Simplex(num_dimensions, ps, *this));
+		return out;
+	}
+	std::vector<std::vector<unsigned int>> tris = transitions[num_dimensions-2][lower_inds.size()][upper_inds.size()][hyper_inds.size()];
+	std::vector<Simplex> out;
+	for (unsigned int t=0; t <tris.size(); t++) {
+		std::vector<NdPoint> ps(tris[t].size());
+		for (unsigned int i=0; i<tris[t].size(); i++)
+			ps[i] = points[tris[t][i]];
+		out.push_back(Simplex(num_dimensions, ps, *this));
+	}
+	return out;
+}
+
+std::vector<Simplex> Triangulator::generateCellSimplices(unsigned int num_dimensions, std::vector<NdPoint>& points) {
+	switch(num_dimensions) {
+	case 2: {
+		std::vector<Simplex> simplices;
+		std::vector<NdPoint> ps_0(3);
+		ps_0[0] = points[0];
+		ps_0[1] = points[1];
+		ps_0[2] = points[3];
+		simplices.push_back(Simplex(num_dimensions,ps_0,*this));
+		std::vector<NdPoint> ps_1(3);
+		ps_1[0] = points[3];
+		ps_1[1] = points[2];
+		ps_1[2] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_1,*this));
+		return simplices;
+	}
+	case 3: {
+		std::vector<Simplex> simplices;
+		std::vector<NdPoint> ps_0(4);
+		ps_0[0] = points[0];
+		ps_0[1] = points[1];
+		ps_0[2] = points[3];
+		ps_0[3] = points[7];
+		simplices.push_back(Simplex(num_dimensions,ps_0,*this));
+		std::vector<NdPoint> ps_1(4);
+		ps_1[0] = points[7];
+		ps_1[1] = points[1];
+		ps_1[2] = points[5];
+		ps_1[3] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_1,*this));
+		std::vector<NdPoint> ps_2(4);
+		ps_2[0] = points[7];
+		ps_2[1] = points[2];
+		ps_2[2] = points[3];
+		ps_2[3] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_2,*this));
+		std::vector<NdPoint> ps_3(4);
+		ps_3[0] = points[0];
+		ps_3[1] = points[2];
+		ps_3[2] = points[6];
+		ps_3[3] = points[7];
+		simplices.push_back(Simplex(num_dimensions,ps_3,*this));
+		std::vector<NdPoint> ps_4(4);
+		ps_4[0] = points[0];
+		ps_4[1] = points[4];
+		ps_4[2] = points[5];
+		ps_4[3] = points[7];
+		simplices.push_back(Simplex(num_dimensions,ps_4,*this));
+		std::vector<NdPoint> ps_5(4);
+		ps_5[0] = points[7];
+		ps_5[1] = points[4];
+		ps_5[2] = points[6];
+		ps_5[3] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_5,*this));
+		return simplices;
+	}
+	case 4: {
+		std::vector<Simplex> simplices;
+		std::vector<NdPoint> ps_0(5);
+		ps_0[0] = points[0];
+		ps_0[1] = points[1];
+		ps_0[2] = points[3];
+		ps_0[3] = points[7];
+		ps_0[4] = points[15];
+		simplices.push_back(Simplex(num_dimensions,ps_0,*this));
+		std::vector<NdPoint> ps_1(5);
+		ps_1[0] = points[15];
+		ps_1[1] = points[1];
+		ps_1[2] = points[3];
+		ps_1[3] = points[11];
+		ps_1[4] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_1,*this));
+		std::vector<NdPoint> ps_2(5);
+		ps_2[0] = points[15];
+		ps_2[1] = points[1];
+		ps_2[2] = points[5];
+		ps_2[3] = points[7];
+		ps_2[4] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_2,*this));
+		std::vector<NdPoint> ps_3(5);
+		ps_3[0] = points[0];
+		ps_3[1] = points[1];
+		ps_3[2] = points[5];
+		ps_3[3] = points[13];
+		ps_3[4] = points[15];
+		simplices.push_back(Simplex(num_dimensions,ps_3,*this));
+		std::vector<NdPoint> ps_4(5);
+		ps_4[0] = points[0];
+		ps_4[1] = points[1];
+		ps_4[2] = points[9];
+		ps_4[3] = points[11];
+		ps_4[4] = points[15];
+		simplices.push_back(Simplex(num_dimensions,ps_4,*this));
+		std::vector<NdPoint> ps_5(5);
+		ps_5[0] = points[15];
+		ps_5[1] = points[1];
+		ps_5[2] = points[9];
+		ps_5[3] = points[13];
+		ps_5[4] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_5,*this));
+		std::vector<NdPoint> ps_6(5);
+		ps_6[0] = points[15];
+		ps_6[1] = points[2];
+		ps_6[2] = points[3];
+		ps_6[3] = points[7];
+		ps_6[4] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_6,*this));
+		std::vector<NdPoint> ps_7(5);
+		ps_7[0] = points[0];
+		ps_7[1] = points[2];
+		ps_7[2] = points[3];
+		ps_7[3] = points[11];
+		ps_7[4] = points[15];
+		simplices.push_back(Simplex(num_dimensions,ps_7,*this));
+		std::vector<NdPoint> ps_8(5);
+		ps_8[0] = points[0];
+		ps_8[1] = points[2];
+		ps_8[2] = points[6];
+		ps_8[3] = points[7];
+		ps_8[4] = points[15];
+		simplices.push_back(Simplex(num_dimensions,ps_8,*this));
+		std::vector<NdPoint> ps_9(5);
+		ps_9[0] = points[15];
+		ps_9[1] = points[2];
+		ps_9[2] = points[6];
+		ps_9[3] = points[14];
+		ps_9[4] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_9,*this));
+		std::vector<NdPoint> ps_10(5);
+		ps_10[0] = points[15];
+		ps_10[1] = points[2];
+		ps_10[2] = points[10];
+		ps_10[3] = points[11];
+		ps_10[4] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_10,*this));
+		std::vector<NdPoint> ps_11(5);
+		ps_11[0] = points[0];
+		ps_11[1] = points[2];
+		ps_11[2] = points[10];
+		ps_11[3] = points[14];
+		ps_11[4] = points[15];
+		simplices.push_back(Simplex(num_dimensions,ps_11,*this));
+		std::vector<NdPoint> ps_12(5);
+		ps_12[0] = points[0];
+		ps_12[1] = points[4];
+		ps_12[2] = points[5];
+		ps_12[3] = points[7];
+		ps_12[4] = points[15];
+		simplices.push_back(Simplex(num_dimensions,ps_12,*this));
+		std::vector<NdPoint> ps_13(5);
+		ps_13[0] = points[15];
+		ps_13[1] = points[4];
+		ps_13[2] = points[5];
+		ps_13[3] = points[13];
+		ps_13[4] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_13,*this));
+		std::vector<NdPoint> ps_14(5);
+		ps_14[0] = points[15];
+		ps_14[1] = points[4];
+		ps_14[2] = points[6];
+		ps_14[3] = points[7];
+		ps_14[4] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_14,*this));
+		std::vector<NdPoint> ps_15(5);
+		ps_15[0] = points[0];
+		ps_15[1] = points[4];
+		ps_15[2] = points[6];
+		ps_15[3] = points[14];
+		ps_15[4] = points[15];
+		simplices.push_back(Simplex(num_dimensions,ps_15,*this));
+		std::vector<NdPoint> ps_16(5);
+		ps_16[0] = points[0];
+		ps_16[1] = points[4];
+		ps_16[2] = points[12];
+		ps_16[3] = points[13];
+		ps_16[4] = points[15];
+		simplices.push_back(Simplex(num_dimensions,ps_16,*this));
+		std::vector<NdPoint> ps_17(5);
+		ps_17[0] = points[15];
+		ps_17[1] = points[4];
+		ps_17[2] = points[12];
+		ps_17[3] = points[14];
+		ps_17[4] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_17,*this));
+		std::vector<NdPoint> ps_18(5);
+		ps_18[0] = points[15];
+		ps_18[1] = points[8];
+		ps_18[2] = points[9];
+		ps_18[3] = points[11];
+		ps_18[4] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_18,*this));
+		std::vector<NdPoint> ps_19(5);
+		ps_19[0] = points[0];
+		ps_19[1] = points[8];
+		ps_19[2] = points[9];
+		ps_19[3] = points[13];
+		ps_19[4] = points[15];
+		simplices.push_back(Simplex(num_dimensions,ps_19,*this));
+		std::vector<NdPoint> ps_20(5);
+		ps_20[0] = points[0];
+		ps_20[1] = points[8];
+		ps_20[2] = points[10];
+		ps_20[3] = points[11];
+		ps_20[4] = points[15];
+		simplices.push_back(Simplex(num_dimensions,ps_20,*this));
+		std::vector<NdPoint> ps_21(5);
+		ps_21[0] = points[15];
+		ps_21[1] = points[8];
+		ps_21[2] = points[10];
+		ps_21[3] = points[14];
+		ps_21[4] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_21,*this));
+		std::vector<NdPoint> ps_22(5);
+		ps_22[0] = points[15];
+		ps_22[1] = points[8];
+		ps_22[2] = points[12];
+		ps_22[3] = points[13];
+		ps_22[4] = points[0];
+		simplices.push_back(Simplex(num_dimensions,ps_22,*this));
+		std::vector<NdPoint> ps_23(5);
+		ps_23[0] = points[0];
+		ps_23[1] = points[8];
+		ps_23[2] = points[12];
+		ps_23[3] = points[14];
+		ps_23[4] = points[15];
+		simplices.push_back(Simplex(num_dimensions,ps_23,*this));
+		return simplices;
+	}
+	default: {
+		return std::vector<Simplex>();
+	}
+	}
+}
+std::vector<NdPoint> Triangulator::generateUnitCubePoints(unsigned int num_dimensions) {
+	switch(num_dimensions) {
+	case 2: {
+		std::vector<NdPoint> points(4);
+		std::vector<double> coords_0(2);
+		coords_0[0] = 0.0;
+		coords_0[1] = 0.0;
+		points[0] = NdPoint(coords_0);
+		std::vector<double> coords_1(2);
+		coords_1[0] = 0.0;
+		coords_1[1] = 1.0;
+		points[1] = NdPoint(coords_1);
+		std::vector<double> coords_2(2);
+		coords_2[0] = 1.0;
+		coords_2[1] = 0.0;
+		points[2] = NdPoint(coords_2);
+		std::vector<double> coords_3(2);
+		coords_3[0] = 1.0;
+		coords_3[1] = 1.0;
+		points[3] = NdPoint(coords_3);
+		return points;
+	}
+	case 3: {
+		std::vector<NdPoint> points(8);
+		std::vector<double> coords_0(3);
+		coords_0[0] = 0.0;
+		coords_0[1] = 0.0;
+		coords_0[2] = 0.0;
+		points[0] = NdPoint(coords_0);
+		std::vector<double> coords_1(3);
+		coords_1[0] = 0.0;
+		coords_1[1] = 0.0;
+		coords_1[2] = 1.0;
+		points[1] = NdPoint(coords_1);
+		std::vector<double> coords_2(3);
+		coords_2[0] = 0.0;
+		coords_2[1] = 1.0;
+		coords_2[2] = 0.0;
+		points[2] = NdPoint(coords_2);
+		std::vector<double> coords_3(3);
+		coords_3[0] = 0.0;
+		coords_3[1] = 1.0;
+		coords_3[2] = 1.0;
+		points[3] = NdPoint(coords_3);
+		std::vector<double> coords_4(3);
+		coords_4[0] = 1.0;
+		coords_4[1] = 0.0;
+		coords_4[2] = 0.0;
+		points[4] = NdPoint(coords_4);
+		std::vector<double> coords_5(3);
+		coords_5[0] = 1.0;
+		coords_5[1] = 0.0;
+		coords_5[2] = 1.0;
+		points[5] = NdPoint(coords_5);
+		std::vector<double> coords_6(3);
+		coords_6[0] = 1.0;
+		coords_6[1] = 1.0;
+		coords_6[2] = 0.0;
+		points[6] = NdPoint(coords_6);
+		std::vector<double> coords_7(3);
+		coords_7[0] = 1.0;
+		coords_7[1] = 1.0;
+		coords_7[2] = 1.0;
+		points[7] = NdPoint(coords_7);
+		return points;
+	}
+	case 4: {
+		std::vector<NdPoint> points(16);
+		std::vector<double> coords_0(4);
+		coords_0[0] = 0.0;
+		coords_0[1] = 0.0;
+		coords_0[2] = 0.0;
+		coords_0[3] = 0.0;
+		points[0] = NdPoint(coords_0);
+		std::vector<double> coords_1(4);
+		coords_1[0] = 0.0;
+		coords_1[1] = 0.0;
+		coords_1[2] = 0.0;
+		coords_1[3] = 1.0;
+		points[1] = NdPoint(coords_1);
+		std::vector<double> coords_2(4);
+		coords_2[0] = 0.0;
+		coords_2[1] = 0.0;
+		coords_2[2] = 1.0;
+		coords_2[3] = 0.0;
+		points[2] = NdPoint(coords_2);
+		std::vector<double> coords_3(4);
+		coords_3[0] = 0.0;
+		coords_3[1] = 0.0;
+		coords_3[2] = 1.0;
+		coords_3[3] = 1.0;
+		points[3] = NdPoint(coords_3);
+		std::vector<double> coords_4(4);
+		coords_4[0] = 0.0;
+		coords_4[1] = 1.0;
+		coords_4[2] = 0.0;
+		coords_4[3] = 0.0;
+		points[4] = NdPoint(coords_4);
+		std::vector<double> coords_5(4);
+		coords_5[0] = 0.0;
+		coords_5[1] = 1.0;
+		coords_5[2] = 0.0;
+		coords_5[3] = 1.0;
+		points[5] = NdPoint(coords_5);
+		std::vector<double> coords_6(4);
+		coords_6[0] = 0.0;
+		coords_6[1] = 1.0;
+		coords_6[2] = 1.0;
+		coords_6[3] = 0.0;
+		points[6] = NdPoint(coords_6);
+		std::vector<double> coords_7(4);
+		coords_7[0] = 0.0;
+		coords_7[1] = 1.0;
+		coords_7[2] = 1.0;
+		coords_7[3] = 1.0;
+		points[7] = NdPoint(coords_7);
+		std::vector<double> coords_8(4);
+		coords_8[0] = 1.0;
+		coords_8[1] = 0.0;
+		coords_8[2] = 0.0;
+		coords_8[3] = 0.0;
+		points[8] = NdPoint(coords_8);
+		std::vector<double> coords_9(4);
+		coords_9[0] = 1.0;
+		coords_9[1] = 0.0;
+		coords_9[2] = 0.0;
+		coords_9[3] = 1.0;
+		points[9] = NdPoint(coords_9);
+		std::vector<double> coords_10(4);
+		coords_10[0] = 1.0;
+		coords_10[1] = 0.0;
+		coords_10[2] = 1.0;
+		coords_10[3] = 0.0;
+		points[10] = NdPoint(coords_10);
+		std::vector<double> coords_11(4);
+		coords_11[0] = 1.0;
+		coords_11[1] = 0.0;
+		coords_11[2] = 1.0;
+		coords_11[3] = 1.0;
+		points[11] = NdPoint(coords_11);
+		std::vector<double> coords_12(4);
+		coords_12[0] = 1.0;
+		coords_12[1] = 1.0;
+		coords_12[2] = 0.0;
+		coords_12[3] = 0.0;
+		points[12] = NdPoint(coords_12);
+		std::vector<double> coords_13(4);
+		coords_13[0] = 1.0;
+		coords_13[1] = 1.0;
+		coords_13[2] = 0.0;
+		coords_13[3] = 1.0;
+		points[13] = NdPoint(coords_13);
+		std::vector<double> coords_14(4);
+		coords_14[0] = 1.0;
+		coords_14[1] = 1.0;
+		coords_14[2] = 1.0;
+		coords_14[3] = 0.0;
+		points[14] = NdPoint(coords_14);
+		std::vector<double> coords_15(4);
+		coords_15[0] = 1.0;
+		coords_15[1] = 1.0;
+		coords_15[2] = 1.0;
+		coords_15[3] = 1.0;
+		points[15] = NdPoint(coords_15);
+		return points;
+	}
+	default: {
+		return std::vector<NdPoint>();
+	}
+	}
+}

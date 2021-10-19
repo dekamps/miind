@@ -1,8 +1,6 @@
-#include "Grid.hpp"
+#include <NdGrid.hpp>
 
-// obviously this constrains the number of dimensions to a hard coded 3.
-    // need to pass the function as a parameter to the class. Can't be bothered right now.
-void applyRybakInterneuronEuler(Point& p, double t) {
+void applyRybakInterneuronEuler(NdPoint& p, double t) {
     double g_nap = 0.25;
     double g_na = 30.0;
     double g_k = 6.0;
@@ -45,7 +43,7 @@ void applyRybakInterneuronEuler(Point& p, double t) {
 
 }
 
-void applyHindmarshRoseEuler(Point& p, double t) {
+void applyHindmarshRoseEuler(NdPoint& p, double t) {
     double a = 1.0;
     double b = 3.0;
     double c = 1.0;
@@ -77,7 +75,7 @@ void applyHindmarshRoseEuler(Point& p, double t) {
 
 }
 
-void applyConductance3D(Point& p, double t) {
+void applyConductance3D(NdPoint& p, double t) {
     double tau_m = 20e-3;
     double E_r = -65e-3;
     double E_e = 0;
@@ -114,7 +112,40 @@ void applyConductance3D(Point& p, double t) {
     p.coords[0] = u;
 }
 
-void applyMauritzioExEuler(Point& p, double t) {
+void applyConductance2D(NdPoint& p, double t) {
+    double tau_m = 20e-3;
+    double E_r = -65e-3;
+    double E_e = 0;
+    double tau_s = 5e-3;
+    double tau_t = 5e-3;
+    double g_max = 0.8;
+    double V_min = -66e-3;
+    double V_max = -55e-3;
+    double V_th = -55e-3;
+    double N_V = 2000;
+    double w_min = 0.0;
+    double w_max = 10.0;
+    double N_w = 20.0;
+    double u_min = 0.0;
+    double u_max = 10.0;
+    double N_u = 20.0;
+
+    double v = p.coords[1];
+    double w = p.coords[0];
+
+    for (unsigned int i = 0; i < 11; i++) {
+        double v_prime = (-(v - E_r) - w * (v - E_e)) / tau_m;
+        double w_prime = -w / tau_s;
+
+        v = v + (t / 11.0) * v_prime;
+        w = w + (t / 11.0) * w_prime;
+    }
+
+    p.coords[1] = v;
+    p.coords[0] = w;
+}
+
+void applyMauritzioExEuler(NdPoint& p, double t) {
 
     double C_m = 281.0;
     double g_L = 30.0;
@@ -157,7 +188,7 @@ void applyMauritzioExEuler(Point& p, double t) {
 
 }
 
-void applyMauritzioInEuler(Point& p, double t) {
+void applyMauritzioInEuler(NdPoint& p, double t) {
 
     double C_m = 281.0;
     double g_L = 30.0;
@@ -201,15 +232,14 @@ void applyMauritzioInEuler(Point& p, double t) {
 }
 
 int main() {
-	std::vector<double> base = {-0.2,-0.2,-66e-3};
-	std::vector<double> dims = {2.2,2.2, 12e-3};
+	std::vector<double> base = { -0.2,-0.2,-66e-3};
+	std::vector<double> dims = { 2.2,2.2, 12e-3};
 	std::vector<unsigned int> res = {50,50,100};
 	double threshold = -55e-3;
 	double reset_v = -65e-3;
-	Grid g(base, dims, res, threshold, reset_v, 1e-05);
+    NdGrid g(base, dims, res, threshold, reset_v, 1e-05);
 
-    //g.setCppFunction(applyConductance3D);
-    g.setPythonFunction("test_script", "cond");
+    g.setCppFunction(applyConductance3D);
 	g.generateModelFile("conductanceNdNoise", 1);
 	g.generateTMatFileBatched("conductanceNdNoise");
 	return 0;

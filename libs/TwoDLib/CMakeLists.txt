@@ -15,6 +15,11 @@ INCLUDE_DIRECTORIES(
 )
 
 set( TWOD_SRC
+NdCell.cpp
+NdPoint.cpp
+NdGrid.cpp
+Simplex.cpp
+Triangulator.cpp
 Cell.cpp
 CheckSystem.cpp
 Mesh.cpp
@@ -51,6 +56,11 @@ GridAlgorithmCode.cpp
 )
 
 set( TWOD_HEADERS
+NdCell.hpp
+NdPoint.hpp
+NdGrid.hpp
+Simplex.hpp
+Triangulator.hpp
 Bin.hpp
 MasterOMP.hpp
 MasterParameter.hpp
