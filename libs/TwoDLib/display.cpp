@@ -135,44 +135,27 @@ void Display::display(void) {
 
 	Mesh m = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index];
 
-	double max = -99999999.0;
-	for(unsigned int i = 0; i<m.NrStrips(); i++){
-		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
-			double cell_area = std::abs(m.Quad(i,j).SignedArea());
-			if(_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j)]/cell_area == 0){
-				continue;
-			}
-			if (max < log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j)]/cell_area))
-				max = log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j)]/cell_area);
-		}
-	}
-
-	double min = 999999.0;
-	for(unsigned int i = 0; i<m.NrStrips(); i++){
-		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
-			double cell_area = std::abs(m.Quad(i,j).SignedArea());
-			if(_dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j)]/cell_area == 0){
-				continue;
-			}
-
-			if (log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j)]/cell_area) < min)
-				min = log10(1e-6 + _dws[window_index]._system->Mass()[_dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j)]/cell_area);
-		}
-	}
-
 	double mesh_min_v = _dws[window_index].mesh_min_v;
 	double mesh_max_v = _dws[window_index].mesh_max_v;
 	double mesh_min_h = _dws[window_index].mesh_min_h;
 	double mesh_max_h = _dws[window_index].mesh_max_h;
 
+	double max_m = -9999999;
+	double min_m = 9999999;
 	for(unsigned int i = 0; i<m.NrStrips(); i++){
 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
 			unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j);
 			Quadrilateral q = m.Quad(i,j);
 			double cell_area = std::abs(q.SignedArea());
 			double mass = 0.0;
+
+			if (max_m < log10(1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area))
+				max_m = log10(1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area);
+			if (min_m >= log10(1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area))
+				min_m = log10(1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area);
+
 			if (_dws[window_index]._system->Mass()[idx] / cell_area != 0 && _dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] == 0) {
-				mass = std::min(1.0, std::max(0.0, (log10(_dws[window_index]._system->Mass()[idx] / cell_area) - min) / (max - min)));
+				mass = std::min(1.0, std::max(0.0, (log10(_dws[window_index]._system->Mass()[idx] / cell_area) - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass)));
 			}
 			else {
 				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() > 0)
@@ -189,6 +172,9 @@ void Display::display(void) {
 			glVertex2f(2*(ps[3][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[3][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
 		}
 	}
+
+	_dws[window_index].max_mass = max_m;
+	_dws[window_index].min_mass = min_m;
 
 	glEnd();
 
@@ -520,7 +506,7 @@ void Display::display_3d(void) {
 				unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index, (i * size_y) + k, j);
 
 				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() == 0 && i != 0 && k != 0 && j != 0 && i != size_z - 1 && k != size_y - 1 && j != size_x - 1)
-					if (_dws[window_index]._system->Mass()[idx] == 0) continue; // skip if mass is basically nothing
+					if (_dws[window_index]._system->Mass()[idx] < 0.000000001) continue; // skip if mass is basically nothing
 
 				double cell_area = std::abs(m.Quad(0, 0).SignedArea());
 

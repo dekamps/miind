@@ -98,7 +98,8 @@ _threshold_reset_jump_dimension(m._threshold_reset_jump_dimension),
 _base(m._base),
 _num_strips(m._num_strips),
 _strip_length(m._strip_length),
-_strips_are_v_oriented(m._strips_are_v_oriented)
+_strips_are_v_oriented(m._strips_are_v_oriented),
+_has_defined_strips(m._has_defined_strips)
 {
 }
 
@@ -536,7 +537,6 @@ void Mesh::FromXML(istream& s)
     if (!result)
     	throw TwoDLib::TwoDLibException("Couldn't parse Mesh from stream");
 
-
     pugi::xml_node node_mesh = doc.first_child();
     if  (node_mesh.name() == std::string("Model"))
     	node_mesh = doc.first_child().child("Mesh");
@@ -589,8 +589,9 @@ void Mesh::FromXML(istream& s)
 	_threshold_reset_dimension = _grid_num_dimensions - 1;
 	_threshold_reset_jump_dimension = _grid_num_dimensions - 2;
 	_strips_are_v_oriented = true;
+	_has_defined_strips = false;
 
-	if (_dimensions.size() == 0 || _grid_num_dimensions == 2) { // this is a mesh or a 2D grid
+	if (_resolution[0] == 0) { // this is a mesh or an old style grid where the resolution isn't in the XML
 		_num_strips = 0;
 		for (pugi::xml_node strip = node_mesh.child("Strip"); strip; strip = strip.next_sibling("Strip")) {
 
@@ -600,6 +601,8 @@ void Mesh::FromXML(istream& s)
 			_vec_vec_quad.push_back(vec_quad);
 			_num_strips++;
 		}
+
+		_has_defined_strips = true;
 
 		// We're unfortunately still potentially using the old way of doing 2D
 		// i.e strips in a different direction instead of always horizontal.

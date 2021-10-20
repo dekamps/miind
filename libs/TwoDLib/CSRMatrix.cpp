@@ -90,6 +90,10 @@ void CSRMatrix::Validate(const TransitionMatrix& mat){
 
 	const Mesh& m = _sys.MeshObjects()[_mesh_index];
 
+	// No need to do this if we don't actually have a mesh
+	if (!m.hasDefinedStrips())
+		return;
+
 	const std::vector<TransitionMatrix::TransferLine>& lines = mat.Matrix();
 
 	MPILib::Number count = 0;
@@ -113,7 +117,7 @@ void CSRMatrix::Validate(const TransitionMatrix& mat){
 		}
 	}
 
-	if ( count != m.NrCellsInStrip(0) )
+	if ( count != m.NrCellsInStrip(0))
 	   throw TwoDLib::TwoDLibException("There is a stationary point in your mesh file, but no entries in the mat file that lead away from it.");
 
 }

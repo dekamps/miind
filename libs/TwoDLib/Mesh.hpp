@@ -142,6 +142,8 @@ namespace TwoDLib {
 		//! Time step used in Mesh generation.
 		double TimeStep() const {return _t_step;}
 
+		bool hasDefinedStrips() const { return _has_defined_strips; }
+
 		//! Write to an XM format. It is guaranteed that a single strip is written on a single line,
 		//! and therefore can be processed by getline
 		void ToXML(std::ostream&) const;
@@ -226,6 +228,8 @@ namespace TwoDLib {
 		unsigned int								_num_strips;
 		unsigned int								_strip_length;
 		bool										_strips_are_v_oriented;
+
+		bool										_has_defined_strips;
 
 		// It is sometimes necessary to find out to which cells a given mesh point belongs.
 		// A mesh point will be mapped to an index position in a list of a list of coordinates.

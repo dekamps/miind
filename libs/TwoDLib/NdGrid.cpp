@@ -281,20 +281,21 @@ void NdGrid::generateTMatFileBatched(std::string basename) {
 #pragma omp critical
             transitions[cell.grid_coords] = ts;
         }
-
-        for (auto const& kv : transitions) {
-            std::vector<unsigned int> pair = coords_to_strip_and_cell(kv.first);
-            file << "1000000000;" << pair[0] << "," << pair[1] << ";";
-            for (auto const& tv : kv.second) {
-                std::vector<unsigned int> tpair = coords_to_strip_and_cell(tv.first);
-                file << tpair[0] << "," << tpair[1] << ":" << tv.second << ";";
-            }
-            file << "\n";
-        }
-
         std::cout << '\r' << std::setw(5) << 100.0 * ((float)(batch * batch_size) / (float)coord_list.size()) << "% complete." << std::setfill(' ') << std::flush;
-        transitions.clear();
     }
+
+    for (auto const& kv : transitions) {
+        std::vector<unsigned int> pair = coords_to_strip_and_cell(kv.first);
+        file << "1000000000;" << pair[0] << "," << pair[1] << ";";
+        for (auto const& tv : kv.second) {
+            std::vector<unsigned int> tpair = coords_to_strip_and_cell(tv.first);
+            file << tpair[0] << "," << tpair[1] << ":" << tv.second << ";";
+        }
+        file << "\n";
+    }
+
+    transitions.clear();
+
     std::cout << "\n";
 }
 

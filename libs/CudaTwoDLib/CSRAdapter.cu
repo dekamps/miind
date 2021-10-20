@@ -457,7 +457,7 @@ void CSRAdapter::CalculateMeshGridDerivativeWithEfficacyFinite(const std::vector
 
         CudaGridUpdateFiniteObjectsCalc << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_m], _group._vec_num_object_offsets[mesh_m], _random_poisson, _group._vec_objects_to_index,
             _group._vec_objects_refract_times, _group._vec_objects_refract_index,
-            efficacy[mesh_m],cell_widths[mesh_m], cell_offsets[mesh_m], _randomState);
+            efficacy[m],cell_widths[m], cell_offsets[m], _randomState);
 
     }
 
