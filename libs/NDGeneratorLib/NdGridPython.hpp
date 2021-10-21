@@ -12,7 +12,7 @@ public:
     CPyObject python_func;
 
     NdGridPython(std::vector<double> _base, std::vector<double> _dims, std::vector<unsigned int> _res,
-        double _threshold_v, double _reset_v, double _timestep);
+        double _threshold_v, double _reset_v, std::vector<double> _reset_jump_relative, double _timestep);
     ~NdGridPython();
 
     void setPythonFunctionFromStrings(std::string function, std::string functionname);

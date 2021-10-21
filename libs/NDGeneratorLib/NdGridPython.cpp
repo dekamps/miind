@@ -1,8 +1,8 @@
 #include "NdGridPython.hpp"
 
 NdGridPython::NdGridPython(std::vector<double> _base, std::vector<double> _dims, std::vector<unsigned int> _res,
-    double _threshold_v, double _reset_v, double _timestep) :
-    NdGrid(_base, _dims, _res, _threshold_v, _reset_v, _timestep) {
+    double _threshold_v, double _reset_v, std::vector<double> _reset_jump_relative, double _timestep) :
+    NdGrid(_base, _dims, _res, _threshold_v, _reset_v, _reset_jump_relative, _timestep) {
 
         num_dimensions = _dims.size();
 

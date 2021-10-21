@@ -1,12 +1,13 @@
 #include "NdGrid.hpp"
 
 NdGrid::NdGrid(std::vector<double> _base, std::vector<double> _dims, std::vector<unsigned int> _res,
-    double _threshold_v, double _reset_v, double _timestep) :
+    double _threshold_v, double _reset_v, std::vector<double> _reset_relative, double _timestep) :
     base(_base),
     dimensions(_dims),
     resolution(_res),
     threshold_v(_threshold_v),
     reset_v(_reset_v),
+    reset_relative(_reset_relative),
     timestep(_timestep) {
 
     num_dimensions = _dims.size();
@@ -359,6 +360,47 @@ void NdGrid::generateTMatFile(std::string basename) {
     file.close();
 }
 
+void NdGrid::generateResetRelativeNdProportions(int num_strips, std::ofstream& file,
+    std::vector<unsigned int>& strip_offset_multipliers, 
+    std::vector<int>& reset_relative_cells, 
+    std::vector<double>& reset_relative_cells_stays, 
+    unsigned int strip, unsigned int threshold_cell, unsigned int reset_cell, int offset, double prop, int dim) {
+
+    double n_prop = prop * reset_relative_cells_stays[dim];
+    double n_prop_2 = prop * (1.0 - reset_relative_cells_stays[dim]);
+    int n_offset = offset + (strip_offset_multipliers[dim] * reset_relative_cells[dim]);
+    int n_offset_2 = n_offset + (reset_relative[dim] >= 0.0 ? strip_offset_multipliers[dim] : -strip_offset_multipliers[dim]);
+
+    int strp = (int)strip + n_offset;
+    if (strp < 0)
+        strp = 0;
+
+    if (strp >= num_strips)
+        strp = num_strips-1;
+
+    int strp_2 = (int)strip + n_offset_2;
+    if (strp_2 < 0)
+        strp_2 = 0;
+
+    if (strp_2 >= num_strips)
+        strp_2 = num_strips - 1;
+
+    if (dim == 0) {
+        if (n_prop > 0)
+            file << strip << "," << threshold_cell << "\t" << strp << "," << reset_cell << "\t" << n_prop << "\n";
+        if (n_prop_2 > 0)
+            file << strip << "," << threshold_cell << "\t" << strp_2 << "," << reset_cell << "\t" << n_prop_2 << "\n";
+        return;
+    }
+
+    generateResetRelativeNdProportions(num_strips, file, strip_offset_multipliers, reset_relative_cells, reset_relative_cells_stays, strip, threshold_cell, reset_cell,
+        n_offset, n_prop, dim - 1);
+
+    
+    generateResetRelativeNdProportions(num_strips, file, strip_offset_multipliers, reset_relative_cells, reset_relative_cells_stays, strip, threshold_cell, reset_cell,
+        n_offset_2, n_prop_2, dim - 1);
+}
+
 void NdGrid::generateResetMapping(std::ofstream& file) {
     unsigned int num_strips = 1;
     for (unsigned int d = 0; d < num_dimensions - 1; d++)
@@ -367,8 +409,23 @@ void NdGrid::generateResetMapping(std::ofstream& file) {
     unsigned int threshold_cell = int((threshold_v - base[num_dimensions - 1]) / (dimensions[num_dimensions - 1] / resolution[num_dimensions - 1]));
     unsigned int reset_cell = int((reset_v - base[num_dimensions - 1]) / (dimensions[num_dimensions - 1] / resolution[num_dimensions - 1]));
 
+    std::vector<unsigned int> strip_offset_multipliers(num_dimensions);
+    strip_offset_multipliers[num_dimensions - 1] = 0;
+    unsigned int strip = 1;
+    for (int d = num_dimensions - 2; d >= 0; d--) {
+        strip_offset_multipliers[d] = strip;
+        strip *= resolution[d];
+    }
+
+    std::vector<int> reset_relative_cells(num_dimensions);
+    std::vector<double> reset_relative_cells_stays(num_dimensions);
+    for (unsigned int d = 0; d < num_dimensions; d++) {
+        reset_relative_cells[d] = int(reset_relative[d] / (dimensions[d] / resolution[d]));
+        reset_relative_cells_stays[d] = 1.0 - (abs(reset_relative[d] / (dimensions[d] / resolution[d])) - abs(reset_relative_cells[d]));
+    }   
+
     for (unsigned int strip = 0; strip < num_strips; strip++) {
-        file << strip << "," << threshold_cell << "\t" << strip << "," << reset_cell << "\t" << 1 << "\n";
+        generateResetRelativeNdProportions(num_strips, file, strip_offset_multipliers, reset_relative_cells, reset_relative_cells_stays, strip, threshold_cell, reset_cell, 0, 1.0, num_dimensions - 2);
     }
 }
 

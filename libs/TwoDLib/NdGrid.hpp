@@ -20,6 +20,7 @@ public:
     unsigned int num_dimensions;
     double threshold_v;
     double reset_v;
+    std::vector<double> reset_relative;
     Triangulator triangulator;
     std::vector<double> dimensions;
     std::vector<unsigned int> resolution;
@@ -29,7 +30,7 @@ public:
     void (*fcnPtr)(NdPoint&,double);
 
     NdGrid(std::vector<double> _base, std::vector<double> _dims, std::vector<unsigned int> _res,
-        double _threshold_v, double _reset_v, double _timestep);
+        double _threshold_v, double _reset_v, std::vector<double> _reset_relative, double _timestep);
     void setCppFunction(void(*Func)(NdPoint&, double));
     virtual NdCell generate_cell_with_coords(std::vector<unsigned int> cell_coord, bool btranslated);
     void generate_cell_coords(std::vector<unsigned int> cell_coord, std::vector<unsigned int> res);
@@ -47,6 +48,11 @@ public:
     void generateTMatFile(std::string basename);
     void generateResetMapping(std::ofstream& file);
     void generateModelFile(std::string basename, double timestep_multiplier);
+    void generateResetRelativeNdProportions(int num_strips, std::ofstream& file,
+        std::vector<unsigned int>& strip_offset_multipliers,
+        std::vector<int>& reset_relative_cells,
+        std::vector<double>& reset_relative_cells_stays,
+        unsigned int strip, unsigned int threshold_cell, unsigned int reset_cell, int offset, double prop, int dim);
 
 };
 

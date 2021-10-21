@@ -13,6 +13,7 @@ void ParseArguments(PyObject* args) {
     std::vector<unsigned int> resolution;
     double threshold = 0.0;
     double reset = 0.0;
+    std::vector<double> relative_jump;
     double timestep = 0.0;
     double timescale = 0.0;
 
@@ -120,7 +121,27 @@ void ParseArguments(PyObject* args) {
         i++;
     }
 
-    // Eighth argument is the time step
+    // Eighth argument is the relative jump list
+    temp_p = PyTuple_GetItem(args, i);
+    if (temp_p == NULL) { return; }
+    pr_length = PyObject_Length(temp_p);
+    if (pr_length < 0)
+        return;
+
+    relative_jump = std::vector<double>(pr_length);
+
+    for (int index = 0; index < pr_length; index++) {
+        PyObject* item;
+        item = PyList_GetItem(temp_p, index);
+        if (!PyFloat_Check(item))
+            relative_jump[index] = 0.0;
+        relative_jump[index] = PyFloat_AsDouble(item);
+    }
+
+    Py_XDECREF(temp_p);
+    i++;
+
+    // Nineth argument is the time step
     temp_p = PyTuple_GetItem(args, i);
     if (temp_p == NULL) { return; }
     if (PyNumber_Check(temp_p) == 1) {
@@ -131,7 +152,7 @@ void ParseArguments(PyObject* args) {
         i++;
     }
 
-    // Nineth argument is the time scale
+    // Tenth argument is the time scale
     temp_p = PyTuple_GetItem(args, i);
     if (temp_p == NULL) { return; }
     if (PyNumber_Check(temp_p) == 1) {
@@ -142,7 +163,7 @@ void ParseArguments(PyObject* args) {
         i++;
     }
 
-    NdGridPython g(base, size, resolution, threshold, reset, timestep);
+    NdGridPython g(base, size, resolution, threshold, reset, relative_jump, timestep);
 
     g.setPythonFunction(python_function);
     g.generateModelFile(basename, timescale);

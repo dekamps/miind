@@ -1,0 +1,31 @@
+<Simulation>
+ <Variable Name='TIME_END'>0.2</Variable>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="GridAlgorithmGroup" name="OSC" modelfile="cond3D.model" tau_refractive="0.0" transformfile="cond3D.tmat" start_v="-0.065" start_w="0.0001" >
+<TimeStep>1e-05</TimeStep>
+</Algorithm>
+<Algorithm type="RateFunctor" name="MLR_1">
+<expression>500</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="OSC" name="RG_E" type="NEUTRAL" />
+<Node algorithm="MLR_1" name="MLR_E" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<Connection In="MLR_E" Out="RG_E" num_connections="1" efficacy="0.05" delay="0.0" dimension="1"/>
+<Connection In="MLR_E" Out="RG_E" num_connections="1" efficacy="0.05" delay="0.0" dimension="2"/>
+</Connections>
+<Reporting>
+	<!--<Density node="RG_E" t_start="0.0" t_end="6.0" t_interval="0.001" />
+	<Density node="RG_F" t_start="0.0" t_end="6.0" t_interval="0.001" />-->
+	<Display node="RG_E" />
+	<Rate node="RG_E" t_interval="0.00001" />
+</Reporting>
+<SimulationRunParameter>
+<t_end>TIME_END</t_end>
+<t_step>1e-05</t_step>
+<name_log>cond.log</name_log>
+</SimulationRunParameter>
+</Simulation>
