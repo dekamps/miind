@@ -11,11 +11,11 @@ jobs:
         os: [ubuntu-18.04, windows-2019, macos-10.15]  
         include:
           - os: windows-2019
-            vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
+            vcpkgCommitId: 'fe811d93907cb832ba1a40c761338bcc922bf31a'
           - os: ubuntu-18.04
-            vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
+            vcpkgCommitId: 'fe811d93907cb832ba1a40c761338bcc922bf31a'
           - os: macos-10.15
-            vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
+            vcpkgCommitId: 'fe811d93907cb832ba1a40c761338bcc922bf31a'
             
     env:
       buildDir: '${{ github.workspace }}/build'
