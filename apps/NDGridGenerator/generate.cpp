@@ -141,7 +141,7 @@ void applyConductance2D(NdPoint& p, double t) {
 int main() {
 	std::vector<double> base = { 0,-30,-5};
 	std::vector<double> dims = { 8, 40, 10};
-	std::vector<unsigned int> res = {50, 50,50};
+	std::vector<unsigned int> res = {100,100,100};
     std::vector<double> reset_relative = { 0.0,0.0,0.0 };
 	double threshold = 4.99;
 	double reset_v = -4.99;

@@ -421,7 +421,7 @@ void NdGrid::generateResetMapping(std::ofstream& file) {
     std::vector<double> reset_relative_cells_stays(num_dimensions);
     for (unsigned int d = 0; d < num_dimensions; d++) {
         reset_relative_cells[d] = int(reset_relative[d] / (dimensions[d] / resolution[d]));
-        reset_relative_cells_stays[d] = 1.0 - (abs(reset_relative[d] / (dimensions[d] / resolution[d])) - abs(reset_relative_cells[d]));
+        reset_relative_cells_stays[d] = 1.0 - (std::abs(reset_relative[d] / (dimensions[d] / resolution[d])) - std::abs(reset_relative_cells[d]));
     }   
 
     for (unsigned int strip = 0; strip < num_strips; strip++) {

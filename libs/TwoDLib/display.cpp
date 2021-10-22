@@ -759,7 +759,7 @@ void Display::updateDisplay(long current_sim_it) {
 	time = glutGet(GLUT_ELAPSED_TIME);
 	Display::getInstance()->_current_sim_it = current_sim_it;
 	lastTime = time;
-	Sleep(1);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	for (MPILib::NodeId id = 0; id < _nodes_to_display.size(); id++) {
 		if(!glutGetWindow())
 			continue;
