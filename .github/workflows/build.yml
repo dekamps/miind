@@ -16,7 +16,6 @@ jobs:
             vcpkgGitCommitId: '81350a624460e5c10a9ddb2ede4a9fe687ee9cc0'
           - os: macos-10.15
             vcpkgGitCommitId: '81350a624460e5c10a9ddb2ede4a9fe687ee9cc0'
-            
     env:
       buildDir: '${{ github.workspace }}/build'
       # skip python 2.7 and 3.5, PyPy, and 32 bit builds
