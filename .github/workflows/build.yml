@@ -46,8 +46,12 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         if: contains( matrix.os, 'windows')
                   
-      - name: Install Dependencies on Windows
-        run: choco install cuda ninja -y
+      - name: Install Cuda Dependency on Windows
+        run: choco install cuda --version 11.2.2.46133 -y
+        if: contains( matrix.os, 'windows')
+
+      - name: Install Ninja Dependency on Windows
+        run: choco install ninja -y
         if: contains( matrix.os, 'windows')
         
       - name: Install Dependencies on MacOS

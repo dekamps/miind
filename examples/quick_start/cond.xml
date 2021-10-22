@@ -23,6 +23,8 @@
           <Connection In="I" Out="I" num_connections="1" efficacy="-0.1" delay="0.001"/>
      </Connections>
      <Reporting>
+		  <Density node="E" t_start="0.0" t_end="0.2" t_interval="0.0001" />
+		  <Density node="I" t_start="0.0" t_end="0.2" t_interval="0.0001" />
           <Display node="E" />
           <Display node="I" />
           <Rate node="E" t_interval="0.001" />
