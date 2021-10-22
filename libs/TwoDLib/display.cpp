@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <iomanip>
+#include <thread>
 #include <sstream>
 #ifdef ENABLE_OPENMP
 #include <omp.h>

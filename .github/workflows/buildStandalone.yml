@@ -56,7 +56,7 @@ jobs:
         shell: bash
         
       - name: Run CMake
-        uses: lukka/run-cmake@main
+        uses: lukka/run-cmake@v3.4
         env:
           CC: gcc-6
           CXX: g++-6
@@ -69,7 +69,7 @@ jobs:
         if: contains( matrix.os, 'macos')
         
       - name: Run CMake on Linux
-        uses: lukka/run-cmake@main
+        uses: lukka/run-cmake@v3.4
         with:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
