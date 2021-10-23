@@ -43,7 +43,7 @@ jobs:
       - uses: lukka/get-cmake@latest
           
       - name: Add msbuild to PATH
-        uses: ilammy/msvc-dev-cmd@latest
+        uses: ilammy/msvc-dev-cmd@v1
         with:
           toolset: 14.29.30133
         if: contains( matrix.os, 'windows')
