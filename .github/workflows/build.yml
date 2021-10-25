@@ -23,10 +23,11 @@ jobs:
       #CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64 cp36-macosx_x86_64 cp37-macosx_x86_64 cp38-macosx_x86_64 cp39-macosx_x86_64
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
       CIBW_BEFORE_BUILD: pip install cmake scikit-build build auditwheel numpy matplotlib scipy shapely descartes
+      CIBW_BEFORE_BUILD_WINDOWS: C:/\"Program Files (x86)\"/\"Microsoft Visual Studio\"/2019/Professional/VC/Auxiliary/Build/vcvars64.bat
       # Linux builds are on docker images so we need to add the dependency installation setup here so they go to the docker not the host. Installing cuda is *SLOW* and we have to do it on *EVERY* image argh!
       CIBW_BEFORE_BUILD_LINUX: yum install -y centos-release-scl ; yum install -y devtoolset-7 ; yum install -y ninja-build boost-devel pugixml-devel python36-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel wget ; wget  https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-repo-rhel7-10.0.130-1.x86_64.rpm ; rpm -i cuda-repo-*.rpm ; yum install -y cuda-10-0 
       CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" # Something wrong with the cibuildwheel delocate call. We manually run it after all wheels have been built.
-      CIBW_ENVIRONMENT_WINDOWS: "PATH=$PATH:C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.2/bin:C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.2/libnvvp CUDA_PATH=C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.2 CUDACXX=C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.2/bin/nvcc.exe"
+      CIBW_ENVIRONMENT_WINDOWS: "PATH=$PATH:\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin\":\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/libnvvp\" CUDA_PATH=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2\" CUDACXX=\"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin/nvcc.exe\""
       CIBW_ENVIRONMENT_MACOS: "CC=gcc-6 CXX=g++-6"
       CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/usr/lib64/openmpi/bin/ LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:/usr/lib64/nvidia:$LD_LIBRARY_PATH CC=/opt/rh/devtoolset-7/root/usr/bin/gcc CXX=/opt/rh/devtoolset-7/root/usr/bin/g++"
       CIBW_BUILD_VERBOSITY: 0
@@ -44,8 +45,6 @@ jobs:
           
       - name: Add msbuild to PATH
         uses: ilammy/msvc-dev-cmd@v1
-        with:
-          toolset: 14.29.30133
         if: contains( matrix.os, 'windows')
                   
       - name: Install Cuda Dependency on Windows
