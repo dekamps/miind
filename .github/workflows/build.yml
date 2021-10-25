@@ -45,6 +45,9 @@ jobs:
           
       - name: Add msbuild to PATH
         uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+          toolset: 14.29.30133
         if: contains( matrix.os, 'windows')
                   
       - name: Install Cuda Dependency on Windows
