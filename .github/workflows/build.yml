@@ -55,9 +55,9 @@ jobs:
         
       - name: Add cuda and MSVC to path on Windows
         run: |
-          echo "C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.0/bin" >> $GITHUB_PATH
-          echo "C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.0/libnvvp" >> $GITHUB_PATH
-          echo "C:/\"Program Files (x86)\"/\"Microsoft Visual Studio\"/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/cl.exe" >> $GITHUB_PATH
+          echo "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.0/bin" >> $GITHUB_PATH
+          echo "C:/Program Files/\VIDIA GPU Computing Toolkit/CUDA/v11.0/libnvvp" >> $GITHUB_PATH
+          echo "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/cl.exe" >> $GITHUB_PATH
         if: contains( matrix.os, 'windows')
 
       - name: Install Ninja Dependency on Windows
