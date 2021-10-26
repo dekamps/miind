@@ -48,7 +48,7 @@ jobs:
       #  if: contains( matrix.os, 'windows')
       - name: Manually add MSVC to Path
         run: |
-          echo "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/cl.exe" >> $GITHUB_PATH
+          PATH=$PATH:C:/"Program Files (x86)"/"Microsoft Visual Studio"/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/cl.exe
           echo $PATH
         shell: bash
         if: contains( matrix.os, 'windows')
