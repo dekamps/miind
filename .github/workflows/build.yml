@@ -27,7 +27,7 @@ jobs:
       # Linux builds are on docker images so we need to add the dependency installation setup here so they go to the docker not the host. Installing cuda is *SLOW* and we have to do it on *EVERY* image argh!
       CIBW_BEFORE_BUILD_LINUX: pip install cmake scikit-build build auditwheel numpy matplotlib scipy shapely descartes && yum install -y centos-release-scl ; yum install -y devtoolset-7 ; yum install -y ninja-build boost-devel pugixml-devel python36-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel wget ; wget  https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-repo-rhel7-10.0.130-1.x86_64.rpm ; rpm -i cuda-repo-*.rpm ; yum install -y cuda-10-0 
       CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" # Something wrong with the cibuildwheel delocate call. We manually run it after all wheels have been built.
-      CIBW_ENVIRONMENT_WINDOWS: "CUDA_PATH=C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.0 CUDACXX=C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.0/bin/nvcc.exe"
+      CIBW_ENVIRONMENT_WINDOWS: "CUDA_PATH=C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.2 CUDACXX=C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.2/bin/nvcc.exe"
       CIBW_ENVIRONMENT_MACOS: "CC=gcc-6 CXX=g++-6"
       CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/usr/lib64/openmpi/bin/ LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:/usr/lib64/nvidia:$LD_LIBRARY_PATH CC=/opt/rh/devtoolset-7/root/usr/bin/gcc CXX=/opt/rh/devtoolset-7/root/usr/bin/g++"
       CIBW_BUILD_VERBOSITY: 0
@@ -42,19 +42,18 @@ jobs:
           submodules: true
           
       - uses: lukka/get-cmake@latest
-          
-      #- name: Add msbuild to PATH
-      #  uses: ilammy/msvc-dev-cmd@v1
-      #  if: contains( matrix.os, 'windows')
+      
+      # If you're having trouble with "nvcc failed to compile simple test program" make sure the below version and location is correct
       - name: Manually add MSVC to Path
         run: |
           PATH=$PATH:C:/"Program Files (x86)"/"Microsoft Visual Studio"/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/cl.exe
           echo $PATH
         shell: bash
         if: contains( matrix.os, 'windows')
-                  
+      
+      # If changing the version of CUDA here, also change the locations define above in CIBW_ENVIRONMENT_WINDOWS
       - name: Install Cuda Dependency on Windows
-        run: choco install cuda --version 11.0.3 -y
+        run: choco install cuda --version 11.2.2.46133 -y
         if: contains( matrix.os, 'windows')
 
       - name: Install Ninja Dependency on Windows
