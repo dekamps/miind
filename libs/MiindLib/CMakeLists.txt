@@ -1,9 +1,9 @@
 
 project( ${MIIND_LIBRARY_PREFIX}shared )
 
-if (WIN32) # When cmake generates the VS files, it needs to know this is a cuda project
-enable_language(CUDA)
-endif (WIN32)
+#if (WIN32) # When cmake generates the VS files, it needs to know this is a cuda project
+#enable_language(CUDA)
+#endif (WIN32)
 
 find_package(CUDA  REQUIRED)
 include_directories( ${CUDA_INCLUDE_DIRS} )
