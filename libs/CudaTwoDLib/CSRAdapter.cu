@@ -109,6 +109,25 @@ void CSRAdapter::InitializeStaticGridEfficacies(const std::vector<inttype>& veci
     }
 }
 
+void CSRAdapter::InitializeStaticGridCellEfficacies(const std::vector<inttype>& vecindex, const std::vector<std::vector<fptype>>& vals, const std::vector<fptype>& cell_width, const std::vector<inttype>& grid_efficacy_offset) {
+    _nr_grid_connections = vals.size();
+    for (inttype m = 0; m < vals.size(); m++)
+    {
+        checkCudaErrors(cudaMalloc((fptype**)&_goes[m], _nr_rows[vecindex[m]] * sizeof(fptype)));
+        checkCudaErrors(cudaMalloc((fptype**)&_stays[m], _nr_rows[vecindex[m]] * sizeof(fptype)));
+        checkCudaErrors(cudaMalloc((inttype**)&_offset1s[m], _nr_rows[vecindex[m]] * sizeof(inttype)));
+        checkCudaErrors(cudaMalloc((inttype**)&_offset2s[m], _nr_rows[vecindex[m]] * sizeof(inttype)));
+        checkCudaErrors(cudaMalloc((fptype**)&_cell_vals[m], vals[m].size() * sizeof(fptype)));
+        checkCudaErrors(cudaMemcpy(_cell_vals[m], &vals[m][0], vals[m].size() * sizeof(fptype), cudaMemcpyHostToDevice));
+        
+        inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1) / _blockSize;
+
+        CudaCalculateGridCellEfficacies << <numBlocks, _blockSize >> > (_nr_rows[vecindex[m]],
+            _cell_vals[m], cell_width[m], grid_efficacy_offset[m],
+            _stays[m], _goes[m], _offset1s[m], _offset2s[m], _offsets[vecindex[m]]);
+    }
+}
+
 void CSRAdapter::InitializeStaticGridConductanceEfficacies(const std::vector<inttype>& vecindex,
     const std::vector<fptype>& efficacy, const std::vector<fptype>& cell_widths, const std::vector<inttype>& cell_offsets, const std::vector<fptype>& rest_vs) {
     _nr_grid_connections = efficacy.size();
@@ -201,6 +220,7 @@ CSRAdapter::CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib:
     _stays(nr_grid_connections),
     _offset1s(nr_grid_connections),
     _offset2s(nr_grid_connections),
+    _cell_vals(nr_grid_connections),
     _blockSize(256),
     _numBlocks((_group._n + _blockSize - 1) / _blockSize)
 {

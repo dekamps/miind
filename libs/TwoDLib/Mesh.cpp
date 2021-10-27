@@ -527,6 +527,23 @@ std::vector<TwoDLib::Cell> Mesh::CellsFromValues(const std::vector<double>& vec_
 	return vec_cells;
 }
 
+void Mesh::getCoordsOfIndex(std::vector<unsigned int>& coords, unsigned int index) {
+	if (coords.size() == getGridNumDimensions())
+		return;
+
+	unsigned int divisor = 1;
+	for (int d = 0; d < getGridNumDimensions() - coords.size() - 1; d++)
+		divisor *= getGridResolutionByDimension(d);
+
+	coords.push_back(int(index / divisor));
+	getCoordsOfIndex(coords, int(index % divisor));
+}
+
+std::vector<unsigned int> Mesh::getCoordsOfIndex(unsigned int index) {
+	std::vector<unsigned int> coords;
+	getCoordsOfIndex(coords, index);
+	return coords;
+}
 
 void Mesh::FromXML(istream& s)
 {

@@ -190,11 +190,54 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
         TwoDLib::Display::getInstance()->animate(write_displays, _display_nodes, _network_time_step);
     }
 
+    std::vector<std::vector<fptype>> grid_cell_efficacies;
+
     for (unsigned int i = 0; i < _grid_connections.size(); i++) {
         // for each connection, which of group's meshes is being affected
         _connection_out_group_mesh.push_back(_node_id_to_group_mesh[_grid_connections[i]._out]);
         _effs.push_back(std::stod(_grid_connections[i]._params["efficacy"]));
+
+        int total_num_cells = 1;
+        for (int d = 0; d < _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions(); d++)
+            total_num_cells *= _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridResolutionByDimension(d);
         
+        if (_grid_connections[i]._params.find("type") == _grid_connections[i]._params.end()) {
+            std::vector<fptype> cell_vals(total_num_cells, std::stod(_grid_connections[i]._params["efficacy"]));
+            grid_cell_efficacies.push_back(cell_vals);
+        } else if (_grid_connections[i]._params["type"] == std::string("eff_times_v")){
+            std::vector<fptype> cell_vals(total_num_cells);
+            // Calculate the v for each cell in the grid
+            for (int c = 0; c < total_num_cells; c++) {
+                cell_vals[c] = std::stod(_grid_connections[i]._params["efficacy"]) *
+                    ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions()-1] 
+                        * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 1))
+                        + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 1));
+            }
+            grid_cell_efficacies.push_back(cell_vals);
+        } 
+        else if (_grid_connections[i]._params["type"] == std::string("eff_times_w")) {
+            std::vector<fptype> cell_vals(total_num_cells);
+            // Calculate the v for each cell in the grid
+            for (int c = 0; c < total_num_cells; c++) {
+                cell_vals[c] = std::stod(_grid_connections[i]._params["efficacy"]) *
+                    ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 2]
+                        * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 2))
+                        + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 2));
+            }
+            grid_cell_efficacies.push_back(cell_vals);
+        } 
+        else if (_grid_connections[i]._params["type"] == std::string("eff_times_u")) {
+            std::vector<fptype> cell_vals(total_num_cells);
+            // Calculate the v for each cell in the grid
+            for (int c = 0; c < total_num_cells; c++) {
+                cell_vals[c] = std::stod(_grid_connections[i]._params["efficacy"]) *
+                    ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 3]
+                        * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 3))
+                        + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 3));
+            }
+            grid_cell_efficacies.push_back(cell_vals);
+        }
+
         unsigned int connection_dimension = 0;
         if (_grid_connections[i]._params.find("dimension") != _grid_connections[i]._params.end())
             connection_dimension = std::stoi(_grid_connections[i]._params["dimension"]);
@@ -294,7 +337,7 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
     _csr_adapter = new CudaTwoDLib::CSRAdapter(*_group_adapter, _csrs, 
         _effs.size(), h, _mesh_transform_indexes, _grid_transform_indexes);
 
-    _csr_adapter->InitializeStaticGridEfficacies(_connection_out_group_mesh, _effs, _grid_cell_widths, _grid_cell_offsets);
+    _csr_adapter->InitializeStaticGridCellEfficacies(_connection_out_group_mesh, grid_cell_efficacies, _grid_cell_widths, _grid_cell_offsets);
 
     const auto p1 = std::chrono::system_clock::now();
     _csr_adapter->setRandomSeeds(std::chrono::duration_cast<std::chrono::seconds>(

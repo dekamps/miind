@@ -65,6 +65,8 @@ namespace CudaTwoDLib {
 
 		void InitializeStaticGridEfficacies(const std::vector<inttype>& vecindex, const std::vector<fptype>& efficacy, const std::vector<fptype>& cell_width, const std::vector<inttype>& grid_efficacy_offset);
 
+		void InitializeStaticGridCellEfficacies(const std::vector<inttype>& vecindex, const std::vector<std::vector<fptype>>& vals, const std::vector<fptype>& cell_width, const std::vector<inttype>& grid_efficacy_offset);
+
 		void InitializeStaticGridConductanceEfficacies(const std::vector<inttype>& vecindex, const std::vector<fptype>& efficacy, const std::vector<fptype>& cell_widths, const std::vector<inttype>& cell_offsets, const std::vector<fptype>& rest_vs);
 
 		void CalculateMeshGridDerivativeWithEfficacy(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates);
@@ -138,6 +140,8 @@ namespace CudaTwoDLib {
 		std::vector<fptype*> _stays;
 		std::vector<int*> _offset1s;
 		std::vector<int*> _offset2s;
+
+		std::vector<fptype*> _cell_vals;
 
 		fptype* _izh_vs;
 		fptype* _izh_ws;
