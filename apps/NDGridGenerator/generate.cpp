@@ -152,12 +152,12 @@ void applyConductance2D(NdPoint& p, double t) {
 // g.generateTMatFileBatched("synapse");
 void applyTsodyks(NdPoint& p, double t) {
     double tau_intact = 3;
-    double tau_rec = 450;
-    double U_se = 0.55;
-    double A_se = 530;
+    double tau_rec = 800;
+    double U_se = 0.67;
+    double A_se = 250;
     double R_in = 100;
     double V_r = -65;
-    double tau_mem = 30;
+    double tau_mem = 50;
 
     double v = p.coords[2];
     double e = p.coords[1];
@@ -180,15 +180,15 @@ void applyTsodyks(NdPoint& p, double t) {
 
 int main() {
      std::vector<double> base = { -0.2,-0.2,-66 };
-     std::vector<double> dims = { 1.4, 1.4, 12 };
+     std::vector<double> dims = { 1.4, 1.4, 100 };
      std::vector<unsigned int> res = { 50, 50, 50 };
      std::vector<double> reset_relative = { 0.0,0.0,0.0 };
-     double threshold = -55;
+     double threshold = 30;
      double reset_v = -65;
      NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-02);
 
      g.setCppFunction(applyTsodyks);
-     g.generateModelFile("synapse", 0.001);
-     g.generateTMatFileBatched("synapse");
+     g.generateModelFile("synapse50", 0.001);
+     g.generateTMatFileBatched("synapse50");
 	return 0;
 }

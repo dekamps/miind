@@ -532,8 +532,13 @@ void Display::display_3d(void) {
 					mass = (log10(_dws[window_index]._system->Mass()[idx] / cell_area) - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass);
 				}
 
-				if (_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] > 0 && _dws[window_index]._system->_vec_cells_to_objects[idx].size() > 0)
-					mass = 1.0; // 1000.0 * ((double)_dws[window_index]._system->_vec_cells_to_objects[idx].size() / (double)_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index]);
+				if (_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] > 0) {
+					if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() > 0)
+						mass = 0.5 + 1000.0 * ((double)_dws[window_index]._system->_vec_cells_to_objects[idx].size() / (double)_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index]);
+					else
+						continue;
+				}
+					
 
 				if (mass < 0.00000001 && (j == 0 || k ==0 || i == size_z -1 || i == 0 || k == size_y - 1 || j == size_x - 1)) {
 					continue; // glColor4f(1.0, 1.0, 1.0, 0.02);

@@ -2,7 +2,7 @@
  <Variable Name='TIME_END'>1.5</Variable>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="GridAlgorithmGroup" name="OSC" modelfile="HindmarshRose.model" tau_refractive="0.0" transformfile="HindmarshRose.tmat" start_v="0.1" start_w="-20.1" start_u="0.1" >
+<Algorithm type="GridAlgorithmGroup" finite_size="5" name="OSC" modelfile="HindmarshRose.model" tau_refractive="0.0" transformfile="HindmarshRose.tmat" start_v="0.1" start_w="-20.1" start_u="0.1" >
 <TimeStep>1e-04</TimeStep>
 </Algorithm>
 <Algorithm type="RateFunctor" name="MLR_1">

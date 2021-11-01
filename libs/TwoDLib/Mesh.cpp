@@ -532,7 +532,7 @@ void Mesh::getCoordsOfIndex(std::vector<unsigned int>& coords, unsigned int inde
 		return;
 
 	unsigned int divisor = 1;
-	for (int d = 0; d < getGridNumDimensions() - coords.size() - 1; d++)
+	for (int d = getGridNumDimensions() - 1; d > coords.size(); d--)
 		divisor *= getGridResolutionByDimension(d);
 
 	coords.push_back(int(index / divisor));

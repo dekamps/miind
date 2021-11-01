@@ -128,6 +128,21 @@ void CSRAdapter::InitializeStaticGridCellEfficacies(const std::vector<inttype>& 
     }
 }
 
+void CSRAdapter::InitializeStaticGridCellProportionsNd(const std::vector<inttype>& vecindex, const std::vector<std::vector<fptype>>& vals, const std::vector<std::vector<int>>& offs, const std::vector<inttype>& strides) {
+    _nr_grid_connections = vals.size();
+    for (inttype m = 0; m < vals.size(); m++)
+    {
+        _proportion_cell_stride[m] = strides[m];
+
+        checkCudaErrors(cudaMalloc((fptype**)&_proportions[m], vals[m].size() * sizeof(fptype)));
+        checkCudaErrors(cudaMemcpy(_proportions[m], &vals[m][0], vals[m].size() * sizeof(fptype), cudaMemcpyHostToDevice));
+
+        checkCudaErrors(cudaMalloc((int**)&_proportion_offsets[m], offs[m].size() * sizeof(int)));
+        checkCudaErrors(cudaMemcpy(_proportion_offsets[m], &offs[m][0], offs[m].size() * sizeof(int), cudaMemcpyHostToDevice));
+        
+    }
+}
+
 void CSRAdapter::InitializeStaticGridConductanceEfficacies(const std::vector<inttype>& vecindex,
     const std::vector<fptype>& efficacy, const std::vector<fptype>& cell_widths, const std::vector<inttype>& cell_offsets, const std::vector<fptype>& rest_vs) {
     _nr_grid_connections = efficacy.size();
@@ -221,6 +236,9 @@ CSRAdapter::CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib:
     _offset1s(nr_grid_connections),
     _offset2s(nr_grid_connections),
     _cell_vals(nr_grid_connections),
+    _proportions(nr_grid_connections),
+    _proportion_offsets(nr_grid_connections),
+    _proportion_cell_stride(nr_grid_connections),
     _blockSize(256),
     _numBlocks((_group._n + _blockSize - 1) / _blockSize)
 {
@@ -365,7 +383,7 @@ void CSRAdapter::CalculateMeshGridDerivative(const std::vector<inttype>& vecinde
 
     for (inttype m = 0; m < vecstays.size(); m++)
     {
-        // be careful to use this blo							void CalculateMeshGridDerivativeForward(const std::vector<inttype>& vecindex,ck size
+        // be careful to use this block size
         inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1) / _blockSize;
         CudaCalculateGridDerivative << <numBlocks, _blockSize, 0, _streams[vecindex[m]] >> > (_nr_rows[vecindex[m]], vecrates[m], vecstays[m], vecgoes[m], vecoff1s[m], vecoff2s[m], _dydt, _group._mass, _offsets[vecindex[m]]);
     }
@@ -393,8 +411,10 @@ void CSRAdapter::CalculateMeshGridDerivativeWithEfficacy(const std::vector<intty
         // be careful to use this block size
         inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1) / _blockSize;
 
-        CudaCalculateGridDerivativeWithEfficacy << <numBlocks, _blockSize, 0, _streams[vecindex[m]] >> > (_nr_rows[vecindex[m]],
-            vecrates[m], _stays[m], _goes[m], _offset1s[m], _offset2s[m], _dydt, _group._mass, _offsets[vecindex[m]]);
+        CudaCalculateGridDerivativeWithEfficacyNd << <numBlocks, _blockSize, 0, _streams[vecindex[m]] >> > (_nr_rows[vecindex[m]],
+                vecrates[m], _proportions[m], _proportion_offsets[m], _proportion_cell_stride[m], _dydt, _group._mass, _offsets[vecindex[m]]);
+        //CudaCalculateGridDerivativeWithEfficacy << <numBlocks, _blockSize, 0, _streams[vecindex[m]] >> > (_nr_rows[vecindex[m]],
+        //    vecrates[m], _stays[m], _goes[m], _offset1s[m], _offset2s[m], _dydt, _group._mass, _offsets[vecindex[m]]);
     }
 
     for (int n = _nr_grid_connections; n < vecrates.size(); n++)

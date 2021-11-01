@@ -95,6 +95,20 @@ namespace MiindLib {
             _density_intervals = intervals;
         }
 
+        int modulo(int a, int b) {
+            int r = a % b;
+            return r < 0 ? r + b : r;
+        }
+
+        void generateResetRelativeNdProportions(std::vector<fptype>& final_props, std::vector<int>& final_offs, std::vector<fptype> cell_val, std::vector<double> cell_widths, std::vector<int> dimension_offset, int offset, double prop, int dim);
+
+        void calculateProportions1DEfficacyWithValues(double cell_width, unsigned int total_num_cells, std::vector<fptype>& cell_vals, int dimension_offset, std::vector<std::vector<fptype>>& grid_cell_efficacies, std::vector<std::vector<int>>& grid_cell_offsets, std::vector<inttype>& grid_cell_strides);
+
+        void calculateProportionsNDEfficacyWithValues(std::vector<double> cell_widths, unsigned int total_num_cells,
+            std::vector<std::vector<fptype>>& cell_vals, std::vector<int> dimension_offsets,
+            std::vector<std::vector<fptype>>& grid_cell_efficacies, std::vector<std::vector<int>>& grid_cell_offsets,
+            std::vector<inttype>& grid_cell_strides);
+
         void addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w, double start_u,
             std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive, unsigned int finite_size = 0);
 

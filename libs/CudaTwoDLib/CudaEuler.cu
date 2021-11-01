@@ -408,7 +408,7 @@ __global__ void CudaSingleTransformStep(inttype N, fptype* derivative, fptype* m
 
 // Performing this calculation per iteration doubles the simulation time.
 // This function shouldn't be used in that way but it a good example in case you want to
-// include some kind of variable efficacy.
+// include some kind of time dependent efficacy.
 __global__ void CudaCalculateGridEfficacies(inttype N,
     fptype efficacy, fptype grid_cell_width, inttype grid_offset_width,
     fptype* stays, fptype* goes, int* offset1s, int* offset2s)
@@ -422,7 +422,7 @@ __global__ void CudaCalculateGridEfficacies(inttype N,
         fptype s = 1.0 - g;
 
         int o1 = (efficacy > 0 ? ofs : -ofs) * grid_offset_width;
-        int o2 = (efficacy > 0 ? (ofs + 1) : (ofs - 1)) * grid_offset_width;
+        int o2 = (efficacy > 0 ? (ofs + 1) : -(ofs + 1)) * grid_offset_width;
 
         stays[modulo(i + o1, N)] = s;
         goes[modulo(i + o2, N)] = g;
@@ -433,7 +433,7 @@ __global__ void CudaCalculateGridEfficacies(inttype N,
 
 // Performing this calculation per iteration doubles the simulation time.
 // This function shouldn't be used in that way but it a good example in case you want to
-// include some kind of variable efficacy.
+// include some kind of time dependent efficacy.
 __global__ void CudaCalculateGridCellEfficacies(inttype N,
     fptype* cell_vals, fptype grid_cell_width, inttype grid_offset_width,
     fptype* stays, fptype* goes, int* offset1s, int* offset2s, inttype vs_offset)
@@ -447,7 +447,7 @@ __global__ void CudaCalculateGridCellEfficacies(inttype N,
         fptype s = 1.0 - g;
 
         int o1 = (cell_vals[i + vs_offset] > 0 ? ofs : -ofs) * grid_offset_width;
-        int o2 = (cell_vals[i + vs_offset] > 0 ? (ofs + 1) : (ofs - 1)) * grid_offset_width;
+        int o2 = (cell_vals[i + vs_offset] > 0 ? (ofs + 1) : -(ofs + 1)) * grid_offset_width;
 
         stays[modulo(i + o1, N)] = s;
         goes[modulo(i + o2, N)] = g;
@@ -477,7 +477,7 @@ __global__ void CudaCalculateGridEfficaciesWithConductance(inttype N,
         fptype s = 1.0 - g;
 
         int o1 = (efficacy > 0 ? ofs : -ofs) * grid_cell_offset;
-        int o2 = (efficacy > 0 ? (ofs + 1) : (ofs - 1)) * grid_cell_offset;
+        int o2 = (efficacy > 0 ? (ofs + 1) : -(ofs + 1)) * grid_cell_offset;
 
         stays[modulo(i + o1, N)] = s;
         goes[modulo(i + o2, N)] = g;
@@ -516,6 +516,29 @@ __global__ void CudaCalculateGridDerivativeWithEfficacy(inttype N, fptype rate, 
         fptype dr = 0.;
         dr += stays[i] * mass[(modulo(io + offset_1[i], N)) + offset];
         dr += goes[i] * mass[(modulo(io + offset_2[i], N)) + offset];
+        dr -= mass[io];
+        derivative[io] += rate * dr;
+    }
+}
+
+// Instead of stays and goes and two offsets, 
+// Have a proportion array and an offset array each of size proportion_stride
+// Allows for more customisable transitions.
+// For example, with proportion_stride = 2^num_dimensions we can define the transition due
+// to an efficacy jump in any direction. See 3D tsodyks example.
+__global__ void CudaCalculateGridDerivativeWithEfficacyNd(inttype N, fptype rate, 
+    fptype* props, int* offsets, inttype proportion_stride,
+    fptype* derivative, fptype* mass, inttype offset)
+{
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        int io = i + offset;
+        fptype dr = 0.;
+        for (int j = 0; j < proportion_stride; j++) {
+            dr += props[(i* proportion_stride)+j] * mass[(modulo(io + offsets[(i * proportion_stride) +j], N)) + offset];
+        }
         dr -= mass[io];
         derivative[io] += rate * dr;
     }

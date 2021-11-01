@@ -177,6 +177,92 @@ void VectorizedNetwork::addExternalMonitor(MPILib::NodeId nid) {
     _monitored_nodes.push_back(nid);
 }
 
+void VectorizedNetwork::calculateProportions1DEfficacyWithValues(double cell_width, unsigned int total_num_cells,
+    std::vector<fptype>& cell_vals, int dimension_offset,
+    std::vector<std::vector<fptype>>& grid_cell_efficacies, std::vector<std::vector<int>>& grid_cell_offsets,
+    std::vector<inttype>& grid_cell_strides) {
+
+    std::vector<fptype> cell_props((unsigned int)(total_num_cells * 2));
+    std::vector<int> cell_offsets((unsigned int)(total_num_cells * 2));
+    for (int c = 0; c < total_num_cells; c++) {
+
+        int ofs = (int)std::abs(cell_vals[c] / cell_width);
+        double goes = (double)std::fabs(cell_vals[c] / cell_width) - ofs;
+        double stays = 1.0 - goes;
+
+        int o1 = (cell_vals[c] > 0 ? ofs : -ofs) * dimension_offset;
+        int o2 = (cell_vals[c] > 0 ? (ofs + 1) : (ofs - 1)) * dimension_offset;
+
+        cell_props[modulo(c + o1, total_num_cells) * 2] = goes;
+        cell_props[(modulo(c + o2, total_num_cells) * 2) + 1] = stays;
+        cell_offsets[modulo(c + o1, total_num_cells) * 2] = -o1;
+        cell_offsets[(modulo(c + o2, total_num_cells) * 2) + 1] = -o2;
+    }
+
+    grid_cell_efficacies.push_back(cell_props);
+    grid_cell_offsets.push_back(cell_offsets);
+    grid_cell_strides.push_back(2);
+}
+
+void VectorizedNetwork::generateResetRelativeNdProportions(std::vector<fptype>& final_props, std::vector<int>& final_offs, std::vector<fptype> cell_val, std::vector<double> cell_widths, std::vector<int> dimension_offset, int offset, double prop, int dim) {
+
+    int ofs = (int)std::abs(cell_val[dim] / cell_widths[dim]);
+    double goes = (double)std::fabs(cell_val[dim] / cell_widths[dim]) - ofs;
+    double stays = 1.0 - goes;
+
+    int o1 = (cell_val[dim] > 0 ? ofs : -ofs) * dimension_offset[dim];
+    int o2 = (cell_val[dim] > 0 ? (ofs + 1) : -(ofs + 1)) * dimension_offset[dim];
+
+    double n_goes = prop * goes;
+    double n_stays = prop * stays;
+    int n_o1 = offset + o1;
+    int n_o2 = offset + o2;
+
+    if (dim == 0) {
+        final_props.push_back(n_goes);
+        final_props.push_back(n_stays);
+        final_offs.push_back(n_o2);
+        final_offs.push_back(n_o1);
+        return;
+    }
+
+    generateResetRelativeNdProportions(final_props, final_offs, cell_val, cell_widths, dimension_offset,
+        n_o2, n_goes, dim - 1);
+
+    generateResetRelativeNdProportions(final_props, final_offs, cell_val, cell_widths, dimension_offset,
+        n_o1, n_stays, dim - 1);
+}
+
+
+void VectorizedNetwork::calculateProportionsNDEfficacyWithValues(std::vector<double> cell_widths, unsigned int total_num_cells,
+    std::vector<std::vector<fptype>>& cell_vals, std::vector<int> dimension_offsets,
+    std::vector<std::vector<fptype>>& grid_cell_efficacies, std::vector<std::vector<int>>& grid_cell_offsets,
+    std::vector<inttype>& grid_cell_strides) {
+
+    unsigned int num_dimensions = cell_widths.size();
+    unsigned int stride = std::pow(2, num_dimensions);
+
+    std::vector<fptype> cell_props((unsigned int)(total_num_cells * stride));
+    std::vector<int> cell_offsets((unsigned int)(total_num_cells * stride));
+
+    for (int c = 0; c < total_num_cells; c++) {
+
+        std::vector<fptype> stride_vals;
+        std::vector<int> stride_offs;
+
+        generateResetRelativeNdProportions(stride_vals, stride_offs, cell_vals[c], cell_widths, dimension_offsets, 0, 1.0, num_dimensions - 1);
+        
+        for (int k = 0; k < stride; k++) {
+            cell_props[modulo(c + stride_offs[k], total_num_cells) * stride + k] = stride_vals[k];
+            cell_offsets[modulo(c + stride_offs[k], total_num_cells) * stride + k] = -stride_offs[k];
+        }
+    }
+
+    grid_cell_efficacies.push_back(cell_props);
+    grid_cell_offsets.push_back(cell_offsets);
+    grid_cell_strides.push_back(stride);
+}
+
 void VectorizedNetwork::setupLoop(bool write_displays) {
 
     for (unsigned int i = 0; i < _display_nodes.size(); i++) {
@@ -191,6 +277,8 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
     }
 
     std::vector<std::vector<fptype>> grid_cell_efficacies;
+    std::vector<std::vector<int>> grid_cell_offsets;
+    std::vector<inttype> grid_cell_strides;
 
     for (unsigned int i = 0; i < _grid_connections.size(); i++) {
         // for each connection, which of group's meshes is being affected
@@ -200,43 +288,6 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
         int total_num_cells = 1;
         for (int d = 0; d < _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions(); d++)
             total_num_cells *= _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridResolutionByDimension(d);
-        
-        if (_grid_connections[i]._params.find("type") == _grid_connections[i]._params.end()) {
-            std::vector<fptype> cell_vals(total_num_cells, std::stod(_grid_connections[i]._params["efficacy"]));
-            grid_cell_efficacies.push_back(cell_vals);
-        } else if (_grid_connections[i]._params["type"] == std::string("eff_times_v")){
-            std::vector<fptype> cell_vals(total_num_cells);
-            // Calculate the v for each cell in the grid
-            for (int c = 0; c < total_num_cells; c++) {
-                cell_vals[c] = std::stod(_grid_connections[i]._params["efficacy"]) *
-                    ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions()-1] 
-                        * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 1))
-                        + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 1));
-            }
-            grid_cell_efficacies.push_back(cell_vals);
-        } 
-        else if (_grid_connections[i]._params["type"] == std::string("eff_times_w")) {
-            std::vector<fptype> cell_vals(total_num_cells);
-            // Calculate the v for each cell in the grid
-            for (int c = 0; c < total_num_cells; c++) {
-                cell_vals[c] = std::stod(_grid_connections[i]._params["efficacy"]) *
-                    ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 2]
-                        * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 2))
-                        + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 2));
-            }
-            grid_cell_efficacies.push_back(cell_vals);
-        } 
-        else if (_grid_connections[i]._params["type"] == std::string("eff_times_u")) {
-            std::vector<fptype> cell_vals(total_num_cells);
-            // Calculate the v for each cell in the grid
-            for (int c = 0; c < total_num_cells; c++) {
-                cell_vals[c] = std::stod(_grid_connections[i]._params["efficacy"]) *
-                    ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 3]
-                        * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 3))
-                        + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 3));
-            }
-            grid_cell_efficacies.push_back(cell_vals);
-        }
 
         unsigned int connection_dimension = 0;
         if (_grid_connections[i]._params.find("dimension") != _grid_connections[i]._params.end())
@@ -250,6 +301,185 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
 
         _grid_cell_widths.push_back(_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(num_dimensions - 1 - connection_dimension));
         _grid_cell_offsets.push_back(offset);
+
+        std::vector<double> cell_dim_widths(num_dimensions);
+        for (int d = 0; d < num_dimensions; d++)
+            cell_dim_widths[d] = _vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(d);
+
+        int temp_offset = 1;
+        std::vector<int> cell_dim_offs(num_dimensions);
+        for (int d = num_dimensions - 1; d >= 0; d--) {
+            cell_dim_offs[d] = temp_offset;
+            temp_offset *= _vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridResolutionByDimension(d);
+        }
+
+        if (_grid_connections[i]._params["type"] == std::string("eff_vector_v")) {
+            std::vector<std::vector<fptype>> test_cell_vals(total_num_cells);
+            std::vector<fptype> eff_vector(num_dimensions);
+            if (_grid_connections[i]._params.find("eff_v") != _grid_connections[i]._params.end())
+                eff_vector[num_dimensions - 1] = std::stod(_grid_connections[i]._params["eff_v"]);
+            if (_grid_connections[i]._params.find("eff_w") != _grid_connections[i]._params.end())
+                eff_vector[num_dimensions - 2] = std::stod(_grid_connections[i]._params["eff_w"]);
+            if (_grid_connections[i]._params.find("eff_u") != _grid_connections[i]._params.end() && num_dimensions>2)
+                eff_vector[num_dimensions - 3] = std::stod(_grid_connections[i]._params["eff_u"]);
+
+            // Calculate the v for each cell in the grid
+            for (int c = 0; c < total_num_cells; c++) {
+                double v = ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 1]
+                    * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 1))
+                    + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 1));
+                std::vector<fptype> dirs(num_dimensions);
+                for (int d = 0; d < num_dimensions; d++) {
+                    dirs[d] = eff_vector[d] * v;
+                }
+
+                test_cell_vals[c] = dirs;
+            }
+
+            calculateProportionsNDEfficacyWithValues(cell_dim_widths, total_num_cells,
+                test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
+        }
+        else if (_grid_connections[i]._params["type"] == std::string("eff_vector_w")) {
+            std::vector<std::vector<fptype>> test_cell_vals(total_num_cells);
+            std::vector<fptype> eff_vector(num_dimensions);
+            if (_grid_connections[i]._params.find("eff_v") != _grid_connections[i]._params.end())
+                eff_vector[num_dimensions - 1] = std::stod(_grid_connections[i]._params["eff_v"]);
+            if (_grid_connections[i]._params.find("eff_w") != _grid_connections[i]._params.end())
+                eff_vector[num_dimensions - 2] = std::stod(_grid_connections[i]._params["eff_w"]);
+            if (_grid_connections[i]._params.find("eff_u") != _grid_connections[i]._params.end() && num_dimensions > 2)
+                eff_vector[num_dimensions - 3] = std::stod(_grid_connections[i]._params["eff_u"]);
+
+            // Calculate the v for each cell in the grid
+            for (int c = 0; c < total_num_cells; c++) {
+                double w = ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 2]
+                    * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 2))
+                    + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 2));
+                std::vector<fptype> dirs(num_dimensions);
+                for (int d = 0; d < num_dimensions; d++) {
+                    dirs[d] = eff_vector[d] * w;
+                }
+
+                test_cell_vals[c] = dirs;
+            }
+
+            calculateProportionsNDEfficacyWithValues(cell_dim_widths, total_num_cells,
+                test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
+        }
+        else if (_grid_connections[i]._params["type"] == std::string("eff_vector_u")) {
+            std::vector<std::vector<fptype>> test_cell_vals(total_num_cells);
+            std::vector<fptype> eff_vector(num_dimensions);
+            if (_grid_connections[i]._params.find("eff_v") != _grid_connections[i]._params.end())
+                eff_vector[num_dimensions - 1] = std::stod(_grid_connections[i]._params["eff_v"]);
+            if (_grid_connections[i]._params.find("eff_w") != _grid_connections[i]._params.end())
+                eff_vector[num_dimensions - 2] = std::stod(_grid_connections[i]._params["eff_w"]);
+            if (_grid_connections[i]._params.find("eff_u") != _grid_connections[i]._params.end() && num_dimensions > 2)
+                eff_vector[num_dimensions - 3] = std::stod(_grid_connections[i]._params["eff_u"]);
+
+            // Calculate the v for each cell in the grid
+            for (int c = 0; c < total_num_cells; c++) {
+                double u = ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 3]
+                    * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 3))
+                    + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 3));
+                std::vector<fptype> dirs(num_dimensions);
+                for (int d = 0; d < num_dimensions; d++) {
+                    dirs[d] = eff_vector[d] * u;
+                }
+
+                test_cell_vals[c] = dirs;
+            }
+
+            calculateProportionsNDEfficacyWithValues(cell_dim_widths, total_num_cells,
+                test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
+        }
+        else if (_grid_connections[i]._params["type"] == std::string("eff_vector")) {
+            std::vector<std::vector<fptype>> test_cell_vals(total_num_cells);
+            std::vector<fptype> eff_vector(num_dimensions);
+            if (_grid_connections[i]._params.find("eff_v") != _grid_connections[i]._params.end())
+                eff_vector[num_dimensions - 1] = std::stod(_grid_connections[i]._params["eff_v"]);
+            if (_grid_connections[i]._params.find("eff_w") != _grid_connections[i]._params.end())
+                eff_vector[num_dimensions - 2] = std::stod(_grid_connections[i]._params["eff_w"]);
+            if (_grid_connections[i]._params.find("eff_u") != _grid_connections[i]._params.end() && num_dimensions > 2)
+                eff_vector[num_dimensions - 3] = std::stod(_grid_connections[i]._params["eff_u"]);
+
+            // Calculate the v for each cell in the grid
+            for (int c = 0; c < total_num_cells; c++) {
+                test_cell_vals[c] = eff_vector;
+            }
+
+            calculateProportionsNDEfficacyWithValues(cell_dim_widths, total_num_cells,
+                test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
+        }
+        else if (_grid_connections[i]._params["type"] == std::string("eff_times_v")){
+            std::vector<fptype> cell_vals(total_num_cells);
+
+            // Calculate the v for each cell in the grid
+            for (int c = 0; c < total_num_cells; c++) {
+                cell_vals[c] = std::stod(_grid_connections[i]._params["efficacy"]) *
+                    ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions()-1] 
+                        * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 1))
+                        + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 1));
+            }
+
+            calculateProportions1DEfficacyWithValues(_grid_cell_widths.back(),
+                total_num_cells,
+                cell_vals,
+                offset,
+                grid_cell_efficacies,
+                grid_cell_offsets,
+                grid_cell_strides);
+        } 
+        else if (_grid_connections[i]._params["type"] == std::string("eff_times_w")) {
+            std::vector<fptype> cell_vals(total_num_cells);
+
+            // Calculate the v for each cell in the grid
+            for (int c = 0; c < total_num_cells; c++) {
+                cell_vals[c] = std::stod(_grid_connections[i]._params["efficacy"]) *
+                    ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 2]
+                        * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 2))
+                        + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 2));
+            }
+
+            calculateProportions1DEfficacyWithValues(_grid_cell_widths.back(),
+                total_num_cells,
+                cell_vals,
+                offset,
+                grid_cell_efficacies,
+                grid_cell_offsets,
+                grid_cell_strides);
+        } 
+        else if (_grid_connections[i]._params["type"] == std::string("eff_times_u")) {
+            std::vector<fptype> cell_vals(total_num_cells);
+
+            double cell_width = _grid_cell_widths.back();
+            // Calculate the v for each cell in the grid
+            for (int c = 0; c < total_num_cells; c++) {
+                cell_vals[c] = std::stod(_grid_connections[i]._params["efficacy"]) *
+                    ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 3]
+                        * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 3))
+                        + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridNumDimensions() - 3));
+            }
+
+            calculateProportions1DEfficacyWithValues(cell_width,
+                total_num_cells,
+                cell_vals,
+                offset,
+                grid_cell_efficacies,
+                grid_cell_offsets,
+                grid_cell_strides);
+        }
+        else {
+            // Calculate the proportions and offsets for a simple efficacy in the v (strip) direction
+            double eff = std::stod(_grid_connections[i]._params["efficacy"]);
+
+            std::vector<fptype> cell_vals(total_num_cells, eff);
+            calculateProportions1DEfficacyWithValues(_grid_cell_widths.back(),
+                total_num_cells,
+                cell_vals,
+                offset,
+                grid_cell_efficacies,
+                grid_cell_offsets,
+                grid_cell_strides);
+        }
 
         _connection_queue.push_back(MPILib::DelayedConnectionQueue(_network_time_step, std::stod(_grid_connections[i]._params["delay"])));
         if (_grid_connections[i]._external)
@@ -337,7 +567,7 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
     _csr_adapter = new CudaTwoDLib::CSRAdapter(*_group_adapter, _csrs, 
         _effs.size(), h, _mesh_transform_indexes, _grid_transform_indexes);
 
-    _csr_adapter->InitializeStaticGridCellEfficacies(_connection_out_group_mesh, grid_cell_efficacies, _grid_cell_widths, _grid_cell_offsets);
+    _csr_adapter->InitializeStaticGridCellProportionsNd(_connection_out_group_mesh, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
 
     const auto p1 = std::chrono::system_clock::now();
     _csr_adapter->setRandomSeeds(std::chrono::duration_cast<std::chrono::seconds>(
