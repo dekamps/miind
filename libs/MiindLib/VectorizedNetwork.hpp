@@ -109,6 +109,11 @@ namespace MiindLib {
             std::vector<std::vector<fptype>>& grid_cell_efficacies, std::vector<std::vector<int>>& grid_cell_offsets,
             std::vector<inttype>& grid_cell_strides);
 
+        void calculateProportionsNDEfficacyWithValuesFinite(std::vector<double> cell_widths, unsigned int total_num_cells,
+            std::vector<std::vector<fptype>>& cell_vals, std::vector<int> dimension_offsets,
+            std::vector<std::vector<fptype>>& grid_cell_efficacies, std::vector<std::vector<int>>& grid_cell_offsets,
+            std::vector<inttype>& grid_cell_strides);
+
         void addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w, double start_u,
             std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive, unsigned int finite_size = 0);
 

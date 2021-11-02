@@ -200,10 +200,38 @@ __global__ void CudaGridUpdateFiniteObjectsCalc(inttype N, inttype finite_offset
             int o1 = (spike_eff > 0 ? ofs : -ofs) * grid_cell_offset;
             objects[offset_index] = objects[offset_index] + o1;
         } else {
-            int o2 = (spike_eff > 0 ? (ofs + 1) : (ofs - 1))* grid_cell_offset;
+            int o2 = (spike_eff > 0 ? (ofs + 1) : -(ofs + 1))* grid_cell_offset;
             objects[offset_index] = objects[offset_index] + o2;
         }
 
+    }
+}
+
+__global__ void CudaGridUpdateFiniteObjectsCalcNd(inttype N, inttype finite_offset, inttype* spike_counts, inttype* objects,
+    fptype* refract_times, inttype* refract_inds, fptype* props, int* offsets, inttype proportion_stride, inttype grid_cell_offset, curandState* state) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        int offset_index = i + finite_offset;
+        if (refract_times[offset_index] > 0 || spike_counts[offset_index] == 0)
+            continue;
+
+        inttype obj = objects[offset_index];
+
+        for (int s = 0; s < spike_counts[offset_index]; s++) {
+            fptype r = curand_uniform(&state[index]);
+            fptype total_prop = 0;
+            for (int j = 0; j < proportion_stride; j++) {
+                total_prop += props[(obj * proportion_stride) + j];
+                if (r < total_prop) {
+                    obj = obj + offsets[(obj * proportion_stride) + j];
+                    break;
+                }
+            }
+        }   
+
+        objects[offset_index] = obj;
     }
 }
 

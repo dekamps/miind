@@ -37,6 +37,8 @@ __global__ void CudaGridEvolveFiniteObjects(inttype N, inttype finite_offset, in
 __global__ void CudaGridUpdateFiniteObjects(inttype N, inttype* spike_counts, inttype* objects, fptype* refract_times, inttype* refract_inds, fptype* stays, fptype* goes, int* offset1, int* offset2, inttype offset, curandState* state);
 __global__ void CudaGridUpdateFiniteObjectsCalc(inttype N, inttype finite_offset, inttype* spike_counts, inttype* objects,
     fptype* refract_times, inttype* refract_inds, fptype efficacy, fptype grid_cell_width, inttype grid_cell_offset, curandState* state);
+__global__ void CudaGridUpdateFiniteObjectsCalcNd(inttype N, inttype finite_offset, inttype* spike_counts, inttype* objects,
+    fptype* refract_times, inttype* refract_inds, fptype* props, int* offsets, inttype proportion_stride, inttype grid_cell_offset, curandState* state);
 __global__ void CudaGridResetFiniteObjects(inttype N, inttype finite_offset, inttype* objects, fptype* refract_times,
     inttype* refract_inds, inttype threshold_col_index, inttype reset_col_index, inttype reset_w_rows,
     inttype res_v, fptype res_v_stays, fptype refractory_time, fptype timestep, inttype* spiked, inttype offset, curandState* state, inttype num_cells);

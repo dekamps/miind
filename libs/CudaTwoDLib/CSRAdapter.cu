@@ -495,9 +495,9 @@ void CSRAdapter::CalculateMeshGridDerivativeWithEfficacyFinite(const std::vector
         inttype numBlocks = (_group._vec_num_objects[mesh_m] + _blockSize - 1) / _blockSize;
         generatePoissonSpikes << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_m], _group._vec_num_object_offsets[mesh_m], vecrates[m], timestep, _random_poisson, _randomState);
 
-        CudaGridUpdateFiniteObjectsCalc << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_m], _group._vec_num_object_offsets[mesh_m], _random_poisson, _group._vec_objects_to_index,
+        CudaGridUpdateFiniteObjectsCalcNd << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_m], _group._vec_num_object_offsets[mesh_m], _random_poisson, _group._vec_objects_to_index,
             _group._vec_objects_refract_times, _group._vec_objects_refract_index,
-            efficacy[m],cell_widths[m], cell_offsets[m], _randomState);
+            _proportions[m], _proportion_offsets[m], _proportion_cell_stride[m], cell_offsets[m], _randomState);
 
     }
 

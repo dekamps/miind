@@ -233,7 +233,6 @@ void VectorizedNetwork::generateResetRelativeNdProportions(std::vector<fptype>& 
         n_o1, n_stays, dim - 1);
 }
 
-
 void VectorizedNetwork::calculateProportionsNDEfficacyWithValues(std::vector<double> cell_widths, unsigned int total_num_cells,
     std::vector<std::vector<fptype>>& cell_vals, std::vector<int> dimension_offsets,
     std::vector<std::vector<fptype>>& grid_cell_efficacies, std::vector<std::vector<int>>& grid_cell_offsets,
@@ -255,6 +254,35 @@ void VectorizedNetwork::calculateProportionsNDEfficacyWithValues(std::vector<dou
         for (int k = 0; k < stride; k++) {
             cell_props[modulo(c + stride_offs[k], total_num_cells) * stride + k] = stride_vals[k];
             cell_offsets[modulo(c + stride_offs[k], total_num_cells) * stride + k] = -stride_offs[k];
+        }
+    }
+
+    grid_cell_efficacies.push_back(cell_props);
+    grid_cell_offsets.push_back(cell_offsets);
+    grid_cell_strides.push_back(stride);
+}
+
+void VectorizedNetwork::calculateProportionsNDEfficacyWithValuesFinite(std::vector<double> cell_widths, unsigned int total_num_cells,
+    std::vector<std::vector<fptype>>& cell_vals, std::vector<int> dimension_offsets,
+    std::vector<std::vector<fptype>>& grid_cell_efficacies, std::vector<std::vector<int>>& grid_cell_offsets,
+    std::vector<inttype>& grid_cell_strides) {
+
+    unsigned int num_dimensions = cell_widths.size();
+    unsigned int stride = std::pow(2, num_dimensions);
+
+    std::vector<fptype> cell_props((unsigned int)(total_num_cells * stride));
+    std::vector<int> cell_offsets((unsigned int)(total_num_cells * stride));
+
+    for (int c = 0; c < total_num_cells; c++) {
+
+        std::vector<fptype> stride_vals;
+        std::vector<int> stride_offs;
+
+        generateResetRelativeNdProportions(stride_vals, stride_offs, cell_vals[c], cell_widths, dimension_offsets, 0, 1.0, num_dimensions - 1);
+
+        for (int k = 0; k < stride; k++) {
+            cell_props[modulo(c, total_num_cells) * stride + k] = stride_vals[k];
+            cell_offsets[modulo(c, total_num_cells) * stride + k] = stride_offs[k];
         }
     }
 
@@ -336,8 +364,12 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
                 test_cell_vals[c] = dirs;
             }
 
-            calculateProportionsNDEfficacyWithValues(cell_dim_widths, total_num_cells,
-                test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
+            if (_group->NumObjects() > 0)
+                calculateProportionsNDEfficacyWithValuesFinite(cell_dim_widths, total_num_cells,
+                    test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
+            else
+                calculateProportionsNDEfficacyWithValues(cell_dim_widths, total_num_cells,
+                    test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
         }
         else if (_grid_connections[i]._params["type"] == std::string("eff_vector_w")) {
             std::vector<std::vector<fptype>> test_cell_vals(total_num_cells);
@@ -362,8 +394,12 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
                 test_cell_vals[c] = dirs;
             }
 
-            calculateProportionsNDEfficacyWithValues(cell_dim_widths, total_num_cells,
-                test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
+            if (_group->NumObjects() > 0)
+                calculateProportionsNDEfficacyWithValuesFinite(cell_dim_widths, total_num_cells,
+                    test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
+            else
+                calculateProportionsNDEfficacyWithValues(cell_dim_widths, total_num_cells,
+                    test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
         }
         else if (_grid_connections[i]._params["type"] == std::string("eff_vector_u")) {
             std::vector<std::vector<fptype>> test_cell_vals(total_num_cells);
@@ -388,8 +424,12 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
                 test_cell_vals[c] = dirs;
             }
 
-            calculateProportionsNDEfficacyWithValues(cell_dim_widths, total_num_cells,
-                test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
+            if (_group->NumObjects() > 0)
+                calculateProportionsNDEfficacyWithValuesFinite(cell_dim_widths, total_num_cells,
+                    test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
+            else
+                calculateProportionsNDEfficacyWithValues(cell_dim_widths, total_num_cells,
+                    test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
         }
         else if (_grid_connections[i]._params["type"] == std::string("eff_vector")) {
             std::vector<std::vector<fptype>> test_cell_vals(total_num_cells);
@@ -406,8 +446,12 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
                 test_cell_vals[c] = eff_vector;
             }
 
-            calculateProportionsNDEfficacyWithValues(cell_dim_widths, total_num_cells,
-                test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
+            if (_group->NumObjects() > 0)
+                calculateProportionsNDEfficacyWithValuesFinite(cell_dim_widths, total_num_cells,
+                    test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
+            else
+                calculateProportionsNDEfficacyWithValues(cell_dim_widths, total_num_cells,
+                    test_cell_vals, cell_dim_offs, grid_cell_efficacies, grid_cell_offsets, grid_cell_strides);
         }
         else if (_grid_connections[i]._params["type"] == std::string("eff_times_v")){
             std::vector<fptype> cell_vals(total_num_cells);
