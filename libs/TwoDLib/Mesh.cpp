@@ -287,7 +287,7 @@ vector<Coordinates> Mesh::findPointInMeshSlow(const Point& p, const double u) co
 				unsigned int j = int(((p[1] - getGridBaseByDimension(_grid_num_dimensions - 2)) / getGridSizeByDimension(_grid_num_dimensions - 2)) * getGridResolutionByDimension(_grid_num_dimensions - 2));
 				unsigned int k = int(((u - getGridBaseByDimension(_grid_num_dimensions - 3)) / getGridSizeByDimension(_grid_num_dimensions - 3)) * getGridResolutionByDimension(_grid_num_dimensions - 3));
 
-				unsigned int strips = j + (k * getGridResolutionByDimension(_grid_num_dimensions - 3));
+				unsigned int strips = j + (k * getGridResolutionByDimension(_grid_num_dimensions - 2));
 
 				vec_ret.push_back(Coordinates(strips, i));
 			}
@@ -525,6 +525,13 @@ std::vector<TwoDLib::Cell> Mesh::CellsFromValues(const std::vector<double>& vec_
 		vec_cells.push_back(cell);
 	}
 	return vec_cells;
+}
+
+Coordinates Mesh::getStripCellCoordsOfIndex(unsigned int index) {
+	unsigned int cells = index % (getGridResolutionByDimension(getGridNumDimensions() - 1));
+	unsigned int strips = int(index / (getGridResolutionByDimension(getGridNumDimensions() - 1)));
+
+	return Coordinates(strips, cells);
 }
 
 void Mesh::getCoordsOfIndex(std::vector<unsigned int>& coords, unsigned int index) {

@@ -23,6 +23,50 @@ __global__ void CudaCalculateDerivative(inttype N, fptype rate, fptype* derivati
     }
 }
 
+__global__ void CudaCalculateGridDerivativeCsr(inttype N, fptype rate, fptype* derivative, fptype* mass, fptype* val, inttype* ia, inttype* ja, inttype offset) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        int io = i + offset;
+        fptype dr = 0.;
+        for (int j = ia[i]; j < ia[i + 1]; j++) {
+            dr += val[j] *
+                mass[ja[j] + offset];
+        }
+        dr -= mass[io];
+        derivative[io] += rate * dr;
+    }
+}
+
+__global__ void CudaCalculateGridDerivativeCsrFinite(inttype N, inttype finite_offset, inttype* spike_counts, inttype* objects,
+    fptype* refract_times, inttype* refract_inds, fptype* val, inttype* ia, inttype* ja, inttype grid_cell_offset, curandState* state) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    for (int i = index; i < N; i += stride) {
+        int offset_index = i + finite_offset;
+        if (refract_times[offset_index] > 0 || spike_counts[offset_index] == 0)
+            continue;
+
+        inttype obj = objects[offset_index] - grid_cell_offset;
+
+        for (int s = 0; s < spike_counts[offset_index]; s++) {
+            fptype r = curand_uniform(&state[index]);
+            fptype total_prop = 0;
+            for (int j = ia[obj]; j < ia[obj+1]; j++) {
+                total_prop += val[j];
+                if (r < total_prop) {
+                    obj = ja[j] + grid_cell_offset;
+                    break;
+                }
+            }
+        }
+
+        objects[offset_index] = obj;
+    }
+}
+
 __global__ void evolveMap(inttype N, inttype offset, inttype* map, inttype* unmap, inttype* cumulatives, 
     inttype* lengths, inttype _t) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -108,11 +152,10 @@ __global__ void countSpikesAndClear(inttype N, inttype finite_offset, inttype* s
         return;
     }
 
-
     idata[tid] = spiked[i + finite_offset];
     __syncthreads();
     // do reduction in shared mem
-    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+    for (unsigned int s = int(blockDim.x / 2); s > 0; s >>= 1) {
         if (tid < s) {
             idata[tid] += idata[tid + s];
         }
@@ -565,7 +608,8 @@ __global__ void CudaCalculateGridDerivativeWithEfficacyNd(inttype N, fptype rate
         int io = i + offset;
         fptype dr = 0.;
         for (int j = 0; j < proportion_stride; j++) {
-            dr += props[(i* proportion_stride)+j] * mass[(modulo(io + offsets[(i * proportion_stride) +j], N)) + offset];
+            dr += props[(i*proportion_stride)+j] * 
+                mass[(modulo(io + offsets[(i*proportion_stride)+j], N))];
         }
         dr -= mass[io];
         derivative[io] += rate * dr;
@@ -669,7 +713,7 @@ __global__ void SumReset(unsigned int n_sum, fptype* sum, fptype* rate) {
     sdata[tid] = sum[i];
     __syncthreads();
     // do reduction in shared mem
-    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+    for (unsigned int s = int(blockDim.x / 2); s > 0; s >>= 1) {
         if (tid < s) {
             sdata[tid] += sdata[tid + s];
         }

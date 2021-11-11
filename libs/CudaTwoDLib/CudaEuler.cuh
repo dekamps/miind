@@ -57,4 +57,6 @@ __global__ void CudaCalculateGridDerivativeWithEfficacyNd(inttype N, fptype rate
 __global__ void CudaCalculateGridEfficaciesWithConductance(inttype N, fptype efficacy, fptype grid_cell_width, inttype grid_cell_offset, fptype* cell_vs, fptype cond_stable, fptype* stays, fptype* goes, int* offset1s, int* offset2s, inttype vs_offset);
 __global__ void CudaCalculateGridEfficacies(inttype N, fptype efficacy, fptype grid_cell_width, inttype grid_offset_width, fptype* stays, fptype* goes, int* offset1s, int* offset2s);
 __global__ void CudaCalculateGridCellEfficacies(inttype N, fptype* cell_vals, fptype grid_cell_width, inttype grid_offset_width, fptype* stays, fptype* goes, int* offset1s, int* offset2s, inttype vs_offset);
+__global__ void CudaCalculateGridDerivativeCsr(inttype N, fptype rate, fptype* derivative, fptype* mass, fptype* val, inttype* ia, inttype* ja, inttype offset);
+__global__ void CudaCalculateGridDerivativeCsrFinite(inttype N, inttype finite_offset, inttype* spike_counts, inttype* objects, fptype* refract_times, inttype* refract_inds, fptype* val, inttype* ia, inttype* ja, inttype grid_cell_offset, curandState* state);
 #endif

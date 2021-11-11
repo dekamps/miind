@@ -34,6 +34,18 @@ _tr_w(0)
 {
 }
 
+TransitionMatrix::TransitionMatrix(double eff_v, double eff_w, std::vector<TransferLine> lines) :
+	_vec_line(lines),
+	_tr_v(eff_v),
+	_tr_w(eff_w)
+{
+}
+
+TransitionMatrix::TransitionMatrix(std::vector<TransferLine> lines) :
+	TransitionMatrix(0,0,lines)
+{
+}
+
 TransitionMatrix::TransitionMatrix(const std::string& fn)
 {
 	std::ifstream ifst(fn);

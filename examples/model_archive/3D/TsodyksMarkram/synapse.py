@@ -15,11 +15,10 @@ def tsodyks(y):
     E = y[1]; # synaptic facilitation / Release probability
     R = y[0]; # synaptic depression
     
-    V_prime = ( -(V - V_r) - (R_in * E * V)) / tau_mem
-    E_prime = - (E / tau_intact)# + U_se*R
-    R_prime = ((1 - R - E) / tau_rec)# - U_se*R
-    
+    V_prime = (-(v - V_r) - (R_in * v * A_se * e)) / tau_mem
+    E_prime = -e / tau_intact
+    R_prime = (1 - r - e) / tau_rec
 
     return [R_prime, E_prime, V_prime]
 
-miindgen.generateNdGrid(tsodyks, "synapse", [-0.2,-0.2,-66], [1.4, 1.4, 12], [50,50,50], -55, -65, [0.0,0.0,0.0], 0.01, 1)
+miindgen.generateNdGrid(tsodyks, "synapse", [-0.2,-0.2,-70], [1.4, 1.4, 40], [50,100,50], -35, -65, [0.0,0.0,0.0], 0.01, 1)

@@ -152,19 +152,19 @@ void applyConductance2D(NdPoint& p, double t) {
 // g.generateTMatFileBatched("synapse");
 void applyTsodyks(NdPoint& p, double t) {
     double tau_intact = 3;
-    double tau_rec = 800;
-    double U_se = 0.67;
-    double A_se = 250;
-    double R_in = 100;
+    double tau_rec = 700;
+    double U_se = 0.65;
+    double A_se = 500; //250 for Hi, 500 for Lo
+    double R_in = 0.2;
     double V_r = -65;
-    double tau_mem = 50;
+    double tau_mem = 25; 
 
     double v = p.coords[2];
     double e = p.coords[1];
     double r = p.coords[0];
 
     for (unsigned int i = 0; i < 11; i++) {
-        double v_prime = (-(v - V_r) - (R_in * e * v)) / tau_mem;
+        double v_prime = (-(v - V_r) - (R_in * v * A_se * e)) / tau_mem;
         double e_prime = -(e / tau_intact);
         double r_prime = ((1 - r - e) / tau_rec);
 
@@ -179,16 +179,16 @@ void applyTsodyks(NdPoint& p, double t) {
 }
 
 int main() {
-     std::vector<double> base = { -0.2,-0.2,-66 };
-     std::vector<double> dims = { 1.4, 1.4, 100 };
-     std::vector<unsigned int> res = { 50, 50, 50 };
-     std::vector<double> reset_relative = { 0.0,0.0,0.0 };
-     double threshold = 30;
-     double reset_v = -65;
-     NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-02);
+    std::vector<double> base = { -0.2,-0.2,-70 };
+    std::vector<double> dims = { 1.4, 1.4, 40 };
+    std::vector<unsigned int> res = { 50, 50, 50 };
+    std::vector<double> reset_relative = { 0.0,0.0,0.0 };
+    double threshold = -35;
+    double reset_v = -65;
+    NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-02);
 
-     g.setCppFunction(applyTsodyks);
-     g.generateModelFile("synapse50", 0.001);
-     g.generateTMatFileBatched("synapse50");
+    g.setCppFunction(applyTsodyks);
+    g.generateModelFile("synapseLo", 0.001);
+    g.generateTMatFileBatched("synapseLo");
 	return 0;
 }

@@ -117,6 +117,8 @@ namespace CudaTwoDLib {
 
 		const unsigned int NumObjects() const { return _group.NumObjects(); }
 
+		const std::vector<inttype> getGroupObjects() const { return _vec_num_objects; }
+
 		TwoDLib::Ode2DSystemGroup& getGroup() { return _group; }
 	private:
 

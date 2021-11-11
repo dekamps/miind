@@ -101,6 +101,7 @@ namespace MiindLib {
         }
 
         void generateResetRelativeNdProportions(std::vector<fptype>& final_props, std::vector<int>& final_offs, std::vector<fptype> cell_val, std::vector<double> cell_widths, std::vector<int> dimension_offset, int offset, double prop, int dim);
+        void generateResetRelativeNdProportions(std::vector<int>& offset_coords, std::vector<int>& dim_lims, std::vector<fptype>& final_props, std::vector<int>& final_offs, std::vector<fptype> cell_val, std::vector<double> cell_widths, std::vector<int> dimension_offset, int offset, double prop, int dim);
 
         void calculateProportions1DEfficacyWithValues(double cell_width, unsigned int total_num_cells, std::vector<fptype>& cell_vals, int dimension_offset, std::vector<std::vector<fptype>>& grid_cell_efficacies, std::vector<std::vector<int>>& grid_cell_offsets, std::vector<inttype>& grid_cell_strides);
 
@@ -108,6 +109,9 @@ namespace MiindLib {
             std::vector<std::vector<fptype>>& cell_vals, std::vector<int> dimension_offsets,
             std::vector<std::vector<fptype>>& grid_cell_efficacies, std::vector<std::vector<int>>& grid_cell_offsets,
             std::vector<inttype>& grid_cell_strides);
+
+        TwoDLib::TransitionMatrix calculateProportionsNDEfficacyForCsr(TwoDLib::Mesh& mesh, std::vector<double> cell_widths, unsigned int total_num_cells,
+            std::vector<std::vector<fptype>>& cell_vals, std::vector<int> dimension_offsets);
 
         void calculateProportionsNDEfficacyWithValuesFinite(std::vector<double> cell_widths, unsigned int total_num_cells,
             std::vector<std::vector<fptype>>& cell_vals, std::vector<int> dimension_offsets,

@@ -18,7 +18,7 @@
 </Connections>
 <Reporting>
 	<Density node="RG_E" t_start="0.0" t_end="1.0" t_interval="0.001" />
-	<!--<Display node="RG_E" />-->
+    <Display node="RG_E" />
 	<Rate node="RG_E" t_interval="0.0001" />
 </Reporting>
 <SimulationIO>

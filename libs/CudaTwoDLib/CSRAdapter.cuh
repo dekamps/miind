@@ -69,6 +69,8 @@ namespace CudaTwoDLib {
 
 		void InitializeStaticGridCellProportionsNd(const std::vector<inttype>& vecindex, const std::vector<std::vector<fptype>>& vals, const std::vector<std::vector<int>>& offs, const std::vector<inttype>& strides);
 
+		void InitializeStaticGridCellCsrNd(const std::vector<inttype>& vecindex, const std::vector<TwoDLib::CSRMatrix>& mats);
+
 		void InitializeStaticGridConductanceEfficacies(const std::vector<inttype>& vecindex, const std::vector<fptype>& efficacy, const std::vector<fptype>& cell_widths, const std::vector<inttype>& cell_offsets, const std::vector<fptype>& rest_vs);
 
 		void CalculateMeshGridDerivativeWithEfficacy(const std::vector<inttype>& vecindex, const std::vector<fptype>& vecrates);
@@ -145,9 +147,12 @@ namespace CudaTwoDLib {
 
 		std::vector<fptype*> _cell_vals;
 
-		std::vector<fptype*> _proportions;
-		std::vector<int*> _proportion_offsets;
-		std::vector<unsigned int> _proportion_cell_stride;
+		std::vector<fptype*>   _grid_val;
+		std::vector<inttype*>  _grid_ia;
+		std::vector<inttype*>  _grid_ja;
+		std::vector<fptype*>   _grid_forward_val;
+		std::vector<inttype*>  _grid_forward_ia;
+		std::vector<inttype*>  _grid_forward_ja;
 
 		fptype* _izh_vs;
 		fptype* _izh_ws;

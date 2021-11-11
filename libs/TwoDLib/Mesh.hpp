@@ -83,6 +83,8 @@ namespace TwoDLib {
 			else { return _vec_vec_quad.size(); }
 		}
 
+		Coordinates getStripCellCoordsOfIndex(unsigned int index);
+
 		void getCoordsOfIndex(std::vector<unsigned int>& coords, unsigned int index);
 		std::vector<unsigned int> getCoordsOfIndex(unsigned int);
 

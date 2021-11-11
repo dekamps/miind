@@ -40,6 +40,10 @@ namespace TwoDLib {
 
 		TransitionMatrix();
 
+		TransitionMatrix(double eff_v, double eff_w, std::vector<TransferLine> lines);
+
+		TransitionMatrix(std::vector<TransferLine> lines);
+
 		//! Requires a ".mat" file
 		TransitionMatrix(const std::string&);
 

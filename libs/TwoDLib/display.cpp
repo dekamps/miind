@@ -338,31 +338,31 @@ void Display::display_3d(void) {
 	glRotatef(200 + _dws[window_index].rot_y, 0.0f, -1.0f, 0.0f);
 
 	glColor3f(1.0, 1.0, 1.0);
-	glRasterPos3f(-0.5f, 0.52f, -0.5f);
+	glRasterPos3f(-0.5f, 0.55f, -0.5f);
 	int len, i;
 	std::string t = std::string("u");
 	const char* c_string = t.c_str();
 	len = (int)strlen(c_string);
 	for (i = 0; i < len; i++) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c_string[i]);
 	}
 
 	glColor3f(1.0, 1.0, 1.0);
-	glRasterPos3f(-0.5f, -0.52f, 0.52f);
+	glRasterPos3f(-0.5f, -0.5f, 0.6f);
 	t = std::string("w");
 	c_string = t.c_str();
 	len = (int)strlen(c_string);
 	for (i = 0; i < len; i++) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c_string[i]);
 	}
 
 	glColor3f(1.0, 1.0, 1.0);
-	glRasterPos3f(0.52f, -0.52f, -0.5f);
+	glRasterPos3f(0.55f, -0.5f, -0.5f);
 	t = std::string("v");
 	c_string = t.c_str();
 	len = (int)strlen(c_string);
 	for (i = 0; i < len; i++) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c_string[i]);
 	}
 
 	// Draw lines
@@ -506,7 +506,7 @@ void Display::display_3d(void) {
 			for (unsigned int j = 0; j < m.NrCellsInStrip(i); j++) {
 				unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index, (i * size_y) + k, j);
 
-				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() == 0 && i != 0 && k != 0 && j != 0 && i != size_z - 1 && k != size_y - 1 && j != size_x - 1)
+				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() == 0)
 					if (_dws[window_index]._system->Mass()[idx] < 0.000000001) continue; // skip if mass is basically nothing
 
 				double cell_area = std::abs(m.Quad(0, 0).SignedArea());
