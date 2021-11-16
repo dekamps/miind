@@ -471,9 +471,9 @@ void Display::display_3d(void) {
 	// **** used for 3D ****
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	GLfloat x_rot = modulof(-22 + _dws[window_index].rot_x, 360) - 45;
+	GLfloat x_rot = modulof(25 + _dws[window_index].rot_x, 360) - 45;
 	glRotatef(x_rot, 1.0f, 0.0f, 0.0f);
-	GLfloat y_rot = modulof(-200 - _dws[window_index].rot_y, 360) - 45;
+	GLfloat y_rot = modulof(-155 + _dws[window_index].rot_y, 360) - 45;
 	glRotatef(y_rot, 0.0f, 1.0f, 0.0f);
 
 	glColor3f(1.0, 1.0, 1.0);

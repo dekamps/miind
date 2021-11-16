@@ -1,9 +1,9 @@
 # MIIND: a population level simulator.
 
 MIIND is a simulator that allows the creation, simulation and analysis of large-scale neural networks. It does not model individual neurons, but models populations
-directly, similarly to a neural mass models, except that we use population density techniques. Population density techniques are based on point model neurons, such as
+directly, similarly to a neural mass model, except that we use population density techniques. Population density techniques are based on point model neurons, such as
 leaky-integrate-and-fire (LIF), quadratic-integrate-and-fire neurons (QIF), or more complex ones, such as adaptive-exponential-integrate-and-fire (AdExp), Izhikevich,
-Fitzhugh-Nagumo (FN). MIIND is able to model populations of 1D neural models (like LIF, QIF), or 2D models (AdExp, Izhikevich, FN, others). It does so by using
+Fitzhugh-Nagumo (FN). MIIND is able to model populations of 1D neural models (like LIF, QIF), 2D models (AdExp, Izhikevich, FN, others), or 3D models (Hindmarsh-Rose, Tsodyks-Markram Synapse). It does so by using
 statistical techniques to answer the question: "If I'd run a NEST or BRIAN simulation (to name some point model-based simulators), where in state space would my neurons be?"
 We calculate this distribution in terms of a density function, and from this density function we can infer many properties of the population, including its own firing rate.
 By modeling large-scale networks as homogeneous populations that exchange firing rate statistics, rather than spikes, remarkable efficiency can be achieved, whilst retaining
@@ -19,7 +19,7 @@ For building from source and further documentation:
 
 https://miind.readthedocs.io/en/latest/
 
-## Three dimensional population density methods! (26/11/2019)
+## Three dimensional population density methods!
 They said it could not be done, but we have created an efficient version of the Hindmarsh rose model,
 a neural model with three state variables.
 <img src="https://github.com/dekamps/miind/blob/master/images/hindmarsh.gif" alt="drawing" width="400"/>
