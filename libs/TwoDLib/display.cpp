@@ -270,6 +270,141 @@ std::vector<double> mat_mult(std::vector<std::vector<double>>& mat, std::vector<
 	return np;
 }
 
+bool gluInvertMatrix(const GLfloat m[16], GLfloat invOut[16])
+{
+	GLfloat inv[16], det;
+	int i;
+
+	inv[0] = m[5] * m[10] * m[15] -
+		m[5] * m[11] * m[14] -
+		m[9] * m[6] * m[15] +
+		m[9] * m[7] * m[14] +
+		m[13] * m[6] * m[11] -
+		m[13] * m[7] * m[10];
+
+	inv[4] = -m[4] * m[10] * m[15] +
+		m[4] * m[11] * m[14] +
+		m[8] * m[6] * m[15] -
+		m[8] * m[7] * m[14] -
+		m[12] * m[6] * m[11] +
+		m[12] * m[7] * m[10];
+
+	inv[8] = m[4] * m[9] * m[15] -
+		m[4] * m[11] * m[13] -
+		m[8] * m[5] * m[15] +
+		m[8] * m[7] * m[13] +
+		m[12] * m[5] * m[11] -
+		m[12] * m[7] * m[9];
+
+	inv[12] = -m[4] * m[9] * m[14] +
+		m[4] * m[10] * m[13] +
+		m[8] * m[5] * m[14] -
+		m[8] * m[6] * m[13] -
+		m[12] * m[5] * m[10] +
+		m[12] * m[6] * m[9];
+
+	inv[1] = -m[1] * m[10] * m[15] +
+		m[1] * m[11] * m[14] +
+		m[9] * m[2] * m[15] -
+		m[9] * m[3] * m[14] -
+		m[13] * m[2] * m[11] +
+		m[13] * m[3] * m[10];
+
+	inv[5] = m[0] * m[10] * m[15] -
+		m[0] * m[11] * m[14] -
+		m[8] * m[2] * m[15] +
+		m[8] * m[3] * m[14] +
+		m[12] * m[2] * m[11] -
+		m[12] * m[3] * m[10];
+
+	inv[9] = -m[0] * m[9] * m[15] +
+		m[0] * m[11] * m[13] +
+		m[8] * m[1] * m[15] -
+		m[8] * m[3] * m[13] -
+		m[12] * m[1] * m[11] +
+		m[12] * m[3] * m[9];
+
+	inv[13] = m[0] * m[9] * m[14] -
+		m[0] * m[10] * m[13] -
+		m[8] * m[1] * m[14] +
+		m[8] * m[2] * m[13] +
+		m[12] * m[1] * m[10] -
+		m[12] * m[2] * m[9];
+
+	inv[2] = m[1] * m[6] * m[15] -
+		m[1] * m[7] * m[14] -
+		m[5] * m[2] * m[15] +
+		m[5] * m[3] * m[14] +
+		m[13] * m[2] * m[7] -
+		m[13] * m[3] * m[6];
+
+	inv[6] = -m[0] * m[6] * m[15] +
+		m[0] * m[7] * m[14] +
+		m[4] * m[2] * m[15] -
+		m[4] * m[3] * m[14] -
+		m[12] * m[2] * m[7] +
+		m[12] * m[3] * m[6];
+
+	inv[10] = m[0] * m[5] * m[15] -
+		m[0] * m[7] * m[13] -
+		m[4] * m[1] * m[15] +
+		m[4] * m[3] * m[13] +
+		m[12] * m[1] * m[7] -
+		m[12] * m[3] * m[5];
+
+	inv[14] = -m[0] * m[5] * m[14] +
+		m[0] * m[6] * m[13] +
+		m[4] * m[1] * m[14] -
+		m[4] * m[2] * m[13] -
+		m[12] * m[1] * m[6] +
+		m[12] * m[2] * m[5];
+
+	inv[3] = -m[1] * m[6] * m[11] +
+		m[1] * m[7] * m[10] +
+		m[5] * m[2] * m[11] -
+		m[5] * m[3] * m[10] -
+		m[9] * m[2] * m[7] +
+		m[9] * m[3] * m[6];
+
+	inv[7] = m[0] * m[6] * m[11] -
+		m[0] * m[7] * m[10] -
+		m[4] * m[2] * m[11] +
+		m[4] * m[3] * m[10] +
+		m[8] * m[2] * m[7] -
+		m[8] * m[3] * m[6];
+
+	inv[11] = -m[0] * m[5] * m[11] +
+		m[0] * m[7] * m[9] +
+		m[4] * m[1] * m[11] -
+		m[4] * m[3] * m[9] -
+		m[8] * m[1] * m[7] +
+		m[8] * m[3] * m[5];
+
+	inv[15] = m[0] * m[5] * m[10] -
+		m[0] * m[6] * m[9] -
+		m[4] * m[1] * m[10] +
+		m[4] * m[2] * m[9] +
+		m[8] * m[1] * m[6] -
+		m[8] * m[2] * m[5];
+
+	det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
+
+	if (det == 0)
+		return false;
+
+	det = 1.0 / det;
+
+	for (i = 0; i < 16; i++)
+		invOut[i] = inv[i] * det;
+
+	return true;
+}
+
+GLfloat modulof(GLfloat a, GLfloat b) {
+	GLfloat r = std::fmod(a,b);
+	return r < 0 ? r + b : r;
+}
+
 // The OpenGL display function, called as fast as possible.
 void Display::display_3d(void) {
 	if (_dws.size() == 0)
@@ -308,6 +443,8 @@ void Display::display_3d(void) {
 		_dws[window_index].rot_y -= 1.5f;
 	}
 
+	bool update_draw_order = leftPressed || upPressed || downPressed || rightPressed;
+
 	glViewport(0, 0, _dws[window_index].width, _dws[window_index].height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -334,8 +471,10 @@ void Display::display_3d(void) {
 	// **** used for 3D ****
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glRotatef(-22 + _dws[window_index].rot_x, 1.0f, 0.0f, 0.0f);
-	glRotatef(200 + _dws[window_index].rot_y, 0.0f, -1.0f, 0.0f);
+	GLfloat x_rot = modulof(-22 + _dws[window_index].rot_x, 360) - 45;
+	glRotatef(x_rot, 1.0f, 0.0f, 0.0f);
+	GLfloat y_rot = modulof(-200 - _dws[window_index].rot_y, 360) - 45;
+	glRotatef(y_rot, 0.0f, 1.0f, 0.0f);
 
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos3f(-0.5f, 0.55f, -0.5f);
@@ -498,13 +637,277 @@ void Display::display_3d(void) {
 	glVertex3f(p1[0], p1[1], p1[2]);
 	glVertex3f(p4[0], p4[1], p4[2]);
 	glVertex3f(p8[0], p8[1], p8[2]);
+
+
+	// Do some crude ordering so that the alpha blend looks ok from all angles
+	std::vector<unsigned int> res_order(3);
+	res_order[0] = 0; //w
+	res_order[1] = 1; //u
+	res_order[2] = 2; //v
+
+	std::vector<unsigned int> vals_start(3);
+	vals_start[0] = 0;
+	vals_start[1] = 0;
+	vals_start[2] = 0;
+
+	std::vector<unsigned int> vals_end(3);
+	vals_end[0] = size_z;
+	vals_end[1] = size_y;
+	vals_end[2] = size_x;
+
+	std::vector<unsigned int> vals_diff(3);
+	vals_diff[0] = 1;
+	vals_diff[1] = 1;
+	vals_diff[2] = 1;
+
+	std::vector<bool> reverse(3);
+	reverse[0] = false;
+	reverse[1] = false;
+	reverse[2] = false;
+
+	if (x_rot >= -45.0 && x_rot < 45.0) {
+		if (y_rot >= -45.0 && y_rot < 45.0) {
+			res_order[0] = 1; //w
+			res_order[1] = 0; //u
+			res_order[2] = 2; //v
+
+			vals_start[0] = 0;
+			vals_start[1] = 0;
+			vals_start[2] = 0;
+
+			vals_end[0] = size_x;
+			vals_end[1] = size_y;
+			vals_end[2] = size_z;
+
+			vals_diff[0] = 1;
+			vals_diff[1] = 1;
+			vals_diff[2] = 1;
+
+			reverse[0] = false;
+			reverse[1] = true;
+			reverse[2] = false;
+		}
+		else if (y_rot >= 45.0 && y_rot < 135.0) {
+			res_order[0] = 2; //w
+			res_order[1] = 1; //u
+			res_order[2] = 0; //v
+
+			vals_start[0] = 0;
+			vals_start[1] = 0;
+			vals_start[2] = 0;
+
+			vals_end[0] = size_x;
+			vals_end[1] = size_y;
+			vals_end[2] = size_z;
+
+			vals_diff[0] = 1;
+			vals_diff[1] = 1;
+			vals_diff[2] = 1;
+
+			reverse[0] = false;
+			reverse[1] = false;
+			reverse[2] = false;
+		}
+		else if (y_rot >= 135.0 && y_rot < 225.0) {
+			res_order[0] = 1; //w
+			res_order[1] = 2; //u
+			res_order[2] = 0; //v
+
+			vals_start[0] = 0;
+			vals_start[1] = 0;
+			vals_start[2] = 0;
+
+			vals_end[0] = size_x;
+			vals_end[1] = size_y;
+			vals_end[2] = size_z;
+
+			vals_diff[0] = 1;
+			vals_diff[1] = 1;
+			vals_diff[2] = 1;
+
+			reverse[0] = false;
+			reverse[1] = false;
+			reverse[2] = false;
+
+		}
+		else if (y_rot >= 225.0 && y_rot < 315.0) {
+			// v=0 u=0 at back
+			res_order[0] = 2; //w
+			res_order[1] = 1; //u
+			res_order[2] = 0; //v
+
+			vals_start[0] = 0;
+			vals_start[1] = 0;
+			vals_start[2] = 0;
+
+			vals_end[0] = size_x;
+			vals_end[1] = size_y;
+			vals_end[2] = size_z;
+
+			vals_diff[0] = 1;
+			vals_diff[1] = 1;
+			vals_diff[2] = 1;
+
+			reverse[0] = false;
+			reverse[1] = false;
+			reverse[2] = true;
+		}
+	} 
+	else if (x_rot >= 45.0 && x_rot < 135.0) {
+		res_order[0] = 0; //w
+		res_order[1] = 1; //u
+		res_order[2] = 2; //v
+
+		vals_start[0] = 0;
+		vals_start[1] = 0;
+		vals_start[2] = 0;
+
+		vals_end[0] = size_y;
+		vals_end[1] = size_z;
+		vals_end[2] = size_x;
+
+		vals_diff[0] = 1;
+		vals_diff[1] = 1;
+		vals_diff[2] = 1;
+
+		reverse[0] = true;
+		reverse[1] = false;
+		reverse[2] = false;
+	}
+	else if (x_rot >= 135.0 && x_rot < 225.0) {
+	if (y_rot >= -45.0 && y_rot < 45.0) {
+		res_order[0] = 1; //w
+		res_order[1] = 0; //u
+		res_order[2] = 2; //v
+
+		vals_start[0] = 0;
+		vals_start[1] = 0;
+		vals_start[2] = 0;
+
+		vals_end[0] = size_x;
+		vals_end[1] = size_y;
+		vals_end[2] = size_z;
+
+		vals_diff[0] = 1;
+		vals_diff[1] = 1;
+		vals_diff[2] = 1;
+
+		reverse[0] = false;
+		reverse[1] = false;
+		reverse[2] = false;
+	}
+	else if (y_rot >= 45.0 && y_rot < 135.0) {
+		// v=0 u=0 at back
+		res_order[0] = 2; //w
+		res_order[1] = 1; //u
+		res_order[2] = 0; //v
+
+		vals_start[0] = 0;
+		vals_start[1] = 0;
+		vals_start[2] = 0;
+
+		vals_end[0] = size_x;
+		vals_end[1] = size_y;
+		vals_end[2] = size_z;
+
+		vals_diff[0] = 1;
+		vals_diff[1] = 1;
+		vals_diff[2] = 1;
+
+		reverse[0] = false;
+		reverse[1] = false;
+		reverse[2] = true;
+	}
+	else if (y_rot >= 135.0 && y_rot < 225.0) {
+		res_order[0] = 1; //w
+		res_order[1] = 2; //u
+		res_order[2] = 0; //v
+
+		vals_start[0] = 0;
+		vals_start[1] = 0;
+		vals_start[2] = 0;
+
+		vals_end[0] = size_x;
+		vals_end[1] = size_y;
+		vals_end[2] = size_z;
+
+		vals_diff[0] = 1;
+		vals_diff[1] = 1;
+		vals_diff[2] = 1;
+
+		reverse[0] = false;
+		reverse[1] = true;
+		reverse[2] = false;
+
+	}
+	else if (y_rot >= 225.0 && y_rot < 315.0) {
+		// v=0 u=0 at back
+		res_order[0] = 2; //w
+		res_order[1] = 1; //u
+		res_order[2] = 0; //v
+
+		vals_start[0] = 0;
+		vals_start[1] = 0;
+		vals_start[2] = 0;
+
+		vals_end[0] = size_x;
+		vals_end[1] = size_y;
+		vals_end[2] = size_z;
+
+		vals_diff[0] = 1;
+		vals_diff[1] = 1;
+		vals_diff[2] = 1;
+
+		reverse[0] = false;
+		reverse[1] = false;
+		reverse[2] = false;
+	}
+	}
+	else if (x_rot >= 225.0 && x_rot < 315.0) {
+		res_order[0] = 0; //w
+		res_order[1] = 1; //u
+		res_order[2] = 2; //v
+
+		vals_start[0] = 0;
+		vals_start[1] = 0;
+		vals_start[2] = 0;
+
+		vals_end[0] = size_y;
+		vals_end[1] = size_z;
+		vals_end[2] = size_x;
+
+		vals_diff[0] = 1;
+		vals_diff[1] = 1;
+		vals_diff[2] = 1;
+
+		reverse[0] = false;
+		reverse[1] = false;
+		reverse[2] = false;
+	}
+	
+
+	std::vector<unsigned int> vals(3);
+	vals[res_order[0]] = vals_start[res_order[0]];
+	vals[res_order[1]] = vals_start[res_order[1]];
+	vals[res_order[2]] = vals_start[res_order[2]];
 	
 	double max_m = -9999999;
 	double min_m = 9999999;
-	for (unsigned int i = 0; i < size_z; i++) {
-		for (unsigned int k = 0; k < size_y; k++) {
-			for (unsigned int j = 0; j < m.NrCellsInStrip(i); j++) {
-				unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index, (i * size_y) + k, j);
+	for (vals[res_order[0]] = vals_start[res_order[0]]; vals[res_order[0]] < vals_end[res_order[0]]; vals[res_order[0]] += vals_diff[res_order[0]]) {
+		for (vals[res_order[1]] = vals_start[res_order[1]]; vals[res_order[1]] < vals_end[res_order[1]]; vals[res_order[1]] += vals_diff[res_order[1]]) {
+			for (vals[res_order[2]] = vals_start[res_order[2]]; vals[res_order[2]] < vals_end[res_order[2]]; vals[res_order[2]] += vals_diff[res_order[2]]) {
+
+				unsigned int i_r = vals[0];
+				if (reverse[0])
+					i_r = vals_end[0] - 1 - vals[0];
+				unsigned int k_r = vals[1];
+				if (reverse[1])
+					k_r = vals_end[1] - 1 - vals[1];
+				unsigned int j_r = vals[2];
+				if (reverse[2])
+					j_r = vals_end[2] - 1 - vals[2];
+
+				unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index, (i_r * size_z) + k_r, j_r);
 
 				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() == 0)
 					if (_dws[window_index]._system->Mass()[idx] < 0.000000001) continue; // skip if mass is basically nothing
@@ -540,7 +943,7 @@ void Display::display_3d(void) {
 				}
 					
 
-				if (mass < 0.00000001 && (j == 0 || k ==0 || i == size_z -1 || i == 0 || k == size_y - 1 || j == size_x - 1)) {
+				if (mass < 0.00000001) {
 					continue; // glColor4f(1.0, 1.0, 1.0, 0.02);
 				}
 				else if (mass > 0.00000001) {
@@ -550,9 +953,9 @@ void Display::display_3d(void) {
 					continue;
 				}
 
-				double cell_x = -0.5 + j * (1.0 / size_x);
-				double cell_y = -0.5 + i * (1.0 / size_z);
-				double cell_z = -0.5 + k * (1.0 / size_y);
+				double cell_x = -0.5 + j_r * (1.0 / size_x);
+				double cell_y = -0.5 + i_r * (1.0 / size_z);
+				double cell_z = -0.5 + k_r * (1.0 / size_y);
 
 				double half_cell_x_width = (0.5 / size_x);
 				double half_cell_y_width = (0.5 / size_z);

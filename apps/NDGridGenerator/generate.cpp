@@ -154,8 +154,8 @@ void applyTsodyks(NdPoint& p, double t) {
     double tau_intact = 3;
     double tau_rec = 700;
     double U_se = 0.65;
-    double A_se = 500; //250 for Hi, 500 for Lo
-    double R_in = 0.2;
+    double A_se = 250; //250 for Hi, 500 for Lo
+    double R_in = 0.02;
     double V_r = -65;
     double tau_mem = 25; 
 
@@ -166,7 +166,7 @@ void applyTsodyks(NdPoint& p, double t) {
     for (unsigned int i = 0; i < 11; i++) {
         double v_prime = (-(v - V_r) - (R_in * v * A_se * e)) / tau_mem;
         double e_prime = -(e / tau_intact);
-        double r_prime = ((1 - r - e) / tau_rec);
+        double r_prime = ((1 - r - std::abs(e)) / tau_rec);
 
         v = v + (t / 11.0) * v_prime;
         e = e + (t / 11.0) * e_prime;
@@ -179,16 +179,16 @@ void applyTsodyks(NdPoint& p, double t) {
 }
 
 int main() {
-    std::vector<double> base = { -0.2,-0.2,-70 };
-    std::vector<double> dims = { 1.4, 1.4, 40 };
-    std::vector<unsigned int> res = { 50, 50, 50 };
+    std::vector<double> base = { -0.2,-1.2,-100 };
+    std::vector<double> dims = { 1.4, 2.4, 60 };
+    std::vector<unsigned int> res = { 50, 100, 50 };
     std::vector<double> reset_relative = { 0.0,0.0,0.0 };
-    double threshold = -35;
+    double threshold = -45;
     double reset_v = -65;
     NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-02);
 
     g.setCppFunction(applyTsodyks);
-    g.generateModelFile("synapseLo", 0.001);
-    g.generateTMatFileBatched("synapseLo");
+    g.generateModelFile("synapseHiExt", 0.001);
+    g.generateTMatFileBatched("synapseHiExt");
 	return 0;
 }

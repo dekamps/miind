@@ -1,0 +1,38 @@
+<Simulation>
+ <Variable Name='TIME_END'>1.0</Variable>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+
+<Algorithm type="GridAlgorithmGroup" name="TM" modelfile="synapseHiExt.model" tau_refractive="0.0" transformfile="synapseHiExt.tmat" start_v="-65.0" start_w="0.0001" start_u="0.9999" >
+<TimeStep>1e-05</TimeStep>
+</Algorithm>
+
+</Algorithms>
+<Nodes>
+<Node algorithm="TM" name="E" type="NEUTRAL" />
+<Node algorithm="TM" name="I" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<IncomingConnection Node="E" type="eff_vector_u" num_connections="1" efficacy="0.5" eff_v="0.0" eff_w="0.3" eff_u="-0.03" delay="0.0"/>
+<IncomingConnection Node="I" type="eff_vector_u" num_connections="1" efficacy="0.5" eff_v="0.0" eff_w="0.3" eff_u="-0.03" delay="0.0"/>
+
+<Connection In="E" Out="E" type="eff_vector_u" num_connections="1" efficacy="0.8" eff_v="0.0" eff_w="0.3" eff_u="-0.03" delay="0.0"/>
+<Connection In="E" Out="I" type="eff_vector_u" num_connections="1" efficacy="0.8" eff_v="0.0" eff_w="0.3" eff_u="-0.03" delay="0.0"/>
+<Connection In="I" Out="I" type="eff_vector_u" num_connections="1" efficacy="0.8" eff_v="0.0" eff_w="-0.3" eff_u="-0.03" delay="0.0"/>
+<Connection In="I" Out="E" type="eff_vector_u" num_connections="3" efficacy="0.8" eff_v="0.0" eff_w="-0.3" eff_u="-0.03" delay="0.0"/>
+
+<OutgoingConnection Node="E"/>
+<OutgoingConnection Node="I"/>
+</Connections>
+<Reporting>
+	<Display node="E" />
+	<Display node="I" />
+	<Rate node="E" t_interval="0.0001" />
+	<Rate node="I" t_interval="0.0001" />
+</Reporting>
+<SimulationRunParameter>
+<t_end>TIME_END</t_end>
+<t_step>1e-04</t_step>
+<name_log>synapse.log</name_log>
+</SimulationRunParameter>
+</Simulation>
