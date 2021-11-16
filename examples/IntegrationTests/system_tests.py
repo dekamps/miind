@@ -376,7 +376,7 @@ def TestMeshAlgorithmTimeStepMultipleGPU():
 		assert lines[-1].split('\t')[0] == "0.999"
 		steady_rate = float(lines[-1].split('\t')[1])
 		print("Steady state rate is " + str(steady_rate), " between 0.39 and 0.41?")
-		assert steady_rate > 0.39 and steady_rate < 0.41 # This is a very generous margin!
+		assert steady_rate > 0.37 and steady_rate < 0.41 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('../..')
 	shutil.rmtree('lif')

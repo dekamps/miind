@@ -304,7 +304,7 @@ def TestMeshAlgorithmTimeStepMultipleGPU():
 	with open('rate_0', 'r') as ratefile:
 		lines = ratefile.read().splitlines()
 		steady_rate = float(lines[-1].split('\t')[1])
-		assert steady_rate > 0.39 and steady_rate < 0.41 # This is a very generous margin!
+		assert steady_rate > 0.37 and steady_rate < 0.41 # This is a very generous margin!
 	print('Success. Clean up.\n')
 	os.chdir('..')
 	os.chdir('..')
