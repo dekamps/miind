@@ -178,17 +178,81 @@ void applyTsodyks(NdPoint& p, double t) {
     p.coords[0] = r;
 }
 
-int main() {
-    std::vector<double> base = { -0.2,-1.2,-100 };
-    std::vector<double> dims = { 1.4, 2.4, 60 };
-    std::vector<unsigned int> res = { 50, 100, 50 };
-    std::vector<double> reset_relative = { 0.0,0.0,0.0 };
-    double threshold = -45;
-    double reset_v = -65;
-    NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-02);
+// Recommended settings in main() for applyBRMNRedux:
+// std::vector<double> base = { -0.2, -1.5, -1.5 };
+//std::vector<double> dims = { 1.4, 3.0, 3.0 };
+//std::vector<unsigned int> res = { 50, 50, 50 };
+//std::vector<double> reset_relative = { 0.0,0.0,0.0 };
+//double threshold = 0.9;
+//double reset_v = -0.5;
+//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.0001);
+//
+//g.setCppFunction(applyBRMNRedux);
+//g.generateModelFile("brmn", 1);
+//g.generateTMatFileBatched("brmn");
+void applyBRMNRedux(NdPoint& p, double t) {
+    double V_ca = 1.0;
+    double V_k = -0.7;
 
-    g.setCppFunction(applyTsodyks);
-    g.generateModelFile("synapseHiExt", 0.001);
-    g.generateTMatFileBatched("synapseHiExt");
+    double g_na = 0.01;
+    double g_ca = 1.5;
+    double g_k = 0.5;
+    double g_l = 0.5;
+    double V_l = -0.5;
+
+    double v_1 = 0.05;
+    double v_2 = 0.15;
+    double v_3 = 0;
+    double v_4 = 0.1;
+
+    double phi_d = 0.2;
+
+    double tau_v_s = 1.0;
+    double tau_v_d = 1.0;
+    double tau_w_d = 1.0;
+
+    double g_c = 0.25;
+    double pp = 0.5;
+
+    double v_s = p.coords[2];
+    double v_d = p.coords[1];
+    double w_d = p.coords[0];
+    
+
+    for (unsigned int i = 0; i < 11; i++) {
+        double I_l = -g_l * (v_d - V_l);
+        double I_ca = -g_ca * (v_d - V_ca) * ((1.0 / 2.0) * (1.0 + (tanh((v_d - v_1) / v_2))));
+        double I_k = -g_k * w_d * (v_d - V_k);
+
+        double w_inf = ((1.0 / 2.0) * (1.0 + (tanh((v_d - v_3) / v_4))));
+        double tau_s = (1.0 / cosh((v_d - v_3) / (2.0 * v_4)));
+
+        double v_s_prime = (-(v_s - V_l) + ((g_c / pp) * (v_d - v_s))) / tau_v_s; // Soma is just a LIF
+        double v_d_prime = (I_l + I_ca + I_k + ((g_c / (1.0 - pp)) * (v_s - v_d))) / tau_v_d;
+        double w_d_prime = (phi_d * (w_inf - w_d) / tau_s) / tau_w_d;
+
+        v_s = v_s + (t / 11.0) * v_s_prime;
+        v_d = v_d + (t / 11.0) * v_d_prime;
+        w_d = w_d + (t / 11.0) * w_d_prime;
+
+    }
+
+    p.coords[2] = v_s;
+    p.coords[1] = v_d;
+    p.coords[0] = w_d;
+}
+
+int main() {
+    std::vector<double> base = { -0.2, -1.5, -1.5 };
+    std::vector<double> dims = { 1.4, 3.0, 3.0 };
+    std::vector<unsigned int> res = { 50, 50, 50 };
+    std::vector<double> reset_relative = { 0.0,0.0,0.0 };
+    double threshold = 0.4;
+    double reset_v = -0.5;
+    NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.1);
+ 
+    g.setCppFunction(applyBRMNRedux);
+    g.generateModelFile("brmn", 0.001);
+    g.generateTMatFileBatched("brmn");
 	return 0;
 }

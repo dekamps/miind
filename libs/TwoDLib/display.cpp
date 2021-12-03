@@ -651,9 +651,9 @@ void Display::display_3d(void) {
 	vals_start[2] = 0;
 
 	std::vector<unsigned int> vals_end(3);
-	vals_end[0] = size_z;
+	vals_end[0] = size_x;
 	vals_end[1] = size_y;
-	vals_end[2] = size_x;
+	vals_end[2] = size_z;
 
 	std::vector<unsigned int> vals_diff(3);
 	vals_diff[0] = 1;
@@ -671,18 +671,6 @@ void Display::display_3d(void) {
 			res_order[1] = 0; //u
 			res_order[2] = 2; //v
 
-			vals_start[0] = 0;
-			vals_start[1] = 0;
-			vals_start[2] = 0;
-
-			vals_end[0] = size_x;
-			vals_end[1] = size_y;
-			vals_end[2] = size_z;
-
-			vals_diff[0] = 1;
-			vals_diff[1] = 1;
-			vals_diff[2] = 1;
-
 			reverse[0] = false;
 			reverse[1] = true;
 			reverse[2] = false;
@@ -692,18 +680,6 @@ void Display::display_3d(void) {
 			res_order[1] = 1; //u
 			res_order[2] = 0; //v
 
-			vals_start[0] = 0;
-			vals_start[1] = 0;
-			vals_start[2] = 0;
-
-			vals_end[0] = size_x;
-			vals_end[1] = size_y;
-			vals_end[2] = size_z;
-
-			vals_diff[0] = 1;
-			vals_diff[1] = 1;
-			vals_diff[2] = 1;
-
 			reverse[0] = false;
 			reverse[1] = false;
 			reverse[2] = false;
@@ -712,18 +688,6 @@ void Display::display_3d(void) {
 			res_order[0] = 1; //w
 			res_order[1] = 2; //u
 			res_order[2] = 0; //v
-
-			vals_start[0] = 0;
-			vals_start[1] = 0;
-			vals_start[2] = 0;
-
-			vals_end[0] = size_x;
-			vals_end[1] = size_y;
-			vals_end[2] = size_z;
-
-			vals_diff[0] = 1;
-			vals_diff[1] = 1;
-			vals_diff[2] = 1;
 
 			reverse[0] = false;
 			reverse[1] = false;
@@ -736,18 +700,6 @@ void Display::display_3d(void) {
 			res_order[1] = 1; //u
 			res_order[2] = 0; //v
 
-			vals_start[0] = 0;
-			vals_start[1] = 0;
-			vals_start[2] = 0;
-
-			vals_end[0] = size_x;
-			vals_end[1] = size_y;
-			vals_end[2] = size_z;
-
-			vals_diff[0] = 1;
-			vals_diff[1] = 1;
-			vals_diff[2] = 1;
-
 			reverse[0] = false;
 			reverse[1] = false;
 			reverse[2] = true;
@@ -757,18 +709,6 @@ void Display::display_3d(void) {
 		res_order[0] = 0; //w
 		res_order[1] = 1; //u
 		res_order[2] = 2; //v
-
-		vals_start[0] = 0;
-		vals_start[1] = 0;
-		vals_start[2] = 0;
-
-		vals_end[0] = size_y;
-		vals_end[1] = size_z;
-		vals_end[2] = size_x;
-
-		vals_diff[0] = 1;
-		vals_diff[1] = 1;
-		vals_diff[2] = 1;
 
 		reverse[0] = true;
 		reverse[1] = false;
@@ -780,18 +720,6 @@ void Display::display_3d(void) {
 		res_order[1] = 0; //u
 		res_order[2] = 2; //v
 
-		vals_start[0] = 0;
-		vals_start[1] = 0;
-		vals_start[2] = 0;
-
-		vals_end[0] = size_x;
-		vals_end[1] = size_y;
-		vals_end[2] = size_z;
-
-		vals_diff[0] = 1;
-		vals_diff[1] = 1;
-		vals_diff[2] = 1;
-
 		reverse[0] = false;
 		reverse[1] = false;
 		reverse[2] = false;
@@ -802,18 +730,6 @@ void Display::display_3d(void) {
 		res_order[1] = 1; //u
 		res_order[2] = 0; //v
 
-		vals_start[0] = 0;
-		vals_start[1] = 0;
-		vals_start[2] = 0;
-
-		vals_end[0] = size_x;
-		vals_end[1] = size_y;
-		vals_end[2] = size_z;
-
-		vals_diff[0] = 1;
-		vals_diff[1] = 1;
-		vals_diff[2] = 1;
-
 		reverse[0] = false;
 		reverse[1] = false;
 		reverse[2] = true;
@@ -822,18 +738,6 @@ void Display::display_3d(void) {
 		res_order[0] = 1; //w
 		res_order[1] = 2; //u
 		res_order[2] = 0; //v
-
-		vals_start[0] = 0;
-		vals_start[1] = 0;
-		vals_start[2] = 0;
-
-		vals_end[0] = size_x;
-		vals_end[1] = size_y;
-		vals_end[2] = size_z;
-
-		vals_diff[0] = 1;
-		vals_diff[1] = 1;
-		vals_diff[2] = 1;
 
 		reverse[0] = false;
 		reverse[1] = true;
@@ -846,18 +750,6 @@ void Display::display_3d(void) {
 		res_order[1] = 1; //u
 		res_order[2] = 0; //v
 
-		vals_start[0] = 0;
-		vals_start[1] = 0;
-		vals_start[2] = 0;
-
-		vals_end[0] = size_x;
-		vals_end[1] = size_y;
-		vals_end[2] = size_z;
-
-		vals_diff[0] = 1;
-		vals_diff[1] = 1;
-		vals_diff[2] = 1;
-
 		reverse[0] = false;
 		reverse[1] = false;
 		reverse[2] = false;
@@ -868,23 +760,10 @@ void Display::display_3d(void) {
 		res_order[1] = 1; //u
 		res_order[2] = 2; //v
 
-		vals_start[0] = 0;
-		vals_start[1] = 0;
-		vals_start[2] = 0;
-
-		vals_end[0] = size_y;
-		vals_end[1] = size_z;
-		vals_end[2] = size_x;
-
-		vals_diff[0] = 1;
-		vals_diff[1] = 1;
-		vals_diff[2] = 1;
-
 		reverse[0] = false;
 		reverse[1] = false;
 		reverse[2] = false;
 	}
-	
 
 	std::vector<unsigned int> vals(3);
 	vals[res_order[0]] = vals_start[res_order[0]];
@@ -907,7 +786,10 @@ void Display::display_3d(void) {
 				if (reverse[2])
 					j_r = vals_end[2] - 1 - vals[2];
 
-				unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index, (i_r * size_z) + k_r, j_r);
+				unsigned int strip_ind = (i_r * vals_end[1]) + k_r;
+				unsigned int cell_ind = j_r;
+
+				unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index, strip_ind, cell_ind);
 
 				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() == 0)
 					if (_dws[window_index]._system->Mass()[idx] < 0.000000001) continue; // skip if mass is basically nothing
@@ -953,13 +835,13 @@ void Display::display_3d(void) {
 					continue;
 				}
 
-				double cell_x = -0.5 + j_r * (1.0 / size_x);
-				double cell_y = -0.5 + i_r * (1.0 / size_z);
-				double cell_z = -0.5 + k_r * (1.0 / size_y);
+				double cell_x = -0.5 + j_r * (1.0 / vals_end[2]);
+				double cell_y = -0.5 + i_r * (1.0 / vals_end[0]);
+				double cell_z = -0.5 + k_r * (1.0 / vals_end[1]);
 
-				double half_cell_x_width = (0.5 / size_x);
-				double half_cell_y_width = (0.5 / size_z);
-				double half_cell_z_width = (0.5 / size_y);
+				double half_cell_x_width = (0.5 / vals_end[2]);
+				double half_cell_y_width = (0.5 / vals_end[0]);
+				double half_cell_z_width = (0.5 / vals_end[1]);
 
 				std::vector<double> p1 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
 				std::vector<double> p2 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
@@ -1014,7 +896,6 @@ void Display::display_3d(void) {
 	_dws[window_index].min_mass = min_m;
 
 	glEnd();
-
 
 	// Print real time and sim time
 

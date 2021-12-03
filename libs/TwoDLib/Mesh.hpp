@@ -85,8 +85,14 @@ namespace TwoDLib {
 
 		Coordinates getStripCellCoordsOfIndex(unsigned int index);
 
+		bool cellBeyondThreshold(unsigned int index);
+
+		unsigned int shiftCellToThreshold(unsigned int index);
+
 		void getCoordsOfIndex(std::vector<unsigned int>& coords, unsigned int index);
 		std::vector<unsigned int> getCoordsOfIndex(unsigned int);
+
+		unsigned int getIndexOfCoords(std::vector<unsigned int>& coords);
 
 		//!< number of cells in strip i
 		virtual unsigned int NrCellsInStrip(unsigned int i) const {
@@ -228,8 +234,10 @@ namespace TwoDLib {
 		std::vector<unsigned int>					_resolution;
 		std::vector<double>							_dimensions;
 		std::vector<double>							_base;
+		std::vector<unsigned int>					_resolution_offsets;
 		unsigned int								_threshold_reset_dimension;
 		unsigned int								_threshold_reset_jump_dimension;
+		unsigned int								_threshold_cell_num;
 		unsigned int								_num_strips;
 		unsigned int								_strip_length;
 		bool										_strips_are_v_oriented;

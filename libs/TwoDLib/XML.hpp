@@ -52,7 +52,7 @@ inline TwoDLib::Mesh RetrieveMeshFromXML(pugi::xml_node root)
 		throw TwoDLib::TwoDLibException("Couldn't find mesh in model file");
 
 	std::ostringstream ostmesh;
-	mesh_node.print(ostmesh);
+	root.print(ostmesh);
 	std::istringstream istmesh(ostmesh.str());
 	TwoDLib::Mesh mesh(istmesh);
 	return mesh;

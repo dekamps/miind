@@ -1,5 +1,5 @@
 <Simulation>
- <Variable Name='TIME_END'>1.0</Variable>
+ <Variable Name='TIME_END'>2.0</Variable>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
 
@@ -16,10 +16,10 @@
 <IncomingConnection Node="E" type="eff_vector_u" num_connections="1" efficacy="0.5" eff_v="0.0" eff_w="0.3" eff_u="-0.03" delay="0.0"/>
 <IncomingConnection Node="I" type="eff_vector_u" num_connections="1" efficacy="0.5" eff_v="0.0" eff_w="0.3" eff_u="-0.03" delay="0.0"/>
 
-<Connection In="E" Out="E" type="eff_vector_u" num_connections="1" efficacy="0.8" eff_v="0.0" eff_w="0.3" eff_u="-0.03" delay="0.0"/>
-<Connection In="E" Out="I" type="eff_vector_u" num_connections="1" efficacy="0.8" eff_v="0.0" eff_w="0.3" eff_u="-0.03" delay="0.0"/>
-<Connection In="I" Out="I" type="eff_vector_u" num_connections="1" efficacy="0.8" eff_v="0.0" eff_w="-0.3" eff_u="-0.03" delay="0.0"/>
-<Connection In="I" Out="E" type="eff_vector_u" num_connections="3" efficacy="0.8" eff_v="0.0" eff_w="-0.3" eff_u="-0.03" delay="0.0"/>
+<Connection In="E" Out="E" type="eff_vector_u" num_connections="1" efficacy="0.8" eff_v="0.0" eff_w="0.3" eff_u="-0.03" delay="0.002"/>
+<Connection In="E" Out="I" type="eff_vector_u" num_connections="10" efficacy="0.8" eff_v="0.0" eff_w="0.3" eff_u="-0.03" delay="0.002"/>
+<Connection In="I" Out="I" type="eff_vector_u" num_connections="0.2" efficacy="0.8" eff_v="0.0" eff_w="-0.3" eff_u="-0.03" delay="0.002"/>
+<Connection In="I" Out="E" type="eff_vector_u" num_connections="10" efficacy="0.8" eff_v="0.0" eff_w="-0.3" eff_u="-0.03" delay="0.002"/>
 
 <OutgoingConnection Node="E"/>
 <OutgoingConnection Node="I"/>

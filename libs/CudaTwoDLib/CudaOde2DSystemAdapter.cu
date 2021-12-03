@@ -205,6 +205,9 @@ void CudaOde2DSystemAdapter::FillMass()
 }
 
 void CudaOde2DSystemAdapter::FillFiniteVectors() {
+	if (_group.NumObjects() == 0)
+		return;
+
 	// Malloc the object cell index vector
 	checkCudaErrors(cudaMalloc((inttype**)&_vec_objects_to_index, _group.NumObjects() * sizeof(inttype)));
 	
@@ -227,6 +230,9 @@ void CudaOde2DSystemAdapter::FillFiniteVectors() {
 }
 
 void CudaOde2DSystemAdapter::TransferFiniteObjects() {
+	if (_group.NumObjects() == 0)
+		return;
+
 	for (inttype i = 0; i < _group.NumObjects(); i++) {
 		_host_vec_objects_to_index[i] = _group._vec_objects_to_index[i];
 		_host_vec_objects_refract_times[i] = _group._vec_objects_refract_times[i];
@@ -332,6 +338,9 @@ void CudaOde2DSystemAdapter::updateGroupMass()
 
 void CudaOde2DSystemAdapter::updateFiniteObjects()
 {
+	if (_group.NumObjects() == 0)
+		return;
+
 	checkCudaErrors(cudaMemcpy(&_host_vec_objects_to_index[0], _vec_objects_to_index, _group.NumObjects() * sizeof(inttype), cudaMemcpyDeviceToHost));
 	checkCudaErrors(cudaMemcpy(&_host_vec_objects_refract_times[0], _vec_objects_refract_times, _group.NumObjects() * sizeof(inttype), cudaMemcpyDeviceToHost));
 	for (inttype i = 0; i < _group.NumObjects(); i++) {

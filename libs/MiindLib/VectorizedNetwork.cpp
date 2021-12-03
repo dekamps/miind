@@ -277,7 +277,12 @@ TwoDLib::TransitionMatrix VectorizedNetwork::calculateProportionsNDEfficacyForCs
 
         for (auto const& x : fracs) {
             TwoDLib::TransitionMatrix::Redistribution r;
-            r._to = mesh.getStripCellCoordsOfIndex(x.first);
+            if (mesh.cellBeyondThreshold(x.first)) {
+                r._to = mesh.getStripCellCoordsOfIndex(mesh.shiftCellToThreshold(x.first));
+            }
+            else {
+                r._to = mesh.getStripCellCoordsOfIndex(x.first);
+            }  
             r._fraction = x.second;
             l._vec_to_line.push_back(r);
         }
@@ -481,7 +486,6 @@ void VectorizedNetwork::setupLoop(bool write_displays) {
                 
                 test_cell_vals[c] = dirs;
             }
-
 
             mats.push_back(calculateProportionsNDEfficacyForCsr(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]],
                 cell_dim_widths, total_num_cells, test_cell_vals, cell_dim_offs));
@@ -730,9 +734,6 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
         _csr_adapter->SingleTransformStepFiniteSize();
     }
 
-    _group_adapter->RedistributeProbability(_grid_meshes);
-    _group_adapter->MapFinish(_grid_meshes);
-
     for (unsigned int i = 0; i < rates.size(); i++)
         rates[i] *= _n_steps;
 
@@ -749,6 +750,9 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
 
     _group_adapter->RedistributeProbability(_mesh_meshes);
     _group_adapter->MapFinish(_mesh_meshes);
+
+    _group_adapter->RedistributeProbability(_grid_meshes);
+    _group_adapter->MapFinish(_grid_meshes);
 #else
     _csr_adapter->IzhTest(_group_adapter->getSpikes());
 #endif

@@ -121,6 +121,37 @@ twopop/twopop.xml
 twopop/README.txt
 )
 
+set( MA_3D_COND
+model_archive/3D/Conductance3D/cond3D.xml
+model_archive/3D/Conductance3D/cond3D.model
+model_archive/3D/Conductance3D/cond3D.tmat
+)
+
+set( MA_3D_COND_GEN
+model_archive/3D/Generate3DModelExample/cond3D.xml
+model_archive/3D/Generate3DModelExample/buildCond3D.py
+)
+
+set( MA_3D_HR
+model_archive/3D/HindmarshRose/hr.xml
+model_archive/3D/HindmarshRose/HindmarshRose.model
+model_archive/3D/HindmarshRose/HindmarshRose.tmat
+)
+
+set( MA_3D_TM
+model_archive/3D/TsodyksMarkramEI/syn.xml
+model_archive/3D/TsodyksMarkramEI/synapse_example.py
+model_archive/3D/TsodyksMarkramEI/synapseHiExt.model
+model_archive/3D/TsodyksMarkramEI/synapseHiExt.tmat
+)
+
+set( MA_BRMN
+model_archive/3D/ReducedBoothRinzelMN/brmn.xml
+model_archive/3D/ReducedBoothRinzelMN/brmn.model
+model_archive/3D/ReducedBoothRinzelMN/brmn.tmat
+model_archive/3D/ReducedBoothRinzelMN/brmn.py
+)
+
 set( MA_ADEX
 model_archive/Adex/adex.xml
 model_archive/Adex/adex.model
@@ -300,6 +331,16 @@ install( FILES ${MA_PNAP}
 	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/PersistentSodium2D )
 install( FILES ${MA_EPILEPTOR}
 	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Epileptor )
+install( FILES ${MA_3D_COND}
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/Conductance3D )
+install( FILES ${MA_3D_COND_GEN}
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/Generate3DModelExample )
+install( FILES ${MA_3D_HR}
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/HindmarshRose )
+install( FILES ${MA_3D_TM}
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/TsodyksMarkramEI )
+install( FILES ${MA_BRMN}
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/ReducedBoothRinzelMN )
 
 if (NOT SKBUILD) # If we're not installing for pip, install all examples
 	install( FILES ${AEXP}

@@ -99,7 +99,9 @@ _base(m._base),
 _num_strips(m._num_strips),
 _strip_length(m._strip_length),
 _strips_are_v_oriented(m._strips_are_v_oriented),
-_has_defined_strips(m._has_defined_strips)
+_has_defined_strips(m._has_defined_strips),
+_threshold_cell_num(m._threshold_cell_num),
+_resolution_offsets(m._resolution_offsets)
 {
 }
 
@@ -552,6 +554,14 @@ std::vector<unsigned int> Mesh::getCoordsOfIndex(unsigned int index) {
 	return coords;
 }
 
+unsigned int Mesh::getIndexOfCoords(std::vector<unsigned int>& coords) {
+	unsigned int index = 0;
+	for (unsigned int d = 0; d < coords.size(); d++) {
+		index += coords[d] * _resolution_offsets[d];
+	}
+	return index;
+}
+
 void Mesh::FromXML(istream& s)
 {
     pugi::xml_document doc;
@@ -678,6 +688,32 @@ void Mesh::FromXML(istream& s)
 		_num_strips = 1;
 		for (unsigned int d = 0; d < _resolution.size() - 1; d++) { _num_strips *= _resolution[d]; }
 	}
+
+	// Now we have the resolution of the grid, calculate the offsets 
+	_resolution_offsets = vector<unsigned int>(_grid_num_dimensions);
+	_resolution_offsets[_grid_num_dimensions - 1] = 1;
+	for (int d = _grid_num_dimensions - 2; d >= 0; d--) {
+		_resolution_offsets[d] = _resolution_offsets[d + 1] * _resolution[d];
+	}
+
+	// Get the threshold cell num
+	node_ts = doc.first_child().child("threshold");
+	if (node_ts) {
+		std::istringstream ival(node_ts.first_child().value());
+		double thres;
+		ival >> thres;
+		_threshold_cell_num = (unsigned int)(_resolution[_threshold_reset_dimension] * ((thres - _base[_threshold_reset_dimension]) / _dimensions[_threshold_reset_dimension]));
+	}
+}
+
+bool Mesh::cellBeyondThreshold(unsigned int index) {
+	return getCoordsOfIndex(index)[_threshold_reset_dimension] > _threshold_cell_num;
+}
+
+unsigned int Mesh::shiftCellToThreshold(unsigned int index) {
+	auto coords = getCoordsOfIndex(index);
+	coords[_threshold_reset_dimension] = _threshold_cell_num;
+	return getIndexOfCoords(coords);
 }
 
 void Mesh::ToXML(ostream& s) const{
