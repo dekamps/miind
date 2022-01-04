@@ -84,6 +84,11 @@ namespace MiindLib {
             _rate_nodes = ids;
             _rate_intervals = intervals;
         }
+        void setAvgNodes(std::vector<MPILib::NodeId> ids, std::vector<MPILib::Time> intervals) {
+            _avg_nodes = ids;
+            _avg_intervals = intervals;
+        }
+
         void setDisplayNodes(std::vector<MPILib::NodeId> ids) {
             _display_nodes = ids;
         }
@@ -204,7 +209,9 @@ namespace MiindLib {
 
         std::vector<MPILib::NodeId> _display_nodes;
         std::vector<MPILib::NodeId> _rate_nodes;
+        std::vector<MPILib::NodeId> _avg_nodes;
         std::vector<MPILib::Time> _rate_intervals;
+        std::vector<MPILib::Time> _avg_intervals;
         std::vector<MPILib::NodeId> _density_nodes;
         std::vector<MPILib::Time> _density_start_times;
         std::vector<MPILib::Time> _density_end_times;
@@ -219,6 +226,7 @@ namespace MiindLib {
         std::vector<inttype> _grid_cell_offsets;
 
         std::map<MPILib::NodeId, fptype> _current_node_rates;
+        std::map<MPILib::NodeId, std::vector<double>> _current_node_avgs;
 
         std::vector<inttype> _monitored_nodes;
 

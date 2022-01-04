@@ -120,6 +120,8 @@ void SimulationParserCPU<WeightType>::endSimulation() {
 	_display_nodes.clear();
 	_rate_nodes.clear();
 	_rate_node_intervals.clear();
+	_avg_nodes.clear();
+	_avg_node_intervals.clear();
 	_density_nodes.clear();
 	_density_node_start_times.clear();
 	_density_node_end_times.clear();
@@ -553,6 +555,14 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 
 			_rate_nodes.push_back(_node_ids[node]);
 			_rate_node_intervals.push_back(t_interval);
+		}
+
+		for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Average"); conn; conn = conn.next_sibling("Average")) {
+			std::string node = interpretValueAsString(std::string(conn.attribute("node").value())) + std::string("_") + std::to_string(node_num);
+			double t_interval = interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
+
+			_avg_nodes.push_back(_node_ids[node]);
+			_avg_node_intervals.push_back(t_interval);
 		}
 
 		//Reporting Display

@@ -536,7 +536,7 @@ Coordinates Mesh::getStripCellCoordsOfIndex(unsigned int index) {
 	return Coordinates(strips, cells);
 }
 
-void Mesh::getCoordsOfIndex(std::vector<unsigned int>& coords, unsigned int index) {
+void Mesh::getCoordsOfIndex(std::vector<unsigned int>& coords, unsigned int index) const {
 	if (coords.size() == getGridNumDimensions())
 		return;
 
@@ -548,7 +548,7 @@ void Mesh::getCoordsOfIndex(std::vector<unsigned int>& coords, unsigned int inde
 	getCoordsOfIndex(coords, int(index % divisor));
 }
 
-std::vector<unsigned int> Mesh::getCoordsOfIndex(unsigned int index) {
+std::vector<unsigned int> Mesh::getCoordsOfIndex(unsigned int index) const {
 	std::vector<unsigned int> coords;
 	getCoordsOfIndex(coords, index);
 	return coords;
@@ -693,7 +693,7 @@ void Mesh::FromXML(istream& s)
 	_resolution_offsets = vector<unsigned int>(_grid_num_dimensions);
 	_resolution_offsets[_grid_num_dimensions - 1] = 1;
 	for (int d = _grid_num_dimensions - 2; d >= 0; d--) {
-		_resolution_offsets[d] = _resolution_offsets[d + 1] * _resolution[d];
+		_resolution_offsets[d] = _resolution_offsets[d + 1] * _resolution[d+1];
 	}
 
 	// Get the threshold cell num

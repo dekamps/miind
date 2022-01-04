@@ -651,9 +651,9 @@ void Display::display_3d(void) {
 	vals_start[2] = 0;
 
 	std::vector<unsigned int> vals_end(3);
-	vals_end[0] = size_x;
+	vals_end[0] = size_z;
 	vals_end[1] = size_y;
-	vals_end[2] = size_z;
+	vals_end[2] = size_x;
 
 	std::vector<unsigned int> vals_diff(3);
 	vals_diff[0] = 1;
@@ -789,7 +789,7 @@ void Display::display_3d(void) {
 				unsigned int strip_ind = (i_r * vals_end[1]) + k_r;
 				unsigned int cell_ind = j_r;
 
-				unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index, strip_ind, cell_ind);
+				unsigned int idx =  _dws[window_index]._system->Map(_dws[window_index]._mesh_index, strip_ind, cell_ind);
 
 				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() == 0)
 					if (_dws[window_index]._system->Mass()[idx] < 0.000000001) continue; // skip if mass is basically nothing

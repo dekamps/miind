@@ -49,12 +49,12 @@ __global__ void CudaCalculateGridDerivativeCsrFinite(inttype N, inttype finite_o
         if (refract_times[offset_index] > 0 || spike_counts[offset_index] == 0)
             continue;
 
-        inttype obj = objects[offset_index] - grid_cell_offset;
+        inttype obj = objects[offset_index];
 
         for (int s = 0; s < spike_counts[offset_index]; s++) {
             fptype r = curand_uniform(&state[index]);
             fptype total_prop = 0;
-            for (int j = ia[obj]; j < ia[obj+1]; j++) {
+            for (int j = ia[obj - grid_cell_offset]; j < ia[obj - grid_cell_offset +1]; j++) {
                 total_prop += val[j];
                 if (r < total_prop) {
                     obj = ja[j] + grid_cell_offset;
@@ -108,6 +108,8 @@ __global__ void CudaUpdateFiniteObjects(inttype N, inttype finite_offset, inttyp
             continue;
 
         int current_index = unmap[objects[i+finite_offset]] - offset;
+
+        //printf("%i %i %i %i\n", i, offset, finite_offset, current_index);
         for (unsigned int s = 0; s < spike_counts[i+finite_offset]; s++) {
             fptype r = curand_uniform(&state[index]);
             fptype check = 0.0;
@@ -153,6 +155,7 @@ __global__ void countSpikesAndClear(inttype N, inttype finite_offset, inttype* s
     }
 
     idata[tid] = spiked[i + finite_offset];
+
     __syncthreads();
     // do reduction in shared mem
     for (unsigned int s = int(blockDim.x / 2); s > 0; s >>= 1) {

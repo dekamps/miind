@@ -89,8 +89,8 @@ namespace TwoDLib {
 
 		unsigned int shiftCellToThreshold(unsigned int index);
 
-		void getCoordsOfIndex(std::vector<unsigned int>& coords, unsigned int index);
-		std::vector<unsigned int> getCoordsOfIndex(unsigned int);
+		void getCoordsOfIndex(std::vector<unsigned int>& coords, unsigned int index) const;
+		std::vector<unsigned int> getCoordsOfIndex(unsigned int) const;
 
 		unsigned int getIndexOfCoords(std::vector<unsigned int>& coords);
 
@@ -122,6 +122,16 @@ namespace TwoDLib {
 			else {
 				return _vec_vec_quad[i][j];
 			}
+		}
+
+		std::vector<double> Centroid(unsigned int index) const {
+			std::vector<unsigned int> coords = getCoordsOfIndex(index);
+			std::vector<double> vs(getGridNumDimensions(), 0.0);
+			for (unsigned int d = 0; d < getGridNumDimensions(); d++) {
+				vs[d] = getGridBaseByDimension(d) + (getGridCellWidthByDimension(d) * coords[d]);
+			}
+
+			return vs;
 		}
 
 		//!< Provide a mesh point, the function returns a list of Coordinates that this point belongs to

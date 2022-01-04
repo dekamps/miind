@@ -594,17 +594,17 @@ void CudaOde2DSystemAdapter::RemapReversalFiniteObjects() {
 	CudaReversalFiniteObjects << <numBlocks, _blockSize >> > (num_mesh_objects, _vec_num_object_offsets[_mesh_objects_start_index], _vec_objects_to_index, _n_rev, _rev_from, _rev_to, _map);
 }
 
-void CudaOde2DSystemAdapter::RedistributeFiniteObjects(double timestep, curandState* rand_state)
+void CudaOde2DSystemAdapter::RedistributeFiniteObjects(double timestep, double timestep_multiplier, curandState* rand_state)
 {
 	std::vector<inttype> meshes(_mesh_size);
 	for (int i = 0; i < _mesh_size; i++)
 		if (_group.FiniteSizeNumObjects()[i] > 0)
 			meshes[i] = i + _mesh_objects_start_index;
 
-	RedistributeFiniteObjects(meshes, timestep, rand_state);
+	RedistributeFiniteObjects(meshes, timestep, timestep_multiplier, rand_state);
 }
 
-void CudaOde2DSystemAdapter::RedistributeFiniteObjects(std::vector<inttype>& meshes, double timestep, curandState* rand_state )
+void CudaOde2DSystemAdapter::RedistributeFiniteObjects(std::vector<inttype>& meshes, double timestep, double timestep_multiplier, curandState* rand_state )
 {
 	for (inttype m : meshes) {
 		if (_group.FiniteSizeNumObjects()[m] == 0)
@@ -616,23 +616,23 @@ void CudaOde2DSystemAdapter::RedistributeFiniteObjects(std::vector<inttype>& mes
 			_refractories[m], _vec_alpha_ord[m].size(), _res_from_ordered[m], _unmap, _spikes);
 
 		CudaCheckRefractingFiniteObjects << <numBlocks, _blockSize >> > (_vec_num_objects[m], _vec_num_object_offsets[m],
-			_vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index, timestep,
+			_vec_objects_to_index, _vec_objects_refract_times, _vec_objects_refract_index, timestep*timestep_multiplier,
 			_vec_alpha_ord[m].size(), _res_from_ordered[m], _res_to_ordered[m], _res_alpha_ordered[m], rand_state, _map, _unmap);
 	}
 	
 }
 
-void CudaOde2DSystemAdapter::RedistributeGridFiniteObjects(curandState* rand_state)
+void CudaOde2DSystemAdapter::RedistributeGridFiniteObjects(curandState* rand_state, double timestep_multiplier)
 {
 	std::vector<inttype> meshes(_mesh_objects_start_index);
 	for (int i = 0; i < _mesh_objects_start_index; i++)
 		if (_group.FiniteSizeNumObjects()[i] > 0)
 			meshes[i] = i;
 
-	RedistributeGridFiniteObjects(meshes, rand_state);
+	RedistributeGridFiniteObjects(meshes, timestep_multiplier, rand_state);
 }
 
-void CudaOde2DSystemAdapter::RedistributeGridFiniteObjects(std::vector<inttype>& meshes, curandState* rand_state)
+void CudaOde2DSystemAdapter::RedistributeGridFiniteObjects(std::vector<inttype>& meshes, double timestep_multiplier, curandState* rand_state)
 {
 	for (inttype m : meshes) {
 		if (_group.FiniteSizeNumObjects()[m] == 0)
@@ -646,9 +646,9 @@ void CudaOde2DSystemAdapter::RedistributeGridFiniteObjects(std::vector<inttype>&
 		int reset_col = int((_resets[m] - _group.MeshObjects()[m].getGridBaseByDimension(reset_dim)) / _group.MeshObjects()[m].getGridCellWidthByDimension(reset_dim));
 		int reset_w_rows = int (_reset_ws[m] / _group.MeshObjects()[m].getGridCellWidthByDimension(jump_dim));
 		int res_v = _group.MeshObjects()[m].getGridResolutionByDimension(reset_dim);
-		double reset_stays_probability = (_reset_ws[m] / _group.MeshObjects()[m].getGridCellWidthByDimension(jump_dim)) - reset_w_rows;
+		double reset_stays_probability = 1.0 - ((_reset_ws[m] / _group.MeshObjects()[m].getGridCellWidthByDimension(jump_dim)) - reset_w_rows);
 		double refractory_time = _refractories[m];
-		double timestep = _group.MeshObjects()[m].TimeStep();
+		double timestep = _group.MeshObjects()[m].TimeStep() * timestep_multiplier;
 		
 		inttype num_cells = 1;
 		for (int i = 0; i < _group.MeshObjects()[m].getGridNumDimensions(); i++)

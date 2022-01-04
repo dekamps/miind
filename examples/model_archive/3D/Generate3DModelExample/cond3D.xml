@@ -2,8 +2,8 @@
  <Variable Name='TIME_END'>0.2</Variable>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="GridAlgorithmGroup" name="OSC" modelfile="cond3D.model" tau_refractive="0.0" transformfile="cond3D.tmat" start_v="-0.065" start_w="0.0001" >
-<TimeStep>1e-05</TimeStep>
+<Algorithm type="GridAlgorithmGroup" name="OSC" modelfile="conductanceNd.model" tau_refractive="0.0" transformfile="conductanceNd.tmat" start_v="-0.065" start_w="0.0001" >
+<TimeStep>1e-04</TimeStep>
 </Algorithm>
 <Algorithm type="RateFunctor" name="MLR_1">
 <expression>500</expression>
@@ -25,7 +25,7 @@
 </Reporting>
 <SimulationRunParameter>
 <t_end>TIME_END</t_end>
-<t_step>1e-05</t_step>
+<t_step>1e-04</t_step>
 <name_log>cond.log</name_log>
 </SimulationRunParameter>
 </Simulation>

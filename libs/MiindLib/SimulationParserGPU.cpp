@@ -432,6 +432,15 @@ void SimulationParserGPU<WeightType>::parseXmlFile() {
 			SimulationParserCPU<WeightType>::_rate_node_intervals.push_back(t_interval);
 		}
 
+		//Reporting Avgs
+		for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Average"); conn; conn = conn.next_sibling("Average")) {
+			std::string node = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(conn.attribute("node").value())) + std::string("_") + std::to_string(node_num);
+			double t_interval = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(conn.attribute("t_interval").value()));
+
+			SimulationParserCPU<WeightType>::_avg_nodes.push_back(SimulationParserCPU<WeightType>::_node_ids[node]);
+			SimulationParserCPU<WeightType>::_avg_node_intervals.push_back(t_interval);
+		}
+
 		//Reporting Display
 		for (pugi::xml_node conn = doc.child("Simulation").child("Reporting").child("Display"); conn; conn = conn.next_sibling("Display")) {
 			std::string node = SimulationParserCPU<WeightType>::interpretValueAsString(std::string(conn.attribute("node").value())) + std::string("_") + std::to_string(node_num);
@@ -456,6 +465,7 @@ void SimulationParserGPU<WeightType>::parseXmlFile() {
 
 	vec_network.setDisplayNodes(SimulationParserCPU<WeightType>::_display_nodes);
 	vec_network.setRateNodes(SimulationParserCPU<WeightType>::_rate_nodes, SimulationParserCPU<WeightType>::_rate_node_intervals);
+	vec_network.setAvgNodes(SimulationParserCPU<WeightType>::_avg_nodes, SimulationParserCPU<WeightType>::_avg_node_intervals);
 	vec_network.setDensityNodes(SimulationParserCPU<WeightType>::_density_nodes, SimulationParserCPU<WeightType>::_density_node_start_times, SimulationParserCPU<WeightType>::_density_node_end_times, SimulationParserCPU<WeightType>::_density_node_intervals);
 
 	vec_network.initOde2DSystem(master_steps);

@@ -150,6 +150,9 @@ namespace TwoDLib {
 		//! average membrane potential, used for non-threshold crossing models such as Fitzhugh-Nagumo
 		const vector<MPILib::Potential>& AvgV() const ;
 
+		//! average values for each dimension
+		const std::vector<std::vector<MPILib::Potential>>& Avgs() const;
+
 		//! allow direct inspection of the mass array; client must still convert this to a density
 		const vector<MPILib::Mass>& Mass() const { return _vec_mass; }
 
@@ -435,6 +438,7 @@ private:
 		unsigned int					_t;
 		std::vector<MPILib::Mass>		_fs;
 		std::vector<MPILib::Potential>	_avs;
+		std::vector<std::vector<MPILib::Potential>>	_all_avs;
 
 		std::vector< std::vector<std::vector<MPILib::Index> > > _map;
 		std::vector< MPILib::Index> _linear_map;

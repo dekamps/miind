@@ -101,7 +101,7 @@ double Simplex::getVolume() {
 }
 
 std::vector<std::vector<Simplex>> Simplex::intersectWithHyperplane(unsigned int dim_index, double dim) {
-    double eps = 0.00000000001;
+    double eps = 0.000000000001;
 
     std::vector<NdPoint*> lower;
     std::vector<NdPoint*> upper;

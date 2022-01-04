@@ -123,6 +123,21 @@ void VectorizedNetwork::reportNodeActivities(MPILib::Time sim_time) {
         ofst_rate << sim_time << "\t" << _current_node_rates[_rate_nodes[i]] << std::endl;
         ofst_rate.close();
     }
+
+    for (int i = 0; i < _avg_nodes.size(); i++) {
+        if (std::fabs(std::remainder(sim_time, _avg_intervals[i])) > 0.00000001)
+            continue;
+        std::ostringstream ost2;
+        ost2 << "avg_" << _avg_nodes[i];
+        std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
+        ofst_rate.precision(10);
+        ofst_rate << sim_time << "\t";
+        for (fptype f : _current_node_avgs[_avg_nodes[i]]) {
+            ofst_rate << f << "\t";
+        }
+        ofst_rate << std::endl;
+        ofst_rate.close();
+    }
 }
 
 void VectorizedNetwork::reportNodeDensities(MPILib::Time sim_time) {
@@ -745,8 +760,8 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
 
     _csr_adapter->CalculateMeshGridDerivativeWithEfficacyFinite(_connection_out_group_mesh, rates, _effs, _grid_cell_widths, _grid_cell_offsets, _vec_mesh[0].TimeStep());
 
-    _group_adapter->RedistributeFiniteObjects(_mesh_meshes, _vec_mesh[0].TimeStep(), _csr_adapter->getCurandState());
-    _group_adapter->RedistributeGridFiniteObjects(_grid_meshes, _csr_adapter->getCurandState());
+    _group_adapter->RedistributeFiniteObjects(_mesh_meshes, _vec_mesh[0].TimeStep(), _n_steps, _csr_adapter->getCurandState());
+    _group_adapter->RedistributeGridFiniteObjects(_grid_meshes, _n_steps, _csr_adapter->getCurandState());
 
     _group_adapter->RedistributeProbability(_mesh_meshes);
     _group_adapter->MapFinish(_mesh_meshes);
@@ -769,6 +784,16 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
     std::vector<double> monitored_rates(_monitored_nodes.size());
     for (unsigned int i = 0; i < _monitored_nodes.size(); i++) {
         monitored_rates[i] = group_rates[_node_id_to_group_mesh[_monitored_nodes[i]]];
+    }
+
+    if (_avg_nodes.size() > 0) {
+        _group_adapter->updateGroupMass();
+        _group_adapter->updateFiniteObjects();
+
+        for (unsigned int m : _avg_nodes) {
+            _current_node_avgs[m] = _group->Avgs()[m];
+        }
+        
     }
   
     if (_display_nodes.size() > 0) {

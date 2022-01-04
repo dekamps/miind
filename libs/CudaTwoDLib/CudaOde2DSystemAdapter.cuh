@@ -83,13 +83,13 @@ namespace CudaTwoDLib {
 
 		void RedistributeProbability(std::vector<inttype>& meshes);
 
-		void RedistributeFiniteObjects(double timestep, curandState* rand_state);
+		void RedistributeFiniteObjects(double timestep, double timestep_multiplier, curandState* rand_state);
 
-		void RedistributeFiniteObjects(std::vector<inttype>& meshes, double timestep, curandState* rand_state);
+		void RedistributeFiniteObjects(std::vector<inttype>& meshes, double timestep, double timestep_multiplier, curandState* rand_state);
 
-		void RedistributeGridFiniteObjects(curandState* rand_state);
+		void RedistributeGridFiniteObjects(curandState* rand_state, double timestep_multiplier);
 
-		void RedistributeGridFiniteObjects(std::vector<inttype>& meshes, curandState* rand_state);
+		void RedistributeGridFiniteObjects(std::vector<inttype>& meshes, double timestep_multiplier, curandState* rand_state);
 
 		void MapFinish();
 

@@ -364,8 +364,8 @@ std::vector<inttype> CSRAdapter::NrRows(const std::vector<TwoDLib::CSRMatrix>& v
 std::vector<inttype> CSRAdapter::Offsets(const std::vector<TwoDLib::CSRMatrix>& vecmat) const
 {
     std::vector<inttype> vecret;
-    for (inttype m = 0; m < vecmat.size(); m++)
-        vecret.push_back(vecmat[m].Offset());
+    for (inttype m : _group.getGroup().Offsets())
+        vecret.push_back(m);
     return vecret;
 }
 
@@ -430,21 +430,21 @@ void CSRAdapter::CalculateMeshGridDerivativeWithEfficacy(const std::vector<intty
         // be careful to use this block size
         inttype numBlocks = (_nr_rows[vecindex[m]] + _blockSize - 1) / _blockSize;
 
-        CudaCalculateGridDerivativeCsr << <numBlocks, _blockSize, 0, _streams[vecindex[m]] >> > (_nr_rows[vecindex[m]], vecrates[m], _dydt, _group._mass, _grid_val[m], _grid_ia[m], _grid_ja[m], _offsets[vecindex[m]]);
+        CudaCalculateGridDerivativeCsr << <numBlocks, _blockSize, 0, _streams[vecindex[m]] >> > (_nr_rows[vecindex[m]], vecrates[m], _dydt, _group._mass, _grid_val[m], _grid_ia[m], _grid_ja[m], _offsets[mesh_m]);
     }
 
     for (int n = _nr_grid_connections; n < vecrates.size(); n++)
     {
         inttype mat_index = _grid_transforms.size() + (n - _nr_grid_connections);
 
-        unsigned int mesh_m = vecindex[mat_index];
+        unsigned int mesh_m = vecindex[n];
 
         if (_group.getGroupObjects()[mesh_m] > 0)
             continue;
 
         // be careful to use this block size
         inttype numBlocks = (_nr_rows[mat_index] + _blockSize - 1) / _blockSize;
-        CudaCalculateDerivative << <numBlocks, _blockSize, 0, _streams[vecindex[n]] >> > (_nr_rows[mat_index], vecrates[n], _dydt, _group._mass, _val[mat_index], _ia[mat_index], _ja[mat_index], _group._map, _offsets[mat_index]);
+        CudaCalculateDerivative << <numBlocks, _blockSize, 0, _streams[vecindex[n]] >> > (_nr_rows[mat_index], vecrates[n], _dydt, _group._mass, _val[mat_index], _ia[mat_index], _ja[mat_index], _group._map, _offsets[mesh_m]);
     }
 
     cudaDeviceSynchronize();
@@ -518,17 +518,17 @@ void CSRAdapter::CalculateMeshGridDerivativeWithEfficacyFinite(const std::vector
     for (int n = _nr_grid_connections; n < vecrates.size(); n++)
     {
         inttype mat_index = _grid_transforms.size() + (n - _nr_grid_connections);
-        unsigned int mesh_n = vecindex[mat_index];
+        unsigned int mesh_n = vecindex[n];
 
         if (_group.getGroupObjects()[mesh_n] == 0)
             continue;
 
         inttype numBlocks = (_group._vec_num_objects[mesh_n] + _blockSize - 1) / _blockSize;
         // be careful to use this block size
-        generatePoissonSpikes << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_n], _group._vec_num_object_offsets[mesh_n], vecrates[mat_index], timestep, _random_poisson, _randomState);
+        generatePoissonSpikes << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_n], _group._vec_num_object_offsets[mesh_n], vecrates[n], timestep, _random_poisson, _randomState);
         CudaUpdateFiniteObjects << <numBlocks, _blockSize >> > (_group._vec_num_objects[mesh_n], _group._vec_num_object_offsets[mesh_n], _random_poisson, _group._vec_objects_to_index,
             _group._vec_objects_refract_times, _group._vec_objects_refract_index, _forward_val[mat_index], _forward_ia[mat_index], _forward_ja[mat_index],
-            _group._map, _group._unmap, _offsets[mat_index], _randomState);
+            _group._map, _group._unmap, _offsets[mesh_n], _randomState);
 
         
     }

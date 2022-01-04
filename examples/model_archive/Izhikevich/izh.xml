@@ -2,7 +2,7 @@
  <Variable Name='TIME_END'>1.0</Variable>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="GridAlgorithmGroup" finite_size="5000" name="OSC" modelfile="izh.model" tau_refractive="0.0" transformfile="izh_0_0_0_0_.tmat" start_v="-70.000001" start_w="0.0000001" >
+<Algorithm type="GridAlgorithmGroup" name="OSC" modelfile="izh.model" tau_refractive="0.0" transformfile="izh_0_0_0_0_.tmat" start_v="-70.000001" start_w="0.0000001" >
 <TimeStep>0.0001</TimeStep>
 </Algorithm>
 <Algorithm type="RateFunctor" name="MLR_1">

@@ -51,7 +51,9 @@ protected:
 	unsigned long _count;
 	std::vector<MPILib::NodeId> _display_nodes;
 	std::vector<MPILib::NodeId> _rate_nodes;
+	std::vector<MPILib::NodeId> _avg_nodes;
 	std::vector<MPILib::Time> _rate_node_intervals;
+	std::vector<MPILib::Time> _avg_node_intervals;
 	std::vector<MPILib::NodeId> _density_nodes;
 	std::vector<MPILib::Time> _density_node_start_times;
 	std::vector<MPILib::Time> _density_node_end_times;
