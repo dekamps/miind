@@ -127,6 +127,17 @@ void VectorizedNetwork::reportNodeActivities(MPILib::Time sim_time) {
     for (int i = 0; i < _avg_nodes.size(); i++) {
         if (std::fabs(std::remainder(sim_time, _avg_intervals[i])) > 0.00000001)
             continue;
+
+        if (std::fabs(std::remainder(sim_time, last_avg_calc_time)) > 0.00000001) {
+            _group_adapter->updateGroupMass();
+            _group_adapter->updateFiniteObjects();
+
+            for (unsigned int m : _avg_nodes) {
+                _current_node_avgs[m] = _group->Avgs()[m];
+            }
+            last_avg_calc_time = sim_time;
+        }
+        
         std::ostringstream ost2;
         ost2 << "avg_" << _avg_nodes[i];
         std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
@@ -784,16 +795,6 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
     std::vector<double> monitored_rates(_monitored_nodes.size());
     for (unsigned int i = 0; i < _monitored_nodes.size(); i++) {
         monitored_rates[i] = group_rates[_node_id_to_group_mesh[_monitored_nodes[i]]];
-    }
-
-    if (_avg_nodes.size() > 0) {
-        _group_adapter->updateGroupMass();
-        _group_adapter->updateFiniteObjects();
-
-        for (unsigned int m : _avg_nodes) {
-            _current_node_avgs[m] = _group->Avgs()[m];
-        }
-        
     }
   
     if (_display_nodes.size() > 0) {

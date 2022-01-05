@@ -400,16 +400,17 @@ void applyRinzelBurster(NdPoint& p, double t) {
 }
 
 // Recommended settings in main() for applyRinzelBurster:
-//std::vector<double> base = { -0.2,-100 };
-//std::vector<double> dims = { 1.2, 160 };
-//std::vector<unsigned int> res = { 50, 100 };
-//std::vector<double> reset_relative = { 0.0,0.0 };
-//double threshold = 59.9;
-//double reset_v = -79.9;
-//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-02);
+//std::vector<double> base = { -0.2,-130 };
+//std::vector<double> dims = { 1.2, 100 };
+//std::vector<unsigned int> res = { 200, 200 };
+//std::vector<double> reset_relative = { -0.006, 0.0 };
+//double threshold = -36.0;
+//double reset_v = -52.0;
+//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-01);
+//
 //g.setCppFunction(applyRinzelBurster2d);
-//g.generateModelFile("rinzel", 0.001);
-//g.generateTMatFileBatched("rinzel");
+//g.generateModelFile("rinzel2D", 0.001);
+//g.generateTMatFileBatched("rinzel2D");
 void applyRinzelBurster2d(NdPoint& p, double t) {
 
     double g_nap = 0.25;

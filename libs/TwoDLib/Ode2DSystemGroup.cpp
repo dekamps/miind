@@ -656,14 +656,13 @@ const std::vector<std::vector<MPILib::Potential>>& Ode2DSystemGroup::Avgs() cons
 			else { // this is a new-fangled grid
 				std::vector<MPILib::Potential> av(_mesh_list[m].getGridNumDimensions());
 
-				for (MPILib::Index i = 0; i < _mesh_list[m].NrStrips(); i++) {
-					for (MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++) {
-						std::vector<MPILib::Potential> V = _mesh_list[m].Centroid(this->Map(m, i, j) - this->Offsets()[m]);
-						for (unsigned int d = 0; d < _mesh_list[m].getGridNumDimensions(); d++) {
-							av[d] += V[d] * _vec_mass[this->Map(m, i, j)];
-						}
+				for (MPILib::Index i = 0; i < _vec_mesh_offset[m+1] - _vec_mesh_offset[m]; i++) {
+					std::vector<MPILib::Potential> V = _mesh_list[m].Centroid(i);
+					for (unsigned int d = 0; d < _mesh_list[m].getGridNumDimensions(); d++) {
+						av[d] += V[d] * _vec_mass[_vec_mesh_offset[m]+i];
 					}
 				}
+
 				if (_all_avs[m].size() == 0) {
 					const_cast<std::vector<MPILib::Potential>&>(_all_avs[m]) = std::vector<MPILib::Potential>(_mesh_list[m].getGridNumDimensions());
 				}
@@ -694,14 +693,13 @@ const std::vector<std::vector<MPILib::Potential>>& Ode2DSystemGroup::Avgs() cons
 			else { // this is a new-fangled grid
 				std::vector<MPILib::Potential> av(_mesh_list[m].getGridNumDimensions());
 
-				for (MPILib::Index i = 0; i < _mesh_list[m].NrStrips(); i++) {
-					for (MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++) {
-						std::vector<MPILib::Potential> V = _mesh_list[m].Centroid(this->Map(m, i, j) - this->Offsets()[m]);
-						for (unsigned int d = 0; d < _mesh_list[m].getGridNumDimensions(); d++) {
-							av[d] += V[d] * this->_vec_cells_to_objects[this->Map(m, i, j)].size();
-						}
+				for (MPILib::Index i = 0; i < _vec_num_objects[m]; i++) {
+					std::vector<MPILib::Potential> V = _mesh_list[m].Centroid(i);
+					for (unsigned int d = 0; d < _mesh_list[m].getGridNumDimensions(); d++) {
+						av[d] += V[d];
 					}
 				}
+
 				if (_all_avs[m].size() == 0) {
 					const_cast<std::vector<MPILib::Potential>&>(_all_avs[m]) = std::vector<MPILib::Potential>(_mesh_list[m].getGridNumDimensions());
 				}

@@ -203,6 +203,7 @@ namespace MiindLib {
 
         unsigned int _n_steps;
         unsigned int _master_steps;
+        double last_avg_calc_time;
 
         unsigned int _num_nodes;
         MPILib::Time _network_time_step;
