@@ -46,17 +46,17 @@ void applyHindmarshRoseEuler(NdPoint& p, double t) {
 }
 
 // Recommended settings in main() for applyConductance3D:
-// std::vector<double> base = { -0.2,-0.2,-66e-3 };
-// std::vector<double> dims = { 2.2, 2.2, 12e-3 };
-// std::vector<unsigned int> res = { 50, 50,100 };
-// std::vector<double> reset_relative = { 0.0,0.0,0.0 };
-// double threshold = -55e-3;
-// double reset_v = -65e-3;
-// NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-05);
+//std::vector<double> base = { -0.2,-0.2,-90e-3 };
+//std::vector<double> dims = { 1.4, 1.4, 36e-3 };
+//std::vector<unsigned int> res = { 50, 50, 100 };
+//std::vector<double> reset_relative = { 0.0,0.0,0.0 };
+//double threshold = -55e-3;
+//double reset_v = -65e-3;
+//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-04);
 //
-// g.setCppFunction(applyConductance3D);
-// g.generateModelFile("conductanceNdNoise", 1);
-// g.generateTMatFileBatched("conductanceNdNoise");
+//g.setCppFunction(applyConductance3D);
+//g.generateModelFile("conductanceNdNoise", 1);
+//g.generateTMatFileBatched("conductanceNdNoise");
 void applyConductance3D(NdPoint& p, double t) {
     double tau_m = 20e-3;
     double E_r = -65e-3;
@@ -80,7 +80,7 @@ void applyConductance3D(NdPoint& p, double t) {
     double u = p.coords[0];
 
     for (unsigned int i = 0; i < 11; i++) {
-        double v_prime = (-(v - E_r) - w * (v - E_e) - u * (v - E_e)) / tau_m;
+        double v_prime = (-(v - E_r) - w * (v - E_e) + u * (v - E_e)) / tau_m;
         double w_prime = -w / tau_s;
         double u_prime = -u / tau_t;
 
@@ -140,17 +140,17 @@ void applyConductance2D(NdPoint& p, double t) {
 }
 
 // Recommended settings in main() for applyTsodyks:
-// std::vector<double> base = { -0.2,-0.2,-66 };
-// std::vector<double> dims = { 1.4, 1.4, 12 };
-// std::vector<unsigned int> res = { 50, 50, 50 };
-// std::vector<double> reset_relative = { 0.0,0.0,0.0 };
-// double threshold = -55;
-// double reset_v = -65;
-// NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-02);
+//std::vector<double> base = { -0.2,-1.2,-100 };
+//std::vector<double> dims = { 1.4, 2.4, 60 };
+//std::vector<unsigned int> res = { 50, 50, 50 };
+//std::vector<double> reset_relative = { 0.0,0.0,0.0 };
+//double threshold = -45;
+//double reset_v = -65;
+//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-01);
 //
-// g.setCppFunction(applyTsodyks);
-// g.generateModelFile("synapse", 1);
-// g.generateTMatFileBatched("synapse");
+//g.setCppFunction(applyTsodyks);
+//g.generateModelFile("synapse", 0.001);
+//g.generateTMatFileBatched("synapse");
 void applyTsodyks(NdPoint& p, double t) {
     double tau_intact = 3;
     double tau_rec = 700;
@@ -180,16 +180,16 @@ void applyTsodyks(NdPoint& p, double t) {
 }
 
 // Recommended settings in main() for applyBRMNRedux:
-// std::vector<double> base = { -0.2, -1.5, -1.5 };
-//std::vector<double> dims = { 1.4, 3.0, 3.0 };
-//std::vector<unsigned int> res = { 50, 50, 50 };
+//std::vector<double> base = { -0.2, -1.5, -2.5 };
+//std::vector<double> dims = { 1.4, 3.0, 3.5 };
+//std::vector<unsigned int> res = { 50, 50, 100 };
 //std::vector<double> reset_relative = { 0.0,0.0,0.0 };
-//double threshold = 0.9;
+//double threshold = 0.5;
 //double reset_v = -0.5;
-//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.0001);
+//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.01);
 //
 //g.setCppFunction(applyBRMNRedux);
-//g.generateModelFile("brmn", 1);
+//g.generateModelFile("brmn", 0.01);
 //g.generateTMatFileBatched("brmn");
 void applyBRMNRedux(NdPoint& p, double t) {
     double V_ca = 1.0;
@@ -456,17 +456,71 @@ void applyRinzelBurster2d(NdPoint& p, double t) {
     p.coords[0] = h_nap;
 }
 
+// Recommended settings in main() for applyHH:
+//std::vector<double> base = { -0.1, -0.1, -0.1, -100 };
+//std::vector<double> dims = { 1.2, 1.2, 1.2, 160 };
+//std::vector<unsigned int> res = { 50, 50, 50, 50 };
+//std::vector<double> reset_relative = { 0.0,0.0,0.0,0.0 };
+//double threshold = 59.9;
+//double reset_v = -99.9;
+//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.01);
+//
+//g.setCppFunction(applyHH);
+//g.generateModelFile("hh", 0.001);
+//g.generateTMatFileBatched("hh");
+void applyHH(NdPoint& p, double t) {
+    double V_k = -90;
+    double V_na = 50;
+    double V_l = -65;
+    double g_k = 30;
+    double g_na = 100;
+    double g_l = 0.5;
+    double C = 1.0;
+    double V_t = -63;
+
+    double v = p.coords[3];
+    double m = p.coords[2];
+    double n = p.coords[1];
+    double h = p.coords[0];
+
+    for (unsigned int i = 0; i < 1; i++) {
+
+        double alpha_m = (0.32 * (13 - v + V_t)) / (exp((13 - v + V_t) / 4) - 1);
+        double alpha_n = (0.032 * (15 - v + V_t)) / (exp((15 - v + V_t) / 5) - 1);
+        double alpha_h = 0.128 * exp((17 - v + V_t) / 18);
+
+        double beta_m = (0.28 * (v - V_t - 40)) / (exp((v - V_t - 40) / 5) - 1);
+        double beta_n = 0.5 * exp((10 - v + V_t) / 40);
+        double beta_h = 4 / (1 + exp((40 - v + V_t) / 5));
+
+        double v_prime = (-(g_k * pow(n,4) * (v - V_k)) - (g_na * pow(m,3) * h * (v - V_na)) - (g_l * (v - V_l))) / C;
+        double m_prime = (alpha_m * (1 - m)) - (beta_m * m);
+        double n_prime = (alpha_n * (1 - n)) - (beta_n * n);
+        double h_prime = (alpha_h * (1 - h)) - (beta_h * h);
+
+        v = v + (t / 1.0) * v_prime;
+        m = m + (t / 1.0) * m_prime;
+        n = n + (t / 1.0) * n_prime;
+        h = h + (t / 1.0) * h_prime;
+    }
+
+    p.coords[3] = v;
+    p.coords[2] = m;
+    p.coords[1] = n;
+    p.coords[0] = h;
+}
+
 int main() {
-    std::vector<double> base = { -0.2,-130 };
-    std::vector<double> dims = { 1.2, 100 };
-    std::vector<unsigned int> res = { 200, 200 };
-    std::vector<double> reset_relative = { -0.006, 0.0 };
-    double threshold = -36.0;
-    double reset_v = -52.0;
-    NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-01);
+    std::vector<double> base = { -0.2, -0.2, -0.2, -80 };
+    std::vector<double> dims = { 1.4, 1.4, 1.4, 80 };
+    std::vector<unsigned int> res = { 50, 50, 50, 50 };
+    std::vector<double> reset_relative = { 0.0,0.0,0.0,0.0 };
+    double threshold = -0.1;
+    double reset_v = -79.9;
+    NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.0001);
     
-    g.setCppFunction(applyRinzelBurster2d);
-    g.generateModelFile("rinzel2D", 0.001);
-    g.generateTMatFileBatched("rinzel2D");
+    g.setCppFunction(applyHH);
+    g.generateModelFile("hh", 1);
+    g.generateTMatFileBatched("hh");
 	return 0;
 }

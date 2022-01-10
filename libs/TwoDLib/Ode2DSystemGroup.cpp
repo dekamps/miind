@@ -634,8 +634,16 @@ const std::vector<std::vector<MPILib::Potential>>& Ode2DSystemGroup::Avgs() cons
 {
 	// Rate calculation for non-threshold crossing models such as Fitzhugh-Nagumo
 	for (MPILib::Index m = 0; m < _mesh_list.size(); m++) {
-		if (this->FiniteSizeNumObjects()[m] == 0) {
+		Avgs(m);
+	}
+	return _all_avs;
+}
+
+const std::vector<MPILib::Potential>& Ode2DSystemGroup::Avgs(unsigned int m) const
+{
+	if (this->FiniteSizeNumObjects()[m] == 0) {
 			if (_mesh_list[m].hasDefinedStrips()) { // this is a mesh or an old style grid
+
 				MPILib::Potential av = 0.;
 				MPILib::Potential aw = 0.;
 				for (MPILib::Index i = 0; i < _mesh_list[m].NrStrips(); i++) {
@@ -656,10 +664,10 @@ const std::vector<std::vector<MPILib::Potential>>& Ode2DSystemGroup::Avgs() cons
 			else { // this is a new-fangled grid
 				std::vector<MPILib::Potential> av(_mesh_list[m].getGridNumDimensions());
 
-				for (MPILib::Index i = 0; i < _vec_mesh_offset[m+1] - _vec_mesh_offset[m]; i++) {
+				for (MPILib::Index i = 0; i < _vec_mesh_offset[m + 1] - _vec_mesh_offset[m]; i++) {
 					std::vector<MPILib::Potential> V = _mesh_list[m].Centroid(i);
 					for (unsigned int d = 0; d < _mesh_list[m].getGridNumDimensions(); d++) {
-						av[d] += V[d] * _vec_mass[_vec_mesh_offset[m]+i];
+						av[d] += V[d] * _vec_mass[_vec_mesh_offset[m] + i];
 					}
 				}
 
@@ -671,46 +679,46 @@ const std::vector<std::vector<MPILib::Potential>>& Ode2DSystemGroup::Avgs() cons
 				}
 			}
 		}
-		else { // finite size
-			if (_mesh_list[m].hasDefinedStrips()) { // this is a mesh or an old style grid
-				MPILib::Potential av = 0.;
-				MPILib::Potential aw = 0.;
-				for (MPILib::Index i = 0; i < _mesh_list[m].NrStrips(); i++) {
-					for (MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++) {
-						MPILib::Potential V = _mesh_list[m].Quad(i, j).Centroid()[0];
-						MPILib::Potential W = _mesh_list[m].Quad(i, j).Centroid()[1];
-						av += V * this->_vec_cells_to_objects[this->Map(m, i, j)].size();
-						aw += W * this->_vec_cells_to_objects[this->Map(m, i, j)].size();
-					}
-				}
-				if (_all_avs[m].size() == 0) {
-					const_cast<std::vector<MPILib::Potential>&>(_all_avs[m]) = std::vector<MPILib::Potential>(2);
-				}
+	else { // finite size
+		if (_mesh_list[m].hasDefinedStrips()) { // this is a mesh or an old style grid
+			MPILib::Potential av = 0.;
+			MPILib::Potential aw = 0.;
 
-				const_cast<MPILib::Potential&>(_all_avs[m][0]) = av / this->FiniteSizeNumObjects()[m];
-				const_cast<MPILib::Potential&>(_all_avs[m][1]) = aw / this->FiniteSizeNumObjects()[m];
+			for (MPILib::Index i = 0; i < _mesh_list[m].NrStrips(); i++) {
+				for (MPILib::Index j = 0; j < _mesh_list[m].NrCellsInStrip(i); j++) {
+					MPILib::Potential V = _mesh_list[m].Quad(i, j).Centroid()[0];
+					MPILib::Potential W = _mesh_list[m].Quad(i, j).Centroid()[1];
+					av += V * this->_vec_cells_to_objects[this->Map(m, i, j)].size();
+					aw += W * this->_vec_cells_to_objects[this->Map(m, i, j)].size();
+				}
 			}
-			else { // this is a new-fangled grid
-				std::vector<MPILib::Potential> av(_mesh_list[m].getGridNumDimensions());
+			if (_all_avs[m].size() == 0) {
+				const_cast<std::vector<MPILib::Potential>&>(_all_avs[m]) = std::vector<MPILib::Potential>(2);
+			}
 
-				for (MPILib::Index i = 0; i < _vec_num_objects[m]; i++) {
-					std::vector<MPILib::Potential> V = _mesh_list[m].Centroid(i);
-					for (unsigned int d = 0; d < _mesh_list[m].getGridNumDimensions(); d++) {
-						av[d] += V[d];
-					}
-				}
+			const_cast<MPILib::Potential&>(_all_avs[m][0]) = av / this->FiniteSizeNumObjects()[m];
+			const_cast<MPILib::Potential&>(_all_avs[m][1]) = aw / this->FiniteSizeNumObjects()[m];
+		}
+		else { // this is a new-fangled grid
+			std::vector<MPILib::Potential> av(_mesh_list[m].getGridNumDimensions());
 
-				if (_all_avs[m].size() == 0) {
-					const_cast<std::vector<MPILib::Potential>&>(_all_avs[m]) = std::vector<MPILib::Potential>(_mesh_list[m].getGridNumDimensions());
-				}
+			for (MPILib::Index i = 0; i < _vec_num_objects[m]; i++) {
+				std::vector<MPILib::Potential> V = _mesh_list[m].Centroid(i);
 				for (unsigned int d = 0; d < _mesh_list[m].getGridNumDimensions(); d++) {
-					const_cast<MPILib::Potential&>(_all_avs[m][d]) = av[d] / this->FiniteSizeNumObjects()[m];
+					av[d] += V[d];
 				}
+			}
+
+			if (_all_avs[m].size() == 0) {
+				const_cast<std::vector<MPILib::Potential>&>(_all_avs[m]) = std::vector<MPILib::Potential>(_mesh_list[m].getGridNumDimensions());
+			}
+			for (unsigned int d = 0; d < _mesh_list[m].getGridNumDimensions(); d++) {
+				const_cast<MPILib::Potential&>(_all_avs[m][d]) = av[d] / this->FiniteSizeNumObjects()[m];
 			}
 		}
-		
 	}
-	return _all_avs;
+
+	return _all_avs[m];
 }
 
 bool Ode2DSystemGroup::CheckConsistency() const {

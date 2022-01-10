@@ -1,4 +1,5 @@
 #include "NdGrid.hpp"
+#include <omp.h>
 
 NdGrid::NdGrid(std::vector<double> _base, std::vector<double> _dims, std::vector<unsigned int> _res,
     double _threshold_v, double _reset_v, std::vector<double> _reset_relative, double _timestep) :
@@ -258,6 +259,7 @@ void NdGrid::generateTMatFileBatched(std::string basename) {
     for (unsigned int batch = 0; batch < (coord_list.size() / batch_size) + 1; batch++) {
 #pragma omp parallel for
         for (int c = (batch * batch_size); c < (batch * batch_size) + batch_size; c++) {
+
             if (c >= coord_list.size())
                 continue;
 
@@ -282,20 +284,27 @@ void NdGrid::generateTMatFileBatched(std::string basename) {
 #pragma omp critical
             transitions[cell.grid_coords] = ts;
         }
+
+        for (auto const& kv : transitions) {
+            std::vector<unsigned int> pair = coords_to_strip_and_cell(kv.first);
+            file << "1000000000;" << pair[0] << "," << pair[1] << ";";
+            for (auto const& tv : kv.second) {
+                std::vector<unsigned int> tpair = coords_to_strip_and_cell(tv.first);
+                file << tpair[0] << "," << tpair[1] << ":" << tv.second << ";";
+            }
+            file << "\n";
+        }
+
+        file.flush();
+
+        transitions.clear();
+
         std::cout << '\r' << std::setw(5) << 100.0 * ((float)(batch * batch_size) / (float)coord_list.size()) << "% complete." << std::setfill(' ') << std::flush;
     }
 
-    for (auto const& kv : transitions) {
-        std::vector<unsigned int> pair = coords_to_strip_and_cell(kv.first);
-        file << "1000000000;" << pair[0] << "," << pair[1] << ";";
-        for (auto const& tv : kv.second) {
-            std::vector<unsigned int> tpair = coords_to_strip_and_cell(tv.first);
-            file << tpair[0] << "," << tpair[1] << ":" << tv.second << ";";
-        }
-        file << "\n";
-    }
+    
 
-    transitions.clear();
+    
 
     std::cout << "\n";
 }
@@ -468,6 +477,10 @@ void NdGrid::generateModelFile(std::string basename, double timestep_multiplier)
     generateResetMapping(file);
     file << "</Mapping>\n";
     file << "</Model>\n";
+
+    file << std::flush;
+
+    file.flush();
 
     file.close();
 }
