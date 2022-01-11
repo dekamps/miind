@@ -92,7 +92,7 @@ namespace TwoDLib {
 		void getCoordsOfIndex(std::vector<unsigned int>& coords, unsigned int index) const;
 		std::vector<unsigned int> getCoordsOfIndex(unsigned int) const;
 
-		unsigned int getIndexOfCoords(std::vector<unsigned int>& coords);
+		unsigned int getIndexOfCoords(std::vector<unsigned int>& coords) const;
 
 		//!< number of cells in strip i
 		virtual unsigned int NrCellsInStrip(unsigned int i) const {

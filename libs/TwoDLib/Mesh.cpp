@@ -554,7 +554,7 @@ std::vector<unsigned int> Mesh::getCoordsOfIndex(unsigned int index) const {
 	return coords;
 }
 
-unsigned int Mesh::getIndexOfCoords(std::vector<unsigned int>& coords) {
+unsigned int Mesh::getIndexOfCoords(std::vector<unsigned int>& coords) const {
 	unsigned int index = 0;
 	for (unsigned int d = 0; d < coords.size(); d++) {
 		index += coords[d] * _resolution_offsets[d];
