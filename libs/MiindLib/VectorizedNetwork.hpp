@@ -123,7 +123,7 @@ namespace MiindLib {
             std::vector<std::vector<fptype>>& grid_cell_efficacies, std::vector<std::vector<int>>& grid_cell_offsets,
             std::vector<inttype>& grid_cell_strides);
 
-        void addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w, double start_u,
+        void addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w, double start_u, double start_x,
             std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive, unsigned int finite_size = 0);
 
         void addMeshNode(TwoDLib::Mesh mesh, std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive, unsigned int finite_size = 0);
@@ -164,6 +164,7 @@ namespace MiindLib {
         std::vector<double> _start_vs;
         std::vector<double> _start_ws;
         std::vector<double> _start_us;
+        std::vector<double> _start_xs;
 
         std::vector<TwoDLib::Mesh> _vec_mesh;
         std::vector< std::vector<TwoDLib::Redistribution> > _vec_vec_rev;

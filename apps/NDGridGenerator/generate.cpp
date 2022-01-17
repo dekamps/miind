@@ -511,16 +511,16 @@ void applyHH(NdPoint& p, double t) {
 }
 
 int main() {
-    std::vector<double> base = { -0.2, -0.2, -0.2, -80 };
-    std::vector<double> dims = { 1.4, 1.4, 1.4, 80 };
+    std::vector<double> base = { -0.1, -0.1, -0.1, -100 };
+    std::vector<double> dims = { 1.2, 1.2, 1.2, 160 };
     std::vector<unsigned int> res = { 50, 50, 50, 50 };
     std::vector<double> reset_relative = { 0.0,0.0,0.0,0.0 };
-    double threshold = -0.1;
-    double reset_v = -79.9;
-    NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.0001);
-    
+    double threshold = 59.9;
+    double reset_v = -99.9;
+    NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.01);
+
     g.setCppFunction(applyHH);
-    g.generateModelFile("hh", 1);
+    g.generateModelFile("hh", 0.001);
     g.generateTMatFileBatched("hh");
 	return 0;
 }

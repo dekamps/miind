@@ -12,7 +12,7 @@ VectorizedNetwork::VectorizedNetwork(MPILib::Time time_step) :
 {
 }
 
-void VectorizedNetwork::addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w, double start_u,
+void VectorizedNetwork::addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatrix tmat, double start_v, double start_w, double start_u, double start_x,
     std::vector<TwoDLib::Redistribution> vec_rev, std::vector<TwoDLib::Redistribution> vec_res, double tau_refractive, unsigned int finite_size) {
 
     _num_nodes++;
@@ -26,6 +26,7 @@ void VectorizedNetwork::addGridNode(TwoDLib::Mesh mesh, TwoDLib::TransitionMatri
     _start_vs.push_back(start_v);
     _start_ws.push_back(start_w);
     _start_us.push_back(start_u);
+    _start_xs.push_back(start_x);
 
     _num_grid_objects.push_back(finite_size);
 }
@@ -90,7 +91,7 @@ void VectorizedNetwork::initOde2DSystem(unsigned int min_solve_steps) {
 #endif
 
     for (MPILib::Index i = 0; i < _grid_meshes.size(); i++) {
-        vector<TwoDLib::Coordinates> coords = _vec_mesh[_grid_meshes[i]].findPointInMeshSlow(TwoDLib::Point(_start_vs[i], _start_ws[i]), _start_us[i]);
+        vector<TwoDLib::Coordinates> coords = _vec_mesh[_grid_meshes[i]].findPointInMeshSlow(TwoDLib::Point(_start_vs[i], _start_ws[i]), _start_us[i], _start_xs[i]);
         _group->Initialize(_grid_meshes[i], coords[0][0], coords[0][1]);
 
         //create CSR Matrix for each transforms

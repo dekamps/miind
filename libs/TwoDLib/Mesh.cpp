@@ -267,7 +267,7 @@ vector<Coordinates> Mesh::allCoords() const{
 	return vec_ret;
 }
 
-vector<Coordinates> Mesh::findPointInMeshSlow(const Point& p, const double u) const{
+vector<Coordinates> Mesh::findPointInMeshSlow(const Point& p, const double u, const double x) const{
 	vector<Coordinates> vec_ret;
 	for (unsigned int i = 0; i < _vec_vec_quad.size(); i++){
 		for (unsigned int j = 0; j < _vec_vec_quad[i].size(); j++){
@@ -277,7 +277,7 @@ vector<Coordinates> Mesh::findPointInMeshSlow(const Point& p, const double u) co
 	}
 
 	if (vec_ret.size() == 0) { // uh oh, maybe this is a grid, not a mesh
-		if (_grid_num_dimensions >= 3) {
+		if (_grid_num_dimensions == 3) {
 			if (p[0] < getGridBaseByDimension(_grid_num_dimensions - 1) + getGridSizeByDimension(_grid_num_dimensions - 1) &&
 				p[0] > getGridBaseByDimension(_grid_num_dimensions - 1) &&
 				p[1] < getGridBaseByDimension(_grid_num_dimensions - 2) + getGridSizeByDimension(_grid_num_dimensions - 2) &&
@@ -295,6 +295,29 @@ vector<Coordinates> Mesh::findPointInMeshSlow(const Point& p, const double u) co
 			}
 			else {
 				throw TwoDLibException("Position does not exist in 3D Grid");
+			}
+		}
+		else if (_grid_num_dimensions >= 4) {
+			if (p[0] < getGridBaseByDimension(_grid_num_dimensions - 1) + getGridSizeByDimension(_grid_num_dimensions - 1) &&
+				p[0] > getGridBaseByDimension(_grid_num_dimensions - 1) &&
+				p[1] < getGridBaseByDimension(_grid_num_dimensions - 2) + getGridSizeByDimension(_grid_num_dimensions - 2) &&
+				p[1] > getGridBaseByDimension(_grid_num_dimensions - 2) &&
+				u < getGridBaseByDimension(_grid_num_dimensions - 3) + getGridSizeByDimension(_grid_num_dimensions - 3) &&
+				u > getGridBaseByDimension(_grid_num_dimensions - 3) &&
+				x < getGridBaseByDimension(_grid_num_dimensions - 4) + getGridSizeByDimension(_grid_num_dimensions - 4) &&
+				x > getGridBaseByDimension(_grid_num_dimensions - 4)){
+
+				unsigned int i = int(((p[0] - getGridBaseByDimension(_grid_num_dimensions - 1)) / getGridSizeByDimension(_grid_num_dimensions - 1)) * getGridResolutionByDimension(_grid_num_dimensions - 1));
+				unsigned int j = int(((p[1] - getGridBaseByDimension(_grid_num_dimensions - 2)) / getGridSizeByDimension(_grid_num_dimensions - 2)) * getGridResolutionByDimension(_grid_num_dimensions - 2));
+				unsigned int k = int(((u - getGridBaseByDimension(_grid_num_dimensions - 3)) / getGridSizeByDimension(_grid_num_dimensions - 3)) * getGridResolutionByDimension(_grid_num_dimensions - 3));
+				unsigned int l = int(((x - getGridBaseByDimension(_grid_num_dimensions - 4)) / getGridSizeByDimension(_grid_num_dimensions - 4)) * getGridResolutionByDimension(_grid_num_dimensions - 4));
+
+				unsigned int strips = j + (k * getGridResolutionByDimension(_grid_num_dimensions - 2)) + (l * (getGridResolutionByDimension(_grid_num_dimensions - 2) * getGridResolutionByDimension(_grid_num_dimensions - 3)));
+
+				vec_ret.push_back(Coordinates(strips, i));
+			}
+			else {
+				throw TwoDLibException("Position does not exist in 4D Grid");
 			}
 		}
 		else {
