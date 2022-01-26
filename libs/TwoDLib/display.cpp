@@ -489,10 +489,20 @@ void Display::display_3d(void) {
 	GLfloat y_rot = modulof(-155 + _dws[window_index].rot_y, 360) - 45;
 	glRotatef(y_rot, 0.0f, 1.0f, 0.0f);
 
+	std::vector<std::string> labels4(4);
+	labels4[0] = std::string("x");
+	labels4[1] = std::string("u");
+	labels4[2] = std::string("w");
+	labels4[3] = std::string("v");
+
+
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos3f(-0.5f, 0.55f, -0.5f);
 	int len, i;
+
 	std::string t = std::string("u");
+	if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4)
+		t = labels4[modulo(1 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions())];
 	const char* c_string = t.c_str();
 	len = (int)strlen(c_string);
 	for (i = 0; i < len; i++) {
@@ -502,6 +512,8 @@ void Display::display_3d(void) {
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos3f(-0.5f, -0.5f, 0.6f);
 	t = std::string("w");
+	if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4)
+		t = labels4[modulo(2 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions())];
 	c_string = t.c_str();
 	len = (int)strlen(c_string);
 	for (i = 0; i < len; i++) {
@@ -511,6 +523,8 @@ void Display::display_3d(void) {
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos3f(0.55f, -0.5f, -0.5f);
 	t = std::string("v");
+	if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4)
+		t = labels4[modulo(3 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions())];
 	c_string = t.c_str();
 	len = (int)strlen(c_string);
 	for (i = 0; i < len; i++) {
