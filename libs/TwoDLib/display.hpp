@@ -32,6 +32,7 @@ public:
 
   double rot_x;
   double rot_y;
+  int dim_select;
 
   double mesh_min_v;
   double mesh_max_v;
@@ -133,6 +134,8 @@ private:
   bool downPressed;
   bool leftPressed;
   bool rightPressed;
+  bool pgupPressed;
+  bool pgdnPressed;
 };
 
 }

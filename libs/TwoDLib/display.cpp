@@ -29,6 +29,8 @@ Display::Display(){
 	downPressed = false;
 	leftPressed = false;
 	rightPressed = false;
+	pgdnPressed = false;
+	pgupPressed = false;
 }
 
 Display::~Display(){
@@ -54,6 +56,7 @@ unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys, bo
 	window._3D = _3d;
 	window.rot_x = 0.0;
 	window.rot_y = 0.0;
+	window.dim_select = 0;
 	window.max_mass = -9999999;
 	window.min_mass = 9999999;
 
@@ -427,6 +430,16 @@ void Display::display_3d(void) {
 			window_index = iter->first;
 	}
 
+	if (pgupPressed) {
+		_dws[window_index].dim_select = modulo((_dws[window_index].dim_select + 1) , (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions()));
+		pgupPressed = false;
+	}
+
+	if (pgdnPressed) {
+		_dws[window_index].dim_select = modulo((_dws[window_index].dim_select - 1) , (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions()));
+		pgdnPressed = false;
+	}
+
 	if (upPressed) {
 		_dws[window_index].rot_x += 1.5f;
 	}
@@ -789,25 +802,33 @@ void Display::display_3d(void) {
 				unsigned int strip_ind = (i_r * vals_end[1]) + k_r;
 				unsigned int cell_ind = j_r;
 
-				unsigned int idx =  _dws[window_index]._system->Map(_dws[window_index]._mesh_index, strip_ind, cell_ind);
+				std::vector<unsigned int> coords3(3);
+				coords3[0] = i_r;
+				coords3[1] = k_r;
+				coords3[2] = j_r;
 
-				double cell_mass = _dws[window_index]._system->Mass()[idx];
+				unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords3);
+
+				double cell_mass = 0.0;
 				// Sum up all mass above the third dimension as we can't display it (this is effectively a marginal)
 				// for the sake of speed here, just assume that this is 4D - if you're in the future and working on 5D or greater
 				// then congratulations on solving the dimensionality problem or possibly quantum computing.
 				if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4) {
 					for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(0); c++) {
 						std::vector<unsigned int> coords(4);
-						coords[0] = c;
-						coords[1] = i_r;
-						coords[2] = k_r;
-						coords[3] = j_r;
+						coords[0 + _dws[window_index].dim_select] = c;
+						coords[modulo(1 + _dws[window_index].dim_select,4)] = i_r;
+						coords[modulo(2 + _dws[window_index].dim_select,4)] = k_r;
+						coords[modulo(3 + _dws[window_index].dim_select,4)] = j_r;
 
 						cell_mass += _dws[window_index]._system->Mass()[_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords)];
 					}
 				}
+				else {
+					cell_mass = _dws[window_index]._system->Mass()[idx];
+				}
 
-				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() == 0)
+				if (_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] == 0)
 					if (cell_mass < 0.000000001) continue; // skip if mass is basically nothing
 
 				double cell_area = std::abs(m.Quad(0, 0).SignedArea());
@@ -838,13 +859,16 @@ void Display::display_3d(void) {
 					if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4) {
 						for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(0); c++) {
 							std::vector<unsigned int> coords(4);
-							coords[0] = c;
-							coords[1] = i_r;
-							coords[2] = k_r;
-							coords[3] = j_r;
+							coords[0 + _dws[window_index].dim_select] = c;
+							coords[modulo(1 + _dws[window_index].dim_select, 4)] = i_r;
+							coords[modulo(2 + _dws[window_index].dim_select, 4)] = k_r;
+							coords[modulo(3 + _dws[window_index].dim_select, 4)] = j_r;
 
 							count += _dws[window_index]._system->_vec_cells_to_objects[_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords)].size();
 						}
+					}
+					else {
+						count = _dws[window_index]._system->_vec_cells_to_objects[idx].size();
 					}
 
 					if (count > 0)
@@ -1055,6 +1079,12 @@ void Display::keyboard_3d_down(int key, int _x, int _y) {
 
 	if (key == GLUT_KEY_RIGHT)
 		rightPressed = true;
+
+	if (key == GLUT_KEY_PAGE_UP)
+		pgupPressed = true;
+
+	if (key == GLUT_KEY_PAGE_DOWN)
+		pgdnPressed = true;
 }
 
 void Display::keyboard_3d_up(int key, int _x, int _y) {
@@ -1070,6 +1100,12 @@ void Display::keyboard_3d_up(int key, int _x, int _y) {
 
 	if (key == GLUT_KEY_RIGHT)
 		rightPressed = false;
+
+	if (key == GLUT_KEY_PAGE_UP)
+		pgupPressed = false;
+
+	if (key == GLUT_KEY_PAGE_DOWN)
+		pgdnPressed = false;
 }
 
 
