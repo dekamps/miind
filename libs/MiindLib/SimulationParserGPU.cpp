@@ -232,6 +232,7 @@ bool SimulationParserGPU<WeightType>::addGridAlgorithmGroupNode(pugi::xml_docume
 			double start_v = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.attribute("start_v").value()));
 			double start_w = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.attribute("start_w").value()));
 			double start_u = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.attribute("start_u").value()));
+			double start_x = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.attribute("start_x").value()));
 			double time_step = SimulationParserCPU<WeightType>::interpretValueAsDouble(std::string(algorithm.child_value("TimeStep")));
 
 			// todo: Check time_step matches network time step
@@ -244,7 +245,7 @@ bool SimulationParserGPU<WeightType>::addGridAlgorithmGroupNode(pugi::xml_docume
 			_reset_mappings.push_back(TwoDLib::RetrieveMappingFromXML("Reset", model));
 			_transition_mats.push_back(TwoDLib::TransitionMatrix(transform_filename));
 
-			vec_network.addGridNode(_meshes.back(), _transition_mats.back(), start_v, start_w, start_u, _reversal_mappings.back(), _reset_mappings.back(), tau_refractive, finite_size);
+			vec_network.addGridNode(_meshes.back(), _transition_mats.back(), start_v, start_w, start_u, start_x, _reversal_mappings.back(), _reset_mappings.back(), tau_refractive, finite_size);
 			return true;
 		}
 	}

@@ -152,7 +152,7 @@ namespace TwoDLib {
 
 		vector<Coordinates> findV(double V, Threshold) const;
 
-		vector<Coordinates> findPointInMeshSlow(const Point&, const double u = 0.0) const;
+		vector<Coordinates> findPointInMeshSlow(const Point&, const double u = 0.0, const double x = 0.0) const;
 
 		//! These cells are labeled with Coordinates(0,j). They have no neighbours, and tests as to whether
 		//! points fall inside them should be made directly; they can not be expected to show up in

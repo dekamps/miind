@@ -785,7 +785,7 @@ void Display::display_3d(void) {
 				unsigned int j_r = vals[2];
 				if (reverse[2])
 					j_r = vals_end[2] - 1 - vals[2];
-
+				
 				unsigned int strip_ind = (i_r * vals_end[1]) + k_r;
 				unsigned int cell_ind = j_r;
 
@@ -796,12 +796,12 @@ void Display::display_3d(void) {
 				// for the sake of speed here, just assume that this is 4D - if you're in the future and working on 5D or greater
 				// then congratulations on solving the dimensionality problem or possibly quantum computing.
 				if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4) {
-					for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(3); c++) {
+					for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(0); c++) {
 						std::vector<unsigned int> coords(4);
 						coords[0] = c;
 						coords[1] = i_r;
 						coords[2] = k_r;
-						coords[3] = i_r;
+						coords[3] = j_r;
 
 						cell_mass += _dws[window_index]._system->Mass()[_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords)];
 					}
@@ -834,8 +834,21 @@ void Display::display_3d(void) {
 				}
 
 				if (_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] > 0) {
-					if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() > 0)
-						mass = 0.5 + 1000.0 * ((double)_dws[window_index]._system->_vec_cells_to_objects[idx].size() / (double)_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index]);
+					unsigned int count = 0;
+					if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4) {
+						for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(0); c++) {
+							std::vector<unsigned int> coords(4);
+							coords[0] = c;
+							coords[1] = i_r;
+							coords[2] = k_r;
+							coords[3] = j_r;
+
+							count += _dws[window_index]._system->_vec_cells_to_objects[_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords)].size();
+						}
+					}
+
+					if (count > 0)
+						mass = 0.5 + 1000.0 * ((double)count / (double)_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index]);
 					else
 						continue;
 				}

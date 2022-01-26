@@ -518,7 +518,7 @@ int main() {
     double threshold = 59.9;
     double reset_v = -99.9;
     NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.01);
-    
+
     g.setCppFunction(applyHH);
     g.generateModelFile("hh", 0.001);
     g.generateTMatFileBatched("hh");
