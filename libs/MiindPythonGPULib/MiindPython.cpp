@@ -224,9 +224,9 @@ PyObject* miind_startSimulation(PyObject* self, PyObject* args)
 {
     try {
         if (modelCcp)
-            modelCcp->startSimulation();
+            modelCcp->startSimulation(TwoDLib::Display::getInstance());
         else if (modelDc)
-            modelDc->startSimulation();
+            modelDc->startSimulation(TwoDLib::Display::getInstance());
 
         Py_RETURN_NONE;
     }

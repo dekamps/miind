@@ -592,10 +592,12 @@ void SimulationParserCPU<WeightType>::parseXmlFile() {
 }
 
 template<class WeightType>
-void SimulationParserCPU<WeightType>::startSimulation() {
-	if (_display_nodes.size() > 0)
-		TwoDLib::Display::getInstance()->animate(true, _display_nodes, MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_time_step);
-	MPILib::MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::startSimulation();
+void SimulationParserCPU<WeightType>::startSimulation(TwoDLib::Display* display) {
+	if (_display_nodes.size() > 0) {
+		display->setDisplayNodes(_display_nodes);
+		display->animate(true, MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_time_step);
+	}
+	MPILib::MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::startSimulation(display);
 }
 
 template<class WeightType>

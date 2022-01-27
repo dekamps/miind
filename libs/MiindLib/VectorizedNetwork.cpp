@@ -378,18 +378,15 @@ void VectorizedNetwork::calculateProportionsNDEfficacyWithValuesFinite(std::vect
     grid_cell_strides.push_back(stride);
 }
 
-void VectorizedNetwork::setupLoop(bool write_displays) {
+void VectorizedNetwork::setupLoop(bool write_displays, TwoDLib::Display * display) {
 
     for (unsigned int i = 0; i < _display_nodes.size(); i++) {
-        TwoDLib::Display::getInstance()->addOdeSystem(_display_nodes[i], _group, _vec_mesh[_node_id_to_group_mesh[_display_nodes[i]]].getGridNumDimensions() >= 3, _node_id_to_group_mesh[_display_nodes[i]]);
+        display->addOdeSystem(_display_nodes[i], _group, _vec_mesh[_node_id_to_group_mesh[_display_nodes[i]]].getGridNumDimensions() >= 3, _node_id_to_group_mesh[_display_nodes[i]]);
     }
+
+    display->setDisplayNodes(_display_nodes);
 
     const MPILib::Time h = 1. / _master_steps * _vec_mesh[0].TimeStep();
-
-    // Setup the OpenGL displays (if there are any required)
-    if (_display_nodes.size() > 0) {
-        TwoDLib::Display::getInstance()->animate(write_displays, _display_nodes, _network_time_step);
-    }
 
     std::vector<std::vector<fptype>> grid_cell_efficacies;
     std::vector<std::vector<int>> grid_cell_offsets;
@@ -803,7 +800,6 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
         for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++) {
             _group_adapter->EvolveWithoutTransfer(_mesh_meshes);
         }
-        TwoDLib::Display::getInstance()->updateDisplay(i_loop);
     }
 
     if (_density_nodes.size() > 0) {
@@ -819,7 +815,7 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
 void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILib::Time t_report, bool write_displays) {
     MPILib::Number n_iter = static_cast<MPILib::Number>(ceil((t_end - t_begin) / _network_time_step));
 
-    setupLoop(write_displays);
+    setupLoop(write_displays, TwoDLib::Display::getInstance());
 
     MPILib::utilities::ProgressBar* pb = new MPILib::utilities::ProgressBar(n_iter);
     boost::timer::auto_cpu_timer timer;

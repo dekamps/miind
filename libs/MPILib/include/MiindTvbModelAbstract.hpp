@@ -28,7 +28,7 @@ public:
 
 	virtual void init() {};
 
-	virtual void startSimulation() {
+	virtual void startSimulation(TwoDLib::Display* display) {
 		pb = new utilities::ProgressBar(network.startSimulation());
 	}
 
