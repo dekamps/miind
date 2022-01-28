@@ -1135,6 +1135,9 @@ void Display::keyboard_3d_up(int key, int _x, int _y) {
 
 
 void Display::updateDisplay(long current_sim_it) {
+	if (Display::getInstance()->_nodes_to_display.size() == 0)
+		return;
+
 	int time;
 	time = glutGet(GLUT_ELAPSED_TIME);
 	Display::getInstance()->_current_sim_it = current_sim_it;
@@ -1167,6 +1170,9 @@ void Display::setDisplayNodes(std::vector<MPILib::NodeId> nodes_to_display) cons
 }
 
 void Display::animate(bool _write_frames,  double time_step) const{
+
+	if (Display::getInstance()->_nodes_to_display.size() == 0)
+		return;
 
 	Display::getInstance()->write_frames = _write_frames;
 	Display::getInstance()->_time_step = time_step;

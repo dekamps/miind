@@ -92,15 +92,19 @@ int main(int argc, char* argv[]) {
     InitialiseModel(node_count, xmlfile, vars);
     
     double time = 0.0;
+    long its = 0;
 
     if (modelCcp) {
         std::cout << "Time Step: " << modelCcp->getTimeStep() << "\n";
         std::cout << "Sim Time: " << modelCcp->getSimulationLength() << "\n";
         modelCcp->startSimulation(TwoDLib::Display::getInstance());
+        TwoDLib::Display::getInstance()->animate(true, modelCcp->getTimeStep());
         std::vector<double> ins = { 5000.0 };
         while (time < modelCcp->getSimulationLength()) {
             time += modelCcp->getTimeStep();
             std::vector<double> outs = modelCcp->evolveSingleStep(ins);
+            TwoDLib::Display::getInstance()->updateDisplay(its);
+            its++;
         }
         modelCcp->endSimulation();
     }
@@ -108,9 +112,12 @@ int main(int argc, char* argv[]) {
         std::cout << "Time Step: " << modelDc->getTimeStep() << "\n";
         std::cout << "Sim Time: " << modelDc->getSimulationLength() << "\n";
         modelDc->startSimulation(TwoDLib::Display::getInstance());
+        TwoDLib::Display::getInstance()->animate(true, modelDc->getTimeStep());
         while (time < modelDc->getSimulationLength()) {
             time += modelDc->getTimeStep();
             modelDc->evolveSingleStep(std::vector<double>());
+            TwoDLib::Display::getInstance()->updateDisplay(its);
+            its++;
         }
         modelDc->endSimulation();
     }
@@ -118,9 +125,12 @@ int main(int argc, char* argv[]) {
         std::cout << "Time Step: " << modelDouble->getTimeStep() << "\n";
         std::cout << "Sim Time: " << modelDouble->getSimulationLength() << "\n";
         modelDouble->startSimulation(TwoDLib::Display::getInstance());
+        TwoDLib::Display::getInstance()->animate(true, modelDouble->getTimeStep());
         while (time < modelDouble->getSimulationLength()) {
             time += modelDouble->getTimeStep();
             modelDouble->evolveSingleStep(std::vector<double>());
+            TwoDLib::Display::getInstance()->updateDisplay(its);
+            its++;
         }
         modelDouble->endSimulation();
     }

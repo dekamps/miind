@@ -1,6 +1,7 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <TwoDLib/SimulationParserCPU.h>
+long step_count = 0;
 
 // The entirety of MIIND is based on templated code which is not resolved when MIIND is built.
 // It is resolved when the cpp code is generated in python and compiled by the user.
@@ -249,12 +250,18 @@ PyObject* miind_getSimulationLength(PyObject* self, PyObject* args)
 PyObject* miind_startSimulation(PyObject* self, PyObject* args)
 {
     try {
-        if (modelCcp)
+        if (modelCcp) {
             modelCcp->startSimulation(TwoDLib::Display::getInstance());
-        else if (modelDc)
+            TwoDLib::Display::getInstance()->animate(true, modelCcp->getTimeStep());
+        }
+        else if (modelDc) {
             modelDc->startSimulation(TwoDLib::Display::getInstance());
-        else if (modelDouble)
+            TwoDLib::Display::getInstance()->animate(true, modelDc->getTimeStep());
+        }
+        else if (modelDouble) {
             modelDouble->startSimulation(TwoDLib::Display::getInstance());
+            TwoDLib::Display::getInstance()->animate(true, modelDouble->getTimeStep());
+        }
 
         Py_RETURN_NONE;
     }
@@ -299,6 +306,9 @@ PyObject* miind_evolveSingleStep(PyObject* self, PyObject* args)
         else if (modelDouble)
             out_activities = modelDouble->evolveSingleStep(activities);
 
+        TwoDLib::Display::getInstance()->updateDisplay(step_count);
+        step_count++;
+
         PyObject* tuple = PyTuple_New(out_activities.size());
 
         for (int index = 0; index < out_activities.size(); index++) {
@@ -320,6 +330,8 @@ PyObject* miind_evolveSingleStep(PyObject* self, PyObject* args)
 PyObject* miind_endSimulation(PyObject* self, PyObject* args)
 {
     try {
+        step_count = 0;
+
         if (modelCcp)
             modelCcp->endSimulation();
         else if (modelDc)
