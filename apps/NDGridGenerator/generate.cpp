@@ -247,15 +247,15 @@ void applyBRMNRedux(NdPoint& p, double t) {
 
 // Recommended settings in main() for applyBRMN:
 //std::vector<double> base = { -0.2, -0.2, -1.5, -2.5 };
-//std::vector<double> dims = { 1.4, 1.4, 3.0, 3.5 };
+//std::vector<double> dims = { 1.4, 1.4, 3.0, 4.5 };
 //std::vector<unsigned int> res = { 50, 50, 50, 50 };
 //std::vector<double> reset_relative = { 0.0,0.0,0.0,0.0 };
-//double threshold = 0.99;
+//double threshold = 1.99;
 //double reset_v = -2.49;
-//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.00001);
+//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.01);
 //
 //g.setCppFunction(applyBRMN);
-//g.generateModelFile("brmn4d", 1);
+//g.generateModelFile("brmn4d", 0.001);
 //g.generateTMatFileBatched("brmn4d");
 void applyBRMN(NdPoint& p, double t) {
 
@@ -511,16 +511,16 @@ void applyHH(NdPoint& p, double t) {
 }
 
 int main() {
-    std::vector<double> base = { -0.1, -0.1, -0.1, -100 };
-    std::vector<double> dims = { 1.2, 1.2, 1.2, 160 };
+    std::vector<double> base = { -0.2, -0.2, -1.5, -2.5 };
+    std::vector<double> dims = { 1.4, 1.4, 3.0, 4.5 };
     std::vector<unsigned int> res = { 50, 50, 50, 50 };
     std::vector<double> reset_relative = { 0.0,0.0,0.0,0.0 };
-    double threshold = 59.9;
-    double reset_v = -99.9;
+    double threshold = 1.99;
+    double reset_v = -2.49;
     NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.01);
-
-    g.setCppFunction(applyHH);
-    g.generateModelFile("hh", 0.001);
-    g.generateTMatFileBatched("hh");
+    
+    g.setCppFunction(applyBRMN);
+    g.generateModelFile("brmn4d", 0.001);
+    g.generateTMatFileBatched("brmn4d");
 	return 0;
 }
