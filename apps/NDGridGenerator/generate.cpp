@@ -179,6 +179,48 @@ void applyTsodyks(NdPoint& p, double t) {
     p.coords[0] = r;
 }
 
+// Recommended settings in main() for applyTsodyks4d:
+//std::vector<double> base = { -0.2,-0.2,-10, -2 };
+//std::vector<double> dims = { 1.4, 1.4, 120, 5 };
+//std::vector<unsigned int> res = { 50, 50, 50, 50 };
+//std::vector<double> reset_relative = { 0.0,0.0,0.0,0.0 };
+//double threshold = 2.9;
+//double reset_v = -1.9;
+//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.1);
+//
+//g.setCppFunction(applyTsodyks4d);
+//g.generateModelFile("synapse", 0.001);
+//g.generateTMatFileBatched("synapse");
+void applyTsodyks4d(NdPoint& p, double t) {
+    double tau_intact = 3;
+    double tau_rec = 250;
+    double U_se = 0.67;
+    double A_se = 250; //250 for Hi, 500 for Lo
+    double tau_mem = 50;
+
+    double v = p.coords[3];
+    double u = p.coords[2];
+    double e = p.coords[1];
+    double r = p.coords[0];
+
+    for (unsigned int i = 0; i < 11; i++) {
+        double v_prime = (-v + u) / tau_mem;
+        double u_prime = -u;
+        double e_prime = -(e / tau_intact);
+        double r_prime = ((1 - r - std::abs(e)) / tau_rec);
+
+        v = v + (t / 11.0) * v_prime;
+        u = u + (t / 11.0) * u_prime;
+        e = e + (t / 11.0) * e_prime;
+        r = r + (t / 11.0) * r_prime;
+    }
+
+    p.coords[3] = v;
+    p.coords[2] = u;
+    p.coords[1] = e;
+    p.coords[0] = r;
+}
+
 // Recommended settings in main() for applyBRMNRedux:
 //std::vector<double> base = { -0.2, -1.5, -2.5 };
 //std::vector<double> dims = { 1.4, 3.0, 3.5 };
@@ -459,7 +501,7 @@ void applyRinzelBurster2d(NdPoint& p, double t) {
 // Recommended settings in main() for applyHH:
 //std::vector<double> base = { -0.1, -0.1, -0.1, -100 };
 //std::vector<double> dims = { 1.2, 1.2, 1.2, 160 };
-//std::vector<unsigned int> res = { 50, 50, 50, 50 };
+//std::vector<unsigned int> res = { 40, 40, 40, 100 };
 //std::vector<double> reset_relative = { 0.0,0.0,0.0,0.0 };
 //double threshold = 59.9;
 //double reset_v = -99.9;
