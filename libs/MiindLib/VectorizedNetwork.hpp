@@ -151,7 +151,7 @@ namespace MiindLib {
         void reportNodeDensities(MPILib::Time sim_time);
         void mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILib::Time t_report, bool write_displays);
 
-        void setupLoop(bool write_displays);
+        void setupLoop(bool write_displays, TwoDLib::Display* display);
         std::vector<double> singleStep(std::vector<double>, unsigned int i_loop);
         void endLoops();
 

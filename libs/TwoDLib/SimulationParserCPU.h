@@ -20,7 +20,7 @@ public:
 	void addConnection(pugi::xml_node& xml_conn);
 	void addIncomingConnection(pugi::xml_node& xml_conn);
 	void parseXmlFile();
-	void startSimulation();
+	void startSimulation(TwoDLib::Display* display);
 	void init();
 	double getCurrentSimTime();
 	std::vector<double> evolveSingleStep(std::vector<double> activity);

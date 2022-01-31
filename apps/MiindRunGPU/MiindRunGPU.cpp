@@ -12,6 +12,9 @@
 SimulationParserGPU<MPILib::CustomConnectionParameters>* modelCcp;
 SimulationParserGPU<MPILib::DelayedConnection>* modelDc;
 
+TwoDLib::Display* display;
+bool display_threaded = false;
+
 std::map<std::string, std::string> getVariablesFromFile(std::string filename) {
     std::map<std::string, std::string> dict;
 
@@ -55,11 +58,20 @@ bool is_number(const std::string& s)
     return !s.empty() && it == s.end();
 }
 
+void updateDisplay(TwoDLib::Display* disp, long *iterations, double ts) {
+    disp->animate(true, ts);
+
+    while(true)
+        disp->updateDisplay(*iterations);
+}
+
 int main(int argc, char* argv[]) {
     if (argc <= 1) {
         std::cout << "MiindRun expects a MIIND simulation xml file as parameter 1.\n";
         return 1;
     }
+
+    display = TwoDLib::Display::getInstance();
         
     std::string xmlfile(argv[1]);
     int node_count = 1;
@@ -82,26 +94,57 @@ int main(int argc, char* argv[]) {
 
     InitialiseModel(node_count, xmlfile, vars);
     double time = 0.0;
+    long its = 0;
 
     if (modelCcp) {
         std::cout << "Time Step: " << modelCcp->getTimeStep() << "\n";
         std::cout << "Sim Time: " << modelCcp->getSimulationLength() << "\n";
-        modelCcp->startSimulation();
+        modelCcp->startSimulation(display);
+
+        std::thread worker_thread;
+        if (display_threaded) {
+            worker_thread = std::thread(updateDisplay, display, &its, modelCcp->getTimeStep());
+        }
+        else {
+            display->animate(true, modelCcp->getTimeStep());
+        }
+
         while (time < modelCcp->getSimulationLength()) {
             time += modelCcp->getTimeStep();
             modelCcp->evolveSingleStep(std::vector<double>());
+            if (!display_threaded)
+                display->updateDisplay(its);
+            its++;
+        }
+        if (display_threaded) {
+            worker_thread.join();
         }
         modelCcp->endSimulation();
     }
     else if (modelDc) {
         std::cout << "Time Step: " << modelDc->getTimeStep() << "\n";
         std::cout << "Sim Time: " << modelDc->getSimulationLength() << "\n";
-        modelDc->startSimulation();
+        modelDc->startSimulation(display);
+        std::thread worker_thread;
+        if (display_threaded) {
+            worker_thread = std::thread(updateDisplay, display, &its, modelDc->getTimeStep());
+        }
+        else {
+            display->animate(true, modelDc->getTimeStep());
+        }
         while (time < modelDc->getSimulationLength()) {
             time += modelDc->getTimeStep();
             modelDc->evolveSingleStep(std::vector<double>());
+            if (!display_threaded)
+                display->updateDisplay(its);
+            its++;
+        }
+        if (display_threaded) {
+            worker_thread.join();
         }
         modelDc->endSimulation();
     }
+
+    
 
 }

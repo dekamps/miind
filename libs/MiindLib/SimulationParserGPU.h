@@ -38,7 +38,7 @@ public:
 
 	void parseXmlFile();
 
-	void startSimulation();
+	void startSimulation(TwoDLib::Display *display);
 
 	void init();
 

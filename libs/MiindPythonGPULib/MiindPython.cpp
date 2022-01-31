@@ -4,6 +4,7 @@
 
 SimulationParserGPU<MPILib::CustomConnectionParameters>* modelCcp;
 SimulationParserGPU<MPILib::DelayedConnection>* modelDc;
+long step_count = 0;
 
 std::map<std::string, std::string> getVariablesFromFile(std::string filename) {
     std::map<std::string, std::string> dict;
@@ -223,11 +224,15 @@ PyObject* miind_getSimulationLength(PyObject* self, PyObject* args)
 PyObject* miind_startSimulation(PyObject* self, PyObject* args)
 {
     try {
-        if (modelCcp)
-            modelCcp->startSimulation();
-        else if (modelDc)
-            modelDc->startSimulation();
-
+        if (modelCcp) {
+            modelCcp->startSimulation(TwoDLib::Display::getInstance());
+            TwoDLib::Display::getInstance()->animate(true, modelCcp->getTimeStep());
+        }
+        else if (modelDc) {
+            modelDc->startSimulation(TwoDLib::Display::getInstance());
+            TwoDLib::Display::getInstance()->animate(true, modelDc->getTimeStep());
+        }
+            
         Py_RETURN_NONE;
     }
     catch (const std::exception& e) {
@@ -270,6 +275,9 @@ PyObject* miind_evolveSingleStep(PyObject* self, PyObject* args)
         else if (modelDc)
             out_activities = modelDc->evolveSingleStep(activities);
 
+        TwoDLib::Display::getInstance()->updateDisplay(step_count);
+        step_count++;
+
         PyObject* tuple = PyTuple_New(out_activities.size());
 
         for (int index = 0; index < out_activities.size(); index++) {
@@ -291,6 +299,8 @@ PyObject* miind_evolveSingleStep(PyObject* self, PyObject* args)
 PyObject* miind_endSimulation(PyObject* self, PyObject* args)
 {
     try {
+        step_count = 0;
+
         if (modelCcp)
             modelCcp->endSimulation();
         else if (modelDc)

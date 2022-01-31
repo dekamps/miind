@@ -32,6 +32,7 @@ public:
 
   double rot_x;
   double rot_y;
+  int dim_select;
 
   double mesh_min_v;
   double mesh_max_v;
@@ -62,7 +63,8 @@ public:
   void init() const;
   void update();
   void shutdown() const;
-  void animate(bool,std::vector<MPILib::NodeId>, double time_step) const;
+  void setDisplayNodes(std::vector<MPILib::NodeId> nodes_to_display) const ;
+  void animate(bool, double time_step) const;
   void processDraw(void);
 
   void display_3d(void);
@@ -133,6 +135,8 @@ private:
   bool downPressed;
   bool leftPressed;
   bool rightPressed;
+  bool pgupPressed;
+  bool pgdnPressed;
 };
 
 }

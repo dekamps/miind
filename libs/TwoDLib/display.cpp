@@ -29,6 +29,8 @@ Display::Display(){
 	downPressed = false;
 	leftPressed = false;
 	rightPressed = false;
+	pgdnPressed = false;
+	pgupPressed = false;
 }
 
 Display::~Display(){
@@ -54,6 +56,7 @@ unsigned int Display::addOdeSystem(MPILib::NodeId nid, Ode2DSystemGroup* sys, bo
 	window._3D = _3d;
 	window.rot_x = 0.0;
 	window.rot_y = 0.0;
+	window.dim_select = 0;
 	window.max_mass = -9999999;
 	window.min_mass = 9999999;
 
@@ -427,6 +430,16 @@ void Display::display_3d(void) {
 			window_index = iter->first;
 	}
 
+	if (pgupPressed) {
+		_dws[window_index].dim_select = modulo((_dws[window_index].dim_select + 1) , (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions()));
+		pgupPressed = false;
+	}
+
+	if (pgdnPressed) {
+		_dws[window_index].dim_select = modulo((_dws[window_index].dim_select - 1) , (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions()));
+		pgdnPressed = false;
+	}
+
 	if (upPressed) {
 		_dws[window_index].rot_x += 1.5f;
 	}
@@ -476,10 +489,19 @@ void Display::display_3d(void) {
 	GLfloat y_rot = modulof(-155 + _dws[window_index].rot_y, 360) - 45;
 	glRotatef(y_rot, 0.0f, 1.0f, 0.0f);
 
+	std::vector<std::string> labels4(4);
+	labels4[0] = std::string("h");
+	labels4[1] = std::string("n");
+	labels4[2] = std::string("m");
+	labels4[3] = std::string("v");
+
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos3f(-0.5f, 0.55f, -0.5f);
 	int len, i;
+
 	std::string t = std::string("u");
+	if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4)
+		t = labels4[modulo(1 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions())];
 	const char* c_string = t.c_str();
 	len = (int)strlen(c_string);
 	for (i = 0; i < len; i++) {
@@ -489,6 +511,8 @@ void Display::display_3d(void) {
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos3f(-0.5f, -0.5f, 0.6f);
 	t = std::string("w");
+	if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4)
+		t = labels4[modulo(2 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions())];
 	c_string = t.c_str();
 	len = (int)strlen(c_string);
 	for (i = 0; i < len; i++) {
@@ -498,6 +522,8 @@ void Display::display_3d(void) {
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos3f(0.55f, -0.5f, -0.5f);
 	t = std::string("v");
+	if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4)
+		t = labels4[modulo(3 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions())];
 	c_string = t.c_str();
 	len = (int)strlen(c_string);
 	for (i = 0; i < len; i++) {
@@ -789,62 +815,86 @@ void Display::display_3d(void) {
 				unsigned int strip_ind = (i_r * vals_end[1]) + k_r;
 				unsigned int cell_ind = j_r;
 
-				unsigned int idx =  _dws[window_index]._system->Map(_dws[window_index]._mesh_index, strip_ind, cell_ind);
+				std::vector<unsigned int> coords3(3);
+				coords3[0] = i_r;
+				coords3[1] = k_r;
+				coords3[2] = j_r;
 
-				double cell_mass = _dws[window_index]._system->Mass()[idx];
-				// Sum up all mass above the third dimension as we can't display it (this is effectively a marginal)
-				// for the sake of speed here, just assume that this is 4D - if you're in the future and working on 5D or greater
-				// then congratulations on solving the dimensionality problem or possibly quantum computing.
-				if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4) {
-					for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(0); c++) {
-						std::vector<unsigned int> coords(4);
-						coords[0] = c;
-						coords[1] = i_r;
-						coords[2] = k_r;
-						coords[3] = j_r;
+				unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords3);
 
-						cell_mass += _dws[window_index]._system->Mass()[_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords)];
+				double cell_mass = 0.0;
+				double mass = 0.0;
+
+				if (_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] == 0) {
+					// Sum up all mass above the third dimension as we can't display it (this is effectively a marginal)
+					// for the sake of speed here, just assume that this is 4D - if you're in the future and working on 5D or greater
+					// then congratulations on solving the dimensionality problem or possibly quantum computing.
+					if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4) {
+						std::vector<unsigned int> coords4(4);
+						coords4[0 + _dws[window_index].dim_select] = 0;
+						coords4[modulo(1 + _dws[window_index].dim_select, 4)] = i_r;
+						coords4[modulo(2 + _dws[window_index].dim_select, 4)] = k_r;
+						coords4[modulo(3 + _dws[window_index].dim_select, 4)] = j_r;
+
+						unsigned int doo = 1;
+						for (int d = 3; d >= _dws[window_index].dim_select+1; d--)
+							doo *= _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(d);
+
+						unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords4);
+						for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(_dws[window_index].dim_select); c++) {
+							unsigned int index = idx + (c * doo);
+							cell_mass += _dws[window_index]._system->Mass()[index];
+						}
 					}
-				}
+					else {
+						cell_mass = _dws[window_index]._system->Mass()[idx];
+					}
 
-				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() == 0)
 					if (cell_mass < 0.000000001) continue; // skip if mass is basically nothing
 
-				double cell_area = std::abs(m.Quad(0, 0).SignedArea());
+					double cell_area = std::abs(m.Quad(0, 0).SignedArea());
 
-				if (!log_scale) {
-					if (max_m < 1e-6 + cell_mass / cell_area)
-						max_m = 1e-6 + cell_mass / cell_area;
-					if (min_m >= 1e-6 + cell_mass / cell_area)
-						min_m = 1e-6 + cell_mass / cell_area;
+					if (!log_scale) {
+						if (max_m < 1e-6 + cell_mass / cell_area)
+							max_m = 1e-6 + cell_mass / cell_area;
+						if (min_m >= 1e-6 + cell_mass / cell_area)
+							min_m = 1e-6 + cell_mass / cell_area;
+					}
+					else {
+						if (max_m < log10(1e-6 + cell_mass / cell_area))
+							max_m = log10(1e-6 + cell_mass / cell_area);
+						if (min_m >= log10(1e-6 + cell_mass / cell_area))
+							min_m = log10(1e-6 + cell_mass / cell_area);
+					}
+
+					if (!log_scale) {
+						mass = (cell_mass / cell_area - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass);
+					}
+					else {
+						mass = (log10(cell_mass / cell_area) - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass);
+					}
 				}
 				else {
-					if (max_m < log10(1e-6 + cell_mass / cell_area))
-						max_m = log10(1e-6 + cell_mass / cell_area);
-					if (min_m >= log10(1e-6 + cell_mass / cell_area))
-						min_m = log10(1e-6 + cell_mass / cell_area);
-				}
-
-				double mass = 0.0;
-				if (!log_scale) {
-					mass = (cell_mass / cell_area - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass);
-				}
-				else {
-					mass = (log10(cell_mass / cell_area) - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass);
-				}
-
-				if (_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] > 0) {
 					unsigned int count = 0;
 					if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4) {
-						for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(0); c++) {
-							std::vector<unsigned int> coords(4);
-							coords[0] = c;
-							coords[1] = i_r;
-							coords[2] = k_r;
-							coords[3] = j_r;
+						std::vector<unsigned int> coords4(4);
+						coords4[0 + _dws[window_index].dim_select] = 0;
+						coords4[modulo(1 + _dws[window_index].dim_select, 4)] = i_r;
+						coords4[modulo(2 + _dws[window_index].dim_select, 4)] = k_r;
+						coords4[modulo(3 + _dws[window_index].dim_select, 4)] = j_r;
 
-							count += _dws[window_index]._system->_vec_cells_to_objects[_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords)].size();
+						unsigned int doo = 1;
+						for (int d = 3; d >= _dws[window_index].dim_select + 1; d--)
+							doo *= _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(d);
+
+						unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords4);
+						for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(_dws[window_index].dim_select); c++) {
+							unsigned int index = idx + (c * doo);
+							count += _dws[window_index]._system->_vec_cells_to_objects[index].size();
 						}
+					}
+					else {
+						count = _dws[window_index]._system->_vec_cells_to_objects[idx].size();
 					}
 
 					if (count > 0)
@@ -853,7 +903,6 @@ void Display::display_3d(void) {
 						continue;
 				}
 					
-
 				if (mass < 0.00000001) {
 					continue; // glColor4f(1.0, 1.0, 1.0, 0.02);
 				}
@@ -1055,6 +1104,12 @@ void Display::keyboard_3d_down(int key, int _x, int _y) {
 
 	if (key == GLUT_KEY_RIGHT)
 		rightPressed = true;
+
+	if (key == GLUT_KEY_PAGE_UP)
+		pgupPressed = true;
+
+	if (key == GLUT_KEY_PAGE_DOWN)
+		pgdnPressed = true;
 }
 
 void Display::keyboard_3d_up(int key, int _x, int _y) {
@@ -1070,10 +1125,19 @@ void Display::keyboard_3d_up(int key, int _x, int _y) {
 
 	if (key == GLUT_KEY_RIGHT)
 		rightPressed = false;
+
+	if (key == GLUT_KEY_PAGE_UP)
+		pgupPressed = false;
+
+	if (key == GLUT_KEY_PAGE_DOWN)
+		pgdnPressed = false;
 }
 
 
 void Display::updateDisplay(long current_sim_it) {
+	if (Display::getInstance()->_nodes_to_display.size() == 0)
+		return;
+
 	int time;
 	time = glutGet(GLUT_ELAPSED_TIME);
 	Display::getInstance()->_current_sim_it = current_sim_it;
@@ -1101,10 +1165,15 @@ void Display::shutdown() const {
 	// Nice new line if we quit early.
 	std::cout << "\n";
 }
-
-void Display::animate(bool _write_frames, std::vector<MPILib::NodeId> nodes_to_display, double time_step) const{
-
+void Display::setDisplayNodes(std::vector<MPILib::NodeId> nodes_to_display) const {
 	Display::getInstance()->_nodes_to_display = nodes_to_display;
+}
+
+void Display::animate(bool _write_frames,  double time_step) const{
+
+	if (Display::getInstance()->_nodes_to_display.size() == 0)
+		return;
+
 	Display::getInstance()->write_frames = _write_frames;
 	Display::getInstance()->_time_step = time_step;
 
