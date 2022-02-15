@@ -161,7 +161,8 @@ model_archive/Adex/adex_0_0_0_0_.tmat
 set( MA_COND_GRID
 model_archive/Conductance2D/Grid/cond.xml
 model_archive/Conductance2D/Grid/cond.model
-model_archive/Conductance2D/Grid/cond_0_0_0_0_.tmat
+model_archive/Conductance2D/Grid/cond.tmat
+model_archive/Conductance2D/Grid/generateCondFiles.py
 )
 
 set( MA_COND_MESH
