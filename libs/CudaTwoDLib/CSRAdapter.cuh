@@ -130,7 +130,7 @@ namespace CudaTwoDLib {
 		std::vector<inttype>   _nja;
 		std::vector<inttype*>  _ja;
 
-		curandState				   *_randomState;
+		curandState*				   _randomState;
 		inttype*					_random_poisson;
 
 		std::vector<inttype*>  _forward_ia;

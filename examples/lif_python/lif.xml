@@ -1,19 +1,20 @@
 <Simulation>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="MeshAlgorithm" name="E" modelfile="lif.model" >
+<Algorithm type="MeshAlgorithmGroup" name="E" modelfile="lif.model" >
 <TimeStep>0.001</TimeStep>
 <MatrixFile>lif_0.01_0_0_0_.mat</MatrixFile>
 </Algorithm>
 </Algorithms>
 <Nodes>
-<Node algorithm="E" name="LIF" type="EXCITATORY_DIRECT" />
+<Node algorithm="E" name="LIF" type="EXCITATORY" />
 </Nodes>
 <Connections>
-<IncomingConnection Node="LIF">1 0.01 0</IncomingConnection>
+<IncomingConnection Node="LIF" num_connections="1" efficacy="0.01" delay="0.0" />
 <OutgoingConnection Node="LIF"/>
 </Connections>
 <Reporting>
+<Display node="LIF" />
 <Rate node="LIF" t_interval="0.01" />
 </Reporting>
 <SimulationRunParameter>

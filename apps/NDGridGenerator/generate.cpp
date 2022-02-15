@@ -46,48 +46,63 @@ void applyHindmarshRoseEuler(NdPoint& p, double t) {
 }
 
 // Recommended settings in main() for applyConductance3D:
-//std::vector<double> base = { -0.2,-0.2,-90e-3 };
-//std::vector<double> dims = { 1.4, 1.4, 36e-3 };
-//std::vector<unsigned int> res = { 50, 50, 100 };
+//std::vector<double> base = { -50, -50,-80 };
+//std::vector<double> dims = { 650, 650, 40 };
+//std::vector<unsigned int> res = { 200, 200, 100 };
 //std::vector<double> reset_relative = { 0.0,0.0,0.0 };
-//double threshold = -55e-3;
-//double reset_v = -65e-3;
-//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1e-04);
+//double threshold = -50.4;
+//double reset_v = -70.6;
+//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1);
 //
 //g.setCppFunction(applyConductance3D);
-//g.generateModelFile("conductanceNdNoise", 1);
-//g.generateTMatFileBatched("conductanceNdNoise");
+//g.generateModelFile("cond3d_large", 0.001);
+//g.generateTMatFileBatched("cond3d_large");
+
+
+//std::vector<double> base = { -50,-50,-80 };
+//std::vector<double> dims = { 450, 350, 40 };
+//std::vector<unsigned int> res = { 200, 200, 100 };
+//std::vector<double> reset_relative = { 0.0,0.0,0.0 };
+//double threshold = -50.4;
+//double reset_v = -70.6;
+//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1);
+//
+//g.setCppFunction(applyConductance3D);
+//g.generateModelFile("cond3d", 0.001);
+//g.generateTMatFileBatched("cond3d");
+
+//std::vector<double> base = { -0.2,-0.2,-80 };
+//std::vector<double> dims = { 5.4, 5.4, 40 };
+//std::vector<unsigned int> res = { 50, 50, 200 };
+//std::vector<double> reset_relative = { 0.0,0.0,0.0 };
+//double threshold = -50.4;
+//double reset_v = -70.6;
+//NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1);
+//
+//g.setCppFunction(applyConductance3D);
+//g.generateModelFile("cond3d_small", 0.001);
+//g.generateTMatFileBatched("cond3d_small");
 void applyConductance3D(NdPoint& p, double t) {
-    double tau_m = 20e-3;
-    double E_r = -65e-3;
-    double E_e = 0;
-    double tau_s = 5e-3;
-    double tau_t = 5e-3;
-    double g_max = 0.8;
-    double V_min = -66e-3;
-    double V_max = -55e-3;
-    double V_th = -55e-3;
-    double N_V = 2000;
-    double w_min = 0.0;
-    double w_max = 10.0;
-    double N_w = 20.0;
-    double u_min = 0.0;
-    double u_max = 10.0;
-    double N_u = 20.0;
+    double E_l = -70.6;
+    double V_thres = -50.4;
+    double E_e = 0.0;
+    double E_i = -75;
+    double C = 281;
+    double g_l = 0.03;
+    double tau_e = 2.728;
+    double tau_i = 10.49;
 
     double v = p.coords[2];
     double w = p.coords[1];
     double u = p.coords[0];
 
-    for (unsigned int i = 0; i < 11; i++) {
-        double v_prime = (-(v - E_r) - w * (v - E_e) + u * (v - E_e)) / tau_m;
-        double w_prime = -w / tau_s;
-        double u_prime = -u / tau_t;
+    double v_prime = (-g_l * (v - E_l) - w * (v - E_e) - u * (v - E_i)) / C;
+    double w_prime = -w / tau_e;
+    double u_prime = -u / tau_i;
 
-        v = v + (t / 11.0) * v_prime;
-        w = w + (t / 11.0) * w_prime;
-        u = u + (t / 11.0) * u_prime;
-    }
+    v = v + (t * v_prime);
+    w = w + (t * w_prime);
+    u = u + (t * u_prime);
 
     p.coords[2] = v;
     p.coords[1] = w;
@@ -553,16 +568,16 @@ void applyHH(NdPoint& p, double t) {
 }
 
 int main() {
-    std::vector<double> base = { -0.2, -0.2, -1.5, -2.5 };
-    std::vector<double> dims = { 1.4, 1.4, 3.0, 4.5 };
-    std::vector<unsigned int> res = { 50, 50, 50, 50 };
-    std::vector<double> reset_relative = { 0.0,0.0,0.0,0.0 };
-    double threshold = 1.99;
-    double reset_v = -2.49;
-    NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 0.01);
+    std::vector<double> base = { -0.2,-0.2,-80 };
+    std::vector<double> dims = { 5.4, 5.4, 40 };
+    std::vector<unsigned int> res = { 500, 500, 500 };
+    std::vector<double> reset_relative = { 0.0,0.0,0.0 };
+    double threshold = -50.4;
+    double reset_v = -70.6;
+    NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1);
     
-    g.setCppFunction(applyBRMN);
-    g.generateModelFile("brmn4d", 0.001);
-    g.generateTMatFileBatched("brmn4d");
+    g.setCppFunction(applyConductance3D);
+    g.generateModelFile("cond3d_small_500x500x500", 0.001);
+    g.generateTMatFileBatched("cond3d_small_500x500x500");
 	return 0;
 }

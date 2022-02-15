@@ -181,12 +181,19 @@ void CudaOde2DSystemAdapter::DeleteMass()
 
 void CudaOde2DSystemAdapter::DeleteMapData()
 {
+	cudaFree(_map_cumulative_value);
+	cudaFree(_map_strip_length_value);
     cudaFree(_map);
 	cudaFree(_unmap);
 }
 
 CudaOde2DSystemAdapter::~CudaOde2DSystemAdapter()
 {
+	for (unsigned int m = 0; m< _refractory_mass_local.size(); m++)
+		cudaFree(_refractory_mass[m]);
+
+	cudaFree(_spikes);
+
 	this->DeleteFiniteVectors();
     this->DeleteMass();
     this->DeleteMapData();
@@ -678,6 +685,7 @@ void CudaOde2DSystemAdapter::DeleteResetMap()
         cudaFree(_res_from_offsets[m]);
 				cudaFree(_res_to_mass[m]);
 				cudaFree(_res_sum[m]);
+				cudaFree(_spikeCounts[m]);
     }
 
 }

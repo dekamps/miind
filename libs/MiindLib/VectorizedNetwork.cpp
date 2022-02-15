@@ -595,6 +595,44 @@ void VectorizedNetwork::setupLoop(bool write_displays, TwoDLib::Display * displa
 
             csrs.push_back(TwoDLib::CSRMatrix(mats.back(), *_group, _node_id_to_group_mesh[_grid_connections[i]._out]));
         }
+        else if (_grid_connections[i]._params["type"] == std::string("tsodyks")) { //specific connection type designed for the tsodyks markram 4D model
+        
+        std::vector<std::vector<fptype>> test_cell_vals(total_num_cells);
+
+        double U_se = 0.55; //55
+        double A_se = 5.3; //530
+
+        if (_grid_connections[i]._params.find("U_se") != _grid_connections[i]._params.end())
+            U_se = std::stod(_grid_connections[i]._params["U_se"]);
+
+        if (_grid_connections[i]._params.find("A_se") != _grid_connections[i]._params.end())
+            A_se = std::stod(_grid_connections[i]._params["A_se"]);
+
+        for (int c = 0; c < total_num_cells; c++) {
+
+            std::vector<fptype> eff_vector(num_dimensions);
+
+            double R = ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[0]
+                * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(0))
+                + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(0));
+
+            double E = ((_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getCoordsOfIndex(c)[1]
+                * _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridCellWidthByDimension(1))
+                + _grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]].getGridBaseByDimension(1));
+
+            eff_vector[0] = -U_se * R;
+            eff_vector[1] =  U_se * R;
+            eff_vector[2] =  U_se * A_se * E;
+            eff_vector[3] =  0.0;
+
+            test_cell_vals[c] = eff_vector;
+        }
+
+        mats.push_back(calculateProportionsNDEfficacyForCsr(_grid_vec_mesh[_node_id_to_group_mesh[_grid_connections[i]._out]],
+            cell_dim_widths, total_num_cells, test_cell_vals, cell_dim_offs));
+
+        csrs.push_back(TwoDLib::CSRMatrix(mats.back(), *_group, _node_id_to_group_mesh[_grid_connections[i]._out]));
+        }
         else {
             std::vector<std::vector<fptype>> test_cell_vals(total_num_cells);
             // Calculate the v for each cell in the grid
@@ -823,4 +861,80 @@ void VectorizedNetwork::mainLoop(MPILib::Time t_begin, MPILib::Time t_end, MPILi
         singleStep(std::vector<double>(), i_loop);
         (*pb)++;
     }
+}
+
+void VectorizedNetwork::endSimulation() {
+    _vec_transforms.clear();
+    _start_vs.clear();
+    _start_ws.clear();
+    _start_us.clear();
+    _start_xs.clear();
+
+    _vec_mesh.clear();
+    _vec_vec_rev.clear();
+    _vec_vec_res.clear();
+    _vec_tau_refractive.clear();
+
+    _grid_node_ids.clear();
+    _grid_vec_mesh.clear();
+    _grid_vec_vec_rev.clear();
+    _grid_vec_vec_res.clear();
+    _grid_vec_tau_refractive.clear();
+
+    _mesh_node_ids.clear();
+    _mesh_vec_mesh.clear();
+    _mesh_vec_vec_rev.clear();
+    _mesh_vec_vec_res.clear();
+    _mesh_vec_tau_refractive.clear();
+
+    _rate_func_node_ids.clear();
+
+    _grid_transform_indexes.clear();
+    _mesh_transform_indexes.clear();
+
+    _grid_meshes.clear();
+    _mesh_meshes.clear();
+
+    _num_grid_objects.clear();
+    _num_mesh_objects.clear();
+    _num_objects.clear();
+
+
+    delete _group_adapter;
+    delete _csr_adapter;
+
+    _csrs.clear();
+
+    _display_nodes.clear();
+    _rate_nodes.clear();
+    _avg_nodes.clear();
+    _rate_intervals.clear();
+    _avg_intervals.clear();
+    _density_nodes.clear();
+    _density_start_times.clear();
+    _density_end_times.clear();
+    _density_intervals.clear();
+
+    _connection_out_group_mesh.clear();
+    _connection_queue.clear();
+    _node_to_connection_queue.clear();
+    _external_to_connection_queue.clear();
+    _effs.clear();
+    _grid_cell_widths.clear();
+    _grid_cell_offsets.clear();
+
+    _current_node_rates.clear();
+    _current_node_avgs.clear();
+
+    _monitored_nodes.clear();
+
+    _mesh_connections.clear();
+    _mesh_custom_connections.clear();
+    _grid_connections.clear();
+
+    _rate_functions.clear();
+    _rate_functors.clear();
+
+    _node_id_to_group_mesh.clear();
+    _group_mesh_to_node_id.clear();
 }

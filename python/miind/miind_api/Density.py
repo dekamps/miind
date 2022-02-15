@@ -181,7 +181,7 @@ class Density(Result):
         for fname in self.fnames:
             path, filename = op.split(fname)
             tokens = filename.split('_')
-            if float(tokens[-2]) == float(time):
+            if float(tokens[-1]) == float(time) or float(tokens[-2]) == float(time):
                 return fname
         return None
 

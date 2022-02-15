@@ -305,7 +305,30 @@ CSRAdapter::CSRAdapter(CudaOde2DSystemAdapter& group, const std::vector<TwoDLib:
 
 CSRAdapter::~CSRAdapter()
 {
+#ifdef IZHIKEVICH_TEST
+    free(_izh_vs);
+    free(_izh_ws);
+    free(_refract_times);
+#endif
+
+    cudaFree(_cell_vs);
+
+    for (inttype m = 0; m < _nr_grid_connections; m++) {
+        cudaFree(_grid_val[m]);
+        cudaFree(_grid_ia[m]);
+        cudaFree(_grid_ja[m]);
+        cudaFree(_grid_forward_val[m]);
+        cudaFree(_grid_forward_ia[m]);
+        cudaFree(_grid_forward_ja[m]);
+        cudaFree(_cell_vals[m]);
+        cudaFree(_goes[m]);
+        cudaFree(_stays[m]);
+        cudaFree(_offset1s[m]);
+        cudaFree(_offset2s[m]);
+    }
+
     this->DeleteMatrixMaps();
+    this->DeleteForwardMatrixMaps();
     this->DeleteDerivative();
     this->DeleteStreams();
     this->DeleteRandom();
@@ -320,7 +343,7 @@ void CSRAdapter::CreateStreams()
 
 void CSRAdapter::DeleteStreams()
 {
-    free(_streams);
+    cudaFree(_streams);
 }
 
 void CSRAdapter::FillDerivative()
@@ -337,8 +360,8 @@ void CSRAdapter::FillRandom()
 
 void CSRAdapter::DeleteRandom()
 {
-    free(_random_poisson);
-    free(_randomState);
+    cudaFree(_random_poisson);
+    cudaFree(_randomState);
 }
 
 void CSRAdapter::DeleteDerivative()

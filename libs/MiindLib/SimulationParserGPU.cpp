@@ -59,6 +59,7 @@ int SimulationParserGPU<WeightType>::interpretValueAsInt(std::string value) {
 
 template<class WeightType>
 void SimulationParserGPU<WeightType>::endSimulation() {
+	vec_network.endSimulation();
 	SimulationParserCPU<WeightType>::endSimulation();
 }
 

@@ -155,6 +155,8 @@ namespace MiindLib {
         std::vector<double> singleStep(std::vector<double>, unsigned int i_loop);
         void endLoops();
 
+        void endSimulation();
+
         void setTimeStep(double time_step) { _network_time_step = time_step; }
         double getTimeStep() { return _network_time_step; }
 

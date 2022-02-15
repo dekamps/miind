@@ -17,6 +17,7 @@
 <Connection In="Drive" Out="CondNode" num_connections="1" efficacy="0.05" delay="0.0"/>
 </Connections>
 <Reporting>
+<Display node="CondNode" />
 <Density node="CondNode" t_start="0.0" t_end="0.1" t_interval="0.001" />
 <Rate node="CondNode" t_interval="0.001"/>
 </Reporting>

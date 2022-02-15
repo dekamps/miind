@@ -703,7 +703,7 @@ const std::vector<MPILib::Potential>& Ode2DSystemGroup::Avgs(unsigned int m) con
 			std::vector<MPILib::Potential> av(_mesh_list[m].getGridNumDimensions());
 			
 			for (MPILib::Index i = 0; i < _vec_num_objects[m]; i++) {
-				std::vector<MPILib::Potential> V = _mesh_list[m].Centroid(this->_vec_objects_to_index[i]);
+				std::vector<MPILib::Potential> V = _mesh_list[m].Centroid(this->_vec_objects_to_index[i+this->_vec_num_object_offsets[m]]);
 				for (unsigned int d = 0; d < _mesh_list[m].getGridNumDimensions(); d++) {
 					av[d] += V[d];
 				}

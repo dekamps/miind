@@ -602,9 +602,9 @@ void Display::display_3d(void) {
 
 	// Display 3D mass
 
-	unsigned int size_x = m.getGridResolutionByDimension(2);
-	unsigned int size_y = m.getGridResolutionByDimension(1);
-	unsigned int size_z = m.getGridResolutionByDimension(0);
+	unsigned int size_x = m.getGridResolutionByDimension(modulo(-1 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions()));
+	unsigned int size_y = m.getGridResolutionByDimension(modulo(-2 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions()));
+	unsigned int size_z = m.getGridResolutionByDimension(modulo(-3 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions()));
 
 	// Draw a Cube
 
@@ -820,7 +820,7 @@ void Display::display_3d(void) {
 				coords3[1] = k_r;
 				coords3[2] = j_r;
 
-				unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords3);
+				unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords3) + _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index];
 
 				double cell_mass = 0.0;
 				double mass = 0.0;
@@ -840,7 +840,7 @@ void Display::display_3d(void) {
 						for (int d = 3; d >= _dws[window_index].dim_select+1; d--)
 							doo *= _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(d);
 
-						unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords4);
+						unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords4) + _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index];
 						for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(_dws[window_index].dim_select); c++) {
 							unsigned int index = idx + (c * doo);
 							cell_mass += _dws[window_index]._system->Mass()[index];
@@ -887,7 +887,7 @@ void Display::display_3d(void) {
 						for (int d = 3; d >= _dws[window_index].dim_select + 1; d--)
 							doo *= _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(d);
 
-						unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords4);
+						unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords4) + _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index];
 						for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(_dws[window_index].dim_select); c++) {
 							unsigned int index = idx + (c * doo);
 							count += _dws[window_index]._system->_vec_cells_to_objects[index].size();

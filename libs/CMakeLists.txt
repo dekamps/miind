@@ -1,6 +1,4 @@
-if(NOT WIN32)
-	ADD_SUBDIRECTORY( EPFLLib )
-endif(NOT WIN32)
+#ADD_SUBDIRECTORY( EPFLLib ) Removed to avoid FFTW dependency issues (not required)
 ADD_SUBDIRECTORY( MPILib)
 ADD_SUBDIRECTORY( GeomLib)
 ADD_SUBDIRECTORY( NumtoolsLib )

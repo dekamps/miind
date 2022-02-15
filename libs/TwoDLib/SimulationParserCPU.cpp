@@ -595,7 +595,6 @@ template<class WeightType>
 void SimulationParserCPU<WeightType>::startSimulation(TwoDLib::Display* display) {
 	if (_display_nodes.size() > 0) {
 		display->setDisplayNodes(_display_nodes);
-		display->animate(true, MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::_time_step);
 	}
 	MPILib::MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::startSimulation(display);
 }
