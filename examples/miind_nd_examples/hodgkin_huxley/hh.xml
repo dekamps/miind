@@ -1,0 +1,27 @@
+<Simulation>
+<Variable Name='TIME_END'>0.04</Variable>
+<Variable Name='MODEL_FILE' type="String">cond3D.model</Variable>
+<Variable Name='TMAT_FILE' type="String">cond3D.tmat</Variable>
+<Variable Name='RATE'>200</Variable>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="GridAlgorithmGroup" name="OSC" modelfile="MODEL_FILE" tau_refractive="0.0" transformfile="TMAT_FILE" start_v="-70" start_w="0.05" start_u="0.3" start_x="0.6">
+<TimeStep>1e-05</TimeStep>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="OSC" name="E" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<IncomingConnection Node="E" num_connections="100" efficacy="3" delay="0.0" dimension="0"/>
+</Connections>
+<Reporting>
+	<Average node="E" t_interval="0.0001" />
+</Reporting>
+<SimulationRunParameter>
+<master_steps>10</master_steps>
+<t_end>TIME_END</t_end>
+<t_step>1e-05</t_step>
+<name_log>hh.log</name_log>
+</SimulationRunParameter>
+</Simulation>

@@ -1,0 +1,47 @@
+<Simulation>
+<Variable Name='TE'>1.0</Variable>
+<Variable Name='MF' type="String">cond3D.model</Variable>
+<Variable Name='TMF' type="String">cond3D.tmat</Variable>
+<Variable Name='E_EFFICACY'>1</Variable>
+<Variable Name='I_EFFICACY'>4</Variable>
+<Variable Name='N_EE'>80</Variable>
+<Variable Name='N_EI'>80</Variable>
+<Variable Name='N_IE'>20</Variable>
+<Variable Name='N_II'>20</Variable>
+<Variable Name='N_E'>800</Variable>
+<Variable Name='N_I'>200</Variable>
+<Variable Name='RATE'>500</Variable>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="GridAlgorithmGroup" name="COND3D" modelfile="MF" tau_refractive="0.0" transformfile="TMF" start_v="-65" start_w="0.00001" start_u="0.00001">
+<TimeStep>1e-03</TimeStep>
+</Algorithm>
+<Algorithm type="GridAlgorithmGroup" name="COND3DI" modelfile="MF" tau_refractive="0.0" transformfile="TMF" start_v="-65" start_w="0.00001" start_u="0.00001">
+<TimeStep>1e-03</TimeStep>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="COND3D" name="E" type="NEUTRAL" />
+<Node algorithm="COND3DI" name="I" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<IncomingConnection Node="E" num_connections="10" efficacy="0.15" delay="0.0" dimension="1"/>
+<IncomingConnection Node="I" num_connections="10" efficacy="0.15" delay="0.0" dimension="1"/>
+
+<Connection In="E" Out="E" num_connections="N_EE" efficacy="E_EFFICACY" delay="0.003" dimension="1"/>
+<Connection In="I" Out="E" num_connections="N_IE" efficacy="I_EFFICACY" delay="0.003" dimension="2"/>
+
+<Connection In="E" Out="I" num_connections="N_EI" efficacy="E_EFFICACY" delay="0.003" dimension="1"/>
+<Connection In="I" Out="I" num_connections="N_II" efficacy="I_EFFICACY" delay="0.003" dimension="2"/>
+
+</Connections>
+<Reporting>
+	<Display node="E" />
+</Reporting>
+<SimulationRunParameter>
+<master_steps>100</master_steps>
+<t_end>TE</t_end>
+<t_step>1e-03</t_step>
+<name_log>cond.log</name_log>
+</SimulationRunParameter>
+</Simulation>

@@ -121,6 +121,38 @@ twopop/twopop.xml
 twopop/README.txt
 )
 
+set( MIIND_ND_EXAMPLE_COND
+miind_nd_examples/LIF_conductance/cond3D.xml
+miind_nd_examples/LIF_conductance/cond3d_small_50x50x50.model
+miind_nd_examples/LIF_conductance/cond3d_small_50x50x50.tmat
+miind_nd_examples/LIF_conductance/cond3d_small_50x50x300.model
+miind_nd_examples/LIF_conductance/cond3d_small_50x50x300.tmat
+miind_nd_examples/LIF_conductance/generateCond3D.py
+miind_nd_examples/LIF_conductance/run_current_curves.py
+miind_nd_examples/LIF_conductance/run_direct.py
+miind_nd_examples/LIF_conductance/run_miind.py
+)
+
+set( MIIND_ND_EXAMPLE_COND_EI
+miind_nd_examples/ei_network/cond3D_EI.xml
+miind_nd_examples/ei_network/run_direct_EI.py
+miind_nd_examples/ei_network/run_miind_EI.py
+)
+
+set( MIIND_ND_EXAMPLE_HH
+miind_nd_examples/hodgkin_huxley/generateHH.py
+miind_nd_examples/hodgkin_huxley/hh.xml
+miind_nd_examples/hodgkin_huxley/run_hh_finite.py
+miind_nd_examples/hodgkin_huxley/run_hh_miind.py
+)
+
+set( MA_4D_HH
+model_archive/4D/HodgkinHuxley/hh.xml
+model_archive/4D/HodgkinHuxley/run_hh_finite.py
+model_archive/4D/HodgkinHuxley/run_hh_miind.py
+model_archive/4D/HodgkinHuxley/generateHH.py
+)
+
 set( MA_3D_COND
 model_archive/3D/Conductance3D/cond3D.xml
 model_archive/3D/Conductance3D/cond3D.model
@@ -342,6 +374,8 @@ install( FILES ${MA_3D_TM}
 	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/TsodyksMarkramEI )
 install( FILES ${MA_BRMN}
 	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/ReducedBoothRinzelMN )
+install( FILES ${MA_4D_HH}
+	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/4D/HodgkinHuxley )
 
 if (NOT SKBUILD) # If we're not installing for pip, install all examples
 	install( FILES ${AEXP}
@@ -388,4 +422,10 @@ if (NOT SKBUILD) # If we're not installing for pip, install all examples
 		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/t3 )
 	install( FILES ${TUTORIAL_VECTOR}
 		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial/vectorised )
+	install( FILES ${MIIND_ND_EXAMPLE_COND}
+		DESTINATION ${EXAMPLES_BASE_DIR}/miind_nd_examples/LIF_conductance )
+	install( FILES ${MIIND_ND_EXAMPLE_COND_EI}
+		DESTINATION ${EXAMPLES_BASE_DIR}/miind_nd_examples/ei_network )
+	install( FILES ${MIIND_ND_EXAMPLE_HH}
+		DESTINATION ${EXAMPLES_BASE_DIR}/miind_nd_examples/hodgkin_huxley )
 endif(NOT SKBUILD)

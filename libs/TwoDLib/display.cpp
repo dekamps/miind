@@ -161,10 +161,10 @@ void Display::display(void) {
 			if (_dws[window_index]._system->Mass()[idx] / cell_area != 0 && _dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] == 0) {
 				mass = std::min(1.0, std::max(0.0, (log10(_dws[window_index]._system->Mass()[idx] / cell_area) - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass)));
 			}
-			else {
+			else if (_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] > 0){
 				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() > 0)
-					//mass = (double)_dws[window_index]._system->_vec_cells_to_objects[idx].size() / (double)_dws[window_index]._system->_num_objects;
-					mass = 1.0;
+				    mass = 0.5 + 1000.0 * ((double)_dws[window_index]._system->_vec_cells_to_objects[idx].size() / (double)_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index]);
+					//mass = 1.0;
 			}
 
 			vector<Point> ps = q.Points();

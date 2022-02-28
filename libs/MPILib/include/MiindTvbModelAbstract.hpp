@@ -43,6 +43,10 @@ public:
 		t.report();
 	}
 
+	void reportAutoTime() {
+		t.report();
+	}
+
 	double getTimeStep() {
 		return _time_step;
 	}

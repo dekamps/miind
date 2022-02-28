@@ -1,0 +1,38 @@
+<Simulation>
+<Variable Name='TIME_END'>1.0</Variable>
+<Variable Name='MODEL_FILE' type="String">cond3D.model</Variable>
+<Variable Name='TMAT_FILE' type="String">cond3D.tmat</Variable>
+<Variable Name='RATE'>500</Variable>
+<WeightType>CustomConnectionParameters</WeightType>
+<Algorithms>
+<Algorithm type="GridAlgorithmGroup" name="COND3D" modelfile="MODEL_FILE" tau_refractive="0.0" transformfile="TMAT_FILE" start_v="-65" start_w="0.00001" start_u="0.00001">
+<TimeStep>1e-03</TimeStep>
+</Algorithm>
+<Algorithm type="RateFunctor" name="DRIVE_1">
+<expression>50</expression>
+</Algorithm>
+<Algorithm type="RateFunctor" name="DRIVE_2">
+<expression>50</expression>
+</Algorithm>
+</Algorithms>
+<Nodes>
+<Node algorithm="COND3D" name="E" type="NEUTRAL" />
+<Node algorithm="DRIVE_1" name="NOISE" type="NEUTRAL" />
+<Node algorithm="DRIVE_2" name="NOISE2" type="NEUTRAL" />
+</Nodes>
+<Connections>
+<IncomingConnection Node="E" num_connections="1" efficacy="1.5" delay="0.0" dimension="1"/>
+<Connection In="NOISE" Out="E" num_connections="1" efficacy="1.5" delay="0.0" dimension="1"/>
+<Connection In="NOISE2" Out="E" num_connections="1" efficacy="1.5" delay="0.0" dimension="2"/>
+</Connections>
+<Reporting>
+	<Rate node="E" t_interval="0.001" />
+	<Average node="E" t_interval="0.001" />
+</Reporting>
+<SimulationRunParameter>
+<master_steps>10</master_steps>
+<t_end>TIME_END</t_end>
+<t_step>1e-03</t_step>
+<name_log>cond.log</name_log>
+</SimulationRunParameter>
+</Simulation>

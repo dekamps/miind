@@ -128,7 +128,7 @@ namespace TwoDLib {
 			std::vector<unsigned int> coords = getCoordsOfIndex(index);
 			std::vector<double> vs(getGridNumDimensions(), 0.0);
 			for (unsigned int d = 0; d < getGridNumDimensions(); d++) {
-				vs[d] = getGridBaseByDimension(d) + (getGridCellWidthByDimension(d) * coords[d]);
+				vs[d] = getGridBaseByDimension(d) + (getGridCellWidthByDimension(d) * coords[d]) + (getGridCellWidthByDimension(d)/2.0);
 			}
 
 			return vs;

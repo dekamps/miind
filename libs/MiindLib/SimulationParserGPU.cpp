@@ -477,6 +477,9 @@ void SimulationParserGPU<WeightType>::parseXmlFile() {
 template<class WeightType>
 void SimulationParserGPU<WeightType>::startSimulation(TwoDLib::Display* display) {
 	vec_network.setupLoop(true, display);
+	std::cout << "Simulation setup complete.\n";
+	MiindTvbModelAbstract<WeightType, MPILib::utilities::CircularDistribution>::reportAutoTime();
+	std::cout << "Starting simulation...\n";
 	SimulationParserCPU<WeightType>::pb = new MPILib::utilities::ProgressBar((int)(SimulationParserCPU<WeightType>::_simulation_length / SimulationParserCPU<WeightType>::_time_step));
 }
 
