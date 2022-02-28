@@ -1169,6 +1169,11 @@ void Display::setDisplayNodes(std::vector<MPILib::NodeId> nodes_to_display) cons
 	Display::getInstance()->_nodes_to_display = nodes_to_display;
 }
 
+void Display::animate(bool _write_frames, std::vector<MPILib::NodeId> display_nodes, double time_step) const {
+	Display::getInstance()->_nodes_to_display = display_nodes;
+	animate(_write_frames, time_step);
+}
+
 void Display::animate(bool _write_frames,  double time_step) const{
 
 	if (Display::getInstance()->_nodes_to_display.size() == 0)

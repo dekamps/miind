@@ -65,6 +65,7 @@ public:
   void shutdown() const;
   void setDisplayNodes(std::vector<MPILib::NodeId> nodes_to_display) const ;
   void animate(bool, double time_step) const;
+  void animate(bool, std::vector<MPILib::NodeId>, double time_step) const;
   void processDraw(void);
 
   void display_3d(void);
