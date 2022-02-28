@@ -13,7 +13,10 @@ SimulationParserGPU<MPILib::CustomConnectionParameters>* modelCcp;
 SimulationParserGPU<MPILib::DelayedConnection>* modelDc;
 
 TwoDLib::Display* display;
+
+#ifdef WIN32 // displaying the density in a different thread requires std::thread which is not supported by gcc so will only work on windows
 bool display_threaded = false;
+#endif
 
 std::map<std::string, std::string> getVariablesFromFile(std::string filename) {
     std::map<std::string, std::string> dict;
@@ -101,6 +104,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Sim Time: " << modelCcp->getSimulationLength() << "\n";
         modelCcp->startSimulation(display);
 
+#ifdef WIN32
         std::thread worker_thread;
         if (display_threaded) {
             worker_thread = std::thread(updateDisplay, display, &its, modelCcp->getTimeStep());
@@ -120,11 +124,24 @@ int main(int argc, char* argv[]) {
             worker_thread.join();
         }
         modelCcp->endSimulation();
+#else
+        display->animate(true, modelCcp->getTimeStep());
+
+        while (time < modelCcp->getSimulationLength()) {
+            time += modelCcp->getTimeStep();
+            modelCcp->evolveSingleStep(std::vector<double>());
+            display->updateDisplay(its);
+            its++;
+        }
+        modelCcp->endSimulation();
+#endif
     }
     else if (modelDc) {
         std::cout << "Time Step: " << modelDc->getTimeStep() << "\n";
         std::cout << "Sim Time: " << modelDc->getSimulationLength() << "\n";
         modelDc->startSimulation(display);
+
+#ifdef WIN32
         std::thread worker_thread;
         if (display_threaded) {
             worker_thread = std::thread(updateDisplay, display, &its, modelDc->getTimeStep());
@@ -143,6 +160,16 @@ int main(int argc, char* argv[]) {
             worker_thread.join();
         }
         modelDc->endSimulation();
+#else
+        display->animate(true, modelDc->getTimeStep());
+        while (time < modelDc->getSimulationLength()) {
+            time += modelDc->getTimeStep();
+            modelDc->evolveSingleStep(std::vector<double>());
+            display->updateDisplay(its);
+            its++;
+        }
+        modelDc->endSimulation();
+#endif
     }
 
     
