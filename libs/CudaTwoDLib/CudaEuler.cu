@@ -328,10 +328,10 @@ __global__ void CudaGridResetFiniteObjects(inttype N, inttype finite_offset, int
         int offset_ind = i + finite_offset;
         spiked[offset_ind] = 0;
 
-        if (refract_times[offset_ind] >= 0) {
+        if (refract_times[offset_ind] >= timestep+(timestep/2.0)) {
             refract_times[offset_ind] -= timestep;
 
-            if (refract_times[offset_ind] <= 0) {
+            if (refract_times[offset_ind] < timestep+(timestep/2.0)) {
                 refract_times[offset_ind] = -1.0;
 
                 objects[offset_ind] = refract_inds[offset_ind] + offset;

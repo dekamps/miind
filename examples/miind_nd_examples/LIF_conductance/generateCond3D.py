@@ -23,3 +23,8 @@ def cond(y):
     return [u_prime, w_prime, v_prime]
 
 miindgen.generateNdGrid(cond, 'cond3d_small_50x50x50', [-0.2,-0.2,-80], [5.4,5.4,40.0], [50,50,50], -50.4, -70.6, [0.0,0.0,0.0], 1, 0.001)
+miindgen.generateNdGrid(cond, 'cond3d_small_100x100x100', [-0.2,-0.2,-80], [5.4,5.4,40.0], [100,100,100], -50.4, -70.6, [0.0,0.0,0.0], 1, 0.001)
+miindgen.generateNdGrid(cond, 'cond3d_small_150x150x150', [-0.2,-0.2,-80], [5.4,5.4,40.0], [150,150,150], -50.4, -70.6, [0.0,0.0,0.0], 1, 0.001)
+miindgen.generateNdGrid(cond, 'cond3d_small_50x50x300', [-0.2,-0.2,-80], [5.4,5.4,40.0], [50,50,300], -50.4, -70.6, [0.0,0.0,0.0], 1, 0.001)
+miindgen.generateNdGrid(cond, 'cond3d_small_200x200x100', [-0.2,-0.2,-80], [5.4,5.4,40.0], [200,200,100], -50.4, -70.6, [0.0,0.0,0.0], 1, 0.001)
+miindgen.generateNdGrid(cond, 'cond3d_small_100x100x200', [-0.2,-0.2,-80], [5.4,5.4,40.0], [100,100,200], -50.4, -70.6, [0.0,0.0,0.0], 1, 0.001)

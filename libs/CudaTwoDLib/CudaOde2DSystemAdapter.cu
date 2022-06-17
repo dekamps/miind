@@ -415,7 +415,7 @@ const std::vector<fptype>& CudaOde2DSystemAdapter::F(unsigned int n_steps) const
 			for (auto& count : host_sum)
 				sum += count;
 				
-			_host_fs.push_back(((double)sum / (double)_vec_num_objects[m]) / (_time_step * n_steps));
+			_host_fs.push_back(((double)sum / (double)(_vec_num_objects[m])) / (_time_step * n_steps));
 		}
 		
 	}

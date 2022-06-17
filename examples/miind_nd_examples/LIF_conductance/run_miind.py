@@ -62,6 +62,14 @@ for i in range(len(models)):
         # back to base
         os.chdir('..')
         
+        directory_exists[i] = True
+        
+        with open(output_dir + "/avg_0") as avg_file:
+            reader = csv.reader(avg_file, delimiter='\t')
+            for row in reader:
+                if len(row) > 1:
+                    dataE[i].append([float(a) for a in row[:-1]])
+        
     except:
         # We've already run the simulations so just read the output
         directory_exists[i] = True

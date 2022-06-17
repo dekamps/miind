@@ -44,6 +44,8 @@ Mesh::Mesh(double timestep,
 	_dimensions(dimension),
 	_base(base){
 
+	_threshold = 0.0;
+	_reset = 0.0;
 	_grid_num_dimensions = _dimensions.size();
 	_num_strips = 1;
 	for (unsigned int d = 0; d < _resolution.size()-1; d++) { _num_strips *= _resolution[d]; }
@@ -82,26 +84,28 @@ _vec_timefactor(0){
 	this->FromXML(s);
 }
 
-Mesh::Mesh(const Mesh& m):
-_vec_block(m._vec_block),
-_vec_vec_quad(m._vec_vec_quad),
-_vec_vec_gen(m._vec_vec_gen),
-_vec_timefactor(m._vec_timefactor),
-_t_step(m._t_step),
-_map(m._map),
-_vec_vec_cell(m._vec_vec_cell),
-_grid_num_dimensions(m._grid_num_dimensions),
-_resolution(m._resolution),
-_dimensions(m._dimensions),
-_threshold_reset_dimension(m._threshold_reset_dimension),
-_threshold_reset_jump_dimension(m._threshold_reset_jump_dimension),
-_base(m._base),
-_num_strips(m._num_strips),
-_strip_length(m._strip_length),
-_strips_are_v_oriented(m._strips_are_v_oriented),
-_has_defined_strips(m._has_defined_strips),
-_threshold_cell_num(m._threshold_cell_num),
-_resolution_offsets(m._resolution_offsets)
+Mesh::Mesh(const Mesh& m) :
+	_vec_block(m._vec_block),
+	_vec_vec_quad(m._vec_vec_quad),
+	_vec_vec_gen(m._vec_vec_gen),
+	_vec_timefactor(m._vec_timefactor),
+	_t_step(m._t_step),
+	_map(m._map),
+	_vec_vec_cell(m._vec_vec_cell),
+	_grid_num_dimensions(m._grid_num_dimensions),
+	_resolution(m._resolution),
+	_dimensions(m._dimensions),
+	_threshold_reset_dimension(m._threshold_reset_dimension),
+	_threshold_reset_jump_dimension(m._threshold_reset_jump_dimension),
+	_base(m._base),
+	_num_strips(m._num_strips),
+	_strip_length(m._strip_length),
+	_strips_are_v_oriented(m._strips_are_v_oriented),
+	_has_defined_strips(m._has_defined_strips),
+	_threshold_cell_num(m._threshold_cell_num),
+	_resolution_offsets(m._resolution_offsets),
+	_threshold(m._threshold),
+	_reset(m._reset)
 {
 }
 
@@ -725,8 +729,19 @@ void Mesh::FromXML(istream& s)
 		std::istringstream ival(node_ts.first_child().value());
 		double thres;
 		ival >> thres;
-		_threshold_cell_num = (unsigned int)(_resolution[_threshold_reset_dimension] * ((thres - _base[_threshold_reset_dimension]) / _dimensions[_threshold_reset_dimension]));
+		_threshold = thres;
+		_threshold_cell_num = (unsigned int)(_resolution[_threshold_reset_dimension] * ((_threshold - _base[_threshold_reset_dimension]) / _dimensions[_threshold_reset_dimension]));
 	}
+
+	// Get the reset value
+	node_ts = doc.first_child().child("V_reset");
+	if (node_ts) {
+		std::istringstream ival(node_ts.first_child().value());
+		double res;
+		ival >> res;
+		_reset = res;
+	}
+
 }
 
 bool Mesh::cellBeyondThreshold(unsigned int index) {

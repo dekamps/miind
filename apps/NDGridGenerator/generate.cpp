@@ -568,16 +568,16 @@ void applyHH(NdPoint& p, double t) {
 }
 
 int main() {
-    std::vector<double> base = { -10, -2,-80 };
-    std::vector<double> dims = { 110, 17, 40 };
-    std::vector<unsigned int> res = {150, 150, 150 };
+    std::vector<double> base = { -10, -2, -75 };
+    std::vector<double> dims = { 80, 17, 30 };
+    std::vector<unsigned int> res = {50, 50, 300};
     std::vector<double> reset_relative = { 0.0,0.0,0.0 };
     double threshold = -50.4;
     double reset_v = -70.6;
     NdGrid g(base, dims, res, threshold, reset_v, reset_relative, 1);
     
     g.setCppFunction(applyConductance3D);
-    g.generateModelFile("cond3d_100x15x40", 0.001);
-    g.generateTMatFileBatched("cond3d_100x15x40");
+    g.generateModelFile("cond3d_70x15x30", 0.001);
+    g.generateTMatFileBatched("cond3d_70x15x30");
 	return 0;
 }

@@ -163,6 +163,9 @@ namespace TwoDLib {
 		//! Time step used in Mesh generation.
 		double TimeStep() const {return _t_step;}
 
+		double getThreshold() const { return _threshold; }
+		double getReset() const { return _reset; }
+
 		bool hasDefinedStrips() const { return _has_defined_strips; }
 
 		//! Write to an XM format. It is guaranteed that a single strip is written on a single line,
@@ -248,6 +251,8 @@ namespace TwoDLib {
 		unsigned int								_threshold_reset_dimension;
 		unsigned int								_threshold_reset_jump_dimension;
 		unsigned int								_threshold_cell_num;
+		double										_threshold;
+		double										_reset;
 		unsigned int								_num_strips;
 		unsigned int								_strip_length;
 		bool										_strips_are_v_oriented;

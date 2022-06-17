@@ -664,12 +664,16 @@ const std::vector<MPILib::Potential>& Ode2DSystemGroup::Avgs(unsigned int m) con
 			else { // this is a new-fangled grid
 				std::vector<MPILib::Potential> av(_mesh_list[m].getGridNumDimensions());
 
+				double mass_sum = 0.0;
 				for (MPILib::Index i = 0; i < _vec_mesh_offset[m + 1] - _vec_mesh_offset[m]; i++) {
 					std::vector<MPILib::Potential> V = _mesh_list[m].Centroid(i);
 					for (unsigned int d = 0; d < _mesh_list[m].getGridNumDimensions(); d++) {
 						av[d] += V[d] * _vec_mass[_vec_mesh_offset[m] + i];
 					}
+					mass_sum += _vec_mass[_vec_mesh_offset[m] + i];
 				}
+
+				av[_mesh_list[m].getGridThresholdResetDirection()] += _mesh_list[m].getReset() * (1.0 - mass_sum);
 
 				if (_all_avs[m].size() == 0) {
 					const_cast<std::vector<MPILib::Potential>&>(_all_avs[m]) = std::vector<MPILib::Potential>(_mesh_list[m].getGridNumDimensions());
@@ -703,6 +707,11 @@ const std::vector<MPILib::Potential>& Ode2DSystemGroup::Avgs(unsigned int m) con
 			std::vector<MPILib::Potential> av(_mesh_list[m].getGridNumDimensions());
 			
 			for (MPILib::Index i = 0; i < _vec_num_objects[m]; i++) {
+				if (_vec_objects_refract_times[i + this->_vec_num_object_offsets[m]] > 0) {
+					av[_mesh_list[m].getGridThresholdResetDirection()] += _mesh_list[m].getReset();
+					continue;
+				}
+					
 				std::vector<MPILib::Potential> V = _mesh_list[m].Centroid(this->_vec_objects_to_index[i+this->_vec_num_object_offsets[m]]);
 				for (unsigned int d = 0; d < _mesh_list[m].getGridNumDimensions(); d++) {
 					av[d] += V[d];
