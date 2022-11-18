@@ -26,7 +26,7 @@ jobs:
       
       - name: Ubuntu - install dependencies
         run: |
-          sudo apt-get install ninja-build libboost-all-dev libpugixml-dev fftw3-dev freeglut3-dev libgsl0-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev
+          sudo apt-get install -y apt-transport-https ninja-build libboost-all-dev libpugixml-dev fftw3-dev freeglut3-dev libgsl0-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev
           sudo apt-get install -y --no-install-recommends wget
           sudo apt-get update
           wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-keyring_1.0-1_all.deb
