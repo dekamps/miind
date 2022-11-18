@@ -31,7 +31,7 @@ jobs:
           sudo apt-get update
           sudo add-apt-repository ppa:graphics-drivers
           sudo apt-key del 7fa2af80
-          wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-keyring_1.0-1_all.deb
+          wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-keyring_1.0-1_all.deb
           sudo dpkg -i cuda-keyring_1.0-1_all.deb
           sudo bash -c 'echo "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64 /" > /etc/apt/sources.list.d/cuda.list'
           sudo bash -c 'echo "deb http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64 /" > /etc/apt/sources.list.d/cuda_learn.list'
@@ -68,7 +68,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=ON -DENABLE_MPI:BOOL=OFF -DENABLE_CUDA:BOOL=OFF'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=OFF -DENABLE_MPI:BOOL=OFF -DENABLE_CUDA:BOOL=OFF'
           buildWithCMake: true
         if: contains( matrix.os, 'macos')
         
