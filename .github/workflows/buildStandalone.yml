@@ -44,7 +44,7 @@ jobs:
         if: contains( matrix.os, 'ubuntu')
 
       - name: MacOS - install dependencies
-        run: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja
+        run: brew install gcc pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja
         if: contains( matrix.os, 'macos')
       
       - name: dir
@@ -57,8 +57,8 @@ jobs:
       - name: Run CMake
         uses: lukka/run-cmake@v3.4
         env:
-          CC: gcc-6
-          CXX: g++-6
+          CC: gcc
+          CXX: g++
         with:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -127,8 +127,8 @@ jobs:
       # WARNING: TESTS FAIL FOr MACOS BUILD BUT I DON't HAVE A MAC TO DEBUG THE ISSUE. 
       #- name: Run Integration Tests
       #  env:
-      #    CC: gcc-6
-      #    CXX: g++-6
+      #    CC: gcc
+      #    CXX: g++
       #  working-directory: ${{ github.workspace }}/examples/IntegrationTests 
       #  run: python system_tests.py
       #  shell: bash

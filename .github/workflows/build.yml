@@ -28,7 +28,7 @@ jobs:
       CIBW_BEFORE_BUILD_LINUX: pip install cmake scikit-build==0.13.0 build auditwheel numpy matplotlib scipy shapely descartes ; yum install -y centos-release-scl ; yum install -y devtoolset-7 ; yum install -y ninja-build boost-devel pugixml-devel python36-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel wget ; sudo dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-$distro.repo ; wget  https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-repo-rhel7-10.0.130-1.x86_64.rpm ; rpm -i cuda-repo-*.rpm ; yum install -y cuda-10-0 
       CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" # Something wrong with the cibuildwheel delocate call. We manually run it after all wheels have been built.
       CIBW_ENVIRONMENT_WINDOWS: "CUDA_PATH=C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.2 CUDACXX=C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.2/bin/nvcc.exe"
-      CIBW_ENVIRONMENT_MACOS: "CC=gcc-6 CXX=g++-6"
+      CIBW_ENVIRONMENT_MACOS: "CC=gcc CXX=g++"
       CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/usr/lib64/openmpi/bin/ LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:/usr/lib64/nvidia:$LD_LIBRARY_PATH CC=/opt/rh/devtoolset-7/root/usr/bin/gcc CXX=/opt/rh/devtoolset-7/root/usr/bin/g++"
       CIBW_BUILD_VERBOSITY: 0
       CIBW_TEST_COMMAND_LINUX: python -m miind.system_tests
@@ -60,8 +60,12 @@ jobs:
         run: choco install ninja -y
         if: contains( matrix.os, 'windows')
         
+      - name: Install Freeglut? on Windows
+        run: choco install glfw3 -y
+        if: contains( matrix.os, 'windows')
+        
       - name: Install Dependencies on MacOS
-        run: brew install gcc6 pugixml boost gsl boost-python3 xquartz fftw libomp pkg-config ninja
+        run: brew install gcc pugixml boost gsl boost-python3 xquartz fftw libomp pkg-config ninja
         if: contains( matrix.os, 'macos')
 
       - name: Restore artifacts, or setup vcpkg 
@@ -101,7 +105,7 @@ jobs:
         
         # Cibuildwheel's delocate-wheel call seems broken for some reason. Let's do it ourselves now
       - name: Try MacOS delocate-wheel manually
-        run: delocate-wheel -v dist/*-cp36-cp36m-macosx_10_9_x86_64.whl & delocate-wheel -v dist/*-cp37-cp37m-macosx_10_9_x86_64.whl & delocate-wheel -v dist/*-cp38-cp38-macosx_10_9_x86_64.whl & delocate-wheel -v dist/*-cp39-cp39-macosx_10_9_x86_64.whl
+        run: delocate-wheel -v dist/*-cp36-cp36m-macosx_11_x86_64.whl & delocate-wheel -v dist/*-cp37-cp37m-macosx_11_x86_64.whl & delocate-wheel -v dist/*-cp38-cp38-macosx_11_x86_64.whl & delocate-wheel -v dist/*-cp39-cp39-macosx_11_x86_64.whl
         if: contains( matrix.os, 'macos')
 
       #- name: Publish package to test pypi
