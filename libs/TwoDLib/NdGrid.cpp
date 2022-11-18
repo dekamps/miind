@@ -1,5 +1,7 @@
 #include "NdGrid.hpp"
-#include <omp.h>
+#ifdef ENABLE_OPENMP
+    #include <omp.h>
+#endif
 
 NdGrid::NdGrid(std::vector<double> _base, std::vector<double> _dims, std::vector<unsigned int> _res,
     double _threshold_v, double _reset_v, std::vector<double> _reset_relative, double _timestep) :
