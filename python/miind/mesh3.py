@@ -15,7 +15,6 @@ from miind.bary3 import splitquadrilateral
 from miind.bary3 import distance_to_line_segment
 from miind.bary3 import generate_random_triangle_points
 from miind.bary3 import generate_random_quadrilateral_points
-from scipy import random
 from scipy.spatial import KDTree
 from scipy.spatial import distance
 from matplotlib.path import Path
