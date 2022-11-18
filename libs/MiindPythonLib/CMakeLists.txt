@@ -6,6 +6,8 @@ set( LIB_TYPE SHARED )
 
 set( Python3_USE_STATIC_LIBS FALSE )
 
+find_package(glut REQUIRED)
+
 if (APPLE)
 if (SKBUILD) # We're building using SKBUILD which means the correct python lib is passed as a flag! Hooray!
 set(Python3_INCLUDE_DIRS ${PYTHON_INCLUDE_DIR} )
