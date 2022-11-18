@@ -13,7 +13,7 @@ jobs:
         include:
           - os: ubuntu-18.04
             installDir: /usr/local
-          - os: macos-10.15
+          - os: macos-12
             installDir: /usr/local
             
     env:
