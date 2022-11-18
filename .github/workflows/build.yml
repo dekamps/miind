@@ -61,10 +61,6 @@ jobs:
         run: choco install ninja -y
         if: contains( matrix.os, 'windows')
         
-      - name: Install Freeglut? on Windows
-        run: choco install glfw3 -y
-        if: contains( matrix.os, 'windows')
-        
       - name: Install Dependencies on MacOS
         run: brew install gcc pugixml boost gsl boost-python3 xquartz fftw libomp pkg-config ninja
         if: contains( matrix.os, 'macos')
