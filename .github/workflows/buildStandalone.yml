@@ -33,7 +33,6 @@ jobs:
           sudo dpkg -i cuda-keyring_1.0-1_all.deb
           sudo apt update
           sudo apt install cuda-10-1
-          sudo apt install libcudnn7
         if: contains( matrix.os, 'ubuntu')
 
       - name: Add cuda to path
