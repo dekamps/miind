@@ -40,7 +40,7 @@ std::map<unsigned int, std::vector<double>> NdCell::calculateAAHyperplanes(std::
 }
 
 double NdCell::intersectsWith(NdCell& other) {
-    double vol_eps = 0.00000001;
+    double vol_eps = 0.000000000001;
     double orig_vol = getVolume();
 
     std::vector<Simplex> test_simplices = simplices;

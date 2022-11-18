@@ -216,7 +216,7 @@ std::vector<ActivityType> activities) {
 		int i=0;
 		for (auto& id : _externalReceivers) {
 			if (_nodeDistribution.isLocalNode(id)) {
-				_localNodes.find(id)->second.setExternalPrecurserActivity(activities[i]);
+				_localNodes.find(id)->second.setExternalPrecurserActivity(i, activities[i]);
 			} else {
 				utilities::MPIProxy().isend(_nodeDistribution.getResponsibleProcessor(id), 999,
 						activities[i]);
@@ -224,10 +224,12 @@ std::vector<ActivityType> activities) {
 			i++;
 		}
 	} else {
+		int i = 0;
 		for (auto& id : _externalReceivers) {
 			if (_nodeDistribution.isLocalNode(id)) {
-				_localNodes.find(id)->second.recvExternalPrecurserActivity(0,999);
+				_localNodes.find(id)->second.recvExternalPrecurserActivity(0,999,i);
 			}
+			i++;
 		}
 	}
 }

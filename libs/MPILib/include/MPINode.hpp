@@ -162,19 +162,19 @@ public:
 	/**
 	 * Expose External precursor's activity
 	 */
-	ActivityType getExternalPrecursorActivity();
-	void setExternalPrecurserActivity(ActivityType activity);
+	ActivityType getExternalPrecursorActivity(unsigned int external_id);
+	void setExternalPrecurserActivity(unsigned int external_id, ActivityType activity);
 
 	/**
 	 * Receive the activity of external precursor, usually expext to
 	 * recieve from NodeId 0
 	 */
-	void recvExternalPrecurserActivity(NodeId id, int tag);
+	void recvExternalPrecurserActivity(NodeId id, int tag, unsigned int external_id);
 
 	/**
    * Set up the weight and nodetype of the connection from the external precursor
 	 */
-	void setExternalPrecursor(const Weight& weight, NodeType nodeType);
+	unsigned int setExternalPrecursor(const Weight& weight, NodeType nodeType);
 
 protected:
 
@@ -242,9 +242,10 @@ protected:
 	 * Flags suck but are marginally better than checking default values!
 	 */
 	bool _hasExternalPrecursor = false;
-	ActivityType _externalPrecursorActivity;
-	Weight _externalPrecursorWeight;
-	NodeType _externalPrecursorType;
+	unsigned int _external_precurser_count = 0;
+	std::vector < ActivityType > _externalPrecursorActivity;
+	std::vector < Weight > _externalPrecursorWeight;
+	std::vector < NodeType > _externalPrecursorType;
 
 	Number _number_iterations = 0;
 	Number _maximum_iterations = 0;
