@@ -119,11 +119,12 @@ IF(ENABLE_OPENMP)
 	add_definitions( -DENABLE_OPENMP=1 )
 ENDIF(ENABLE_OPENMP)
 
-IF (WIN32 OR APPLE) # For windows packaging, we want to include the glut dll so we need FindGLUT to find it during install
+IF (APPLE) # For windows packaging, we want to include the glut dll so we need FindGLUT to find it during install
+find_package(GLUT REQUIRED)
 if (GLUT_FOUND AND APPLE)
 add_definitions( -DUSING_APPLE_GLUT=1 ) # this tells TwoDLib/display.cpp to avoid non mac-glut functions.
 endif(GLUT_FOUND AND APPLE)
-ENDIF (WIN32 OR APPLE)
+ENDIF (APPLE)
 
 IF(ENABLE_OPENMP)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
