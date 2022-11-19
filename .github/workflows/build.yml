@@ -106,7 +106,7 @@ jobs:
         
         # Cibuildwheel's delocate-wheel call seems broken for some reason. Let's do it ourselves now
       - name: Try MacOS delocate-wheel manually
-        run: delocate-wheel -v dist/*-cp36-cp36m-macosx_x86_64.whl & delocate-wheel -v dist/*-cp37-cp37m-macosx_x86_64.whl & delocate-wheel -v dist/*-cp38-cp38-macosx_x86_64.whl & delocate-wheel -v dist/*-cp39-cp39-macosx_x86_64.whl
+        run: delocate-wheel -v dist/*-cp36-cp36m-macosx_10_9_x86_64.whl & delocate-wheel -v dist/*-cp37-cp37m-macosx_10_9_x86_64.whl & delocate-wheel -v dist/*-cp38-cp38-macosx_10_9_x86_64.whl & delocate-wheel -v dist/*-cp39-cp39-macosx_10_9_x86_64.whl
         if: contains( matrix.os, 'macos')
 
       #- name: Publish package to test pypi
