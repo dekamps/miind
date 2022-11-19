@@ -322,6 +322,7 @@ class RearrangeCMakeOutput(object):
             data_files,
             # To get around a check that prepends source dir to paths and breaks package detection code.
             cmake_source_dir="",
+            _cmake_install_dir=cmake_install_reldir,
         )
 
 # This creates a list which is empty but returns a length of 1.
