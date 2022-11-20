@@ -53,7 +53,6 @@ set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}twod
     ${gsl_LINK_FLAGS}
     gsl
-    ${GLUT_LIBRARY}
 	${PYTHON_LIBRARIES}
 )
 
@@ -67,7 +66,7 @@ message ( "Using python libraries: ${PYTHON_LIBRARIES} and ${Python3_LIBRARIES}"
 
 add_library( ${MIIND_LIBRARY_PREFIX}sim ${LIB_TYPE} MiindPython.cpp)
 
-target_link_libraries( ${MIIND_LIBRARY_PREFIX}sim ${LIBLIST})
+target_link_libraries( ${MIIND_LIBRARY_PREFIX}sim ${LIBLIST} PRIVATE GLUT::GLUT)
 
 # On all platforms this should be called miindsim (not libmiindsim)
 SET_TARGET_PROPERTIES(${MIIND_LIBRARY_PREFIX}sim PROPERTIES PREFIX "")
