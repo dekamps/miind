@@ -6,8 +6,6 @@ set( LIB_TYPE SHARED )
 
 set( Python3_USE_STATIC_LIBS FALSE )
 
-find_package(GLUT REQUIRED)
-
 if (APPLE)
 if (SKBUILD) # We're building using SKBUILD which means the correct python lib is passed as a flag! Hooray!
 set(Python3_INCLUDE_DIRS ${PYTHON_INCLUDE_DIR} )
@@ -92,7 +90,7 @@ install( TARGETS ${MIIND_LIBRARY_PREFIX}sim DESTINATION lib)
 if (WIN32 AND SKBUILD)
 ## First lets get GLUT, it should be easy thanks to FindGLUT.
 #get_filename_component(glut_lib_basename "${GLUT_glut_LIBRARY}" NAME_WE)
-#install( FILES ${GLUT_RUNTIME_LIBRARY} DESTINATION bin)
+install( FILES ${GLUT_RUNTIME_LIBRARY} DESTINATION bin)
 
 # Now get the boost dlls - more difficult to get these because we only know where the libs are.
 # Let's set up a few directories to search. Also add the location of the glut dll above just
