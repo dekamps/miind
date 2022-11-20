@@ -120,10 +120,7 @@ IF(ENABLE_OPENMP)
 ENDIF(ENABLE_OPENMP)
 
 IF (WIN32 OR APPLE) # For windows packaging, we want to include the glut dll so we need FindGLUT to find it during install
-IF (WIN32)
-set(CMAKE_PREFIX_PATH "${VCPKG_INSTALLED_DIR}")
-ENDIF (WIN32)
-find_package(GLUT REQUIRED)
+find_package(GLUT REQUIRED HINTS ${VCPKG_INSTALLED_DIR})
 if (GLUT_FOUND AND APPLE)
 add_definitions( -DUSING_APPLE_GLUT=1 ) # this tells TwoDLib/display.cpp to avoid non mac-glut functions.
 endif(GLUT_FOUND AND APPLE)
