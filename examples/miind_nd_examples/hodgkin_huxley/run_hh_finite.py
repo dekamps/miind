@@ -99,7 +99,7 @@ def hh_run(_N=1000, _input_rates=[5,10,15,20,25,30,35,40,45,50]):
 
 # Straight Comparison of Activity
 input_rate = 200
-N = 1000
+N = 10000
 input_rates=[1,2,3,4,5,6,7,8,9,20,30,40]
 
 hh_run(_N=N, _input_rates=input_rates)
@@ -159,7 +159,7 @@ ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 color1 = '#990000'
 color2 = '#009900'
 color3 = '#FF9900'
-ax2.set_ylabel('Conductance Variables, w,u', color=color1)  # we already handled the x-label with ax1
+ax2.set_ylabel('Gating Variables, m,n,h', color=color1)  # we already handled the x-label with ax1
 ax2.plot(read_times, np.mean(read_data_m, axis=1), color=color1, ls='--')
 ax2.plot(read_times, np.mean(read_data_n, axis=1), color=color2, ls=':')
 ax2.plot(read_times, np.mean(read_data_h, axis=1), color=color3, ls='-.')

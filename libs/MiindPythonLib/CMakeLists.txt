@@ -52,11 +52,12 @@ set ( LIBLIST
     ${MIIND_LIBRARY_PREFIX}numtools
     ${MIIND_LIBRARY_PREFIX}twod
     ${gsl_LINK_FLAGS}
-    gsl
     ${GLUT_LIBRARY}
+    gsl
 	${PYTHON_LIBRARIES}
 )
 
+message ( "Using Glut library: ${GLUT_LIBRARY} with ${GLUT_RUNTIME_LIBRARY_DIRS}")
 message ( "Using python libraries: ${PYTHON_LIBRARIES} and ${Python3_LIBRARIES}")
 
 #if (APPLE)
@@ -88,13 +89,13 @@ install( TARGETS ${MIIND_LIBRARY_PREFIX}sim DESTINATION lib)
 # took me all weekend just to get this to work.
 if (WIN32 AND SKBUILD)
 ## First lets get GLUT, it should be easy thanks to FindGLUT.
-get_filename_component(glut_lib_basename "${GLUT_glut_LIBRARY}" NAME_WE)
-install( FILES ${GLUT_RUNTIME_LIBRARY}/${glut_lib_basename}.dll DESTINATION bin)
+#get_filename_component(glut_lib_basename "${GLUT_glut_LIBRARY}" NAME_WE)
+install( FILES ${GLUT_RUNTIME_LIBRARY} DESTINATION bin)
 
 # Now get the boost dlls - more difficult to get these because we only know where the libs are.
 # Let's set up a few directories to search. Also add the location of the glut dll above just
 # in case they're in the same place... cough VCPKG cough
-set(MY_DEPENDENCY_PATHS ${Boost_LIBRARY_DIR_RELEASE} ${Boost_LIBRARY_DIR_RELEASE}/../bin/ ${GLUT_RUNTIME_LIBRARY} ${ADDITIONAL_DLL_DEPENDENCY_DIRS} ) 
+set(MY_DEPENDENCY_PATHS ${Boost_LIBRARY_DIR_RELEASE} ${Boost_LIBRARY_DIR_RELEASE}/../bin/ ${VCPKG_INSTALLED_DIR} ${ADDITIONAL_DLL_DEPENDENCY_DIRS} ) 
 cmake_policy(PUSH)
 cmake_policy(SET CMP0026 OLD)
 GET_TARGET_PROPERTY(OUTPUT_PATH ${MIIND_LIBRARY_PREFIX}sim LOCATION )
@@ -114,7 +115,11 @@ install(CODE [[
   
   #The GET_RUNTIME_DEPENDENCIES function has a filtering mechanism which would be better instead of the following filter
   foreach(_file ${_r_deps})
-	if (NOT (${_file} MATCHES "boost_chrono" OR ${_file} MATCHES "boost_filesystem" OR ${_file} MATCHES "boost_timer" OR ${_file} MATCHES "python") )
+	if (NOT (${_file} MATCHES "boost_chrono"
+ OR ${_file} MATCHES "boost_filesystem"
+ OR ${_file} MATCHES "boost_timer" 
+ OR ${_file} MATCHES "python"
+ OR ${_file} MATCHES "glut") )
 		continue()
 	endif() 
 	

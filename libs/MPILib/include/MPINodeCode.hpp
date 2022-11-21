@@ -63,10 +63,10 @@ Time MPINode<Weight, NodeDistribution>::evolve(Time time) {
 	std::vector<ActivityType> _pActivity(_precursorActivity);
 	std::vector<Weight> _pWeights(_weights);
 	std::vector<NodeType> _pTypes(_precursorTypes);
-	if(_hasExternalPrecursor) {
-		_pActivity.push_back(_externalPrecursorActivity);
-		_pWeights.push_back(_externalPrecursorWeight);
-		_pTypes.push_back(_externalPrecursorType);
+	for(unsigned int i=0; i<_external_precurser_count; i++) {
+		_pActivity.push_back(_externalPrecursorActivity[i]);
+		_pWeights.push_back(_externalPrecursorWeight[i]);
+		_pTypes.push_back(_externalPrecursorType[i]);
 	}
 
 	++_number_iterations;
@@ -93,10 +93,10 @@ void MPINode<Weight, NodeDistribution>::prepareEvolve() {
 	std::vector<ActivityType> _pActivity(_precursorActivity);
 	std::vector<Weight> _pWeights(_weights);
 	std::vector<NodeType> _pTypes(_precursorTypes);
-	if(_hasExternalPrecursor) {
-		_pActivity.push_back(_externalPrecursorActivity);
-		_pWeights.push_back(_externalPrecursorWeight);
-		_pTypes.push_back(_externalPrecursorType);
+	for (unsigned int i = 0; i < _external_precurser_count; i++) {
+		_pActivity.push_back(_externalPrecursorActivity[i]);
+		_pWeights.push_back(_externalPrecursorWeight[i]);
+		_pTypes.push_back(_externalPrecursorType[i]);
 	}
 
 	_pAlgorithm->prepareEvolve(_pActivity, _pWeights, _pTypes);
@@ -109,13 +109,13 @@ ActivityType MPINode<Weight, NodeDistribution>::getActivity(){
 }
 
 template<class Weight, class NodeDistribution>
-void MPINode<Weight, NodeDistribution>::setExternalPrecurserActivity(ActivityType activity){
-	_externalPrecursorActivity = activity;
+void MPINode<Weight, NodeDistribution>::setExternalPrecurserActivity(unsigned int id, ActivityType activity){
+	_externalPrecursorActivity[id] = activity;
 }
 
 template<class Weight, class NodeDistribution>
-void MPINode<Weight, NodeDistribution>::recvExternalPrecurserActivity(NodeId id, int tag){
-	utilities::MPIProxy().irecv(id, tag, _externalPrecursorActivity);
+void MPINode<Weight, NodeDistribution>::recvExternalPrecurserActivity(NodeId id, int tag, unsigned int precursor_id){
+	utilities::MPIProxy().irecv(id, tag, _externalPrecursorActivity[precursor_id]);
 }
 
 template<class Weight, class NodeDistribution>
@@ -140,10 +140,12 @@ void MPINode<Weight, NodeDistribution>::configureSimulationRun(
 }
 
 template<class Weight, class NodeDistribution>
-void MPINode<Weight, NodeDistribution>::setExternalPrecursor(const Weight& weight, NodeType nodeType) {
-			_hasExternalPrecursor = true;
-			_externalPrecursorWeight = weight;
-			_externalPrecursorType = nodeType;
+unsigned int MPINode<Weight, NodeDistribution>::setExternalPrecursor(const Weight& weight, NodeType nodeType) {
+	_external_precurser_count++;
+	_externalPrecursorActivity.push_back(0.0);
+	_externalPrecursorWeight.push_back(weight);
+	_externalPrecursorType.push_back(nodeType);
+	return _external_precurser_count;
 }
 
 template<class Weight, class NodeDistribution>
@@ -172,8 +174,8 @@ NodeId MPINode<Weight, NodeDistribution>::getNodeId() const {
 }
 
 template<class Weight, class NodeDistribution>
-ActivityType MPINode<Weight, NodeDistribution>::getExternalPrecursorActivity() {
-	return _externalPrecursorActivity;
+ActivityType MPINode<Weight, NodeDistribution>::getExternalPrecursorActivity(unsigned int id) {
+	return _externalPrecursorActivity[id];
 }
 
 template<class Weight, class NodeDistribution>

@@ -92,8 +92,8 @@ install( TARGETS ${MIIND_LIBRARY_PREFIX}simv DESTINATION lib)
 # took me all weekend just to get this to work.
 if (WIN32 AND SKBUILD)
 ## First lets get GLUT, it should be easy thanks to FindGLUT.
-get_filename_component(glut_lib_basename "${GLUT_glut_LIBRARY}" NAME_WE)
-install( FILES ${GLUT_RUNTIME_LIBRARY}/${glut_lib_basename}.dll DESTINATION bin)
+#get_filename_component(glut_lib_basename "${GLUT_glut_LIBRARY}" NAME_WE)
+#install( FILES ${GLUT_RUNTIME_LIBRARY}/${glut_lib_basename}.dll DESTINATION bin)
 
 # Now get the boost dlls - more difficult to get these because we only know where the libs are.
 # Let's set up a few directories to search. Also add the location of the glut dll above just
@@ -118,7 +118,11 @@ install(CODE [[
   
   #The GET_RUNTIME_DEPENDENCIES function has a filtering mechanism which would be better instead of the following filter
   foreach(_file ${_r_deps})
-	if (NOT (${_file} MATCHES "boost_chrono" OR ${_file} MATCHES "boost_filesystem" OR ${_file} MATCHES "boost_timer" OR ${_file} MATCHES "python") )
+	if (NOT (${_file} MATCHES "boost_chrono" 
+OR ${_file} MATCHES "boost_filesystem" 
+OR ${_file} MATCHES "boost_timer" 
+OR ${_file} MATCHES "python"
+OR ${_file} MATCHES "glut") )
 		continue()
 	endif() 
 	

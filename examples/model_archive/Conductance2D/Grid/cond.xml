@@ -22,6 +22,7 @@
 	<!--<Rate node="RG_E" t_interval="0.0001" />-->
 </Reporting>
 <SimulationRunParameter>
+<master_steps>1</master_steps>
 <t_end>TIME_END</t_end>
 <t_step>1e-05</t_step>
 <name_log>cond.log</name_log>

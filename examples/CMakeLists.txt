@@ -123,11 +123,8 @@ twopop/README.txt
 
 set( MIIND_ND_EXAMPLE_COND
 miind_nd_examples/LIF_conductance/cond3D.xml
-miind_nd_examples/LIF_conductance/cond3d_small_50x50x50.model
-miind_nd_examples/LIF_conductance/cond3d_small_50x50x50.tmat
-miind_nd_examples/LIF_conductance/cond3d_small_50x50x300.model
-miind_nd_examples/LIF_conductance/cond3d_small_50x50x300.tmat
 miind_nd_examples/LIF_conductance/generateCond3D.py
+miind_nd_examples/LIF_conductance/readme.txt
 miind_nd_examples/LIF_conductance/run_current_curves.py
 miind_nd_examples/LIF_conductance/run_direct.py
 miind_nd_examples/LIF_conductance/run_miind.py
@@ -135,6 +132,8 @@ miind_nd_examples/LIF_conductance/run_miind.py
 
 set( MIIND_ND_EXAMPLE_COND_EI
 miind_nd_examples/ei_network/cond3D_EI.xml
+miind_nd_examples/ei_network/generateCond3D.py
+miind_nd_examples/ei_network/readme.txt
 miind_nd_examples/ei_network/run_direct_EI.py
 miind_nd_examples/ei_network/run_miind_EI.py
 )
@@ -142,6 +141,7 @@ miind_nd_examples/ei_network/run_miind_EI.py
 set( MIIND_ND_EXAMPLE_HH
 miind_nd_examples/hodgkin_huxley/generateHH.py
 miind_nd_examples/hodgkin_huxley/hh.xml
+miind_nd_examples/hodgkin_huxley/readme.txt
 miind_nd_examples/hodgkin_huxley/run_hh_finite.py
 miind_nd_examples/hodgkin_huxley/run_hh_miind.py
 )

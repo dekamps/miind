@@ -9,11 +9,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, macos-10.15] #
+        os: [ubuntu-18.04, macos-11] #
         include:
           - os: ubuntu-18.04
             installDir: /usr/local
-          - os: macos-10.15
+          - os: macos-11
             installDir: /usr/local
             
     env:
@@ -26,14 +26,13 @@ jobs:
       
       - name: Ubuntu - install dependencies
         run: |
-          sudo apt-get install ninja-build libboost-all-dev libpugixml-dev fftw3-dev freeglut3-dev libgsl0-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev
-          sudo add-apt-repository ppa:graphics-drivers
-          sudo apt-key adv --fetch-keys  http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
-          sudo bash -c 'echo "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64 /" > /etc/apt/sources.list.d/cuda.list'
-          sudo bash -c 'echo "deb http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64 /" > /etc/apt/sources.list.d/cuda_learn.list'
+          sudo apt-get install -y apt-transport-https ninja-build libboost-all-dev libpugixml-dev fftw3-dev freeglut3-dev libgsl0-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libxrandr-dev libxxf86vm-dev
+          sudo apt-get install -y --no-install-recommends wget
+          sudo apt-get update
+          wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-keyring_1.0-1_all.deb
+          sudo dpkg -i cuda-keyring_1.0-1_all.deb
           sudo apt update
           sudo apt install cuda-10-1
-          sudo apt install libcudnn7
         if: contains( matrix.os, 'ubuntu')
 
       - name: Add cuda to path
@@ -45,7 +44,7 @@ jobs:
         if: contains( matrix.os, 'ubuntu')
 
       - name: MacOS - install dependencies
-        run: brew install gcc6 pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja
+        run: brew install gcc pugixml boost freeglut gsl boost-python3 xquartz fftw libomp pkg-config ninja
         if: contains( matrix.os, 'macos')
       
       - name: dir
@@ -58,13 +57,13 @@ jobs:
       - name: Run CMake
         uses: lukka/run-cmake@v3.4
         env:
-          CC: gcc-6
-          CXX: g++-6
+          CC: gcc
+          CXX: g++
         with:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildDirectory: '${{ env.buildDir }}'
-          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=ON -DENABLE_MPI:BOOL=OFF -DENABLE_CUDA:BOOL=OFF'
+          cmakeAppendedArgs: '"-GNinja" -DCMAKE_INSTALL_PREFIX=${{ env.installDir }} -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP:BOOL=OFF -DENABLE_MPI:BOOL=OFF -DENABLE_CUDA:BOOL=OFF'
           buildWithCMake: true
         if: contains( matrix.os, 'macos')
         
@@ -128,8 +127,8 @@ jobs:
       # WARNING: TESTS FAIL FOr MACOS BUILD BUT I DON't HAVE A MAC TO DEBUG THE ISSUE. 
       #- name: Run Integration Tests
       #  env:
-      #    CC: gcc-6
-      #    CXX: g++-6
+      #    CC: gcc
+      #    CXX: g++
       #  working-directory: ${{ github.workspace }}/examples/IntegrationTests 
       #  run: python system_tests.py
       #  shell: bash

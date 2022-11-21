@@ -67,6 +67,14 @@ for i in range(len(models)):
             # back to base
             os.chdir('..')
             
+            directory_exists[i] = True
+            
+            with open(output_dir + "/avg_0") as avg_file:
+                reader = csv.reader(avg_file, delimiter='\t')
+                for row in reader:
+                    if len(row) > 1:
+                        dataE[r][i].append([float(a) for a in row[:-1]])
+            
         except:
             # We've already run the simulations so just read the output
             directory_exists[i] = True
@@ -87,12 +95,12 @@ with open("direct_hh_times" + str(check_rate) + ".csv", newline='') as infile:
     for row in filereadear:
         read_times = read_times + [float(row[0])]
 
-read_data_v = np.empty((0,1000))
+read_data_v = np.empty((0,10000))
 with open("direct_hh_v" + str(check_rate) + ".csv", newline='') as infile:
     filereadear = csv.reader(infile, delimiter=',', quotechar='|')
     for row in filereadear:
         row = [float(r) for r in row]
-        reshaped = np.reshape(row, (1,1000))
+        reshaped = np.reshape(row, (1,10000))
         read_data_v = np.concatenate((read_data_v,reshaped), axis=0)
     read_data_v = np.array(read_data_v)
 

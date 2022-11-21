@@ -39,7 +39,7 @@ def main():
         "\\", "/"
     )
 
-    package_version = "1.0.16"
+    package_version = "1.0.17"
 
     package_name = "miind"
 
@@ -99,7 +99,6 @@ def main():
                 '-DENABLE_ROOT:BOOL=OFF',
                 '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 '-DVCPKG_MANIFEST_MODE:BOOL=ON',
-                '-DVCPKG_APPLOCAL_DEPS:BOOL=ON',
                 '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_50,code=[compute_50,sm_50]',
                 '-DVCPKG_TARGET_TRIPLET=x64-windows',
                 '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/vcpkg/scripts/buildsystems/vcpkg.cmake'
@@ -111,7 +110,7 @@ def main():
         cmake_args = (
             [
                 '-DCMAKE_BUILD_TYPE=Release',
-                '-DENABLE_OPENMP:BOOL=ON',
+                '-DENABLE_OPENMP:BOOL=OFF',
                 '-DENABLE_MPI:BOOL=OFF',
                 '-DENABLE_TESTING:BOOL=ON',
                 '-DENABLE_CUDA:BOOL=OFF',
@@ -322,6 +321,7 @@ class RearrangeCMakeOutput(object):
             data_files,
             # To get around a check that prepends source dir to paths and breaks package detection code.
             cmake_source_dir="",
+            _cmake_install_dir=cmake_install_reldir,
         )
 
 # This creates a list which is empty but returns a length of 1.

@@ -8,13 +8,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, windows-2019, macos-10.15]  
+        os: [ubuntu-18.04, windows-2019, macos-11]  
         include:
           - os: windows-2019
             vcpkgGitCommitId: '81350a624460e5c10a9ddb2ede4a9fe687ee9cc0'
           - os: ubuntu-18.04
             vcpkgGitCommitId: '81350a624460e5c10a9ddb2ede4a9fe687ee9cc0'
-          - os: macos-10.15
+          - os: macos-11
             vcpkgGitCommitId: '81350a624460e5c10a9ddb2ede4a9fe687ee9cc0'
     env:
       buildDir: '${{ github.workspace }}/build'
@@ -22,13 +22,12 @@ jobs:
       CIBW_SKIP: "cp27* cp35* pp* *-win32 *-manylinux_i686"
       #CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp39-win_amd64 cp36-macosx_x86_64 cp37-macosx_x86_64 cp38-macosx_x86_64 cp39-macosx_x86_64
       CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux2014_x86_64:latest
-      CIBW_BEFORE_BUILD: pip install cmake scikit-build build auditwheel numpy matplotlib scipy shapely descartes
-      #CIBW_BEFORE_BUILD_WINDOWS: pip install cmake scikit-build build auditwheel numpy matplotlib scipy shapely descartes && type C:/\"Program Files (x86)\"/\"Microsoft Visual Studio\"/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/HostX86/x64/../../../../../../../VC/Auxiliary/Build/vcvars64.bat
+      CIBW_BEFORE_BUILD: pip install cmake scikit-build==0.13.0 build auditwheel numpy matplotlib scipy shapely descartes
       # Linux builds are on docker images so we need to add the dependency installation setup here so they go to the docker not the host. Installing cuda is *SLOW* and we have to do it on *EVERY* image argh!
-      CIBW_BEFORE_BUILD_LINUX: pip install cmake scikit-build build auditwheel numpy matplotlib scipy shapely descartes && yum install -y centos-release-scl ; yum install -y devtoolset-7 ; yum install -y ninja-build boost-devel pugixml-devel python36-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel wget ; wget  https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-repo-rhel7-10.0.130-1.x86_64.rpm ; rpm -i cuda-repo-*.rpm ; yum install -y cuda-10-0 
-      CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" # Something wrong with the cibuildwheel delocate call. We manually run it after all wheels have been built.
+      CIBW_BEFORE_BUILD_LINUX: pip install cmake scikit-build==0.13.0 build auditwheel numpy matplotlib scipy shapely descartes ; yum install -y centos-release-scl ; yum install -y devtoolset-7 ; yum install -y ninja-build boost-devel pugixml-devel python36-devel freeglut-devel gsl-devel libXi-devel mesa-libGL-devel mesa-libGLU-devel libXrandr-devel libXxf86vm-devel fftw-devel wget ; rpm --erase gpg-pubkey-7fa2af80* ; wget https://developer.download.nvidia.com/compute/cuda/repos/fedora32/x86_64/D42D0685.pub ; rpm --import D42D0685.pub ; yum-config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo ; yum clean all ; wget https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-repo-rhel7-10.0.130-1.x86_64.rpm ; rpm -i cuda-repo-*.rpm ; yum -y install cuda 
+      CIBW_REPAIR_WHEEL_COMMAND_MACOS: "" # Something wrong with the cibuildwheel delocate call. We manually run it after all wheels have been built. 
       CIBW_ENVIRONMENT_WINDOWS: "CUDA_PATH=C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.2 CUDACXX=C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v11.2/bin/nvcc.exe"
-      CIBW_ENVIRONMENT_MACOS: "CC=gcc-6 CXX=g++-6"
+      CIBW_ENVIRONMENT_MACOS: "CC=gcc CXX=g++"
       CIBW_ENVIRONMENT_LINUX: "PATH=$PATH:/usr/lib64/openmpi/bin/ LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:/usr/lib64/nvidia:$LD_LIBRARY_PATH CC=/opt/rh/devtoolset-7/root/usr/bin/gcc CXX=/opt/rh/devtoolset-7/root/usr/bin/g++"
       CIBW_BUILD_VERBOSITY: 0
       CIBW_TEST_COMMAND_LINUX: python -m miind.system_tests
@@ -61,7 +60,7 @@ jobs:
         if: contains( matrix.os, 'windows')
         
       - name: Install Dependencies on MacOS
-        run: brew install gcc6 pugixml boost gsl boost-python3 xquartz fftw libomp pkg-config ninja
+        run: brew install gcc pugixml boost gsl boost-python3 xquartz fftw libomp pkg-config ninja
         if: contains( matrix.os, 'macos')
 
       - name: Restore artifacts, or setup vcpkg 
@@ -97,6 +96,10 @@ jobs:
           
       - name: Install delocate on MacOS
         run: python -m pip install delocate
+        if: contains( matrix.os, 'macos')
+        
+      - name: List the whl files in dist
+        run: ls dist
         if: contains( matrix.os, 'macos')
         
         # Cibuildwheel's delocate-wheel call seems broken for some reason. Let's do it ourselves now

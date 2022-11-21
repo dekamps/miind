@@ -205,6 +205,8 @@ class MiindSimulation:
             outdir = os.path.join(self.xml_location, os.path.basename(os.path.splitext(self.original_xml_path)[0]) + '_')
             for k,v in self.parameters.items():
                 outdir = outdir + k + '_' + v + '_'
+            if not op.exists(outdir): # If that doesn't exist, then lets assume we're just using the directory of the xml (which happens if we ran from a python script)
+                return self.xml_location
             return outdir 
 
     def getModelFilenameAndIndexFromNode(self, nodename):

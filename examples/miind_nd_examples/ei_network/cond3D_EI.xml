@@ -13,10 +13,10 @@
 <Variable Name='RATE'>500</Variable>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="GridAlgorithmGroup" name="COND3D" modelfile="MF" tau_refractive="0.0" transformfile="TMF" start_v="-65" start_w="0.00001" start_u="0.00001">
+<Algorithm type="GridAlgorithmGroup" name="COND3D" modelfile="MF" tau_refractive="0.002" transformfile="TMF" start_v="-65" start_w="0.00001" start_u="0.00001">
 <TimeStep>1e-03</TimeStep>
 </Algorithm>
-<Algorithm type="GridAlgorithmGroup" name="COND3DI" modelfile="MF" tau_refractive="0.0" transformfile="TMF" start_v="-65" start_w="0.00001" start_u="0.00001">
+<Algorithm type="GridAlgorithmGroup" name="COND3DI" modelfile="MF" tau_refractive="0.002" transformfile="TMF" start_v="-65" start_w="0.00001" start_u="0.00001">
 <TimeStep>1e-03</TimeStep>
 </Algorithm>
 </Algorithms>
@@ -36,10 +36,13 @@
 
 </Connections>
 <Reporting>
-	<Display node="E" />
+	<Average node="E" t_interval="0.001" />
+	<Average node="I" t_interval="0.001" />
+	<Rate node="E" t_interval="0.001" />
+	<Rate node="I" t_interval="0.001" />
 </Reporting>
 <SimulationRunParameter>
-<master_steps>100</master_steps>
+<master_steps>10</master_steps>
 <t_end>TE</t_end>
 <t_step>1e-03</t_step>
 <name_log>cond.log</name_log>

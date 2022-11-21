@@ -91,6 +91,8 @@ NdCell NdGridPython::generate_cell_with_coords(std::vector<unsigned int> cell_co
 
 std::map<std::vector<unsigned int>, std::map<std::vector<unsigned int>, double>> NdGridPython::calculateTransitionMatrix() {
     std::map<std::vector<unsigned int>, std::map<std::vector<unsigned int>, double>> transitions;
+
+    unsigned int threshold_cell = int((threshold_v - base[num_dimensions - 1]) / (dimensions[num_dimensions - 1] / resolution[num_dimensions - 1]));
     for (int c = 0; c < coord_list.size(); c++) {
         NdCell cell = generate_cell_with_coords(coord_list[c], true);
         std::vector<NdCell> check_cells = getCellRange(cell);
@@ -98,6 +100,13 @@ std::map<std::vector<unsigned int>, std::map<std::vector<unsigned int>, double>>
 
         if (ts.size() == 0) { // cell was completely outside the grid, so don't move it.
             ts[cell.grid_coords] = 1.0;
+        }
+
+        if (cell.grid_coords[num_dimensions - 1] >= threshold_cell) {
+            ts.clear();
+            std::vector<unsigned int> ncoords = cell.grid_coords;
+            ncoords[num_dimensions - 1] = threshold_cell;
+            ts[ncoords] = 1.0;
         }
 
         double total_prop = 0.0;
@@ -125,6 +134,8 @@ void NdGridPython::generateTMatFileBatched(std::string basename) {
 
     file << "0\t0\n";
 
+    unsigned int threshold_cell = int((threshold_v - base[num_dimensions - 1]) / (dimensions[num_dimensions - 1] / resolution[num_dimensions - 1]));
+
     std::map<std::vector<unsigned int>, std::map<std::vector<unsigned int>, double>> transitions;
     for (unsigned int batch = 0; batch < (coord_list.size() / batch_size) + 1; batch++) {
         for (int c = (batch * batch_size); c < (batch * batch_size) + batch_size; c++) {
@@ -137,6 +148,13 @@ void NdGridPython::generateTMatFileBatched(std::string basename) {
 
             if (ts.size() == 0) { // cell was completely outside the grid, so don't move it.
                 ts[cell.grid_coords] = 1.0;
+            }
+
+            if (cell.grid_coords[num_dimensions - 1] >= threshold_cell) {
+                ts.clear();
+                std::vector<unsigned int> ncoords = cell.grid_coords;
+                ncoords[num_dimensions - 1] = threshold_cell;
+                ts[ncoords] = 1.0;
             }
 
             double total_prop = 0.0;

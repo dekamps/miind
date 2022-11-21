@@ -5,7 +5,7 @@
 <Variable Name='RATE'>500</Variable>
 <WeightType>CustomConnectionParameters</WeightType>
 <Algorithms>
-<Algorithm type="GridAlgorithmGroup" name="COND3D" modelfile="MODEL_FILE" tau_refractive="0.0" transformfile="TMAT_FILE" start_v="-65" start_w="0.00001" start_u="0.00001">
+<Algorithm type="GridAlgorithmGroup" name="COND3D" modelfile="MODEL_FILE" tau_refractive="0.002" transformfile="TMAT_FILE" start_v="-65" start_w="0.00001" start_u="0.00001">
 <TimeStep>1e-03</TimeStep>
 </Algorithm>
 <Algorithm type="RateFunctor" name="DRIVE_1">

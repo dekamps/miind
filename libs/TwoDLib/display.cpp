@@ -4,6 +4,8 @@
 #include <iomanip>
 #include <thread>
 #include <sstream>
+#include <numeric>
+#include <algorithm>
 #ifdef ENABLE_OPENMP
 #include <omp.h>
 #endif
@@ -14,6 +16,11 @@
 #include "include/glm/glm.hpp"
 #include <MPILib/include/MPINetworkCode.hpp>
 #include "Quadrilateral.hpp"
+
+#define WINDOW_WIDTH 1024
+#define WINDOW_HEIGHT 768
+#define SHOW_TEXT true
+#define SHOW_3D_SPACE true
 
 using namespace TwoDLib;
 using namespace std::chrono;
@@ -126,7 +133,7 @@ void Display::display(void) {
 	// if (time_elapsed.count() % 10 != 0)
 	// 	return;
 
-	glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -136,6 +143,47 @@ void Display::display(void) {
 	// glTranslatef(0, 0, -1);
 
 	glBegin(GL_QUADS);
+
+	std::vector<double> inferno_r_range(8);
+	std::vector<double> inferno_g_range(8);
+	std::vector<double> inferno_b_range(8);
+	std::vector<double> inferno_values(8);
+
+	for (unsigned int i = 0; i < 8; i++) {
+		inferno_values[i] = (1.0 / (double)8) * (double)i;
+	}
+
+	inferno_r_range[0] = (double)0 / (double)255;
+	inferno_g_range[0] = (double)0 / (double)255;
+	inferno_b_range[0] = (double)4 / (double)255;
+
+	inferno_r_range[1] = (double)40 / (double)255;
+	inferno_g_range[1] = (double)11 / (double)255;
+	inferno_b_range[1] = (double)84 / (double)255;
+
+	inferno_r_range[2] = (double)101 / (double)255;
+	inferno_g_range[2] = (double)21 / (double)255;
+	inferno_b_range[2] = (double)110 / (double)255;
+
+	inferno_r_range[3] = (double)159 / (double)255;
+	inferno_g_range[3] = (double)42 / (double)255;
+	inferno_b_range[3] = (double)99 / (double)255;
+
+	inferno_r_range[4] = (double)212 / (double)255;
+	inferno_g_range[4] = (double)72 / (double)255;
+	inferno_b_range[4] = (double)66 / (double)255;
+
+	inferno_r_range[5] = (double)245 / (double)255;
+	inferno_g_range[5] = (double)125 / (double)255;
+	inferno_b_range[5] = (double)21 / (double)255;
+
+	inferno_r_range[6] = (double)250 / (double)255;
+	inferno_g_range[6] = (double)193 / (double)255;
+	inferno_b_range[6] = (double)39 / (double)255;
+
+	inferno_r_range[7] = (double)252 / (double)255;
+	inferno_g_range[7] = (double)255 / (double)255;
+	inferno_b_range[7] = (double)164 / (double)255;
 
 	Mesh m = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index];
 
@@ -148,7 +196,9 @@ void Display::display(void) {
 	double min_m = 9999999;
 	for(unsigned int i = 0; i<m.NrStrips(); i++){
 		for(unsigned int j = 0; j<m.NrCellsInStrip(i); j++) {
+
 			unsigned int idx = _dws[window_index]._system->Map(_dws[window_index]._mesh_index,i,j);
+			
 			Quadrilateral q = m.Quad(i,j);
 			double cell_area = std::abs(q.SignedArea());
 			double mass = 0.0;
@@ -158,18 +208,30 @@ void Display::display(void) {
 			if (min_m >= log10(1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area))
 				min_m = log10(1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area);
 
+			/*if (max_m < _dws[window_index]._system->Mass()[idx])
+				max_m = _dws[window_index]._system->Mass()[idx];
+			if (min_m >= _dws[window_index]._system->Mass()[idx])
+				min_m = _dws[window_index]._system->Mass()[idx];*/
+
 			if (_dws[window_index]._system->Mass()[idx] / cell_area != 0 && _dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] == 0) {
-				mass = std::min(1.0, std::max(0.0, (log10(_dws[window_index]._system->Mass()[idx] / cell_area) - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass)));
+				mass = std::min(1.0, std::max(0.0, (log10(1e-6 + _dws[window_index]._system->Mass()[idx] / cell_area) - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass)));
+				//mass = std::min(1.0, std::max(0.0, (_dws[window_index]._system->Mass()[idx] - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass)));
 			}
 			else if (_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] > 0){
 				if (_dws[window_index]._system->_vec_cells_to_objects[idx].size() > 0)
 				    mass = 0.5 + 1000.0 * ((double)_dws[window_index]._system->_vec_cells_to_objects[idx].size() / (double)_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index]);
 					//mass = 1.0;
 			}
-
 			vector<Point> ps = q.Points();
 
-			glColor3f(std::min(1.0,mass*2.0), std::max(0.0,((mass*2.0) - 1.0)), 0);
+			unsigned int lower_num = int(mass * 8.0);
+			if (lower_num > 6)
+				lower_num = 6;
+
+			double green = inferno_g_range[lower_num] + (((mass - inferno_values[lower_num]) / (inferno_values[lower_num+1] - inferno_values[lower_num])) * (inferno_g_range[lower_num+1] - inferno_g_range[lower_num]));
+			double red = inferno_r_range[lower_num] + (((mass - inferno_values[lower_num]) / (inferno_values[lower_num + 1] - inferno_values[lower_num])) * (inferno_r_range[lower_num + 1] - inferno_r_range[lower_num]));
+			double blue = inferno_b_range[lower_num] + (((mass - inferno_values[lower_num]) / (inferno_values[lower_num + 1] - inferno_values[lower_num])) * (inferno_b_range[lower_num + 1] - inferno_b_range[lower_num]));
+			glColor3f(std::min(1.0,red), std::max(0.0,green), std::max(0.0, blue));
 			glVertex2f(2*(ps[0][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[0][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
 			glVertex2f(2*(ps[1][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[1][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
 			glVertex2f(2*(ps[2][0]-(mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v), 2*(ps[2][1]-(mesh_min_h + ((mesh_max_h - mesh_min_h)/2)))/(mesh_max_h - mesh_min_h));
@@ -183,77 +245,78 @@ void Display::display(void) {
 	glEnd();
 
 	// Print real time and sim time
+	if (SHOW_TEXT) {
+		double sim_time = 0.0;
 
-	double sim_time = 0.0;
+		sim_time = _current_sim_it * _time_step;
 
-	sim_time = _current_sim_it * _time_step;
-
-	glColor3f( 1.0, 1.0, 1.0 );
-  glRasterPos2f(0.3, 0.9);
-  int len, i;
-	std::string t = std::string("Sim Time (s) : ") + std::to_string( sim_time );
-	const char* c_string = t.c_str();
-  len = (int)strlen( c_string );
-  for (i = 0; i < len; i++) {
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
-  }
-
-	double h_width = (mesh_max_h - mesh_min_h);
-	char buff[32];
-  sprintf(buff, "%.*g", 1, h_width);
-	double h_step = (double)std::atof(buff) / 10.0;
-
-	std::string s_h_step = std::to_string(h_step);
-	s_h_step.pop_back();
-	h_step = std::stod(s_h_step);
-	double nice_min_h = (double)floor(mesh_min_h/h_step) * h_step;
-	double nice_max_h = (double)ceil(mesh_max_h/h_step) * h_step;
-
-	double v_width = (mesh_max_v - mesh_min_v);
-  sprintf(buff, "%.*g", 1, v_width);
-	double v_step = (double)std::atof(buff) / 10.0;
-
-	std::string s_v_step = std::to_string(v_step);
-	s_v_step.pop_back();
-	v_step = std::stod(s_v_step);
-	double nice_min_v = (double)floor(mesh_min_v/v_step) * v_step;
-	double nice_max_v = (double)ceil(mesh_max_v/v_step) * v_step;
-
-	double pos = nice_min_h;
-	while(pos < nice_max_h){
-		if (std::abs(pos) < 0.0000000001 )
-			pos = 0.0;
-
-		glColor3f( 1.0, 1.0, 1.0 );
-	  glRasterPos2f(-1.0, 2*((pos - (mesh_min_h + ((mesh_max_h - mesh_min_h)/2.0)))/(mesh_max_h - mesh_min_h)));
-
-		std::stringstream stream;
-		stream <<  std::setprecision(3) << pos;
-		t = stream.str();
-		c_string = t.c_str();
-	  len = (int)strlen( c_string );
-	  for (i = 0; i < len; i++) {
-	    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
-	  }
-		pos += h_step;
-	}
-
-	pos = nice_min_v;
-	while(pos < nice_max_v){
-		if (std::abs(pos) < 0.0000000001 )
-			pos = 0.0;
-		glRasterPos2f(2*((pos - (mesh_min_v + ((mesh_max_v - mesh_min_v)/2.0)))/(mesh_max_v - mesh_min_v)), -1.0);
-		std::stringstream stream2;
-		stream2 <<  std::setprecision(3) << pos;
-		t = stream2.str();
-		c_string = t.c_str();
-		len = (int)strlen( c_string );
+		glColor3f(1.0, 1.0, 1.0);
+		glRasterPos2f(0.3, 0.9);
+		int len, i;
+		std::string t = std::string("Sim Time (s) : ") + std::to_string(sim_time);
+		const char* c_string = t.c_str();
+		len = (int)strlen(c_string);
 		for (i = 0; i < len; i++) {
 			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
 		}
-		pos += (nice_max_v - nice_min_v) / 10;
-	}
 
+		double h_width = (mesh_max_h - mesh_min_h);
+		char buff[32];
+		sprintf(buff, "%.*g", 1, h_width);
+		double h_step = (double)std::atof(buff) / 10.0;
+
+		std::string s_h_step = std::to_string(h_step);
+		s_h_step.pop_back();
+		h_step = std::stod(s_h_step);
+		double nice_min_h = (double)floor(mesh_min_h / h_step) * h_step;
+		double nice_max_h = (double)ceil(mesh_max_h / h_step) * h_step;
+
+		double v_width = (mesh_max_v - mesh_min_v);
+		sprintf(buff, "%.*g", 1, v_width);
+		double v_step = (double)std::atof(buff) / 10.0;
+
+		std::string s_v_step = std::to_string(v_step);
+		s_v_step.pop_back();
+		v_step = std::stod(s_v_step);
+		double nice_min_v = (double)floor(mesh_min_v / v_step) * v_step;
+		double nice_max_v = (double)ceil(mesh_max_v / v_step) * v_step;
+
+		double pos = nice_min_h;
+		while (pos < nice_max_h) {
+			if (std::abs(pos) < 0.0000000001)
+				pos = 0.0;
+
+			glColor3f(1.0, 1.0, 1.0);
+			glRasterPos2f(-1.0, 2 * ((pos - (mesh_min_h + ((mesh_max_h - mesh_min_h) / 2.0))) / (mesh_max_h - mesh_min_h)));
+
+			std::stringstream stream;
+			stream << std::setprecision(3) << pos;
+			t = stream.str();
+			c_string = t.c_str();
+			len = (int)strlen(c_string);
+			for (i = 0; i < len; i++) {
+				glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+			}
+			pos += h_step;
+		}
+
+		pos = nice_min_v;
+		while (pos < nice_max_v) {
+			if (std::abs(pos) < 0.0000000001)
+				pos = 0.0;
+			glRasterPos2f(2 * ((pos - (mesh_min_v + ((mesh_max_v - mesh_min_v) / 2.0))) / (mesh_max_v - mesh_min_v)), -1.0);
+			std::stringstream stream2;
+			stream2 << std::setprecision(3) << pos;
+			t = stream2.str();
+			c_string = t.c_str();
+			len = (int)strlen(c_string);
+			for (i = 0; i < len; i++) {
+				glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string[i]);
+			}
+			pos += (nice_max_v - nice_min_v) / 10;
+		}
+	}
+	
 	// **** used for 3D ****
 	// glPopMatrix();
 	glutSwapBuffers();
@@ -408,6 +471,36 @@ GLfloat modulof(GLfloat a, GLfloat b) {
 	return r < 0 ? r + b : r;
 }
 
+GLfloat camDist(std::vector<double>& point1, std::vector<double>& point2) {
+	return std::sqrt(((point2[0]-point1[0])* (point2[0] - point1[0])) + ((point2[1] - point1[1]) * (point2[1] - point1[1])) + ((point2[2] - point1[2]) * (point2[2] - point1[2])));
+}
+
+template <typename T>
+std::vector<unsigned int> sort_indexes(const std::vector<T>& v) {
+
+	// initialize original index locations
+	std::vector<unsigned int> idx(v.size());
+	iota(idx.begin(), idx.end(), 0);
+
+	// sort indexes based on comparing values in v
+	// using std::stable_sort instead of std::sort
+	// to avoid unnecessary index re-orderings
+	// when v contains elements of equal values 
+	std::stable_sort(idx.begin(), idx.end(),
+		[&v](unsigned int i1, unsigned int i2) {return v[i1] > v[i2]; });
+
+	return idx;
+}
+
+double dot_prod(std::vector<double>& vec1, std::vector<double>& vec2) {
+	double sum = 0.0;
+	for (unsigned int i = 0; i < vec1.size(); i++) {
+		sum += vec1[i] * vec2[i];
+	}
+
+	return sum;
+}
+
 // The OpenGL display function, called as fast as possible.
 void Display::display_3d(void) {
 	if (_dws.size() == 0)
@@ -464,12 +557,14 @@ void Display::display_3d(void) {
 
 	gluPerspective(45.0f, (GLfloat)_dws[window_index].width / (GLfloat)_dws[window_index].height, 0.1f, 50.0f);
 
-	gluLookAt(  0, 0,-2,
+	gluLookAt(  0, -0.75,-1.5, // distance from centre of the cube
 				0, 0, 0,
 				0, 1, 0); //Orient the camera
 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	std::vector<double> camPos = { 0,0,-1.5,1.0 };
+
+	//glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -477,7 +572,7 @@ void Display::display_3d(void) {
 	//if (time_elapsed.count() % 10 != 0)
 	// 	return;
 
-	glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	//glClear(GL_COLOR_BUFFER_BIT);
 
@@ -489,6 +584,25 @@ void Display::display_3d(void) {
 	GLfloat y_rot = modulof(-155 + _dws[window_index].rot_y, 360) - 45;
 	glRotatef(y_rot, 0.0f, 1.0f, 0.0f);
 
+	GLfloat inv[16];
+	GLfloat viewmat[16];
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, viewmat);
+
+	gluInvertMatrix(viewmat, inv);
+
+	//std::vector<double> a = { inv[0],inv[1],inv[2],inv[3] };
+	//std::vector<double> b = { inv[4],inv[5],inv[6],inv[7] };
+	//std::vector<double> c = { inv[8],inv[9],inv[10],inv[11] };
+	//std::vector<double> d = { inv[12],inv[13],inv[14],inv[15] };
+	std::vector<double> a = { inv[0],inv[4],inv[8],inv[12] };
+	std::vector<double> b = { inv[1],inv[5],inv[9],inv[13] };
+	std::vector<double> c = { inv[2],inv[5],inv[10],inv[14] };
+	std::vector<double> d = { inv[3],inv[7],inv[11],inv[15] };
+	std::vector<std::vector<double>> dinv = { a,b,c,d };
+
+	std::vector<double> inverted_cam_pos = mat_mult(dinv, camPos);
+
 	std::vector<std::string> labels4(4);
 	labels4[0] = std::string("h");
 	labels4[1] = std::string("n");
@@ -499,94 +613,101 @@ void Display::display_3d(void) {
 	glRasterPos3f(-0.5f, 0.55f, -0.5f);
 	int len, i;
 
-	std::string t = std::string("u");
-	if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4)
-		t = labels4[modulo(1 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions())];
-	const char* c_string = t.c_str();
-	len = (int)strlen(c_string);
-	for (i = 0; i < len; i++) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c_string[i]);
+	if (SHOW_TEXT) {
+
+		std::string t = std::string("u");
+		if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4)
+			t = labels4[modulo(1 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions())];
+		const char* c_string = t.c_str();
+		len = (int)strlen(c_string);
+		for (i = 0; i < len; i++) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c_string[i]);
+		}
+
+		glColor3f(1.0, 1.0, 1.0);
+		glRasterPos3f(-0.5f, -0.5f, 0.6f);
+		t = std::string("w");
+		if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4)
+			t = labels4[modulo(2 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions())];
+		c_string = t.c_str();
+		len = (int)strlen(c_string);
+		for (i = 0; i < len; i++) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c_string[i]);
+		}
+
+		glColor3f(1.0, 1.0, 1.0);
+		glRasterPos3f(0.55f, -0.5f, -0.5f);
+		t = std::string("v");
+		if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4)
+			t = labels4[modulo(3 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions())];
+		c_string = t.c_str();
+		len = (int)strlen(c_string);
+		for (i = 0; i < len; i++) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c_string[i]);
+		}
+
+		// Draw lines
+
+		glLineWidth(2.0f);
+		glBegin(GL_LINES);
+
+		// y axis
+		glVertex3f(-0.5f, -0.5f, -0.5f);
+		glVertex3f(-0.5f, 0.5f, -0.5f);
+
+		glVertex3f(-0.5f, 0.5f, -0.5f);
+		glVertex3f(-0.5f, 0.48f, -0.48f);
+
+		glVertex3f(-0.5f, 0.5f, -0.5f);
+		glVertex3f(-0.48f, 0.48f, -0.5f);
+
+		glVertex3f(-0.5f, 0.5f, -0.5f);
+		glVertex3f(-0.5f, 0.48f, -0.52f);
+
+		glVertex3f(-0.5f, 0.5f, -0.5f);
+		glVertex3f(-0.52f, 0.48f, -0.5f);
+
+		// x axis
+		glVertex3f(-0.5f, -0.5f, -0.5f);
+		glVertex3f(0.5f, -0.5f, -0.5f);
+
+		glVertex3f(0.5f, -0.5f, -0.5f);
+		glVertex3f(0.48f, -0.48f, -0.5f);
+
+		glVertex3f(0.5f, -0.5f, -0.5f);
+		glVertex3f(0.48f, -0.5f, -0.48f);
+
+		glVertex3f(0.5f, -0.5f, -0.5f);
+		glVertex3f(0.48f, -0.5f, -0.52f);
+
+		glVertex3f(0.5f, -0.5f, -0.5f);
+		glVertex3f(0.48f, -0.52f, -0.5f);
+
+		// z axis
+		glVertex3f(-0.5f, -0.5f, -0.5f);
+		glVertex3f(-0.5f, -0.5f, 0.5f);
+
+		glVertex3f(-0.5f, -0.5f, 0.5f);
+		glVertex3f(-0.48f, -0.5f, 0.48f);
+
+		glVertex3f(-0.5f, -0.5f, 0.5f);
+		glVertex3f(-0.5f, -0.48f, 0.48f);
+
+		glVertex3f(-0.5f, -0.5f, 0.5f);
+		glVertex3f(-0.5f, -0.52f, 0.48f);
+
+		glVertex3f(-0.5f, -0.5f, 0.5f);
+		glVertex3f(-0.52f, -0.5f, 0.48f);
+
+		glEnd();
 	}
-
-	glColor3f(1.0, 1.0, 1.0);
-	glRasterPos3f(-0.5f, -0.5f, 0.6f);
-	t = std::string("w");
-	if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4)
-		t = labels4[modulo(2 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions())];
-	c_string = t.c_str();
-	len = (int)strlen(c_string);
-	for (i = 0; i < len; i++) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c_string[i]);
-	}
-
-	glColor3f(1.0, 1.0, 1.0);
-	glRasterPos3f(0.55f, -0.5f, -0.5f);
-	t = std::string("v");
-	if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4)
-		t = labels4[modulo(3 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions())];
-	c_string = t.c_str();
-	len = (int)strlen(c_string);
-	for (i = 0; i < len; i++) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c_string[i]);
-	}
-
-	// Draw lines
-
-	glLineWidth(2.0f);
-	glBegin(GL_LINES);
-
-	// y axis
-	glVertex3f(-0.5f, -0.5f, -0.5f);
-	glVertex3f(-0.5f, 0.5f, -0.5f);
-
-	glVertex3f(-0.5f, 0.5f, -0.5f);
-	glVertex3f(-0.5f, 0.48f, -0.48f);
-
-	glVertex3f(-0.5f, 0.5f, -0.5f);
-	glVertex3f(-0.48f, 0.48f, -0.5f);
-
-	glVertex3f(-0.5f, 0.5f, -0.5f);
-	glVertex3f(-0.5f, 0.48f, -0.52f);
-
-	glVertex3f(-0.5f, 0.5f, -0.5f);
-	glVertex3f(-0.52f, 0.48f, -0.5f);
-
-	// x axis
-	glVertex3f(-0.5f, -0.5f, -0.5f);
-	glVertex3f(0.5f, -0.5f, -0.5f);
-
-	glVertex3f(0.5f, -0.5f, -0.5f);
-	glVertex3f(0.48f, -0.48f, -0.5f);
-
-	glVertex3f(0.5f, -0.5f, -0.5f);
-	glVertex3f(0.48f, -0.5f, -0.48f);
-
-	glVertex3f(0.5f, -0.5f, -0.5f);
-	glVertex3f(0.48f, -0.5f, -0.52f);
-
-	glVertex3f(0.5f, -0.5f, -0.5f);
-	glVertex3f(0.48f, -0.52f, -0.5f);
-
-	// z axis
-	glVertex3f(-0.5f, -0.5f, -0.5f);
-	glVertex3f(-0.5f, -0.5f, 0.5f);
-
-	glVertex3f(-0.5f, -0.5f, 0.5f);
-	glVertex3f(-0.48f, -0.5f, 0.48f);
-
-	glVertex3f(-0.5f, -0.5f, 0.5f);
-	glVertex3f(-0.5f, -0.48f, 0.48f);
-
-	glVertex3f(-0.5f, -0.5f, 0.5f);
-	glVertex3f(-0.5f, -0.52f, 0.48f);
-
-	glVertex3f(-0.5f, -0.5f, 0.5f);
-	glVertex3f(-0.52f, -0.5f, 0.48f);
-
-	glEnd();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
 
 	glBegin(GL_QUADS);
 
@@ -607,63 +728,64 @@ void Display::display_3d(void) {
 	unsigned int size_z = m.getGridResolutionByDimension(modulo(-3 + _dws[window_index].dim_select, _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions()));
 
 	// Draw a Cube
+	if (SHOW_3D_SPACE) {
 
-	double cell_x = 0.0;
-	double cell_y = 0.0;
-	double cell_z = 0.0;
+		double cell_x = 0.0;
+		double cell_y = 0.0;
+		double cell_z = 0.0;
 
-	double half_cell_x_width = 0.5;
-	double half_cell_y_width = 0.5;
-	double half_cell_z_width = 0.5;
+		double half_cell_x_width = 0.5;
+		double half_cell_y_width = 0.5;
+		double half_cell_z_width = 0.5;
 
-	std::vector<double> p1 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
-	std::vector<double> p2 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
-	std::vector<double> p3 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
-	std::vector<double> p4 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
-	std::vector<double> p5 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
-	std::vector<double> p6 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
-	std::vector<double> p7 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
-	std::vector<double> p8 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
-	//glColor4f(0.0, 0.0, 0.0, 1);
-	glColor4f(0.3, 0.3, 0.3, 1);
-	// front face
-	glVertex3f(p1[0], p1[1], p1[2]);
-	glVertex3f(p2[0], p2[1], p2[2]);
-	glVertex3f(p3[0], p3[1], p3[2]);
-	glVertex3f(p4[0], p4[1], p4[2]);
+		std::vector<double> p1 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+		std::vector<double> p2 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+		std::vector<double> p3 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+		std::vector<double> p4 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+		std::vector<double> p5 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+		std::vector<double> p6 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+		std::vector<double> p7 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+		std::vector<double> p8 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+		//glColor4f(0.0, 0.0, 0.0, 1);
+		glColor4f(0.3, 0.3, 0.3, 0.1);
+		// front face
+		glVertex3f(p1[0], p1[1], p1[2]);
+		glVertex3f(p2[0], p2[1], p2[2]);
+		glVertex3f(p3[0], p3[1], p3[2]);
+		glVertex3f(p4[0], p4[1], p4[2]);
 
-	// back face
-	glVertex3f(p6[0], p6[1], p6[2]);
-	glVertex3f(p5[0], p5[1], p5[2]);
-	glVertex3f(p8[0], p8[1], p8[2]);
-	glVertex3f(p7[0], p7[1], p7[2]);
+		// back face
+		glVertex3f(p6[0], p6[1], p6[2]);
+		glVertex3f(p5[0], p5[1], p5[2]);
+		glVertex3f(p8[0], p8[1], p8[2]);
+		glVertex3f(p7[0], p7[1], p7[2]);
 
-	glColor4f(0.35, 0.35, 0.35, 1);
-	// right face
-	glVertex3f(p4[0], p4[1], p4[2]);
-	glVertex3f(p3[0], p3[1], p3[2]);
-	glVertex3f(p7[0], p7[1], p7[2]);
-	glVertex3f(p8[0], p8[1], p8[2]);
+		glColor4f(0.35, 0.35, 0.35, 1);
+		// right face
+		glVertex3f(p4[0], p4[1], p4[2]);
+		glVertex3f(p3[0], p3[1], p3[2]);
+		glVertex3f(p7[0], p7[1], p7[2]);
+		glVertex3f(p8[0], p8[1], p8[2]);
 
-	// left face
-	glVertex3f(p6[0], p6[1], p6[2]);
-	glVertex3f(p2[0], p2[1], p2[2]);
-	glVertex3f(p1[0], p1[1], p1[2]);
-	glVertex3f(p5[0], p5[1], p5[2]);
+		// left face
+		glVertex3f(p6[0], p6[1], p6[2]);
+		glVertex3f(p2[0], p2[1], p2[2]);
+		glVertex3f(p1[0], p1[1], p1[2]);
+		glVertex3f(p5[0], p5[1], p5[2]);
 
-	glColor4f(0.4, 0.4, 0.4, 1);
-	//// top face
-	glVertex3f(p2[0], p2[1], p2[2]);
-	glVertex3f(p6[0], p6[1], p6[2]);
-	glVertex3f(p7[0], p7[1], p7[2]);
-	glVertex3f(p3[0], p3[1], p3[2]);
+		glColor4f(0.4, 0.4, 0.4, 1);
+		//// top face
+		glVertex3f(p2[0], p2[1], p2[2]);
+		glVertex3f(p6[0], p6[1], p6[2]);
+		glVertex3f(p7[0], p7[1], p7[2]);
+		glVertex3f(p3[0], p3[1], p3[2]);
 
-	//// bottom face
-	glVertex3f(p5[0], p5[1], p5[2]);
-	glVertex3f(p1[0], p1[1], p1[2]);
-	glVertex3f(p4[0], p4[1], p4[2]);
-	glVertex3f(p8[0], p8[1], p8[2]);
-
+		//// bottom face
+		glVertex3f(p5[0], p5[1], p5[2]);
+		glVertex3f(p1[0], p1[1], p1[2]);
+		glVertex3f(p4[0], p4[1], p4[2]);
+		glVertex3f(p8[0], p8[1], p8[2]);
+	}
 
 	// Do some crude ordering so that the alpha blend looks ok from all angles
 	std::vector<unsigned int> res_order(3);
@@ -691,117 +813,21 @@ void Display::display_3d(void) {
 	reverse[1] = false;
 	reverse[2] = false;
 
-	if (x_rot >= -45.0 && x_rot < 45.0) {
-		if (y_rot >= -45.0 && y_rot < 45.0) {
-			res_order[0] = 1; //w
-			res_order[1] = 0; //u
-			res_order[2] = 2; //v
-
-			reverse[0] = false;
-			reverse[1] = true;
-			reverse[2] = false;
-		}
-		else if (y_rot >= 45.0 && y_rot < 135.0) {
-			res_order[0] = 2; //w
-			res_order[1] = 1; //u
-			res_order[2] = 0; //v
-
-			reverse[0] = false;
-			reverse[1] = false;
-			reverse[2] = false;
-		}
-		else if (y_rot >= 135.0 && y_rot < 225.0) {
-			res_order[0] = 1; //w
-			res_order[1] = 2; //u
-			res_order[2] = 0; //v
-
-			reverse[0] = false;
-			reverse[1] = false;
-			reverse[2] = false;
-
-		}
-		else if (y_rot >= 225.0 && y_rot < 315.0) {
-			// v=0 u=0 at back
-			res_order[0] = 2; //w
-			res_order[1] = 1; //u
-			res_order[2] = 0; //v
-
-			reverse[0] = false;
-			reverse[1] = false;
-			reverse[2] = true;
-		}
-	} 
-	else if (x_rot >= 45.0 && x_rot < 135.0) {
-		res_order[0] = 0; //w
-		res_order[1] = 1; //u
-		res_order[2] = 2; //v
-
-		reverse[0] = true;
-		reverse[1] = false;
-		reverse[2] = false;
-	}
-	else if (x_rot >= 135.0 && x_rot < 225.0) {
-	if (y_rot >= -45.0 && y_rot < 45.0) {
-		res_order[0] = 1; //w
-		res_order[1] = 0; //u
-		res_order[2] = 2; //v
-
-		reverse[0] = false;
-		reverse[1] = false;
-		reverse[2] = false;
-	}
-	else if (y_rot >= 45.0 && y_rot < 135.0) {
-		// v=0 u=0 at back
-		res_order[0] = 2; //w
-		res_order[1] = 1; //u
-		res_order[2] = 0; //v
-
-		reverse[0] = false;
-		reverse[1] = false;
-		reverse[2] = true;
-	}
-	else if (y_rot >= 135.0 && y_rot < 225.0) {
-		res_order[0] = 1; //w
-		res_order[1] = 2; //u
-		res_order[2] = 0; //v
-
-		reverse[0] = false;
-		reverse[1] = true;
-		reverse[2] = false;
-
-	}
-	else if (y_rot >= 225.0 && y_rot < 315.0) {
-		// v=0 u=0 at back
-		res_order[0] = 2; //w
-		res_order[1] = 1; //u
-		res_order[2] = 0; //v
-
-		reverse[0] = false;
-		reverse[1] = false;
-		reverse[2] = false;
-	}
-	}
-	else if (x_rot >= 225.0 && x_rot < 315.0) {
-		res_order[0] = 0; //w
-		res_order[1] = 1; //u
-		res_order[2] = 2; //v
-
-		reverse[0] = false;
-		reverse[1] = false;
-		reverse[2] = false;
-	}
-
 	std::vector<unsigned int> vals(3);
 	vals[res_order[0]] = vals_start[res_order[0]];
 	vals[res_order[1]] = vals_start[res_order[1]];
 	vals[res_order[2]] = vals_start[res_order[2]];
-	
-	double max_m = -9999999;
-	double min_m = 9999999;
-	for (vals[res_order[0]] = vals_start[res_order[0]]; vals[res_order[0]] < vals_end[res_order[0]]; vals[res_order[0]] += vals_diff[res_order[0]]) {
+
+	// Perfect but slow depth ordering
+	int num_cells = size_x * size_y * size_z;
+	std::vector<unsigned int> cell_inds(num_cells);
+	std::vector<GLfloat> depths(num_cells);
+	int current_cell_ind = 0;
+
+	// Crude but fast ordering
+	/*for (vals[res_order[0]] = vals_start[res_order[0]]; vals[res_order[0]] < vals_end[res_order[0]]; vals[res_order[0]] += vals_diff[res_order[0]]) {
 		for (vals[res_order[1]] = vals_start[res_order[1]]; vals[res_order[1]] < vals_end[res_order[1]]; vals[res_order[1]] += vals_diff[res_order[1]]) {
 			for (vals[res_order[2]] = vals_start[res_order[2]]; vals[res_order[2]] < vals_end[res_order[2]]; vals[res_order[2]] += vals_diff[res_order[2]]) {
-
 				unsigned int i_r = vals[0];
 				if (reverse[0])
 					i_r = vals_end[0] - 1 - vals[0];
@@ -811,9 +837,6 @@ void Display::display_3d(void) {
 				unsigned int j_r = vals[2];
 				if (reverse[2])
 					j_r = vals_end[2] - 1 - vals[2];
-				
-				unsigned int strip_ind = (i_r * vals_end[1]) + k_r;
-				unsigned int cell_ind = j_r;
 
 				std::vector<unsigned int> coords3(3);
 				coords3[0] = i_r;
@@ -821,152 +844,262 @@ void Display::display_3d(void) {
 				coords3[2] = j_r;
 
 				unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords3) + _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index];
+				cell_inds[current_cell_ind] = idx;
+				current_cell_ind++;
+			}
+		}
+	}*/
 
-				double cell_mass = 0.0;
-				double mass = 0.0;
-
-				if (_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] == 0) {
-					// Sum up all mass above the third dimension as we can't display it (this is effectively a marginal)
-					// for the sake of speed here, just assume that this is 4D - if you're in the future and working on 5D or greater
-					// then congratulations on solving the dimensionality problem or possibly quantum computing.
-					if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4) {
-						std::vector<unsigned int> coords4(4);
-						coords4[0 + _dws[window_index].dim_select] = 0;
-						coords4[modulo(1 + _dws[window_index].dim_select, 4)] = i_r;
-						coords4[modulo(2 + _dws[window_index].dim_select, 4)] = k_r;
-						coords4[modulo(3 + _dws[window_index].dim_select, 4)] = j_r;
-
-						unsigned int doo = 1;
-						for (int d = 3; d >= _dws[window_index].dim_select+1; d--)
-							doo *= _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(d);
-
-						unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords4) + _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index];
-						for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(_dws[window_index].dim_select); c++) {
-							unsigned int index = idx + (c * doo);
-							cell_mass += _dws[window_index]._system->Mass()[index];
-						}
-					}
-					else {
-						cell_mass = _dws[window_index]._system->Mass()[idx];
-					}
-
-					if (cell_mass < 0.000000001) continue; // skip if mass is basically nothing
-
-					double cell_area = std::abs(m.Quad(0, 0).SignedArea());
-
-					if (!log_scale) {
-						if (max_m < 1e-6 + cell_mass / cell_area)
-							max_m = 1e-6 + cell_mass / cell_area;
-						if (min_m >= 1e-6 + cell_mass / cell_area)
-							min_m = 1e-6 + cell_mass / cell_area;
-					}
-					else {
-						if (max_m < log10(1e-6 + cell_mass / cell_area))
-							max_m = log10(1e-6 + cell_mass / cell_area);
-						if (min_m >= log10(1e-6 + cell_mass / cell_area))
-							min_m = log10(1e-6 + cell_mass / cell_area);
-					}
-
-					if (!log_scale) {
-						mass = (cell_mass / cell_area - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass);
-					}
-					else {
-						mass = (log10(cell_mass / cell_area) - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass);
-					}
-				}
-				else {
-					unsigned int count = 0;
-					if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4) {
-						std::vector<unsigned int> coords4(4);
-						coords4[0 + _dws[window_index].dim_select] = 0;
-						coords4[modulo(1 + _dws[window_index].dim_select, 4)] = i_r;
-						coords4[modulo(2 + _dws[window_index].dim_select, 4)] = k_r;
-						coords4[modulo(3 + _dws[window_index].dim_select, 4)] = j_r;
-
-						unsigned int doo = 1;
-						for (int d = 3; d >= _dws[window_index].dim_select + 1; d--)
-							doo *= _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(d);
-
-						unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords4) + _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index];
-						for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(_dws[window_index].dim_select); c++) {
-							unsigned int index = idx + (c * doo);
-							count += _dws[window_index]._system->_vec_cells_to_objects[index].size();
-						}
-					}
-					else {
-						count = _dws[window_index]._system->_vec_cells_to_objects[idx].size();
-					}
-
-					if (count > 0)
-						mass = 0.5 + 1000.0 * ((double)count / (double)_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index]);
-					else
-						continue;
-				}
-					
-				if (mass < 0.00000001) {
-					continue; // glColor4f(1.0, 1.0, 1.0, 0.02);
-				}
-				else if (mass > 0.00000001) {
-					glColor4f(std::min(1.0, mass * 2.0), std::max(0.0, ((mass * 2.0) - 1.0)), 0, 1);
-				}
-				else {
-					continue;
-				}
+	for (vals[res_order[0]] = vals_start[res_order[0]]; vals[res_order[0]] < vals_end[res_order[0]]; vals[res_order[0]] += vals_diff[res_order[0]]) {
+		for (vals[res_order[1]] = vals_start[res_order[1]]; vals[res_order[1]] < vals_end[res_order[1]]; vals[res_order[1]] += vals_diff[res_order[1]]) {
+			for (vals[res_order[2]] = vals_start[res_order[2]]; vals[res_order[2]] < vals_end[res_order[2]]; vals[res_order[2]] += vals_diff[res_order[2]]) {
+				unsigned int i_r = vals[0];
+				if (reverse[0])
+					i_r = vals_end[0] - 1 - vals[0];
+				unsigned int k_r = vals[1];
+				if (reverse[1])
+					k_r = vals_end[1] - 1 - vals[1];
+				unsigned int j_r = vals[2];
+				if (reverse[2])
+					j_r = vals_end[2] - 1 - vals[2];
 
 				double cell_x = -0.5 + j_r * (1.0 / vals_end[2]);
 				double cell_y = -0.5 + i_r * (1.0 / vals_end[0]);
 				double cell_z = -0.5 + k_r * (1.0 / vals_end[1]);
+				std::vector<double> cell_point = { cell_x, cell_y, cell_z };
 
-				double half_cell_x_width = (0.5 / vals_end[2]);
-				double half_cell_y_width = (0.5 / vals_end[0]);
-				double half_cell_z_width = (0.5 / vals_end[1]);
-
-				std::vector<double> p1 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
-				std::vector<double> p2 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
-				std::vector<double> p3 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
-				std::vector<double> p4 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
-				std::vector<double> p5 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
-				std::vector<double> p6 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
-				std::vector<double> p7 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
-				std::vector<double> p8 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
-
-				// front face
-				glVertex3f(p2[0], p2[1], p2[2]);
-				glVertex3f(p1[0], p1[1], p1[2]);
-				glVertex3f(p4[0], p4[1], p4[2]);
-				glVertex3f(p3[0], p3[1], p3[2]);
-
-				// back face
-				glVertex3f(p5[0], p5[1], p5[2]);
-				glVertex3f(p6[0], p6[1], p6[2]);
-				glVertex3f(p7[0], p7[1], p7[2]);
-				glVertex3f(p8[0], p8[1], p8[2]);
-
-				// right face
-				glVertex3f(p3[0], p3[1], p3[2]);
-				glVertex3f(p4[0], p4[1], p4[2]);
-				glVertex3f(p8[0], p8[1], p8[2]);
-				glVertex3f(p7[0], p7[1], p7[2]);
-
-				// left face
-				glVertex3f(p2[0], p2[1], p2[2]);
-				glVertex3f(p6[0], p6[1], p6[2]);
-				glVertex3f(p5[0], p5[1], p5[2]);
-				glVertex3f(p1[0], p1[1], p1[2]);
-
-				//// top face
-				glVertex3f(p6[0], p6[1], p6[2]);
-				glVertex3f(p2[0], p2[1], p2[2]);
-				glVertex3f(p3[0], p3[1], p3[2]);
-				glVertex3f(p7[0], p7[1], p7[2]);
-
-				//// bottom face
-				glVertex3f(p1[0], p1[1], p1[2]);
-				glVertex3f(p5[0], p5[1], p5[2]);
-				glVertex3f(p8[0], p8[1], p8[2]);
-				glVertex3f(p4[0], p4[1], p4[2]);
-
+				depths[current_cell_ind] = camDist(cell_point, inverted_cam_pos);
+				current_cell_ind++;
 			}
+		}
+	}
+	
+	cell_inds = sort_indexes(depths);
+
+	std::vector<double> inferno_r_range(8);
+	std::vector<double> inferno_g_range(8);
+	std::vector<double> inferno_b_range(8);
+	std::vector<double> inferno_values(8);
+
+	for (unsigned int i = 0; i < 8; i++) {
+		inferno_values[i] = (1.0 / (double)8) * (double)i;
+	}
+
+	inferno_r_range[0] = (double)0 / (double)255;
+	inferno_g_range[0] = (double)0 / (double)255;
+	inferno_b_range[0] = (double)4 / (double)255;
+
+	inferno_r_range[1] = (double)40 / (double)255;
+	inferno_g_range[1] = (double)11 / (double)255;
+	inferno_b_range[1] = (double)84 / (double)255;
+
+	inferno_r_range[2] = (double)101 / (double)255;
+	inferno_g_range[2] = (double)21 / (double)255;
+	inferno_b_range[2] = (double)110 / (double)255;
+
+	inferno_r_range[3] = (double)159 / (double)255;
+	inferno_g_range[3] = (double)42 / (double)255;
+	inferno_b_range[3] = (double)99 / (double)255;
+
+	inferno_r_range[4] = (double)212 / (double)255;
+	inferno_g_range[4] = (double)72 / (double)255;
+	inferno_b_range[4] = (double)66 / (double)255;
+
+	inferno_r_range[5] = (double)245 / (double)255;
+	inferno_g_range[5] = (double)125 / (double)255;
+	inferno_b_range[5] = (double)21 / (double)255;
+
+	inferno_r_range[6] = (double)250 / (double)255;
+	inferno_g_range[6] = (double)193 / (double)255;
+	inferno_b_range[6] = (double)39 / (double)255;
+
+	inferno_r_range[7] = (double)252 / (double)255;
+	inferno_g_range[7] = (double)255 / (double)255;
+	inferno_b_range[7] = (double)164 / (double)255;
+	
+	double max_m = -9999999;
+	double min_m = 9999999;
+	for (unsigned int idx : cell_inds) {
+
+		unsigned int i_r = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getCoordsOfIndex(idx)[0];
+		unsigned int k_r = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getCoordsOfIndex(idx)[1];
+		unsigned int j_r = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getCoordsOfIndex(idx)[2];
+
+		double cell_mass = 0.0;
+		double mass = 0.0;
+
+		if (_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index] == 0) {
+			// Sum up all mass above the third dimension as we can't display it (this is effectively a marginal)
+			// for the sake of speed here, just assume that this is 4D - if you're in the future and working on 5D or greater
+			// then congratulations on solving the dimensionality problem or possibly quantum computing.
+			if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4) {
+
+				i_r = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getCoordsOfIndex(idx)[3];
+				k_r = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getCoordsOfIndex(idx)[2];
+				j_r = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getCoordsOfIndex(idx)[1];
+
+				std::vector<unsigned int> coords4(4);
+				coords4[0 + _dws[window_index].dim_select] = 0;
+				coords4[modulo(1 + _dws[window_index].dim_select, 4)] = i_r;
+				coords4[modulo(2 + _dws[window_index].dim_select, 4)] = k_r;
+				coords4[modulo(3 + _dws[window_index].dim_select, 4)] = j_r;
+
+				unsigned int doo = 1;
+				for (int d = 3; d >= _dws[window_index].dim_select+1; d--)
+					doo *= _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(d);
+
+				unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords4) + _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index];
+				for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(_dws[window_index].dim_select); c++) {
+					unsigned int index = idx + (c * doo);
+					cell_mass += _dws[window_index]._system->Mass()[index];
+				}
+			}
+			else {
+				cell_mass = _dws[window_index]._system->Mass()[idx];
+			}
+
+			if (cell_mass < 0.000000001) continue; // skip if mass is basically nothing
+
+			double cell_area = std::abs(m.Quad(0, 0).SignedArea());
+
+			if (!log_scale) {
+				if (max_m < 1e-6 + cell_mass / cell_area)
+					max_m = 1e-6 + cell_mass / cell_area;
+				if (min_m >= 1e-6 + cell_mass / cell_area)
+					min_m = 1e-6 + cell_mass / cell_area;
+			}
+			else {
+				if (max_m < log10(1e-6 + cell_mass / cell_area))
+					max_m = log10(1e-6 + cell_mass / cell_area);
+				if (min_m >= log10(1e-6 + cell_mass / cell_area))
+					min_m = log10(1e-6 + cell_mass / cell_area);
+			}
+
+			if (!log_scale) {
+				mass = (cell_mass / cell_area - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass);
+			}
+			else {
+				mass = (log10(cell_mass / cell_area) - _dws[window_index].min_mass) / (_dws[window_index].max_mass - _dws[window_index].min_mass);
+			}
+		}
+		else {
+			unsigned int count = 0;
+			if (_dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridNumDimensions() == 4) {
+				std::vector<unsigned int> coords4(4);
+				coords4[0 + _dws[window_index].dim_select] = 0;
+				coords4[modulo(1 + _dws[window_index].dim_select, 4)] = i_r;
+				coords4[modulo(2 + _dws[window_index].dim_select, 4)] = k_r;
+				coords4[modulo(3 + _dws[window_index].dim_select, 4)] = j_r;
+
+				unsigned int doo = 1;
+				for (int d = 3; d >= _dws[window_index].dim_select + 1; d--)
+					doo *= _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(d);
+
+				unsigned int idx = _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getIndexOfCoords(coords4) + _dws[window_index]._system->Offsets()[_dws[window_index]._mesh_index];
+				for (unsigned int c = 0; c < _dws[window_index]._system->MeshObjects()[_dws[window_index]._mesh_index].getGridResolutionByDimension(_dws[window_index].dim_select); c++) {
+					unsigned int index = idx + (c * doo);
+					count += _dws[window_index]._system->_vec_cells_to_objects[index].size();
+				}
+			}
+			else {
+				count = _dws[window_index]._system->_vec_cells_to_objects[idx].size();
+			}
+
+			if (count > 0)
+				mass = 0.5 + 1000.0 * ((double)count / (double)_dws[window_index]._system->FiniteSizeNumObjects()[_dws[window_index]._mesh_index]);
+			else
+				continue;
+		}
+
+		unsigned int lower_num = int(mass * 8.0);
+		if (lower_num > 6)
+			lower_num = 6;
+
+		double green = inferno_g_range[lower_num] + (((mass - inferno_values[lower_num]) / (inferno_values[lower_num + 1] - inferno_values[lower_num])) * (inferno_g_range[lower_num + 1] - inferno_g_range[lower_num]));
+		double red = inferno_r_range[lower_num] + (((mass - inferno_values[lower_num]) / (inferno_values[lower_num + 1] - inferno_values[lower_num])) * (inferno_r_range[lower_num + 1] - inferno_r_range[lower_num]));
+		double blue = inferno_b_range[lower_num] + (((mass - inferno_values[lower_num]) / (inferno_values[lower_num + 1] - inferno_values[lower_num])) * (inferno_b_range[lower_num + 1] - inferno_b_range[lower_num]));
+		//glColor3f(std::min(1.0, red), std::max(0.0, green), std::max(0.0, blue));
+					
+		if (mass < 0.00000001) {
+			continue; // glColor4f(1.0, 1.0, 1.0, 0.02);
+		}
+		else if (mass > 0.00000001) {
+			glColor4f(std::min(1.0, red), std::max(0.0, green), std::max(0.0, blue), mass);
+		}
+		else {
+			continue;
+		}
+
+		double cell_x = -0.5 + j_r * (1.0 / vals_end[2]);
+		double cell_y = -0.5 + i_r * (1.0 / vals_end[0]);
+		double cell_z = -0.5 + k_r * (1.0 / vals_end[1]);
+
+		double half_cell_x_width = (0.5 / vals_end[2]);
+		double half_cell_y_width = (0.5 / vals_end[0]);
+		double half_cell_z_width = (0.5 / vals_end[1]);
+
+		std::vector<double> p1 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+		std::vector<double> p2 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+		std::vector<double> p3 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+		std::vector<double> p4 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z + half_cell_z_width, 1.0 };
+		std::vector<double> p5 = { cell_x - half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+		std::vector<double> p6 = { cell_x - half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+		std::vector<double> p7 = { cell_x + half_cell_x_width, cell_y + half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+		std::vector<double> p8 = { cell_x + half_cell_x_width, cell_y - half_cell_y_width, cell_z - half_cell_z_width, 1.0 };
+
+		std::vector<double> cam_dir = {(cell_x - inverted_cam_pos[0]),(cell_y - inverted_cam_pos[1]),(cell_z - inverted_cam_pos[2])};
+		// front face
+		std::vector<double> dir = {0,0,-1};
+		if (dot_prod(dir, cam_dir) > 0) {
+			glVertex3f(p2[0], p2[1], p2[2]);
+			glVertex3f(p1[0], p1[1], p1[2]);
+			glVertex3f(p4[0], p4[1], p4[2]);
+			glVertex3f(p3[0], p3[1], p3[2]);
+		}
+
+		// back face
+		dir = { 0,0,1 };
+		if (dot_prod(dir, cam_dir) > 0) {
+			glVertex3f(p5[0], p5[1], p5[2]);
+			glVertex3f(p6[0], p6[1], p6[2]);
+			glVertex3f(p7[0], p7[1], p7[2]);
+			glVertex3f(p8[0], p8[1], p8[2]);
+		}
+
+		// right face
+		dir = { -1,0,0 };
+		if (dot_prod(dir, cam_dir) > 0) {
+			glVertex3f(p3[0], p3[1], p3[2]);
+			glVertex3f(p4[0], p4[1], p4[2]);
+			glVertex3f(p8[0], p8[1], p8[2]);
+			glVertex3f(p7[0], p7[1], p7[2]);
+		}
+
+		// left face
+		dir = { 1,0,0 };
+		if (dot_prod(dir, cam_dir) > 0) {
+			glVertex3f(p2[0], p2[1], p2[2]);
+			glVertex3f(p6[0], p6[1], p6[2]);
+			glVertex3f(p5[0], p5[1], p5[2]);
+			glVertex3f(p1[0], p1[1], p1[2]);
+		}
+
+		//// top face
+		dir = { 0,-1,0 };
+		if (dot_prod(dir, cam_dir) > 0) {
+			glVertex3f(p6[0], p6[1], p6[2]);
+			glVertex3f(p2[0], p2[1], p2[2]);
+			glVertex3f(p3[0], p3[1], p3[2]);
+			glVertex3f(p7[0], p7[1], p7[2]);
+		}
+
+		//// bottom face
+		dir = { 0,1,0 };
+		if (dot_prod(dir, cam_dir) > 0) {
+			glVertex3f(p1[0], p1[1], p1[2]);
+			glVertex3f(p5[0], p5[1], p5[2]);
+			glVertex3f(p8[0], p8[1], p8[2]);
+			glVertex3f(p4[0], p4[1], p4[2]);
 		}
 	}
 
@@ -988,14 +1121,19 @@ void Display::display_3d(void) {
 
 	sim_time = _current_sim_it * _time_step;
 
-	glColor3f(1.0, 1.0, 1.0);
-	glRasterPos2f(0.3, 0.9);
-	int text_len, text_i;
-	std::string text_v = std::string("Sim Time (s) : ") + std::to_string(sim_time);
-	const char* c_string_v = text_v.c_str();
-	text_len = (int)strlen(c_string_v);
-	for (text_i = 0; text_i < text_len; text_i++) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string_v[text_i]);
+	if (SHOW_TEXT) {
+
+
+		glColor3f(1.0, 1.0, 1.0);
+		glRasterPos2f(0.3, 0.9);
+		int text_len, text_i;
+		std::string text_v = std::string("Sim Time (s) : ") + std::to_string(sim_time);
+		const char* c_string_v = text_v.c_str();
+		text_len = (int)strlen(c_string_v);
+		for (text_i = 0; text_i < text_len; text_i++) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c_string_v[text_i]);
+		}
+
 	}
 
 	glPopMatrix();
@@ -1012,7 +1150,7 @@ void Display::writeFrame(unsigned int system, long frame_num){
   glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
   // width * height * 3
-  int nSize = 500*500*3;
+  int nSize = WINDOW_WIDTH * WINDOW_HEIGHT *3;
   // First let's create our buffer, 3 channels per Pixel
   char* dataBuffer = (char*)malloc(nSize*sizeof(char));
 
@@ -1024,7 +1162,7 @@ void Display::writeFrame(unsigned int system, long frame_num){
 	// 	(GLint)w, (GLint)h,
 	// 	 GL_BGR, GL_UNSIGNED_BYTE, dataBuffer);
 	 glReadPixels((GLint)0, (GLint)0,
-	 (GLint)500, (GLint)500,
+	 (GLint)WINDOW_WIDTH, (GLint)WINDOW_HEIGHT,
 		GL_BGR, GL_UNSIGNED_BYTE, dataBuffer);
 
 		const std::string dirname = std::string("node_") + std::to_string(system);
@@ -1042,8 +1180,8 @@ void Display::writeFrame(unsigned int system, long frame_num){
   //  unsigned char header[6] = { w%256,w/256,
 	// 		       h%256,h/256,
 	// 		       24,0};
-	 unsigned char header[6] = { 500%256,500/256,
- 						500%256,500/256,
+	 unsigned char header[6] = { WINDOW_WIDTH %256,WINDOW_WIDTH /256,
+						WINDOW_HEIGHT %256,WINDOW_HEIGHT /256,
  						24,0};
    // We write the headers
    fwrite(TGAheader,	sizeof(unsigned char),	12,	filePtr);
@@ -1186,7 +1324,7 @@ void Display::animate(bool _write_frames,  double time_step) const{
 	int count = 1;
 	glutInit(&count, arv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowSize(500, 500);
+	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutInitWindowPosition(0, 0);
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 

@@ -8,16 +8,13 @@ import glob
 import shutil
 import csv
 
-models = ['cond3d_100x10x40', 'cond3d_100x25x40', 'cond3d_100x25x40','cond3d_100x25x40']
-Inhib_percent = [50, 20, 10, 90]
-
-#models = ['cond3d_100x25x40']
-#Inhib_percent = [20]
+models = [ 'cond3d_100x10x40','cond3d_100x25x40']
+Inhib_percent = [50, 20]
 
 model_files = [m + '.model' for m in models]
 tmat_files = [m + '.tmat' for m in models]
 
-time_end = "1.0"
+time_end = "0.5"
 
 dataE = [[] for j in range(len(Inhib_percent))]
 dataI = [[] for j in range(len(Inhib_percent))]
@@ -71,6 +68,20 @@ for j in range(len(Inhib_percent)):
         # back to base
         os.chdir('..')
         
+        directory_exists[j] = True
+        
+        with open(output_dir + "/avg_0") as avg_file:
+            reader = csv.reader(avg_file, delimiter='\t')
+            for row in reader:
+                if len(row) > 1:
+                    dataE[j].append([float(a) for a in row[:-1]])
+                    
+        with open(output_dir + "/avg_1") as avg_file:
+            reader = csv.reader(avg_file, delimiter='\t')
+            for row in reader:
+                if len(row) > 1:
+                    dataI[j].append([float(a) for a in row[:-1]])
+        
     except:
         # We've already run the simulations so just read the output
         directory_exists[j] = True
@@ -91,17 +102,17 @@ fig, ax1 = plt.subplots()
 check_inhib_index = 0
 
 read_times = []
-with open("direct_ei_times_inhib_" + str(Inhib_percent[check_inhib_index]*10) + ".csv", newline='') as infile:
+with open("direct_ei_times_inhib_" + str(Inhib_percent[check_inhib_index]*100) + ".csv", newline='') as infile:
     filereadear = csv.reader(infile, delimiter=',', quotechar='|')
     for row in filereadear:
         read_times = read_times + [float(row[0])]
 
-read_data_v = np.empty((0,1000-(Inhib_percent[check_inhib_index]*10)))
-with open("direct_e_v_inhib_" + str(Inhib_percent[check_inhib_index]*10) + ".csv", newline='') as infile:
+read_data_v = np.empty((0,10000-(Inhib_percent[check_inhib_index]*100)))
+with open("direct_e_v_inhib_" + str(Inhib_percent[check_inhib_index]*100) + ".csv", newline='') as infile:
     filereadear = csv.reader(infile, delimiter=',', quotechar='|')
     for row in filereadear:
         row = [float(r) for r in row]
-        reshaped = np.reshape(row, (1,1000-(Inhib_percent[check_inhib_index]*10)))
+        reshaped = np.reshape(row, (1,10000-(Inhib_percent[check_inhib_index]*100)))
         read_data_v = np.concatenate((read_data_v,reshaped), axis=0)
     read_data_v = np.array(read_data_v)
 
@@ -129,13 +140,13 @@ plt.show()
 fig, ax1 = plt.subplots()
 
 read_times = []
-with open("direct_ei_times_inhib_" + str(Inhib_percent[check_inhib_index]*10) + ".csv", newline='') as infile:
+with open("direct_ei_times_inhib_" + str(Inhib_percent[check_inhib_index]*100) + ".csv", newline='') as infile:
     filereadear = csv.reader(infile, delimiter=',', quotechar='|')
     for row in filereadear:
         read_times = read_times + [float(row[0])]
 
 read_rates = []
-with open("direct_e_rate_inhib_" + str(Inhib_percent[check_inhib_index]*10) + ".csv", newline='') as infile:
+with open("direct_e_rate_inhib_" + str(Inhib_percent[check_inhib_index]*100) + ".csv", newline='') as infile:
     filereadear = csv.reader(infile, delimiter=',', quotechar='|')
     for row in filereadear:
         row = [float(r) for r in row]

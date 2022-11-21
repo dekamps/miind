@@ -134,7 +134,7 @@ void VectorizedNetwork::reportNodeActivities(MPILib::Time sim_time) {
         _group_adapter->updateGroupMass();
         _group_adapter->updateFiniteObjects();
         _current_node_avgs[_node_id_to_group_mesh[_avg_nodes[i]]] = _group->Avgs(_node_id_to_group_mesh[_avg_nodes[i]]);
-        
+
         std::ostringstream ost2;
         ost2 << "avg_" << _avg_nodes[i];
         std::ofstream ofst_rate(ost2.str(), std::ofstream::app);
@@ -154,7 +154,7 @@ void VectorizedNetwork::reportNodeDensities(MPILib::Time sim_time) {
             continue;
 
         std::ostringstream ost;
-        ost << _density_nodes[i] << "_" << sim_time << "1";
+        ost << _density_nodes[i] << "_" << sim_time;
         string fn("node_" + ost.str());
 
         std::string model_path("densities");
