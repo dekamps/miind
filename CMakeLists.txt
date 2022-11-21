@@ -10,7 +10,12 @@ enable_language(C CXX)
 
 # include cmake scripts
 #############################################################################
+IF (APPLE)
+set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake-modules ${PROJECT_SOURCE_DIR}/cmake-modules/APPLE )
+ELSE (APPLE)
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake-modules )
+ENDIF (APPLE)
+
 
 # require out-of-source build
 INCLUDE(require_out_of_src_build)
