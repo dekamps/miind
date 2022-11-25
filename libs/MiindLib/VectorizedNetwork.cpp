@@ -835,14 +835,19 @@ std::vector<double> VectorizedNetwork::singleStep(std::vector<double> activities
     if (_display_nodes.size() > 0) {
         _group_adapter->updateGroupMass();
         _group_adapter->updateFiniteObjects();
-        for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++) {
-            _group_adapter->EvolveWithoutTransfer(_mesh_meshes);
-        }
     }
 
     if (_density_nodes.size() > 0) {
         _group_adapter->updateGroupMass();
         reportNodeDensities(time);
+    }
+
+    // If we're recording the density in any way, we need to update the Map for the meshes locally (as well as on the GPU)
+    // so that the correct values are stored.
+    if (_display_nodes.size() > 0 || _density_nodes.size() > 0) {
+        for (MPILib::Index i_part = 0; i_part < _n_steps; i_part++) {
+            _group_adapter->EvolveWithoutTransfer(_mesh_meshes);
+        }
     }
 
     reportNodeActivities(time);
