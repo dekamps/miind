@@ -364,18 +364,8 @@ install( FILES ${MA_PNAP}
 	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/PersistentSodium2D )
 install( FILES ${MA_EPILEPTOR}
 	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/Epileptor )
-install( FILES ${MA_3D_COND}
-	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/Conductance3D )
 install( FILES ${MA_3D_COND_GEN}
 	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/Generate3DModelExample )
-install( FILES ${MA_3D_HR}
-	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/HindmarshRose )
-install( FILES ${MA_3D_TM}
-	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/TsodyksMarkramEI )
-install( FILES ${MA_BRMN}
-	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/ReducedBoothRinzelMN )
-install( FILES ${MA_4D_HH}
-	DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/4D/HodgkinHuxley )
 
 if (NOT SKBUILD) # If we're not installing for pip, install all examples
 	install( FILES ${AEXP}
@@ -410,6 +400,16 @@ if (NOT SKBUILD) # If we're not installing for pip, install all examples
 		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/QIF )
 	install( FILES ${MA_WC}
 		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/WilsonCowan )
+	install( FILES ${MA_3D_COND}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/Conductance3D )
+	install( FILES ${MA_3D_HR}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/HindmarshRose )
+	install( FILES ${MA_3D_TM}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/TsodyksMarkramEI )
+	install( FILES ${MA_BRMN}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/3D/ReducedBoothRinzelMN )
+	install( FILES ${MA_4D_HH}
+		DESTINATION ${EXAMPLES_BASE_DIR}/model_archive/4D/HodgkinHuxley )
 	install( FILES ${TUTORIAL}
 		DESTINATION ${EXAMPLES_BASE_DIR}/tutorial )
 	install( FILES ${TUTORIAL_GRID}
