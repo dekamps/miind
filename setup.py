@@ -150,12 +150,6 @@ def main():
         python_requires=">=3.6",
         classifiers=[
             "Programming Language :: Python",
-            "Programming Language :: Python :: 3",
-            "Programming Language :: Python :: 3 :: Only",
-            "Programming Language :: Python :: 3.6",
-            "Programming Language :: Python :: 3.7",
-            "Programming Language :: Python :: 3.8",
-            "Programming Language :: Python :: 3.9",
             "Operating System :: MacOS",
             "Operating System :: Unix",
             "Operating System :: Microsoft :: Windows",
@@ -321,7 +315,7 @@ class RearrangeCMakeOutput(object):
             data_files,
             # To get around a check that prepends source dir to paths and breaks package detection code.
             cmake_source_dir="",
-            _cmake_install_dir=cmake_install_reldir,
+            cmake_install_dir=cmake_install_reldir,
         )
 
 # This creates a list which is empty but returns a length of 1.
