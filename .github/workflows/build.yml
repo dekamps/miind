@@ -8,11 +8,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, windows-2019, macos-11]  
+        os: [ubuntu-latest, windows-2019, macos-11]  
         include:
           - os: windows-2019
             vcpkgGitCommitId: '81350a624460e5c10a9ddb2ede4a9fe687ee9cc0'
-          - os: ubuntu-18.04
+          - os: ubuntu-latest
             vcpkgGitCommitId: '81350a624460e5c10a9ddb2ede4a9fe687ee9cc0'
           - os: macos-11
             vcpkgGitCommitId: '81350a624460e5c10a9ddb2ede4a9fe687ee9cc0'
