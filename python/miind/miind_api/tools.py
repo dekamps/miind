@@ -7,7 +7,8 @@ import os.path as op
 import glob
 import numpy as np
 import copy
-from collections import Mapping, OrderedDict
+from collections.abc import Mapping
+from collections import OrderedDict
 import miind.directories3 as directories
 
 
