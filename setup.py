@@ -310,19 +310,34 @@ class RearrangeCMakeOutput(object):
             os.path.join(cmake_install_dir, p) for p in final_install_relpaths
         ]
 
-        return (cls.wraps._classify_installed_files)(
-            final_install_paths,
-            package_data,
-            package_prefixes,
-            py_modules,
-            new_py_modules,
-            scripts,
-            new_scripts,
-            data_files,
-            # To get around a check that prepends source dir to paths and breaks package detection code.
-            cmake_source_dir="",
-            _cmake_install_dir=cmake_install_reldir,
-        )
+        if int(platform.python_version_tuple()[1]) < 10:
+            return (cls.wraps._classify_installed_files)(
+                final_install_paths,
+                package_data,
+                package_prefixes,
+                py_modules,
+                new_py_modules,
+                scripts,
+                new_scripts,
+                data_files,
+                # To get around a check that prepends source dir to paths and breaks package detection code.
+                cmake_source_dir="",
+                cmake_install_dir=cmake_install_reldir,
+            )
+        else:
+            return (cls.wraps._classify_installed_files)(
+                final_install_paths,
+                package_data,
+                package_prefixes,
+                py_modules,
+                new_py_modules,
+                scripts,
+                new_scripts,
+                data_files,
+                # To get around a check that prepends source dir to paths and breaks package detection code.
+                cmake_source_dir="",
+                _cmake_install_dir=cmake_install_reldir,
+            )
 
 # This creates a list which is empty but returns a length of 1.
 # Should make the wheel a binary distribution and platlib compliant.
