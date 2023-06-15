@@ -8,8 +8,8 @@ import subprocess
 import re
 import sysconfig
 import shutil
-import platform
-from sys import platform as pltfm
+import platform as pltfm
+from sys import platform
 import skbuild
 from skbuild import cmaker
 
