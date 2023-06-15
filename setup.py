@@ -9,7 +9,7 @@ import re
 import sysconfig
 import shutil
 import platform
-from sys import platform
+from sys import platform as pltfm
 import skbuild
 from skbuild import cmaker
 
@@ -310,7 +310,7 @@ class RearrangeCMakeOutput(object):
             os.path.join(cmake_install_dir, p) for p in final_install_relpaths
         ]
 
-        if int(platform.python_version_tuple()[1]) < 10:
+        if int(pltfm.python_version_tuple()[1]) < 10:
             return (cls.wraps._classify_installed_files)(
                 final_install_paths,
                 package_data,
