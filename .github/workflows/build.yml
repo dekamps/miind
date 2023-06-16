@@ -54,6 +54,10 @@ jobs:
       #- name: Install Cuda Dependency on Windows
       #  run: choco install cuda --version 11.2.2.46133 -y
       #  if: contains( matrix.os, 'windows')
+      
+      - name: install wget on windows
+        run: choco install wget -y
+        if: contains( matrix.os, 'windows')
         
       - name: Download cuda toolkit and silent install nvcc
         run: |
