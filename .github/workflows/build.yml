@@ -62,8 +62,7 @@ jobs:
       - name: Download cuda toolkit and silent install nvcc
         run: |
           wget https://developer.download.nvidia.com/compute/cuda/12.1.1/local_installers/cuda_12.1.1_531.14_windows.exe
-          ./cuda_12.1.1_531.14_windows.exe -s curand_12.1 curand_dev_12.1 cudart_12.1 nvcc_12.1
-          
+          ./cuda_12.1.1_531.14_windows.exe -s
         shell: bash
         if: contains( matrix.os, 'windows')
 

@@ -32,15 +32,15 @@ jobs:
           wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-keyring_1.0-1_all.deb
           sudo dpkg -i cuda-keyring_1.0-1_all.deb
           sudo apt update
-          sudo apt install build-essential cuda-10-1
+          sudo apt install build-essential cuda-12-1
         if: contains( matrix.os, 'ubuntu')
 
       - name: Add cuda to path
-        run: echo '/usr/local/cuda-10.1/bin' >> $GITHUB_PATH
+        run: echo '/usr/local/cuda-12.1/bin' >> $GITHUB_PATH
         if: contains( matrix.os, 'ubuntu')
 
       - name: Add cuda to ld
-        run: echo "LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64" >> $GITHUB_ENV
+        run: echo "LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64" >> $GITHUB_ENV
         if: contains( matrix.os, 'ubuntu')
 
       - name: MacOS - install dependencies
