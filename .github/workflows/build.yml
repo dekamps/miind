@@ -89,7 +89,7 @@ jobs:
         
       - name: Clear Cache on Windows
         run: |
-          rm -rf C:\Users\runneradmin\AppData\Local\pypa\cibuildwheel\Cache\*
+          rm -r -fo C:\Users\runneradmin\AppData\Local\pypa\cibuildwheel\Cache\*
         if: contains( matrix.os, 'windows')
         
       - name: Build wheels
