@@ -51,8 +51,16 @@ jobs:
         if: contains( matrix.os, 'windows')
       
       # If changing the version of CUDA here, also change the locations define above in CIBW_ENVIRONMENT_WINDOWS
-      - name: Install Cuda Dependency on Windows
-        run: choco install cuda --version 11.2.2.46133 -y
+      #- name: Install Cuda Dependency on Windows
+      #  run: choco install cuda --version 11.2.2.46133 -y
+      #  if: contains( matrix.os, 'windows')
+        
+      - name: Download cuda toolkit and silent install nvcc
+        run: |
+          wget https://developer.download.nvidia.com/compute/cuda/11.2.2/local_installers/cuda_11.2.2_461.33_win10.exe
+          ./cuda_11.2.2_461.33_win10.exe -n -s curand_11.2 curand_dev_11.2 cudart_11.2 nvcc_11.2
+          
+        shell: bash
         if: contains( matrix.os, 'windows')
 
       - name: Install Ninja Dependency on Windows
@@ -86,11 +94,6 @@ jobs:
       - name: Install cibuildwheel
         run: |
           python -m pip install cmake numpy matplotlib scipy descartes shapely twine cibuildwheel
-        
-      - name: Clear Cache on Windows
-        run: |
-          rm -r -fo C:\Users\runneradmin\AppData\Local\pypa\cibuildwheel\Cache\*
-        if: contains( matrix.os, 'windows')
         
       - name: Build wheels
         run: python -m cibuildwheel --output-dir dist
