@@ -89,7 +89,7 @@ jobs:
           # Just install vcpkg for now, do not install any ports in this step yet.
           vcpkgGitCommitId: '${{ matrix.vcpkgGitCommitId}}'
           # Location of the vcpkg submodule in the Git repository.
-          vcpkgDirectory: 'C:\miind\vcpkg'
+          vcpkgDirectory: 'C:\vcpkg'
           # Since the cache must be invalidated when content of the vcpkg.json file changes, let's
           # compute its hash and append this to the computed cache's key.
           vcpkgJsonGlob: '**/vcpkg.json'
