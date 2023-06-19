@@ -100,10 +100,10 @@ jobs:
         run: echo "CPLUS_INCLUDE_PATH=${{ env.installDir }}/include/miind:${{ env.installDir }}/include/miind/GeomLib" >> $GITHUB_ENV
       - name: Add MIIND_INCLUDE_DIR to ENV
         run: echo "MIIND_INCLUDE_DIR=${{ env.installDir }}/include/miind" >> $GITHUB_ENV
-      - name: Update locate database on Linux
-        run: sudo updatedb
-        shell: bash
-        if: contains( matrix.os, 'ubuntu')
+      #- name: Update locate database on Linux
+      #  run: sudo updatedb
+      #  shell: bash
+      #  if: contains( matrix.os, 'ubuntu')
       - name: Update locate database on MACOS
         run: sudo /usr/libexec/locate.updatedb
         shell: bash

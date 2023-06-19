@@ -35,10 +35,23 @@ jobs:
       #TESTS DON'T WORK ON MAC CI MACHINE! LET'S STILL BUILD AND DISTRIBUTE IT FOR NOW
       #CIBW_TEST_COMMAND_MACOS: python -m miind.system_tests
     steps:
-    
+
       - uses: actions/checkout@v2
         with:
           submodules: true
+          
+      # For windows, we need to build on the C: drive (which I think is a hack and not recommended but I've seen a few people doing it to avoid the 
+      # harsh limitation of 14Gb on the workspace - let's copy the repo from the working directory to 
+      - name: Copy MIIND from workspace to windows C drive
+        run: |
+          mkdir C:/miind
+          cp -a ${{ github.workspace }}/. C:/miind
+        shell: bash
+        if: contains( matrix.os, 'windows')
+        
+      - name: update working directory
+        working-directory: C:/miind
+        if: contains( matrix.os, 'windows')
           
       - uses: lukka/get-cmake@latest
       
