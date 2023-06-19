@@ -85,9 +85,11 @@ jobs:
 
       - name: Restore artifacts, or setup vcpkg 
         uses: lukka/run-vcpkg@v10
+        working-directory: C:/miind
         with:
           # Just install vcpkg for now, do not install any ports in this step yet.
           setupOnly: true
+          vcpkgGitCommitId: '81350a624460e5c10a9ddb2ede4a9fe687ee9cc0'
           # Location of the vcpkg submodule in the Git repository.
           vcpkgDirectory: 'C:/miind/vcpkg'
           # Since the cache must be invalidated when content of the vcpkg.json file changes, let's
