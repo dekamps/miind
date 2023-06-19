@@ -44,7 +44,7 @@ jobs:
       # harsh limitation of 14Gb on the workspace - let's copy the repo from the working directory to 
       - name: Copy MIIND from workspace to windows C drive
         run: |
-          cp -a ${{ github.workspace }} C:/
+          cp -a '${{ github.workspace }}' C:/
         shell: bash
         if: contains( matrix.os, 'windows')
           
