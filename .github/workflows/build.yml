@@ -83,8 +83,7 @@ jobs:
         run: brew install gcc pugixml boost gsl boost-python3 xquartz fftw libomp pkg-config ninja
         if: contains( matrix.os, 'macos')
 
-      - name: Restore artifacts, or setup vcpkg 
-        working-directory: C:/miind
+      - name: Restore artifacts, or setup vcpkg
         uses: lukka/run-vcpkg@v10
         with:
           # Just install vcpkg for now, do not install any ports in this step yet.
