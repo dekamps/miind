@@ -11,11 +11,11 @@ jobs:
         os: [ubuntu-latest, windows-2019, macos-11]  
         include:
           - os: windows-2019
-            vcpkgGitCommitId: '81350a624460e5c10a9ddb2ede4a9fe687ee9cc0'
+            vcpkgGitCommitId: '62d01b70df227850b728f5050418b917ad6d2b32' 
           - os: ubuntu-latest
-            vcpkgGitCommitId: '81350a624460e5c10a9ddb2ede4a9fe687ee9cc0'
+            vcpkgGitCommitId: '62d01b70df227850b728f5050418b917ad6d2b32'
           - os: macos-11
-            vcpkgGitCommitId: '81350a624460e5c10a9ddb2ede4a9fe687ee9cc0'
+            vcpkgGitCommitId: '62d01b70df227850b728f5050418b917ad6d2b32'
     env:
       buildDir: '${{ github.workspace }}/build'
       # skip python 2.7 and 3.5, PyPy, and 32 bit builds
