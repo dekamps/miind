@@ -84,8 +84,8 @@ jobs:
         if: contains( matrix.os, 'macos')
 
       - name: Restore artifacts, or setup vcpkg 
-        uses: lukka/run-vcpkg@v10
         working-directory: C:/miind
+        uses: lukka/run-vcpkg@v10
         with:
           # Just install vcpkg for now, do not install any ports in this step yet.
           setupOnly: true
