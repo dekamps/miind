@@ -1,0 +1,100 @@
+# Github Actions Windows runners have a limit of ~15Gb workspaces. Which gets quickly eaten up by muiltiple vcpkg installations (one per wheel/python version)
+# This obviously sucks and I hope they increase it at some point or perhaps cibuildwheel will set up a way to delete work files per wheel. 
+# For now, the workaround is to have a separate build script for each wheel on windows.
+# Lots of duplication and a maintainance nightmare.   
+
+name: Build Windows py39
+on: [push]
+
+jobs: 
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019]  
+        include:
+          - os: windows-2019
+            vcpkgGitCommitId: '62d01b70df227850b728f5050418b917ad6d2b32' 
+    env:
+      buildDir: '${{ github.workspace }}/build'
+      CIBW_BUILD: cp39-win_amd64 #cp36-win_amd64 cp37-win_amd64 cp38-win_amd64 cp310-win_amd64 cp311-win_amd64 cp312-win_amd64
+      CIBW_BEFORE_BUILD: pip install cmake scikit-build build auditwheel numpy matplotlib scipy shapely descartes
+      CIBW_ENVIRONMENT_WINDOWS: "CUDA_PATH=C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v12.1 CUDACXX=C:/\"Program Files\"/\"NVIDIA GPU Computing Toolkit\"/CUDA/v12.1/bin/nvcc.exe"
+      CIBW_BUILD_VERBOSITY: 0
+      CIBW_TEST_COMMAND_WINDOWS: python -m miind.system_tests
+      
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+          
+      # For windows, we need to build on the C: drive (which I think is a hack and not recommended but I've seen a few people doing it to avoid the 
+      # harsh limitation of 14Gb on the workspace - let's copy the repo from the working directory to 
+      - name: Copy MIIND from workspace to windows C drive
+        run: |
+          cp -a '${{ github.workspace }}' C:/
+        shell: bash
+          
+      - uses: lukka/get-cmake@latest
+      
+      # If you're having trouble with "nvcc failed to compile simple test program" make sure the below version and location is correct
+      - name: Manually add MSVC to Path
+        run: |
+          PATH=$PATH:C:/"Program Files (x86)"/"Microsoft Visual Studio"/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/cl.exe
+          echo $PATH
+        shell: bash
+      
+      - name: install wget on windows
+        run: choco install wget -y
+        
+      - name: Download cuda toolkit and silent install nvcc
+        working-directory: C:/miind
+        run: |
+          wget https://developer.download.nvidia.com/compute/cuda/12.1.1/local_installers/cuda_12.1.1_531.14_windows.exe
+          ./cuda_12.1.1_531.14_windows.exe -s
+        shell: bash
+
+      - name: Install Ninja Dependency on Windows
+        run: choco install ninja -y
+
+      - name: Restore artifacts, or setup vcpkg 
+        uses: lukka/run-vcpkg@v10
+        with:
+          # Just install vcpkg for now, do not install any ports in this step yet.
+          vcpkgGitCommitId: '${{ matrix.vcpkgGitCommitId}}'
+          # Location of the vcpkg submodule in the Git repository.
+          vcpkgDirectory: 'C:\vcpkg'
+          # Since the cache must be invalidated when content of the vcpkg.json file changes, let's
+          # compute its hash and append this to the computed cache's key.
+          vcpkgJsonGlob: '**/vcpkg.json'
+          vcpkgTriplet: x64-windows
+          # Ensure the vcpkg artifacts are cached, they are generated in the 'CMAKE_BINARY_DIR/vcpkg_installed' directory.
+          additionalCachedPaths: 'C:\miind\vcpkg_installed'
+        
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+          
+      - name: Install cibuildwheel
+        run: |
+          python -m pip install cmake numpy matplotlib scipy descartes shapely twine cibuildwheel
+        
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir dist
+            
+      - uses: actions/upload-artifact@v2
+        with:
+          path: dist/*.whl 
+
+      #- name: Publish package to test pypi
+      #  run: python -m twine upload -u __token__ -p ${{ secrets.PYPI_TEST_MIIND_API_TOKEN }} --skip-existing --repository testpypi dist/*
+      #  if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        
+      - name: Publish package to pypi
+        run: python -m twine upload dist/* -u __token__ -p ${{ secrets.PYPI_MIIND_API_TOKEN }}
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        

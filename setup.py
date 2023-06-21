@@ -100,8 +100,8 @@ def main():
                 '-DVCPKG_MANIFEST_INSTALL:BOOL=ON',
                 '-DVCPKG_MANIFEST_MODE:BOOL=ON',
                 '-DCMAKE_CUDA_FLAGS=--generate-code=arch=compute_50,code=[compute_50,sm_50]',
-                '-DVCPKG_TARGET_TRIPLET=x64-windows'#,
-                #'-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/vcpkg/scripts/buildsystems/vcpkg.cmake'
+                '-DVCPKG_TARGET_TRIPLET=x64-windows',
+                '-DCMAKE_TOOLCHAIN_FILE=' + os.path.dirname(os.path.abspath(__file__)) + '/vcpkg/scripts/buildsystems/vcpkg.cmake'
             ]
         )
     
