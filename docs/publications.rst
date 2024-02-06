@@ -1,6 +1,7 @@
 ============
 Publications
 ============
+
 - Osborne, H and de Kamps, M. A numerical population density technique for N-dimensional neuron models. Frontiers in Neuroinformatics, 16   https://doi.org/10.3389/fninf.2022.883796
 - Osborne, H., Lai, Y.M., Lepperød, M.E., Sichau, D., Deutz, L. and De Kamps, M., 2021. MIIND: a model-agnostic simulator of neural populations. Frontiers in Neuroinformatics, 15.
 - De Kamps, M., Lepperød, M. and Lai, Y.M., 2019. Computational geometry for modeling neural populations: From visualization to simulation. PLoS computational biology, 15(3), p.e1006729.
