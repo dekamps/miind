@@ -12,8 +12,6 @@ certifi==2024.2.2
     # via requests
 charset-normalizer==3.3.2
     # via requests
-colorama==0.4.6
-    # via sphinx
 docutils==0.19
     # via
     #   sphinx
@@ -30,7 +28,7 @@ packaging==23.2
     # via sphinx
 pygments==2.17.2
     # via sphinx
-requests==2.31.0
+requests==2.32.0
     # via sphinx
 snowballstemmer==2.2.0
     # via sphinx
