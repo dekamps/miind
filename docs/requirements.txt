@@ -8,12 +8,10 @@ alabaster==0.7.16
     # via sphinx
 babel==2.14.0
     # via sphinx
-certifi==2024.2.2
+certifi==2024.7.4
     # via requests
 charset-normalizer==3.3.2
     # via requests
-colorama==0.4.6
-    # via sphinx
 docutils==0.19
     # via
     #   sphinx
